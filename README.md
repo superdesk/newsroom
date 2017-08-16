@@ -18,7 +18,7 @@ pip install -r dev-requirements.txt
 python app.py
 ```
 
-Will make it available on `http://localhost:5000`.
+Will make it available on `http://localhost:5050` by default.
 
 ## Test application
 
