@@ -28,3 +28,5 @@ CORE_APPS = [
     'content_api.items_versions',
     'content_api.assets',
 ]
+
+SITE_NAME = 'AAP Newsroom'

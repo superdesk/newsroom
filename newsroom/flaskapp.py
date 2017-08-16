@@ -9,6 +9,8 @@ import os
 import eve
 import importlib
 
+from flask_babel import Babel
+
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from content_api.tokens import SubscriberTokenAuth
@@ -39,6 +41,7 @@ class Newsroom(eve.Eve):
             self.media = SuperdeskGridFSMediaStorage(self)
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
+        self._setup_babel()
 
     def load_config(self):
         """Override Eve.load_config in order to get default_settings."""
@@ -57,3 +60,6 @@ class Newsroom(eve.Eve):
             mod = importlib.import_module(name)
             if hasattr(mod, 'init_app'):
                 mod.init_app(self)
+
+    def _setup_babel(self):
+        Babel(self)
