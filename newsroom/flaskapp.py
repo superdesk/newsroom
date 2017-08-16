@@ -11,22 +11,6 @@ import importlib
 
 from superdesk.datalayer import SuperdeskDataLayer
 
-DEFAULT_SETTINGS = {
-    'XML': False,
-    'IF_MATCH': True,
-    'JSON_SORT_KEYS': False,
-    'DOMAIN': {},
-    'X_DOMAINS': '*',
-    'X_MAX_AGE': 24 * 3600,
-    'X_HEADERS': ['Content-Type', 'Authorization', 'If-Match'],
-    'URL_PREFIX': 'api',
-    'SECRET_KEY': os.urandom(32),
-}
-
-MODULES = [
-    'newsroom.news',
-    'newsroom.auth',
-]
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -39,11 +23,15 @@ class Newsroom(eve.Eve):
         super(Newsroom, self).__init__(
             import_name,
             data=SuperdeskDataLayer,
-            settings=DEFAULT_SETTINGS,
+            settings=settings,
             template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
             static_folder=os.path.join(NEWSROOM_DIR, 'static'),
             **kwargs)
-        self._setup_blueprints(MODULES)
+        self._setup_blueprints(self.config['MODULES'])
+
+    def load_config(self):
+        super(Newsroom, self).load_config()
+        self.config.from_object('newsroom.default_settings')
 
     def _setup_blueprints(self, modules):
         for name in modules:
