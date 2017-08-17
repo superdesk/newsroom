@@ -1,37 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shring-to-fit=no">
+
     <title>{% block title %}{{ config.SITE_NAME }}{% endblock %}</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous"> 
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <link rel="icon" type="image/x-icon"
+        href="{{ url_for('static', filename='favicon.ico') }}">
+
 </head>
 <body>
-    <div class="container">
+    <header class="container-fluid headerbar">
         <nav class="navbar">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="{{ url_for('news.index') }}">{{ config.SITE_NAME }}</a>
-            </div>
+            <a class="navbar-brand" href="{{ url_for('news.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
+
             {% if session.get('username') %}
-            <div class="navbar-group navbar-right">
+            <div class="form-inline">
                 {{ session['username'] }} / <a href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
             </div>
             {% else %}
-            <div class="navbar-group navbar-right">
+            <div class="form-inline">
                 <a href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             </div>
             {% endif %}
         </nav>
-    </div>
+    </header>
 
-    <section class="container">
+    <section class="container-fluid mt-3">
     {% block content %}{% endblock %}
     </section>
 
-    <footer class="container">
-        <small class="pull-right">All contents &copy; Copyright 2017 Superdesk. All rights reserved.</small>
+    <footer class="container-fluid">
+        <p class="text-right"><small class="text-muted">All contents &copy; Copyright 2017 Superdesk. All rights reserved.</small></p>
     </footer>
 </body>
 </html>

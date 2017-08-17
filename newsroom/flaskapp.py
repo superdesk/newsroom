@@ -9,7 +9,7 @@ import os
 import eve
 import importlib
 
-from flask_babel import Babel
+from flask_babel import Babel, format_time
 
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
@@ -40,6 +40,7 @@ class Newsroom(eve.Eve):
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
         self._setup_babel()
+        self._setup_jinja_filters()
 
     def load_config(self):
         """Override Eve.load_config in order to get default_settings."""
@@ -60,3 +61,10 @@ class Newsroom(eve.Eve):
 
     def _setup_babel(self):
         Babel(self)
+
+    def _setup_jinja_filters(self):
+        def datetime_short(datetime):
+            if datetime:
+                return format_time(datetime, 'short')
+
+        self.add_template_filter(datetime_short, 'datetime_short')

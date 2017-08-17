@@ -1,4 +1,5 @@
 import os
+import tzlocal
 
 from superdesk.default_settings import (   # noqa
     VERSION,
@@ -27,6 +28,16 @@ CORE_APPS = [
     'content_api.items',
     'content_api.items_versions',
     'content_api.assets',
+    'content_api.search',
 ]
 
 SITE_NAME = 'AAP Newsroom'
+
+TEMPLATES_AUTO_RELOAD = True
+
+DEFAULT_TIMEZONE = os.environ.get('DEFAULT_TIMEZONE')
+
+if DEFAULT_TIMEZONE is None:
+    DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
+
+BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
