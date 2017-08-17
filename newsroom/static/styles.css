@@ -1,0 +1,14 @@
+body {
+    color: #444;
+    background-color: #f8f8f8;
+}
+
+.card {
+    color: #444;
+    background-color: #fff;
+}
+
+.headerbar, .headerbar .navbar-brand {
+    color: #969696;
+    background-color: #2d2d2d;
+}
