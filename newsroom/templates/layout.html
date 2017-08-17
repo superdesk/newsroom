@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Newsroom{% endblock %}</title>
+    <title>{% block title %}{{ config.SITE_NAME }}{% endblock %}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}" />
@@ -12,15 +12,15 @@
     <div class="container">
         <nav class="navbar">
             <div class="navbar-header">
-                <a class="navbar-brand" href="{{ url_for('news.index') }}">Newsroom</a>
+                <a class="navbar-brand" href="{{ url_for('news.index') }}">{{ config.SITE_NAME }}</a>
             </div>
             {% if session.get('username') %}
             <div class="navbar-group navbar-right">
-                {{ session['username'] }} / <a href="{{ url_for('auth.logout') }}">Logout</a>
+                {{ session['username'] }} / <a href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
             </div>
             {% else %}
             <div class="navbar-group navbar-right">
-                <a href="{{ url_for('auth.login') }}">Login</a>
+                <a href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             </div>
             {% endif %}
         </nav>
@@ -31,7 +31,7 @@
     </section>
 
     <footer class="container">
-        <small class="pull-right">All contents &copy; copyright 2017 Superdesk. All rights reserved.</small>
+        <small class="pull-right">All contents &copy; Copyright 2017 Superdesk. All rights reserved.</small>
     </footer>
 </body>
 </html>

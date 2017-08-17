@@ -1,5 +1,11 @@
 import os
 
+from superdesk.default_settings import (   # noqa
+    VERSION,
+    CONTENTAPI_MONGO_URI,
+    CONTENTAPI_ELASTICSEARCH_URL
+)
+
 XML = False
 IF_MATCH = True
 JSON_SORT_KEYS = False
@@ -12,7 +18,15 @@ X_HEADERS = ['Content-Type', 'Authorization', 'If-Match']
 URL_PREFIX = 'api'
 SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(32))
 
-MODULES = [
+BLUEPRINTS = [
     'newsroom.news',
     'newsroom.auth',
 ]
+
+CORE_APPS = [
+    'content_api.items',
+    'content_api.items_versions',
+    'content_api.assets',
+]
+
+SITE_NAME = 'AAP Newsroom'
