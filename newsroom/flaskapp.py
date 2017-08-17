@@ -15,15 +15,13 @@ from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from content_api.tokens import SubscriberTokenAuth
 
-
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class Newsroom(eve.Eve):
     """The main Newsroom object."""
 
-    def __init__(self, import_name=__package__, settings='settings.py',
-                 **kwargs):
+    def __init__(self, import_name=__package__, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
         to create an instance using ``app = Newsroom()``
         """
@@ -31,7 +29,7 @@ class Newsroom(eve.Eve):
             import_name,
             data=SuperdeskDataLayer,
             auth=SubscriberTokenAuth,
-            settings=settings,
+            settings=os.path.join(NEWSROOM_DIR, 'default_settings.py'),
             template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
             static_folder=os.path.join(NEWSROOM_DIR, 'static'),
             **kwargs)
@@ -46,7 +44,6 @@ class Newsroom(eve.Eve):
     def load_config(self):
         """Override Eve.load_config in order to get default_settings."""
         super(Newsroom, self).load_config()
-        self.config.from_object('newsroom.default_settings')
         self.config.from_envvar('NEWSROOM_SETTINGS', silent=True)
 
     def _setup_blueprints(self, modules):
