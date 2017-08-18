@@ -15,6 +15,8 @@ from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from content_api.tokens import SubscriberTokenAuth
 
+from newsroom.webpack import NewsroomWebpack
+
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -41,6 +43,7 @@ class Newsroom(eve.Eve):
         self._setup_apps(self.config['CORE_APPS'])
         self._setup_babel()
         self._setup_jinja_filters()
+        self._setup_webpack()
 
     def load_config(self):
         """Override Eve.load_config in order to get default_settings."""
@@ -68,3 +71,6 @@ class Newsroom(eve.Eve):
                 return format_time(datetime, 'short')
 
         self.add_template_filter(datetime_short, 'datetime_short')
+
+    def _setup_webpack(self):
+        NewsroomWebpack(self)

@@ -41,3 +41,6 @@ if DEFAULT_TIMEZONE is None:
     DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
 
 BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
+
+WEBPACK_MANIFEST_PATH = './dist/manifest.json'
+WEBPACK_ASSETS_URL = 'http://localhost:8080/assets/'
