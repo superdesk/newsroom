@@ -1,0 +1,11 @@
+[ignore]
+.*/venv/.*
+.*/dist/.*
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
