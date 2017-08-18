@@ -1,3 +1,3 @@
 // @flow
 
-console.info('Newsroom loaded.')
+console.info('Newsroom loaded.');

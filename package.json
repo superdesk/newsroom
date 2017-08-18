@@ -1,7 +1,9 @@
 {
   "scripts": {
     "server": "webpack-dev-server --progress --colors --content-base dist",
-    "build": "webpack --config webpack.config.js --progress --profile --colors"
+    "build": "webpack --config webpack.config.js --progress --profile --colors",
+    "lint": "jscs assets",
+    "flow": "flow"
   },
   "dependencies": {
     "babel-core": "^6.26.0",
@@ -12,6 +14,7 @@
     "css-loader": "^0.28.5",
     "extract-text-webpack-plugin": "^3.0.0",
     "flow-bin": "^0.53.1",
+    "jscs": "^3.0.7",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "style-loader": "^0.18.2",
