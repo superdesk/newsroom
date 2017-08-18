@@ -6,12 +6,12 @@
 
     <title>{% block title %}{{ config.SITE_NAME }}{% endblock %}</title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous"> 
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 
     <link rel="icon" type="image/x-icon"
         href="{{ url_for('static', filename='favicon.ico') }}">
+
+    {{ stylesheet_tag('newsroom_css') | safe }}
 
 </head>
 <body>
@@ -31,6 +31,8 @@
         </nav>
     </header>
 
+    <section id="root"></section>
+
     <section class="container-fluid mt-3">
     {% block content %}{% endblock %}
     </section>
@@ -38,5 +40,7 @@
     <footer class="container-fluid">
         <p class="text-right"><small class="text-muted">All contents &copy; Copyright 2017 Superdesk. All rights reserved.</small></p>
     </footer>
+
+    {{ javascript_tag('newsroom_js') | safe }}
 </body>
 </html>
