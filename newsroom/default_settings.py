@@ -29,6 +29,9 @@ CORE_APPS = [
     'content_api.items_versions',
     'content_api.assets',
     'content_api.search',
+    'content_api.auth',
+    'content_api.users',
+    'content_api.companies'
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -44,3 +47,6 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 WEBPACK_MANIFEST_PATH = './dist/manifest.json'
 WEBPACK_ASSETS_URL = 'http://localhost:8080/assets/'
+
+# How many days a new account can stay active before it is approved by admin
+NEW_ACCOUNT_ACTIVE_DAYS = 14
