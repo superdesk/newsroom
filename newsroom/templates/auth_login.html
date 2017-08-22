@@ -7,16 +7,6 @@
 <p>Invalid credentials.</p>
 {% endif %}
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-
 <form method="post">
     <p><input type="email" name="email" value="{{ email }}" required>
     <p><input type="password" name="password" required>

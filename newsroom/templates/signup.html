@@ -5,16 +5,6 @@
 
 <p>Create your free account.</p>
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-
 <form class="form-horizontal" method="post">
     <label><b>Your name</b></label>
     <p><input type="text" name="name" required></p>
