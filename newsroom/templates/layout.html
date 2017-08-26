@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shring-to-fit=no">
 
-    <title>{% block title %}{{ config.SITE_NAME }}{% endblock %}</title>
+    <title>{% block title %}{% endblock %}</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 
@@ -14,14 +14,17 @@
     {{ stylesheet_tag('newsroom_css') | safe }}
 
 </head>
-<body>
-    <header class="container-fluid headerbar">
+<body class="container-fluid">
+    <header class="headerbar">
         <nav class="navbar">
             <a class="navbar-brand" href="{{ url_for('news.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
 
             {% if session.get('name') %}
             <div class="form-inline">
                 {{ session['name'] }} / <a href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
+            </div>
+            <div class="form-inline">
+                <a href="{{ url_for('users.index') }}">{{ gettext('Users') }}</a>
             </div>
             {% else %}
             <div class="form-inline">
@@ -34,26 +37,31 @@
         </nav>
     </header>
 
-    <section class="container-fluid mt-3">
+    <section class="row mt-3">
 
-    {% block content %}{% endblock %}
+        <div id="content" class="col-md">
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+            {% block content %}{% endblock %}
+
+            {% include "flash_messages.html" %}
+
+        </div>
+
+        {% block sidebar %}{% endblock %}
+
+
+
 
     </section>
+
+
 
     <footer class="container-fluid">
         <p class="text-right"><small class="text-muted">All contents &copy; Copyright 2017 Superdesk. All rights reserved.</small></p>
     </footer>
 
     {{ javascript_tag('newsroom_js') | safe }}
+
+    {% block script %}{% endblock %}
 </body>
 </html>

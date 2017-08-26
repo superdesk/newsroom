@@ -1,10 +1,12 @@
 const path = require('path');
+const webpack = require("webpack");
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 
 module.exports = {
     entry: {
         newsroom_js: './assets/index.js',
+        users_js: './assets/users.js',
         newsroom_css: './assets/index.css'
     },
     output: {
@@ -37,7 +39,11 @@ module.exports = {
     },
     plugins: [
         new ExtractTextPlugin('[name].[chunkhash].css'),
-        new ManifestPlugin(path.resolve(__dirname, 'manifest.json'))
+        new ManifestPlugin(path.resolve(__dirname, 'manifest.json')),
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery"
+        })
     ],
     devtool: 'eval'
 };

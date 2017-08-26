@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ config.SITE_NAME }} - Users{% endblock %}
+
+{% block content %}
+    <table class="table table-responsive">
+  <thead>
+    <tr>
+      <th>{{ gettext('Name') }}</th>
+      <th>{{ gettext('Email') }}</th>
+      <th>{{ gettext('Telephone') }}</th>
+      <th>{{ gettext('User Type') }}</th>
+      <th>{{ gettext('Company') }}</th>
+      <th>{{ gettext('Status') }}</th>
+      <th>{{ gettext('Created On') }}</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for user in users %}
+    <tr>
+
+      <td>{{ user['name'] }}</td>
+      <td>{{ user['email'] }}</td>
+      <td>{{ user['phone'] }}</td>
+      <td>{{ user['user_type'] }}</td>
+      <td>{{ user['company'] }}</td>
+        {% if user['is_validated'] %}
+            {% if user['is_approved'] %}
+                <td>Approved</td>
+            {% else %}
+                <td>Needs Approval</td>
+            {% endif %}
+        {% else %}
+            <td>Needs Validation</td>
+        {% endif %}
+      <td>{{ user['_created'] }}</td>
+      <td>
+          <button class="btn btn-secondary btn-sm edit-user" data-id="{{user['_id']}}"> {{ gettext('edit') }}</button>
+          <button class="btn btn-secondary btn-sm delete-user" data-id="{{user['_id']}}"> {{ gettext('delete') }}</button>
+      </td>
+    </tr>
+
+  {% else %}
+    <tr colspan="9">There are users yet.</tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block sidebar %}
+   <div id="sidebar" class="col-md-4" hidden></div>
+{% endblock %}
+
+{% block script %} {{ javascript_tag('users_js') | safe }} {% endblock %}
