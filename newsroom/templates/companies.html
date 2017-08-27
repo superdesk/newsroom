@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ config.SITE_NAME }} - Companies{% endblock %}
+
+{% block contentHeader %}
+    <div class="col"><h2>Companies</h2></div>
+    <div class="col-2">
+        <button id="create-company" class="btn btn-primary btn-lg active float-right ">New Company</button>
+        <button id="refresh" class="btn btn-primary btn-lg active float-right" hidden>Refresh</button>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+<table class="table table-responsive">
+  <thead>
+    <tr>
+      <th>{{ gettext('Name') }}</th>
+      <th>{{ gettext('Superdesk Subscriber Id') }}</th>
+      <th>{{ gettext('Status') }}</th>
+      <th>{{ gettext('Contact Name') }}</th>
+      <th>{{ gettext('Telephone') }}</th>
+      <th>{{ gettext('Country') }}</th>
+      <th>{{ gettext('Created On') }}</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for company in companies %}
+    <tr>
+
+      <td>{{ company['name'] }}</td>
+      <td>{{ company['sd_subscriber_id'] }}</td>
+
+    {% if company['is_enabled'] %}
+        <td>Active</td>
+    {% else %}
+        <td>Inactive</td>
+    {% endif %}
+
+      <td>{{ company['contact_name'] }}</td>
+      <td>{{ company['phone'] }}</td>
+      <td>{{ company['country'] }}</td>
+      <td>{{ company['_created'] | datetimeformat }}</td>
+      <td>
+          <button class="btn btn-sm find-users" data-id="{{company['_id']}}"> {{ gettext('users') }}</button>
+          <button class="btn btn-sm edit-company" data-id="{{company['_id']}}"> {{ gettext('edit') }}</button>
+          <button class="btn btn-sm delete-company" data-id="{{company['_id']}}"> {{ gettext('delete') }}</button>
+      </td>
+    </tr>
+
+  {% else %}
+    <tr colspan="7">There are no companies yet.</tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block sidebar %}
+   <div id="sidebar" class="col-md-4" hidden></div>
+{% endblock %}
+
+{% block script %} {{ javascript_tag('companies_js') | safe }} {% endblock %}

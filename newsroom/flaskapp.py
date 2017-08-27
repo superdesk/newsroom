@@ -13,7 +13,7 @@ from flask_babel import Babel, format_time
 
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
-from content_api.tokens import SubscriberTokenAuth
+from content_api.tokens import CompanyTokenAuth
 
 from newsroom.webpack import NewsroomWebpack
 
@@ -30,7 +30,7 @@ class Newsroom(eve.Eve):
         super(Newsroom, self).__init__(
             import_name,
             data=SuperdeskDataLayer,
-            auth=SubscriberTokenAuth,
+            auth=CompanyTokenAuth,
             settings=os.path.join(NEWSROOM_DIR, 'default_settings.py'),
             template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
             static_folder=os.path.join(NEWSROOM_DIR, 'static'),

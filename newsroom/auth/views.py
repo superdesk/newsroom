@@ -6,9 +6,7 @@ from datetime import timedelta
 from flask import current_app as app
 import bcrypt
 from flask_babel import gettext as _
-
-
-blueprint = flask.Blueprint('auth', __name__)
+from newsroom.auth import blueprint
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])

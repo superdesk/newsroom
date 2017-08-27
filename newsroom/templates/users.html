@@ -34,10 +34,10 @@
         {% else %}
             <td>Needs Validation</td>
         {% endif %}
-      <td>{{ user['_created'] }}</td>
+      <td>{{ user['_created'] | datetimeformat }}</td>
       <td>
-          <button class="btn btn-secondary btn-sm edit-user" data-id="{{user['_id']}}"> {{ gettext('edit') }}</button>
-          <button class="btn btn-secondary btn-sm delete-user" data-id="{{user['_id']}}"> {{ gettext('delete') }}</button>
+          <button class="btn btn-sm edit-user" data-id="{{user['_id']}}"> {{ gettext('edit') }}</button>
+          <button class="btn btn-sm delete-user" data-id="{{user['_id']}}"> {{ gettext('delete') }}</button>
       </td>
     </tr>
 

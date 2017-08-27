@@ -6,23 +6,23 @@
 <p>Create your free account.</p>
 
 <form class="form-horizontal" method="post">
-    <label><b>Your name</b></label>
+    <label><b>{{ gettext('Your name') }}</b></label>
     <p><input type="text" name="name" required></p>
-    <label><b>Your email address</b></label>
+    <label><b>{{ gettext('Your email address') }}</b></label>
     <p><input type="email" name="email" required></p>
-    <label><b>Please re-enter email</b></label>
+    <label><b>{{ gettext('Please re-enter email') }}</b></label>
     <p><input type="email" name="email2" required></p>
 
-    <label><b>Your password</b></label>
+    <label><b>{{ gettext('Your password') }}</b></label>
     <p><input type="password" name="password" required></p>
-    <label><b>Your phone number</b></label>
+    <label><b>{{ gettext('Your phone number') }}</b></label>
     <p><input type="tel" name="telephone" required></p>
-    <label><b>Your country</b></label>
+    <label><b>{{ gettext('Your country') }}</b></label>
     <p><input type="text" name="country" required></p>
-    <label><b>Company name</b></label>
+    <label><b>{{ gettext('Company name') }}</b></label>
     <p><input type="text" name="company" required></p>
 
-    <label><b>Your position</b></label>
+    <label><b>{{ gettext('Your position') }}</b></label>
     <p><select name="occupation">
         <option value="Editor">Editor</option>
         <option value="Journalist">Journalist</option>
@@ -31,7 +31,7 @@
         <option value="CEO">CEO</option>
     </select></p>
 
-    <label><b>Size of your company</b></label>
+    <label><b>{{ gettext('Size of your company') }}</b></label>
     <p><select name="company_size">
         <option value="0-10">0-10</option>
         <option value="11-100">11-100</option>
@@ -39,8 +39,8 @@
     </select></p>
 
     <div class="clearfix">
-      <button type="reset"  class="cancelbtn">Cancel</button>
-      <button type="submit" value="signup" class="signupbtn">Sign Up</button>
+      <button type="reset"  class="cancelbtn">{{ gettext('Cancel') }}</button>
+      <button type="submit" value="signup" class="signupbtn">{{ gettext('Sign Up') }}</button>
     </div>
 </form>
 {% endblock %}

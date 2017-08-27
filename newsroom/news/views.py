@@ -1,10 +1,6 @@
-
 import flask
-
+from newsroom.news import blueprint
 from newsroom.utils import query_resource
-
-
-blueprint = flask.Blueprint('news', __name__)  # noqa
 
 
 @blueprint.route('/')

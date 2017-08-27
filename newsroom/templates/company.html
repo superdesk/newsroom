@@ -1,0 +1,58 @@
+<div class="modal-header">
+    <h5 class="modal-title">{{ form_name }} Company {{ form.name.data if form.name.data is not none }}</h5>
+    <button id="hide-sidebar" type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+<div class="modal-body">
+<form method="POST" id="edit-company-form" action={{ action }}>
+
+  {{ form.csrf_token }}
+
+{% if form.errors %}
+  <div class="alert alert-danger" role="alert">
+    <ul>
+      {% for field, errors in form.errors.items(): %}
+        <li>{{ field }}: {{ errors[0] }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+  <div class="form-group">
+    <label for="companyName">{{ form.name.label.text }}</label>
+    {{ form.name(class="form-control", id="companyName") }}
+  </div>
+
+  <div class="form-group">
+    <label for="sdSubscriberId">{{ form.sd_subscriber_id.label.text }}</label>
+    {{ form.sd_subscriber_id(class="form-control", id="sdSubscriberId") }}
+  </div>
+
+  <div class="form-group">
+    <label for="phone">{{ form.phone.label.text }}</label>
+    {{ form.phone(class="form-control", id="userPhone") }}
+  </div>
+
+  <div class="form-group">
+    <label for="contactName">{{ form.contact_name.label.text }}</label>
+    {{ form.contact_name(class="form-control", id="contactName") }}
+  </div>
+
+  <div class="form-check mt-4">
+    <label class="form-check-label" for="enabled">
+    {{ form.is_enabled(class="form-check-input", id="enabled") }}
+    {{ form.is_enabled.label.text }}
+    </label>
+  </div>
+
+
+<div class="modal-footer">
+  <input type="submit" class="btn btn-primary" value="Save" id="companySave">
+</div>
+
+</form>
+</div>
+
+{% include "flash_messages.html" %}

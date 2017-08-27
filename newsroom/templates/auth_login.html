@@ -1,15 +1,27 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1>Login</h1>
 
 {% if credentials_error %}
 <p>Invalid credentials.</p>
 {% endif %}
 
-<form method="post">
-    <p><input type="email" name="email" value="{{ email }}" required>
-    <p><input type="password" name="password" required>
-    <p><input type="submit" value="Login">
-</form>
+  <form class="form-signin" method="post">
+    <h2 class="form-signin-heading">Please login</h2>
+
+      <label for="email" class="sr-only">Email address</label>
+      <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
+
+      <label for="password" class="sr-only">Password</label>
+      <input type="password" type="password" name="password" class="form-control" placeholder="Password" required>
+
+      <div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+      </div>
+
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+  </form>
+
 {% endblock %}

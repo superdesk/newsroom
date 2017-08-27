@@ -6,7 +6,7 @@
   </div>
 
 <div class="modal-body">
-<form method="POST" id="edit-user-form" action="/user/{{ form.id.data }}">
+<form method="POST" id="edit-user-form" action="/users/{{ form.id.data }}">
 
   {{ form.csrf_token }}
 
@@ -19,10 +19,11 @@
     </ul>
   </div>
 {% endif %}
+  {{ form.id() }}
 
   <div class="form-group">
     <label for="userName">{{ form.name.label.text }}</label>
-    {{ form.name(class="form-control", id="formGroupExampleInput") }}
+    {{ form.name(class="form-control", id="userName") }}
   </div>
 
   <div class="form-group">
@@ -31,7 +32,7 @@
   </div>
 
   <div class="form-group">
-    <label for="phone">{{ form.phone.label.text }}</label>
+    <label for="userPhone">{{ form.phone.label.text }}</label>
     {{ form.phone(class="form-control", id="userPhone") }}
   </div>
 

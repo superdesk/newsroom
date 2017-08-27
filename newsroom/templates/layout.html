@@ -17,27 +17,29 @@
 <body class="container-fluid">
     <header class="headerbar">
         <nav class="navbar">
-            <a class="navbar-brand" href="{{ url_for('news.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
+            <a  class="nav-link" class="navbar-brand" href="{{ url_for('news.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
 
             {% if session.get('name') %}
-            <div class="form-inline">
-                {{ session['name'] }} / <a href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
-            </div>
-            <div class="form-inline">
-                <a href="{{ url_for('users.index') }}">{{ gettext('Users') }}</a>
+            <div class="form-inline my-2 my-lg-0">
+                <a  class="nav-link" href="{{ url_for('users.index') }}">{{ gettext('Users') }}</a>
+                <a  class="nav-link" href="{{ url_for('companies.index') }}">{{ gettext('Companies') }}</a>
+                <a  class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
+                <span class="badge badge-success">{{ session['name'] }}</span>
             </div>
             {% else %}
-            <div class="form-inline">
-                <a href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
-            </div>
-            <div class="form-inline">
-                <a href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
+            <div class="form-inline my-2 my-lg-0">
+                <a  class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
+                <a   class="nav-link"href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
             </div>
             {% endif %}
         </nav>
     </header>
 
-    <section class="row mt-3">
+    <section class="row mt-3 ml-3">
+        {% block contentHeader %}{% endblock %}
+    </section>
+
+    <section class="row mt-3 ml-1">
 
         <div id="content" class="col-md">
 

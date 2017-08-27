@@ -7,6 +7,7 @@ module.exports = {
     entry: {
         newsroom_js: './assets/index.js',
         users_js: './assets/users.js',
+        companies_js: './assets/companies.js',
         newsroom_css: './assets/index.css'
     },
     output: {
