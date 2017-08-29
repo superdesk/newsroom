@@ -5,7 +5,7 @@ from superdesk.utc import utcnow
 from datetime import timedelta
 from flask import current_app as app
 import bcrypt
-from flask_babel import gettext
+from flask_babel import gettext as _
 
 
 blueprint = flask.Blueprint('auth', __name__)
@@ -21,16 +21,16 @@ def login():
             user = get_resource_service('auth_user').find_one(req=None, email=credentials.get('email'))
 
             if not user:
-                raise Exception(gettext('Wrong email or password'))
+                raise Exception(_('Wrong email or password'))
 
             if not user.get('is_enabled'):
-                raise Exception(gettext('Account is disabled'))
+                raise Exception(_('Account is disabled'))
 
             if not user.get('is_approved'):
                 account_created = user.get('_created')
 
                 if account_created < utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14)):
-                    raise Exception(gettext('Account has not been approved'))
+                    raise Exception(_('Account has not been approved'))
 
             password = credentials.get('password').encode('UTF-8')
             hashed = user.get('password').encode('UTF-8')
@@ -39,14 +39,14 @@ def login():
                 raise Exception('Wrong email or password')
 
             if not bcrypt.checkpw(password, hashed):
-                raise Exception(gettext('Wrong email or password'))
+                raise Exception(_('Wrong email or password'))
 
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
 
             flask.session['name'] = user.get('name')
             return flask.redirect(flask.url_for('news.index'))
         except Exception as ex:
-            flask.flash(gettext('Invalid login: {} Please try again.'.format(str(ex))))
+            flask.flash(_('Invalid login: {} Please try again.'.format(str(ex))))
             return flask.render_template('auth_login.html')
 
     return flask.render_template('auth_login.html',
@@ -77,21 +77,21 @@ def signup():
 
 def _validate_new_user(new_user):
     if not new_user.get('email'):
-        raise Exception(gettext('Email cannot be empty'))
+        raise Exception(_('Email cannot be empty'))
 
     if not new_user.get('name'):
-        raise Exception(gettext('Name cannot be empty'))
+        raise Exception(_('Name cannot be empty'))
 
     if not new_user.get('password'):
-        raise Exception(gettext('Password cannot be empty'))
+        raise Exception(_('Password cannot be empty'))
 
     if new_user.get('email') != new_user.get('email2'):
-        raise Exception(gettext('Email addresses do not match'))
+        raise Exception(_('Email addresses do not match'))
 
     existing_users = query_resource('users', {'email': new_user.get('email')})
 
     if existing_users.count() > 0:
-        raise Exception(gettext('Email address is already in use'))
+        raise Exception(_('Email address is already in use'))
 
 
 def _modify_user_data(new_user):
