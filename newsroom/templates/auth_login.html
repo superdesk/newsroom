@@ -6,22 +6,32 @@
 <p>Invalid credentials.</p>
 {% endif %}
 
-  <form class="form-signin" method="post">
-    <h2 class="form-signin-heading">Please login</h2>
-
-      <label for="email" class="sr-only">Email address</label>
-      <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
-
-      <label for="password" class="sr-only">Password</label>
-      <input type="password" type="password" name="password" class="form-control" placeholder="Password" required>
-
-      <div class="checkbox">
-          <label>
-            <input type="checkbox" value="remember-me"> Remember me
-          </label>
-      </div>
-
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
-  </form>
-
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0">{{ gettext("Newsroom login") }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <form class="form" role="form" id="formLogin" method="post">
+                                <div class="form-group">
+                                    <label for="email">{{ gettext("Email") }}</label>
+                                    <input type="email" class="form-control" name="email" id="email" placeholder={{ gettext("Email") }} required autofocus>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">{{ gettext("Password") }}</label>
+                                    <input type="password" class="form-control" name="password" id="password" placeholder={{ gettext("Password") }} required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Login") }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

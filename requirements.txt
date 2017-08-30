@@ -1,4 +1,4 @@
-git+git://github.com/superdesk/superdesk-core@ff649504#egg=superdesk-core
+git+git://github.com/superdesk/superdesk-core@014422e#egg=superdesk-core
 flask-babel==0.11.2
 flask-webpack==0.1.0
 Flask-WTF==0.14.2

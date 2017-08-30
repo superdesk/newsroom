@@ -1,46 +1,75 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1>Signup</h1>
 
-<p>Create your free account.</p>
+<div class="container py-6">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0">{{ gettext("Newsroom sign up") }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <form class="form" method="post">
+                                <div class="form-group">
+                                    <label for="name">{{ gettext('Your name') }}</label>
+                                    <input class="form-control" name="name" id="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">{{ gettext('Your email address') }}</label>
+                                    <input type="email" class="form-control" name="email" id="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email2">{{ gettext('Please re-enter email') }}</label>
+                                    <input type="email" class="form-control" name="email2" id="email2" required>
+                                </div>
 
-<form class="form-horizontal" method="post">
-    <label><b>{{ gettext('Your name') }}</b></label>
-    <p><input type="text" name="name" required></p>
-    <label><b>{{ gettext('Your email address') }}</b></label>
-    <p><input type="email" name="email" required></p>
-    <label><b>{{ gettext('Please re-enter email') }}</b></label>
-    <p><input type="email" name="email2" required></p>
+                                <div class="form-group">
+                                    <label for="password">{{ gettext('Your password') }}</label>
+                                    <input class="form-control" name="password" id="password" type="password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password2">{{ gettext('Please re-enter password') }}</label>
+                                    <input class="form-control" name="password2" id="password2" type="password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="country">{{ gettext('Your country') }}</label>
+                                    <input class="form-control" name="country" id="country" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="company">{{ gettext('Your company') }}</label>
+                                    <input class="form-control" name="company" id="company" required>
+                                </div>
 
-    <label><b>{{ gettext('Your password') }}</b></label>
-    <p><input type="password" name="password" required></p>
-    <label><b>{{ gettext('Your phone number') }}</b></label>
-    <p><input type="tel" name="telephone" required></p>
-    <label><b>{{ gettext('Your country') }}</b></label>
-    <p><input type="text" name="country" required></p>
-    <label><b>{{ gettext('Company name') }}</b></label>
-    <p><input type="text" name="company" required></p>
+                                <div class="form-group">
+                                    <label for="occupation">{{ gettext('Your position') }}</label>
+                                    <select class="form-control" name="occupation">
+                                        <option value="Editor">Editor</option>
+                                        <option value="Journalist">Journalist</option>
+                                        <option value="Sales">Sales Representative</option>
+                                        <option value="CTO">CTO</option>
+                                        <option value="CEO">CEO</option>
+                                    </select>
+                                </div>
 
-    <label><b>{{ gettext('Your position') }}</b></label>
-    <p><select name="occupation">
-        <option value="Editor">Editor</option>
-        <option value="Journalist">Journalist</option>
-        <option value="Sales">Sales Representative</option>
-        <option value="CTO">CTO</option>
-        <option value="CEO">CEO</option>
-    </select></p>
-
-    <label><b>{{ gettext('Size of your company') }}</b></label>
-    <p><select name="company_size">
-        <option value="0-10">0-10</option>
-        <option value="11-100">11-100</option>
-        <option value=">100">{{ ">100" | e}}</option>
-    </select></p>
-
-    <div class="clearfix">
-      <button type="reset"  class="cancelbtn">{{ gettext('Cancel') }}</button>
-      <button type="submit" value="signup" class="signupbtn">{{ gettext('Sign Up') }}</button>
+                                <div class="form-group">
+                                    <label for="company_size">{{ gettext('Size of your company') }}</label>
+                                    <select class="form-control" name="company_size">
+                                        <option value="0-10">0-10</option>
+                                        <option value="11-100">11-100</option>
+                                        <option value=">100">{{ ">100" | e}}</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Sign up") }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</form>
+</div>
+
 {% endblock %}

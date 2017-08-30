@@ -6,9 +6,11 @@ from newsroom.users.forms import UserForm
 from superdesk import get_resource_service
 from newsroom.users import blueprint
 from flask_babel import gettext
+from newsroom.auth.decorator import admin_only
 
 
 @blueprint.route('/users', methods=['GET'])
+@admin_only
 def index():
     users = init_users()
     return flask.render_template(
@@ -17,6 +19,7 @@ def index():
 
 
 @blueprint.route('/users/<id>', methods=['GET', 'POST'])
+@admin_only
 def edit(id):
     if not id:
         return BadRequest(gettext('User id not provided'))
@@ -63,5 +66,6 @@ def init_users():
     companies = list(query_resource('companies', max_results=200))
     company_dict = {str(c['_id']): c['name'] for c in companies}
     for user in users:
-        user['company'] = company_dict[str(user['company'])]
+        if user.get('company'):
+            user['company'] = company_dict[str(user['company'])]
     return users

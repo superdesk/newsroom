@@ -40,8 +40,8 @@ def login():
                 raise Exception(_('Wrong email or password'))
 
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
-
             flask.session['name'] = user.get('name')
+            flask.session['user_type'] = user['user_type']
             return flask.redirect(flask.url_for('news.index'))
         except Exception as ex:
             flask.flash(_('Invalid login: {} Please try again.'.format(str(ex))))
@@ -55,6 +55,7 @@ def login():
 @blueprint.route('/logout')
 def logout():
     flask.session['name'] = None
+    flask.session['user_type'] = None
     return flask.redirect(flask.url_for('news.index'))
 
 
@@ -86,6 +87,9 @@ def _validate_new_user(new_user):
     if new_user.get('email') != new_user.get('email2'):
         raise Exception(_('Email addresses do not match'))
 
+    if new_user.get('password') != new_user.get('password2'):
+        raise Exception(_('Passwords do not match'))
+
     existing_users = query_resource('users', {'email': new_user.get('email')})
 
     if existing_users.count() > 0:
@@ -102,6 +106,7 @@ def _modify_user_data(new_user):
         'company_size': new_user.get('company_size'),
     }
     new_user.pop('email2')
+    new_user.pop('password2')
     new_user.pop('company')
     new_user.pop('occupation')
     new_user.pop('company_size')

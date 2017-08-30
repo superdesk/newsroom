@@ -8,45 +8,38 @@ body {
     background-color: #fff;
 }
 
-.headerbar, .headerbar .navbar-brand {
+nav {
     color: #969696;
     background-color: #2d2d2d;
+    height: 60px;
 }
 
-.form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: 0 auto;
-}
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-  margin-bottom: 10px;
-}
-.form-signin .checkbox {
-  font-weight: normal;
-}
-.form-signin .form-control {
-  position: relative;
-  height: auto;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-  padding: 10px;
-  font-size: 16px;
-}
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+.col-fixed-60{
+    width:60px;
+    background:rgb(0, 172, 236);
+    position:fixed;
+    height:100%;
+    z-index:1;
 }
 
-.form-control {
-    margin-top: 10px;
+
+.col-offset-120{
+    padding-left:120px;
+    z-index:0;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    background:rgb(0, 111, 153);
+    margin-left: -16px;
+}
+
+img.logo {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 7px;
+    width: 45px;
+    height: 45px;
+    display: block;
 }

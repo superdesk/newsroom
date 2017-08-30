@@ -14,9 +14,11 @@
     {{ stylesheet_tag('newsroom_css') | safe }}
 
 </head>
-<body class="container-fluid">
-    <header class="headerbar">
-        <nav class="navbar">
+<body>
+ <nav class="navbar navbar-inverse bg-inverse">
+    <div class="logo">
+      <img class="logo" src="{{ url_for('static', filename = 'aap.png') }}"/>
+    </div>
             <a  class="nav-link" class="navbar-brand" href="{{ url_for('news.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
 
             {% if session.get('name') %}
@@ -33,34 +35,43 @@
             </div>
             {% endif %}
         </nav>
-    </header>
+<div class="container-fluid">
+<div class="row">
 
-    <section class="row mt-3 ml-3">
-        {% block contentHeader %}{% endblock %}
-    </section>
+</div>
+<div class="row">
+    <div class="col-fixed-60">
+    </div>
 
-    <section class="row mt-3 ml-1">
+    <div class="col-md-12 col-offset-120">
+        <section class="row mt-3 ml-3">
+            {% block contentHeader %}{% endblock %}
+        </section>
 
-        <div id="content" class="col-md">
+        <section class="row mt-3 ml-1">
 
-            {% block content %}{% endblock %}
+            <div id="content" class="col-md">
 
-            {% include "flash_messages.html" %}
+                {% block content %}{% endblock %}
 
-        </div>
+                {% include "flash_messages.html" %}
 
-        {% block sidebar %}{% endblock %}
+            </div>
 
-
-
-
-    </section>
+            {% block sidebar %}{% endblock %}
 
 
 
+
+        </section>
+    </div>
+
+
+</div>
     <footer class="container-fluid">
         <p class="text-right"><small class="text-muted">All contents &copy; Copyright 2017 Superdesk. All rights reserved.</small></p>
     </footer>
+</div>
 
     {{ javascript_tag('newsroom_js') | safe }}
 

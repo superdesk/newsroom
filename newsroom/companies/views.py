@@ -6,9 +6,11 @@ from bson import ObjectId
 from werkzeug.exceptions import BadRequest
 from superdesk import get_resource_service
 from flask_babel import gettext
+from newsroom.auth.decorator import admin_only
 
 
 @blueprint.route('/companies', methods=['GET'])
+@admin_only
 def index():
     companies = list(query_resource('companies', max_results=50))
     return flask.render_template(
@@ -17,6 +19,7 @@ def index():
 
 
 @blueprint.route('/companies/new', methods=['GET', 'POST'])
+@admin_only
 def create():
     form = CompanyForm(flask.request.form)
     if flask.request.method == 'POST':
@@ -36,6 +39,7 @@ def create():
 
 
 @blueprint.route('/companies/<id>', methods=['GET', 'POST'])
+@admin_only
 def edit(id):
     if not id:
         return BadRequest(gettext('Company id not provided'))
