@@ -15,26 +15,28 @@
 
 </head>
 <body>
- <nav class="navbar navbar-inverse bg-inverse">
+ <nav class="main navbar  justify-content-start">
     <div class="logo">
-      <img class="logo" src="{{ url_for('static', filename = 'aap.png') }}"/>
+        <img class="logo" src="{{ url_for('static', filename = 'aap.png') }}"/>
     </div>
-            <a  class="nav-link" class="navbar-brand" href="{{ url_for('news.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
+    <div class="navbar-brand p-2">
+        <a  class="nav-link text-white"  href="{{ url_for('news.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
+    </div>
 
-            {% if session.get('name') %}
-            <div class="form-inline my-2 my-lg-0">
-                <a  class="nav-link" href="{{ url_for('users.index') }}">{{ gettext('Users') }}</a>
-                <a  class="nav-link" href="{{ url_for('companies.index') }}">{{ gettext('Companies') }}</a>
-                <a  class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
-                <span class="badge badge-success">{{ session['name'] }}</span>
-            </div>
-            {% else %}
-            <div class="form-inline my-2 my-lg-0">
-                <a  class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
-                <a   class="nav-link"href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
-            </div>
-            {% endif %}
-        </nav>
+    {% if session.get('name') %}
+    <div class="form-inline my-2 my-lg-0 ml-auto p-2">
+        <a  class="nav-link" href="{{ url_for('users.index') }}">{{ gettext('Users') }}</a>
+        <a  class="nav-link" href="{{ url_for('companies.index') }}">{{ gettext('Companies') }}</a>
+        <a  class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
+        <span class="badge badge-success">{{ session['name'] }}</span>
+    </div>
+    {% else %}
+    <div class="form-inline my-2 my-lg-0 ml-auto p-2">
+        <a  class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
+        <a   class="nav-link"href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
+    </div>
+    {% endif %}
+</nav>
 <div class="container-fluid">
 <div class="row">
 
@@ -43,8 +45,8 @@
     <div class="col-fixed-60">
     </div>
 
-    <div class="col-md-12 col-offset-120">
-        <section class="row mt-3 ml-3">
+    <div class="col-md-12 pl-5">
+        <section class="row mt-1 ml-3">
             {% block contentHeader %}{% endblock %}
         </section>
 

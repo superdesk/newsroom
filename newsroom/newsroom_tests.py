@@ -1,7 +1,5 @@
-
 import json
 import unittest
-
 from newsroom import Newsroom
 
 

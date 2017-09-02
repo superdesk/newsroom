@@ -7,6 +7,7 @@ This module implements WSGI application extending eve.Eve
 
 import os
 import eve
+import flask
 import importlib
 
 from flask_babel import Babel, format_time
@@ -23,15 +24,24 @@ NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 class Newsroom(eve.Eve):
     """The main Newsroom object."""
 
-    def __init__(self, import_name=__package__, **kwargs):
+    def __init__(self, import_name=__package__, config=None, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
         to create an instance using ``app = Newsroom()``
         """
+        app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
+
+        # get content api default conf
+
+        if config:
+            app_config = flask.Config(app_config)
+            app_config.from_object('content_api.app.settings')
+            app_config.update(config)
+
         super(Newsroom, self).__init__(
             import_name,
             data=SuperdeskDataLayer,
             auth=CompanyTokenAuth,
-            settings=os.path.join(NEWSROOM_DIR, 'default_settings.py'),
+            settings=app_config,
             template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
             static_folder=os.path.join(NEWSROOM_DIR, 'static'),
             **kwargs)

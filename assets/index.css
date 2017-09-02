@@ -8,10 +8,14 @@ body {
     background-color: #fff;
 }
 
-nav {
+nav.main {
     color: #969696;
     background-color: #2d2d2d;
     height: 60px;
+}
+
+nav.search {
+    width: 100%;
 }
 
 .col-fixed-60{

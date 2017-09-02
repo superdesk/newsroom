@@ -105,8 +105,8 @@ def _modify_user_data(new_user):
         'occupation': new_user.get('occupation'),
         'company_size': new_user.get('company_size'),
     }
-    new_user.pop('email2')
-    new_user.pop('password2')
-    new_user.pop('company')
-    new_user.pop('occupation')
-    new_user.pop('company_size')
+    new_user.pop('email2', None)
+    new_user.pop('password2', None)
+    new_user.pop('company', None)
+    new_user.pop('occupation', None)
+    new_user.pop('company_size', None)

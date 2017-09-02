@@ -52,3 +52,6 @@ WEBPACK_ASSETS_URL = 'http://localhost:8080/assets/'
 
 # How many days a new account can stay active before it is approved by admin
 NEW_ACCOUNT_ACTIVE_DAYS = 14
+
+# Enable CSRF protection for forms
+WTF_CSRF_ENABLED = True

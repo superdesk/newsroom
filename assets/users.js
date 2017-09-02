@@ -36,6 +36,7 @@ $(document).ready(function () {
         posting.done(function (data) {
           initUserDetails(data);
           $('#userSave').prop('disabled', true);
+          $('#refresh').prop('hidden', false);
         });
 
         posting.fail(function(data) {
@@ -53,6 +54,16 @@ $(document).ready(function () {
       });
     });
   };
+
+  function refreshContent() {
+    $.get('/users/', function (data) {
+      $('body').html(data);
+    });
+  }
+
+  $('#refresh').click(function () {
+    refreshContent();
+  });
 
   initEvents();
 });

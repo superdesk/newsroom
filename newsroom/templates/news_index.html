@@ -2,16 +2,21 @@
 
 {% block title %}{{ config.SITE_NAME }} - News{% endblock %}
 
-{% block content %}
-<nav class="navbar navbar-light mb-3">
+{% block contentHeader %}
+<nav class="navbar navbar-light search">
     <form class="form-inline">
-        <input class="form-control" type="text" name="q" value="{{ query }}" placeholder="{{ gettext('Search') }}">
+        <input class="form-control" name="q" value="{{ query }}" placeholder="{{ gettext('Search') }}">
+        <span class="input-group-btn">
+            <button class="btn btn-secondary" type="submit">Search</button>
+          </span>
     </form>
     {% if query %}
     <div class="navbar-brand"><strong>{{ total }}</strong></div>
     {% endif %}
 </nav>
+{% endblock %}
 
+{% block content %}
 {% for item in items %}
 <article class="card mb-3">
     <div class="card-body">
