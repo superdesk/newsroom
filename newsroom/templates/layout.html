@@ -54,15 +54,13 @@
 
             <div id="content" class="col-md">
 
-                {% block content %}{% endblock %}
-
                 {% include "flash_messages.html" %}
+
+                {% block content %}{% endblock %}
 
             </div>
 
             {% block sidebar %}{% endblock %}
-
-
 
 
         </section>

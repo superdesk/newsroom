@@ -2,10 +2,6 @@
 
 {% block content %}
 
-{% if credentials_error %}
-<p>Invalid credentials.</p>
-{% endif %}
-
 <div class="container py-5">
     <div class="row">
         <div class="col-md-12">
@@ -17,13 +13,18 @@
                         </div>
                         <div class="card-body">
                             <form class="form" role="form" id="formLogin" method="post">
+
+                                {{ form.csrf_token }}
+
+                                {% include "form_alerts.html" %}
+
                                 <div class="form-group">
-                                    <label for="email">{{ gettext("Email") }}</label>
-                                    <input type="email" class="form-control" name="email" id="email" placeholder={{ gettext("Email") }} required autofocus>
+                                    <label for="email">{{ gettext(form.email.label.text) }}</label>
+                                    {{ form.email(class="form-control", id="email", required="true") }}
                                 </div>
                                 <div class="form-group">
-                                    <label for="password">{{ gettext("Password") }}</label>
-                                    <input type="password" class="form-control" name="password" id="password" placeholder={{ gettext("Password") }} required>
+                                    <label for="password">{{ gettext(form.password.label.text) }}</label>
+                                    {{ form.password(class="form-control", id="password", required="true") }}
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Login") }}</button>
                             </form>

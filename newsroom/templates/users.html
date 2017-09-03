@@ -32,15 +32,21 @@
       <td>{{ user['phone'] }}</td>
       <td>{{ user['user_type'] }}</td>
       <td>{{ user['company'] }}</td>
+        {% set status = gettext("Enabled") %}
+        {% if not user['is_enabled'] %}
+            {% set status = gettext("Disabled") %}
+        {% endif %}
         {% if user['is_validated'] %}
             {% if user['is_approved'] %}
-                <td>Approved</td>
+                <td>{{ gettext('Approved') }} - {{ status }}</td>
             {% else %}
-                <td>Needs Approval</td>
+                <td>{{ gettext('Needs Approval') }} - {{ status}}</td>
             {% endif %}
+
         {% else %}
-            <td>Needs Validation</td>
+            <td>{{ gettext('Needs Validation') }} - {{ status }}</td>
         {% endif %}
+
       <td>{{ user['_created'] | datetimeformat }}</td>
       <td>
           <button class="btn btn-sm edit-user" data-id="{{user['_id']}}"> {{ gettext('edit') }}</button>

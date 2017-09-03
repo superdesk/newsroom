@@ -26,7 +26,7 @@ def create():
         if form.validate():
             new_company = flask.request.form.to_dict()
             get_resource_service('companies').post([new_company])
-            flask.flash(gettext('Company has been updated successfully.'))
+            flask.flash(gettext('Company has been updated successfully.'), 'success')
         else:
             return flask.render_template('company.html',
                                          form=form,
@@ -56,7 +56,7 @@ def edit(id):
             updates['contact_name'] = edited_form.contact_name.data
             get_resource_service('companies').patch(id=ObjectId(id),
                                                     updates=updates)
-            flask.flash(gettext('Company has been updated successfully.'))
+            flask.flash(gettext('Company has been updated successfully.'), 'success')
         else:
             return flask.render_template(
                 'company.html',

@@ -1,7 +1,7 @@
 import flask
 from newsroom.utils import query_resource, find_one
 from bson import ObjectId
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 from newsroom.users.forms import UserForm
 from superdesk import get_resource_service
 from newsroom.users import blueprint
@@ -26,32 +26,32 @@ def edit(id):
 
     user = find_one('users', _id=ObjectId(id))
 
-    if flask.request.method == 'POST':
-        edited_form = UserForm(flask.request.form)
-        edited_form.company.choices = init_companies()
-        if edited_form.validate():
-            updates = {}
-            updates['name'] = edited_form.name.data
-            updates['email'] = edited_form.email.data
-            updates['phone'] = edited_form.phone.data
-            if edited_form.company.data:
-                updates['company'] = ObjectId(edited_form.company.data)
-            else:
-                updates['company'] = None
-            get_resource_service('users').patch(id=ObjectId(id),
-                                                updates=updates)
-            flask.flash(gettext('User has been updated successfully.'))
-        else:
-            return flask.render_template(
-                'user.html',
-                form=edited_form), 400
+    if not user:
+        return NotFound(gettext('User not found'))
 
     user['id'] = str(user['_id'])
-    user_form = UserForm(**user)
-    user_form.company.choices = init_companies()
-    return flask.render_template(
-        'user.html',
-        form=user_form), 200
+    if flask.request.method == 'POST':
+        form = UserForm(user=user)
+        form.company.choices = init_companies()
+        if form.validate_on_submit():
+            updates = {}
+            updates['name'] = form.name.data
+            updates['email'] = form.email.data
+            updates['phone'] = form.phone.data
+            updates['user_type'] = form.user_type.data
+            updates['is_enabled'] = form.is_enabled.data
+            updates['is_approved'] = form.is_approved.data
+            if form.company.data:
+                updates['company'] = ObjectId(form.company.data)
+
+            get_resource_service('users').patch(id=ObjectId(id), updates=updates)
+            flask.flash(gettext('User has been updated successfully.'), 'success')
+        else:
+            return flask.render_template('user.html', form=form), 400
+
+    form = UserForm(**user)
+    form.company.choices = init_companies()
+    return flask.render_template('user.html', form=form), 200
 
 
 def init_companies():

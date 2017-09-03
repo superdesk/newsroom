@@ -1,55 +1,57 @@
 import flask
-from newsroom.utils import query_resource
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from datetime import timedelta
 from flask import current_app as app
 import bcrypt
-from flask_babel import gettext as _
 from newsroom.auth import blueprint
+from newsroom.auth.forms import SignupForm, LoginForm
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
-    kwargs = {}
-    if flask.request.method == 'POST':
-        try:
-            credentials = flask.request.form
-
-            user = get_resource_service('auth_user').find_one(req=None, email=credentials.get('email'))
-
-            if not user:
-                raise Exception(_('Wrong email or password'))
-
-            if not user.get('is_enabled'):
-                raise Exception(_('Account is disabled'))
-
-            if not user.get('is_approved'):
-                account_created = user.get('_created')
-
-                if account_created < utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14)):
-                    raise Exception(_('Account has not been approved'))
-
-            password = credentials.get('password').encode('UTF-8')
-            hashed = user.get('password').encode('UTF-8')
-
-            if not (password and hashed):
-                raise Exception('Wrong email or password')
-
-            if not bcrypt.checkpw(password, hashed):
-                raise Exception(_('Wrong email or password'))
-
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = get_resource_service('auth_user').find_one(req=None, email=form.email.data)
+        if user is not None and _is_password_valid(form.password.data.encode('UTF-8'), user):
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
-            flask.session['name'] = user.get('name')
-            flask.session['user_type'] = user['user_type']
-            return flask.redirect(flask.url_for('news.index'))
-        except Exception as ex:
-            flask.flash(_('Invalid login: {} Please try again.'.format(str(ex))))
-            return flask.render_template('auth_login.html')
+            if is_account_valid(user):
+                flask.session['name'] = user.get('name')
+                flask.session['user_type'] = user['user_type']
+                return flask.redirect(flask.request.args.get('next') or flask.url_for('news.index'))
+        else:
+            flask.flash('Invalid username or password.', 'danger')
+    return flask.render_template('login.html', form=form)
 
-    return flask.render_template('auth_login.html',
-                                 email=flask.request.args.get('email'),
-                                 **kwargs)
+
+def _is_password_valid(password, user):
+    """
+    Checks the password of the user
+    """
+    hashed = user.get('password').encode('UTF-8')
+
+    if not bcrypt.checkpw(password, hashed):
+        return False
+
+    return True
+
+
+def is_account_valid(user):
+    """
+    Checks if user account is active and approved
+    """
+    if not user.get('is_enabled'):
+        flask.flash('Account is disabled', 'danger')
+        return False
+
+    if not user.get('is_approved'):
+        account_created = user.get('_created')
+
+        if account_created < utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14)):
+            flask.flash('Account has not been approved', 'danger')
+            return False
+
+    return True
 
 
 @blueprint.route('/logout')
@@ -61,39 +63,14 @@ def logout():
 
 @blueprint.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if flask.request.method == 'POST':
-        try:
-            new_user = flask.request.form.to_dict()
-            _validate_new_user(new_user)
-            _modify_user_data(new_user)
-            get_resource_service('users').post([new_user])
-        except Exception as ex:
-            flask.flash('User could not be created: {}'.format(str(ex)))
-            return flask.render_template('signup.html', **new_user)
-        return flask.redirect(flask.url_for('auth.login', email=new_user.get('email')))
-    return flask.render_template('signup.html')
-
-
-def _validate_new_user(new_user):
-    if not new_user.get('email'):
-        raise Exception(_('Email cannot be empty'))
-
-    if not new_user.get('name'):
-        raise Exception(_('Name cannot be empty'))
-
-    if not new_user.get('password'):
-        raise Exception(_('Password cannot be empty'))
-
-    if new_user.get('email') != new_user.get('email2'):
-        raise Exception(_('Email addresses do not match'))
-
-    if new_user.get('password') != new_user.get('password2'):
-        raise Exception(_('Passwords do not match'))
-
-    existing_users = query_resource('users', {'email': new_user.get('email')})
-
-    if existing_users.count() > 0:
-        raise Exception(_('Email address is already in use'))
+    form = SignupForm()
+    if form.validate_on_submit():
+        new_user = form.data
+        _modify_user_data(new_user)
+        get_resource_service('users').post([new_user])
+        flask.flash('User has been created', 'success')
+        return flask.redirect(flask.url_for('auth.login'))
+    return flask.render_template('signup.html', form=form)
 
 
 def _modify_user_data(new_user):

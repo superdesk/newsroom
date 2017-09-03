@@ -8,17 +8,12 @@
 <div class="modal-body">
 <form method="POST" id="edit-user-form" action="/users/{{ form.id.data }}">
 
+  {% include "form_alerts.html" %}
+
+  {% include "flash_messages.html" %}
+
   {{ form.csrf_token }}
 
-{% if form.errors %}
-  <div class="alert alert-danger" role="alert">
-    <ul>
-      {% for field, errors in form.errors.items(): %}
-        <li>{{ field }}: {{ errors[0] }}</li>
-      {% endfor %}
-    </ul>
-  </div>
-{% endif %}
   {{ form.id() }}
 
   <div class="form-group">
@@ -81,5 +76,3 @@
 
 </form>
 </div>
-
-{% include "flash_messages.html" %}

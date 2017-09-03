@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField, BooleanField, TextAreaField
 from wtforms import SelectField
-from wtforms.validators import DataRequired, email
+from wtforms.validators import DataRequired, Email
 
 
 class UserForm(FlaskForm):
@@ -12,7 +12,7 @@ class UserForm(FlaskForm):
 
     id = HiddenField('Id')
     name = StringField('Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), email()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
     phone = StringField('Telephone', validators=[DataRequired()])
     user_type = SelectField('User Type', choices=user_types)
     company = SelectField('Company', coerce=str)

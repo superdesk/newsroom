@@ -13,56 +13,56 @@
                         </div>
                         <div class="card-body">
                             <form class="form" method="post">
+
+                                {{ form.csrf_token }}
+
+                                {% include "form_alerts.html" %}
+
                                 <div class="form-group">
-                                    <label for="name">{{ gettext('Your name') }}</label>
-                                    <input class="form-control" name="name" id="name" required>
+                                    <label for="name">{{ gettext(form.name.label.text) }}</label>
+                                    {{ form.name(class="form-control", id="name", required="true") }}
                                 </div>
                                 <div class="form-group">
-                                    <label for="email">{{ gettext('Your email address') }}</label>
-                                    <input type="email" class="form-control" name="email" id="email" required>
+                                    <label for="email">{{ gettext(form.email.label.text) }}</label>
+                                    {{ form.email(class="form-control", id="email", required="true") }}
                                 </div>
                                 <div class="form-group">
-                                    <label for="email2">{{ gettext('Please re-enter email') }}</label>
-                                    <input type="email" class="form-control" name="email2" id="email2" required>
+                                    <label for="email2">{{ gettext(form.email2.label.text) }}</label>
+                                    {{ form.email2(class="form-control", id="email2", required="true") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">{{ gettext(form.password.label.text) }}</label>
+                                    {{ form.password(class="form-control", id="password", required="true") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="password2">{{ gettext(form.password2.label.text) }}</label>
+                                    {{ form.password2(class="form-control", id="password2", required="true") }}
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="password">{{ gettext('Your password') }}</label>
-                                    <input class="form-control" name="password" id="password" type="password">
+                                    <label for="phone">{{ gettext(form.phone.label.text) }}</label>
+                                    {{ form.phone(class="form-control", id="phone", required="true") }}
                                 </div>
                                 <div class="form-group">
-                                    <label for="password2">{{ gettext('Please re-enter password') }}</label>
-                                    <input class="form-control" name="password2" id="password2" type="password">
+                                    <label for="country">{{ gettext(form.country.label.text) }}</label>
+                                    {{ form.country(class="form-control", id="country", required="true") }}
                                 </div>
                                 <div class="form-group">
-                                    <label for="country">{{ gettext('Your country') }}</label>
-                                    <input class="form-control" name="country" id="country" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="company">{{ gettext('Your company') }}</label>
-                                    <input class="form-control" name="company" id="company" required>
+                                    <label for="company">{{ gettext(form.company.label.text) }}</label>
+                                    {{ form.company(class="form-control", id="company", required="true") }}
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="occupation">{{ gettext('Your position') }}</label>
-                                    <select class="form-control" name="occupation">
-                                        <option value="Editor">Editor</option>
-                                        <option value="Journalist">Journalist</option>
-                                        <option value="Sales">Sales Representative</option>
-                                        <option value="CTO">CTO</option>
-                                        <option value="CEO">CEO</option>
-                                    </select>
+                                    <label for="occupation">{{ gettext(form.occupation.label.text) }}</label>
+                                    {{ form.occupation(class="form-control", id="occupation", required="true") }}
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="company_size">{{ gettext('Size of your company') }}</label>
-                                    <select class="form-control" name="company_size">
-                                        <option value="0-10">0-10</option>
-                                        <option value="11-100">11-100</option>
-                                        <option value=">100">{{ ">100" | e}}</option>
-                                    </select>
+                                    <label for="company_size">{{ gettext(form.company_size.label.text) }}</label>
+                                    {{ form.company_size(class="form-control", id="company_size", required="true") }}
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Sign up") }}</button>
+                                <button type="submit" class="btn btn-primary btn-lg float-right">
+                                    {{ gettext("Sign up") }}</button>
                             </form>
                         </div>
                     </div>

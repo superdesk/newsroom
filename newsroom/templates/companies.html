@@ -33,9 +33,9 @@
       <td>{{ company['sd_subscriber_id'] }}</td>
 
     {% if company['is_enabled'] %}
-        <td>Active</td>
+        <td>{{ gettext("Enabled") }}</td>
     {% else %}
-        <td>Inactive</td>
+        <td>{{ gettext("Disabled") }}</td>
     {% endif %}
 
       <td>{{ company['contact_name'] }}</td>
