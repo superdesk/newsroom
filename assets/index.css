@@ -8,7 +8,49 @@ body {
     background-color: #fff;
 }
 
-.headerbar, .headerbar .navbar-brand {
+nav.main {
     color: #969696;
     background-color: #2d2d2d;
+    height: 60px;
+}
+
+nav.search {
+    width: 100%;
+}
+
+.form-alert {
+    width: 450px;
+    max-width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.col-fixed-60{
+    width:60px;
+    background:rgb(0, 172, 236);
+    position:fixed;
+    height:100%;
+    z-index:1;
+}
+
+
+.col-offset-120{
+    padding-left:120px;
+    z-index:0;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    background:rgb(0, 111, 153);
+    margin-left: -16px;
+}
+
+img.logo {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 7px;
+    width: 45px;
+    height: 45px;
+    display: block;
 }

@@ -1,0 +1,78 @@
+<div class="modal-header">
+    <h5 class="modal-title">Edit user {{ form.email.data }}</h5>
+    <button id="hide-sidebar" type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+<div class="modal-body">
+<form method="POST" id="edit-user-form" action="/users/{{ form.id.data }}">
+
+  {% include "form_alerts.html" %}
+
+  {% include "flash_messages.html" %}
+
+  {{ form.csrf_token }}
+
+  {{ form.id() }}
+
+  <div class="form-group">
+    <label for="userName">{{ form.name.label.text }}</label>
+    {{ form.name(class="form-control", id="userName") }}
+  </div>
+
+  <div class="form-group">
+    <label for="userEmail">{{ form.email.label.text }}</label>
+    {{ form.email(class="form-control", id="userEmail") }}
+  </div>
+
+  <div class="form-group">
+    <label for="userPhone">{{ form.phone.label.text }}</label>
+    {{ form.phone(class="form-control", id="userPhone") }}
+  </div>
+
+  <div class="form-group">
+    <label for="userType">{{ form.user_type.label.text }}</label>
+    {{ form.user_type(class="form-control", id="userType") }}
+  </div>
+
+  <div class="form-group">
+    <label for="company">{{ form.company.label.text }}</label>
+    {{ form.company(class="form-control", id="company") }}
+  </div>
+
+  <div class="form-group">
+    <label for="signup_details">{{ form.signup_details.label.text }}</label>
+    {{ form.signup_details(class="form-control", id="signup_details", readonly=true) }}
+  </div>
+
+  <div class="form-check">
+    <label class="form-check-label" for="validated">
+    {{ form.is_validated(class="form-check-input", id="validated", disabled=true) }}
+    {{ form.is_validated.label.text }}
+    </label>
+
+  </div>
+
+  <div class="form-check">
+    <label class="form-check-label" for="approved">
+    {{ form.is_approved(class="form-check-input", id="approved") }}
+    {{ form.is_approved.label.text }}
+    </label>
+  </div>
+
+  <div class="form-check">
+    <label class="form-check-label" for="enabled">
+    {{ form.is_enabled(class="form-check-input", id="enabled") }}
+    {{ form.is_enabled.label.text }}
+    </label>
+  </div>
+
+<div class="modal-footer">
+  <input type="button" class="btn btn-secondary" value="Resend Validation Email" id="resendEmail">
+  <input type="button" class="btn btn-secondary" value="Reset Password" id="resetPassword">
+  <input type="submit" class="btn btn-primary" value="Save" id="userSave">
+</div>
+
+</form>
+</div>
