@@ -9,10 +9,10 @@
                 <div class="col-md-6 mx-auto">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="mb-0">{{ gettext("Newsroom login") }}</h3>
+                            <h3 class="mb-0">{{ gettext("Newsroom Token") }}</h3>
                         </div>
                         <div class="card-body">
-                            <form class="form" role="form" id="formLogin" method="post">
+                            <form class="form" role="form" id="formToken" method="post">
 
                                 {{ form.csrf_token }}
 
@@ -22,16 +22,13 @@
                                     <label for="email">{{ gettext(form.email.label.text) }}</label>
                                     {{ form.email(class="form-control", id="email", required="true") }}
                                 </div>
-                                <div class="form-group">
-                                    <label for="password">{{ gettext(form.password.label.text) }}</label>
-                                    {{ form.password(class="form-control", id="password", required="true") }}
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Login") }}</button>
+
+                                {% if token_type=='validate' %}
+                                    <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Validate") }}</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Reset Password") }}</button>
+                                {% endif %}
                             </form>
-                        </div>
-                        <div class="card-footer text-muted"">
-                            <p><a href="{{ url_for('auth.token', token_type='validate') }}">Click here</a> to resend validation token.
-                            New user? <a href="{{ url_for('auth.signup') }}">Click here</a> to register</p>
                         </div>
                     </div>
                 </div>
