@@ -33,7 +33,7 @@ $(document).ready(function () {
         postData.sd_subscriber_id = $form.find('input[name="sd_subscriber_id"]').val();
         postData.phone = $form.find('input[name="phone"]').val();
         postData.contact_name = $form.find('input[name="contact_name"]').val();
-        postData.is_enabled = $form.find('input[name="is_enabled"]').is(":checked");
+        postData.is_enabled = $form.find('input[name="is_enabled"]').is(':checked');
 
         var posting = $.post(url, postData);
 
@@ -44,7 +44,7 @@ $(document).ready(function () {
           $('#refresh').prop('hidden', false);
         });
 
-        posting.fail(function(data) {
+        posting.fail(function (data) {
           initCompanyDetails(data.responseText);
         });
       });
