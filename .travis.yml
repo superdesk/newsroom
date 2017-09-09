@@ -32,7 +32,7 @@ install:
 
 script:
     - flake8
-    - python newsroom_tests.py
+    - pytest --cov=newsroom
     - npm run lint
     - npm run flow
     - npm run build

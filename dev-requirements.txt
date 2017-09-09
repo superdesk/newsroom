@@ -1,4 +1,4 @@
 flake8
 sphinx
-coverage
-nose
+pytest
+pytest-cov
