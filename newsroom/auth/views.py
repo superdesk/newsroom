@@ -23,7 +23,11 @@ def login():
                 flask.flash('Your email address needs validation.', 'danger')
                 return flask.render_template('login.html', form=form)
 
-            if is_account_enabled(user):
+            if not _is_company_enabled(user):
+                flask.flash('Company account has been disabled.', 'danger')
+                return flask.render_template('login.html', form=form)
+
+            if _is_account_enabled(user):
                 flask.session['name'] = user.get('name')
                 flask.session['user_type'] = user['user_type']
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('news.index'))
@@ -44,7 +48,22 @@ def _is_password_valid(password, user):
     return True
 
 
-def is_account_enabled(user):
+def _is_company_enabled(user):
+    """
+    Checks if the company of the user is enabled
+    """
+    if not user.get('company'):
+        # there's no company assigned for this user so this check doesn't apply
+        return True
+
+    company = get_resource_service('companies').find_one(req=None, _id=user.get('company'))
+    if not company:
+        return False
+
+    return company.get('is_enabled', False)
+
+
+def _is_account_enabled(user):
     """
     Checks if user account is active and approved
     """

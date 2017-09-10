@@ -25,6 +25,7 @@ def create():
     if flask.request.method == 'POST':
         if form.validate():
             new_company = flask.request.form.to_dict()
+            new_company.pop('csrf_token', None)
             get_resource_service('companies').post([new_company])
             flask.flash(gettext('Company has been updated successfully.'), 'success')
         else:
