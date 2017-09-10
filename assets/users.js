@@ -12,20 +12,27 @@ $(document).ready(function () {
     submitForm();
 
     $('#resendEmail').click(function () {
-      const $form = $('#edit-user-form');
-      const userId = $form.find('input[name="id"]').val();
-      const url = `/users/${userId}/resend_token`;
+      processTokenRequest('validate');
+    });
 
-      var posting = $.post(url);
+    $('#resetPassword').click(function () {
+      processTokenRequest('reset_password');
+    });
+  }
 
-      posting.done(function (data) {
-        initUserDetails(data);
-      });
+  function processTokenRequest(tokenType) {
+    const $form = $('#edit-user-form');
+    const userId = $form.find('input[name="id"]').val();
+    const url = `/users/${userId}/${tokenType}`;
 
-      posting.fail(function (data) {
-        initUserDetails(data.responseText);
-      });
+    var posting = $.post(url);
 
+    posting.done(function (data) {
+      initUserDetails(data);
+    });
+
+    posting.fail(function (data) {
+      initUserDetails(data.responseText);
     });
   }
 

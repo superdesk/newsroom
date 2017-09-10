@@ -6,7 +6,7 @@ from flask import current_app as app
 import bcrypt
 from newsroom.auth import blueprint
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm
-from newsroom.email import send_validate_account_email
+from newsroom.email import send_validate_account_email, send_reset_password_email
 from newsroom.utils import get_random_string
 from bson import ObjectId
 
@@ -160,11 +160,17 @@ def token():
 
 
 def send_token(user, token_type='validate'):
-    if user is not None and not user.get('is_validated'):
+    if user is not None and user.get('is_enabled', False):
+
+        if token_type == 'validate' and user.get('is_validated', False):
+            return False
+
         updates = {}
         _add_token_data(updates)
         get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
         if token_type == 'validate':
             send_validate_account_email(user['name'], user['email'], updates['token'])
+        elif token_type == 'reset_password':
+            send_reset_password_email(user['name'], user['email'], updates['token'])
         return True
     return False

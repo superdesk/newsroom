@@ -72,19 +72,34 @@ def init_users():
     return users
 
 
-@blueprint.route('/users/<id>/resend_token', methods=['POST'])
+@blueprint.route('/users/<id>/validate', methods=['POST'])
+def validate(id):
+    return _resend_token(id, token_type='validate')
+
+
+@blueprint.route('/users/<id>/reset_password', methods=['POST'])
 def resend_token(id):
-    if not id:
+    return _resend_token(id, token_type='reset_password')
+
+
+def _resend_token(user_id, token_type):
+    """
+    Sends a new token for a given user_id
+    :param user_id: Id of the user to send the token
+    :param token_type: validate or reset_password
+    :return:
+    """
+    if not user_id:
         return BadRequest(gettext('User id not provided'))
 
-    user = find_one('users', _id=ObjectId(id))
+    user = find_one('users', _id=ObjectId(user_id))
     status = 200
 
     if not user:
         return NotFound(gettext('User not found'))
 
-    if send_token(user, token_type='validate'):
-        flask.flash(gettext('A new validation token has been sent to user'), 'success')
+    if send_token(user, token_type):
+        flask.flash(gettext('A new token has been sent to user'), 'success')
     else:
         flask.flash(gettext('Token is not generated.'), 'danger')
         status = 400
