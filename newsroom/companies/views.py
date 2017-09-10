@@ -55,6 +55,7 @@ def edit(id):
             updates['phone'] = edited_form.phone.data
             updates['is_enabled'] = edited_form.is_enabled.data
             updates['contact_name'] = edited_form.contact_name.data
+            updates['country'] = edited_form.country.data
             get_resource_service('companies').patch(id=ObjectId(id),
                                                     updates=updates)
             flask.flash(gettext('Company has been updated successfully.'), 'success')

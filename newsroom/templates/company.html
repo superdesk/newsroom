@@ -32,6 +32,11 @@
     {{ form.contact_name(class="form-control", id="contactName") }}
   </div>
 
+  <div class="form-group">
+    <label for="country">{{ form.country.label.text }}</label>
+    {{ form.country(class="form-control", id="country") }}
+  </div>
+
   <div class="form-check mt-4">
     <label class="form-check-label" for="enabled">
     {{ form.is_enabled(class="form-check-input", id="enabled") }}

@@ -34,6 +34,7 @@ $(document).ready(function () {
         postData.phone = $form.find('input[name="phone"]').val();
         postData.contact_name = $form.find('input[name="contact_name"]').val();
         postData.is_enabled = $form.find('input[name="is_enabled"]').is(':checked');
+        postData.country = $form.find('input[name="country"]').val();
 
         var posting = $.post(url, postData);
 
