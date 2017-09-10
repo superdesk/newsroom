@@ -10,6 +10,23 @@ $(document).ready(function () {
     });
 
     submitForm();
+
+    $('#resendEmail').click(function () {
+      const $form = $('#edit-user-form');
+      const userId = $form.find('input[name="id"]').val();
+      const url = `/users/${userId}/resend_token`;
+
+      var posting = $.post(url);
+
+      posting.done(function (data) {
+        initUserDetails(data);
+      });
+
+      posting.fail(function (data) {
+        initUserDetails(data.responseText);
+      });
+
+    });
   }
 
   function submitForm() {

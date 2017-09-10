@@ -153,11 +153,18 @@ def token():
     token_type = flask.request.args['token_type']
     if form.validate_on_submit():
         user = get_resource_service('users').find_one(req=None, email=form.email.data)
-        if user is not None:
-            updates = {}
-            _add_token_data(updates)
-            get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
-            send_validate_account_email(user['name'], user['email'], updates['token'])
+        send_token(user, token_type)
         flask.flash('A new validation token has been sent. Please check your emails')
         return flask.redirect(flask.url_for('auth.login'))
     return flask.render_template('request_token.html', form=form, token_type=token_type)
+
+
+def send_token(user, token_type='validate'):
+    if user is not None and not user.get('is_validated'):
+        updates = {}
+        _add_token_data(updates)
+        get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
+        if token_type == 'validate':
+            send_validate_account_email(user['name'], user['email'], updates['token'])
+        return True
+    return False

@@ -69,7 +69,9 @@
   </div>
 
 <div class="modal-footer">
-  <input type="button" class="btn btn-secondary" value="Resend Validation Email" id="resendEmail">
+    {% if not form.is_validated.data %}
+        <input type="button" class="btn btn-secondary" value="Resend Validation Email" id="resendEmail">
+    {% endif %}
   <input type="button" class="btn btn-secondary" value="Reset Password" id="resetPassword">
   <input type="submit" class="btn btn-primary" value="Save" id="userSave">
 </div>
