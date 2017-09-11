@@ -73,11 +73,13 @@ def init_users():
 
 
 @blueprint.route('/users/<id>/validate', methods=['POST'])
+@admin_only
 def validate(id):
     return _resend_token(id, token_type='validate')
 
 
 @blueprint.route('/users/<id>/reset_password', methods=['POST'])
+@admin_only
 def resend_token(id):
     return _resend_token(id, token_type='reset_password')
 

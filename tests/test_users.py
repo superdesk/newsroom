@@ -35,6 +35,7 @@ def test_login_succeeds_for_admin(client):
 
 
 def test_validation_token_sent_for_user_succeeds(app, client):
+    test_login_succeeds_for_admin(client)
     # Insert a new user
     app.data.insert('users', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
@@ -53,6 +54,7 @@ def test_validation_token_sent_for_user_succeeds(app, client):
 
 
 def test_validation_token_resend_fails_if_user_is_validated(app, client):
+    test_login_succeeds_for_admin(client)
     # Insert a new user
     app.data.insert('users', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
@@ -71,6 +73,7 @@ def test_validation_token_resend_fails_if_user_is_validated(app, client):
 
 
 def test_reset_password_token_sent_for_user_succeeds(app, client):
+    test_login_succeeds_for_admin(client)
     # Insert a new user
     app.data.insert('users', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
@@ -91,6 +94,7 @@ def test_reset_password_token_sent_for_user_succeeds(app, client):
 
 
 def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client):
+    test_login_succeeds_for_admin(client)
     # Insert a new user
     app.data.insert('users', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
