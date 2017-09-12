@@ -55,3 +55,19 @@ NEW_ACCOUNT_ACTIVE_DAYS = 14
 
 # Enable CSRF protection for forms
 WTF_CSRF_ENABLED = True
+
+# Email settings
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 465
+MAIL_USE_SSL = True
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+
+#: The number of days a token is valid
+RESET_PASSWORD_TOKEN_TIME_TO_LIVE = 1
+#: The number of days a validation token is valid
+VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 1
+#: default sender for superdesk emails
+MAIL_DEFAULT_SENDER = MAIL_USERNAME or 'newsroom@localhost'
+#: public client url - used to create links within emails etc
+CLIENT_URL = 'http://localhost:5050'

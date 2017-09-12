@@ -10,3 +10,4 @@ class CompanyForm(Form):
     is_enabled = BooleanField('Account Enabled', default=True, validators=[])
     contact_name = StringField('Contact Name', validators=[])
     phone = StringField('Telephone', validators=[])
+    country = StringField('Country', validators=[])

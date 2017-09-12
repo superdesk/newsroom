@@ -7,6 +7,7 @@ from superdesk import get_resource_service
 from newsroom.users import blueprint
 from flask_babel import gettext
 from newsroom.auth.decorator import admin_only
+from newsroom.auth.views import send_token
 
 
 @blueprint.route('/users', methods=['GET'])
@@ -69,3 +70,43 @@ def init_users():
         if user.get('company'):
             user['company'] = company_dict[str(user['company'])]
     return users
+
+
+@blueprint.route('/users/<id>/validate', methods=['POST'])
+@admin_only
+def validate(id):
+    return _resend_token(id, token_type='validate')
+
+
+@blueprint.route('/users/<id>/reset_password', methods=['POST'])
+@admin_only
+def resend_token(id):
+    return _resend_token(id, token_type='reset_password')
+
+
+def _resend_token(user_id, token_type):
+    """
+    Sends a new token for a given user_id
+    :param user_id: Id of the user to send the token
+    :param token_type: validate or reset_password
+    :return:
+    """
+    if not user_id:
+        return BadRequest(gettext('User id not provided'))
+
+    user = find_one('users', _id=ObjectId(user_id))
+    status = 200
+
+    if not user:
+        return NotFound(gettext('User not found'))
+
+    if send_token(user, token_type):
+        flask.flash(gettext('A new token has been sent to user'), 'success')
+    else:
+        flask.flash(gettext('Token is not generated.'), 'danger')
+        status = 400
+
+    user['id'] = str(user['_id'])
+    form = UserForm(**user)
+    form.company.choices = init_companies()
+    return flask.render_template('user.html', form=form), status

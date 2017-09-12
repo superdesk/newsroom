@@ -23,7 +23,7 @@
 
   <div class="form-group">
     <label for="userEmail">{{ form.email.label.text }}</label>
-    {{ form.email(class="form-control", id="userEmail") }}
+    {{ form.email(class="form-control", id="userEmail", readonly=true) }}
   </div>
 
   <div class="form-group">
@@ -69,8 +69,12 @@
   </div>
 
 <div class="modal-footer">
-  <input type="button" class="btn btn-secondary" value="Resend Validation Email" id="resendEmail">
-  <input type="button" class="btn btn-secondary" value="Reset Password" id="resetPassword">
+    {% if not form.is_validated.data and form.is_enabled.data %}
+        <input type="button" class="btn btn-secondary" value="Resend Validation Email" id="resendEmail">
+    {% endif %}
+    {% if form.is_enabled.data %}
+      <input type="button" class="btn btn-secondary" value="Reset Password" id="resetPassword">
+    {% endif %}
   <input type="submit" class="btn btn-primary" value="Save" id="userSave">
 </div>
 

@@ -10,6 +10,30 @@ $(document).ready(function () {
     });
 
     submitForm();
+
+    $('#resendEmail').click(function () {
+      processTokenRequest('validate');
+    });
+
+    $('#resetPassword').click(function () {
+      processTokenRequest('reset_password');
+    });
+  }
+
+  function processTokenRequest(tokenType) {
+    const $form = $('#edit-user-form');
+    const userId = $form.find('input[name="id"]').val();
+    const url = `/users/${userId}/${tokenType}`;
+
+    var posting = $.post(url);
+
+    posting.done(function (data) {
+      initUserDetails(data);
+    });
+
+    posting.fail(function (data) {
+      initUserDetails(data.responseText);
+    });
   }
 
   function submitForm() {

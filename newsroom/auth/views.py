@@ -5,7 +5,11 @@ from datetime import timedelta
 from flask import current_app as app
 import bcrypt
 from newsroom.auth import blueprint
-from newsroom.auth.forms import SignupForm, LoginForm
+from newsroom.auth.forms import SignupForm, LoginForm, TokenForm
+from newsroom.email import send_validate_account_email, send_reset_password_email
+from newsroom.utils import get_random_string
+from bson import ObjectId
+from flask_babel import gettext
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
@@ -15,12 +19,21 @@ def login():
         user = get_resource_service('auth_user').find_one(req=None, email=form.email.data)
         if user is not None and _is_password_valid(form.password.data.encode('UTF-8'), user):
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
-            if is_account_valid(user):
+
+            if not user.get('is_validated'):
+                flask.flash(gettext('Your email address needs validation.'), 'danger')
+                return flask.render_template('login.html', form=form)
+
+            if not _is_company_enabled(user):
+                flask.flash(gettext('Company account has been disabled.'), 'danger')
+                return flask.render_template('login.html', form=form)
+
+            if _is_account_enabled(user):
                 flask.session['name'] = user.get('name')
                 flask.session['user_type'] = user['user_type']
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('news.index'))
         else:
-            flask.flash('Invalid username or password.', 'danger')
+            flask.flash(gettext('Invalid username or password.'), 'danger')
     return flask.render_template('login.html', form=form)
 
 
@@ -36,19 +49,34 @@ def _is_password_valid(password, user):
     return True
 
 
-def is_account_valid(user):
+def _is_company_enabled(user):
+    """
+    Checks if the company of the user is enabled
+    """
+    if not user.get('company'):
+        # there's no company assigned for this user so this check doesn't apply
+        return True
+
+    company = get_resource_service('companies').find_one(req=None, _id=user.get('company'))
+    if not company:
+        return False
+
+    return company.get('is_enabled', False)
+
+
+def _is_account_enabled(user):
     """
     Checks if user account is active and approved
     """
     if not user.get('is_enabled'):
-        flask.flash('Account is disabled', 'danger')
+        flask.flash(gettext('Account is disabled'), 'danger')
         return False
 
     if not user.get('is_approved'):
         account_created = user.get('_created')
 
         if account_created < utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14)):
-            flask.flash('Account has not been approved', 'danger')
+            flask.flash(gettext('Account has not been approved'), 'danger')
             return False
 
     return True
@@ -67,8 +95,10 @@ def signup():
     if form.validate_on_submit():
         new_user = form.data
         _modify_user_data(new_user)
+        _add_token_data(new_user)
         get_resource_service('users').post([new_user])
-        flask.flash('User has been created', 'success')
+        send_validate_account_email(new_user['name'], new_user['email'], new_user['token'])
+        flask.flash(gettext('Validation email has been sent. Please check your emails.'), 'success')
         return flask.redirect(flask.url_for('auth.login'))
     return flask.render_template('signup.html', form=form)
 
@@ -87,3 +117,57 @@ def _modify_user_data(new_user):
     new_user.pop('company', None)
     new_user.pop('occupation', None)
     new_user.pop('company_size', None)
+    new_user.pop('csrf_token', None)
+
+
+def _add_token_data(user):
+    user['token'] = get_random_string()
+    user['token_expiry_date'] = utcnow() + timedelta(days=app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'])
+
+
+@blueprint.route('/validate/<token>')
+def validate_account(token):
+    user = get_resource_service('users').find_one(req=None, token=token)
+    if not user:
+        flask.abort(404)
+
+    if user.get('is_validated'):
+        return flask.redirect(flask.url_for('auth.login'))
+
+    if user.get('token_expiry_date') > utcnow():
+        updates = {'is_validated': True, 'token': None, 'token_expiry_date': None}
+        get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
+        flask.flash(gettext('Your account has been validated.'), 'success')
+        return flask.redirect(flask.url_for('auth.login'))
+
+    flask.flash(gettext('Token has expired. Please create a new token'), 'danger')
+    flask.redirect(flask.url_for('auth.token', token_type='validate'))
+
+
+@blueprint.route('/token', methods=['GET', 'POST'])
+def token():
+    form = TokenForm()
+    token_type = flask.request.args['token_type']
+    if form.validate_on_submit():
+        user = get_resource_service('users').find_one(req=None, email=form.email.data)
+        send_token(user, token_type)
+        flask.flash(gettext('A new validation token has been sent. Please check your emails'), 'success')
+        return flask.redirect(flask.url_for('auth.login'))
+    return flask.render_template('request_token.html', form=form, token_type=token_type)
+
+
+def send_token(user, token_type='validate'):
+    if user is not None and user.get('is_enabled', False):
+
+        if token_type == 'validate' and user.get('is_validated', False):
+            return False
+
+        updates = {}
+        _add_token_data(updates)
+        get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
+        if token_type == 'validate':
+            send_validate_account_email(user['name'], user['email'], updates['token'])
+        elif token_type == 'reset_password':
+            send_reset_password_email(user['name'], user['email'], updates['token'])
+        return True
+    return False

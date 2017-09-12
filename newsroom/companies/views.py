@@ -25,6 +25,7 @@ def create():
     if flask.request.method == 'POST':
         if form.validate():
             new_company = flask.request.form.to_dict()
+            new_company.pop('csrf_token', None)
             get_resource_service('companies').post([new_company])
             flask.flash(gettext('Company has been updated successfully.'), 'success')
         else:
@@ -54,6 +55,7 @@ def edit(id):
             updates['phone'] = edited_form.phone.data
             updates['is_enabled'] = edited_form.is_enabled.data
             updates['contact_name'] = edited_form.contact_name.data
+            updates['country'] = edited_form.country.data
             get_resource_service('companies').patch(id=ObjectId(id),
                                                     updates=updates)
             flask.flash(gettext('Company has been updated successfully.'), 'success')

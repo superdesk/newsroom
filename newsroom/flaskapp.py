@@ -15,6 +15,7 @@ from flask_babel import Babel, format_time
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from content_api.tokens import CompanyTokenAuth
+from flask_mail import Mail
 
 from newsroom.webpack import NewsroomWebpack
 
@@ -54,6 +55,7 @@ class Newsroom(eve.Eve):
         self._setup_babel()
         self._setup_jinja_filters()
         self._setup_webpack()
+        self._setup_email()
 
     def load_config(self):
         """Override Eve.load_config in order to get default_settings."""
@@ -84,3 +86,6 @@ class Newsroom(eve.Eve):
 
     def _setup_webpack(self):
         NewsroomWebpack(self)
+
+    def _setup_email(self):
+        self.mail = Mail(self)
