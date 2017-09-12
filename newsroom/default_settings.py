@@ -4,7 +4,9 @@ import tzlocal
 from superdesk.default_settings import (   # noqa
     VERSION,
     CONTENTAPI_MONGO_URI,
-    CONTENTAPI_ELASTICSEARCH_URL
+    CONTENTAPI_ELASTICSEARCH_URL,
+    DATE_FORMAT,
+    ELASTIC_DATE_FORMAT,
 )
 
 XML = False

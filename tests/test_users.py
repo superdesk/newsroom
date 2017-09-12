@@ -31,7 +31,6 @@ def test_login_succeeds_for_admin(client):
         follow_redirects=True
     )
     assert response.status_code == 200
-    assert b'<h5>There are no items yet.</h5>' in response.data
 
 
 def test_validation_token_sent_for_user_succeeds(app, client):
