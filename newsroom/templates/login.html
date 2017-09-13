@@ -29,9 +29,8 @@
                                 <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Login") }}</button>
                             </form>
                         </div>
-                        <div class="card-footer text-muted"">
-                            <p><a href="{{ url_for('auth.token', token_type='validate') }}">Click here</a> to resend validation token.
-                            New user? <a href="{{ url_for('auth.signup') }}">Click here</a> to register</p>
+                        <div class="card-footer text-muted">
+                            <p>Forgot your password? <a href="{{ url_for('auth.token', token_type='reset_password') }}">Click here</a> to reset</p>
                         </div>
                     </div>
                 </div>

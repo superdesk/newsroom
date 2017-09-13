@@ -233,26 +233,6 @@ def test_login_for_user_with_enabled_company_succeeds(client):
     assert 'John Doe' in response.get_data(as_text=True)
 
 
-def test_login_fails_for_invalidated_user(client):
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
-        'name': 'John Doe',
-        'password': 'abc',
-        'password2': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'})
-    assert response.status_code == 302
-    response = client.post(
-        url_for('auth.login'),
-        data={'email': 'newuser@abc.org', 'password': 'abc'},
-        follow_redirects=True)
-    assert 'Your email address needs validation' in response.get_data(as_text=True)
-
-
 def test_login_fails_for_not_approved_user(app, client):
     # If user is created more than 14 days ago login fails
     app.data.insert('users', [{

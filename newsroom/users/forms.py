@@ -18,5 +18,5 @@ class UserForm(FlaskForm):
     company = SelectField('Company', coerce=str)
     signup_details = TextAreaField('Sign Up Details', validators=[])
     is_validated = BooleanField('Email Validated', validators=[])
-    is_enabled = BooleanField('Account Enabled', validators=[])
+    is_enabled = BooleanField('Account Enabled', default=True, validators=[])
     is_approved = BooleanField('Account Approved', validators=[])

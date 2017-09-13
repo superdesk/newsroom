@@ -9,10 +9,6 @@ $(document).ready(function () {
 
         submitForm();
 
-        $('#resendEmail').click(function () {
-            processTokenRequest('validate');
-        });
-
         $('#resetPassword').click(function () {
             processTokenRequest('reset_password');
         });
@@ -85,6 +81,13 @@ $(document).ready(function () {
 
     $('#refresh').click(function () {
         refreshContent();
+    });
+
+    $('#create-user').click(function () {
+        $('#sidebar').prop('hidden', false);
+        $.get('/users/new', function (data) {
+            initUserDetails(data);
+        });
     });
 
     initEvents();

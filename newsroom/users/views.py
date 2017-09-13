@@ -7,7 +7,7 @@ from superdesk import get_resource_service
 from newsroom.users import blueprint
 from flask_babel import gettext
 from newsroom.auth.decorator import admin_only
-from newsroom.auth.views import send_token
+from newsroom.auth.views import send_token, add_token_data, send_reset_password_email
 
 
 @blueprint.route('/users', methods=['GET'])
@@ -19,12 +19,42 @@ def index():
         users=users)
 
 
+@blueprint.route('/users/new', methods=['GET', 'POST'])
+@admin_only
+def create():
+    form = UserForm(flask.request.form)
+    form.company.choices = init_companies()
+
+    if flask.request.method == 'POST':
+        if form.validate() and _is_email_address_valid(form.email.data):
+            new_user = flask.request.form.to_dict()
+            add_token_data(new_user)
+            new_user.pop('csrf_token', None)
+            get_resource_service('users').post([new_user])
+            flask.flash(gettext('User has been created successfully.'), 'success')
+            send_reset_password_email(new_user['name'], new_user['email'], new_user['token'])
+        else:
+            return flask.render_template('user.html',
+                                         form=form,
+                                         form_name='Create',
+                                         action='/users/new'), 400
+    return flask.render_template('user.html',
+                                 form=form,
+                                 form_name='Create',
+                                 action='/users/new'), 201
+
+
+def _is_email_address_valid(email):
+    existing_users = query_resource('users', {'email': email})
+    if existing_users.count() > 0:
+        flask.flash(gettext('Email address is already in use'), 'danger')
+        return False
+    return True
+
+
 @blueprint.route('/users/<id>', methods=['GET', 'POST'])
 @admin_only
 def edit(id):
-    if not id:
-        return BadRequest(gettext('User id not provided'))
-
     user = find_one('users', _id=ObjectId(id))
 
     if not user:
@@ -34,7 +64,8 @@ def edit(id):
     if flask.request.method == 'POST':
         form = UserForm(user=user)
         form.company.choices = init_companies()
-        if form.validate_on_submit():
+        form.email.disabled = True
+        if form.email.data != user['email'] and _is_email_address_valid(form.email.data) and form.validate_on_submit():
             updates = {}
             updates['name'] = form.name.data
             updates['email'] = form.email.data
@@ -48,11 +79,17 @@ def edit(id):
             get_resource_service('users').patch(id=ObjectId(id), updates=updates)
             flask.flash(gettext('User has been updated successfully.'), 'success')
         else:
-            return flask.render_template('user.html', form=form), 400
+            return flask.render_template('user.html',
+                                         form=form,
+                                         form_name='Edit',
+                                         action='/users/{}'.format(id)), 400
 
     form = UserForm(**user)
     form.company.choices = init_companies()
-    return flask.render_template('user.html', form=form), 200
+    return flask.render_template('user.html',
+                                 form=form,
+                                 form_name='Edit',
+                                 action='/users/{}'.format(id)), 200
 
 
 def init_companies():

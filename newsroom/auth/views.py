@@ -5,7 +5,7 @@ from datetime import timedelta
 from flask import current_app as app
 import bcrypt
 from newsroom.auth import blueprint
-from newsroom.auth.forms import SignupForm, LoginForm, TokenForm
+from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
 from newsroom.email import send_validate_account_email, send_reset_password_email
 from newsroom.utils import get_random_string
 from bson import ObjectId
@@ -19,10 +19,6 @@ def login():
         user = get_resource_service('auth_user').find_one(req=None, email=form.email.data)
         if user is not None and _is_password_valid(form.password.data.encode('UTF-8'), user):
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
-
-            if not user.get('is_validated'):
-                flask.flash(gettext('Your email address needs validation.'), 'danger')
-                return flask.render_template('login.html', form=form)
 
             if not _is_company_enabled(user):
                 flask.flash(gettext('Company account has been disabled.'), 'danger')
@@ -95,7 +91,7 @@ def signup():
     if form.validate_on_submit():
         new_user = form.data
         _modify_user_data(new_user)
-        _add_token_data(new_user)
+        add_token_data(new_user)
         get_resource_service('users').post([new_user])
         send_validate_account_email(new_user['name'], new_user['email'], new_user['token'])
         flask.flash(gettext('Validation email has been sent. Please check your emails.'), 'success')
@@ -120,7 +116,7 @@ def _modify_user_data(new_user):
     new_user.pop('csrf_token', None)
 
 
-def _add_token_data(user):
+def add_token_data(user):
     user['token'] = get_random_string()
     user['token_expiry_date'] = utcnow() + timedelta(days=app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'])
 
@@ -144,14 +140,28 @@ def validate_account(token):
     flask.redirect(flask.url_for('auth.token', token_type='validate'))
 
 
-@blueprint.route('/token', methods=['GET', 'POST'])
-def token():
+@blueprint.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    user = get_resource_service('users').find_one(req=None, token=token)
+    if not user:
+        flask.abort(404)
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        updates = {'password': form.new_password.data, 'token': None, 'token_expiry_date': None}
+        get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
+        flask.flash(gettext('Your password has been changed. Please login again.'), 'success')
+        return flask.redirect(flask.url_for('auth.login'))
+    return flask.render_template('reset_password.html', form=form, token=token)
+
+
+@blueprint.route('/token/<token_type>', methods=['GET', 'POST'])
+def token(token_type):
     form = TokenForm()
-    token_type = flask.request.args['token_type']
     if form.validate_on_submit():
         user = get_resource_service('users').find_one(req=None, email=form.email.data)
         send_token(user, token_type)
-        flask.flash(gettext('A new validation token has been sent. Please check your emails'), 'success')
+        flask.flash(gettext('A new reset password token has been sent. Please check your emails'), 'success')
         return flask.redirect(flask.url_for('auth.login'))
     return flask.render_template('request_token.html', form=form, token_type=token_type)
 
@@ -163,7 +173,7 @@ def send_token(user, token_type='validate'):
             return False
 
         updates = {}
-        _add_token_data(updates)
+        add_token_data(updates)
         get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
         if token_type == 'validate':
             send_validate_account_email(user['name'], user['email'], updates['token'])
