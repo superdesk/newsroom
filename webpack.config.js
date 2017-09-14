@@ -8,7 +8,8 @@ module.exports = {
         newsroom_js: './assets/index.js',
         users_js: './assets/users.js',
         companies_js: './assets/companies.js',
-        newsroom_css: './assets/index.css'
+        newsroom_css: './assets/index.css',
+        wire_js: './assets/wire/index.js',
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -23,7 +24,8 @@ module.exports = {
                 loader: 'babel-loader',
                 exclude: /node_modules/,
                 options: {
-                    presets: ['flow', 'es2015', 'react']
+                    presets: ['flow', 'es2015', 'react'],
+                    plugins: ['transform-object-rest-spread'],
                 }
             },
             {

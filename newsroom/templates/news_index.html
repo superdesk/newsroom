@@ -2,33 +2,14 @@
 
 {% block title %}{{ config.SITE_NAME }} - News{% endblock %}
 
-{% block contentHeader %}
-<nav class="navbar navbar-light search">
-    <form class="form-inline">
-        <input class="form-control" name="q" value="{{ query }}" placeholder="{{ gettext('Search') }}">
-        <span class="input-group-btn">
-            <button class="btn btn-secondary" type="submit">Search</button>
-          </span>
-    </form>
-    {% if query %}
-    <div class="navbar-brand"><strong>{{ total }}</strong></div>
-    {% endif %}
-</nav>
+{% block content %}
+<div id="wire-app"></div>
 {% endblock %}
 
-{% block content %}
-{% for item in items %}
-<article class="card mb-3">
-    <div class="card-body">
-        <h4 class="card-title">{{ item.headline }}</h4>
-        <h6 class="card-subtitle">{{ item.slugline }}</h6>
-        <small class="card-subtitle">{{ gettext('Source: %(source)s', source=item.source) }} // {{ item.versioncreated | datetime_short }}</small>
-        <p class="card-text">{{ item.description_text }}</p>
-    </div>
-</article>
+{% block script %}
+    <script>
+        window.wireItems = {{ items | tojson | safe }};
+    </script>
 
-{% else %}
-<h5>There are no items yet.</h5>
-{% endfor %}
-
+    {{ javascript_tag('wire_js') | safe }}
 {% endblock %}
