@@ -13,8 +13,10 @@ addons:
     apt:
         sources:
             - elasticsearch-2.x
+            - google-chrome
         packages:
             - elasticsearch
+            - google-chrome-stable
 
 cache:
   - pip
@@ -35,4 +37,5 @@ script:
     - pytest --cov=newsroom
     - npm run lint
     - npm run flow
+    - npm run karma
     - npm run build

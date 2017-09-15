@@ -10,7 +10,7 @@ import { createLogger } from 'redux-logger';
 
 import wireReducer from './reducers';
 import WireApp from './components/WireApp';
-import { setItems, setQuery } from './actions';
+import { fetchItems, setQuery, setState } from './actions';
 
 const loggerMiddleware = createLogger({
     duration: true,
@@ -26,16 +26,19 @@ const store = createStore(
     )
 );
 
-// init items
-if (window.wireItems) {
-    store.dispatch(setItems(window.wireItems));
-}
-
 // init query
 const params = new URLSearchParams(window.location.search);
 if (params.get('q')) {
     store.dispatch(setQuery(params.get('q')));
 }
+
+// init data
+store.dispatch(fetchItems());
+
+// handle history
+window.onpopstate = function(event) {
+    store.dispatch(setState(event.state));
+};
 
 render(
     <Provider store={store}>

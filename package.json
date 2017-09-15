@@ -1,8 +1,9 @@
 {
   "scripts": {
-    "server": "webpack-dev-server --progress --colors --content-base dist",
+    "start": "webpack-dev-server --progress --colors --content-base dist",
     "build": "webpack --config webpack.config.js --progress --profile --colors",
     "lint": "eslint assets --ext .js --ext .jsx",
+    "karma": "karma start --single-run",
     "flow": "flow"
   },
   "dependencies": {
@@ -17,13 +18,20 @@
     "css-loader": "^0.28.5",
     "extract-text-webpack-plugin": "^3.0.0",
     "isomorphic-fetch": "^2.2.1",
+    "jasmine-core": "^2.8.0",
     "jquery": "^3.2.1",
+    "karma": "^1.7.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-webpack": "^2.0.4",
+    "node-sass": "^4.5.3",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
+    "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
     "webpack": "^3.5.5",
     "webpack-dev-server": "^2.7.1",

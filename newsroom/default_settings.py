@@ -73,3 +73,5 @@ VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 1
 MAIL_DEFAULT_SENDER = MAIL_USERNAME or 'newsroom@localhost'
 #: public client url - used to create links within emails etc
 CLIENT_URL = 'http://localhost:5050'
+
+MEDIA_PREFIX = os.environ.get('MEDIA_PREFIX', '')
