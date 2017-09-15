@@ -7,6 +7,7 @@ from werkzeug.exceptions import BadRequest
 from superdesk import get_resource_service
 from flask_babel import gettext
 from newsroom.auth.decorator import admin_only
+import json
 
 
 @blueprint.route('/companies', methods=['GET'])
@@ -73,3 +74,15 @@ def edit(id):
         form=company_form,
         form_name='Edit',
         action='/companies/{}'.format(id)), 200
+
+
+@blueprint.route('/companies/<id>', methods=['DELETE'])
+@admin_only
+def delete(id):
+    """
+    Deletes the company and users of the company with given company id
+    """
+    get_resource_service('users').delete(lookup={'company': ObjectId(id)})
+    get_resource_service('companies').delete({'_id': ObjectId(id)})
+    flask.flash(gettext('Company has been deleted'), 'success')
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}

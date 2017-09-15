@@ -71,6 +71,18 @@ $(document).ready(function () {
                 initUserDetails(data);
             });
         });
+
+        $('.delete-user').click(function () {
+            if (confirm(`Would you like to delete user: ${$(this).data('name')}`)) {
+                $.ajax({
+                    url: `/users/${$(this).data('id')}`,
+                    type: 'DELETE',
+                    contentType:'application/json',
+                    success: () => refreshContent(),
+                    error: (data) => initUserDetails(data.responseText)
+                });
+            }
+        });
     }
 
     function refreshContent() {

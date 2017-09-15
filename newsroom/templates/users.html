@@ -37,21 +37,16 @@
         {% if not user['is_enabled'] %}
             {% set status = gettext("Disabled") %}
         {% endif %}
-        {% if user['is_validated'] %}
-            {% if user['is_approved'] %}
-                <td>{{ gettext('Approved') }} - {{ status }}</td>
-            {% else %}
-                <td>{{ gettext('Needs Approval') }} - {{ status}}</td>
-            {% endif %}
-
+        {% if user['is_approved'] %}
+            <td>{{ gettext('Approved') }} - {{ status }}</td>
         {% else %}
-            <td>{{ gettext('Needs Validation') }} - {{ status }}</td>
+            <td>{{ gettext('Needs Approval') }} - {{ status}}</td>
         {% endif %}
 
       <td>{{ user['_created'] | datetimeformat }}</td>
       <td>
           <button class="btn btn-sm edit-user" data-id="{{user['_id']}}"> {{ gettext('edit') }}</button>
-          <button class="btn btn-sm delete-user" data-id="{{user['_id']}}"> {{ gettext('delete') }}</button>
+          <button class="btn btn-sm delete-user" data-id="{{user['_id']}}" data-name="{{user['name']}}"> {{ gettext('delete') }}</button>
       </td>
     </tr>
 

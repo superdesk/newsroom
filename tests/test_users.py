@@ -176,3 +176,27 @@ def test_new_user_fails_if_fields_not_provided(client):
     assert 'name: This field is required' in txt
     assert 'email: This field is required' in txt
     assert 'user_type: Not a valid choice' in txt
+
+
+def test_new_user_can_be_deleted(client):
+    test_login_succeeds_for_admin(client)
+    # Register a new account
+    response = client.post('/users/new', data={
+        'email': 'newuser@abc.org',
+        'name': 'John Doe',
+        'password': 'abc',
+        'phone': '1234567',
+        'company': '',
+        'user_type': 'public'
+    })
+
+    # print(response.get_data(as_text=True))
+
+    assert response.status_code == 201
+    user = get_resource_service('users').find_one(req=None, email='newuser@abc.org')
+
+    response = client.delete('/users/{}'.format(user['_id']))
+    assert response.status_code == 200
+
+    user = get_resource_service('users').find_one(req=None, email='newuser@abc.org')
+    assert user is None
