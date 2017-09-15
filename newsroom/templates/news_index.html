@@ -7,9 +7,5 @@
 {% endblock %}
 
 {% block script %}
-    <script>
-        window.wireItems = {{ items | tojson | safe }};
-    </script>
-
     {{ javascript_tag('wire_js') | safe }}
 {% endblock %}

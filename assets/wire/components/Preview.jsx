@@ -8,7 +8,7 @@ function Preview({item}) {
         <div className="col">
             <article className="preview">
                 <h2>{item.headline}</h2>
-                <p className="byline">{gettext(`By: ${item.byline}`)}</p>
+                <p className="byline">{gettext('By: {{ byline }}', {byline: item.byline})}</p>
                 <p className="lead">{item.description_text}</p>
                 {item.body_html &&
                     <div dangerouslySetInnerHTML={({__html: item.body_html})} />

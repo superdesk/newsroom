@@ -1,13 +1,17 @@
 import flask
+
+from eve.render import send_response
+from eve.methods.get import get_internal
+
 from newsroom.news import blueprint
-from newsroom.utils import query_resource
 
 
 @blueprint.route('/')
 def index():
-    result = query_resource('search_capi', max_results=50)
-    return flask.render_template(
-        'news_index.html',
-        items=list(result),
-        total=result.count(),
-        query=flask.request.args.get('q', ''))
+    return flask.render_template('news_index.html')
+
+
+@blueprint.route('/search')
+def search():
+    response = get_internal('search_capi')
+    return send_response('search_capi', response)

@@ -33,12 +33,12 @@ Will make it available on `http://localhost:5050` by default.
 Sources are located in `assets`, in order to use them run:
 
 ```
-npm run server
+npm run start
 ```
 
 It will start webpack dev server, python app is configured to make use of it.
 
-## Test application
+## Test Python app
 
 There is syntax and code style checker:
 
@@ -52,3 +52,22 @@ And tests:
 python newsroom_tests.py
 ```
 
+## Test Javascript code
+
+Check syntax via eslint:
+
+```
+npm run lint
+```
+
+Or test code using karma & jasmine:
+
+```
+npm run karma
+```
+
+for single run, or to watch for changes:
+
+```
+npm run karma start
+```
