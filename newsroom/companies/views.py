@@ -1,5 +1,5 @@
 import flask
-from newsroom.utils import query_resource, find_one
+from newsroom.utils import query_resource, find_one, json_serialize_datetime_objectId
 from newsroom.companies import blueprint
 from newsroom.companies.forms import CompanyForm
 from bson import ObjectId
@@ -17,6 +17,18 @@ def index():
     return flask.render_template(
         'companies.html',
         companies=companies)
+
+
+@blueprint.route('/companies/search', methods=['GET'])
+@admin_only
+def search():
+    companies = list(query_resource('companies', max_results=50))
+    response = flask.current_app.response_class(
+        response=json.dumps(companies, default=json_serialize_datetime_objectId),
+        status=200,
+        mimetype='application/json'
+    )
+    return response
 
 
 @blueprint.route('/companies/new', methods=['GET', 'POST'])

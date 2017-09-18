@@ -5,6 +5,8 @@ from wtforms.validators import DataRequired, Email
 
 
 class UserForm(FlaskForm):
+    class Meta:
+        csrf = False
 
     user_types = [('administrator', 'Administrator'),
                   ('public', 'Public'),

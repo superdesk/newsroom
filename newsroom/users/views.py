@@ -1,5 +1,5 @@
 import flask
-from newsroom.utils import query_resource, find_one
+from newsroom.utils import query_resource, find_one, json_serialize_datetime_objectId
 from bson import ObjectId
 from werkzeug.exceptions import BadRequest, NotFound
 from newsroom.users.forms import UserForm
@@ -18,6 +18,18 @@ def index():
     return flask.render_template(
         'users.html',
         users=users)
+
+
+@blueprint.route('/users/search', methods=['GET'])
+@admin_only
+def search():
+    users = init_users()
+    response = flask.current_app.response_class(
+        response=json.dumps(users, default=json_serialize_datetime_objectId),
+        status=200,
+        mimetype='application/json'
+    )
+    return response
 
 
 @blueprint.route('/users/new', methods=['GET', 'POST'])
@@ -68,7 +80,8 @@ def edit(id):
         form = UserForm(user=user)
         form.company.choices = init_companies()
         form.email.disabled = True
-        if form.email.data == user['email'] or (_is_email_address_valid(form.email.data) and form.validate_on_submit()):
+        if form.validate_on_submit() and \
+                (form.email.data == user['email'] or _is_email_address_valid(form.email.data)):
             updates = {}
             updates['name'] = form.name.data
             updates['email'] = form.email.data
@@ -80,19 +93,8 @@ def edit(id):
                 updates['company'] = ObjectId(form.company.data)
 
             get_resource_service('users').patch(id=ObjectId(id), updates=updates)
-            flask.flash(gettext('User has been updated successfully.'), 'success')
-        else:
-            return flask.render_template('user.html',
-                                         form=form,
-                                         form_name='Edit',
-                                         action='/users/{}'.format(id)), 400
-
-    form = UserForm(**user)
-    form.company.choices = init_companies()
-    return flask.render_template('user.html',
-                                 form=form,
-                                 form_name='Edit',
-                                 action='/users/{}'.format(id)), 200
+            return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+        return json.dumps(form.errors), 400, {'ContentType': 'application/json'}
 
 
 def init_companies():
@@ -104,11 +106,6 @@ def init_companies():
 
 def init_users():
     users = list(query_resource('users', max_results=50))
-    companies = list(query_resource('companies', max_results=200))
-    company_dict = {str(c['_id']): c['name'] for c in companies}
-    for user in users:
-        if user.get('company'):
-            user['company'] = company_dict[str(user['company'])]
     return users
 
 

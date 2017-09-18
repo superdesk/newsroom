@@ -5,7 +5,6 @@ from superdesk.default_settings import (   # noqa
     VERSION,
     CONTENTAPI_MONGO_URI,
     CONTENTAPI_ELASTICSEARCH_URL,
-    DATE_FORMAT,
     ELASTIC_DATE_FORMAT,
 )
 
@@ -46,6 +45,7 @@ SITE_NAME = 'AAP Newsroom'
 TEMPLATES_AUTO_RELOAD = True
 
 DEFAULT_TIMEZONE = os.environ.get('DEFAULT_TIMEZONE')
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%S+0000'
 
 if DEFAULT_TIMEZONE is None:
     DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
