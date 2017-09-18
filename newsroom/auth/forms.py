@@ -41,3 +41,10 @@ class LoginForm(FlaskForm):
 
 class TokenForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email()])
+
+
+class ResetPasswordForm(FlaskForm):
+    old_password = PasswordField('Old password', validators=[])
+    new_password = PasswordField('New password', validators=[DataRequired(),
+                                                             EqualTo('new_password2', message='Passwords must match.')])
+    new_password2 = PasswordField('Confirm new password', validators=[DataRequired()])

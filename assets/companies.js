@@ -72,4 +72,16 @@ $(document).ready(function () {
             initCompanyDetails(data);
         });
     });
+
+    $('.delete-company').click(function () {
+        if (confirm(`Would you like to delete company: ${$(this).data('name')}? Users of this company will also be deleted.`)) {
+            $.ajax({
+                url: `/companies/${$(this).data('id')}`,
+                type: 'DELETE',
+                contentType:'application/json',
+                success: () => refreshContent(),
+                error: (data) => initCompanyDetails(data.responseText)
+            });
+        }
+    });
 });

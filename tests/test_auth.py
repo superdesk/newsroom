@@ -14,7 +14,7 @@ def init(app):
         'user_type': 'administrator',
         'is_validated': True,
         'is_enabled': True,
-        'is_approved': True
+        'is_approved': True,
     }])
 
     app.data.insert('companies', [{
@@ -231,26 +231,6 @@ def test_login_for_user_with_enabled_company_succeeds(client):
         follow_redirects=True
     )
     assert 'John Doe' in response.get_data(as_text=True)
-
-
-def test_login_fails_for_invalidated_user(client):
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
-        'name': 'John Doe',
-        'password': 'abc',
-        'password2': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'})
-    assert response.status_code == 302
-    response = client.post(
-        url_for('auth.login'),
-        data={'email': 'newuser@abc.org', 'password': 'abc'},
-        follow_redirects=True)
-    assert 'Your email address needs validation' in response.get_data(as_text=True)
 
 
 def test_login_fails_for_not_approved_user(app, client):

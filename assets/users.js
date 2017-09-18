@@ -9,10 +9,6 @@ $(document).ready(function () {
 
         submitForm();
 
-        $('#resendEmail').click(function () {
-            processTokenRequest('validate');
-        });
-
         $('#resetPassword').click(function () {
             processTokenRequest('reset_password');
         });
@@ -75,6 +71,18 @@ $(document).ready(function () {
                 initUserDetails(data);
             });
         });
+
+        $('.delete-user').click(function () {
+            if (confirm(`Would you like to delete user: ${$(this).data('name')}`)) {
+                $.ajax({
+                    url: `/users/${$(this).data('id')}`,
+                    type: 'DELETE',
+                    contentType:'application/json',
+                    success: () => refreshContent(),
+                    error: (data) => initUserDetails(data.responseText)
+                });
+            }
+        });
     }
 
     function refreshContent() {
@@ -85,6 +93,13 @@ $(document).ready(function () {
 
     $('#refresh').click(function () {
         refreshContent();
+    });
+
+    $('#create-user').click(function () {
+        $('#sidebar').prop('hidden', false);
+        $.get('/users/new', function (data) {
+            initUserDetails(data);
+        });
     });
 
     initEvents();
