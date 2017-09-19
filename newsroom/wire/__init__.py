@@ -1,9 +1,9 @@
 import superdesk
 
 from flask import Blueprint
-from newsroom.news.search import WireSearchResource, WireSearchService
+from newsroom.wire.search import WireSearchResource, WireSearchService
 
-blueprint = Blueprint('news', __name__)
+blueprint = Blueprint('wire', __name__)
 
 from . import views  # noqa
 

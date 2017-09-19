@@ -3,12 +3,12 @@ import flask
 from eve.render import send_response
 from eve.methods.get import get_internal
 
-from newsroom.news import blueprint
+from newsroom.wire import blueprint
 
 
 @blueprint.route('/')
 def index():
-    return flask.render_template('news_index.html')
+    return flask.render_template('wire_index.html')
 
 
 @blueprint.route('/search')
