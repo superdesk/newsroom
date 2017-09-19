@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+import server from 'server';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -36,7 +36,7 @@ export function fetchItems() {
 
         const query = getState().query || '';
 
-        return fetch(`/search?q=${query}`)
+        return server.get(`/search?q=${query}`)
             .then(
                 (response) => response.json(),
                 (reason) => console.error(reason)

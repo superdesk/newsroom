@@ -9,21 +9,23 @@ import { render as _render } from 'react-dom';
  * Create redux store with default middleware
  *
  * @param {func} reducer
+ * @param {bool} withLogger
  * @return {Store}
  */
-export function createStore(reducer) {
-    const loggerMiddleware = createLogger({
-        duration: true,
-        collapsed: true,
-        timestamp: false,
-    });
+export function createStore(reducer, withLogger = false) {
+    const middlewares = [thunkMiddleware];
+
+    if (withLogger) {
+        middlewares.push(createLogger({
+            duration: true,
+            collapsed: true,
+            timestamp: false,
+        }));
+    }
 
     return _createStore(
         reducer,
-        applyMiddleware(
-            thunkMiddleware,
-            loggerMiddleware
-        )
+        applyMiddleware.apply(null, middlewares)
     );
 }
 
