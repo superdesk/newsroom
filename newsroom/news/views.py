@@ -13,5 +13,5 @@ def index():
 
 @blueprint.route('/search')
 def search():
-    response = get_internal('search_capi')
-    return send_response('search_capi', response)
+    response = get_internal('wire_search')
+    return send_response('wire_search', response)

@@ -35,7 +35,8 @@ CORE_APPS = [
     'content_api.search',
     'content_api.auth',
     'content_api.users',
-    'content_api.companies'
+    'content_api.companies',
+    'newsroom.news',
 ]
 
 SITE_NAME = 'AAP Newsroom'

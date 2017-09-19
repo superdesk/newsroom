@@ -38,9 +38,7 @@ export function recieveItems(data) {
 export function fetchItems() {
     return function (dispatch, getState) {
         dispatch(queryItems());
-
         const query = getState().query || '';
-
         return server.get(`/search?q=${query}`)
             .then(
                 (response) => response.json(),
