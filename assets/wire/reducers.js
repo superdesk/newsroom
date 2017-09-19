@@ -6,6 +6,7 @@ import {
     QUERY_ITEMS,
     RECIEVE_ITEMS,
     SET_STATE,
+    SET_ACTIVE,
 } from './actions';
 
 const initialState = {
@@ -36,11 +37,16 @@ export default function wireReducer(state = initialState, action) {
         };
     }
 
+    case SET_ACTIVE:
+        return {
+            ...state,
+            activeItem: action.item || null,
+        };
+
     case PREVIEW_ITEM:
         return {
             ...state,
-            activeItem: action.id || null,
-            previewItem: action.id || null,
+            previewItem: action.item || null,
         };
 
     case SET_QUERY:

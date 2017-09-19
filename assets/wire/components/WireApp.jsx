@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { previewItem } from 'wire/actions';
-
 import Preview from './Preview';
 import ItemsList from './ItemsList';
 import SearchBar from './SearchBar';
@@ -28,10 +26,7 @@ class WireApp extends React.Component {
                             {this.props.activeQuery &&
                             <SearchResultsInfo totalItems={this.props.totalItems} query={this.props.activeQuery} />
                             }
-                            <ItemsList
-                                items={this.props.items}
-                                onClick={this.props.previewItem}
-                                activeItem={this.props.activeItem} />
+                            <ItemsList />
                         </div>
                     )}
                     {this.props.itemToPreview &&
@@ -44,26 +39,17 @@ class WireApp extends React.Component {
 }
 
 WireApp.propTypes = {
-    items: PropTypes.arrayOf(PropTypes.object),
-    itemToPreview: PropTypes.object,
-    activeItem: PropTypes.string,
-    previewItem: PropTypes.func,
     isLoading: PropTypes.bool,
-    activeQuery: PropTypes.string,
     totalItems: PropTypes.number,
+    activeQuery: PropTypes.string,
+    itemToPreview: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
-    items: state.items.map((id) => state.itemsById[id]),
-    itemToPreview: state.itemsById[state.previewItem],
-    activeItem: state.activeItem,
     isLoading: state.isLoading,
-    activeQuery: state.activeQuery,
     totalItems: state.totalItems,
+    activeQuery: state.activeQuery,
+    itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    previewItem: (_id) => dispatch(previewItem(_id))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
+export default connect(mapStateToProps, null)(WireApp);

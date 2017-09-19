@@ -10,9 +10,14 @@ export function setItems(items) {
     return {type: SET_ITEMS, items};
 }
 
+export const SET_ACTIVE = 'SET_ACTIVE';
+export function setActive(item) {
+    return {type: SET_ACTIVE, item};
+}
+
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function previewItem(id) {
-    return {type: PREVIEW_ITEM, id};
+export function previewItem(item) {
+    return {type: PREVIEW_ITEM, item};
 }
 
 export const SET_QUERY = 'SET_QUERY';
