@@ -63,11 +63,11 @@ npm run lint
 Or test code using karma & jasmine:
 
 ```
-npm run karma
+npm run test
 ```
 
 for single run, or to watch for changes:
 
 ```
-npm run karma start
+npm run test start
 ```

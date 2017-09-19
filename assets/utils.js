@@ -1,3 +1,47 @@
+import React from 'react';
+import { Provider } from 'react-redux';
+import { createStore as _createStore, applyMiddleware } from 'redux';
+import { createLogger } from 'redux-logger';
+import thunkMiddleware from 'redux-thunk';
+import { render as _render } from 'react-dom';
+
+/**
+ * Create redux store with default middleware
+ *
+ * @param {func} reducer
+ * @return {Store}
+ */
+export function createStore(reducer) {
+    const loggerMiddleware = createLogger({
+        duration: true,
+        collapsed: true,
+        timestamp: false,
+    });
+
+    return _createStore(
+        reducer,
+        applyMiddleware(
+            thunkMiddleware,
+            loggerMiddleware
+        )
+    );
+}
+
+/**
+ * Render helper
+ *
+ * @param {Store} store
+ * @param {Component} App
+ * @param {Element} element
+ */
+export function render(store, App, element) {
+    return _render(
+        <Provider store={store}>
+            <App />
+        </Provider>,
+        element
+    );
+}
 
 /**
  * Noop for now, but it's better to use it from beginning.

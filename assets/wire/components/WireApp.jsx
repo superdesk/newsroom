@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { previewItem } from '../actions';
+import { previewItem } from 'wire/actions';
 
 import Preview from './Preview';
 import ItemsList from './ItemsList';

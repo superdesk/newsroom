@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { gettext } from '../utils';
-import { setQuery, fetchItems } from '../actions';
+import { gettext } from 'utils';
+import { setQuery, fetchItems } from 'wire/actions';
 
 class SearchBar extends React.Component {
     constructor(props) {

@@ -102,7 +102,6 @@ ENV/
 
 # js
 node_modules
-yarn.lock
 
 # editor
 .idea

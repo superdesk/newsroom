@@ -21,6 +21,7 @@ addons:
 cache:
   - pip
   - npm
+  - yarn
 
 before_install:
     - sudo apt-get purge elasticsearch
@@ -30,12 +31,11 @@ before_install:
 install:
     - pip install -r requirements.txt
     - pip install -r dev-requirements.txt
-    - npm install
+    - yarn install
 
 script:
     - flake8
     - pytest --cov=newsroom
     - npm run lint
-    - npm run flow
-    - npm run karma
+    - npm run test
     - npm run build

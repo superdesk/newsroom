@@ -9,7 +9,7 @@ module.exports = {
         users_js: './assets/users.js',
         companies_js: './assets/companies.js',
         newsroom_css: './assets/index.css',
-        wire_js: './assets/wire/index.js',
+        wire_js: ['babel-polyfill', './assets/wire/index.js'],
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -24,7 +24,7 @@ module.exports = {
                 loader: 'babel-loader',
                 exclude: /node_modules/,
                 options: {
-                    presets: ['flow', 'es2015', 'react'],
+                    presets: ['es2015', 'react'],
                     plugins: ['transform-object-rest-spread'],
                 }
             },
@@ -46,7 +46,8 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.js', '.jsx']
+        extensions: ['.js', '.jsx'],
+        modules: [path.resolve(__dirname, 'assets'), 'node_modules'],
     },
     plugins: [
         new ExtractTextPlugin('[name].[chunkhash].css'),
