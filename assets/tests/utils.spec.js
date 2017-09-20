@@ -1,7 +1,6 @@
 import {
     gettext,
-
-} from '../utils';
+} from 'utils';
 
 describe('gettext', () => {
     it('can translate text', () => {

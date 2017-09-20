@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { gettext, shortDate, fullDate } from '../utils';
+import { gettext, shortDate, fullDate } from 'utils';
 
 function wordCount(html) {
-    return html.split(' ').filter(x => x.trim()).length;
+    return html && html.split(' ').filter(x => x.trim()).length || 0;
 }
 
 function WireListItem({item, onClick}) {
