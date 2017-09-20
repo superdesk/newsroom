@@ -2,31 +2,23 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
-import thunkMiddleware from 'redux-thunk';
+import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 
 /**
  * Create redux store with default middleware
  *
  * @param {func} reducer
- * @param {bool} withLogger
  * @return {Store}
  */
-export function createStore(reducer, withLogger = false) {
-    const middlewares = [thunkMiddleware];
+export function createStore(reducer) {
+    const logger = createLogger({
+        duration: true,
+        collapsed: true,
+        timestamp: false,
+    });
 
-    if (withLogger) {
-        middlewares.push(createLogger({
-            duration: true,
-            collapsed: true,
-            timestamp: false,
-        }));
-    }
-
-    return _createStore(
-        reducer,
-        applyMiddleware.apply(null, middlewares)
-    );
+    return _createStore(reducer, applyMiddleware(thunk, logger));
 }
 
 /**

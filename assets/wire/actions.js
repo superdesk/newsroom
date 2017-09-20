@@ -35,15 +35,61 @@ export function recieveItems(data) {
     return {type: RECIEVE_ITEMS, data};
 }
 
+export const RENDER_MODAL = 'RENDER_MODAL';
+export function renderModal(modal, data) {
+    return {type: RENDER_MODAL, modal, data};
+}
+
+export const CLOSE_MODAL = 'CLOSE_MODAL';
+export function closeModal() {
+    return {type: CLOSE_MODAL};
+}
+
+export const INIT_DATA = 'INIT_DATA';
+export function initData(data) {
+    return {type: INIT_DATA, data};
+}
+
+export const ADD_TOPIC = 'ADD_TOPIC';
+export function addTopic(topic) {
+    return {type: ADD_TOPIC, topic};
+}
+
+/**
+ * Fetch items for current query
+ */
 export function fetchItems() {
-    return function (dispatch, getState) {
+    return (dispatch, getState) => {
         dispatch(queryItems());
         const query = getState().query || '';
         return server.get(`/search?q=${query}`)
-            .then(
-                (response) => response.json(),
-                (reason) => console.error(reason)
-            )
-            .then((data) => dispatch(recieveItems(data)));
+            .then((response) => response.json())
+            .then((data) => dispatch(recieveItems(data)))
+            .catch(errorHandler);
     };
+}
+
+/**
+ * Start a follow topic action
+ *
+ * @param {String} topic
+ */
+export function followTopic(topic) {
+    return renderModal('followTopic', {topic});
+}
+
+export function submitFollowTopic(data) {
+    return (dispatch, getState) => {
+        const user = getState().user;
+        const url = `/api/users/${user}/topics`;
+        return server.post(url, data)
+            .then((response) => response.json())
+            .then((updates) => dispatch(addTopic(Object.assign(data, updates))))
+            .then(() => dispatch(closeModal()))
+            .catch(errorHandler);
+    };
+}
+
+function errorHandler(reason) {
+    console.error('error', reason);
 }

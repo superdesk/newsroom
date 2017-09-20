@@ -2,15 +2,30 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { followTopic } from 'wire/actions';
+
 import Preview from './Preview';
 import ItemsList from './ItemsList';
 import SearchBar from './SearchBar';
 import SearchResultsInfo from './SearchResultsInfo';
 
+import FollowTopicModal from './FollowTopicModal';
+
+const modals = {
+    followTopic: FollowTopicModal,
+};
+
 class WireApp extends React.Component {
+    renderModal(specs) {
+        if (specs) {
+            const Modal = modals[specs.modal];
+            return <Modal data={specs.data} />;
+        }
+    }
+
     render() {
         const progressStyle = {width: '25%'};
-
+        const modal = this.renderModal(this.props.modal);
         return (
             <div>
                 <SearchBar />
@@ -24,7 +39,13 @@ class WireApp extends React.Component {
                         :
                         <div className="col">
                             {this.props.activeQuery &&
-                            <SearchResultsInfo totalItems={this.props.totalItems} query={this.props.activeQuery} />
+                            <SearchResultsInfo
+                                user={this.props.user}
+                                query={this.props.activeQuery}
+                                totalItems={this.props.totalItems}
+                                followTopic={this.props.followTopic}
+                                topics={this.props.topics}
+                            />
                             }
                             <ItemsList />
                         </div>
@@ -33,6 +54,7 @@ class WireApp extends React.Component {
                         <Preview item={this.props.itemToPreview} />
                     }
                 </div>
+                {modal}
             </div>
         );
     }
@@ -43,6 +65,10 @@ WireApp.propTypes = {
     totalItems: PropTypes.number,
     activeQuery: PropTypes.string,
     itemToPreview: PropTypes.object,
+    followTopic: PropTypes.func,
+    modal: PropTypes.object,
+    user: PropTypes.string,
+    topics: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -50,6 +76,13 @@ const mapStateToProps = (state) => ({
     totalItems: state.totalItems,
     activeQuery: state.activeQuery,
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
+    modal: state.modal,
+    user: state.user,
+    topics: state.topics,
 });
 
-export default connect(mapStateToProps, null)(WireApp);
+const mapDispatchToProps = (dispatch) => ({
+    followTopic: (topic) => dispatch(followTopic(topic)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

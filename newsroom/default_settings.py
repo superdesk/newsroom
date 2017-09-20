@@ -38,6 +38,7 @@ CORE_APPS = [
     'content_api.users',
     'content_api.companies',
     'newsroom.wire',
+    'newsroom.topics',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -61,9 +62,9 @@ NEW_ACCOUNT_ACTIVE_DAYS = 14
 WTF_CSRF_ENABLED = True
 
 # Email settings
-MAIL_SERVER = 'smtp.gmail.com'
-MAIL_PORT = 465
-MAIL_USE_SSL = True
+MAIL_SERVER = 'localhost'
+MAIL_PORT = 25
+MAIL_USE_SSL = False
 MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 

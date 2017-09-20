@@ -25,6 +25,7 @@ def login():
                 return flask.render_template('login.html', form=form)
 
             if _is_account_enabled(user):
+                flask.session['user'] = str(user['_id'])  # str to avoid serialization issues
                 flask.session['name'] = user.get('name')
                 flask.session['user_type'] = user['user_type']
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
@@ -80,6 +81,7 @@ def _is_account_enabled(user):
 
 @blueprint.route('/logout')
 def logout():
+    flask.session['user'] = None
     flask.session['name'] = None
     flask.session['user_type'] = None
     return flask.redirect(flask.url_for('wire.index'))

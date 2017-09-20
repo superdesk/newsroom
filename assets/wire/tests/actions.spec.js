@@ -25,12 +25,14 @@ describe('fetch actions', () => {
     });
 
     it('can fetch items', () => {
-        return store.dispatch(actions.fetchItems())
+        const promise = store.dispatch(actions.fetchItems())
             .then(() => {
                 const state = store.getState();
                 expect(state.isLoading).toBe(false);
                 expect(state.items).toEqual(['foo']);
             });
+        expect(store.getState().isLoading).toBe(true);
+        return promise;
     });
 
     it('can fetch items using query', () => {
