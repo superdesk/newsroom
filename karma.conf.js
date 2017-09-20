@@ -9,12 +9,13 @@ module.exports = function(config) {
         ],
 
         preprocessors: {
-            'assets/**/*spec.js': ['webpack'],
+            'assets/**/*spec.js': ['webpack', 'sourcemap'],
         },
 
         webpack: {
             module: webpackConfig.module,
             resolve: webpackConfig.resolve,
+            devtool: 'inline-source-map',
         },
 
         webpackMiddleware: {
@@ -22,6 +23,5 @@ module.exports = function(config) {
         },
 
         browsers: ['ChromeHeadless'],
-        singleRun: true,
     });
 };
