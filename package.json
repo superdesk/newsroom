@@ -19,11 +19,7 @@
     "isomorphic-fetch": "^2.2.1",
     "jasmine-core": "^2.8.0",
     "jquery": "^3.2.1",
-    "karma": "^1.7.1",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-jasmine": "^1.1.0",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^2.0.4",
     "node-sass": "^4.5.3",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
@@ -40,7 +36,9 @@
   "devDependencies": {
     "eslint": "^4.6.1",
     "eslint-plugin-react": "^7.3.0",
-    "react-devtools": "^2.5.0",
-    "redux-devtools": "^3.4.0"
+    "karma": "^1.7.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-webpack": "^2.0.4"
   }
 }
