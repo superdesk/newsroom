@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}Design{% endblock %}
+
+{% block content %}
+<section>
+    <h1>Newsroom Design</h1>
+    <p>Here goes some generic design info, maybe even some sort of components documentation? Who knows..</p>
+
+    <h3>Pages:</h3>
+    <ul>
+        <li><a href="{{ url_for('design.wire') }}">Wire</a></li>
+        <li><a href="{{ url_for('design.users') }}">Users</a></li>
+    </ul>
+</section>
+{% endblock %}

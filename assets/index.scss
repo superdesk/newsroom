@@ -1,6 +1,9 @@
+$primary-color: #444;
+$background-color: #f8f8f8;
+
 body {
-    color: #444;
-    background-color: #f8f8f8;
+    color: $primary-color;
+    background-color: $background-color;
     font-family: 'Droid Serif', serif;
 }
 

@@ -26,6 +26,7 @@ BLUEPRINTS = [
     'newsroom.auth',
     'newsroom.users',
     'newsroom.companies',
+    'newsroom.design',
 ]
 
 CORE_APPS = [
