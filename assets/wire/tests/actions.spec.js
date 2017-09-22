@@ -1,28 +1,44 @@
 
-import server from 'server';
-import { createStore } from 'utils';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+
+import fetchMock from 'fetch-mock';
 
 import wireApp from '../reducers';
 import * as actions from '../actions';
 
-describe('actions', () => {
+describe('fetch actions', () => {
     let store;
+    const response = {
+        _meta: {total: 1},
+        _items: [{_id: 'foo'}],
+    };
 
     beforeEach(() => {
-        store = createStore(wireApp, false);
+        fetchMock.get('/search?q=', response);
+        fetchMock.get('/search?q=foo', response);
+        store = createStore(wireApp, applyMiddleware(thunk));
+    });
+
+    afterEach(() => {
+        fetchMock.restore();
     });
 
     it('can fetch items', () => {
-        spyOn(server, 'get').and.returnValue(Promise.resolve({}));
-        store.dispatch(actions.fetchItems());
-        expect(server.get).toHaveBeenCalledWith('/search?q=');
+        return store.dispatch(actions.fetchItems())
+            .then(() => {
+                const state = store.getState();
+                expect(state.isLoading).toBe(false);
+                expect(state.items).toEqual(['foo']);
+            });
     });
 
     it('can fetch items using query', () => {
-        spyOn(server, 'get').and.returnValue(Promise.resolve({}));
         store.dispatch(actions.setQuery('foo'));
-        store.dispatch(actions.fetchItems());
-        expect(server.get).toHaveBeenCalledWith('/search?q=foo');
-        expect(store.getState().activeQuery).toBe('foo');
+        return store.dispatch(actions.fetchItems())
+            .then(() => {
+                const state = store.getState();
+                expect(state.activeQuery).toBe('foo');
+            });
     });
 });

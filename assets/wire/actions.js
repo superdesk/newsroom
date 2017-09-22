@@ -44,8 +44,6 @@ export function fetchItems() {
                 (response) => response.json(),
                 (reason) => console.error(reason)
             )
-            .then((data) =>
-                dispatch(recieveItems(data))
-            );
+            .then((data) => dispatch(recieveItems(data)));
     };
 }
