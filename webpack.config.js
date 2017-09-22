@@ -8,7 +8,7 @@ module.exports = {
         newsroom_js: './assets/index.js',
         users_js: './assets/users.js',
         companies_js: './assets/companies.js',
-        newsroom_css: './assets/index.css',
+        newsroom_css: './assets/index.scss',
         wire_js: ['babel-polyfill', './assets/wire/index.js'],
     },
     output: {
@@ -37,12 +37,11 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                use: [
-                    {loader: 'style-loader'},
-                    {loader: 'css-loader'},
-                    {loader: 'sass-loader'},
-                ]
-            }
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: ['css-loader', 'sass-loader'],
+                })
+            },
         ]
     },
     resolve: {
