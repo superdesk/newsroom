@@ -51,13 +51,22 @@ if [ -f /tmp/client.pid ]; then
     rm /tmp/client.pid
 fi
 
+/vagrant/node_modules/webpack-dev-server/bin/webpack-dev-server.js \
+    --quiet \
+    --host 0.0.0.0 \
+    --port 8080 \
+    --public localhost:8080 \
+    --watch-poll 1000 &
+echo $! >> /tmp/client.pid
+
+echo 'starting..'
+# wait for initial webpack build
+while ! curl -sfo /dev/null 'http://localhost:8080/manifest.json'; do echo -n '.' && sleep .5; done
+echo 'done.'
+
+# start server
 python app.py &
 echo $! >> /tmp/server.pid
-
-/vagrant/node_modules/webpack-dev-server/bin/webpack-dev-server.js --content-base dist --host 0.0.0.0
-#echo $! >> /tmp/client.pid
-
-echo "done"
 SCRIPT
 
 Vagrant.configure("2") do |config|

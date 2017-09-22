@@ -21,7 +21,7 @@ class NewsroomWebpack(Webpack):
         webpack_stats = app.config['WEBPACK_MANIFEST_PATH']
         self.assets_url = app.config['WEBPACK_ASSETS_URL']
 
-        if app.debug and self.assets_url:
+        if self.assets_url:
             self.assets = requests.get('{0}{1}'.format(self.assets_url, 'manifest.json')).json()
             return
 

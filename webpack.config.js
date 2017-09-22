@@ -6,16 +6,16 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 module.exports = {
     entry: {
         newsroom_js: './assets/index.js',
+        newsroom_css: './assets/style.js',
         users_js: './assets/users.js',
         companies_js: './assets/companies.js',
-        newsroom_css: './assets/index.scss',
         wire_js: ['babel-polyfill', './assets/wire/index.js'],
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        publicPath: 'http://localhost:8080/assets/',
-        filename: '[name].[chunkhash].js',
-        chunkFilename: '[id].[chunkhash].js'
+        publicPath: 'http://localhost:8080/',
+        filename: '[name].js',
+        chunkFilename: '[id].js'
     },
     module: {
         rules: [
@@ -30,17 +30,18 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: 'css-loader',
-                })
+                use: [
+                    'style-loader',
+                    'css-loader',
+                ],
             },
             {
                 test: /\.scss$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: ['css-loader', 'sass-loader'],
-                })
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader',
+                ],
             },
         ]
     },
@@ -49,12 +50,10 @@ module.exports = {
         modules: [path.resolve(__dirname, 'assets'), 'node_modules'],
     },
     plugins: [
-        new ExtractTextPlugin('[name].[chunkhash].css'),
-        new ManifestPlugin(path.resolve(__dirname, 'manifest.json')),
+        new ManifestPlugin(),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery"
         })
-    ],
-    devtool: 'eval'
+    ]
 };
