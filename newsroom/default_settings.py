@@ -22,7 +22,7 @@ URL_PREFIX = 'api'
 SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(32))
 
 BLUEPRINTS = [
-    'newsroom.news',
+    'newsroom.wire',
     'newsroom.auth',
     'newsroom.users',
     'newsroom.companies',
@@ -35,7 +35,8 @@ CORE_APPS = [
     'content_api.search',
     'content_api.auth',
     'content_api.users',
-    'content_api.companies'
+    'content_api.companies',
+    'newsroom.wire',
 ]
 
 SITE_NAME = 'AAP Newsroom'

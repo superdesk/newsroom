@@ -27,7 +27,7 @@ def login():
             if _is_account_enabled(user):
                 flask.session['name'] = user.get('name')
                 flask.session['user_type'] = user['user_type']
-                return flask.redirect(flask.request.args.get('next') or flask.url_for('news.index'))
+                return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
         else:
             flask.flash(gettext('Invalid username or password.'), 'danger')
     return flask.render_template('login.html', form=form)
@@ -82,7 +82,7 @@ def _is_account_enabled(user):
 def logout():
     flask.session['name'] = None
     flask.session['user_type'] = None
-    return flask.redirect(flask.url_for('news.index'))
+    return flask.redirect(flask.url_for('wire.index'))
 
 
 @blueprint.route('/signup', methods=['GET', 'POST'])
