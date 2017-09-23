@@ -6,11 +6,16 @@ import CheckboxInput from '../../common/components/CheckboxInput';
 
 import { gettext } from '../../utils';
 
+const userTypes = [
+    {value: 'administrator', text: 'Administrator'},
+    {value: 'internal', text: 'Internal'},
+    {value: 'public', text: 'Public'},
+];
+
 function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose}) {
     return (
         <div className="col">
             <div className="modal-header">
-                <h5 className="modal-title">Edit user</h5>
                 <button
                     id="hide-sidebar"
                     type="button"
@@ -49,7 +54,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                     label="User Type"
                     value={user.user_type}
                     defaultOption=""
-                    options={[{value: 'administrator', text: 'Administrator'}]}
+                    options={userTypes}
                     onChange={onChange}
                     error={errors ? errors.user_type : null} />
 
@@ -76,12 +81,13 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
 
 
                 <div className="modal-footer">
+                    {user._id ?
                     <input
                         type="button"
                         className="btn btn-secondary"
                         value={gettext('Reset Password')}
                         id="resetPassword"
-                        onClick={onResetPassword} />
+                        onClick={onResetPassword} /> : null}
 
                     <input
                         type="button"

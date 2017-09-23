@@ -1,14 +1,14 @@
 
 import {
-    GET_USERS,
-    SELECT_USER,
-    EDIT_USER,
-    QUERY_USERS,
-    SET_QUERY,
-    GET_COMPANIES,
-    SAVE_USER,
-    CANCEL_EDIT,
-    SAVE_ERROR
+  GET_USERS,
+  SELECT_USER,
+  EDIT_USER,
+  QUERY_USERS,
+  SET_QUERY,
+  GET_COMPANIES,
+  SAVE_USER,
+  CANCEL_EDIT,
+  SAVE_ERROR, NEW_USER
 } from './actions';
 
 const initialState = {
@@ -40,6 +40,20 @@ export default function userReducer(state = initialState, action) {
         return {...state, userToEdit: user, errors: null};
     }
 
+    case NEW_USER: {
+        const newUser = {
+            user_type: 'public',
+            is_approved: true,
+            is_enabled: true,
+            _id: null,
+            name: '',
+            email: '',
+            phone: '',
+            company: '',
+        };
+        return {...state, userToEdit: newUser, errors: null};
+    }
+
     case SAVE_USER: {
         return {...state, userToEdit: state.userToEdit, errors: null};
     }
@@ -56,7 +70,11 @@ export default function userReducer(state = initialState, action) {
         return {...state, query: action.query};
 
     case QUERY_USERS:
-        return {...state, isLoading: true, totalUsers: null, activeQuery: state.query};
+        return {...state,
+          isLoading: true,
+          totalUsers: null,
+          userToEdit: null,
+          activeQuery: state.query};
 
     case GET_USERS: {
         const usersById = Object.assign({}, state.usersById);

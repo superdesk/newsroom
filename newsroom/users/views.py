@@ -32,37 +32,28 @@ def search():
     return response
 
 
-@blueprint.route('/users/new', methods=['GET', 'POST'])
+@blueprint.route('/users/new', methods=['POST'])
 @admin_only
 def create():
-    form = UserForm(flask.request.form)
-    form.company.choices = init_companies()
+    form = UserForm()
+    if form.validate():
+        if not _is_email_address_valid(form.email.data):
+            return json.dumps({'email': ['Email address is already in use']}), \
+                   400, {'ContentType': 'application/json'}
 
-    if flask.request.method == 'POST':
-        if form.validate() and _is_email_address_valid(form.email.data):
-            new_user = flask.request.form.to_dict()
-            add_token_data(new_user)
-            new_user.pop('csrf_token', None)
-            if form.company.data:
-                new_user['company'] = ObjectId(form.company.data)
-            get_resource_service('users').post([new_user])
-            flask.flash(gettext('User has been created successfully.'), 'success')
-            send_reset_password_email(new_user['name'], new_user['email'], new_user['token'])
-        else:
-            return flask.render_template('user.html',
-                                         form=form,
-                                         form_name='Create',
-                                         action='/users/new'), 400
-    return flask.render_template('user.html',
-                                 form=form,
-                                 form_name='Create',
-                                 action='/users/new'), 201
+        new_user = form.data
+        add_token_data(new_user)
+        if form.company.data:
+            new_user['company'] = ObjectId(form.company.data)
+        get_resource_service('users').post([new_user])
+        # send_reset_password_email(new_user['name'], new_user['email'], new_user['token'])
+        return json.dumps({'success': True}), 201, {'ContentType': 'application/json'}
+    return json.dumps(form.errors), 400, {'ContentType': 'application/json'}
 
 
 def _is_email_address_valid(email):
     existing_users = query_resource('users', {'email': email})
     if existing_users.count() > 0:
-        flask.flash(gettext('Email address is already in use'), 'danger')
         return False
     return True
 
@@ -80,8 +71,11 @@ def edit(id):
         form = UserForm(user=user)
         form.company.choices = init_companies()
         form.email.disabled = True
-        if form.validate_on_submit() and \
-                (form.email.data == user['email'] or _is_email_address_valid(form.email.data)):
+        if form.validate_on_submit():
+            if form.email.data != user['email'] and not _is_email_address_valid(form.email.data):
+                return json.dumps({'email': ['Email address is already in use']}), \
+                       400, {'ContentType': 'application/json'}
+
             updates = {}
             updates['name'] = form.name.data
             updates['email'] = form.email.data

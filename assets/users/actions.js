@@ -12,6 +12,11 @@ export function editUser(event) {
     return {type: EDIT_USER, event};
 }
 
+export const NEW_USER = 'NEW_USER';
+export function newUser() {
+    return {type: NEW_USER};
+}
+
 export const CANCEL_EDIT = 'CANCEL_EDIT';
 export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
@@ -97,12 +102,13 @@ function parseJSON(response) {
     return response.json();
 }
 
+
 export function postUser() {
     return function (dispatch, getState) {
 
         const user = getState().userToEdit;
 
-        return fetch(`/users/${user._id}`, {
+        return fetch(`/users/${user._id ? user._id : 'new'}`, {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
@@ -113,10 +119,15 @@ export function postUser() {
             .then(checkStatus)
             .then(parseJSON)
             .then(function() {
-                alertify.success('User updated successfully');
+                alertify.success((user._id ? 'User updated' : 'User created') + 'successfully');
+                dispatch(fetchUsers());
             }).catch(function(error) {
-                parseJSON(error.response).then(function(datax) {
-                    dispatch(saveError(datax));
+                if (error.response.status !== 400) {
+                    alertify.error(error.response.statusText);
+                    return;
+                }
+                parseJSON(error.response).then(function(data) {
+                    dispatch(saveError(data));
                 });
             });
 

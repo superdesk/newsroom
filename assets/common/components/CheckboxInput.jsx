@@ -12,7 +12,7 @@ const CheckboxInput = ({name, label, onChange, value}) => {
                     name={name}
                     className="form-check-input"
                     defaultChecked={value}
-                    onChange={() => onChange()} />
+                    onChange={onChange} />
                 {gettext(label)}</label>
         </div>
     );
