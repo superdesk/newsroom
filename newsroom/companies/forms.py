@@ -4,6 +4,11 @@ from wtforms.validators import DataRequired
 
 
 class CompanyForm(Form):
+    class Meta:
+        csrf = False
+
+    BooleanField.false_values = {False, 'false', ''}
+
     id = HiddenField('Id')
     name = StringField('Company Name', validators=[DataRequired()])
     sd_subscriber_id = StringField('Superdesk Subscriber Id', validators=[])

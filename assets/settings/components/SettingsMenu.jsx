@@ -9,16 +9,19 @@ function SettingsMenu({isCompanySettings, isUserSettings, isSystemSettings, onCl
             <li className='nav-item'>
                 <a className={`nav-link ${isCompanySettings?'active':null}`}
                     href='#'
+                    name='companies'
                     onClick={onClick}>{gettext('Company Management')}</a>
             </li>
             <li className='nav-item'>
                 <a className={`nav-link ${isUserSettings?'active':null}`}
                     href='#'
+                    name='users'
                     onClick={onClick}>{gettext('User Management')}</a>
             </li>
             <li className='nav-item'>
                 <a className={`nav-link ${isSystemSettings?'active':null}`}
-                    href='#'>{gettext('System Settings')}</a>
+                    href='#'
+                    name='settings'>{gettext('System Settings')}</a>
             </li>
         </ul>
     );

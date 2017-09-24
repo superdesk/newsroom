@@ -6,13 +6,13 @@ import CheckboxInput from '../../../common/components/CheckboxInput';
 
 import { gettext } from '../../../utils';
 
-const userTypes = [
-    {value: 'administrator', text: gettext('Administrator')},
-    {value: 'internal', text: gettext('Internal')},
-    {value: 'public', text: gettext('Public')},
+const countries = [
+    {value: 'au', text: gettext('Australia')},
+    {value: 'nz', text: gettext('New Zealand')},
+    {value: 'other', text: gettext('Other')},
 ];
 
-function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose}) {
+function EditCompany({company, onChange, errors, onSave, onClose}) {
     return (
         <div className="col">
             <div className="modal-header">
@@ -31,64 +31,48 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                 <TextInput
                     name="name"
                     label="Name"
-                    value={user.name}
+                    value={company.name}
                     onChange={onChange}
                     error={errors ? errors.name : null} />
 
                 <TextInput
-                    name="email"
-                    label="Email"
-                    value={user.email}
+                    name="sd_subscriber_id"
+                    label="Superdesk Subscriber Id"
+                    value={company.sd_subscriber_id}
                     onChange={onChange}
-                    error={errors ? errors.email : null} />
+                    error={errors ? errors.sd_subscriber_id : null} />
 
                 <TextInput
                     name="phone"
                     label="Telephone"
-                    value={user.phone}
+                    value={company.phone}
                     onChange={onChange}
                     error={errors ? errors.phone : null} />
 
+                <TextInput
+                    name="contact_name"
+                    label="Contact Name"
+                    value={company.contact_name}
+                    onChange={onChange}
+                    error={errors ? errors.contact_name : null} />
+
                 <SelectInput
-                    name="user_type"
-                    label="User Type"
-                    value={user.user_type}
+                    name="country"
+                    label="Country"
+                    value={company.country}
                     defaultOption=""
-                    options={userTypes}
+                    options={countries}
                     onChange={onChange}
                     error={errors ? errors.user_type : null} />
-
-                <SelectInput
-                    name="company"
-                    label="Company"
-                    value={user.company}
-                    defaultOption=""
-                    options={companies}
-                    onChange={onChange}
-                    error={errors ? errors.company : null} />
-
-                <CheckboxInput
-                    name="is_approved"
-                    label="Approved"
-                    value={user.is_approved}
-                    onChange={onChange} />
 
                 <CheckboxInput
                     name="is_enabled"
                     label="Enabled"
-                    value={user.is_enabled}
+                    value={company.is_enabled}
                     onChange={onChange} />
 
 
                 <div className="modal-footer">
-                    {user._id ?
-                        <input
-                            type="button"
-                            className="btn btn-secondary"
-                            value={gettext('Reset Password')}
-                            id="resetPassword"
-                            onClick={onResetPassword} /> : null}
-
                     <input
                         type="button"
                         className="btn btn-primary"
@@ -102,14 +86,13 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
     );
 }
 
-EditUser.propTypes = {
-    user: PropTypes.object.isRequired,
+EditCompany.propTypes = {
+    company: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     errors: PropTypes.object,
-    companies: PropTypes.arrayOf(PropTypes.object),
+    users: PropTypes.arrayOf(PropTypes.object),
     onSave: PropTypes.func.isRequired,
-    onResetPassword: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 };
 
-export default EditUser;
+export default EditCompany;

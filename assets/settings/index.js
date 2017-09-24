@@ -27,7 +27,7 @@ const store = createStore(
 );
 
 // init users and companies
-store.dispatch(fetchItems());
+store.dispatch(fetchItems('companies'));
 store.dispatch(fetchCompanies());
 
 render(

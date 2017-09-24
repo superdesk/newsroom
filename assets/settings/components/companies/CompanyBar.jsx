@@ -3,26 +3,26 @@ import PropTypes from 'prop-types';
 import { gettext } from '../../../utils';
 import SearchBar from '../../../wire/components/SearchBar';
 
-class UserBar extends React.Component {
+class CompanyBar extends React.Component {
     render() {
         return (
             <nav className="navbar sticky-top navbar-light bg-light">
                 <SearchBar />
                 <button
                     className="btn btn-primary btn-lg active float-right"
-                    onClick={() => this.props.onNewUser('users')}>{gettext('New User')}</button>
+                    onClick={() => this.props.onNewCompany('companies')}>{gettext('New Company')}</button>
             </nav>
         );
     }
 }
 
-UserBar.propTypes = {
+CompanyBar.propTypes = {
     query: PropTypes.string,
     setQuery: PropTypes.func,
     fetchItems: PropTypes.func,
     state: PropTypes.object,
-    onNewUser: PropTypes.func,
+    onNewCompany: PropTypes.func,
 };
 
 
-export default UserBar;
+export default CompanyBar;

@@ -11,13 +11,10 @@ from newsroom.auth.views import send_token, add_token_data, send_reset_password_
 import json
 
 
-@blueprint.route('/users', methods=['GET'])
+@blueprint.route('/settings', methods=['GET'])
 @admin_only
-def index():
-    users = init_users()
-    return flask.render_template(
-        'users.html',
-        users=users)
+def settings():
+    return flask.render_template('settings.html')
 
 
 @blueprint.route('/users/search', methods=['GET'])
@@ -69,20 +66,12 @@ def edit(id):
     user['id'] = str(user['_id'])
     if flask.request.method == 'POST':
         form = UserForm(user=user)
-        form.company.choices = init_companies()
-        form.email.disabled = True
         if form.validate_on_submit():
             if form.email.data != user['email'] and not _is_email_address_valid(form.email.data):
                 return json.dumps({'email': ['Email address is already in use']}), \
                        400, {'ContentType': 'application/json'}
 
-            updates = {}
-            updates['name'] = form.name.data
-            updates['email'] = form.email.data
-            updates['phone'] = form.phone.data
-            updates['user_type'] = form.user_type.data
-            updates['is_enabled'] = form.is_enabled.data
-            updates['is_approved'] = form.is_approved.data
+            updates = form.data
             if form.company.data:
                 updates['company'] = ObjectId(form.company.data)
 

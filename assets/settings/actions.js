@@ -13,8 +13,8 @@ export function editItem(event) {
 }
 
 export const NEW_ITEM = 'NEW_ITEM';
-export function newItem() {
-    return {type: NEW_ITEM};
+export function newItem(data) {
+    return {type: NEW_ITEM, data};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
@@ -57,19 +57,36 @@ export function getItems(data) {
     return {type: GET_ITEMS, data};
 }
 
-export function fetchItems() {
+export const UPDATE_MENU = 'UPDATE_MENU';
+export function updateMenu(data) {
+    return function (dispatch) {
+        dispatch(fetchItems(data.target.name));
+        dispatch(selectMenu(data));
+
+    };
+}
+
+export const SELECT_MENU = 'SELECT_MENU';
+export function selectMenu(data) {
+    return {type: SELECT_MENU, data};
+}
+
+export function fetchItems(endpoint) {
     return function (dispatch) {
         dispatch(queryItems());
 
-        return fetch('/users/search', {
+        return fetch(`/${endpoint}/search`, {
             credentials: 'same-origin'
         })
             .then((response) => {
                 return response.json();
             })
-            .then((data) =>
-                dispatch(getItems(data))
-            );
+            .then((data) => {
+                dispatch(getItems(data));
+                if (endpoint === 'companies') {
+                    dispatch(getCompanies(data, endpoint));
+                }
+            });
     };
 }
 
@@ -103,12 +120,12 @@ function parseJSON(response) {
 }
 
 
-export function postItem() {
+export function postItem(type) {
     return function (dispatch, getState) {
 
         const item = getState().itemToEdit;
 
-        return fetch(`/users/${item._id ? item._id : 'new'}`, {
+        return fetch(`/${type}/${item._id ? item._id : 'new'}`, {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
@@ -120,7 +137,7 @@ export function postItem() {
             .then(parseJSON)
             .then(function() {
                 alertify.success((item._id ? 'Item updated' : 'Item created') + 'successfully');
-                dispatch(fetchItems());
+                dispatch(fetchItems(type));
             }).catch(function(error) {
                 if (error.response.status !== 400) {
                     alertify.error(error.response.statusText);

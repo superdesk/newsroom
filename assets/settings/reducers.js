@@ -8,7 +8,9 @@ import {
     GET_COMPANIES,
     SAVE_ITEM,
     CANCEL_EDIT,
-    SAVE_ERROR, NEW_ITEM
+    SAVE_ERROR,
+    NEW_ITEM,
+    SELECT_MENU,
 } from './actions';
 
 const initialState = {
@@ -19,6 +21,7 @@ const initialState = {
     isLoading: false,
     totalItems: null,
     activeQuery: null,
+    selectedMenu: 'companies',
 };
 
 export default function itemReducer(state = initialState, action) {
@@ -41,7 +44,7 @@ export default function itemReducer(state = initialState, action) {
     }
 
     case NEW_ITEM: {
-        const newUser = {
+        const newUser =  {
             user_type: 'public',
             is_approved: true,
             is_enabled: true,
@@ -51,7 +54,17 @@ export default function itemReducer(state = initialState, action) {
             phone: '',
             company: '',
         };
-        return {...state, itemToEdit: newUser, errors: null};
+
+        const newCompany = {
+            name: '',
+            sd_subscriber_id: '',
+            phone: '',
+            contact_name: '',
+            country: '',
+            is_enabled: true,
+        };
+
+        return {...state, itemToEdit: action.data === 'users' ? newUser : newCompany, errors: null};
     }
 
     case SAVE_ITEM: {
@@ -96,6 +109,16 @@ export default function itemReducer(state = initialState, action) {
         });
 
         return {...state, companies, companiesById, companyOptions};
+    }
+
+    case SELECT_MENU: {
+        return {
+            ...state,
+            itemToEdit: null,
+            activeItemId: null,
+            errors: null,
+            selectedMenu: action.data.target.name
+        };
     }
 
     default:

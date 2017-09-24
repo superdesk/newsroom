@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import EditUser from './EditUser';
-import UsersList from './UsersList';
+import EditCompany from './EditCompany';
+import CompanyList from './CompanyList';
 import SearchResultsInfo from '../../../wire/components/SearchResultsInfo';
 
-class Users extends React.Component {
+class Companies extends React.Component {
     constructor(props, context) {
         super(props, context);
 
@@ -19,8 +19,8 @@ class Users extends React.Component {
         let valid = true;
         let errors = {};
 
-        if (!this.props.userToEdit.email) {
-            errors.email = ['Please provide email'];
+        if (!this.props.companyToEdit.name) {
+            errors.name = ['Please provide company name'];
             valid = false;
         }
 
@@ -35,7 +35,7 @@ class Users extends React.Component {
             return;
         }
 
-        this.props.saveUser('users');
+        this.props.saveCompany('companies');
     }
 
     render() {
@@ -53,24 +53,21 @@ class Users extends React.Component {
                     <div className="col">
                         {this.props.activeQuery &&
                         <SearchResultsInfo
-                            totalItems={this.props.totalUsers}
+                            totalItems={this.props.totalCompanies}
                             query={this.props.activeQuery} />
                         }
-                        <UsersList
-                            users={this.props.users}
-                            onClick={this.props.selectUser}
-                            activeUserId={this.props.activeUserId}
-                            companiesById={this.props.companiesById}/>
+                        <CompanyList
+                            companies={this.props.companies}
+                            onClick={this.props.selectCompany}
+                            activeCompanyId={this.props.activeCompanyId} />
                     </div>
                 )}
-                {this.props.userToEdit &&
-                    <EditUser
-                        user={this.props.userToEdit}
-                        onChange={this.props.editUser}
+                {this.props.companyToEdit &&
+                    <EditCompany
+                        company={this.props.companyToEdit}
+                        onChange={this.props.editCompany}
                         errors={this.props.errors}
-                        companies={this.props.companyOptions}
                         onSave={this.save}
-                        onResetPassword={this.props.resetPassword}
                         onClose={this.props.cancelEdit}
                     />
                 }
@@ -79,22 +76,19 @@ class Users extends React.Component {
     }
 }
 
-Users.propTypes = {
-    users: PropTypes.arrayOf(PropTypes.object),
-    userToEdit: PropTypes.object,
-    activeUserId: PropTypes.string,
-    selectUser: PropTypes.func,
-    editUser: PropTypes.func,
-    saveUser: PropTypes.func,
-    newUser: PropTypes.func,
-    resetPassword: PropTypes.func,
+Companies.propTypes = {
+    companies: PropTypes.arrayOf(PropTypes.object),
+    companyToEdit: PropTypes.object,
+    activeCompanyId: PropTypes.string,
+    selectCompany: PropTypes.func,
+    editCompany: PropTypes.func,
+    saveCompany: PropTypes.func,
+    newCompany: PropTypes.func,
     cancelEdit: PropTypes.func,
     isLoading: PropTypes.bool,
     activeQuery: PropTypes.string,
-    totalUsers: PropTypes.number,
-    companyOptions: PropTypes.arrayOf(PropTypes.object),
-    companiesById: PropTypes.object,
+    totalCompanies: PropTypes.number,
     errors: PropTypes.object,
 };
 
-export default Users;
+export default Companies;
