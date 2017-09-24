@@ -36,8 +36,7 @@
 
         {% if session.get('name') %}
         <div class="form-inline my-2 my-lg-0 ml-auto p-2">
-            <a class="nav-link" href="{{ url_for('users.index') }}">{{ gettext('Users') }}</a>
-            <a class="nav-link" href="{{ url_for('companies.index') }}">{{ gettext('Companies') }}</a>
+            <a class="nav-link" href="{{ url_for('users.index') }}">{{ gettext('Settings') }}</a>
             <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
             <span class="badge badge-success">{{ session['name'] }}</span>
         </div>

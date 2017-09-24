@@ -9,8 +9,8 @@ import thunkMiddleware from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 
 import userReducer from './reducers';
-import UsersApp from './components/UsersApp';
-import { fetchUsers, fetchCompanies } from './actions';
+import SettingsApp from './components/SettingsApp';
+import { fetchItems, fetchCompanies } from './actions';
 
 const loggerMiddleware = createLogger({
     duration: true,
@@ -27,12 +27,12 @@ const store = createStore(
 );
 
 // init users and companies
-store.dispatch(fetchUsers());
+store.dispatch(fetchItems());
 store.dispatch(fetchCompanies());
 
 render(
     <Provider store={store}>
-        <UsersApp />
+        <SettingsApp />
     </Provider>,
-    document.getElementById('users-app')
+    document.getElementById('settings-app')
 );

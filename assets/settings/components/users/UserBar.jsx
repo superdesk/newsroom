@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from '../../utils';
-import SearchBar from '../../wire/components/SearchBar';
+import { gettext } from '../../../utils';
+import SearchBar from '../../../wire/components/SearchBar';
 
 class UserBar extends React.Component {
     render() {
@@ -9,8 +9,8 @@ class UserBar extends React.Component {
             <nav className="navbar sticky-top navbar-light bg-light">
                 <SearchBar />
                 <button
-                  className="btn btn-primary btn-lg active float-right"
-                  onClick={this.props.onNewUser}>{gettext('New User')}</button>
+                    className="btn btn-primary btn-lg active float-right"
+                    onClick={this.props.onNewUser}>{gettext('New User')}</button>
             </nav>
         );
     }

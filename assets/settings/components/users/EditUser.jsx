@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TextInput from '../../common/components/TextInput';
-import SelectInput from '../../common/components/SelectInput';
-import CheckboxInput from '../../common/components/CheckboxInput';
+import TextInput from '../../../common/components/TextInput';
+import SelectInput from '../../../common/components/SelectInput';
+import CheckboxInput from '../../../common/components/CheckboxInput';
 
-import { gettext } from '../../utils';
+import { gettext } from '../../../utils';
 
 const userTypes = [
     {value: 'administrator', text: 'Administrator'},
@@ -82,12 +82,12 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
 
                 <div className="modal-footer">
                     {user._id ?
-                    <input
-                        type="button"
-                        className="btn btn-secondary"
-                        value={gettext('Reset Password')}
-                        id="resetPassword"
-                        onClick={onResetPassword} /> : null}
+                        <input
+                            type="button"
+                            className="btn btn-secondary"
+                            value={gettext('Reset Password')}
+                            id="resetPassword"
+                            onClick={onResetPassword} /> : null}
 
                     <input
                         type="button"

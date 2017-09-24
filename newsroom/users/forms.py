@@ -8,6 +8,8 @@ class UserForm(FlaskForm):
     class Meta:
         csrf = False
 
+    BooleanField.false_values = {False, 'false', ''}
+
     user_types = [('administrator', 'Administrator'),
                   ('public', 'Public'),
                   ('internal', 'Internal')]

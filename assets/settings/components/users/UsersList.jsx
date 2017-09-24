@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import UserListItem from './UserListItem';
-import { gettext } from '../../utils';
+import { gettext } from '../../../utils';
 
 
 function UsersList({users, onClick, activeUserId, companiesById}) {

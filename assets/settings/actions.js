@@ -2,19 +2,19 @@ import fetch from 'isomorphic-fetch';
 import alertify from 'alertifyjs';
 
 
-export const SELECT_USER = 'SELECT_USER';
-export function selectUser(id) {
-    return {type: SELECT_USER, id};
+export const SELECT_ITEM = 'SELECT_ITEM';
+export function selectItem(id) {
+    return {type: SELECT_ITEM, id};
 }
 
-export const EDIT_USER = 'EDIT_USER';
-export function editUser(event) {
-    return {type: EDIT_USER, event};
+export const EDIT_ITEM = 'EDIT_ITEM';
+export function editItem(event) {
+    return {type: EDIT_ITEM, event};
 }
 
-export const NEW_USER = 'NEW_USER';
-export function newUser() {
-    return {type: NEW_USER};
+export const NEW_ITEM = 'NEW_ITEM';
+export function newItem() {
+    return {type: NEW_ITEM};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
@@ -22,9 +22,9 @@ export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
 }
 
-export const SAVE_USER = 'SAVE_USER';
-export function saveUser(data) {
-    return {type: SAVE_USER, data};
+export const SAVE_ITEM = 'SAVE_ITEM';
+export function saveItem(data) {
+    return {type: SAVE_ITEM, data};
 }
 
 export const SAVE_ERROR = 'SAVE_ERROR';
@@ -42,9 +42,9 @@ export function setQuery(query) {
     return {type: SET_QUERY, query};
 }
 
-export const QUERY_USERS = 'QUERY_USERS';
-export function queryUsers() {
-    return {type: QUERY_USERS};
+export const QUERY_ITEMS = 'QUERY_ITEMS';
+export function queryItems() {
+    return {type: QUERY_ITEMS};
 }
 
 export const GET_COMPANIES = 'GET_COMPANIES';
@@ -52,14 +52,14 @@ export function getCompanies(data) {
     return {type: GET_COMPANIES, data};
 }
 
-export const GET_USERS = 'GET_USERS';
-export function getUsers(data) {
-    return {type: GET_USERS, data};
+export const GET_ITEMS = 'GET_ITEMS';
+export function getItems(data) {
+    return {type: GET_ITEMS, data};
 }
 
-export function fetchUsers() {
+export function fetchItems() {
     return function (dispatch) {
-        dispatch(queryUsers());
+        dispatch(queryItems());
 
         return fetch('/users/search', {
             credentials: 'same-origin'
@@ -68,7 +68,7 @@ export function fetchUsers() {
                 return response.json();
             })
             .then((data) =>
-                dispatch(getUsers(data))
+                dispatch(getItems(data))
             );
     };
 }
@@ -103,24 +103,24 @@ function parseJSON(response) {
 }
 
 
-export function postUser() {
+export function postItem() {
     return function (dispatch, getState) {
 
-        const user = getState().userToEdit;
+        const item = getState().itemToEdit;
 
-        return fetch(`/users/${user._id ? user._id : 'new'}`, {
+        return fetch(`/users/${item._id ? item._id : 'new'}`, {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(user)
+            body: JSON.stringify(item)
         })
             .then(checkStatus)
             .then(parseJSON)
             .then(function() {
-                alertify.success((user._id ? 'User updated' : 'User created') + 'successfully');
-                dispatch(fetchUsers());
+                alertify.success((item._id ? 'Item updated' : 'Item created') + 'successfully');
+                dispatch(fetchItems());
             }).catch(function(error) {
                 if (error.response.status !== 400) {
                     alertify.error(error.response.statusText);

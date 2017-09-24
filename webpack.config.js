@@ -6,9 +6,8 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 module.exports = {
     entry: {
         newsroom_js: './assets/index.js',
+        settings_js: ['babel-polyfill', './assets/settings/index.js'],
         newsroom_css: './assets/style.js',
-        users_js: './assets/users/index.js',
-        companies_js: './assets/companies.js',
         wire_js: ['babel-polyfill', './assets/wire/index.js'],
     },
     output: {
