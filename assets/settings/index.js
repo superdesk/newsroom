@@ -10,7 +10,7 @@ import { createLogger } from 'redux-logger';
 
 import userReducer from './reducers';
 import SettingsApp from './components/SettingsApp';
-import { fetchItems, fetchCompanies } from './actions';
+import { fetchItems } from './actions';
 
 const loggerMiddleware = createLogger({
     duration: true,
@@ -28,7 +28,7 @@ const store = createStore(
 
 // init users and companies
 store.dispatch(fetchItems('companies'));
-store.dispatch(fetchCompanies());
+store.dispatch(fetchItems('users'));
 
 render(
     <Provider store={store}>

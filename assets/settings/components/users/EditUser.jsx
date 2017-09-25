@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TextInput from '../../../common/components/TextInput';
-import SelectInput from '../../../common/components/SelectInput';
-import CheckboxInput from '../../../common/components/CheckboxInput';
+import TextInput from '../../../components/TextInput';
+import SelectInput from '../../../components/SelectInput';
+import CheckboxInput from '../../../components/CheckboxInput';
 
-import { gettext } from '../../../utils';
+import { gettext } from 'utils';
 
 const userTypes = [
     {value: 'administrator', text: gettext('Administrator')},
@@ -12,7 +12,7 @@ const userTypes = [
     {value: 'public', text: gettext('Public')},
 ];
 
-function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose}) {
+function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose, onDelete}) {
     return (
         <div className="col">
             <div className="modal-header">
@@ -94,6 +94,12 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         className="btn btn-primary"
                         value={gettext('Save')}
                         onClick={onSave} />
+
+                    <input
+                        type="button"
+                        className="btn btn-primary"
+                        value={gettext('Delete')}
+                        onClick={onDelete} />
                 </div>
 
 
@@ -110,6 +116,7 @@ EditUser.propTypes = {
     onSave: PropTypes.func.isRequired,
     onResetPassword: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
 };
 
 export default EditUser;

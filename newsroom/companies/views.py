@@ -3,7 +3,7 @@ from newsroom.utils import query_resource, find_one, json_serialize_datetime_obj
 from newsroom.companies import blueprint
 from newsroom.companies.forms import CompanyForm
 from bson import ObjectId
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import NotFound
 from superdesk import get_resource_service
 from flask_babel import gettext
 from newsroom.auth.decorator import admin_only
@@ -42,7 +42,6 @@ def create():
     return json.dumps(form.errors), 400, {'ContentType': 'application/json'}
 
 
-
 @blueprint.route('/companies/<id>', methods=['GET', 'POST'])
 @admin_only
 def edit(id):
@@ -60,7 +59,6 @@ def edit(id):
         return json.dumps(form.errors), 400, {'ContentType': 'application/json'}
 
 
-
 @blueprint.route('/companies/<id>', methods=['DELETE'])
 @admin_only
 def delete(id):
@@ -69,5 +67,4 @@ def delete(id):
     """
     get_resource_service('users').delete(lookup={'company': ObjectId(id)})
     get_resource_service('companies').delete({'_id': ObjectId(id)})
-    flask.flash(gettext('Company has been deleted'), 'success')
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}

@@ -31,6 +31,19 @@ class Server {
             body: JSON.stringify(data),
         }));
     }
+
+    /**
+     * Make DELETE request to url
+     *
+     * @param {String} url
+     * @return {Promise}
+     */
+    del(url) {
+        return fetch(url, options({
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+        }));
+    }
 }
 
 export default new Server();

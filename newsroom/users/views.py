@@ -43,7 +43,7 @@ def create():
         if form.company.data:
             new_user['company'] = ObjectId(form.company.data)
         get_resource_service('users').post([new_user])
-        # send_reset_password_email(new_user['name'], new_user['email'], new_user['token'])
+        send_reset_password_email(new_user['name'], new_user['email'], new_user['token'])
         return json.dumps({'success': True}), 201, {'ContentType': 'application/json'}
     return json.dumps(form.errors), 400, {'ContentType': 'application/json'}
 
@@ -115,21 +115,14 @@ def _resend_token(user_id, token_type):
         return BadRequest(gettext('User id not provided'))
 
     user = find_one('users', _id=ObjectId(user_id))
-    status = 200
 
     if not user:
         return NotFound(gettext('User not found'))
 
     if send_token(user, token_type):
-        flask.flash(gettext('A new token has been sent to user'), 'success')
-    else:
-        flask.flash(gettext('Token is not generated.'), 'danger')
-        status = 400
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
-    user['id'] = str(user['_id'])
-    form = UserForm(**user)
-    form.company.choices = init_companies()
-    return flask.render_template('user.html', form=form), status
+    return json.dumps({'message': 'Token could not be sent'}), 400, {'ContentType': 'application/json'}
 
 
 @blueprint.route('/users/<id>', methods=['DELETE'])
@@ -137,5 +130,4 @@ def _resend_token(user_id, token_type):
 def delete(id):
     """ Deletes the user by given id """
     get_resource_service('users').delete({'_id': ObjectId(id)})
-    flask.flash(gettext('User has been deleted'), 'success')
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}

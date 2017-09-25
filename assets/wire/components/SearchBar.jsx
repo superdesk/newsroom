@@ -30,16 +30,16 @@ class SearchBar extends React.Component {
 
     render() {
         return (
-	<form className="form-inline" onSubmit={this.onSubmit}>
-	    <input type="text"
-	        name="q"
-	        className="form-control mr-sm-2"
-	        value={this.state.query}
-	        onChange={this.onChange}
-	    />
-	    <button className="btn btn-outline-success my-2 my-sm-0"
-	        type="submit">{gettext('Search')}</button>
-	</form>
+            <form className="form-inline" onSubmit={this.onSubmit}>
+                <input type="text"
+                    name="q"
+                    className="form-control mr-sm-2"
+                    value={this.state.query}
+                    onChange={this.onChange}
+                />
+                <button className="btn btn-outline-success my-2 my-sm-0"
+                    type="submit">{gettext('Search')}</button>
+            </form>
         );
     }
 }

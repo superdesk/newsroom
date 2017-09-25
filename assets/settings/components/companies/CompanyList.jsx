@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import CompanyListItem from './CompanyListItem';
-import { gettext } from '../../../utils';
+import { gettext } from 'utils';
 
 
 function CompanyList({companies, onClick, activeCompanyId}) {
@@ -24,7 +24,6 @@ function CompanyList({companies, onClick, activeCompanyId}) {
                     <th>{ gettext('Telephone') }</th>
                     <th>{ gettext('Country') }</th>
                     <th>{ gettext('Created On') }</th>
-                    <th></th>
                 </tr>
             </thead>
             <tbody>{list}</tbody>

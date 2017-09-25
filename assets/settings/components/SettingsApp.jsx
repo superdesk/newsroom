@@ -1,7 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { selectItem, editItem, cancelEdit, resetPassword, postItem, newItem, updateMenu } from '../actions';
+import {
+    selectItem,
+    editItem,
+    cancelEdit,
+    resetPassword,
+    postItem,
+    deleteItem,
+    newItem,
+    updateMenu } from '../actions';
 import UserBar from './users/UserBar';
 import Users from './users/Users';
 import SettingsMenu from './SettingsMenu';
@@ -41,6 +49,7 @@ class SettingsApp extends React.Component {
                             editUser={this.props.editItem}
                             saveUser={this.props.saveItem}
                             newUser={this.props.newItem}
+                            deleteUser={this.props.deleteItem}
                             resetPassword={this.props.resetPassword}
                             cancelEdit={this.props.cancelEdit}
                             isLoading={this.props.isLoading}
@@ -63,6 +72,7 @@ class SettingsApp extends React.Component {
                             selectCompany={this.props.selectItem}
                             editCompany={this.props.editItem}
                             saveCompany={this.props.saveItem}
+                            deleteCompany={this.props.deleteItem}
                             newCompany={this.props.newItem}
                             cancelEdit={this.props.cancelEdit}
                             isLoading={this.props.isLoading}
@@ -84,6 +94,7 @@ SettingsApp.propTypes = {
     selectItem: PropTypes.func,
     editItem: PropTypes.func,
     saveItem: PropTypes.func,
+    deleteItem: PropTypes.func,
     newItem: PropTypes.func,
     resetPassword: PropTypes.func,
     cancelEdit: PropTypes.func,
@@ -114,9 +125,10 @@ const mapDispatchToProps = (dispatch) => ({
     selectItem: (_id) => dispatch(selectItem(_id)),
     editItem: (event) => dispatch(editItem(event)),
     saveItem: (type) => dispatch(postItem(type)),
+    deleteItem: (type) => dispatch(deleteItem(type)),
     newItem: (data) => dispatch(newItem(data)),
     cancelEdit: (event) => dispatch(cancelEdit(event)),
-    resetPassword: (event) => dispatch(resetPassword(event)),
+    resetPassword: () => dispatch(resetPassword()),
     selectMenu: (event) => dispatch(updateMenu(event)),
 });
 

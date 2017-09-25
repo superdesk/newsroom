@@ -62,9 +62,9 @@ NEW_ACCOUNT_ACTIVE_DAYS = 14
 WTF_CSRF_ENABLED = True
 
 # Email settings
-MAIL_SERVER = 'localhost'
-MAIL_PORT = 25
-MAIL_USE_SSL = False
+MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'localhost'
+MAIL_PORT = os.environ.get('MAIL_PORT') or 25
+MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL') or False
 MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate } from '../../../utils';
+import { gettext, shortDate } from 'utils';
 
 
 function UserListItem({user, isActive, onClick, companiesById}) {
@@ -16,9 +16,6 @@ function UserListItem({user, isActive, onClick, companiesById}) {
             <td>{(user.is_approved ? gettext('Approved') : gettext('Needs Approval'))} -
                 {(user.is_enabled ? gettext('Enabled') : gettext('Disabled'))}</td>
             <td>{shortDate(user._created)}</td>
-            <td>
-                <button className="btn btn-sm delete-user"> {gettext('delete')}</button>
-            </td>
         </tr>
     );
 }

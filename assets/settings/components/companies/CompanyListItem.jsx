@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate } from '../../../utils';
+import { gettext, shortDate } from 'utils';
 
 
 function CompanyListItem({company, isActive, onClick}) {
@@ -15,9 +15,6 @@ function CompanyListItem({company, isActive, onClick}) {
             <td>{company.phone}</td>
             <td>{company.country}</td>
             <td>{shortDate(company._created)}</td>
-            <td>
-                <button className="btn btn-sm delete-company"> {gettext('delete')}</button>
-            </td>
         </tr>
     );
 }

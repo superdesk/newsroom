@@ -1,5 +1,6 @@
-import fetch from 'isomorphic-fetch';
 import alertify from 'alertifyjs';
+import { gettext } from 'utils';
+import server from 'server';
 
 
 export const SELECT_ITEM = 'SELECT_ITEM';
@@ -23,18 +24,10 @@ export function cancelEdit(event) {
 }
 
 export const SAVE_ITEM = 'SAVE_ITEM';
-export function saveItem(data) {
-    return {type: SAVE_ITEM, data};
-}
 
 export const SAVE_ERROR = 'SAVE_ERROR';
 export function saveError(data) {
     return {type: SAVE_ERROR, data};
-}
-
-export const RESET_PASSWORD = 'RESET_PASSWORD';
-export function resetPassword(data) {
-    return {type: RESET_PASSWORD, data};
 }
 
 export const SET_QUERY = 'SET_QUERY';
@@ -57,12 +50,10 @@ export function getItems(data) {
     return {type: GET_ITEMS, data};
 }
 
-export const UPDATE_MENU = 'UPDATE_MENU';
 export function updateMenu(data) {
     return function (dispatch) {
         dispatch(fetchItems(data.target.name));
         dispatch(selectMenu(data));
-
     };
 }
 
@@ -71,39 +62,44 @@ export function selectMenu(data) {
     return {type: SELECT_MENU, data};
 }
 
-export function fetchItems(endpoint) {
+function errorHandler(error, dispatch) {
+    console.error('error', error);
+
+    if (error.response.status !== 400) {
+        alertify.error(error.response.statusText);
+        return;
+    }
+    parseJSON(error.response).then(function(data) {
+        dispatch(saveError(data));
+    });
+}
+
+
+function parseJSON(response) {
+    return response.json();
+}
+
+/**
+ * Fetches users and companies for the time being
+ *
+ * @param {String} type either users or companies
+ */
+export function fetchItems(type) {
     return function (dispatch) {
         dispatch(queryItems());
 
-        return fetch(`/${endpoint}/search`, {
-            credentials: 'same-origin'
-        })
-            .then((response) => {
-                return response.json();
-            })
+        return server.get(`/${type}/search`)
+            .then(parseJSON)
             .then((data) => {
                 dispatch(getItems(data));
-                if (endpoint === 'companies') {
-                    dispatch(getCompanies(data, endpoint));
+                if (type === 'companies') {
+                    dispatch(getCompanies(data, type));
                 }
-            });
+            })
+            .catch((error) => errorHandler(error, dispatch));
     };
 }
 
-export function fetchCompanies() {
-    return function (dispatch) {
-
-        return fetch('/companies/search', {
-            credentials: 'same-origin'
-        }).then((response) => {
-            return response.json();
-        })
-            .then((data) =>
-                dispatch(getCompanies(data))
-            );
-
-    };
-}
 
 function checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
@@ -115,38 +111,63 @@ function checkStatus(response) {
     }
 }
 
-function parseJSON(response) {
-    return response.json();
-}
-
-
+/**
+ * Creates new users and companies for the time being
+ *
+ * @param {String} type either users or companies
+ */
 export function postItem(type) {
     return function (dispatch, getState) {
 
         const item = getState().itemToEdit;
+        const url = `/${type}/${item._id ? item._id : 'new'}`;
 
-        return fetch(`/${type}/${item._id ? item._id : 'new'}`, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(item)
-        })
+        return server.post(url, item)
             .then(checkStatus)
             .then(parseJSON)
             .then(function() {
-                alertify.success((item._id ? 'Item updated' : 'Item created') + 'successfully');
+                alertify.success(gettext((item._id ? 'Item updated' : 'Item created') + 'successfully'));
                 dispatch(fetchItems(type));
-            }).catch(function(error) {
-                if (error.response.status !== 400) {
-                    alertify.error(error.response.statusText);
-                    return;
-                }
-                parseJSON(error.response).then(function(data) {
-                    dispatch(saveError(data));
-                });
-            });
+            })
+            .catch((error) => errorHandler(error, dispatch));
 
+    };
+}
+
+
+export function resetPassword() {
+    return function (dispatch, getState) {
+
+        const item = getState().itemToEdit;
+        const url = `/users/${item._id}/reset_password`;
+
+        return server.post(url, {})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(() => alertify.success(gettext('Reset password token is sent successfully')))
+            .catch((error) => errorHandler(error, dispatch));
+
+    };
+}
+
+/**
+ * Deletes a user or company
+ *
+ * @param {String} type either users or companies
+ */
+export function deleteItem(type) {
+    return function (dispatch, getState) {
+
+        const item = getState().itemToEdit;
+        const url = `/${type}/${item._id}`;
+
+        return server.del(url)
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(() => {
+                alertify.success(gettext('Item deleted successfully'));
+                dispatch(fetchItems(type));
+            })
+            .catch((error) => errorHandler(error, dispatch));
     };
 }

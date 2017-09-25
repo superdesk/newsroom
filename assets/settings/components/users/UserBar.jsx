@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from '../../../utils';
+import { gettext } from 'utils';
 import SearchBar from '../../../wire/components/SearchBar';
 
 class UserBar extends React.Component {

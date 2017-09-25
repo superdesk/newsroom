@@ -13,6 +13,7 @@ class Users extends React.Component {
         };
         this.isFormValid = this.isFormValid.bind(this);
         this.save = this.save.bind(this);
+        this.deleteUser = this.deleteUser.bind(this);
     }
 
     isFormValid() {
@@ -36,6 +37,14 @@ class Users extends React.Component {
         }
 
         this.props.saveUser('users');
+    }
+
+    deleteUser(event) {
+        event.preventDefault();
+
+        if (confirm(`Would you like to delete user: ${this.props.userToEdit.name}`)) {
+            this.props.deleteUser('users');
+        }
     }
 
     render() {
@@ -72,6 +81,7 @@ class Users extends React.Component {
                         onSave={this.save}
                         onResetPassword={this.props.resetPassword}
                         onClose={this.props.cancelEdit}
+                        onDelete={this.deleteUser}
                     />
                 }
             </div>
@@ -87,6 +97,7 @@ Users.propTypes = {
     editUser: PropTypes.func,
     saveUser: PropTypes.func,
     newUser: PropTypes.func,
+    deleteUser: PropTypes.func,
     resetPassword: PropTypes.func,
     cancelEdit: PropTypes.func,
     isLoading: PropTypes.bool,

@@ -13,6 +13,7 @@ class Companies extends React.Component {
         };
         this.isFormValid = this.isFormValid.bind(this);
         this.save = this.save.bind(this);
+        this.deleteCompany = this.deleteCompany.bind(this);
     }
 
     isFormValid() {
@@ -36,6 +37,14 @@ class Companies extends React.Component {
         }
 
         this.props.saveCompany('companies');
+    }
+
+    deleteCompany(event) {
+        event.preventDefault();
+
+        if (confirm(`Would you like to delete company: ${this.props.companyToEdit.name}`)) {
+            this.props.deleteCompany('companies');
+        }
     }
 
     render() {
@@ -69,6 +78,7 @@ class Companies extends React.Component {
                         errors={this.props.errors}
                         onSave={this.save}
                         onClose={this.props.cancelEdit}
+                        onDelete={this.deleteCompany}
                     />
                 }
             </div>
@@ -83,6 +93,7 @@ Companies.propTypes = {
     selectCompany: PropTypes.func,
     editCompany: PropTypes.func,
     saveCompany: PropTypes.func,
+    deleteCompany: PropTypes.func,
     newCompany: PropTypes.func,
     cancelEdit: PropTypes.func,
     isLoading: PropTypes.bool,

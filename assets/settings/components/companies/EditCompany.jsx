@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TextInput from '../../../common/components/TextInput';
-import SelectInput from '../../../common/components/SelectInput';
-import CheckboxInput from '../../../common/components/CheckboxInput';
+import TextInput from '../../../components/TextInput';
+import SelectInput from '../../../components/SelectInput';
+import CheckboxInput from '../../../components/CheckboxInput';
 
 import { gettext } from '../../../utils';
 
@@ -12,7 +12,7 @@ const countries = [
     {value: 'other', text: gettext('Other')},
 ];
 
-function EditCompany({company, onChange, errors, onSave, onClose}) {
+function EditCompany({company, onChange, errors, onSave, onClose, onDelete}) {
     return (
         <div className="col">
             <div className="modal-header">
@@ -78,6 +78,11 @@ function EditCompany({company, onChange, errors, onSave, onClose}) {
                         className="btn btn-primary"
                         value={gettext('Save')}
                         onClick={onSave} />
+                    <input
+                        type="button"
+                        className="btn btn-primary"
+                        value={gettext('Delete')}
+                        onClick={onDelete} />
                 </div>
 
 
@@ -93,6 +98,7 @@ EditCompany.propTypes = {
     users: PropTypes.arrayOf(PropTypes.object),
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
 };
 
 export default EditCompany;
