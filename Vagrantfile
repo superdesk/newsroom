@@ -19,12 +19,12 @@ npm install -g n
 n lts
 
 # create python venv
-if ! [ -d /vagrant/venv ]; then
-    python3 -m venv /vagrant/venv
+if ! [ -d /opt/venv ]; then
+    python3 -m venv /opt/venv
 fi
 
 # install python dependencies
-source /vagrant/venv/bin/activate
+source /opt/venv/bin/activate
 pip install -U pip wheel
 pip install -U -r /vagrant/requirements.txt
 pip install -U -r /vagrant/dev-requirements.txt
@@ -32,14 +32,14 @@ pip install -U -r /vagrant/dev-requirements.txt
 cd /vagrant
 
 # install javascript dependencies
-yarn install
+yarn install --no-bin-links
 SCRIPT
 
 $start = <<SCRIPT
 #!/usr/bin/env bash
 
 cd /vagrant
-source ./venv/bin/activate
+source /opt/venv/bin/activate
 
 if [ -f /tmp/server.pid ]; then
     kill `cat /tmp/server.pid`
@@ -51,13 +51,22 @@ if [ -f /tmp/client.pid ]; then
     rm /tmp/client.pid
 fi
 
+/vagrant/node_modules/webpack-dev-server/bin/webpack-dev-server.js \
+    --quiet \
+    --host 0.0.0.0 \
+    --port 8080 \
+    --public localhost:8080 \
+    --watch-poll 1000 &
+echo $! >> /tmp/client.pid
+
+echo 'starting..'
+# wait for initial webpack build
+while ! curl -sfo /dev/null 'http://localhost:8080/manifest.json'; do echo -n '.' && sleep .5; done
+echo 'done.'
+
+# start server
 python app.py &
 echo $! >> /tmp/server.pid
-
-yarn run start --host 0.0.0.0
-#echo $! >> /tmp/client.pid
-
-echo "done"
 SCRIPT
 
 Vagrant.configure("2") do |config|
