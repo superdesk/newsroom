@@ -30,15 +30,19 @@ export default function wireReducer(state = initialState, action) {
 
     case SET_ITEMS: {
         const itemsById = {};
+        const items = [];
 
         action.items.forEach((item) => {
-            itemsById[item._id] = item;
+            if (!itemsById[item._id]) {
+                itemsById[item._id] = item;
+                items.push(item._id);
+            }
         });
 
         return {
             ...state,
             itemsById,
-            items: action.items.map((item) => item._id)
+            items,
         };
     }
 
