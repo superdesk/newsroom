@@ -1,5 +1,4 @@
-import alertify from 'alertifyjs';
-import { gettext } from 'utils';
+import { gettext, notify } from 'utils';
 import server from 'server';
 
 
@@ -66,7 +65,7 @@ function errorHandler(error, dispatch) {
     console.error('error', error);
 
     if (error.response.status !== 400) {
-        alertify.error(error.response.statusText);
+        notify.error(error.response.statusText);
         return;
     }
     error.response.json().then(function(data) {
@@ -112,7 +111,7 @@ export function postItem(type) {
 
         return server.post(url, item)
             .then(function() {
-                alertify.success(gettext((item._id ? 'Item updated' : 'Item created') + 'successfully'));
+                notify.success(gettext((item._id ? 'Item updated' : 'Item created') + 'successfully'));
                 dispatch(fetchItems(type));
             })
             .catch((error) => errorHandler(error, dispatch));
@@ -128,7 +127,7 @@ export function resetPassword() {
         const url = `/users/${item._id}/reset_password`;
 
         return server.post(url, {})
-            .then(() => alertify.success(gettext('Reset password token is sent successfully')))
+            .then(() => notify.success(gettext('Reset password token is sent successfully')))
             .catch((error) => errorHandler(error, dispatch));
 
     };
@@ -147,7 +146,7 @@ export function deleteItem(type) {
 
         return server.del(url)
             .then(() => {
-                alertify.success(gettext('Item deleted successfully'));
+                notify.success(gettext('Item deleted successfully'));
                 dispatch(fetchItems(type));
             })
             .catch((error) => errorHandler(error, dispatch));

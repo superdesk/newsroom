@@ -4,6 +4,7 @@ import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
+import alertify from 'alertifyjs';
 
 /**
  * Create redux store with default middleware
@@ -92,3 +93,11 @@ export function fullDate(dateString) {
     const date = parseDate(dateString);
     return date.toLocaleString();
 }
+
+/**
+ * Wrapper for alertifyjs
+ */
+export const notify = {
+    success: (message) => alertify.success(message),
+    error: (message) => alertify.error(message),
+};

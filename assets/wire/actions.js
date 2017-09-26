@@ -1,4 +1,6 @@
+
 import server from 'server';
+import { gettext, notify } from 'utils';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -53,6 +55,26 @@ export function initData(data) {
 export const ADD_TOPIC = 'ADD_TOPIC';
 export function addTopic(topic) {
     return {type: ADD_TOPIC, topic};
+}
+
+/**
+ * Copy contents of item preview.
+ *
+ * This is an initial version, should be updated with preview markup changes.
+ */
+export function copyPreviewContents() {
+    const preview = document.getElementById('preview-article');
+    const selection = window.getSelection();
+    const range = document.createRange();
+    selection.removeAllRanges();
+    range.selectNode(preview);
+    selection.addRange(range);
+    if (document.execCommand('copy')) {
+        notify.success(gettext('Item copied successfully.'));
+    } else {
+        notify.error(gettext('Sorry, Copy is not supported.'));
+    }
+    selection.removeAllRanges();
 }
 
 /**
