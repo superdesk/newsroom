@@ -12,10 +12,10 @@ module.exports = {
         wire_js: ['babel-polyfill', './assets/wire/index.js'],
     },
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'newsroom', 'static'),
         publicPath: 'http://localhost:8080/',
-        filename: '[name].js',
-        chunkFilename: '[id].js'
+        filename: '[name].[chunkhash].js',
+        chunkFilename: '[id].[chunkhash].js'
     },
     module: {
         rules: [
