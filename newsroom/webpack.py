@@ -2,7 +2,7 @@
 import json
 import requests
 
-from flask import current_app
+from flask import current_app, request
 from flask_webpack import Webpack
 
 
@@ -25,8 +25,9 @@ class NewsroomWebpack(Webpack):
             self.assets = {}
             return
 
-        if app.debug and self.assets_url:
+        if app.debug:
             try:
+                self.assets_url = 'http://localhost:8080/'
                 self.assets = requests.get('{0}{1}'.format(self.assets_url, 'manifest.json')).json()
                 return
             except requests.exceptions.ConnectionError:
@@ -36,6 +37,7 @@ class NewsroomWebpack(Webpack):
             with app.open_resource(webpack_stats, 'r') as stats_json:
                 self.assets = json.load(stats_json)
         except IOError:
-            raise RuntimeError(
-                "Flask-Webpack requires 'WEBPACK_MANIFEST_PATH' to be set and "
-                "it must point to a valid json file.")
+            if request:
+                raise RuntimeError(
+                    "Flask-Webpack requires 'WEBPACK_MANIFEST_PATH' to be set and "
+                    "it must point to a valid json file.")
