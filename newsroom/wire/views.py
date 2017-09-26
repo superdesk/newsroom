@@ -4,11 +4,18 @@ from eve.render import send_response
 from eve.methods.get import get_internal
 
 from newsroom.wire import blueprint
+from newsroom.auth import get_user_id
+from newsroom.topics import get_user_topics
 
 
 @blueprint.route('/')
 def index():
-    return flask.render_template('wire_index.html')
+    user_id = get_user_id()
+    data = {
+        'user': str(user_id) if user_id else None,
+        'topics': get_user_topics(user_id) if user_id else [],
+    }
+    return flask.render_template('wire_index.html', data=data)
 
 
 @blueprint.route('/search')

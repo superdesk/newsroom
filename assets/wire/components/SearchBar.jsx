@@ -10,18 +10,20 @@ class SearchBar extends React.Component {
         super(props);
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.state = {query: props.query || ''};
     }
 
     onChange(event) {
-        this.props.setQuery(event.target.value);
+        this.setState({query: event.target.value});
     }
 
     onSubmit(event) {
         event.preventDefault();
+        this.props.setQuery(this.state.query);
         this.props.fetchItems().then(() => {
             // update browser url - where should this go?
             const params = new URLSearchParams(window.location.search);
-            params.set('q', this.props.query);
+            params.set('q', this.state.query);
             history.pushState(this.props.state, null, '?' + params.toString());
         });
     }
@@ -33,7 +35,7 @@ class SearchBar extends React.Component {
                     <input type="text"
                         name="q"
                         className="form-control mr-sm-2"
-                        value={this.props.query || ''}
+                        value={this.state.query}
                         onChange={this.onChange}
                     />
                     <button className="btn btn-outline-success my-2 my-sm-0"
@@ -52,7 +54,7 @@ SearchBar.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    query: state.query,
+    query: state.activeQuery,
     state: state,
 });
 

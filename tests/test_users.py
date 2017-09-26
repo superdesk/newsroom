@@ -7,7 +7,7 @@ from superdesk import get_resource_service
 @fixture(autouse=True)
 def init(app):
     app.data.insert('users', [{
-        '_id': 1,
+        '_id': ObjectId(),
         'name': 'admin',
         'email': 'admin@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',

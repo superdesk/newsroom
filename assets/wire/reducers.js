@@ -7,10 +7,13 @@ import {
     RECIEVE_ITEMS,
     SET_STATE,
     SET_ACTIVE,
+    RENDER_MODAL,
+    CLOSE_MODAL,
+    INIT_DATA,
+    ADD_TOPIC,
 } from './actions';
 
 const initialState = {
-    query: null,
     items: [],
     itemsById: {},
     activeItem: null,
@@ -18,6 +21,8 @@ const initialState = {
     isLoading: false,
     totalItems: null,
     activeQuery: null,
+    user: null,
+    topics: [],
 };
 
 export default function wireReducer(state = initialState, action) {
@@ -67,6 +72,25 @@ export default function wireReducer(state = initialState, action) {
 
     case SET_STATE:
         return Object.assign({}, action.state);
+
+    case RENDER_MODAL:
+        return {...state, modal: {modal: action.modal, data: action.data}};
+
+    case CLOSE_MODAL:
+        return {...state, modal: null};
+
+    case INIT_DATA:
+        return {
+            ...state,
+            user: action.data.user || null,
+            topics: action.data.topics || [],
+        };
+
+    case ADD_TOPIC:
+        return {
+            ...state,
+            topics: state.topics.concat([action.topic]),
+        };
 
     default:
         return state;
