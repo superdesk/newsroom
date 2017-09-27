@@ -8,6 +8,8 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/themes/bootstrap.min.css"/>
 
     <link rel="icon" type="image/x-icon"
         href="{{ url_for('static', filename='favicon.ico') }}">
@@ -34,8 +36,7 @@
 
         {% if session.get('name') %}
         <div class="form-inline my-2 my-lg-0 ml-auto p-2">
-            <a class="nav-link" href="{{ url_for('users.index') }}">{{ gettext('Users') }}</a>
-            <a class="nav-link" href="{{ url_for('companies.index') }}">{{ gettext('Companies') }}</a>
+            <a class="nav-link" href="{{ url_for('users.settings') }}">{{ gettext('Settings') }}</a>
             <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
             <span class="badge badge-success">{{ session['name'] }}</span>
         </div>

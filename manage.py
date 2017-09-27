@@ -3,6 +3,7 @@ from app import Newsroom
 from flask_script import Manager
 import unittest
 import coverage as cover
+from superdesk import get_resource_service
 
 
 app = Newsroom()
@@ -28,6 +29,32 @@ def coverage():
     print('Coverage Summary:')
     cov.report()
     cov.erase()
+
+
+@manager.command
+def create_user(email, password, name, is_admin):
+    new_user = {
+        'email': email,
+        'password': password,
+        'name': name,
+        'email': email,
+        'user_type': 'administrator' if is_admin else 'public',
+        'is_enabled': True,
+        'is_approved': True
+    }
+
+    with app.test_request_context('/users', method='POST'):
+
+        user = get_resource_service('users').find_one(email=email, req=None)
+
+        if user:
+            print('user already exists %s' % str(new_user))
+        else:
+            print('creating user %s' % str(new_user))
+            get_resource_service('users').post([new_user])
+            print('user saved %s' % (new_user))
+
+        return new_user
 
 
 def run_unittests():

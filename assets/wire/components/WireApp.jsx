@@ -28,7 +28,9 @@ class WireApp extends React.Component {
         const modal = this.renderModal(this.props.modal);
         return (
             <div>
-                <SearchBar />
+                <nav className="navbar sticky-top navbar-light bg-light">
+                    <SearchBar />
+                </nav>
                 <div className="row">
                     {(this.props.isLoading ?
                         <div className="col">

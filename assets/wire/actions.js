@@ -63,7 +63,6 @@ export function fetchItems() {
         dispatch(queryItems());
         const query = getState().query || '';
         return server.get(`/search?q=${query}`)
-            .then((response) => response.json())
             .then((data) => dispatch(recieveItems(data)))
             .catch(errorHandler);
     };
@@ -83,7 +82,6 @@ export function submitFollowTopic(data) {
         const user = getState().user;
         const url = `/api/users/${user}/topics`;
         return server.post(url, data)
-            .then((response) => response.json())
             .then((updates) => dispatch(addTopic(Object.assign(data, updates))))
             .then(() => dispatch(closeModal()))
             .catch(errorHandler);

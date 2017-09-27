@@ -6,6 +6,17 @@ function options(custom={}) {
     return Object.assign({}, defaultOptions, custom);
 }
 
+function checkStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return response.json();
+    } else {
+        var error = new Error(response.statusText);
+        error.response = response;
+        throw error;
+    }
+}
+
+
 class Server {
     /**
      * Make GET request
@@ -14,7 +25,8 @@ class Server {
      * @return {Promise}
      */
     get(url) {
-        return fetch(url, options({}));
+        return fetch(url, options({}))
+            .then(checkStatus);
     }
 
     /**
@@ -29,7 +41,20 @@ class Server {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data),
-        }));
+        })).then(checkStatus);
+    }
+
+    /**
+     * Make DELETE request to url
+     *
+     * @param {String} url
+     * @return {Promise}
+     */
+    del(url) {
+        return fetch(url, options({
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+        })).then(checkStatus);
     }
 }
 
