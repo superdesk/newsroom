@@ -7,6 +7,8 @@ from superdesk.default_settings import (   # noqa
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,
     ELASTIC_DATE_FORMAT,
+    CELERY_BROKER_URL,
+    celery_queue,
 )
 
 XML = False
@@ -30,6 +32,7 @@ BLUEPRINTS = [
 ]
 
 CORE_APPS = [
+    'superdesk.notification',
     'content_api.items',
     'content_api.items_versions',
     'content_api.assets',
@@ -106,3 +109,5 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
+
+WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
