@@ -8,8 +8,6 @@ class WireSearchResource(newsroom.Resource):
     datasource = {
         'search_backend': 'elastic',
         'source': 'items',
-        'default_sort': [('_updated', -1)],
-        'elastic_filter': {"bool": {"must_not": {"term": {"type": "composite"}}}},
     }
 
     item_methods = []
@@ -29,6 +27,10 @@ class WireSearchService(newsroom.Service):
                 }
             }
 
+        source = {'query': query}
+        source['sort'] = [{'versioncreated': 'desc'}]
+        source['size'] = 25
+
         internal_req = ParsedRequest()
-        internal_req.args = {'source': json.dumps({'query': query})}
+        internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
