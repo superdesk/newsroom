@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
-import SearchResultsInfo from '../../../wire/components/SearchResultsInfo';
+import SearchResultsInfo from 'wire/components/SearchResultsInfo';
 
 class Companies extends React.Component {
     constructor(props, context) {

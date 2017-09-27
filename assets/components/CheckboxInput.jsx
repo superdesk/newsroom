@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
 
 
 const CheckboxInput = ({name, label, onChange, value}) => {
@@ -13,7 +12,7 @@ const CheckboxInput = ({name, label, onChange, value}) => {
                     className="form-check-input"
                     checked={value}
                     onChange={onChange} />
-                {gettext(label)}</label>
+                {label}</label>
         </div>
     );
 };

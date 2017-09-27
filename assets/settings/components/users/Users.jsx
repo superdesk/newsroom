@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import EditUser from './EditUser';
 import UsersList from './UsersList';
-import SearchResultsInfo from '../../../wire/components/SearchResultsInfo';
+import SearchResultsInfo from 'wire/components/SearchResultsInfo';
 
 class Users extends React.Component {
     constructor(props, context) {

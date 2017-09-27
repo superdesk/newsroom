@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext } from 'utils';
-import SearchBar from '../../../wire/components/SearchBar';
+import SearchBar from 'wire/components/SearchBar';
 
 class CompanyBar extends React.Component {
     render() {

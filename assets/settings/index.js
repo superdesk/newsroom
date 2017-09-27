@@ -26,9 +26,8 @@ const store = createStore(
     )
 );
 
-// init users and companies
+// init companies
 store.dispatch(fetchItems('companies'));
-store.dispatch(fetchItems('users'));
 
 render(
     <Provider store={store}>

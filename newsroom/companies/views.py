@@ -1,5 +1,5 @@
 import flask
-from newsroom.utils import query_resource, find_one, json_serialize_datetime_objectId
+from newsroom.utils import query_resource, find_one
 from newsroom.companies import blueprint
 from newsroom.companies.forms import CompanyForm
 from bson import ObjectId
@@ -7,7 +7,7 @@ from werkzeug.exceptions import NotFound
 from superdesk import get_resource_service
 from flask_babel import gettext
 from newsroom.auth.decorator import admin_only
-import json
+from flask import jsonify
 
 
 @blueprint.route('/companies', methods=['GET'])
@@ -23,12 +23,7 @@ def index():
 @admin_only
 def search():
     companies = list(query_resource('companies', max_results=50))
-    response = flask.current_app.response_class(
-        response=json.dumps(companies, default=json_serialize_datetime_objectId),
-        status=200,
-        mimetype='application/json'
-    )
-    return response
+    return jsonify(companies), 200
 
 
 @blueprint.route('/companies/new', methods=['POST'])
@@ -38,8 +33,8 @@ def create():
     if form.validate():
         new_company = form.data
         get_resource_service('companies').post([new_company])
-        return json.dumps({'success': True}), 201, {'ContentType': 'application/json'}
-    return json.dumps(form.errors), 400, {'ContentType': 'application/json'}
+        return jsonify({'success': True}), 201
+    return jsonify(form.errors), 400
 
 
 @blueprint.route('/companies/<id>', methods=['GET', 'POST'])
@@ -55,8 +50,8 @@ def edit(id):
         if form.validate():
             get_resource_service('companies').patch(id=ObjectId(id),
                                                     updates=form.data)
-            return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
-        return json.dumps(form.errors), 400, {'ContentType': 'application/json'}
+            return jsonify({'success': True}), 200
+        return jsonify(form.errors), 400
 
 
 @blueprint.route('/companies/<id>', methods=['DELETE'])
@@ -67,4 +62,4 @@ def delete(id):
     """
     get_resource_service('users').delete(lookup={'company': ObjectId(id)})
     get_resource_service('companies').delete({'_id': ObjectId(id)})
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return jsonify({'success': True}), 200

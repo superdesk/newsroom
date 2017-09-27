@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
 
 
 const TextInput = ({name, label, onChange, value, error}) => {
@@ -10,7 +9,7 @@ const TextInput = ({name, label, onChange, value, error}) => {
     }
     return (
         <div className={wrapperClass}>
-            <label htmlFor="{name}">{gettext(label)}</label>
+            <label htmlFor="{name}">{label}</label>
             <div className="field">
                 <input
                     type="text"

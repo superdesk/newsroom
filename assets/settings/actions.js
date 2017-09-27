@@ -69,15 +69,13 @@ function errorHandler(error, dispatch) {
         alertify.error(error.response.statusText);
         return;
     }
-    parseJSON(error.response).then(function(data) {
+    error.response.json().then(function(data) {
         dispatch(saveError(data));
     });
 }
 
 
-function parseJSON(response) {
-    return response.json();
-}
+
 
 /**
  * Fetches users and companies for the time being
@@ -89,7 +87,6 @@ export function fetchItems(type) {
         dispatch(queryItems());
 
         return server.get(`/${type}/search`)
-            .then(parseJSON)
             .then((data) => {
                 dispatch(getItems(data));
                 if (type === 'companies') {
@@ -100,16 +97,6 @@ export function fetchItems(type) {
     };
 }
 
-
-function checkStatus(response) {
-    if (response.status >= 200 && response.status < 300) {
-        return response;
-    } else {
-        var error = new Error(response.statusText);
-        error.response = response;
-        throw error;
-    }
-}
 
 /**
  * Creates new users and companies for the time being
@@ -123,8 +110,6 @@ export function postItem(type) {
         const url = `/${type}/${item._id ? item._id : 'new'}`;
 
         return server.post(url, item)
-            .then(checkStatus)
-            .then(parseJSON)
             .then(function() {
                 alertify.success(gettext((item._id ? 'Item updated' : 'Item created') + 'successfully'));
                 dispatch(fetchItems(type));
@@ -142,8 +127,6 @@ export function resetPassword() {
         const url = `/users/${item._id}/reset_password`;
 
         return server.post(url, {})
-            .then(checkStatus)
-            .then(parseJSON)
             .then(() => alertify.success(gettext('Reset password token is sent successfully')))
             .catch((error) => errorHandler(error, dispatch));
 
@@ -162,8 +145,6 @@ export function deleteItem(type) {
         const url = `/${type}/${item._id}`;
 
         return server.del(url)
-            .then(checkStatus)
-            .then(parseJSON)
             .then(() => {
                 alertify.success(gettext('Item deleted successfully'));
                 dispatch(fetchItems(type));
