@@ -9,7 +9,9 @@ import {
     postItem,
     deleteItem,
     newItem,
-    updateMenu } from '../actions';
+    updateMenu,
+    fetchItems
+} from '../actions';
 import UserBar from './users/UserBar';
 import Users from './users/Users';
 import SettingsMenu from './SettingsMenu';
@@ -40,6 +42,7 @@ class SettingsApp extends React.Component {
                     <div className="col">
                         <UserBar
                             onNewUser={this.props.newItem}
+                            fetchItems={this.props.fetchItems}
                         />
                         <Users
                             users={this.props.items}
@@ -64,6 +67,7 @@ class SettingsApp extends React.Component {
                     <div className="col">
                         <CompanyBar
                             onNewCompany={this.props.newItem}
+                            fetchItems={this.props.fetchItems}
                         />
                         <Companies
                             companies={this.props.items}
@@ -106,6 +110,7 @@ SettingsApp.propTypes = {
     errors: PropTypes.object,
     selectMenu: PropTypes.func,
     selectedMenu: PropTypes.string,
+    fetchItems: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -130,6 +135,7 @@ const mapDispatchToProps = (dispatch) => ({
     cancelEdit: (event) => dispatch(cancelEdit(event)),
     resetPassword: () => dispatch(resetPassword()),
     selectMenu: (event) => dispatch(updateMenu(event)),
+    fetchItems: (type) => dispatch(fetchItems(type))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsApp);

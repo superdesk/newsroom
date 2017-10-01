@@ -8,6 +8,7 @@ from superdesk import get_resource_service
 from flask_babel import gettext
 from newsroom.auth.decorator import admin_only
 from flask import jsonify
+import re
 
 
 @blueprint.route('/companies', methods=['GET'])
@@ -22,7 +23,11 @@ def index():
 @blueprint.route('/companies/search', methods=['GET'])
 @admin_only
 def search():
-    companies = list(query_resource('companies', max_results=50))
+    lookup = None
+    if flask.request.args.get('q'):
+        regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
+        lookup = {'name': regex}
+    companies = list(query_resource('companies', lookup=lookup, max_results=50))
     return jsonify(companies), 200
 
 

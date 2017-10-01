@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { followTopic } from 'wire/actions';
+import { followTopic, fetchItems } from 'wire/actions';
 
 import Preview from './Preview';
 import ItemsList from './ItemsList';
@@ -29,7 +29,7 @@ class WireApp extends React.Component {
         return (
             <div>
                 <nav className="navbar sticky-top navbar-light bg-light">
-                    <SearchBar />
+                    <SearchBar fetchItems={this.props.fetchItems}/>
                 </nav>
                 <div className="row">
                     {(this.props.isLoading ?
@@ -71,6 +71,7 @@ WireApp.propTypes = {
     modal: PropTypes.object,
     user: PropTypes.string,
     topics: PropTypes.array,
+    fetchItems: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -85,6 +86,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     followTopic: (topic) => dispatch(followTopic(topic)),
+    fetchItems: () => dispatch(fetchItems())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

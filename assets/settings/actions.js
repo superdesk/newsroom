@@ -83,10 +83,11 @@ function errorHandler(error, dispatch) {
  * @param {String} type either users or companies
  */
 export function fetchItems(type) {
-    return function (dispatch) {
+    return function (dispatch, getState) {
         dispatch(queryItems());
+        const query = getState().query || '';
 
-        return server.get(`/${type}/search`)
+        return server.get(`/${type}/search?q=${query}`)
             .then((data) => {
                 dispatch(getItems(data));
                 if (type === 'companies') {

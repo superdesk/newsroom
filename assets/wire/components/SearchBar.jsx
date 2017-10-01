@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { gettext } from 'utils';
-import { setQuery, fetchItems } from 'wire/actions';
+import { setQuery } from 'wire/actions';
 
 class SearchBar extends React.Component {
     constructor(props) {
@@ -57,8 +57,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    setQuery: (query) => dispatch(setQuery(query)),
-    fetchItems: () => dispatch(fetchItems()),
+    setQuery: (query) => dispatch(setQuery(query))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);
