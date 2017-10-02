@@ -4,12 +4,25 @@ import PropTypes from 'prop-types';
 import { gettext, fullDate } from 'utils';
 
 function Preview({item, actions}) {
-    const actionButtons = actions.map((action) => (
-        <button className="btn btn-outline-primary"
-            key={action.name}
-            onClick={() => action.action(item)}
-        >{action.name}</button>
-    ));
+    const actionButtons = actions.map((action) => {
+        if (action.url) {
+            return (
+                <a className="btn btn-outline-primary"
+                    key={action.name}
+                    href={action.url(item)}
+                    download={action.download(item)}
+                >{action.name}</a>
+            );
+        }
+
+        return (
+            <button className="btn btn-outline-primary"
+                key={action.name}
+                onClick={() => action.action(item)}
+            >{action.name}</button>
+        );
+    });
+
     return (
         <div className="col">
             <nav className="navbar">
@@ -33,7 +46,8 @@ Preview.propTypes = {
     item: PropTypes.object.isRequired,
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
-        action: PropTypes.func.isRequired,
+        action: PropTypes.func,
+        url: PropTypes.func,
     })),
 };
 

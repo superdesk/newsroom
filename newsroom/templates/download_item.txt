@@ -1,0 +1,5 @@
+{{ item.slugline }}
+{{ item.headline }}
+{% if item.byline %}By: {{ item.byline }}{% endif %}
+
+{{ item.body_html | striptags }}
