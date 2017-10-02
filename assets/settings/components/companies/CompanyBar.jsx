@@ -7,7 +7,7 @@ class CompanyBar extends React.Component {
     render() {
         return (
             <nav className="navbar sticky-top navbar-light bg-light">
-                <SearchBar />
+                <SearchBar fetchItems={()=>this.props.fetchItems('companies')}/>
                 <button
                     className="btn btn-primary btn-lg active float-right"
                     onClick={() => this.props.onNewCompany('companies')}>{gettext('New Company')}</button>

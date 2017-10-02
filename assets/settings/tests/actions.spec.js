@@ -12,6 +12,7 @@ describe('fetch actions', () => {
     const response = [{_id: 'foo'}];
 
     beforeEach(() => {
+        fetchMock.get('/users/search?q=', response);
         fetchMock.get('/users/search', response);
         store = createStore(wireApp, applyMiddleware(thunk));
     });

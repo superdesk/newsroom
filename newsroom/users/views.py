@@ -9,6 +9,7 @@ from flask_babel import gettext
 from newsroom.auth.decorator import admin_only
 from newsroom.auth.views import send_token, add_token_data, send_reset_password_email
 from flask import jsonify
+import re
 
 
 @blueprint.route('/settings', methods=['GET'])
@@ -20,7 +21,11 @@ def settings():
 @blueprint.route('/users/search', methods=['GET'])
 @admin_only
 def search():
-    users = list(query_resource('users', max_results=50))
+    lookup = None
+    if flask.request.args.get('q'):
+        regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
+        lookup = {'name': regex}
+    users = list(query_resource('users', lookup=lookup, max_results=50))
     return jsonify(users), 200
 
 
