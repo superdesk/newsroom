@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { gettext } from 'utils';
 
-import { followTopic, fetchItems } from 'wire/actions';
+import { followTopic, fetchItems, copyPreviewContents } from 'wire/actions';
 
 import Preview from './Preview';
 import ItemsList from './ItemsList';
@@ -15,6 +16,7 @@ const modals = {
     followTopic: FollowTopicModal,
 };
 
+
 class WireApp extends React.Component {
     renderModal(specs) {
         if (specs) {
@@ -26,6 +28,12 @@ class WireApp extends React.Component {
     render() {
         const progressStyle = {width: '25%'};
         const modal = this.renderModal(this.props.modal);
+        const itemActions = [
+            {
+                name: gettext('Copy'),
+                action: this.props.copyPreviewContents,
+            },
+        ];
         return (
             <div>
                 <nav className="navbar sticky-top navbar-light bg-light">
@@ -53,7 +61,10 @@ class WireApp extends React.Component {
                         </div>
                     )}
                     {this.props.itemToPreview &&
-                        <Preview item={this.props.itemToPreview} />
+                        <Preview
+                            item={this.props.itemToPreview}
+                            actions={itemActions}
+                        />
                     }
                 </div>
                 {modal}
@@ -72,6 +83,7 @@ WireApp.propTypes = {
     user: PropTypes.string,
     topics: PropTypes.array,
     fetchItems: PropTypes.func,
+    copyPreviewContents: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -86,7 +98,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     followTopic: (topic) => dispatch(followTopic(topic)),
-    fetchItems: () => dispatch(fetchItems())
+    fetchItems: () => dispatch(fetchItems()),
+    copyPreviewContents: () => dispatch(copyPreviewContents()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
