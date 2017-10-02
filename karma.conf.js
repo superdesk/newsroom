@@ -9,7 +9,7 @@ module.exports = function(config) {
         ],
 
         preprocessors: {
-            'assets/**/*spec.js': ['webpack', 'sourcemap'],
+            'assets/**/*.js': ['webpack', 'sourcemap'],
         },
 
         webpack: {

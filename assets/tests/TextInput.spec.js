@@ -4,6 +4,8 @@ import { shallow } from 'enzyme';
 import TextInput from '../components/TextInput';
 import { spy } from 'sinon';
 
+import 'tests/setup';
+
 function setup(errorStrings) {
     const handleChange = spy();
 
