@@ -8,7 +8,8 @@ from superdesk import get_resource_service
 def init(app):
     app.data.insert('users', [{
         '_id': ObjectId(),
-        'name': 'admin',
+        'first_name': 'admin',
+        'last_name': 'admin',
         'email': 'admin@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'administrator',
@@ -38,7 +39,8 @@ def test_reset_password_token_sent_for_user_succeeds(app, client):
     # Insert a new user
     app.data.insert('users', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
-        'name': 'John Smith',
+        'first_name': 'John',
+        'last_name': 'Smith',
         'email': 'test@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',
@@ -59,7 +61,8 @@ def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client)
     # Insert a new user
     app.data.insert('users', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
-        'name': 'John Smith',
+        'first_name': 'John',
+        'last_name': 'Smith',
         'email': 'test@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',
@@ -80,7 +83,8 @@ def test_new_user_has_correct_flags(client):
     # Register a new account
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
         'company': '',
@@ -100,7 +104,8 @@ def test_new_user_fails_if_email_is_used_before(client):
     # Register a new account
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
         'company': '',
@@ -109,7 +114,8 @@ def test_new_user_fails_if_email_is_used_before(client):
 
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
-        'name': 'John Smith',
+        'first_name': 'John',
+        'last_name': 'Smith',
         'password': 'abc',
         'phone': '1234567',
         'company': '',
@@ -127,7 +133,8 @@ def test_create_new_user_succeeds(app, client):
     # Insert a new user
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'country': 'Australia',
         'phone': '1234567',
@@ -174,7 +181,8 @@ def test_new_user_fails_if_fields_not_provided(client):
 
     # print(txt)
 
-    assert '"name"' in txt
+    assert '"first_name"' in txt
+    assert '"last_name"' in txt
     assert '"email"' in txt
     assert 'user_type' in txt
 
@@ -184,7 +192,8 @@ def test_new_user_can_be_deleted(client):
     # Register a new account
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
         'company': '',

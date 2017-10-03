@@ -18,7 +18,8 @@ class SignupForm(FlaskForm):
     email = StringField('Your email', validators=[DataRequired(), Length(1, 128), Email(),
                                                   EqualTo('email2', message='Emails must match.')])
     email2 = StringField('Confirm your email', validators=[DataRequired()])
-    name = StringField('Your Name', validators=[DataRequired(), Length(1, 128)])
+    first_name = StringField('Your First Name', validators=[DataRequired(), Length(1, 128)])
+    last_name = StringField('Your Last Name', validators=[DataRequired(), Length(1, 128)])
     password = PasswordField('Password', validators=[DataRequired(),
                                                      EqualTo('password2', message='Passwords must match.')])
     password2 = PasswordField('Confirm your password', validators=[DataRequired()])

@@ -24,7 +24,7 @@ def search():
     lookup = None
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
-        lookup = {'name': regex}
+        lookup = {'$or': [{'first_name': regex}, {'last_name': regex}]}
     users = list(query_resource('users', lookup=lookup, max_results=50))
     return jsonify(users), 200
 
@@ -42,7 +42,7 @@ def create():
         if form.company.data:
             new_user['company'] = ObjectId(form.company.data)
         get_resource_service('users').post([new_user])
-        send_reset_password_email(new_user['name'], new_user['email'], new_user['token'])
+        send_reset_password_email(new_user['first_name'], new_user['email'], new_user['token'])
         return jsonify({'success': True}), 201
     return jsonify(form.errors), 400
 

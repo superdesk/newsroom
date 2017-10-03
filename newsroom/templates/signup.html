@@ -19,8 +19,12 @@
                                 {% include "form_alerts.html" %}
 
                                 <div class="form-group">
-                                    <label for="name">{{ gettext(form.name.label.text) }}</label>
-                                    {{ form.name(class="form-control", id="name", required="true") }}
+                                    <label for="first_name">{{ gettext(form.first_name.label.text) }}</label>
+                                    {{ form.first_name(class="form-control", id="first_name", required="true") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="last_name">{{ gettext(form.last_name.label.text) }}</label>
+                                    {{ form.last_name(class="form-control", id="last_name", required="true") }}
                                 </div>
                                 <div class="form-group">
                                     <label for="email">{{ gettext(form.email.label.text) }}</label>
