@@ -99,11 +99,10 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     followTopic: (topic) => dispatch(followTopic(topic)),
     fetchItems: () => dispatch(fetchItems()),
-    copyPreviewContents: () => dispatch(copyPreviewContents()),
     actions: [
         {
             name: gettext('Copy'),
-            action: () => dispatch(copyPreviewContents()),
+            action: copyPreviewContents,
         },
         {
             name: gettext('Download'),
