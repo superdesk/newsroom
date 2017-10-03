@@ -101,3 +101,30 @@ export const notify = {
     success: (message) => alertify.success(message),
     error: (message) => alertify.error(message),
 };
+
+/**
+ * Get text from html
+ *
+ * @param {string} html
+ * @return {string}
+ */
+function getTextFromHtml(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+}
+
+/**
+ * Get word count for given item
+ *
+ * @param {string} html
+ * @return {number}
+ */
+export function wordCount(html) {
+    if (!html) {
+        return 0;
+    }
+
+    const text = getTextFromHtml(html);
+    return text.split(' ').filter(x => x.trim()).length || 0;
+}

@@ -2,11 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { gettext, shortDate, fullDate } from 'utils';
-
-function wordCount(html) {
-    return html && html.split(' ').filter(x => x.trim()).length || 0;
-}
+import { gettext, shortDate, fullDate, wordCount } from 'utils';
 
 class WireListItem extends React.Component {
     constructor(props) {
