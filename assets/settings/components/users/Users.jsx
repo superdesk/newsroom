@@ -42,7 +42,7 @@ class Users extends React.Component {
     deleteUser(event) {
         event.preventDefault();
 
-        if (confirm(`Would you like to delete user: ${this.props.userToEdit.name}`)) {
+        if (confirm(`Would you like to delete user: ${this.props.userToEdit.first_name}`)) {
             this.props.deleteUser('users');
         }
     }

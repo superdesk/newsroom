@@ -29,11 +29,18 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
 
             <form>
                 <TextInput
-                    name='name'
-                    label={gettext('Name')}
-                    value={user.name}
+                    name='first_name'
+                    label={gettext('First Name')}
+                    value={user.first_name}
                     onChange={onChange}
-                    error={errors ? errors.name : null} />
+                    error={errors ? errors.first_name : null} />
+
+                <TextInput
+                    name='last_name'
+                    label={gettext('Last Name')}
+                    value={user.last_name}
+                    onChange={onChange}
+                    error={errors ? errors.last_name : null} />
 
                 <TextInput
                     name='email'

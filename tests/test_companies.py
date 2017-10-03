@@ -8,7 +8,8 @@ from superdesk import get_resource_service
 def init(app):
     app.data.insert('users', [{
         '_id': ObjectId(),
-        'name': 'admin',
+        'first_name': 'admin',
+        'last_name': 'admin',
         'email': 'admin@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'administrator',
@@ -50,7 +51,8 @@ def test_delete_company_deletes_company_and_users(client):
     # Register a user for the company
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
         'company': ObjectId(company['_id']),

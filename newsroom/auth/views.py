@@ -26,7 +26,7 @@ def login():
 
             if _is_account_enabled(user):
                 flask.session['user'] = str(user['_id'])  # str to avoid serialization issues
-                flask.session['name'] = user.get('name')
+                flask.session['name'] = '{} {}'.format(user.get('first_name'), user.get('last_name'))
                 flask.session['user_type'] = user['user_type']
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
         else:
@@ -95,7 +95,7 @@ def signup():
         _modify_user_data(new_user)
         add_token_data(new_user)
         get_resource_service('users').post([new_user])
-        send_validate_account_email(new_user['name'], new_user['email'], new_user['token'])
+        send_validate_account_email(new_user['first_name'], new_user['email'], new_user['token'])
         flask.flash(gettext('Validation email has been sent. Please check your emails.'), 'success')
         return flask.redirect(flask.url_for('auth.login'))
     return flask.render_template('signup.html', form=form)
@@ -178,8 +178,8 @@ def send_token(user, token_type='validate'):
         add_token_data(updates)
         get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
         if token_type == 'validate':
-            send_validate_account_email(user['name'], user['email'], updates['token'])
+            send_validate_account_email(user['first_name'], user['email'], updates['token'])
         elif token_type == 'reset_password':
-            send_reset_password_email(user['name'], user['email'], updates['token'])
+            send_reset_password_email(user['first_name'], user['email'], updates['token'])
         return True
     return False

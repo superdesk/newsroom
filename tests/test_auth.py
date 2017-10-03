@@ -8,7 +8,8 @@ from superdesk import get_resource_service
 def init(app):
     app.data.insert('users', [{
         '_id': 1,
-        'name': 'admin',
+        'first_name': 'admin',
+        'last_name': 'admin',
         'email': 'admin@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'administrator',
@@ -29,7 +30,8 @@ def test_new_user_signup_succeeds(app, client):
     response = client.post(url_for('auth.signup'), data={
         'email': 'newuser@abc.org',
         'email2': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'password2': 'abc',
         'country': 'Australia',
@@ -65,7 +67,8 @@ def test_new_user_signup_fails_if_email_exists(client):
     response = client.post(url_for('auth.signup'), data={
         'email': 'newuser@abc.org',
         'email2': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'password2': 'abc',
         'country': 'Australia',
@@ -79,7 +82,8 @@ def test_new_user_signup_fails_if_email_exists(client):
     response = client.post(url_for('auth.signup'), data={
         'email': 'newuser@abc.org',
         'email2': 'newuser@abc.org',
-        'name': 'John Smith',
+        'first_name': 'John',
+        'last_name': 'Smith',
         'password': '123',
         'password2': '123',
         'phone': '1234567',
@@ -113,8 +117,8 @@ def test_new_user_signup_fails_if_passwords_do_not_match(client):
     # Register a new account
     response = client.post(url_for('auth.signup'), data={
         'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'password2': '123',
         'country': 'Australia',
@@ -131,7 +135,8 @@ def test_new_user_has_correct_flags(client):
     response = client.post(url_for('auth.signup'), data={
         'email': 'newuser@abc.org',
         'email2': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'password2': 'abc',
         'country': 'Australia',
@@ -160,7 +165,8 @@ def test_login_fails_for_disabled_user(client):
     response = client.post(url_for('auth.signup'), data={
         'email': 'newuser@abc.org',
         'email2': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'password2': 'abc',
         'country': 'Australia',
@@ -186,7 +192,8 @@ def test_login_fails_for_user_with_disabled_company(client):
     response = client.post(url_for('auth.signup'), data={
         'email': 'newuser@abc.org',
         'email2': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'password2': 'abc',
         'country': 'Australia',
@@ -211,7 +218,8 @@ def test_login_for_user_with_enabled_company_succeeds(client):
     response = client.post(url_for('auth.signup'), data={
         'email': 'newuser@abc.org',
         'email2': 'newuser@abc.org',
-        'name': 'John Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'password': 'abc',
         'password2': 'abc',
         'country': 'Australia',
@@ -237,7 +245,8 @@ def test_login_fails_for_not_approved_user(app, client):
     # If user is created more than 14 days ago login fails
     app.data.insert('users', [{
         '_id': 2,
-        'name': 'test',
+        'first_name': 'test',
+        'last_name': 'test',
         'email': 'test@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',

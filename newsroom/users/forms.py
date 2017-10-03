@@ -15,7 +15,8 @@ class UserForm(FlaskForm):
                   ('internal', 'Internal')]
 
     id = HiddenField('Id')
-    name = StringField('Name', validators=[DataRequired()])
+    first_name = StringField('First Name', validators=[DataRequired()])
+    last_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     phone = StringField('Telephone', validators=[DataRequired()])
     user_type = SelectField('User Type', choices=user_types)

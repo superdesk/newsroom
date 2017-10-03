@@ -32,11 +32,12 @@ def coverage():
 
 
 @manager.command
-def create_user(email, password, name, is_admin):
+def create_user(email, password, first_name, last_name, is_admin):
     new_user = {
         'email': email,
         'password': password,
-        'name': name,
+        'first_name': first_name,
+        'last_name': last_name,
         'email': email,
         'user_type': 'administrator' if is_admin else 'public',
         'is_enabled': True,
