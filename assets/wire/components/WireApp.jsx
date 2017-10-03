@@ -105,6 +105,11 @@ const mapDispatchToProps = (dispatch) => ({
             action: copyPreviewContents,
         },
         {
+            name: gettext('Print'),
+            url: (item) => `/wire/${item._id}?print`,
+            target: '_blank',
+        },
+        {
             name: gettext('Download'),
             url: (item) => `/download/${item._id}?version=${item.version}`,
             download: () => 'newsroom.zip',

@@ -12,6 +12,13 @@ from newsroom.auth import get_user_id
 from newsroom.topics import get_user_topics
 
 
+def get_item_or_404(_id):
+    item = superdesk.get_resource_service('items').find_one(req=None, _id=_id)
+    if not item:
+        flask.abort(404)
+    return item
+
+
 @blueprint.route('/')
 def index():
     user_id = get_user_id()
@@ -30,9 +37,7 @@ def search():
 
 @blueprint.route('/download/<_id>')
 def download(_id):
-    item = superdesk.get_resource_service('items').find_one(req=None, _id=_id)
-    if not item:
-        flask.abort(404)
+    item = get_item_or_404(_id)
     _file = io.BytesIO()
     with zipfile.ZipFile(_file, mode='w') as zf:
         zf.writestr(
@@ -41,3 +46,11 @@ def download(_id):
         )
     _file.seek(0)
     return flask.send_file(_file, attachment_filename='newsroom.zip', as_attachment=True)
+
+
+@blueprint.route('/wire/<_id>')
+def item(_id):
+    item = get_item_or_404(_id)
+    if 'print' in flask.request.args:
+        return flask.render_template('wire_item_print.html', item=item)
+    return flask.render_template('wire_item.html', item=item)

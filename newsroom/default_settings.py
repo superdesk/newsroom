@@ -41,7 +41,8 @@ CORE_APPS = [
     'newsroom.topics',
 ]
 
-SITE_NAME = 'AAP Newsroom'
+SITE_NAME = 'Newsroom'
+COPYRIGHT_HOLDER = 'AAP'
 
 TEMPLATES_AUTO_RELOAD = True
 

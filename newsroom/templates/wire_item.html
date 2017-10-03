@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ item.headline }}{% endblock %}
+
+{% block content %}
+<article>
+    <pre>{{ item.slugline }}</pre>
+
+    <h1>{{ item.headline }}</h1>
+    <p>{{ _('By:') }} <b>{{ item.byline }}</b> {{ item.versioncreated|datetime_long }}</p>
+
+    <div class="row">
+        <div class="col-9">
+            <div class="lead">
+                {{ item.description_html | safe }}
+            </div>
+
+            {{ item.body_html | safe }}
+        </div>
+        <div class="col">
+            <h5>{{ _('Metadata') }}</h3>
+            <dl>
+                {% if item.subject %}
+                <dt>{{ _('Category') }}</dt>
+                <dd>{{ item.subject|join(', ', attribute='name')}}</dd>
+                {% endif %}
+                {% if item.genre %}
+                <dt>{{ _('Genre') }}</dt>
+                <dd>{{ item.genre|join(', ', attribute='name')}}</dd>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+</article>
+{% endblock %}

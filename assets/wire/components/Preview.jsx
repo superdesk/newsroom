@@ -18,7 +18,8 @@ function Preview({item, actions}) {
                 <a className="btn btn-outline-primary"
                     key={action.name}
                     href={action.url(item)}
-                    download={action.download(item)}
+                    download={action.download && action.download(item)}
+                    target={action.target}
                 >{action.name}</a>
             );
         }
