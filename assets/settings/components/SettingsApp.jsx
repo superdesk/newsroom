@@ -10,7 +10,8 @@ import {
     deleteItem,
     newItem,
     updateMenu,
-    fetchItems
+    fetchItems,
+    fetchCompanyUsers,
 } from '../actions';
 import UserBar from './users/UserBar';
 import Users from './users/Users';
@@ -72,6 +73,7 @@ class SettingsApp extends React.Component {
                         <Companies
                             companies={this.props.items}
                             companyToEdit={this.props.itemToEdit}
+                            companyUsers={this.props.companyUsers}
                             activeCompanyId={this.props.activeItemId}
                             selectCompany={this.props.selectItem}
                             editCompany={this.props.editItem}
@@ -83,6 +85,7 @@ class SettingsApp extends React.Component {
                             activeQuery={this.props.activeQuery}
                             totalCompanies={this.props.totalItems}
                             errors={this.props.errors}
+                            fetchCompanyUsers={this.props.fetchCompanyUsers}
                         />
                     </div> : null }
             </div>
@@ -107,10 +110,12 @@ SettingsApp.propTypes = {
     totalItems: PropTypes.number,
     companyOptions: PropTypes.arrayOf(PropTypes.object),
     companiesById: PropTypes.object,
+    companyUsers: PropTypes.arrayOf(PropTypes.object),
     errors: PropTypes.object,
     selectMenu: PropTypes.func,
     selectedMenu: PropTypes.string,
     fetchItems: PropTypes.func,
+    fetchCompanyUsers: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -122,6 +127,7 @@ const mapStateToProps = (state) => ({
     totalItems: state.totalItems,
     companyOptions: state.companyOptions,
     companiesById: state.companiesById,
+    companyUsers: state.companyUsers,
     selectedMenu: state.selectedMenu,
     errors: state.errors,
 });
@@ -135,7 +141,8 @@ const mapDispatchToProps = (dispatch) => ({
     cancelEdit: (event) => dispatch(cancelEdit(event)),
     resetPassword: () => dispatch(resetPassword()),
     selectMenu: (event) => dispatch(updateMenu(event)),
-    fetchItems: (type) => dispatch(fetchItems(type))
+    fetchItems: (type) => dispatch(fetchItems(type)),
+    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsApp);

@@ -25,6 +25,23 @@ def test_user_list_fails_for_anonymous_user(client):
     assert b'403 Forbidden' in response.data
 
 
+def test_return_search_for_users(client):
+    test_login_succeeds_for_admin(client)
+    # Register a new account
+    response = client.post('/users/new', data={
+        'email': 'newuser@abc.org',
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'password': 'abc',
+        'phone': '1234567',
+        'company': ObjectId('59b4c5c61d41c8d736852fbf'),
+        'user_type': 'public'
+    })
+
+    response = client.get('/users/search?q=jo')
+    assert 'John' in response.get_data(as_text=True)
+
+
 def test_login_succeeds_for_admin(client):
     response = client.post(
         url_for('auth.login'),

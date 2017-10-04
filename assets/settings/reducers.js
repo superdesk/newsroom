@@ -6,6 +6,7 @@ import {
     QUERY_ITEMS,
     SET_QUERY,
     GET_COMPANIES,
+    GET_COMPANY_USERS,
     SAVE_ITEM,
     CANCEL_EDIT,
     SAVE_ERROR,
@@ -109,6 +110,10 @@ export default function itemReducer(state = initialState, action) {
         });
 
         return {...state, companies, companiesById, companyOptions};
+    }
+
+    case GET_COMPANY_USERS: {
+        return {...state, companyUsers: action.data};
     }
 
     case SELECT_MENU: {
