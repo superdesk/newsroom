@@ -22,6 +22,7 @@ const initialState = {
     totalItems: null,
     activeQuery: null,
     user: null,
+    company: null,
     topics: [],
 };
 
@@ -88,6 +89,7 @@ export default function wireReducer(state = initialState, action) {
             ...state,
             user: action.data.user || null,
             topics: action.data.topics || [],
+            company: action.data.company || null,
         };
 
     case ADD_TOPIC:

@@ -16,3 +16,12 @@ describe('wordCount', () => {
         expect(utils.wordCount(html)).toBe(2);
     });
 });
+
+describe('toggleValue', () => {
+    it('can toggle value', () => {
+        const items = ['foo', 'bar'];
+        expect(utils.toggleValue(items, 'foo')).toEqual(['bar']);
+        expect(utils.toggleValue(items, 'baz')).toEqual(['foo', 'bar', 'baz']);
+        expect(items).toEqual(['foo', 'bar']);
+    });
+});

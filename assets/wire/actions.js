@@ -110,6 +110,38 @@ export function submitFollowTopic(data) {
     };
 }
 
+/**
+ * Start share item action - display modal to pick users
+ *
+ * @return {function}
+ */
+export function shareItem(item) {
+    return (dispatch, getState) => {
+        const user = getState().user;
+        const company = getState().company;
+        return server.get(`/companies/${company}/users`)
+            .then((users) => users.filter((u) => u._id !== user))
+            .then((users) => dispatch(renderModal('shareItem', {item, users})))
+            .catch(errorHandler);
+    };
+}
+
+/**
+ * Submit share item form and close modal if that works
+ *
+ * @param {Object} data
+ */
+export function submitShareItem(data) {
+    return (dispatch) => {
+        return server.post(`/wire/${data.item}/share`, data)
+            .then(() => {
+                notify.success(gettext('Item was shared successfully'));
+                dispatch(closeModal());
+            })
+            .catch(errorHandler);
+    };
+}
+
 function errorHandler(reason) {
     console.error('error', reason);
 }
