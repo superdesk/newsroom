@@ -15,7 +15,7 @@ def init(app):
     }])
 
 
-def test_download_item(client):
+def test_item_download(client):
     resp = client.get('/download/tag:foo?version=2')
     assert resp.status_code == 200
     assert resp.mimetype == 'application/zip'
@@ -26,3 +26,10 @@ def test_download_item(client):
         assert 'AMAZON-BOOKSTORE-OPENING' in content[0]
         assert 'Amazon Is Opening More Bookstores' in content[1]
         assert '<p>' not in content
+
+
+def test_item_detail(client):
+    resp = client.get('/wire/tag:foo')
+    assert resp.status_code == 200
+    html = resp.get_data().decode('utf-8')
+    assert '<h1>Amazon Is Opening More Bookstores</h1>' in html

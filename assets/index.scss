@@ -7,6 +7,11 @@ body {
     font-family: 'Droid Serif', serif;
 }
 
+body.print {
+    color: #000;
+    background-color: #fff;
+}
+
 .sidenav {
     position: fixed;
     top: 0;

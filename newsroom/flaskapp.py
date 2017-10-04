@@ -84,7 +84,13 @@ class Newsroom(eve.Eve):
         def datetime_short(datetime):
             if datetime:
                 return format_time(datetime, 'short')
+
+        def datetime_long(datetime):
+            if datetime:
+                return format_time(datetime, 'long')
+
         self.add_template_filter(datetime_short, 'datetime_short')
+        self.add_template_filter(datetime_long, 'datetime_long')
 
     def _setup_webpack(self):
         NewsroomWebpack(self)
