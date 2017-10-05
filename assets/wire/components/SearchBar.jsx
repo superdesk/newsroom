@@ -20,12 +20,7 @@ class SearchBar extends React.Component {
     onSubmit(event) {
         event.preventDefault();
         this.props.setQuery(this.state.query);
-        this.props.fetchItems().then(() => {
-            // update browser url - where should this go?
-            const params = new URLSearchParams(window.location.search);
-            params.set('q', this.state.query);
-            history.pushState(this.props.state, null, '?' + params.toString());
-        });
+        this.props.fetchItems();
     }
 
     render() {
@@ -48,12 +43,10 @@ SearchBar.propTypes = {
     query: PropTypes.string,
     setQuery: PropTypes.func,
     fetchItems: PropTypes.func,
-    state: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
     query: state.activeQuery,
-    state: state,
 });
 
 const mapDispatchToProps = (dispatch) => ({

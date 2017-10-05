@@ -2,33 +2,46 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
-const TextInput = ({name, label, onChange, value, error}) => {
+function TextInput({name, label, onChange, value, error, required, readOnly, maxLength}) {
     let wrapperClass = 'form-group';
+
     if (error && error.length > 0) {
         wrapperClass += ' has-error';
     }
+
+    if (!name) {
+        name = `input-${label}`;
+    }
+
     return (
         <div className={wrapperClass}>
-            <label htmlFor="{name}">{label}</label>
+            <label htmlFor={name}>{label}</label>
             <div className="field">
-                <input
-                    type="text"
+                <input type="text"
+                    id={name}
                     name={name}
                     className="form-control"
                     value={value}
-                    onChange={onChange} />
+                    onChange={onChange}
+                    required={required}
+                    maxLength={maxLength}
+                    readOnly={readOnly}
+                />
                 {error && <div className="alert alert-danger">{error}</div>}
             </div>
         </div>
     );
-};
+}
 
 TextInput.propTypes = {
-    name: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
+    name: PropTypes.string,
     value: PropTypes.string,
-    error: PropTypes.arrayOf(PropTypes.string)
+    error: PropTypes.arrayOf(PropTypes.string),
+    onChange: PropTypes.func,
+    required: PropTypes.bool,
+    readOnly: PropTypes.bool,
+    maxLength: PropTypes.number,
 };
 
 export default TextInput;

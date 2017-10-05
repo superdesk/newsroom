@@ -2,18 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
+import classNames from 'classnames';
 
 import {
     followTopic,
     fetchItems,
     copyPreviewContents,
     shareItem,
+    setQuery,
 } from 'wire/actions';
 
 import Preview from './Preview';
 import ItemsList from './ItemsList';
 import SearchBar from './SearchBar';
 import SearchResultsInfo from './SearchResultsInfo';
+import SearchSidebar from './SearchSidebar';
 
 import FollowTopicModal from './FollowTopicModal';
 import ShareItemModal from './ShareItemModal';
@@ -24,11 +27,24 @@ const modals = {
 };
 
 class WireApp extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            withSidebar: false,
+        };
+        this.toggleSidebar = this.toggleSidebar.bind(this);
+    }
+
     renderModal(specs) {
         if (specs) {
             const Modal = modals[specs.modal];
             return <Modal data={specs.data} />;
         }
+    }
+
+    toggleSidebar(event) {
+        event.preventDefault();
+        this.setState({withSidebar: !this.state.withSidebar});
     }
 
     render() {
@@ -37,9 +53,26 @@ class WireApp extends React.Component {
         return (
             <div>
                 <nav className="navbar sticky-top navbar-light bg-light">
-                    <SearchBar fetchItems={this.props.fetchItems}/>
+                    <div className="navbar-nav">
+                        <div className="nav-item">
+                            <a className={classNames('nav-link', {active: this.state.withSidebar})}
+                                href="#"
+                                onClick={this.toggleSidebar}
+                            >{gettext('Sidebar')}</a>
+                        </div>
+                    </div>
+                    <SearchBar fetchItems={this.props.fetchItems} setQuery={this.props.setQuery} />
                 </nav>
                 <div className="row">
+                    {this.state.withSidebar &&
+                        <div className="col-2">
+                            <SearchSidebar
+                                topics={this.props.topics}
+                                setQuery={this.props.setQuery}
+                                activeQuery={this.props.activeQuery}
+                            />
+                        </div>
+                    }
                     {(this.props.isLoading ?
                         <div className="col">
                             <div className="progress">
@@ -88,6 +121,7 @@ WireApp.propTypes = {
         name: PropTypes.string,
         action: PropTypes.func,
     })),
+    setQuery: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -104,6 +138,10 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     followTopic: (topic) => dispatch(followTopic(topic)),
     fetchItems: () => dispatch(fetchItems()),
+    setQuery: (query) => {
+        dispatch(setQuery(query));
+        dispatch(fetchItems());
+    },
     actions: [
         {
             name: gettext('Open'),
