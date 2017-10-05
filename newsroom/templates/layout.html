@@ -7,7 +7,7 @@
     <title>{% block title %}{% endblock %}</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif">
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/alertify.min.css"/>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/themes/bootstrap.min.css"/>
 
@@ -19,17 +19,12 @@
 </head>
 <body>
 
-<div class="container-fluid">
-
-    <nav class="sidenav">
-        <div class="logo">
-            <img src="{{ url_for('static', filename = 'aap.png') }}" width="32" height="32"/>
-        </div>
-        {% block sidenav %}
-        {% endblock %}
-    </nav>
+<div class="newsroomWrap">
 
     <nav class="main navbar justify-content-start">
+        <div class="navbar__logo">
+            <img src="{{ url_for('static', filename = 'aap.png') }}" width="32" height="32"/>
+        </div>
         <div class="navbar-brand p-2">
             <a class="nav-link text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
         </div>
@@ -48,14 +43,32 @@
         {% endif %}
     </nav>
 
-    <div class="content col-md-12 pl-5">
-        <section class="row mt-1 ml-3">
-            {% block contentHeader %}{% endblock %}
-        </section>
+    <nav class="sidenav">
 
-        <section class="row mt-3 ml-1">
+        <ul class="sidenav-icons">
+          <li class="sidenav-icons__item">D</li>
+          <li class="sidenav-icons__item">L</li>
+          <li class="sidenav-icons__item">I</li>
+          <li class="sidenav-icons__item">E</li>
+          <li class="sidenav-icons__item sidenav-icons__item--admin">A</li>
+        </ul>
 
-            <div id="content" class="col-md">
+        {% block sidenav %}
+        {% endblock %}
+
+    </nav>
+
+    <section class="content-header">
+        {% block contentHeader %}
+
+        {% endblock %}
+    </section>
+    
+    <div class="content">
+
+        <section class="content-main">
+
+            <div id="content" class="">
 
                 {% include "flash_messages.html" %}
 
@@ -67,15 +80,19 @@
         </section>
     </div>
 
-    <footer class="container-fluid">
+    <!-- <footer class="container-fluid">
         <p class="text-right"><small class="text-muted">All contents &copy; Copyright 2017 {{ config.COPYRIGHT_HOLDER }}. All rights reserved.</small></p>
-    </footer>
+    </footer> -->
 
 </div>
 
 {{ javascript_tag('newsroom_js') | safe }}
 
 {% block script %}{% endblock %}
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
 
 </body>
 </html>
