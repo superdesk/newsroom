@@ -63,7 +63,7 @@ class WireApp extends React.Component {
                     {this.props.itemToPreview &&
                         <Preview
                             item={this.props.itemToPreview}
-                            actions={this.props.actions}
+                            actions={this.props.actions.filter((action) => !action.when || action.when(this.props))}
                         />
                     }
                 </div>
@@ -81,6 +81,7 @@ WireApp.propTypes = {
     followTopic: PropTypes.func,
     modal: PropTypes.object,
     user: PropTypes.string,
+    company: PropTypes.string,
     topics: PropTypes.array,
     fetchItems: PropTypes.func,
     actions: PropTypes.arrayOf(PropTypes.shape({
@@ -96,6 +97,7 @@ const mapStateToProps = (state) => ({
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     modal: state.modal,
     user: state.user,
+    company: state.company,
     topics: state.topics,
 });
 
@@ -104,12 +106,14 @@ const mapDispatchToProps = (dispatch) => ({
     fetchItems: () => dispatch(fetchItems()),
     actions: [
         {
-            name: gettext('Copy'),
-            action: copyPreviewContents,
+            name: gettext('Open'),
+            url: (item) => `/wire/${item._id}`,
+            target: '_blank',
         },
         {
             name: gettext('Share'),
             action: (item) => dispatch(shareItem(item._id)),
+            when: (state) => state.user && state.company,
         },
         {
             name: gettext('Print'),
@@ -117,9 +121,14 @@ const mapDispatchToProps = (dispatch) => ({
             target: '_blank',
         },
         {
+            name: gettext('Copy'),
+            action: copyPreviewContents,
+        },
+        {
             name: gettext('Download'),
             url: (item) => `/download/${item._id}?version=${item.version}`,
             download: () => 'newsroom.zip',
+            when: (state) => state.user && state.company,
         },
     ],
 });
