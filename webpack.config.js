@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const NODE_MODULES = process.env.NODE_PATH || 'node_modules';
 
 module.exports = {
     entry: {
@@ -46,7 +47,10 @@ module.exports = {
     },
     resolve: {
         extensions: ['.js', '.jsx'],
-        modules: [path.resolve(__dirname, 'assets'), 'node_modules'],
+        modules: [path.resolve(__dirname, 'assets'), NODE_MODULES],
+    },
+    resolveLoader: {
+        modules: [NODE_MODULES],
     },
     plugins: [
         new ManifestPlugin(),
