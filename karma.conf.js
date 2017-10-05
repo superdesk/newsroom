@@ -15,6 +15,7 @@ module.exports = function(config) {
         webpack: {
             module: webpackConfig.module,
             resolve: webpackConfig.resolve,
+            plugins: webpackConfig.plugins,
             devtool: 'inline-source-map',
         },
 
