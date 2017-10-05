@@ -4,6 +4,13 @@ import server from 'server';
 
 export const SELECT_ITEM = 'SELECT_ITEM';
 export function selectItem(id) {
+    return function (dispatch) {
+        dispatch(select(id));
+        dispatch(fetchCompanyUsers(id));
+    };
+}
+
+function select(id) {
     return {type: SELECT_ITEM, id};
 }
 
@@ -42,6 +49,11 @@ export function queryItems() {
 export const GET_COMPANIES = 'GET_COMPANIES';
 export function getCompanies(data) {
     return {type: GET_COMPANIES, data};
+}
+
+export const GET_COMPANY_USERS = 'GET_COMPANY_USERS';
+export function getCompanyUsers(data) {
+    return {type: GET_COMPANY_USERS, data};
 }
 
 export const GET_ITEMS = 'GET_ITEMS';
@@ -92,6 +104,25 @@ export function fetchItems(type) {
                 if (type === 'companies') {
                     dispatch(getCompanies(data, type));
                 }
+            })
+            .catch((error) => errorHandler(error, dispatch));
+    };
+}
+
+/**
+ * Fetches users of a company
+ *
+ * @param {String} companyId
+ */
+export function fetchCompanyUsers(companyId) {
+    return function (dispatch, getState) {
+        if (!getState().itemsById[companyId].name) {
+            return;
+        }
+
+        return server.get(`/companies/${companyId}/users`)
+            .then((data) => {
+                return dispatch(getCompanyUsers(data));
             })
             .catch((error) => errorHandler(error, dispatch));
     };

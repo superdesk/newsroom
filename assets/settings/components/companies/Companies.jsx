@@ -79,6 +79,8 @@ class Companies extends React.Component {
                         onSave={this.save}
                         onClose={this.props.cancelEdit}
                         onDelete={this.deleteCompany}
+                        users={this.props.companyUsers}
+                        fetchCompanyUsers={this.props.fetchCompanyUsers}
                     />
                 }
             </div>
@@ -89,6 +91,7 @@ class Companies extends React.Component {
 Companies.propTypes = {
     companies: PropTypes.arrayOf(PropTypes.object),
     companyToEdit: PropTypes.object,
+    companyUsers: PropTypes.arrayOf(PropTypes.object),
     activeCompanyId: PropTypes.string,
     selectCompany: PropTypes.func,
     editCompany: PropTypes.func,
@@ -100,6 +103,7 @@ Companies.propTypes = {
     activeQuery: PropTypes.string,
     totalCompanies: PropTypes.number,
     errors: PropTypes.object,
+    fetchCompanyUsers: PropTypes.func,
 };
 
 export default Companies;
