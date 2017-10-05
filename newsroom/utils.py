@@ -1,5 +1,5 @@
 
-from flask import current_app as app
+from flask import current_app as app, json
 from eve.utils import parse_request
 from uuid import uuid4
 from datetime import datetime
@@ -7,9 +7,10 @@ from bson import ObjectId
 from eve.utils import config
 
 
-def query_resource(resource, lookup=None, max_results=0):
+def query_resource(resource, lookup=None, max_results=0, projection=None):
     req = parse_request(resource)
     req.max_results = max_results
+    req.projection = json.dumps(projection) if projection else None
     return app.data.find(resource, req, lookup)
 
 

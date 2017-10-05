@@ -6,7 +6,7 @@ from bson import ObjectId
 from werkzeug.exceptions import NotFound
 from superdesk import get_resource_service
 from flask_babel import gettext
-from newsroom.auth.decorator import admin_only
+from newsroom.auth.decorator import admin_only, login_required
 from flask import jsonify
 import re
 
@@ -37,8 +37,8 @@ def create():
     form = CompanyForm()
     if form.validate():
         new_company = form.data
-        get_resource_service('companies').post([new_company])
-        return jsonify({'success': True}), 201
+        ids = get_resource_service('companies').post([new_company])
+        return jsonify({'success': True, '_id': ids[0]}), 201
     return jsonify(form.errors), 400
 
 
@@ -68,3 +68,11 @@ def delete(id):
     get_resource_service('users').delete(lookup={'company': ObjectId(id)})
     get_resource_service('companies').delete({'_id': ObjectId(id)})
     return jsonify({'success': True}), 200
+
+
+@blueprint.route('/companies/<id>/users', methods=['GET'])
+@login_required
+def company_users(id):
+    """TODO(petr): use projection to hide fields like token/email."""
+    users = list(query_resource('users', lookup={'company': ObjectId(id)}, max_results=50))
+    return jsonify(users), 200

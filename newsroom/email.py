@@ -1,21 +1,26 @@
-from flask_mail import Message
+from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template
 
 
-def send_email(to, subject, text_body, html_body):
+def send_email(to, subject, text_body, html_body=None, sender=None, connection=None):
     """
     Sends the email
     :param to: List of recipients
     :param subject: Subject text
     :param text_body: Text Body
     :param html_body: Html Body
+    :param sender: Sender
     :return:
     """
-    msg = Message(subject=subject, sender=current_app.config['MAIL_DEFAULT_SENDER'], recipients=to)
+    if sender is None:
+        sender = current_app.config['MAIL_DEFAULT_SENDER']
+    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to)
     msg.body = text_body
     msg.html = html_body
     app = current_app._get_current_object()
-    app.mail.send(msg)
+    if connection:
+        return connection.send(msg)
+    return app.mail.send(msg)
 
 
 def send_validate_account_email(user_name, user_email, token):

@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, json
 from pytest import fixture
 from bson import ObjectId
 from superdesk import get_resource_service
@@ -67,3 +67,24 @@ def test_delete_company_deletes_company_and_users(client):
     assert company is None
     user = get_resource_service('users').find_one(req=None, email='newuser@abc.org')
     assert user is None
+
+
+def test_get_company_users(client):
+    test_login_succeeds_for_admin(client)
+    resp = client.post('companies/new', data={'name': 'Test'})
+    company_id = json.loads(resp.get_data()).get('_id')
+    assert company_id
+    resp = client.post('users/new', data={
+        'company': company_id,
+        'first_name': 'foo',
+        'last_name': 'bar',
+        'phone': '123456789',
+        'email': 'foo@bar.com',
+        'user_type': 'public',
+    })
+    assert resp.status_code == 201, resp.get_data().decode('utf-8')
+    resp = client.get('companies/%s/users' % company_id)
+    assert resp.status_code == 200, resp.get_data().decode('utf-8')
+    users = json.loads(resp.get_data())
+    assert 1 == len(users)
+    assert 'foo' == users[0].get('first_name'), users[0].keys()

@@ -128,3 +128,17 @@ export function wordCount(html) {
     const text = getTextFromHtml(html);
     return text.split(' ').filter(x => x.trim()).length || 0;
 }
+
+/**
+ * Toggle value within array
+ *
+ * returns a new array so can be used with setState
+ *
+ * @param {Array} items
+ * @param {mixed} value
+ * @return {Array}
+ */
+export function toggleValue(items, value) {
+    const without = items.filter((x) => value !== x);
+    return without.length === items.length ? without.concat([value]) : without;
+}

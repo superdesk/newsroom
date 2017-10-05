@@ -2,4 +2,11 @@
 {{ item.headline }}
 {% if item.byline %}By: {{ item.byline }}{% endif %}
 
+{% if item.description_html %}
+{{ item.description_html | striptags }}
+{% else %}
+{{ item.description_text }}
+{% endif %}
+
+
 {{ item.body_html | striptags }}

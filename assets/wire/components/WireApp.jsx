@@ -7,6 +7,7 @@ import {
     followTopic,
     fetchItems,
     copyPreviewContents,
+    shareItem,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -15,9 +16,11 @@ import SearchBar from './SearchBar';
 import SearchResultsInfo from './SearchResultsInfo';
 
 import FollowTopicModal from './FollowTopicModal';
+import ShareItemModal from './ShareItemModal';
 
 const modals = {
     followTopic: FollowTopicModal,
+    shareItem: ShareItemModal,
 };
 
 class WireApp extends React.Component {
@@ -103,6 +106,10 @@ const mapDispatchToProps = (dispatch) => ({
         {
             name: gettext('Copy'),
             action: copyPreviewContents,
+        },
+        {
+            name: gettext('Share'),
+            action: (item) => dispatch(shareItem(item._id)),
         },
         {
             name: gettext('Print'),
