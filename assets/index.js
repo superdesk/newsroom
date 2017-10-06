@@ -10,6 +10,9 @@ document.getElementsByClassName('content-bar__menu--nav')[0].onclick = function(
 
 // Open article from wire list
 
+
+// Open article from wire list
+
 var listItem = document.getElementsByClassName('wire-articles__item');
 
 var currentItem;
