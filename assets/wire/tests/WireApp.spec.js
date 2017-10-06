@@ -45,13 +45,13 @@ describe('WireApp', () => {
         const enzymeWrapper = setup({...state, user: 'foo', company: 'bar'});
         const actions = getActions(enzymeWrapper);
         const names = getNames(actions);
-        expect(names).toEqual(['Open', 'Share', 'Print', 'Copy', 'Download']);
+        expect(names).toEqual(['Open', 'Share', 'Print', 'Copy', 'Download', 'Bookmark']);
     });
 
     it('can pick multi item actions', () => {
         const enzymeWrapper = setup({...state, user: 'foo', company: 'bar'});
         const actions = getMultiActions(enzymeWrapper);
         const names = getNames(actions);
-        expect(names).toEqual(['Share', 'Download']);
+        expect(names).toEqual(['Share', 'Download', 'Bookmark']);
     });
 });

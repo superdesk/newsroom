@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from flask_babel import gettext
 
 from newsroom.wire import blueprint
-from newsroom.auth import get_user, login_required
+from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 
@@ -22,15 +22,33 @@ def get_item_or_404(_id):
     return item
 
 
-@blueprint.route('/')
-def index():
+def get_json_or_400():
+    data = flask.request.get_json()
+    if not isinstance(data, dict):
+        flask.abort(400)
+    return data
+
+
+def get_user_data():
     user = get_user()
-    data = {
+    return {
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': get_user_topics(user['_id']) if user else [],
     }
-    return flask.render_template('wire_index.html', data=data)
+
+
+@blueprint.route('/')
+def index():
+    return flask.render_template('wire_index.html', data=get_user_data())
+
+
+@blueprint.route('/bookmarks')
+@login_required
+def bookmarks():
+    data = get_user_data()
+    data['bookmarks'] = True
+    return flask.render_template('wire_bookmarks.html', data=data)
 
 
 @blueprint.route('/search')
@@ -65,8 +83,7 @@ def item(_id):
 @login_required
 def share():
     current_user = get_user(required=True)
-    data = flask.request.get_json()
-    assert isinstance(data, dict)
+    data = get_json_or_400()
     assert data.get('users')
     assert data.get('items')
     items = [get_item_or_404(_id) for _id in data.get('items')]
@@ -89,3 +106,28 @@ def share():
                 connection=connection
             )
     return flask.jsonify(), 201
+
+
+@blueprint.route('/wire_bookmark', methods=['POST', 'DELETE'])
+@login_required
+def bookmark():
+    """Bookmark an item.
+
+    Stores user id into item.bookmarks array.
+    Uses mongodb to update the array and then pushes updated array to elastic.
+    """
+    user_id = get_user_id()
+    data = get_json_or_400()
+    assert data.get('items')
+    db = app.data.get_mongo_collection('items')
+    elastic = app.data._search_backend('items')
+    if flask.request.method == 'POST':
+        updates = {'$addToSet': {'bookmarks': user_id}}
+    else:
+        updates = {'$pull': {'bookmarks': user_id}}
+    for item_id in data.get('items'):
+        result = db.update_one({'_id': item_id}, updates)
+        if result.modified_count:
+            modified = db.find_one({'_id': item_id})
+            elastic.update('items', item_id, {'bookmarks': modified['bookmarks']})
+    return flask.jsonify(), 200

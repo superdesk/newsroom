@@ -13,6 +13,8 @@ import {
     TOGGLE_SELECTED,
     SELECT_ALL,
     SELECT_NONE,
+    BOOKMARK_ITEMS,
+    REMOVE_BOOKMARK,
 } from './actions';
 
 import { toggleValue } from 'utils';
@@ -29,6 +31,7 @@ const initialState = {
     company: null,
     topics: [],
     selectedItems: [],
+    bookmarks: false,
 };
 
 export default function wireReducer(state = initialState, action) {
@@ -95,6 +98,7 @@ export default function wireReducer(state = initialState, action) {
             user: action.data.user || null,
             topics: action.data.topics || [],
             company: action.data.company || null,
+            bookmarks: action.data.bookmarks || false,
         };
 
     case ADD_TOPIC:
@@ -119,6 +123,20 @@ export default function wireReducer(state = initialState, action) {
         return {
             ...state,
             selectedItems: [],
+        };
+
+    case BOOKMARK_ITEMS: {
+        const missing = action.items.filter((item) => state.bookmarkedItems.indexOf(item) === -1);
+        return {
+            ...state,
+            bookmarkedItems: state.bookmarkedItems.concat(missing),
+        };
+    }
+
+    case REMOVE_BOOKMARK:
+        return {
+            ...state,
+            bookmarkedItems: state.bookmarkedItems.filter((val) => val !== action.item),
         };
 
     default:

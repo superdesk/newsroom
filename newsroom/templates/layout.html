@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shring-to-fit=no">
 
-    <title>{% block title %}{% endblock %}</title>
+    <title>{{ config.SITE_NAME }} - {% block title %}{% endblock %}</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet">
@@ -27,7 +27,10 @@
             <img src="{{ url_for('static', filename = 'aap.png') }}" width="32" height="32"/>
         </div>
         <div class="navbar-brand">
-            <a class="nav-link text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
+            <nav class="breadrumb">
+                <a class="breadcrumb-item text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }}</a>
+                {% block breadcrumb %}{% endblock %}
+            </nav>
         </div>
 
         {% if session.get('name') %}
@@ -49,11 +52,20 @@
         <nav class="sidenav">
 
             <ul class="sidenav-icons">
-              <li class="sidenav-icons__item">D</li>
-              <li class="sidenav-icons__item">L</li>
-              <li class="sidenav-icons__item">I</li>
               <li class="sidenav-icons__item">E</li>
               <li class="sidenav-icons__item sidenav-icons__item--admin">A</li>
+
+              <li class="sidenav-icons__item text-white">---</li>
+
+              {% for nav in sidenavs %}
+              <li class="sidenav-icons__item text-white {% if request.endpoint == nav.endpoint %}active{% endif %}">
+                  {% if request.endpoint == nav.endpoint %}
+                  <span>{{ nav.name }}</span>
+                  {% else %}
+                  <a class="text-white" href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}">{{ nav.name }}</a>
+                  {% endif %}
+              </li>
+              {% endfor %}
             </ul>
 
             {% block sidenav %}

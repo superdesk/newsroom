@@ -12,7 +12,7 @@ class SelectedItemsBar extends React.Component {
         const actionButtons = this.props.actions.map((action) => (
             <button key={action.name}
                 className="btn"
-                onClick={() => action.action(this.props.selectedItems)}
+                onClick={() => action.action(this.props.selectedItems) && this.props.selectNone()}
             >{action.name}</button>
         ));
         return (

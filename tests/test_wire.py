@@ -81,3 +81,33 @@ def test_share_items(client, app):
         assert 'http://localhost:5050/wire/%s' % items[0]['_id'] in outbox[0].body
         assert 'http://localhost:5050/wire/%s' % items[1]['_id'] in outbox[0].body
         assert 'Some info message' in outbox[0].body
+
+
+def get_bookmarks_count(client, user):
+    resp = client.get('/api/wire_search?bookmarks=%s' % str(user))
+    assert resp.status_code == 200
+    data = json.loads(resp.get_data())
+    return data['_meta']['total']
+
+
+def test_bookmarks(client, app):
+    users_init(app)
+    test_login_succeeds_for_admin(client)
+    user_id = app.data.find_all('users')[0]['_id']
+    assert user_id
+
+    assert 0 == get_bookmarks_count(client, user_id)
+
+    resp = client.post('/wire_bookmark', data=json.dumps({
+        'items': [items[0]['_id']],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    assert 1 == get_bookmarks_count(client, user_id)
+
+    client.delete('/wire_bookmark', data=json.dumps({
+        'items': [items[0]['_id']],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    assert 0 == get_bookmarks_count(client, user_id)
