@@ -68,7 +68,7 @@
 
 {% block content %}
 
-  <div class="wire-column--3">
+  <div class="wire-column--3 wire-column--3--with-topbar">
 
     <div class="wire-column__nav">
         <div class="wire-column__nav__items">
@@ -102,13 +102,13 @@
         </div>
     </div>
 
-    <div class="container-fluid">
+    <div class="wire-column__main container-fluid">
         <div class="wire-articles wire-articles--list row">
 
             <article class="wire-articles__item-wrap col-12">
                 <div class="wire-articles__item wire-articles__item--list">
                     <div class="wire-articles__item--list__text">
-                        <h4 class="wire-articles__item--list__headline">Headline sadsa dsad sad sadsadsadsa ddsadsad sadsa dsadsadsadsadsa</h4>
+                        <h4 class="wire-articles__item--list__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h4>
                         <div class="wire-articles__item__meta">
                             <div class="wire-articles__item__icons">
                                 <span class="wire-articles__item__icon">
@@ -126,13 +126,16 @@
                             </div>
                         </div>
                         <div class="wire-articles__item__text">
-                            <p>Sdsa dsad sads adsak fdaskg fsdg fhdgshfdsfdshgfhds fndsbv fnvsd fvdshfhds fdsbfnkdsbfdsh jkfhdsjk fhjds hfjdsh jkfhdsjk fhdsjk hfkjds hfjdshfkdsh fkjdslkfds,ncxvjvcuvcxvmcxnvmcx cxvcx</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vel dui metus. Sed tincidunt urna vitae imperdiet sollicitudin. Maecenas sit amet sem vitae arcu luctus vestibulum ut in dolor. Aliquam turpis ligula, ornare non justo vitae, consectetur iaculis leo. Mauris at sapien libero. Donec feugiat pellentesque mi vel dignissim. Morbi id nulla libero. Nulla ornare libero congue ex euismod lacinia. Fusce efficitur mauris nec mauris efficitur, id porttitor risus eleifend. Curabitur varius nibh ut ligula vulputate, a bibendum magna suscipit. Aenean ut massa vel ex facilisis dictum quis id elit. Fusce in aliquam dolor. Mauris finibus sem felis, placerat suscipit nibh sollicitudin at. Duis in nisi sit amet lectus iaculis blandit sed non felis.</p>
                         </div>
-                        <div class="wire-articles__item__versions-btn">
+                        <div class="no-bindable wire-articles__item__versions-btn">
                             Show previous versions (3)
                         </div>
                     </div>
                     <div class="wire-articles__item--list__image">
+                        <span class="wire-articles__item--list__image-icon">
+                            <img src="{{ url_for('static', filename = 'image-icon.png') }}" width="24" height="24"/>
+                        </span>
                         <figure>
                             <img src="{{ url_for('static', filename = 'list_image.png') }}" width="157" height="157"/>
                         </figure>
@@ -140,13 +143,48 @@
                     <div class="wire-articles__item--list__actions">
                         <img src="{{ url_for('static', filename = 'vertical_dots.png') }}" width="4" height="18"/>
                     </div>
+                </div>
+
+                <div class="wire-articles__versions">
+                    <div class="wire-articles__versions__item">
+                        <div class="wire-articles__versions__time">
+                            <span>14:15</span>
+                        </div>
+                        <div class="wire-articles__versions__meta">
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                        <span class="wire-articles__item__divider"></span>
+                        <div class="wire-articles__versions__name">
+                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                        </div>
+                    </div>
+
+                    <div class="wire-articles__versions__item">
+                        <div class="wire-articles__versions__time">
+                            <span>14:02</span>
+                        </div>
+                        <div class="wire-articles__versions__meta">
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                        <span class="wire-articles__item__divider"></span>
+                        <div class="wire-articles__versions__name">
+                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                        </div>
+                    </div>
+
                 </div>
             </article>
 
             <article class="wire-articles__item-wrap col-12">
                 <div class="wire-articles__item wire-articles__item--list">
                     <div class="wire-articles__item--list__text">
-                        <h4 class="wire-articles__item--list__headline">Headline sadsa dsad sad sadsadsadsa ddsadsad sadsa dsadsadsadsadsa dasd sadsa hdsajkhdsajkhdsaj hdjsa hdsah dsah dsa dsa dsajd hsajkhjkh</h4>
+                        <h4 class="wire-articles__item--list__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h4>
                         <div class="wire-articles__item__meta">
                             <div class="wire-articles__item__icons">
                                 <span class="wire-articles__item__icon">
@@ -164,13 +202,16 @@
                             </div>
                         </div>
                         <div class="wire-articles__item__text">
-                            <p>Sdsa dsad sads adsak fdaskg fsdg fhdgshfdsfdshgfhds fndsbv fnvsd fvdshfhds fdsbfnkdsbfdsh jkfhdsjk fhjds hfjdsh jkfhdsjk fhdsjk hfkjds hfjdshfkdsh fkjdslkfds,ncxvjvcuvcxvmcxnvmcx cxvcx Sdsa dsad sads adsak fdaskg fsdg fhdgshfdsfdshgfhds fndsbv fnvsd fvdshfhds fdsbfnkdsbfdsh jkfhdsjk fhjds hfjdsh jkfhdsjk fhdsjk hfkjds hfjdshfkdsh fkjdslkfds,ncxvjvcuvcxvmcxnvmcx cxvcx</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vel dui metus. Sed tincidunt urna vitae imperdiet sollicitudin. Maecenas sit amet sem vitae arcu luctus vestibulum ut in dolor. Aliquam turpis ligula, ornare non justo vitae, consectetur iaculis leo. Mauris at sapien libero. Donec feugiat pellentesque mi vel dignissim. Morbi id nulla libero. Nulla ornare libero congue ex euismod lacinia. Fusce efficitur mauris nec mauris efficitur, id porttitor risus eleifend. Curabitur varius nibh ut ligula vulputate, a bibendum magna suscipit. Aenean ut massa vel ex facilisis dictum quis id elit. Fusce in aliquam dolor. Mauris finibus sem felis, placerat suscipit nibh sollicitudin at. Duis in nisi sit amet lectus iaculis blandit sed non felis.</p>
                         </div>
-                        <div class="wire-articles__item__versions-btn">
+                        <div class="no-bindable wire-articles__item__versions-btn">
                             Show previous versions (3)
                         </div>
                     </div>
                     <div class="wire-articles__item--list__image">
+                        <span class="wire-articles__item--list__image-icon">
+                            <img src="{{ url_for('static', filename = 'image-icon.png') }}" width="24" height="24"/>
+                        </span>
                         <figure>
                             <img src="{{ url_for('static', filename = 'list_image.png') }}" width="157" height="157"/>
                         </figure>
@@ -179,53 +220,192 @@
                         <img src="{{ url_for('static', filename = 'vertical_dots.png') }}" width="4" height="18"/>
                     </div>
                 </div>
-            </article>
 
-            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="wire-articles__item wire-articles__item--grid ">
-                    <p>Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item</p>
+                <div class="wire-articles__versions">
+                    <div class="wire-articles__versions__item">
+                        <div class="wire-articles__versions__time">
+                            <span>14:15</span>
+                        </div>
+                        <div class="wire-articles__versions__meta">
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                        <span class="wire-articles__item__divider"></span>
+                        <div class="wire-articles__versions__name">
+                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                        </div>
+                    </div>
+
+                    <div class="wire-articles__versions__item">
+                        <div class="wire-articles__versions__time">
+                            <span>14:02</span>
+                        </div>
+                        <div class="wire-articles__versions__meta">
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                        <span class="wire-articles__item__divider"></span>
+                        <div class="wire-articles__versions__name">
+                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                        </div>
+                    </div>
+
                 </div>
             </article>
 
-            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="wire-articles__item wire-articles__item--grid ">
-                    <p>Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item</p>
+            <article class="wire-articles__item-wrap col-12">
+                <div class="wire-articles__item wire-articles__item--list">
+                    <div class="wire-articles__item--list__text">
+                        <h4 class="wire-articles__item--list__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h4>
+                        <div class="wire-articles__item__meta">
+                            <div class="wire-articles__item__icons">
+                                <span class="wire-articles__item__icon">
+                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                </span>
+                                <span class="wire-articles__item__icon">
+                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                </span>
+                                <span class="wire-articles__item__divider">
+                                </span>
+                            </div>
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
+                            </div>
+                        </div>
+                        <div class="wire-articles__item__text">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vel dui metus. Sed tincidunt urna vitae imperdiet sollicitudin. Maecenas sit amet sem vitae arcu luctus vestibulum ut in dolor. Aliquam turpis ligula, ornare non justo vitae, consectetur iaculis leo. Mauris at sapien libero. Donec feugiat pellentesque mi vel dignissim. Morbi id nulla libero. Nulla ornare libero congue ex euismod lacinia. Fusce efficitur mauris nec mauris efficitur, id porttitor risus eleifend. Curabitur varius nibh ut ligula vulputate, a bibendum magna suscipit. Aenean ut massa vel ex facilisis dictum quis id elit. Fusce in aliquam dolor. Mauris finibus sem felis, placerat suscipit nibh sollicitudin at. Duis in nisi sit amet lectus iaculis blandit sed non felis.</p>
+                        </div>
+                        <div class="no-bindable wire-articles__item__versions-btn">
+                            Show previous versions (3)
+                        </div>
+                    </div>
+                    <div class="wire-articles__item--list__image">
+                        <span class="wire-articles__item--list__image-icon">
+                            <img src="{{ url_for('static', filename = 'image-icon.png') }}" width="24" height="24"/>
+                        </span>
+                        <figure>
+                            <img src="{{ url_for('static', filename = 'list_image.png') }}" width="157" height="157"/>
+                        </figure>
+                    </div>
+                    <div class="wire-articles__item--list__actions">
+                        <img src="{{ url_for('static', filename = 'vertical_dots.png') }}" width="4" height="18"/>
+                    </div>
+                </div>
+
+                <div class="wire-articles__versions">
+                    <div class="wire-articles__versions__item">
+                        <div class="wire-articles__versions__time">
+                            <span>14:15</span>
+                        </div>
+                        <div class="wire-articles__versions__meta">
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                        <span class="wire-articles__item__divider"></span>
+                        <div class="wire-articles__versions__name">
+                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                        </div>
+                    </div>
+
+                    <div class="wire-articles__versions__item">
+                        <div class="wire-articles__versions__time">
+                            <span>14:02</span>
+                        </div>
+                        <div class="wire-articles__versions__meta">
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                        <span class="wire-articles__item__divider"></span>
+                        <div class="wire-articles__versions__name">
+                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                        </div>
+                    </div>
+
                 </div>
             </article>
 
-            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="wire-articles__item wire-articles__item--grid ">
-                    <p>Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item</p>
+            <article class="wire-articles__item-wrap col-12">
+                <div class="wire-articles__item wire-articles__item--list">
+                    <div class="wire-articles__item--list__text">
+                        <h4 class="wire-articles__item--list__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h4>
+                        <div class="wire-articles__item__meta">
+                            <div class="wire-articles__item__icons">
+                                <span class="wire-articles__item__icon">
+                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                </span>
+                                <span class="wire-articles__item__icon">
+                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                </span>
+                                <span class="wire-articles__item__divider">
+                                </span>
+                            </div>
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
+                            </div>
+                        </div>
+                        <div class="wire-articles__item__text">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vel dui metus. Sed tincidunt urna vitae imperdiet sollicitudin. Maecenas sit amet sem vitae arcu luctus vestibulum ut in dolor. Aliquam turpis ligula, ornare non justo vitae, consectetur iaculis leo. Mauris at sapien libero. Donec feugiat pellentesque mi vel dignissim. Morbi id nulla libero. Nulla ornare libero congue ex euismod lacinia. Fusce efficitur mauris nec mauris efficitur, id porttitor risus eleifend. Curabitur varius nibh ut ligula vulputate, a bibendum magna suscipit. Aenean ut massa vel ex facilisis dictum quis id elit. Fusce in aliquam dolor. Mauris finibus sem felis, placerat suscipit nibh sollicitudin at. Duis in nisi sit amet lectus iaculis blandit sed non felis.</p>
+                        </div>
+                        <div class="no-bindable wire-articles__item__versions-btn">
+                            Show previous versions (3)
+                        </div>
+                    </div>
+                    <div class="wire-articles__item--list__image">
+                        <span class="wire-articles__item--list__image-icon">
+                            <img src="{{ url_for('static', filename = 'image-icon.png') }}" width="24" height="24"/>
+                        </span>
+                        <figure>
+                            <img src="{{ url_for('static', filename = 'list_image.png') }}" width="157" height="157"/>
+                        </figure>
+                    </div>
+                    <div class="wire-articles__item--list__actions">
+                        <img src="{{ url_for('static', filename = 'vertical_dots.png') }}" width="4" height="18"/>
+                    </div>
                 </div>
-            </article>
 
-            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="wire-articles__item wire-articles__item--grid ">
-                    <p>Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item</p>
-                </div>
-            </article>
+                <div class="wire-articles__versions">
+                    <div class="wire-articles__versions__item">
+                        <div class="wire-articles__versions__time">
+                            <span>14:15</span>
+                        </div>
+                        <div class="wire-articles__versions__meta">
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                        <span class="wire-articles__item__divider"></span>
+                        <div class="wire-articles__versions__name">
+                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                        </div>
+                    </div>
 
-            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="wire-articles__item wire-articles__item--grid ">
-                    <p>Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item</p>
-                </div>
-            </article>
+                    <div class="wire-articles__versions__item">
+                        <div class="wire-articles__versions__time">
+                            <span>14:02</span>
+                        </div>
+                        <div class="wire-articles__versions__meta">
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                        <span class="wire-articles__item__divider"></span>
+                        <div class="wire-articles__versions__name">
+                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                        </div>
+                    </div>
 
-            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="wire-articles__item wire-articles__item--grid ">
-                    <p>Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item</p>
-                </div>
-            </article>
-
-            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="wire-articles__item wire-articles__item--grid ">
-                    <p>Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item</p>
-                </div>
-            </article>
-
-            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="wire-articles__item wire-articles__item--grid ">
-                    <p>Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item Wire item</p>
                 </div>
             </article>
 
@@ -234,7 +414,7 @@
 
     <div class="wire-column__preview">
       <div class="wire-column__preview__items">
-        <p>Article preview</p
+        <p>Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview Article preview </p>
       </div>
     </div>
 

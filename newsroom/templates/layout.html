@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/alertify.min.css"/>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/themes/bootstrap.min.css"/>
 
@@ -25,64 +26,64 @@
         <div class="navbar__logo">
             <img src="{{ url_for('static', filename = 'aap.png') }}" width="32" height="32"/>
         </div>
-        <div class="navbar-brand p-2">
+        <div class="navbar-brand">
             <a class="nav-link text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }} // {{ gettext('Wire') }}</a>
         </div>
 
         {% if session.get('name') %}
-        <div class="form-inline my-2 my-lg-0 ml-auto p-2">
+        <div class="form-inline my-lg-0 ml-auto p-2">
             <a class="nav-link" href="{{ url_for('users.settings') }}">{{ gettext('Settings') }}</a>
             <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
             <span class="badge badge-success">{{ session['name'] }}</span>
         </div>
         {% else %}
-        <div class="form-inline my-2 my-lg-0 ml-auto p-2">
+        <div class="form-inline my-lg-0 ml-auto p-2">
             <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             <a class="nav-link"href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
         </div>
         {% endif %}
     </nav>
 
-    <nav class="sidenav">
+    <div class="contentWrap">
 
-        <ul class="sidenav-icons">
-          <li class="sidenav-icons__item">D</li>
-          <li class="sidenav-icons__item">L</li>
-          <li class="sidenav-icons__item">I</li>
-          <li class="sidenav-icons__item">E</li>
-          <li class="sidenav-icons__item sidenav-icons__item--admin">A</li>
-        </ul>
+        <nav class="sidenav">
 
-        {% block sidenav %}
-        {% endblock %}
+            <ul class="sidenav-icons">
+              <li class="sidenav-icons__item">D</li>
+              <li class="sidenav-icons__item">L</li>
+              <li class="sidenav-icons__item">I</li>
+              <li class="sidenav-icons__item">E</li>
+              <li class="sidenav-icons__item sidenav-icons__item--admin">A</li>
+            </ul>
 
-    </nav>
+            {% block sidenav %}
+            {% endblock %}
 
-    <section class="content-header">
-        {% block contentHeader %}
+        </nav>
 
-        {% endblock %}
-    </section>
-    
-    <div class="content">
+        <div class="content">
 
-        <section class="content-main">
+            <section class="content-header">
+                {% block contentHeader %}
 
-            <div id="content" class="">
+                {% endblock %}
+            </section>
 
-                {% include "flash_messages.html" %}
+            <section class="content-main">
 
-                {% block content %}{% endblock %}
+                    {% include "flash_messages.html" %}
 
-            </div>
+                    {% block content %}{% endblock %}
 
-            {% block sidebar %}{% endblock %}
-        </section>
+                {% block sidebar %}{% endblock %}
+            </section>
+
+            <!-- <footer class="container-fluid">
+                <p class="text-right"><small class="text-muted">All contents &copy; Copyright 2017 {{ config.COPYRIGHT_HOLDER }}. All rights reserved.</small></p>
+            </footer> -->
+        </div>
+
     </div>
-
-    <!-- <footer class="container-fluid">
-        <p class="text-right"><small class="text-muted">All contents &copy; Copyright 2017 {{ config.COPYRIGHT_HOLDER }}. All rights reserved.</small></p>
-    </footer> -->
 
 </div>
 
