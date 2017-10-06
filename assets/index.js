@@ -41,3 +41,4 @@ searchInput.onfocus = function() {
 
 document.getElementsByClassName('search__clear')[0].onclick = function() {
     searchInput.value = '';
+};
