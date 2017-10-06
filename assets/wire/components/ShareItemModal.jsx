@@ -11,7 +11,7 @@ import CloseButton from 'components/CloseButton';
 class ShareItemModal extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {message: '', users: [], item: this.props.data.item};
+        this.state = {message: '', users: [], items: this.props.data.items};
         this.onSubmit = this.onSubmit.bind(this);
         this.users = this.props.data.users;
     }
@@ -110,7 +110,7 @@ ShareItemModal.propTypes = {
     closeModal: PropTypes.func.isRequired,
     submit: PropTypes.func.isRequired,
     data: PropTypes.shape({
-        item: PropTypes.string.isRequired,
+        items: PropTypes.arrayOf(PropTypes.string).isRequired,
         users: PropTypes.arrayOf(PropTypes.shape({
             _id: PropTypes.string.isRequired,
             first_name: PropTypes.string.isRequired,

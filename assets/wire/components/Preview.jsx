@@ -13,21 +13,11 @@ function formatCV(items) {
 
 function Preview({item, actions}) {
     const actionButtons = actions.map((action) => {
-        if (action.url) {
-            return (
-                <a className="btn btn-outline-primary"
-                    key={action.name}
-                    href={action.url(item)}
-                    download={action.download && action.download(item)}
-                    target={action.target}
-                >{action.name}</a>
-            );
-        }
-
+        const payload = action.multi ? [item._id] : item;
         return (
             <button className="btn btn-outline-primary"
                 key={action.name}
-                onClick={() => action.action(item)}
+                onClick={() => action.action(payload)}
             >{action.name}</button>
         );
     });

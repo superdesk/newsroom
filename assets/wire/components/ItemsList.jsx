@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import WireListItem from './WireListItem';
-import { setActive, previewItem } from '../actions';
+import { setActive, previewItem, toggleSelected } from '../actions';
 
-const PREVIEW_TIMEOUT = 300; // time to preview an item after selecting using kb
+const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 
 class ItemsList extends React.Component {
     constructor(props) {
@@ -15,7 +15,6 @@ class ItemsList extends React.Component {
     }
 
     onKeyDown(event) {
-        event.preventDefault();
         let diff = 0;
         switch (event.key) {
         case 'ArrowDown':
@@ -30,6 +29,7 @@ class ItemsList extends React.Component {
             return;
         }
 
+        event.preventDefault();
         const activeIndex = this.props.activeItem ? this.props.items.indexOf(this.props.activeItem) : -1;
 
         // keep it within <0, items.length) interval
@@ -65,7 +65,10 @@ class ItemsList extends React.Component {
                 key={_id}
                 item={itemsById[_id]}
                 isActive={activeItem === _id}
-                onClick={this.onItemClick} />
+                isSelected={this.props.selectedItems.indexOf(_id) !== -1}
+                onClick={this.onItemClick}
+                toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
+            />
         );
 
         return (
@@ -81,12 +84,14 @@ ItemsList.propTypes = {
     itemsById: PropTypes.object,
     activeItem: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
+    selectedItems: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
     items: state.items,
     itemsById: state.itemsById,
     activeItem: state.activeItem,
+    selectedItems: state.selectedItems,
 });
 
 export default connect(mapStateToProps)(ItemsList);

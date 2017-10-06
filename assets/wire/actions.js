@@ -88,7 +88,7 @@ export function fetchItems() {
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
                 const params = new URLSearchParams(window.location.search);
-                params.set('q', getState().query);
+                params.set('q', getState().query || '');
                 history.pushState(getState(), null, '?' + params.toString());
             })
             .catch(errorHandler);
@@ -120,13 +120,13 @@ export function submitFollowTopic(data) {
  *
  * @return {function}
  */
-export function shareItem(item) {
+export function shareItems(items) {
     return (dispatch, getState) => {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
             .then((users) => users.filter((u) => u._id !== user))
-            .then((users) => dispatch(renderModal('shareItem', {item, users})))
+            .then((users) => dispatch(renderModal('shareItem', {items, users})))
             .catch(errorHandler);
     };
 }
@@ -138,13 +138,32 @@ export function shareItem(item) {
  */
 export function submitShareItem(data) {
     return (dispatch) => {
-        return server.post(`/wire/${data.item}/share`, data)
+        return server.post('/wire_share', data)
             .then(() => {
-                notify.success(gettext('Item was shared successfully'));
+                if (data.items.length > 1) {
+                    notify.success(gettext('Items were shared successfully.'));
+                } else {
+                    notify.success(gettext('Item was shared successfully.'));
+                }
                 dispatch(closeModal());
             })
             .catch(errorHandler);
     };
+}
+
+export const TOGGLE_SELECTED = 'TOGGLE_SELECTED';
+export function toggleSelected(item) {
+    return {type: TOGGLE_SELECTED, item};
+}
+
+export const SELECT_ALL = 'SELECT_ALL';
+export function selectAll() {
+    return {type: SELECT_ALL};
+}
+
+export const SELECT_NONE = 'SELECT_NONE';
+export function selectNone() {
+    return {type: SELECT_NONE};
 }
 
 function errorHandler(reason) {

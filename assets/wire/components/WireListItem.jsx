@@ -10,18 +10,44 @@ class WireListItem extends React.Component {
         this.wordCount = wordCount(props.item.body_html);
         this.slugline = props.item.slugline && props.item.slugline.trim() ||
           props.item.headline && props.item.headline.replace(/ /g, '-');
+        this.state = {isHover: false};
+        this.onKeyDown = this.onKeyDown.bind(this);
+    }
+
+    onKeyDown(event) {
+        switch (event.key) {
+        case ' ':  // on space toggle selected item
+            this.props.toggleSelected();
+            break;
+
+        default:
+            return;
+        }
+
+        event.preventDefault();
     }
 
     render() {
         const {item, onClick} = this.props;
+        const cardClassName = classNames('card', 'list', 'mb-3', {
+            'border-warning': this.props.isActive,
+            'border-primary': this.props.isSelected && !this.props.isActive,
+        });
         return (
             <article key={item._id}
-                className={classNames('card', 'list', 'mb-3', {'border border-info': this.props.isActive})}
+                className={cardClassName}
                 tabIndex="0"
                 onClick={(event) => event.target.focus()}
                 onFocus={() => !this.props.isActive && onClick(item._id)}
-                ref={(elem) => this.props.isActive && elem && elem.focus()}>
+                ref={(elem) => this.props.isActive && elem && elem.focus()}
+                onMouseEnter={() => this.setState({isHover: true})}
+                onMouseLeave={() => this.setState({isHover: false})}
+                onKeyDown={this.onKeyDown}
+            >
                 <div className="card-body">
+                    {(this.props.isSelected || this.state.isHover) &&
+                        <input type="checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
+                    }
                     <h4 className="card-title">{item.headline}</h4>
                     <h6 className="card-subtitle">{this.slugline}</h6>
                     <small className="card-subtitle">
@@ -41,7 +67,9 @@ class WireListItem extends React.Component {
 WireListItem.propTypes = {
     item: PropTypes.object.isRequired,
     isActive: PropTypes.bool.isRequired,
+    isSelected: PropTypes.bool.isRequired,
     onClick: PropTypes.func.isRequired,
+    toggleSelected: PropTypes.func.isRequired,
 };
 
 export default WireListItem;

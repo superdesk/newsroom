@@ -8,13 +8,22 @@ from pytest import fixture
 from tests.test_users import test_login_succeeds_for_admin, init as users_init
 
 
-items = [{
-    '_id': 'tag:foo',
-    'version': 2,
-    'headline': 'Amazon Is Opening More Bookstores',
-    'slugline': 'AMAZON-BOOKSTORE-OPENING',
-    'body_html': '<p>New stores will open in DC and Austin in 2018.</p>',
-}]
+items = [
+    {
+        '_id': 'tag:foo',
+        'version': 2,
+        'headline': 'Amazon Is Opening More Bookstores',
+        'slugline': 'AMAZON-BOOKSTORE-OPENING',
+        'body_html': '<p>New stores will open in DC and Austin in 2018.</p>',
+    },
+    {
+        '_id': 'urn:localhost:weather',
+        'version': 1,
+        'headline': 'Weather',
+        'slugline': 'WEATHER',
+        'body_html': '<p>Weather report</p>',
+    },
+]
 
 
 @fixture(autouse=True)
@@ -23,7 +32,7 @@ def init(app):
 
 
 def test_item_download(client):
-    resp = client.get('/download/tag:foo?version=2')
+    resp = client.get('/download/%s' % ','.join([item['_id'] for item in items]))
     assert resp.status_code == 200
     assert resp.mimetype == 'application/zip'
     _file = io.BytesIO(resp.get_data())
@@ -42,7 +51,7 @@ def test_item_detail(client):
     assert '<h1>Amazon Is Opening More Bookstores</h1>' in html
 
 
-def test_share_item(client, app):
+def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
         'first_name': 'Foo',
@@ -54,8 +63,8 @@ def test_share_item(client, app):
     test_login_succeeds_for_admin(client)
 
     with app.mail.record_messages() as outbox:
-        resp = client.post('/wire/tag:foo/share', data=json.dumps({
-            'item': 'tag:foo',
+        resp = client.post('/wire_share', data=json.dumps({
+            'items': [item['_id'] for item in items],
             'users': [str(user_ids[0])],
             'message': 'Some info message',
         }), content_type='application/json')
@@ -68,5 +77,7 @@ def test_share_item(client, app):
         assert 'Hi Foo Bar' in outbox[0].body
         assert 'admin admin shared ' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
-        assert 'http://localhost:5050/wire/tag:foo' in outbox[0].body
+        assert items[1]['headline'] in outbox[0].body
+        assert 'http://localhost:5050/wire/%s' % items[0]['_id'] in outbox[0].body
+        assert 'http://localhost:5050/wire/%s' % items[1]['_id'] in outbox[0].body
         assert 'Some info message' in outbox[0].body

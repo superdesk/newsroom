@@ -8,8 +8,10 @@ import {
     followTopic,
     fetchItems,
     copyPreviewContents,
-    shareItem,
+    shareItems,
     setQuery,
+    selectAll,
+    selectNone,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -17,6 +19,7 @@ import ItemsList from './ItemsList';
 import SearchBar from './SearchBar';
 import SearchResultsInfo from './SearchResultsInfo';
 import SearchSidebar from './SearchSidebar';
+import SelectedItemsBar from './SelectedItemsBar';
 
 import FollowTopicModal from './FollowTopicModal';
 import ShareItemModal from './ShareItemModal';
@@ -50,6 +53,8 @@ class WireApp extends React.Component {
     render() {
         const progressStyle = {width: '25%'};
         const modal = this.renderModal(this.props.modal);
+        const previewActionFilter = (action) => !action.when || action.when(this.props);
+        const multiActionFilter = (action) => action.multi && previewActionFilter(action);
         return (
             <div>
                 <nav className="navbar sticky-top navbar-light bg-light">
@@ -81,14 +86,22 @@ class WireApp extends React.Component {
                         </div>
                         :
                         <div className="col">
-                            {this.props.activeQuery &&
-                            <SearchResultsInfo
-                                user={this.props.user}
-                                query={this.props.activeQuery}
-                                totalItems={this.props.totalItems}
-                                followTopic={this.props.followTopic}
-                                topics={this.props.topics}
-                            />
+                            {this.props.activeQuery && !this.props.selectedItems.length &&
+                                <SearchResultsInfo
+                                    user={this.props.user}
+                                    query={this.props.activeQuery}
+                                    totalItems={this.props.totalItems}
+                                    followTopic={this.props.followTopic}
+                                    topics={this.props.topics}
+                                />
+                            }
+                            {!!this.props.selectedItems.length &&
+                                <SelectedItemsBar
+                                    selectedItems={this.props.selectedItems}
+                                    selectAll={this.props.selectAll}
+                                    selectNone={this.props.selectNone}
+                                    actions={this.props.actions.filter(multiActionFilter)}
+                                />
                             }
                             <ItemsList />
                         </div>
@@ -96,7 +109,7 @@ class WireApp extends React.Component {
                     {this.props.itemToPreview &&
                         <Preview
                             item={this.props.itemToPreview}
-                            actions={this.props.actions.filter((action) => !action.when || action.when(this.props))}
+                            actions={this.props.actions.filter(previewActionFilter)}
                         />
                     }
                 </div>
@@ -122,6 +135,9 @@ WireApp.propTypes = {
         action: PropTypes.func,
     })),
     setQuery: PropTypes.func.isRequired,
+    selectedItems: PropTypes.array,
+    selectAll: PropTypes.func,
+    selectNone: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -133,6 +149,7 @@ const mapStateToProps = (state) => ({
     user: state.user,
     company: state.company,
     topics: state.topics,
+    selectedItems: state.selectedItems,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -142,21 +159,22 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(setQuery(query));
         dispatch(fetchItems());
     },
+    selectAll: () => dispatch(selectAll()),
+    selectNone: () => dispatch(selectNone()),
     actions: [
         {
             name: gettext('Open'),
-            url: (item) => `/wire/${item._id}`,
-            target: '_blank',
+            action: (item) => window.open(`/wire/${item._id}`, '_blank'),
         },
         {
             name: gettext('Share'),
-            action: (item) => dispatch(shareItem(item._id)),
+            multi: true,
             when: (state) => state.user && state.company,
+            action: (items) => dispatch(shareItems(items)),
         },
         {
             name: gettext('Print'),
-            url: (item) => `/wire/${item._id}?print`,
-            target: '_blank',
+            action: (item) => window.open(`/wire/${item._id}?print`, '_blank'),
         },
         {
             name: gettext('Copy'),
@@ -164,9 +182,9 @@ const mapDispatchToProps = (dispatch) => ({
         },
         {
             name: gettext('Download'),
-            url: (item) => `/download/${item._id}?version=${item.version}`,
-            download: () => 'newsroom.zip',
+            multi: true,
             when: (state) => state.user && state.company,
+            action: (items) => window.open(`/download/${items.join(',')}`, '_blank'),
         },
     ],
 });

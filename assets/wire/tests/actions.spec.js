@@ -43,4 +43,17 @@ describe('fetch actions', () => {
                 expect(state.activeQuery).toBe('foo');
             });
     });
+
+    it('can toggle selected item', () => {
+        store.dispatch(actions.setItems([{_id: 'foo'}, {_id: 'bar'}]));
+        expect(store.getState().selectedItems).toEqual([]);
+        store.dispatch(actions.toggleSelected('foo'));
+        expect(store.getState().selectedItems).toEqual(['foo']);
+        store.dispatch(actions.toggleSelected('foo'));
+        expect(store.getState().selectedItems).toEqual([]);
+        store.dispatch(actions.selectAll());
+        expect(store.getState().selectedItems).toEqual(['foo', 'bar']);
+        store.dispatch(actions.selectNone());
+        expect(store.getState().selectedItems).toEqual([]);
+    });
 });

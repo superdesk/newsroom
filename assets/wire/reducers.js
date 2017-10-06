@@ -1,4 +1,3 @@
-
 import {
     PREVIEW_ITEM,
     SET_ITEMS,
@@ -11,7 +10,12 @@ import {
     CLOSE_MODAL,
     INIT_DATA,
     ADD_TOPIC,
+    TOGGLE_SELECTED,
+    SELECT_ALL,
+    SELECT_NONE,
 } from './actions';
+
+import { toggleValue } from 'utils';
 
 const initialState = {
     items: [],
@@ -24,6 +28,7 @@ const initialState = {
     user: null,
     company: null,
     topics: [],
+    selectedItems: [],
 };
 
 export default function wireReducer(state = initialState, action) {
@@ -96,6 +101,24 @@ export default function wireReducer(state = initialState, action) {
         return {
             ...state,
             topics: state.topics.concat([action.topic]),
+        };
+
+    case TOGGLE_SELECTED:
+        return {
+            ...state,
+            selectedItems: toggleValue(state.selectedItems, action.item),
+        };
+
+    case SELECT_ALL:
+        return {
+            ...state,
+            selectedItems: state.items.concat(),
+        };
+
+    case SELECT_NONE:
+        return {
+            ...state,
+            selectedItems: [],
         };
 
     default:
