@@ -10,7 +10,7 @@ class TopicsResource(newsroom.Resource):
     schema = {
         'label': {'type': 'string', 'required': True},
         'query': {'type': 'string', 'required': True},
-        'description': {'type': 'string'},
+        'notifications': {'type': 'boolean', 'default': False},
         'user': {'type': 'objectid'},
     }
 

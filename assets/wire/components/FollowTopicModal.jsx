@@ -1,17 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Modal from 'components/Modal';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import { closeModal, submitFollowTopic } from 'wire/actions';
+
+import Modal, { ModalPrimaryButton, ModalSecondaryButton } from 'components/Modal';
+import CloseButton from 'components/CloseButton';
+import TextInput from 'components/TextInput';
+import CheckboxInput from 'components/CheckboxInput';
+
+const TOPIC_NAME_MAXLENGTH = 30;
 
 class FollowTopicModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             query: this.props.data.topic,
-            label: this.props.data.topic,
-            description: ''
+            label: '',
+            notifications: false,
         };
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -19,7 +25,9 @@ class FollowTopicModal extends React.Component {
 
     onSubmit(event) {
         event.preventDefault();
-        this.props.submit(this.state);
+        if (this.state.label) {
+            this.props.submit(this.state);
+        }
     }
 
     onChangeHandler(field) {
@@ -30,44 +38,42 @@ class FollowTopicModal extends React.Component {
         };
     }
 
+    toggleNotifications() {
+        this.setState({notifications: !this.state.notifications});
+    }
+
     render() {
         return (
             <Modal onClose={closeModal}>
-                <button type="button"
-                    className="close pull-right"
-                    onClick={this.props.closeModal}>
-                    <span>&times;</span>
-                </button>
+                <CloseButton onClick={this.props.closeModal} />
                 <h1>{gettext('Follow topic')}</h1>
                 <form onSubmit={this.onSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="topicName">{gettext('Topic name')}</label>
-                        <input type="text"
-                            className="form-control"
-                            id="topicName"
-                            required="required"
-                            value={this.state.label}
-                            onChange={this.onChangeHandler('label')}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="description">{gettext('Description')}</label>
-                        <textarea className="form-control"
-                            id="description"
-                            value={this.state.description}
-                            onChange={this.onChangeHandler('description')}
-                        />
-                    </div>
-                    <button type="button"
-                        className="btn btn-outline-secondary"
-                        onClick={this.props.closeModal}>
-                        {gettext('Cancel')}
-                    </button>
+                    <TextInput
+                        label={gettext('Name')}
+                        required={true}
+                        value={this.state.label}
+                        onChange={this.onChangeHandler('label')}
+                        maxLength={TOPIC_NAME_MAXLENGTH}
+                    />
+                    <TextInput
+                        label={gettext('Query')}
+                        value={this.state.query}
+                        readOnly={true}
+                    />
+                    <CheckboxInput
+                        label={gettext('Send me notifications')}
+                        value={this.state.notifications}
+                        onChange={() => this.toggleNotifications()}
+                    />
+                    <ModalSecondaryButton
+                        onClick={this.props.closeModal}
+                        label={gettext('Cancel')}
+                    />
                     {' '}
-                    <button type="submit"
-                        className="btn btn-outline-primary">
-                        {gettext('Save')}
-                    </button>
+                    <ModalPrimaryButton
+                        type="submit"
+                        label={gettext('Save')}
+                    />
                 </form>
             </Modal>
         );

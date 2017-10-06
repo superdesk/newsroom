@@ -86,6 +86,11 @@ export function fetchItems() {
         const query = getState().query || '';
         return server.get(`/search?q=${query}`)
             .then((data) => dispatch(recieveItems(data)))
+            .then(() => {
+                const params = new URLSearchParams(window.location.search);
+                params.set('q', getState().query);
+                history.pushState(getState(), null, '?' + params.toString());
+            })
             .catch(errorHandler);
     };
 }

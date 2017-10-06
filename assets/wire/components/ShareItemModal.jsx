@@ -1,10 +1,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Modal from 'components/Modal';
 import { connect } from 'react-redux';
 import { gettext, toggleValue } from 'utils';
 import { closeModal, submitShareItem } from 'wire/actions';
+
+import Modal, { ModalPrimaryButton, ModalSecondaryButton } from 'components/Modal';
+import CloseButton from 'components/CloseButton';
 
 class ShareItemModal extends React.Component {
     constructor(props) {
@@ -57,11 +59,7 @@ class ShareItemModal extends React.Component {
 
         return (
             <Modal onClose={this.props.closeModal}>
-                <button type="button"
-                    className="close pull-right"
-                    onClick={this.props.closeModal}>
-                    <span>&times;</span>
-                </button>
+                <CloseButton onClick={this.props.closeModal} />
                 <h1>{gettext('Share Item')}</h1>
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group">
@@ -93,16 +91,15 @@ class ShareItemModal extends React.Component {
                             onChange={this.onChangeHandler('message')}
                         />
                     </div>
-                    <button type="button"
-                        className="btn btn-outline-secondary"
-                        onClick={this.props.closeModal}>
-                        {gettext('Cancel')}
-                    </button>
+                    <ModalSecondaryButton
+                        onClick={this.props.closeModal}
+                        label={gettext('Cancel')}
+                    />
                     {' '}
-                    <button type="submit"
-                        className="btn btn-outline-primary">
-                        {gettext('Share')}
-                    </button>
+                    <ModalPrimaryButton
+                        type="submit"
+                        label={gettext('Share')}
+                    />
                 </form>
             </Modal>
         );

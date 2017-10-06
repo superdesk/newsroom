@@ -4,7 +4,7 @@ from bson import ObjectId
 topic = {
     'label': 'Foo',
     'query': 'foo',
-    'description': 'Foo description',
+    'notifications': False,
 }
 
 user = str(ObjectId())
