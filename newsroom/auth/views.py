@@ -6,7 +6,8 @@ from flask import current_app as app
 import bcrypt
 from newsroom.auth import blueprint
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
-from newsroom.email import send_validate_account_email, send_reset_password_email
+from newsroom.email import send_validate_account_email, \
+    send_reset_password_email, send_new_signup_email
 from newsroom.utils import get_random_string
 from bson import ObjectId
 from flask_babel import gettext
@@ -29,6 +30,8 @@ def login():
                 flask.session['name'] = '{} {}'.format(user.get('first_name'), user.get('last_name'))
                 flask.session['user_type'] = user['user_type']
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
+            else:
+                flask.flash(gettext('Account is disabled.'), 'danger')
         else:
             flask.flash(gettext('Invalid username or password.'), 'danger')
     return flask.render_template('login.html', form=form)
@@ -92,35 +95,10 @@ def signup():
     form = SignupForm()
     if form.validate_on_submit():
         new_user = form.data
-        _modify_user_data(new_user)
-        add_token_data(new_user)
-        get_resource_service('users').post([new_user])
-        send_validate_account_email(new_user['first_name'], new_user['email'], new_user['token'])
-        flask.flash(gettext('Validation email has been sent. Please check your emails.'), 'success')
-        return flask.redirect(flask.url_for('auth.login'))
+        new_user.pop('csrf_token', None)
+        send_new_signup_email(user=new_user)
+        return flask.render_template('signup_success.html'), 200
     return flask.render_template('signup.html', form=form)
-
-
-def _modify_user_data(new_user):
-    """
-    Modifies the user data to make it compatible with user schema
-    """
-    new_user['signup_details'] = {
-        'company': new_user.get('company'),
-        'occupation': new_user.get('occupation'),
-        'company_size': new_user.get('company_size'),
-    }
-    new_user.pop('email2', None)
-    new_user.pop('password2', None)
-    new_user.pop('company', None)
-    new_user.pop('occupation', None)
-    new_user.pop('company_size', None)
-    new_user.pop('csrf_token', None)
-
-
-def add_token_data(user):
-    user['token'] = get_random_string()
-    user['token_expiry_date'] = utcnow() + timedelta(days=app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'])
 
 
 @blueprint.route('/validate/<token>')
@@ -183,3 +161,8 @@ def send_token(user, token_type='validate'):
             send_reset_password_email(user['first_name'], user['email'], updates['token'])
         return True
     return False
+
+
+def add_token_data(user):
+    user['token'] = get_random_string()
+    user['token_expiry_date'] = utcnow() + timedelta(days=app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'])

@@ -76,6 +76,9 @@ RESET_PASSWORD_TOKEN_TIME_TO_LIVE = 1
 VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 1
 #: default sender for superdesk emails
 MAIL_DEFAULT_SENDER = MAIL_USERNAME or 'newsroom@localhost'
+# Recipients for the sign up form filled by new users (single or comma separated)
+SIGNUP_EMAIL_RECIPIENTS = os.environ.get('SIGNUP_EMAIL_RECIPIENTS')
+
 #: public client url - used to create links within emails etc
 CLIENT_URL = 'http://localhost:5050'
 
