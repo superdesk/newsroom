@@ -17,6 +17,8 @@ from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from newsroom.auth import SessionAuth
 from flask_mail import Mail
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from newsroom.webpack import NewsroomWebpack
 
@@ -53,6 +55,7 @@ class Newsroom(eve.Eve):
             self.media = AmazonMediaStorage(self)
         else:
             self.media = SuperdeskGridFSMediaStorage(self)
+        self._setup_limiter()
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
         self._setup_babel()
@@ -69,6 +72,8 @@ class Newsroom(eve.Eve):
         """Setup configured blueprints."""
         for name in modules:
             mod = importlib.import_module(name)
+            if name != 'newsroom.auth':
+                self.limiter.exempt(mod.blueprint)
             self.register_blueprint(mod.blueprint)
 
     def _setup_apps(self, apps):
@@ -97,3 +102,6 @@ class Newsroom(eve.Eve):
 
     def _setup_email(self):
         self.mail = Mail(self)
+
+    def _setup_limiter(self):
+        self.limiter = Limiter(self, key_func=get_remote_address)

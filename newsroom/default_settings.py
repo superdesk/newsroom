@@ -83,3 +83,8 @@ SIGNUP_EMAIL_RECIPIENTS = os.environ.get('SIGNUP_EMAIL_RECIPIENTS')
 CLIENT_URL = 'http://localhost:5050'
 
 MEDIA_PREFIX = os.environ.get('MEDIA_PREFIX', '')
+
+# Flask Limiter Settings
+RATELIMIT_DEFAULT = '60/hour'
+RATELIMIT_STRATEGY = 'fixed-window'
+RATELIMIT_ENABLED = True

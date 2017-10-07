@@ -159,3 +159,17 @@ def test_login_fails_for_not_approved_user(app, client):
         follow_redirects=True
     )
     assert 'Account has not been approved' in response.get_data(as_text=True)
+
+
+def test_login_fails_for_many_times_gets_limited(client):
+    for i in range(1, 100):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'xyz{}@abc.org'.format(i), 'password': 'abc'},
+            follow_redirects=True
+        )
+        if i <= 60:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+        else:
+            assert '429 Too Many Requests' in response.get_data(as_text=True)
+            break
