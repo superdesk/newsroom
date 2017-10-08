@@ -141,7 +141,7 @@ def signup():
         new_user.pop('csrf_token', None)
         send_new_signup_email(user=new_user)
         return flask.render_template('signup_success.html'), 200
-    return flask.render_template('signup.html', form=form)
+    return flask.render_template('signup.html', form=form, sitekey=app.config['RECAPTCHA_PUBLIC_KEY'])
 
 
 @blueprint.route('/validate/<token>')

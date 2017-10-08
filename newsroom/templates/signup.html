@@ -52,7 +52,10 @@
                                     <label for="company_size">{{ gettext(form.company_size.label.text) }}</label>
                                     {{ form.company_size(class="form-control", id="company_size", required="true") }}
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-lg float-right">
+
+                                <div class="g-recaptcha" data-sitekey={{ sitekey }} data-callback="enableSubmitButton"></div>
+
+                                <button type="submit" class="btn btn-primary btn-lg float-right" id="signup-submit" disabled>
                                     {{ gettext("Sign up") }}</button>
                             </form>
                         </div>
@@ -62,5 +65,17 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script src='https://www.google.com/recaptcha/api.js'></script>
+
+<script>
+    function enableSubmitButton(){
+        document.getElementById("signup-submit").disabled = false;
+    }
+</script>
 
 {% endblock %}

@@ -97,3 +97,7 @@ CACHE_TYPE = 'simple'  # in-memory cache
 CACHE_DEFAULT_TIMEOUT = 3600
 # Redis host (used only if CACHE_TYPE is redis)
 CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+
+# Recaptcha Settings
+RECAPTCHA_PUBLIC_KEY = '6LcEljMUAAAAANxcMEtMPjPTB6IRs1pe5oY5ubSp'
+RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')

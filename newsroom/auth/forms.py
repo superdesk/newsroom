@@ -1,6 +1,5 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
-from wtforms import SelectField
+from flask_wtf import FlaskForm, RecaptchaField
+from wtforms import StringField, PasswordField, SelectField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
@@ -21,6 +20,7 @@ class SignupForm(FlaskForm):
     country = StringField('Your country', validators=[DataRequired()])
     occupation = SelectField('Your position', choices=occupations, validators=[DataRequired()])
     company_size = SelectField('Size of your company', choices=company_sizes, validators=[DataRequired()])
+    recaptcha = RecaptchaField()
 
 
 class LoginForm(FlaskForm):
