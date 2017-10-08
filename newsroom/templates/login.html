@@ -26,6 +26,12 @@
                                     <label for="password">{{ gettext(form.password.label.text) }}</label>
                                     {{ form.password(class="form-control", id="password", required="true") }}
                                 </div>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        {{ form.remember_me(class="form-check-input", id="remember_me") }}
+                                        {{ gettext(form.remember_me.label.text) }}
+                                    </label>
+                                </div>
                                 <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Login") }}</button>
                             </form>
                         </div>

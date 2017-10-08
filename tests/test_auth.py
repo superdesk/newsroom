@@ -267,3 +267,49 @@ def test_account_appears_locked_for_non_existing_user(client):
             assert 'Invalid username or password' in response.get_data(as_text=True)
         else:
             assert 'Your account has been locked' in response.get_data(as_text=True)
+
+
+def test_login_with_remember_me_selected_creates_permanent_session(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'company': 1,
+        'is_validated': True,
+        'is_approved': True,
+        'is_enabled': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+
+    get_resource_service('companies').patch(id=1, updates={'is_enabled': True})
+
+    # login with remember_me = None
+    client.post(
+        url_for('auth.login'),
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+
+    with client.session_transaction() as session:
+        assert session.permanent is False
+
+    # now logout
+    client.get(url_for('auth.logout'), follow_redirects=True)
+
+    # login with remember_me = True
+    client.post(
+        url_for('auth.login'),
+        data={
+            'email': 'test@sourcefabric.org',
+            'password': 'admin',
+            'remember_me': True
+        },
+        follow_redirects=True
+    )
+
+    with client.session_transaction() as session:
+        assert session.permanent is True
