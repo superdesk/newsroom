@@ -173,3 +173,97 @@ def test_login_fails_for_many_times_gets_limited(client):
         else:
             assert '429 Too Many Requests' in response.get_data(as_text=True)
             break
+
+
+def test_account_is_locked_after_5_wrong_passwords(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'company': 1,
+        'is_validated': True,
+        'is_approved': True,
+        'is_enabled': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+    for i in range(1, 10):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'test@sourcefabric.org', 'password': 'wrongone'},
+            follow_redirects=True
+        )
+        if i <= 5:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+        else:
+            assert 'Your account has been locked' in response.get_data(as_text=True)
+            break
+
+    # get the user
+    user = get_resource_service('users').find_one(req=None, email='test@sourcefabric.org')
+    assert user['is_enabled'] is False
+
+
+def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'company': 1,
+        'is_validated': True,
+        'is_approved': True,
+        'is_enabled': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+    for i in range(1, 4):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'test@sourcefabric.org', 'password': 'wrongone'},
+            follow_redirects=True
+        )
+        if i <= 5:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+
+    # correct login will clear the attempt count
+    client.post(
+        url_for('auth.login'),
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+
+    # now logout
+    response = client.get(url_for('auth.logout'), follow_redirects=True)
+
+    # user can try 4 more times
+    for i in range(1, 4):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'test@sourcefabric.org', 'password': 'wrongone'},
+            follow_redirects=True
+        )
+        if i <= 5:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+
+    # get the user
+    user = get_resource_service('users').find_one(req=None, email='test@sourcefabric.org')
+    assert user['is_enabled'] is True
+
+
+def test_account_appears_locked_for_non_existing_user(client):
+    for i in range(1, 10):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'xyz@abc.org'.format(i), 'password': 'abc'},
+            follow_redirects=True
+        )
+        if i <= 5:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+        else:
+            assert 'Your account has been locked' in response.get_data(as_text=True)

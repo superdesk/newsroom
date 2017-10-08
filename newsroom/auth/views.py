@@ -17,7 +17,12 @@ from flask_babel import gettext
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+
+        if not is_valid_login_attempt(form.email.data):
+            return flask.render_template('account_locked.html', form=form)
+
         user = get_resource_service('auth_user').find_one(req=None, email=form.email.data)
+
         if user is not None and _is_password_valid(form.password.data.encode('UTF-8'), user):
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
 
@@ -37,15 +42,53 @@ def login():
     return flask.render_template('login.html', form=form)
 
 
+def is_valid_login_attempt(email):
+    """
+    Checks if the user with given email has exceeded maximum number of
+    allowed attempts before the successful login.
+
+    It increments the number of attempts and if it exceeds then it disables
+    the user account
+    """
+    login_attempt = app.cache.get(email)
+
+    if not login_attempt:
+        app.cache.set(email, {'attempt_count': 0})
+        return True
+
+    login_attempt['attempt_count'] += 1
+    app.cache.set(email, login_attempt)
+    max_attempt_allowed = app.config['MAXIMUM_FAILED_LOGIN_ATTEMPTS']
+
+    if login_attempt['attempt_count'] == max_attempt_allowed:
+        if login_attempt.get('user_id'):
+            get_resource_service('users').patch(
+                id=ObjectId(login_attempt['user_id']),
+                updates={'is_enabled': False})
+        return False
+
+    if login_attempt['attempt_count'] > max_attempt_allowed:
+        return False
+
+    return True
+
+
 def _is_password_valid(password, user):
     """
     Checks the password of the user
     """
+    # user is found so save the id in login attempts
+    previous_login_attempt = app.cache.get(user.get('email'))
+    previous_login_attempt['user_id'] = user.get('_id')
+    app.cache.set(user.get('email'), previous_login_attempt)
+
     hashed = user.get('password').encode('UTF-8')
 
     if not bcrypt.checkpw(password, hashed):
         return False
 
+    # login successful so remove the login attempt check record
+    app.cache.delete(user.get('email'))
     return True
 
 
@@ -132,6 +175,8 @@ def reset_password(token):
         get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
         flask.flash(gettext('Your password has been changed. Please login again.'), 'success')
         return flask.redirect(flask.url_for('auth.login'))
+
+    app.cache.delete(user.get('email'))
     return flask.render_template('reset_password.html', form=form, token=token)
 
 

@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container py-6">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0">{{ gettext("Your account has been locked") }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ gettext("We have detected suspicious activity on your account and have locked it.") }}</p>
+                            <p>{{ gettext("Please contact Newsroom administrator to unlock your account") }}</p>
+                            <a class="btn btn-primary"  href="{{ url_for('wire.index') }}">{{ gettext('Home') }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

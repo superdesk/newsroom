@@ -8,7 +8,7 @@ from newsroom.users import blueprint
 from flask_babel import gettext
 from newsroom.auth.decorator import admin_only
 from newsroom.auth.views import send_token, add_token_data, send_reset_password_email
-from flask import jsonify
+from flask import jsonify, current_app as app
 import re
 
 
@@ -74,6 +74,7 @@ def edit(id):
                 updates['company'] = ObjectId(form.company.data)
 
             get_resource_service('users').patch(id=ObjectId(id), updates=updates)
+            app.cache.delete(user.get('email'))
             return jsonify({'success': True}), 200
         return jsonify(form.errors), 400
 

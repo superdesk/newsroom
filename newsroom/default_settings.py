@@ -74,6 +74,8 @@ MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 RESET_PASSWORD_TOKEN_TIME_TO_LIVE = 1
 #: The number of days a validation token is valid
 VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 1
+#: The number login attempts allowed before account is locked
+MAXIMUM_FAILED_LOGIN_ATTEMPTS = 5
 #: default sender for superdesk emails
 MAIL_DEFAULT_SENDER = MAIL_USERNAME or 'newsroom@localhost'
 # Recipients for the sign up form filled by new users (single or comma separated)
@@ -88,3 +90,10 @@ MEDIA_PREFIX = os.environ.get('MEDIA_PREFIX', '')
 RATELIMIT_DEFAULT = '60/hour'
 RATELIMIT_STRATEGY = 'fixed-window'
 RATELIMIT_ENABLED = True
+
+# Cache Settings
+CACHE_TYPE = 'simple'  # in-memory cache
+# The default timeout that is used if no timeout is specified in sec
+CACHE_DEFAULT_TIMEOUT = 3600
+# Redis host (used only if CACHE_TYPE is redis)
+CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
