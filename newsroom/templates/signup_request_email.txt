@@ -1,0 +1,21 @@
+Hi {{app_name}} Administrator,
+
+There's a new sign up request with the following details:
+
+
+First Name:     {{user.first_name}}
+Last Name:      {{user.last_name}}
+Email:          {{user.email}}
+Telephone:      {{user.phone}}
+Country:        {{user.country}}
+Company:        {{user.company}}
+Occupation:     {{user.occupation}}
+Company Size:   {{user.company_size}}
+
+
+Please go to {{url}} to create a new user.
+
+
+Regards,
+{{app_name}}
+

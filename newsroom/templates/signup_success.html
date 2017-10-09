@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container py-6">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0">{{ gettext("Newsroom sign up") }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ gettext("Thank you for your interest in Newsroom") }}</p>
+                            <p>{{ gettext("Your sign up request has been sent successfully") }}</p>
+                            <p>{{ gettext("One of our team members will be in touch with you shortly") }}</p>
+                            <a class="btn btn-primary"  href="{{ url_for('wire.index') }}">{{ gettext('Home') }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,23 +1,14 @@
 import datetime
 from flask import url_for
+from bson import ObjectId
 from pytest import fixture
 from superdesk import get_resource_service
+from tests.test_users import init as users_init
 
 
 @fixture(autouse=True)
 def init(app):
-    app.data.insert('users', [{
-        '_id': 1,
-        'first_name': 'admin',
-        'last_name': 'admin',
-        'email': 'admin@sourcefabric.org',
-        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
-        'user_type': 'administrator',
-        'is_validated': True,
-        'is_enabled': True,
-        'is_approved': True,
-    }])
-
+    users_init(app)
     app.data.insert('companies', [{
         '_id': 1,
         'name': 'Press co.',
@@ -25,75 +16,30 @@ def init(app):
     }])
 
 
-def test_new_user_signup_succeeds(app, client):
-    # Register a new account
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'password': 'abc',
-        'password2': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'
-    })
-    assert response.status_code == 302
+def test_new_user_signup_sends_email(app, client):
+    app.config['SIGNUP_EMAIL_RECIPIENTS'] = 'admin@bar.com'
+    with app.mail.record_messages() as outbox:
+        # Sign up
+        response = client.post(url_for('auth.signup'), data={
+            'email': 'newuser@abc.org',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'country': 'Australia',
+            'phone': '1234567',
+            'company': 'Press co.',
+            'company_size': '0-10',
+            'occupation': 'Other'
+        })
+        assert response.status_code == 200
 
-    # validate the email address
-    user = list(app.data.find('users', req=None, lookup={'email': 'newuser@abc.org'}))[0]
-    client.get(url_for('auth.validate_account', token=user['token']))
-
-    # Login with the new account succeeds
-    response = client.post(
-        url_for('auth.login'),
-        data={'email': 'newuser@abc.org', 'password': 'abc'},
-        follow_redirects=True
-    )
-    assert response.status_code == 200
-    assert 'John Doe' in response.get_data(as_text=True)
-
-    # Logout
-    response = client.get(url_for('auth.logout'), follow_redirects=True)
-    txt = response.get_data(as_text=True)
-    assert 'John Doe' not in txt
-    assert 'Login' in txt
-
-
-def test_new_user_signup_fails_if_email_exists(client):
-    # Register a new account
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'password': 'abc',
-        'password2': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'
-    })
-
-    # Register another account with same email
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
-        'first_name': 'John',
-        'last_name': 'Smith',
-        'password': '123',
-        'password2': '123',
-        'phone': '1234567',
-        'country': 'Australia',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'
-    })
-
-    assert 'Email address is already in use' in response.get_data(as_text=True)
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['admin@bar.com']
+        assert outbox[0].subject == 'A new newsroom signup request'
+        assert 'newuser@abc.org' in outbox[0].body
+        assert 'John' in outbox[0].body
+        assert 'Doe' in outbox[0].body
+        assert '1234567' in outbox[0].body
+        assert 'Press co.' in outbox[0].body
 
 
 def test_new_user_signup_fails_if_fields_not_provided(client):
@@ -113,45 +59,6 @@ def test_new_user_signup_fails_if_fields_not_provided(client):
     assert 'occupation: Not a valid choice' in txt
 
 
-def test_new_user_signup_fails_if_passwords_do_not_match(client):
-    # Register a new account
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'password': 'abc',
-        'password2': '123',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'
-    })
-    assert 'password: Passwords must match' in response.get_data(as_text=True)
-
-
-def test_new_user_has_correct_flags(client):
-    # Register a new account
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'password': 'abc',
-        'password2': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'
-    })
-    assert response.status_code == 302
-    user = get_resource_service('users').find_one(req=None, email='newuser@abc.org')
-    assert not user['is_approved']
-    assert user['is_enabled']
-    assert not user['is_validated']
-
-
 def test_login_fails_for_wrong_username_or_password(client):
     response = client.post(
         url_for('auth.login'),
@@ -161,81 +68,72 @@ def test_login_fails_for_wrong_username_or_password(client):
     assert 'Invalid username or password' in response.get_data(as_text=True)
 
 
-def test_login_fails_for_disabled_user(client):
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'password': 'abc',
-        'password2': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'
-    })
-    assert response.status_code == 302
-    user = get_resource_service('users').find_one(req=None, email='newuser@abc.org')
-    get_resource_service('users').patch(id=user['_id'], updates={'is_enabled': False, 'is_validated': True})
+def test_login_fails_for_disabled_user(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'test',
+        'last_name': 'test',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'is_validated': True,
+        'is_enabled': False,
+        'is_approved': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+
     response = client.post(
         url_for('auth.login'),
-        data={'email': 'newuser@abc.org', 'password': 'abc'},
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
         follow_redirects=True
     )
-    # print(response.get_data(as_text=True))
-    # print(response.status_code)
     assert 'Account is disabled' in response.get_data(as_text=True)
 
 
-def test_login_fails_for_user_with_disabled_company(client):
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'password': 'abc',
-        'password2': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'
-    })
-    assert response.status_code == 302
-    user = get_resource_service('users').find_one(req=None, email='newuser@abc.org')
-    get_resource_service('users').patch(id=user['_id'],
-                                        updates={'is_enabled': True, 'is_validated': True, 'company': 1})
+def test_login_fails_for_user_with_disabled_company(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'test',
+        'last_name': 'test',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'company': 1,
+        'is_validated': True,
+        'is_enabled': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+
     response = client.post(
         url_for('auth.login'),
-        data={'email': 'newuser@abc.org', 'password': 'abc'},
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
         follow_redirects=True
     )
     assert 'Company account has been disabled' in response.get_data(as_text=True)
 
 
-def test_login_for_user_with_enabled_company_succeeds(client):
-    response = client.post(url_for('auth.signup'), data={
-        'email': 'newuser@abc.org',
-        'email2': 'newuser@abc.org',
+def test_login_for_user_with_enabled_company_succeeds(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
         'first_name': 'John',
         'last_name': 'Doe',
-        'password': 'abc',
-        'password2': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': 'Press co.',
-        'company_size': '0-10',
-        'occupation': 'Other'
-    })
-    assert response.status_code == 302
-    user = get_resource_service('users').find_one(req=None, email='newuser@abc.org')
-    get_resource_service('users').patch(id=user['_id'],
-                                        updates={'is_enabled': True, 'is_validated': True, 'company': 1})
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'company': 1,
+        'is_validated': True,
+        'is_approved': True,
+        'is_enabled': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+
     get_resource_service('companies').patch(id=1, updates={'is_enabled': True})
     response = client.post(
         url_for('auth.login'),
-        data={'email': 'newuser@abc.org', 'password': 'abc'},
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
         follow_redirects=True
     )
     assert 'John Doe' in response.get_data(as_text=True)
@@ -244,7 +142,7 @@ def test_login_for_user_with_enabled_company_succeeds(client):
 def test_login_fails_for_not_approved_user(app, client):
     # If user is created more than 14 days ago login fails
     app.data.insert('users', [{
-        '_id': 2,
+        '_id': ObjectId(),
         'first_name': 'test',
         'last_name': 'test',
         'email': 'test@sourcefabric.org',
@@ -261,3 +159,157 @@ def test_login_fails_for_not_approved_user(app, client):
         follow_redirects=True
     )
     assert 'Account has not been approved' in response.get_data(as_text=True)
+
+
+def test_login_fails_for_many_times_gets_limited(client):
+    for i in range(1, 100):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'xyz{}@abc.org'.format(i), 'password': 'abc'},
+            follow_redirects=True
+        )
+        if i <= 60:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+        else:
+            assert '429 Too Many Requests' in response.get_data(as_text=True)
+            break
+
+
+def test_account_is_locked_after_5_wrong_passwords(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'company': 1,
+        'is_validated': True,
+        'is_approved': True,
+        'is_enabled': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+    for i in range(1, 10):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'test@sourcefabric.org', 'password': 'wrongone'},
+            follow_redirects=True
+        )
+        if i <= 5:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+        else:
+            assert 'Your account has been locked' in response.get_data(as_text=True)
+            break
+
+    # get the user
+    user = get_resource_service('users').find_one(req=None, email='test@sourcefabric.org')
+    assert user['is_enabled'] is False
+
+
+def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'company': 1,
+        'is_validated': True,
+        'is_approved': True,
+        'is_enabled': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+    for i in range(1, 4):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'test@sourcefabric.org', 'password': 'wrongone'},
+            follow_redirects=True
+        )
+        if i <= 5:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+
+    # correct login will clear the attempt count
+    client.post(
+        url_for('auth.login'),
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+
+    # now logout
+    response = client.get(url_for('auth.logout'), follow_redirects=True)
+
+    # user can try 4 more times
+    for i in range(1, 4):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'test@sourcefabric.org', 'password': 'wrongone'},
+            follow_redirects=True
+        )
+        if i <= 5:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+
+    # get the user
+    user = get_resource_service('users').find_one(req=None, email='test@sourcefabric.org')
+    assert user['is_enabled'] is True
+
+
+def test_account_appears_locked_for_non_existing_user(client):
+    for i in range(1, 10):
+        response = client.post(
+            url_for('auth.login'),
+            data={'email': 'xyz@abc.org'.format(i), 'password': 'abc'},
+            follow_redirects=True
+        )
+        if i <= 5:
+            assert 'Invalid username or password' in response.get_data(as_text=True)
+        else:
+            assert 'Your account has been locked' in response.get_data(as_text=True)
+
+
+def test_login_with_remember_me_selected_creates_permanent_session(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'company': 1,
+        'is_validated': True,
+        'is_approved': True,
+        'is_enabled': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+
+    get_resource_service('companies').patch(id=1, updates={'is_enabled': True})
+
+    # login with remember_me = None
+    client.post(
+        url_for('auth.login'),
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+
+    with client.session_transaction() as session:
+        assert session.permanent is False
+
+    # now logout
+    client.get(url_for('auth.logout'), follow_redirects=True)
+
+    # login with remember_me = True
+    client.post(
+        url_for('auth.login'),
+        data={
+            'email': 'test@sourcefabric.org',
+            'password': 'admin',
+            'remember_me': True
+        },
+        follow_redirects=True
+    )
+
+    with client.session_transaction() as session:
+        assert session.permanent is True

@@ -6,7 +6,8 @@ from flask import current_app as app
 import bcrypt
 from newsroom.auth import blueprint
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
-from newsroom.email import send_validate_account_email, send_reset_password_email
+from newsroom.email import send_validate_account_email, \
+    send_reset_password_email, send_new_signup_email
 from newsroom.utils import get_random_string
 from bson import ObjectId
 from flask_babel import gettext
@@ -16,7 +17,12 @@ from flask_babel import gettext
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+
+        if not is_valid_login_attempt(form.email.data):
+            return flask.render_template('account_locked.html', form=form)
+
         user = get_resource_service('auth_user').find_one(req=None, email=form.email.data)
+
         if user is not None and _is_password_valid(form.password.data.encode('UTF-8'), user):
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
 
@@ -28,21 +34,62 @@ def login():
                 flask.session['user'] = str(user['_id'])  # str to avoid serialization issues
                 flask.session['name'] = '{} {}'.format(user.get('first_name'), user.get('last_name'))
                 flask.session['user_type'] = user['user_type']
+                flask.session.permanent = form.remember_me.data
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
+            else:
+                flask.flash(gettext('Account is disabled.'), 'danger')
         else:
             flask.flash(gettext('Invalid username or password.'), 'danger')
     return flask.render_template('login.html', form=form)
+
+
+def is_valid_login_attempt(email):
+    """
+    Checks if the user with given email has exceeded maximum number of
+    allowed attempts before the successful login.
+
+    It increments the number of attempts and if it exceeds then it disables
+    the user account
+    """
+    login_attempt = app.cache.get(email)
+
+    if not login_attempt:
+        app.cache.set(email, {'attempt_count': 0})
+        return True
+
+    login_attempt['attempt_count'] += 1
+    app.cache.set(email, login_attempt)
+    max_attempt_allowed = app.config['MAXIMUM_FAILED_LOGIN_ATTEMPTS']
+
+    if login_attempt['attempt_count'] == max_attempt_allowed:
+        if login_attempt.get('user_id'):
+            get_resource_service('users').patch(
+                id=ObjectId(login_attempt['user_id']),
+                updates={'is_enabled': False})
+        return False
+
+    if login_attempt['attempt_count'] > max_attempt_allowed:
+        return False
+
+    return True
 
 
 def _is_password_valid(password, user):
     """
     Checks the password of the user
     """
+    # user is found so save the id in login attempts
+    previous_login_attempt = app.cache.get(user.get('email'))
+    previous_login_attempt['user_id'] = user.get('_id')
+    app.cache.set(user.get('email'), previous_login_attempt)
+
     hashed = user.get('password').encode('UTF-8')
 
     if not bcrypt.checkpw(password, hashed):
         return False
 
+    # login successful so remove the login attempt check record
+    app.cache.delete(user.get('email'))
     return True
 
 
@@ -92,35 +139,10 @@ def signup():
     form = SignupForm()
     if form.validate_on_submit():
         new_user = form.data
-        _modify_user_data(new_user)
-        add_token_data(new_user)
-        get_resource_service('users').post([new_user])
-        send_validate_account_email(new_user['first_name'], new_user['email'], new_user['token'])
-        flask.flash(gettext('Validation email has been sent. Please check your emails.'), 'success')
-        return flask.redirect(flask.url_for('auth.login'))
-    return flask.render_template('signup.html', form=form)
-
-
-def _modify_user_data(new_user):
-    """
-    Modifies the user data to make it compatible with user schema
-    """
-    new_user['signup_details'] = {
-        'company': new_user.get('company'),
-        'occupation': new_user.get('occupation'),
-        'company_size': new_user.get('company_size'),
-    }
-    new_user.pop('email2', None)
-    new_user.pop('password2', None)
-    new_user.pop('company', None)
-    new_user.pop('occupation', None)
-    new_user.pop('company_size', None)
-    new_user.pop('csrf_token', None)
-
-
-def add_token_data(user):
-    user['token'] = get_random_string()
-    user['token_expiry_date'] = utcnow() + timedelta(days=app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'])
+        new_user.pop('csrf_token', None)
+        send_new_signup_email(user=new_user)
+        return flask.render_template('signup_success.html'), 200
+    return flask.render_template('signup.html', form=form, sitekey=app.config['RECAPTCHA_PUBLIC_KEY'])
 
 
 @blueprint.route('/validate/<token>')
@@ -154,6 +176,8 @@ def reset_password(token):
         get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
         flask.flash(gettext('Your password has been changed. Please login again.'), 'success')
         return flask.redirect(flask.url_for('auth.login'))
+
+    app.cache.delete(user.get('email'))
     return flask.render_template('reset_password.html', form=form, token=token)
 
 
@@ -183,3 +207,8 @@ def send_token(user, token_type='validate'):
             send_reset_password_email(user['first_name'], user['email'], updates['token'])
         return True
     return False
+
+
+def add_token_data(user):
+    user['token'] = get_random_string()
+    user['token_expiry_date'] = utcnow() + timedelta(days=app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'])

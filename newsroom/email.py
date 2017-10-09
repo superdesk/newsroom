@@ -23,6 +23,20 @@ def send_email(to, subject, text_body, html_body=None, sender=None, connection=N
     return app.mail.send(msg)
 
 
+def send_new_signup_email(user):
+    app_name = current_app.config['SITE_NAME']
+    url = '{}/settings'.format(current_app.config['CLIENT_URL'])
+    recipients = current_app.config['SIGNUP_EMAIL_RECIPIENTS'].split(',')
+    subject = 'A new newsroom signup request'
+    text_body = render_template(
+        'signup_request_email.txt',
+        app_name=app_name,
+        user=user,
+        url=url)
+
+    send_email(to=recipients, subject=subject, text_body=text_body)
+
+
 def send_validate_account_email(user_name, user_email, token):
     """
     Forms and sends validation email
