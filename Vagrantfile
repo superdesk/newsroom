@@ -51,6 +51,7 @@ if [ -f /tmp/client.pid ]; then
 fi
 
 export NODE_PATH=/opt/node_modules
+export NODE_MODULES=/opt/node_modules
 /opt/node_modules/webpack-dev-server/bin/webpack-dev-server.js \
     --quiet \
     --host 0.0.0.0 \
