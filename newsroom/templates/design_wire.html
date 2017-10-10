@@ -5,8 +5,10 @@
 {% block contentHeader %}
 
 <nav class="content-bar navbar justify-content-start">
-    <span class="content-bar__menu content-bar__menu--nav"><img src="{{ url_for('static', filename = 'menu.png') }}" width="20" height="20"/></span>
-
+    <span class="content-bar__menu content-bar__menu--nav">
+        <i class="icon--hamburger"></i>
+        <i class="icon--close-thin icon--white"></i>
+    </span>
     <div class="search form-inline">
         <div class="dropdown">
             <button class="content-bar__dropdown-btn btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -18,7 +20,7 @@
             </div>
         </div>
         <span class="search__icon">
-            <img src="{{ url_for('static', filename = 'search_icon.png') }}" width="20" height="20"/>
+            <i class="icon--search icon--gray-light"></i>
         </span>
         <div class="search__form input-group">
             <form class="form-inline">
@@ -51,7 +53,7 @@
 
         <div class="btn-group">
             <span class="content-bar__menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img src="{{ url_for('static', filename = 'list_icon.png') }}" width="20" height="20"/>
+                <i class="icon--list-view"></i>
             </span>
             <div class="dropdown-menu dropdown-menu-right">
                 <h6 class="dropdown-header">Change view</h6>
@@ -112,10 +114,10 @@
                         <div class="wire-articles__item__meta">
                             <div class="wire-articles__item__icons">
                                 <span class="wire-articles__item__icon">
-                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                    <i class="icon--text icon--gray-light"></i>
                                 </span>
                                 <span class="wire-articles__item__icon">
-                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                    <i class="icon--photo icon--gray-light"></i>
                                 </span>
                                 <span class="wire-articles__item__divider">
                                 </span>
@@ -134,14 +136,14 @@
                     </div>
                     <div class="wire-articles__item--list__image">
                         <span class="wire-articles__item--list__image-icon">
-                            <img src="{{ url_for('static', filename = 'image-icon.png') }}" width="24" height="24"/>
+                            <i class="icon--resize icon--white"></i>
                         </span>
                         <figure>
                             <img src="{{ url_for('static', filename = 'list_image.png') }}" width="157" height="157"/>
                         </figure>
                     </div>
                     <div class="wire-articles__item--list__actions">
-                        <img src="{{ url_for('static', filename = 'vertical_dots.png') }}" width="4" height="18"/>
+                        <i class="icon--more icon--gray-light"></i>
                     </div>
                 </div>
 
@@ -188,10 +190,10 @@
                         <div class="wire-articles__item__meta">
                             <div class="wire-articles__item__icons">
                                 <span class="wire-articles__item__icon">
-                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                   <i class="icon--text icon--gray-light"></i>
                                 </span>
                                 <span class="wire-articles__item__icon">
-                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                   <i class="icon--photo icon--gray-light"></i>
                                 </span>
                                 <span class="wire-articles__item__divider">
                                 </span>
@@ -210,7 +212,7 @@
                     </div>
 
                     <div class="wire-articles__item--list__actions">
-                        <img src="{{ url_for('static', filename = 'vertical_dots.png') }}" width="4" height="18"/>
+                        <i class="icon--more icon--gray-light"></i>
                     </div>
                 </div>
 
@@ -257,10 +259,10 @@
                         <div class="wire-articles__item__meta">
                             <div class="wire-articles__item__icons">
                                 <span class="wire-articles__item__icon">
-                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                   <i class="icon--text icon--gray-light"></i>
                                 </span>
                                 <span class="wire-articles__item__icon">
-                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                   <i class="icon--photo icon--gray-light"></i>
                                 </span>
                                 <span class="wire-articles__item__divider">
                                 </span>
@@ -279,14 +281,14 @@
                     </div>
                     <div class="wire-articles__item--list__image">
                         <span class="wire-articles__item--list__image-icon">
-                            <img src="{{ url_for('static', filename = 'image-icon.png') }}" width="24" height="24"/>
+                            <i class="icon--resize icon--white"></i>
                         </span>
                         <figure>
                             <img src="{{ url_for('static', filename = 'list_image.png') }}" width="157" height="157"/>
                         </figure>
                     </div>
                     <div class="wire-articles__item--list__actions">
-                        <img src="{{ url_for('static', filename = 'vertical_dots.png') }}" width="4" height="18"/>
+                        <i class="icon--more icon--gray-light"></i>
                     </div>
                 </div>
 
@@ -333,10 +335,10 @@
                         <div class="wire-articles__item__meta">
                             <div class="wire-articles__item__icons">
                                 <span class="wire-articles__item__icon">
-                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                   <i class="icon--text icon--gray-light"></i>
                                 </span>
                                 <span class="wire-articles__item__icon">
-                                    <img src="{{ url_for('static', filename = 'meta_icon.png') }}" width="20" height="22"/>
+                                   <i class="icon--photo icon--gray-light"></i>
                                 </span>
                                 <span class="wire-articles__item__divider">
                                 </span>
@@ -355,14 +357,14 @@
                     </div>
                     <div class="wire-articles__item--list__image">
                         <span class="wire-articles__item--list__image-icon">
-                            <img src="{{ url_for('static', filename = 'image-icon.png') }}" width="24" height="24"/>
+                            <i class="icon--resize icon--white"></i>
                         </span>
                         <figure>
                             <img src="{{ url_for('static', filename = 'list_image.png') }}" width="157" height="157"/>
                         </figure>
                     </div>
                     <div class="wire-articles__item--list__actions">
-                        <img src="{{ url_for('static', filename = 'vertical_dots.png') }}" width="4" height="18"/>
+                        <i class="icon--more icon--gray-light"></i>
                     </div>
                 </div>
 

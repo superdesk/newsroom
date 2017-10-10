@@ -1,0 +1,139 @@
+@mixin fontFace($family,$src,$style,$weight) {
+	@font-face {
+		font-family: $family;
+		src: url('#{$src}.eot'); // IE9 compat
+		src: url('#{$src}.eot?#iefix') format('embedded-opentype'), // IE8 and below
+			url('#{$src}.woff') format('woff'), // standards
+			url('#{$src}.ttf') format('truetype'), // Safari, Android, iOS
+			url('#{$src}.svg##{$family}') format('svg'); // legacy iOS
+
+		font-style: $style;
+		font-weight: $weight;
+	}
+}
+@include fontFace('aap_newsroom_icons','/static/fonts/aap_newsroom_icons', normal, normal);
+
+@mixin icon-base {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    font-family: 'aap_newsroom_icons';
+    font-size: 24px;
+    color: $main_blue;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+  }
+
+[class^="icon--"], [class*=" icon--"] {
+    @include icon-base;
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'aap_newsroom_icons' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+    &.icon--gray-light {
+        color: $gray-light;
+    }
+    &.icon--mid-blue {
+        color: $mid-blue;
+    }
+    &.icon--white {
+        color: #fff;
+    }
+}
+
+.icon--alert:before {
+    content: "\e600";
+}
+.icon--bookmark:before,
+.icon--Bookmarks:before {
+    content: "\e601";
+}
+.icon--bookmark-add:before {
+    content: "\e602";
+}
+.icon--calendar:before {
+    content: "\e603";
+}
+.icon--check:before {
+    content: "\e604";
+}
+.icon--close-thin:before {
+    content: "\e605";
+}
+.icon--close-large:before {
+    content: "\e606";
+}
+.icon--cog:before {
+    content: "\e607";
+}
+.icon--copy:before {
+    content: "\e608";
+}
+.icon--dashboard:before {
+    content: "\e609";
+}
+.icon--download:before {
+    content: "\e60a";
+}
+.icon--edit:before {
+    content: "\e60b";
+}
+.icon--grid-view:before {
+    content: "\e60c";
+}
+.icon--hamburger:before {
+    content: "\e60d";
+}
+.icon--list-view-compact:before {
+    content: "\e60e";
+}
+.icon--list-view:before {
+    content: "\e60f";
+}
+.icon--more:before {
+    content: "\e610";
+}
+.icon--personal:before {
+    content: "\e611";
+}
+.icon--photo:before {
+    content: "\e612";
+}
+.icon--print:before {
+    content: "\e613";
+}
+.icon--resize:before {
+    content: "\e614";
+}
+.icon--search:before {
+    content: "\e615";
+}
+.icon--settings:before {
+    content: "\e616";
+}
+.icon--share:before {
+    content: "\e617";
+}
+.icon--sort:before {
+    content: "\e618";
+}
+.icon--text:before,
+.icon--Wire:before {
+    content: "\e619";
+}
+.icon--trash:before {
+    content: "\e61a";
+}
