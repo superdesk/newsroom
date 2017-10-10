@@ -1,6 +1,3 @@
-$primary-color: #444;
-$background-color: #f8f8f8;
-
 html {
     -webkit-tap-highlight-color: transparent;
     height: 100%;
@@ -8,7 +5,7 @@ html {
 
 body {
     font-family: 'Merriweather', serif;
-    color: $primary-color;
+    color: $body-text;
     background-color: $background-color;
     overflow: hidden;
     height: 100%;
@@ -75,7 +72,8 @@ body.print {
 
 .sidenav {
     flex: 0 0 56px;
-    background-color: #00acec;
+    background-color: $main-blue;
+    position: relative;
 }
 
 .sidenav:after {
@@ -87,17 +85,30 @@ body.print {
     top: 0;
     bottom: 0px;
     right: 0;
-    background-image: linear-gradient(to left,rgba(0,0,0,.15) 0,transparent 100%);
+    background-image: linear-gradient(to left,rgba(0,0,0,.12) 0,transparent 100%);
 }
 
 .sidenav-icons {
   margin: 0px;
   padding: 0px;
+  li {
+      a, span {
+          display: block;
+          height: 54px;
+          line-height: 54px; 
+          text-align: center;
+          i {
+              vertical-align: middle;
+          }
+      }
+  }
 }
 
 .sidenav-icons__item--admin {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .content-header {
@@ -120,7 +131,10 @@ body.print {
   background: #006f99;
   padding: 11px 0 0 11px;
 }
-
+.navbar-brand {
+    margin-left: 2rem;
+    opacity: .6;
+}
 nav.search {
     width: 100%;
 }
@@ -186,10 +200,19 @@ article.list {
 
 .content-bar__menu--nav {
     background: #ededed;
+    .icon--close-thin {
+        display: none;
+    }
 }
 
 .content-bar__menu--nav--open {
     background: #717b96;
+    .icon--hamburger {
+        display: none;
+    }
+    .icon--close-thin {
+        display: block;
+    }
 }
 
 .content-bar__menu + .dropdown-menu {
@@ -327,6 +350,7 @@ article.list {
 
 .wire-column__nav {
     background: #3e4557;
+    max-width: 260px;
     a {
         color: #fff;
     }
@@ -345,7 +369,7 @@ article.list {
         color: #8b8f9a;
         &.active {
             color: #fff;
-            border-bottom: 3px solid #00acec;
+            border-bottom: 3px solid $main-blue;
         }
     }
 }
@@ -392,7 +416,7 @@ article.list {
         text-decoration: none;
     }
     &.wire-button--active {
-        color: #00acec;
+        color: $main-blue;
         border: 1px solid #1982b0;
     }
 }
@@ -451,6 +475,7 @@ article.list {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    flex-basis: 100%; // IE fix
 }
 
 .wire-articles__item--list__headline {
@@ -524,7 +549,7 @@ article.list {
 .wire-articles__item__versions-btn {
     font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.8125rem;
-    color: #00acec;
+    color: $main-blue;
 }
 
 .wire-articles__item__versions-btn--open {

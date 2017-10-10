@@ -27,7 +27,7 @@
             <img src="{{ url_for('static', filename = 'aap.png') }}" width="32" height="32"/>
         </div>
         <div class="navbar-brand">
-            <nav class="breadrumb">
+            <nav>
                 <a class="breadcrumb-item text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }}</a>
                 {% block breadcrumb %}{% endblock %}
             </nav>
@@ -51,18 +51,15 @@
 
         <nav class="sidenav">
 
-            <ul class="sidenav-icons">
-              <li class="sidenav-icons__item">E</li>
-              <li class="sidenav-icons__item sidenav-icons__item--admin">A</li>
-
-              <li class="sidenav-icons__item text-white">---</li>
+            <ul class="sidenav-icons">              
+              <li class="sidenav-icons__item sidenav-icons__item--admin"><a href="#" title=""><i class="icon--cog icon--mid-blue"></i></a></li>
 
               {% for nav in sidenavs %}
-              <li class="sidenav-icons__item text-white {% if request.endpoint == nav.endpoint %}active{% endif %}">
+              <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %}">
                   {% if request.endpoint == nav.endpoint %}
-                  <span>{{ nav.name }}</span>
+                  <span><i class="icon--{{ nav.name }} icon--white"></i></span>
                   {% else %}
-                  <a class="text-white" href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}">{{ nav.name }}</a>
+                  <a href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}"><i class="icon--{{ nav.name }} icon--mid-blue"></i></a>
                   {% endif %}
               </li>
               {% endfor %}
