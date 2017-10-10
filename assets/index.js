@@ -15,6 +15,8 @@ var listItem = document.getElementsByClassName('wire-articles__item');
 var currentItem;
 for(var i = 0; i < listItem.length; i++) {
     listItem[i].onclick = function(event) {
+        document.getElementsByClassName('wire-articles__item')[0].classList.toggle('wire-articles__item--open');
+
         if (event.target.classList[0] === 'no-bindable') {
             document.getElementsByClassName('wire-articles__versions')[0].classList.toggle('wire-articles__versions--open');
             return false;
