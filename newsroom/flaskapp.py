@@ -33,6 +33,8 @@ class Newsroom(eve.Eve):
         """Override __init__ to do Newsroom specific config and still be able
         to create an instance using ``app = Newsroom()``
         """
+        self.sidenavs = []
+
         app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
 
         # get content api default conf
@@ -98,6 +100,7 @@ class Newsroom(eve.Eve):
 
         self.add_template_filter(datetime_short, 'datetime_short')
         self.add_template_filter(datetime_long, 'datetime_long')
+        self.add_template_global(self.sidenavs, 'sidenavs')
 
     def _setup_webpack(self):
         NewsroomWebpack(self)
@@ -111,3 +114,7 @@ class Newsroom(eve.Eve):
     def _setup_cache(self):
         # configuring for in-memory cache for now
         self.cache = Cache(self)
+
+    def sidenav(self, name, endpoint, icon=None):
+        """Register an item in sidebar menu."""
+        self.sidenavs.append({'name': name, 'endpoint': endpoint, icon: icon})

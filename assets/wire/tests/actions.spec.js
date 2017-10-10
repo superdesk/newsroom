@@ -7,7 +7,7 @@ import fetchMock from 'fetch-mock';
 import wireApp from '../reducers';
 import * as actions from '../actions';
 
-describe('fetch actions', () => {
+describe('wire actions', () => {
     let store;
     const response = {
         _meta: {total: 1},
@@ -55,5 +55,17 @@ describe('fetch actions', () => {
         expect(store.getState().selectedItems).toEqual(['foo', 'bar']);
         store.dispatch(actions.selectNone());
         expect(store.getState().selectedItems).toEqual([]);
+    });
+
+    it('can bookmark items', () => {
+        fetchMock.post('/wire_bookmark', {});
+        fetchMock.delete('/wire_bookmark', {});
+
+        store.dispatch(actions.bookmarkItems(['foo', 'bar']));
+        expect(fetchMock.called('/wire_bookmark')).toBeTruthy();
+        fetchMock.reset();
+
+        store.dispatch(actions.removeBookmarks('foo'));
+        expect(fetchMock.called('/wire_bookmark')).toBeTruthy();
     });
 });

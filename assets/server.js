@@ -50,10 +50,11 @@ class Server {
      * @param {String} url
      * @return {Promise}
      */
-    del(url) {
+    del(url, data) {
         return fetch(url, options({
             method: 'DELETE',
             headers: {'Content-Type': 'application/json'},
+            body: data ? JSON.stringify(data) : null,
         })).then(checkStatus);
     }
 }

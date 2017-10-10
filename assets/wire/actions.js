@@ -84,7 +84,8 @@ export function fetchItems() {
     return (dispatch, getState) => {
         dispatch(queryItems());
         const query = getState().query || '';
-        return server.get(`/search?q=${query}`)
+        const bookmarks = getState().bookmarks ? `&bookmarks=${getState().user}` : '';
+        return server.get(`/search?q=${query}${bookmarks}`)
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
                 const params = new URLSearchParams(window.location.search);
@@ -164,6 +165,21 @@ export function selectAll() {
 export const SELECT_NONE = 'SELECT_NONE';
 export function selectNone() {
     return {type: SELECT_NONE};
+}
+
+export function bookmarkItems(items) {
+    return () =>
+        server.post('/wire_bookmark', {items})
+            .then(() => notify.success(gettext('Items were bookmarked successfully.')))
+            .catch(errorHandler);
+}
+
+export function removeBookmarks(items) {
+    return (dispatch) =>
+        server.del('/wire_bookmark', {items: items})
+            .then(() => notify.success(gettext('Items were removed from bookmarks successfully.')))
+            .then(() => dispatch(fetchItems()))
+            .catch(errorHandler);
 }
 
 function errorHandler(reason) {

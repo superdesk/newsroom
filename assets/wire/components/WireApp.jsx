@@ -12,6 +12,8 @@ import {
     setQuery,
     selectAll,
     selectNone,
+    bookmarkItems,
+    removeBookmarks,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -90,6 +92,7 @@ class WireApp extends React.Component {
                                 <SearchResultsInfo
                                     user={this.props.user}
                                     query={this.props.activeQuery}
+                                    bookmarks={this.props.bookmarks}
                                     totalItems={this.props.totalItems}
                                     followTopic={this.props.followTopic}
                                     topics={this.props.topics}
@@ -138,6 +141,7 @@ WireApp.propTypes = {
     selectedItems: PropTypes.array,
     selectAll: PropTypes.func,
     selectNone: PropTypes.func,
+    bookmarks: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -150,6 +154,7 @@ const mapStateToProps = (state) => ({
     company: state.company,
     topics: state.topics,
     selectedItems: state.selectedItems,
+    bookmarks: state.bookmarks,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -185,6 +190,18 @@ const mapDispatchToProps = (dispatch) => ({
             multi: true,
             when: (state) => state.user && state.company,
             action: (items) => window.open(`/download/${items.join(',')}`, '_blank'),
+        },
+        {
+            name: gettext('Bookmark'),
+            multi: true,
+            when: (state) => state.user && !state.bookmarks,
+            action: (items) => dispatch(bookmarkItems(items)),
+        },
+        {
+            name: gettext('Remove from bookmarks'),
+            multi: true,
+            when: (state) => state.user && state.bookmarks,
+            action: (items) => dispatch(removeBookmarks(items)),
         },
     ],
 });

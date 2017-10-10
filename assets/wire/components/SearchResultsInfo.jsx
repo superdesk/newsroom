@@ -5,7 +5,7 @@ import { gettext } from 'utils';
 
 import './SearchResultsInfo.scss';
 
-function SearchResultsInfo({user, query, totalItems, followTopic, topics}) {
+function SearchResultsInfo({user, query, totalItems, followTopic, topics, bookmarks}) {
     const isFollowing = user && topics.find((topic) => topic.query === query);
     return (
         <div className="navbar">
@@ -14,7 +14,7 @@ function SearchResultsInfo({user, query, totalItems, followTopic, topics}) {
                 {gettext('search results for:')}<br />
                 <b>{'"'}{query}{'"'}</b>
             </div>
-            {user &&
+            {user && !bookmarks &&
             <button
                 disabled={isFollowing}
                 className="btn btn-outline-primary"
@@ -31,6 +31,7 @@ SearchResultsInfo.propTypes = {
     topics: PropTypes.array,
     totalItems: PropTypes.number,
     followTopic: PropTypes.func,
+    bookmarks: PropTypes.bool,
 };
 
 export default SearchResultsInfo;
