@@ -10,8 +10,14 @@ const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 class ItemsList extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {actioningItem: null};
+
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onItemClick = this.onItemClick.bind(this);
+        this.onActionList = this.onActionList.bind(this);
+        this.closeActionList = this.closeActionList.bind(this);
+        this.filterActions = this.filterActions.bind(this);
     }
 
     onKeyDown(event) {
@@ -58,8 +64,22 @@ class ItemsList extends React.Component {
         this.props.dispatch(previewItem(item));
     }
 
+    onActionList(event, item) {
+        event.stopPropagation();
+        this.setState({actioningItem: item});
+    }
+
+    closeActionList() {
+        this.setState({actioningItem: null});
+    }
+
+    filterActions() {
+        return this.props.actions.filter((action) => !action.when || action.when(this.props));
+    }
+
     render() {
         const {items, itemsById, activeItem} = this.props;
+        const filteredActions = this.filterActions();
         const articles = items.map((_id) =>
             <WireListItem
                 key={_id}
@@ -67,7 +87,11 @@ class ItemsList extends React.Component {
                 isActive={activeItem === _id}
                 isSelected={this.props.selectedItems.indexOf(_id) !== -1}
                 onClick={this.onItemClick}
+                onActionList={this.onActionList}
+                showActions={!!this.state.actioningItem && this.state.actioningItem._id === _id}
+                onActionListClose={this.closeActionList}
                 toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
+                actions={filteredActions}
             />
         );
 
@@ -85,6 +109,13 @@ ItemsList.propTypes = {
     activeItem: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
     selectedItems: PropTypes.array,
+    actions: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string,
+        action: PropTypes.func,
+    })),
+    bookmarks: PropTypes.bool,
+    user: PropTypes.string,
+    company: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -92,6 +123,9 @@ const mapStateToProps = (state) => ({
     itemsById: state.itemsById,
     activeItem: state.activeItem,
     selectedItems: state.selectedItems,
+    bookmarks: state.bookmarks,
+    user: state.user,
+    company: state.company,
 });
 
 export default connect(mapStateToProps)(ItemsList);

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
+import ActionList from 'components/ActionList';
 
 class WireListItem extends React.Component {
     constructor(props) {
@@ -59,6 +60,21 @@ class WireListItem extends React.Component {
                     </small>
                     <p className="card-text">{item.description_text}</p>
                 </div>
+                <div className="wire-articles__item--list__image-icon">
+                    { this.props.showActions ? <ActionList
+                        item={this.props.item}
+                        actions={this.props.actions}
+                        onClose={this.props.onActionListClose}
+                    /> : null }
+                    <div width="20" onClick={(event) => this.props.onActionList(event, this.props.item)}>
+                        <img
+                            src="/static/vertical_dots.png"
+                            width="4"
+                            height="18"
+                        />
+                    </div>
+                </div>
+
             </article>
         );
     }
@@ -69,7 +85,14 @@ WireListItem.propTypes = {
     isActive: PropTypes.bool.isRequired,
     isSelected: PropTypes.bool.isRequired,
     onClick: PropTypes.func.isRequired,
+    onActionList: PropTypes.func.isRequired,
+    onActionListClose: PropTypes.func.isRequired,
+    showActions: PropTypes.bool.isRequired,
     toggleSelected: PropTypes.func.isRequired,
+    actions: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string,
+        action: PropTypes.func,
+    })),
 };
 
 export default WireListItem;

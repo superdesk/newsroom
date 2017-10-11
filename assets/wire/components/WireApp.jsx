@@ -106,7 +106,7 @@ class WireApp extends React.Component {
                                     actions={this.props.actions.filter(multiActionFilter)}
                                 />
                             }
-                            <ItemsList />
+                            <ItemsList actions={this.props.actions.filter(previewActionFilter)}/>
                         </div>
                     )}
                     {this.props.itemToPreview &&
