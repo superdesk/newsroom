@@ -9,8 +9,9 @@
 
     <h3>Pages:</h3>
     <ul>
-        <li><a href="{{ url_for('design.wire') }}">Wire</a></li>
-        <li><a href="{{ url_for('design.users') }}">Users</a></li>
+        <li><a href="{{ url_for('design.page', page='wire') }}">Wire</a></li>
+        <li><a href="{{ url_for('design.page', page='item_detail') }}">Item Detail</a></li>
+        <li><a href="{{ url_for('design.page', page='users') }}">Users</a></li>
     </ul>
 </section>
 {% endblock %}

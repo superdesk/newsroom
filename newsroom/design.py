@@ -9,11 +9,6 @@ def index():
     return flask.render_template('design_index.html')
 
 
-@blueprint.route('/design/wire')
-def wire():
-    return flask.render_template('design_wire.html')
-
-
-@blueprint.route('/design/users')
-def users():
-    return flask.render_template('design_users.html')
+@blueprint.route('/design/<page>')
+def page(page):
+    return flask.render_template('design_%s.html' % page)
