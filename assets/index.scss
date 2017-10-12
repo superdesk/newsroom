@@ -18,8 +18,24 @@ body {
     border-radius: 0px;
     border: 0px;
     box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
-}
+    font-size: 0.875rem;
 
+    [class^="icon--"], [class*=" icon--"] {
+        vertical-align: middle;
+    }
+}
+.dropdown-item {
+    padding: .25rem 1rem;
+    [class^="icon--"], [class*=" icon--"] {
+        margin-right: 1rem;
+    }
+    &:active {
+        background-color: $main-blue;
+        [class^="icon--"], [class*=" icon--"] {
+            color: white;
+        }
+    }
+}
 .btn.focus, .btn:focus {
     outline: 0px;
     box-shadow: none;
@@ -575,6 +591,13 @@ article.list {
 
 .wire-articles__item--list__actions {
     margin-left: 20px;
+    .btn-group {
+        &:hover {
+            > span > [class^="icon--"], [class*=" icon--"] {
+                color: $body-text;
+            }
+        }
+    }
 }
 
 .wire-articles__versions {
