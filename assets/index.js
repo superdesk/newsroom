@@ -32,6 +32,16 @@ for(var i = 0; i < listItem.length; i++) {
     };
 }
 
+// Show and hide multi action bar
+
+$('.wire-articles__item--list__select input').click(function(){
+    $('.multi-action-bar').toggleClass('multi-action-bar--open');
+});
+
+$('.multi-action-bar__button').click(function(){
+    $('.multi-action-bar').removeClass('multi-action-bar--open');
+});
+
 // Top bar search items
 
 var searchForm = document.getElementsByClassName('search__form')[0];
