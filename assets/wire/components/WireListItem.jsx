@@ -5,14 +5,17 @@ import classNames from 'classnames';
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import ActionList from 'components/ActionList';
 
+import ListItemPreviousVersions from './ListItemPreviousVersions';
+
 class WireListItem extends React.Component {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item.body_html);
         this.slugline = props.item.slugline && props.item.slugline.trim() ||
           props.item.headline && props.item.headline.replace(/ /g, '-');
-        this.state = {isHover: false};
+        this.state = {isHover: false, previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
+        this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
     }
 
     onKeyDown(event) {
@@ -28,6 +31,11 @@ class WireListItem extends React.Component {
         event.preventDefault();
     }
 
+    togglePreviousVersions(event) {
+        event.stopPropagation();
+        this.setState({previousVersions: !this.state.previousVersions});
+    }
+
     render() {
         const {item, onClick} = this.props;
         const cardClassName = classNames('card', 'list', 'mb-3', {
@@ -38,9 +46,7 @@ class WireListItem extends React.Component {
             <article key={item._id}
                 className={cardClassName}
                 tabIndex="0"
-                onClick={(event) => event.target.focus()}
-                onFocus={() => !this.props.isActive && onClick(item._id)}
-                ref={(elem) => this.props.isActive && elem && elem.focus()}
+                onClick={() => !this.props.isActive && onClick(item._id)}
                 onMouseEnter={() => this.setState({isHover: true})}
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
@@ -60,6 +66,11 @@ class WireListItem extends React.Component {
                     </small>
                     <p className="card-text">{item.description_text}</p>
                 </div>
+                {item.ancestors && item.ancestors.length && (
+                    <button className="wire-articles__item__versions-btn" onClick={this.togglePreviousVersions}>
+                        {gettext('Show previous versions({{ count }})', {count: item.ancestors.length})}
+                    </button>
+                )}
                 <div className="wire-articles__item--list__image-icon">
                     { this.props.showActions ? <ActionList
                         item={this.props.item}
@@ -75,6 +86,7 @@ class WireListItem extends React.Component {
                     </div>
                 </div>
 
+                {this.state.previousVersions && <ListItemPreviousVersions item={this.props.item} />}
             </article>
         );
     }

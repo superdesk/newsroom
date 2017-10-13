@@ -95,6 +95,28 @@ export function fullDate(dateString) {
 }
 
 /**
+ * Format time of a date
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatTime(dateString) {
+    const date = parseDate(dateString);
+    return date.toLocaleTimeString();
+}
+
+/**
+ * Format date of a date (without time)
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatDate(dateString) {
+    const date = parseDate(dateString);
+    return date.toLocaleDateString();
+}
+
+/**
  * Wrapper for alertifyjs
  */
 export const notify = {
