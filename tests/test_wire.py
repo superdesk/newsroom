@@ -14,7 +14,7 @@ items = [
         'version': 2,
         'headline': 'Amazon Is Opening More Bookstores',
         'slugline': 'AMAZON-BOOKSTORE-OPENING',
-        'body_html': '<p>New stores will open in DC and Austin in 2018.</p>',
+        'body_html': '<p>New stores will open in DC and Austin in 2018.</p><p>Next line</p>',
     },
     {
         '_id': 'urn:localhost:weather',
@@ -42,6 +42,7 @@ def test_item_download(client):
         assert 'AMAZON-BOOKSTORE-OPENING' in content[0]
         assert 'Amazon Is Opening More Bookstores' in content[1]
         assert '<p>' not in content
+        assert 'Next line' == content[-2]
 
 
 def test_item_detail(client):

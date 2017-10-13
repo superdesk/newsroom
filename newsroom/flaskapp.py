@@ -15,6 +15,7 @@ from eve.io.mongo import MongoJSONEncoder
 
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
+from superdesk.text_utils import get_text
 from newsroom.auth import SessionAuth
 from flask_mail import Mail
 from flask_limiter import Limiter
@@ -98,8 +99,12 @@ class Newsroom(eve.Eve):
             if datetime:
                 return format_time(datetime, 'long')
 
-        self.add_template_filter(datetime_short, 'datetime_short')
-        self.add_template_filter(datetime_long, 'datetime_long')
+        def plain_text(html):
+            return get_text(html, lf_on_block=True)
+
+        self.add_template_filter(datetime_short)
+        self.add_template_filter(datetime_long)
+        self.add_template_filter(plain_text)
         self.add_template_global(self.sidenavs, 'sidenavs')
 
     def _setup_webpack(self):
