@@ -71,14 +71,6 @@ def download(_ids):
     return flask.send_file(_file, attachment_filename='newsroom.zip', as_attachment=True)
 
 
-@blueprint.route('/wire/<_id>')
-def item(_id):
-    item = get_item_or_404(_id)
-    if 'print' in flask.request.args:
-        return flask.render_template('wire_item_print.html', item=item)
-    return flask.render_template('wire_item.html', item=item)
-
-
 @blueprint.route('/wire_share', methods=['POST'])
 @login_required
 def share():
@@ -131,3 +123,20 @@ def bookmark():
             modified = db.find_one({'_id': item_id})
             elastic.update('items', item_id, {'bookmarks': modified['bookmarks']})
     return flask.jsonify(), 200
+
+
+@blueprint.route('/wire/<_id>/versions')
+def versions(_id):
+    item = get_item_or_404(_id)
+    items = []
+    if item.get('ancestors'):
+        items = list(app.data.find_list_of_ids('wire_search', item['ancestors']))
+    return flask.jsonify({'_items': items})
+
+
+@blueprint.route('/wire/<_id>')
+def item(_id):
+    item = get_item_or_404(_id)
+    if 'print' in flask.request.args:
+        return flask.render_template('wire_item_print.html', item=item)
+    return flask.render_template('wire_item.html', item=item)

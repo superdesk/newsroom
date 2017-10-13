@@ -185,3 +185,13 @@ export function removeBookmarks(items) {
 function errorHandler(reason) {
     console.error('error', reason);
 }
+
+/**
+ * Fetch item versions.
+ *
+ * @param {Object} item
+ * @return {Promise}
+ */
+export function fetchVersions(item) {
+    return server.get(`/wire/${item._id}/versions`).then((data) => data._items.reverse());
+}

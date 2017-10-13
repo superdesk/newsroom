@@ -7,7 +7,6 @@ from pytest import fixture
 
 from tests.test_users import test_login_succeeds_for_admin, init as users_init
 
-
 items = [
     {
         '_id': 'tag:foo',
@@ -22,13 +21,16 @@ items = [
         'headline': 'Weather',
         'slugline': 'WEATHER',
         'body_html': '<p>Weather report</p>',
+        'ancestors': ['tag:foo'],
     },
 ]
 
 
 @fixture(autouse=True)
-def init(app):
+def init(app, client):
     app.data.insert('items', items)
+    users_init(app)
+    test_login_succeeds_for_admin(client)
 
 
 def test_item_download(client):
@@ -59,10 +61,6 @@ def test_share_items(client, app):
         'last_name': 'Bar',
     }])
 
-    # create admin
-    users_init(app)
-    test_login_succeeds_for_admin(client)
-
     with app.mail.record_messages() as outbox:
         resp = client.post('/wire_share', data=json.dumps({
             'items': [item['_id'] for item in items],
@@ -92,8 +90,6 @@ def get_bookmarks_count(client, user):
 
 
 def test_bookmarks(client, app):
-    users_init(app)
-    test_login_succeeds_for_admin(client)
     user_id = app.data.find_all('users')[0]['_id']
     assert user_id
 
@@ -112,3 +108,15 @@ def test_bookmarks(client, app):
     assert resp.status_code == 200
 
     assert 0 == get_bookmarks_count(client, user_id)
+
+
+def test_versions(client, app):
+    resp = client.get('/wire/%s/versions' % items[0]['_id'])
+    assert 200 == resp.status_code
+    data = json.loads(resp.get_data())
+    assert len(data.get('_items')) == 0
+
+    resp = client.get('/wire/%s/versions' % items[1]['_id'])
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+    assert 'tag:foo' == data['_items'][0]['_id']
