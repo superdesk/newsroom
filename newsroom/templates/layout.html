@@ -70,27 +70,9 @@
 
         </nav>
 
-        <div class="content">
+        {% block content %}
+        {% endblock %}
 
-            <section class="content-header">
-                {% block contentHeader %}
-
-                {% endblock %}
-            </section>
-
-            <section class="content-main">
-
-                    {% include "flash_messages.html" %}
-
-                    {% block content %}{% endblock %}
-
-                {% block sidebar %}{% endblock %}
-            </section>
-
-            <!-- <footer class="container-fluid">
-                <p class="text-right"><small class="text-muted">All contents &copy; Copyright 2017 {{ config.COPYRIGHT_HOLDER }}. All rights reserved.</small></p>
-            </footer> -->
-        </div>
 
     </div>
 

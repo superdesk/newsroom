@@ -96,7 +96,7 @@ class ItemsList extends React.Component {
         );
 
         return (
-            <div className="col" onKeyDown={this.onKeyDown}>
+            <div className="wire-articles wire-articles--list row" onKeyDown={this.onKeyDown}>
                 {articles}
             </div>
         );

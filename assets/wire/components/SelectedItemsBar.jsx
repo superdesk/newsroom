@@ -6,28 +6,36 @@ import { gettext } from 'utils';
 class SelectedItemsBar extends React.Component {
     constructor(props) {
         super(props);
+        this.onAction = this.onAction.bind(this);
+    }
+
+    onAction(event, action) {
+        event.preventDefault();
+        action.action(this.props.selectedItems) && this.props.selectNone();
     }
 
     render() {
-        const actionButtons = this.props.actions.map((action) => (
-            <button key={action.name}
-                className="btn"
-                onClick={() => action.action(this.props.selectedItems) && this.props.selectNone()}
-            >{action.name}</button>
+        const actions = this.props.actions.map((action) => (
+            <a className='multi-action-bar__icon' href='#'
+                key={action.name}
+                onClick={(e) => this.onAction(e, action)}
+            >
+                <i className={`icon--${action.name.toLowerCase()}`}></i>
+            </a>
         ));
         return (
-            <div className="navbar">
-                <div className="navbar-text">
+            <div className='multi-action-bar multi-action-bar--open'>
+                <button className='multi-action-bar__button'
+                    onClick={this.props.selectNone}>{gettext('Cancel')}
+                </button>
+                <button className='multi-action-bar__button'
+                    onClick={this.props.selectAll}>{gettext('Select All')}
+                </button>
+                <span className='multi-action-bar__count'>
                     {gettext('{{ count }} item(s) selected', {count: this.props.selectedItems.length})}
-                    {' '}
-                    <button className="btn btn-link" onClick={this.props.selectAll}>{gettext('Select All')}</button>
-                    {' / '}
-                    <button className="btn btn-link" onClick={this.props.selectNone}>{gettext('Cancel')}</button>
-                </div>
-                <div className="form-inline">
-                    <div className="btn-group">
-                        {actionButtons}
-                    </div>
+                </span>
+                <div className='multi-action-bar__icons'>
+                    {actions}
                 </div>
             </div>
         );

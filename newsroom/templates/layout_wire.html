@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <div class="content">
+
+        <section class="content-header">
+            {% block contentHeader %}
+
+            {% endblock %}
+        </section>
+
+        <section class="content-main">
+
+                {% include "flash_messages.html" %}
+
+                {% block contentMain %}{% endblock %}
+
+            {% block sidebar %}{% endblock %}
+        </section>
+
+    </div>
+
+{% endblock %}
