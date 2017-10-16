@@ -8,6 +8,13 @@ class WireSearchResource(newsroom.Resource):
     datasource = {
         'search_backend': 'elastic',
         'source': 'items',
+        'projection': {
+            'slugline': 1,
+            'headline': 1,
+            'body_html': 1,
+            'versioncreated': 1,
+            'headline': 1,
+        }
     }
 
     item_methods = ['GET']

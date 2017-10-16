@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { connect } from 'react-redux';
 
 import { gettext } from 'utils';
@@ -10,6 +11,7 @@ class SearchBar extends React.Component {
         super(props);
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.onClear = this.onClear.bind(this);
         this.state = {query: props.query || ''};
     }
 
@@ -23,18 +25,34 @@ class SearchBar extends React.Component {
         this.props.fetchItems();
     }
 
+    onClear(){
+        this.props.setQuery('');
+        this.props.fetchItems();
+        this.setState({query: ''});
+    }
+
     render() {
         return (
-            <form className="form-inline" onSubmit={this.onSubmit}>
-                <input type="text"
-                    name="q"
-                    className="form-control mr-sm-2"
-                    value={this.state.query}
-                    onChange={this.onChange}
-                />
-                <button className="btn btn-outline-success my-2 my-sm-0"
-                    type="submit">{gettext('Search')}</button>
-            </form>
+            <div className={classNames('search__form input-group', {
+                'searchForm--active': !!this.state.query,
+            })}>
+                <form className='form-inline' onSubmit={this.onSubmit}>
+                    <input type='text'
+                        name='q'
+                        className='search__input form-control'
+                        placeholder='Search for...'
+                        aria-label='Search for...'
+                        value={this.state.query}
+                        onChange={this.onChange}
+                    />
+                    <div className='search__form__buttons'>
+                        <span className='search__clear' onClick={this.onClear}>
+                            <img src='/static/search_clear.png' width='16' height='16'/>
+                        </span>
+                        <button className='btn' type='submit'>{gettext('Search')}</button>
+                    </div>
+                </form>
+            </div>
         );
     }
 }

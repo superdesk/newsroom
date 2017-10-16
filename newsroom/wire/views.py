@@ -130,7 +130,8 @@ def versions(_id):
     item = get_item_or_404(_id)
     items = []
     if item.get('ancestors'):
-        items = list(app.data.find_list_of_ids('wire_search', item['ancestors']))
+        projection = {'slugline': 1, 'versioncreated': 1, 'body_html': 1, 'headline': 1}
+        items = list(app.data.find_list_of_ids('wire_search', item['ancestors'], projection))
     return flask.jsonify({'_items': items})
 
 

@@ -5,17 +5,15 @@ import CloseButton from './CloseButton';
 
 function ActionList({item, actions, onClose}) {
     return (
-        <div className="wire-articles__item--list__actions">
+        <div className='dropdown-menu dropdown-menu-right show'>
             <CloseButton onClick={onClose}/>
-            <div className="list-group">
-                {actions.map((action) =>
-                    <button
-                        key={action.name}
-                        type="button"
-                        className="list-group-item list-group-item-action"
-                        onClick={() => action.action(action.multi ? [item._id] : item)}>{action.name}</button>
-                )}
-            </div>
+            {actions.map((action) =>
+                <button
+                    key={action.name}
+                    type='button'
+                    className='dropdown-item'
+                    onClick={() => action.action(action.multi ? [item._id] : item)}>{action.name}</button>
+            )}
         </div>
     );
 }

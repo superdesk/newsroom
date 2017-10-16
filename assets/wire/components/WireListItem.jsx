@@ -38,55 +38,81 @@ class WireListItem extends React.Component {
 
     render() {
         const {item, onClick} = this.props;
-        const cardClassName = classNames('card', 'list', 'mb-3', {
+        const cardClassName = classNames('wire-articles__item-wrap col-12', {
             'border-warning': this.props.isActive,
             'border-primary': this.props.isSelected && !this.props.isActive,
         });
         return (
             <article key={item._id}
                 className={cardClassName}
-                tabIndex="0"
+                tabIndex='0'
                 onClick={() => !this.props.isActive && onClick(item._id)}
                 onMouseEnter={() => this.setState({isHover: true})}
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
             >
-                <div className="card-body">
-                    {(this.props.isSelected || this.state.isHover) &&
-                        <input type="checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
-                    }
-                    <h4 className="card-title">{item.headline}</h4>
-                    <h6 className="card-subtitle">{this.slugline}</h6>
-                    <small className="card-subtitle">
-                        {gettext('Source: {{ source }}', {source: item.source})}
-                        {' // '}
-                        <b>{this.wordCount}</b> {gettext('words')}
-                        {' // '}
-                        <time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
-                    </small>
-                    <p className="card-text">{item.description_text}</p>
-                </div>
-                {item.ancestors && item.ancestors.length && (
-                    <button className="wire-articles__item__versions-btn" onClick={this.togglePreviousVersions}>
-                        {gettext('Show previous versions({{ count }})', {count: item.ancestors.length})}
-                    </button>
-                )}
-                <div className="wire-articles__item--list__image-icon">
-                    { this.props.showActions ? <ActionList
-                        item={this.props.item}
-                        actions={this.props.actions}
-                        onClose={this.props.onActionListClose}
-                    /> : null }
-                    <div width="20" onClick={(event) => this.props.onActionList(event, this.props.item)}>
-                        <img
-                            src="/static/vertical_dots.png"
-                            width="4"
-                            height="18"
-                        />
+
+                <div className='wire-articles__item wire-articles__item--list'>
+                    <div className='wire-articles__item--list__text'>
+
+                        <h4 className='wire-articles__item--list__headline'>
+                            {(this.props.isSelected || this.state.isHover) &&
+                            <div className='no-bindable-select wire-articles__item--list__select'>
+                                <label className="circle-checkbox">
+                                    <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
+                                    <i></i>
+                                </label>
+                            </div>}
+                            {item.headline}
+                        </h4>
+    
+                        <div className='wire-articles__item__meta'>
+                            <div className='wire-articles__item__icons'>
+                                <span className='wire-articles__item__icon'>
+                                    <i className='icon--text icon--gray-light'></i>
+                                </span>
+                                {/*<span className='wire-articles__item__icon'>*/}
+                                {/*<i className='icon--photo icon--gray-light'></i>*/}
+                                {/*</span>*/}
+                                <span className='wire-articles__item__divider'>
+                                </span>
+                            </div>
+    
+                            <div className='wire-articles__item__meta-info'>
+                                <span className='bold'>{this.slugline}</span>
+                                <span>{gettext('Source: {{ source }}', {source: item.source})}
+                                    {' // '}<span className='bold'>{this.wordCount}</span> {gettext('words')}
+                                    {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                                </span>
+                            </div>
+                        </div>
+    
+                        <div className='wire-articles__item__text'>
+                            <p>{item.description_text}</p>
+                        </div>
+
+                        {item.ancestors && item.ancestors.length && (
+                            <div className="no-bindable wire-articles__item__versions-btn" onClick={this.togglePreviousVersions}>
+                                {gettext('Show previous versions({{ count }})', {count: item.ancestors.length})}
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className='wire-articles__item--list__actions'>
+                        <div className='btn-group'>
+                            <span onClick={(event) => this.props.onActionList(event, this.props.item)}>
+                                <i className='icon--more icon--gray-light'></i>
+                            </span>
+                            { this.props.showActions ? <ActionList
+                                item={this.props.item}
+                                actions={this.props.actions}
+                                onClose={this.props.onActionListClose}
+                            /> : null }
+                        </div>
                     </div>
                 </div>
 
-                {this.state.previousVersions && <ListItemPreviousVersions item={this.props.item} />}
+                {this.state.previousVersions && <ListItemPreviousVersions item={this.props.item} isPreview={false} />}
             </article>
         );
     }

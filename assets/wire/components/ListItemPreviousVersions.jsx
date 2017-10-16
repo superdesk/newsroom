@@ -8,6 +8,7 @@ class ListItemPreviousVersions extends React.Component {
     constructor(props) {
         super(props);
         this.state = {versions: [], loading: true, error: false};
+        this.baseClass = this.props.isPreview ? 'wire-column__preview' : 'wire-articles';
         fetchVersions(props.item)
             .then((versions) => this.setState({versions, loading: false}))
             .catch(() => this.setState({error: true}));
@@ -16,34 +17,40 @@ class ListItemPreviousVersions extends React.Component {
     render() {
         if (this.state.loading) {
             return (
-                <div className="wire-articles__versions wire-articles__versions--open">
+                <div className={`${this.baseClass}__versions`}>
                     {gettext('Loading')}
                 </div>
             );
         }
 
         const versions = this.state.versions.map((version) => (
-            <div key={version._id} className="wire-articles__versions__item">
-                <div className="wire-articles__versions__time">
-                    <span>{formatTime(version.versioncreated)}</span>
-                </div>
-                <div className="wire-articles__versions__meta">
-                    <div className="wire-articles__item__meta-info">
-                        <span className="bold">{version.slugline}</span>
-                        <span>{formatDate(version.versioncreated)} {'//'} <span className="bold">{wordCount(version.body_html)}</span> {gettext('words')}</span>
+            <div key={version._id} className={`${this.baseClass}__versions__item`}>
+                <div className={`${this.baseClass}__versions__wrap`}>
+                    <div className={`${this.baseClass}__versions__time`}>
+                        <span>{formatTime(version.versioncreated)}</span>
+                    </div>
+                    <div className={`${this.baseClass}__versions__meta`}>
+                        <div className={`${this.baseClass}__item__meta-info`}>
+                            <span className="bold">{version.slugline}</span>
+                            <span>{formatDate(version.versioncreated)} {'//'}
+                                <span className="bold">{wordCount(version.body_html)}</span> {gettext('words')}
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <span className="wire-articles__item__divider"></span>
-                <div className="wire-articles__versions__name">
-                    <h5 className="wire-articles__versions__headline">{version.headline}</h5>
+                {!this.props.isPreview ? <span className={`${this.baseClass}__item__divider`}></span> : null}
+                <div className={`${this.baseClass}__versions__name`}>
+                    <h5 className={`${this.baseClass}__versions__headline`}>{version.headline}</h5>
                 </div>
             </div>
         ));
 
         return (
-            <div className="wire-articles__versions wire-articles__versions--open">
-                {versions}
-            </div>
+            this.props.item.ancestors ?
+                <div className={`${this.baseClass}__versions`}>
+                    {this.props.isPreview ? <span className="wire-column__preview__versions__headline">Previous versions</span> : null }
+                    {versions}
+                </div> : null
         );
     }
 }
@@ -51,7 +58,9 @@ class ListItemPreviousVersions extends React.Component {
 ListItemPreviousVersions.propTypes = {
     item: PropTypes.shape({
         _id: PropTypes.string.isRequired,
+        ancestors: PropTypes.array,
     }).isRequired,
+    isPreview: PropTypes.bool.isRequired
 };
 
 export default ListItemPreviousVersions;
