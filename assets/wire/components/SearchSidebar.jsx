@@ -35,48 +35,46 @@ function SearchSidebar(props) {
     });
 
     return (
-        <div className='wire-column__nav wire-column__nav--open'>
-            <div className='wire-column__nav__items'>
-                <ul className='nav justify-content-center mb-3' id='pills-tab' role='tablist'>
-                    <li className='wire-column__nav__tab nav-item'>
-                        <a className='nav-link active' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-expanded='true'>Navigation</a>
-                    </li>
-                    <li className='wire-column__nav__tab nav-item'>
-                        <a className='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-expanded='true'>Filters</a>
-                    </li>
-                </ul>
-                <div className='tab-content' id='pills-tabContent'>
-                    <div className='tab-pane fade show active' id='pills-home' role='tabpanel' aria-labelledby='pills-home-tab'>
-                        <a href='#' className='wire-button wire-button--active'>All</a>
-                        <a href='#' className='wire-button'>National</a>
-                        <a href='#' className='wire-button'>Courts</a>
-                        <a href='#' className='wire-button'>Entertainment</a>
+        <div className='wire-column__nav__items'>
+            <ul className='nav justify-content-center mb-3' id='pills-tab' role='tablist'>
+                <li className='wire-column__nav__tab nav-item'>
+                    <a className='nav-link active' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-expanded='true'>Navigation</a>
+                </li>
+                <li className='wire-column__nav__tab nav-item'>
+                    <a className='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-expanded='true'>Filters</a>
+                </li>
+            </ul>
+            <div className='tab-content' id='pills-tabContent'>
+                <div className='tab-pane fade show active' id='pills-home' role='tabpanel' aria-labelledby='pills-home-tab'>
+                    <a href='#' className='wire-button wire-button--active'>All</a>
+                    <a href='#' className='wire-button'>National</a>
+                    <a href='#' className='wire-button'>Courts</a>
+                    <a href='#' className='wire-button'>Entertainment</a>
 
-                        <span className='wire-column__nav__divider'></span>
-                        <h5>{gettext('Followed topics')}</h5>
+                    <span className='wire-column__nav__divider'></span>
+                    <h5>{gettext('Followed topics')}</h5>
 
-                        {topicsList}
+                    {topicsList}
 
-                        {topicsList.length === 0 &&
+                    {topicsList.length === 0 &&
                             <i>{gettext('There are no followed topics yet.')}</i>
-                        }
+                    }
 
-                        <span className='wire-column__nav__divider'></span>
-                        <h5>{gettext('Bookmarks')}</h5>
+                    <span className='wire-column__nav__divider'></span>
+                    <h5>{gettext('Bookmarks')}</h5>
 
-                        {bookmarks}
+                    {bookmarks}
 
-                        {bookmarks.length === 0 &&
+                    {bookmarks.length === 0 &&
                             <i>{gettext('There are no bookmarks yet.')}</i>
-                        }
+                    }
 
-                    </div>
-                    <div className='tab-pane fade' id='pills-profile' role='tabpanel' aria-labelledby='pills-profile-tab'>
-                        <a href='#' className='wire-button wire-button--active'>All</a>
-                        <a href='#' className='wire-button'>Filter 1</a>
-                        <a href='#' className='wire-button'>Filter 2</a>
-                        <a href='#' className='wire-button'>Filter 3</a>
-                    </div>
+                </div>
+                <div className='tab-pane fade' id='pills-profile' role='tabpanel' aria-labelledby='pills-profile-tab'>
+                    <a href='#' className='wire-button wire-button--active'>All</a>
+                    <a href='#' className='wire-button'>Filter 1</a>
+                    <a href='#' className='wire-button'>Filter 2</a>
+                    <a href='#' className='wire-button'>Filter 3</a>
                 </div>
             </div>
         </div>

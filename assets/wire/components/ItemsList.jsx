@@ -16,7 +16,6 @@ class ItemsList extends React.Component {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onItemClick = this.onItemClick.bind(this);
         this.onActionList = this.onActionList.bind(this);
-        this.closeActionList = this.closeActionList.bind(this);
         this.filterActions = this.filterActions.bind(this);
     }
 
@@ -66,11 +65,11 @@ class ItemsList extends React.Component {
 
     onActionList(event, item) {
         event.stopPropagation();
-        this.setState({actioningItem: item});
-    }
-
-    closeActionList() {
-        this.setState({actioningItem: null});
+        if (this.state.actioningItem && this.state.actioningItem._id === item._id) {
+            this.setState({actioningItem: null});
+        } else {
+            this.setState({actioningItem: item});
+        }
     }
 
     filterActions() {
@@ -89,7 +88,6 @@ class ItemsList extends React.Component {
                 onClick={this.onItemClick}
                 onActionList={this.onActionList}
                 showActions={!!this.state.actioningItem && this.state.actioningItem._id === _id}
-                onActionListClose={this.closeActionList}
                 toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
                 actions={filteredActions}
             />

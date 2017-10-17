@@ -39,6 +39,7 @@ class WireListItem extends React.Component {
     render() {
         const {item, onClick} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12', {
+            'wire-articles__item--list__selected': this.props.isSelected,
             'border-warning': this.props.isActive,
             'border-primary': this.props.isSelected && !this.props.isActive,
         });
@@ -56,13 +57,12 @@ class WireListItem extends React.Component {
                     <div className='wire-articles__item--list__text'>
 
                         <h4 className='wire-articles__item--list__headline'>
-                            {(this.props.isSelected || this.state.isHover) &&
                             <div className='no-bindable-select wire-articles__item--list__select'>
                                 <label className="circle-checkbox">
                                     <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
                                     <i></i>
                                 </label>
-                            </div>}
+                            </div>
                             {item.headline}
                         </h4>
     
@@ -106,7 +106,6 @@ class WireListItem extends React.Component {
                             { this.props.showActions ? <ActionList
                                 item={this.props.item}
                                 actions={this.props.actions}
-                                onClose={this.props.onActionListClose}
                             /> : null }
                         </div>
                     </div>
@@ -124,7 +123,6 @@ WireListItem.propTypes = {
     isSelected: PropTypes.bool.isRequired,
     onClick: PropTypes.func.isRequired,
     onActionList: PropTypes.func.isRequired,
-    onActionListClose: PropTypes.func.isRequired,
     showActions: PropTypes.bool.isRequired,
     toggleSelected: PropTypes.func.isRequired,
     actions: PropTypes.arrayOf(PropTypes.shape({
