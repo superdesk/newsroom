@@ -195,3 +195,25 @@ function errorHandler(reason) {
 export function fetchVersions(item) {
     return server.get(`/wire/${item._id}/versions`).then((data) => data._items.reverse());
 }
+
+/**
+ * Download items - display modal to pick a format
+ *
+ * @param {Array} items
+ */
+export function downloadItems(items) {
+    return renderModal('downloadItems', {items});
+}
+
+/**
+ * Start download - open download view in new window.
+ *
+ * @param {Array} items
+ * @param {String} format
+ */
+export function submitDownloadItems(items, format) {
+    return (dispatch) => {
+        window.open(`/download/${items.join(',')}?format=${format}`, '_blank');
+        dispatch(closeModal());
+    };
+}

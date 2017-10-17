@@ -1,50 +1,7 @@
 
-import io
-import zipfile
-
 from flask import json
-from pytest import fixture
 
-from tests.test_users import test_login_succeeds_for_admin, init as users_init
-
-items = [
-    {
-        '_id': 'tag:foo',
-        'version': 2,
-        'headline': 'Amazon Is Opening More Bookstores',
-        'slugline': 'AMAZON-BOOKSTORE-OPENING',
-        'body_html': '<p>New stores will open in DC and Austin in 2018.</p><p>Next line</p>',
-    },
-    {
-        '_id': 'urn:localhost:weather',
-        'version': 1,
-        'headline': 'Weather',
-        'slugline': 'WEATHER',
-        'body_html': '<p>Weather report</p>',
-        'ancestors': ['tag:foo'],
-    },
-]
-
-
-@fixture(autouse=True)
-def init(app, client):
-    app.data.insert('items', items)
-    users_init(app)
-    test_login_succeeds_for_admin(client)
-
-
-def test_item_download(client):
-    resp = client.get('/download/%s' % ','.join([item['_id'] for item in items]))
-    assert resp.status_code == 200
-    assert resp.mimetype == 'application/zip'
-    _file = io.BytesIO(resp.get_data())
-    with zipfile.ZipFile(_file) as zf:
-        assert 'tagfoo.txt' in zf.namelist()
-        content = zf.open('tagfoo.txt').read().decode('utf-8').split('\n')
-        assert 'AMAZON-BOOKSTORE-OPENING' in content[0]
-        assert 'Amazon Is Opening More Bookstores' in content[1]
-        assert '<p>' not in content
-        assert 'Next line' == content[-2]
+from .fixtures import items, init  # noqa
 
 
 def test_item_detail(client):

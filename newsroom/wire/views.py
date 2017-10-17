@@ -29,24 +29,25 @@ def get_json_or_400():
     return data
 
 
-def get_user_data():
+def get_view_data():
     user = get_user()
     return {
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': get_user_topics(user['_id']) if user else [],
+        'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()],
     }
 
 
 @blueprint.route('/')
 def index():
-    return flask.render_template('wire_index.html', data=get_user_data())
+    return flask.render_template('wire_index.html', data=get_view_data())
 
 
 @blueprint.route('/bookmarks')
 @login_required
 def bookmarks():
-    data = get_user_data()
+    data = get_view_data()
     data['bookmarks'] = True
     return flask.render_template('wire_bookmarks.html', data=data)
 
@@ -61,11 +62,13 @@ def search():
 def download(_ids):
     items = [get_item_or_404(_id) for _id in _ids.split(',')]
     _file = io.BytesIO()
+    _format = flask.request.args.get('format', 'text')
+    formatter = app.download_formatters[_format]['formatter']
     with zipfile.ZipFile(_file, mode='w') as zf:
         for item in items:
             zf.writestr(
-                secure_filename('{}.txt'.format(item['_id'])),
-                str.encode(flask.render_template('download_item.txt', item=item), 'utf-8')
+                secure_filename(formatter.format_filename(item)),
+                formatter.format_item(item)
             )
     _file.seek(0)
     return flask.send_file(_file, attachment_filename='newsroom.zip', as_attachment=True)

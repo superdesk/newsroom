@@ -35,6 +35,7 @@ class Newsroom(eve.Eve):
         to create an instance using ``app = Newsroom()``
         """
         self.sidenavs = []
+        self.download_formatters = {}
 
         app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
 
@@ -123,3 +124,10 @@ class Newsroom(eve.Eve):
     def sidenav(self, name, endpoint, icon=None):
         """Register an item in sidebar menu."""
         self.sidenavs.append({'name': name, 'endpoint': endpoint, icon: icon})
+
+    def add_download_formatter(self, _format, formatter, name):
+        self.download_formatters[_format] = {
+            'format': _format,
+            'formatter': formatter,
+            'name': name,
+        }

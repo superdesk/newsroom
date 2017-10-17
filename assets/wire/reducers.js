@@ -32,6 +32,7 @@ const initialState = {
     topics: [],
     selectedItems: [],
     bookmarks: false,
+    formats: [],
 };
 
 export default function wireReducer(state = initialState, action) {
@@ -99,6 +100,7 @@ export default function wireReducer(state = initialState, action) {
             topics: action.data.topics || [],
             company: action.data.company || null,
             bookmarks: action.data.bookmarks || false,
+            formats: action.data.formats || [],
         };
 
     case ADD_TOPIC:

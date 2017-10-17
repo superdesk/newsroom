@@ -13,6 +13,7 @@ import {
     selectNone,
     bookmarkItems,
     removeBookmarks,
+    downloadItems,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -24,10 +25,12 @@ import SelectedItemsBar from './SelectedItemsBar';
 
 import FollowTopicModal from './FollowTopicModal';
 import ShareItemModal from './ShareItemModal';
+import DownloadItemsModal from './DownloadItemsModal';
 
 const modals = {
     followTopic: FollowTopicModal,
     shareItem: ShareItemModal,
+    downloadItems: DownloadItemsModal,
 };
 
 class WireApp extends React.Component {
@@ -91,7 +94,7 @@ class WireApp extends React.Component {
                             fetchItems={this.props.fetchItems}
                             setQuery={this.props.setQuery} />
                     </div>
-                
+
                     <div className='content-bar__right ml-auto'>
                         <div className='content-bar__sort btn-group'>
                             <div className='form-control-plaintext'>
@@ -105,7 +108,7 @@ class WireApp extends React.Component {
                                 <button className='dropdown-item' type='button'>Author</button>
                             </div>
                         </div>
-                
+
                         <div className='btn-group'>
                             <span className='content-bar__menu' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                                 <i className='icon--list-view'></i>
@@ -118,12 +121,12 @@ class WireApp extends React.Component {
                             </div>
                         </div>
                     </div>
-                
+
                 </nav>
             </section>,
-                
-                
-                
+
+
+
             <section key="contentMain" className='content-main'>
                 <div className='wire-column--3'>
                     {this.state.withSidebar &&
@@ -237,7 +240,7 @@ const mapDispatchToProps = (dispatch) => ({
             name: gettext('Download'),
             multi: true,
             when: (state) => state.user && state.company,
-            action: (items) => window.open(`/download/${items.join(',')}`, '_blank'),
+            action: (items) => dispatch(downloadItems(items)),
         },
         {
             name: gettext('Bookmark'),
