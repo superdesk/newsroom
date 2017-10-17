@@ -10,9 +10,20 @@ if ! [ -d /etc/apt/sources.list.d/yarn.list ]; then
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 fi
 
+if ! [ -d /etc/apt/sources.list.d/mongodb.list ]; then
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
+    echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | tee /etc/apt/sources.list.d/mongodb.list
+fi
+
+if ! [ -d /tmp/elasticsearch-1.7.6.deb ]; then
+    cd /tmp
+    wget -q https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.6.deb
+    dpkg -i /tmp/elasticsearch-1.7.6.deb
+fi
+
 # install build dependencies
 apt-get update
-apt-get install -y python3-venv python3-pip yarn npm
+apt-get install -y python3-venv python3-pip yarn npm mongodb-org-server
 
 # use node lts
 npm install -g n
@@ -39,6 +50,8 @@ $start = <<SCRIPT
 #!/usr/bin/env bash
 
 cd /vagrant
+
+systemctl start mongod
 
 if [ -f /tmp/server.pid ]; then
     kill `cat /tmp/server.pid`
@@ -68,6 +81,7 @@ echo 'done.'
 
 # start server
 source /opt/venv/bin/activate
+python manage.py create_user admin@localhost.com admin admin admin true
 python app.py &
 echo $! >> /tmp/server.pid
 SCRIPT
