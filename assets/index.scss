@@ -183,7 +183,7 @@ body.print {
 }
 
 .navbar {
-    height: 56px; 
+    height: 56px;
     &.main {
         padding: 0px;
         color: #969696;
@@ -295,7 +295,7 @@ article.list {
     padding: 0 20px;
 }
 
-.side-navigation {   
+.side-navigation {
     width: 220px;
     overflow: hidden;
     overflow-y: auto;
@@ -323,7 +323,7 @@ article.list {
     &:hover {
         background-color: #f1f1f1;
         color: $body-text;
-        text-decoration: none; 
+        text-decoration: none;
     }
     &.active {
         background-color: #f1f1f1;
@@ -356,7 +356,7 @@ article.list {
         overflow: hidden;
         overflow-y: auto;
     }
-    .tab-content {        
+    .tab-content {
         display: flex;
         flex-direction: column;
         flex: 1;
@@ -401,7 +401,7 @@ article.list {
     table {
         tr:first-child {
             td {
-                border-top: none; 
+                border-top: none;
             }
         }
     }
@@ -721,7 +721,6 @@ article.list {
     border: 4px solid transparent;
     outline: 1px solid transparent;
     transition: all .2s ease-out;
-    z-index: 0;
     &:hover {
         border: 4px solid #f5f5f5;
     }
@@ -731,12 +730,17 @@ article.list {
     outline: 1px solid #00aceb;
 }
 
+.wire-articles__item--list__selected .wire-articles__item {
+    border: 4px solid #e6f7fd;
+    outline: 1px solid #00aceb;
+}
+
 .wire-articles__item-wrap {
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
     cursor: pointer;
-    outline: none; // avoid border on focus
+    outline: none;
 }
 
 .wire-articles--list {
@@ -781,6 +785,12 @@ article.list {
         transition: all .2s ease-out;
         transition-delay: 0.2s;
     }
+}
+
+.wire-articles__item--list__selected .wire-articles__item--list__select {
+    width: 24px;
+    opacity: 1;
+    margin-right: 10px;
 }
 
 .wire-articles__item__meta {
@@ -868,6 +878,7 @@ article.list {
     flex-direction: column;
     background: #fafafa;
     box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2);
+    z-index: -1;
     transition: all .2s ease-out;
     > * {
         opacity: 1;
