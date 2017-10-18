@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CloseButton from './CloseButton';
 
 
-function ActionList({item, actions, onClose}) {
+function ActionList({item, actions}) {
     return (
         <div className='dropdown-menu dropdown-menu-right show'>
-            <CloseButton onClick={onClose}/>
             {actions.map((action) =>
                 <button
                     key={action.name}
                     type='button'
                     className='dropdown-item'
-                    onClick={() => action.action(action.multi ? [item._id] : item)}>{action.name}</button>
+                    onClick={() => action.action(action.multi ? [item._id] : item)}>
+                    <i className={`icon--${action.name.toLowerCase()}`}></i>
+                    {action.name}</button>
             )}
         </div>
     );
@@ -23,8 +23,7 @@ ActionList.propTypes = {
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         action: PropTypes.func,
-    })),
-    onClose: PropTypes.func
+    }))
 };
 
 export default ActionList;

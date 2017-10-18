@@ -72,9 +72,10 @@ class WireApp extends React.Component {
                         />
                 }
                 <nav className='content-bar navbar justify-content-start'>
-                    <span className='content-bar__menu content-bar__menu--nav'>
-                        <i className='icon--hamburger' onClick={this.toggleSidebar}></i>
-                        <i className='icon--close-thin icon--white' onClick={this.toggleSidebar}></i>
+                    <span className={`content-bar__menu content-bar__menu--nav${this.state.withSidebar?'--open':''}`}
+                        onClick={this.toggleSidebar}>
+                        <i className={this.state.withSidebar ? 'icon--close-thin icon--white' : 'icon--hamburger'}></i>
+                        {/*<i className='icon--close-thin icon--white' onClick={this.toggleSidebar}></i>*/}
                     </span>
                     <div className='search form-inline'>
                         <div className='dropdown'>
@@ -129,14 +130,16 @@ class WireApp extends React.Component {
 
             <section key="contentMain" className='content-main'>
                 <div className='wire-column--3'>
-                    {this.state.withSidebar &&
-
+                    <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                        {this.state.withSidebar &&
                             <SearchSidebar
                                 topics={this.props.topics}
                                 setQuery={this.props.setQuery}
                                 activeQuery={this.props.activeQuery}
                             />
-                    }
+                        }
+
+                    </div>
                     {(this.props.isLoading ?
                         <div className='col'>
                             <div className='progress'>
@@ -159,12 +162,16 @@ class WireApp extends React.Component {
                             <ItemsList actions={this.props.actions.filter(previewActionFilter)}/>
                         </div>
                     )}
-                    {this.props.itemToPreview &&
+
+                    <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
+                        {this.props.itemToPreview &&
                             <Preview
                                 item={this.props.itemToPreview}
                                 actions={this.props.actions.filter(previewActionFilter)}
                             />
-                    }
+                        }
+
+                    </div>
                 </div>
                 {modal}
             </section>]
