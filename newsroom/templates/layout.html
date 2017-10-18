@@ -51,7 +51,7 @@
 
         <nav class="sidenav">
 
-            <ul class="sidenav-icons">              
+            <ul class="sidenav-icons">
               <li class="sidenav-icons__item sidenav-icons__item--admin"><a href="#" title=""><i class="icon--cog icon--mid-blue"></i></a></li>
 
               {% for nav in sidenavs %}
@@ -77,6 +77,10 @@
     </div>
 
 </div>
+
+<script>
+    window.newsroom = {{ newsroom_config() | tojson | safe }};
+</script>
 
 {{ javascript_tag('newsroom_js') | safe }}
 

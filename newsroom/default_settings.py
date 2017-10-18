@@ -21,7 +21,10 @@ X_MAX_AGE = 24 * 3600
 X_HEADERS = ['Content-Type', 'Authorization', 'If-Match']
 
 URL_PREFIX = 'api'
-SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(32))
+
+# keys for signing, shoudl be binary
+SECRET_KEY = os.environ.get('SECRET_KEY', '').encode() or os.urandom(32)
+NOTIFICATION_KEY = os.environ.get('NOTIFICATION_KEY', '').encode() or SECRET_KEY
 
 BLUEPRINTS = [
     'newsroom.wire',
@@ -29,6 +32,7 @@ BLUEPRINTS = [
     'newsroom.users',
     'newsroom.companies',
     'newsroom.design',
+    'newsroom.notification',
 ]
 
 CORE_APPS = [
