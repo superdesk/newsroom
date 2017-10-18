@@ -4,14 +4,17 @@ import PropTypes from 'prop-types';
 const SelectInput = ({name, label, onChange, defaultOption, value, error, options}) => {
     return (
         <div className="form-group">
-            <label htmlFor="{name}">{label}</label>
+            <label htmlFor={name}>{label}</label>
             <div className="field">
                 <select
+                    id={name}
                     name={name}
                     value={value}
                     onChange={onChange}
                     className="form-control">
-                    <option value="">{defaultOption}</option>
+                    {defaultOption &&
+                        <option value="">{defaultOption}</option>
+                    }
                     {options.map((option) => {
                         return <option key={option.value} value={option.value}>{option.text}</option>;
                     })}
@@ -29,7 +32,10 @@ SelectInput.propTypes = {
     defaultOption: PropTypes.string,
     value: PropTypes.string,
     error: PropTypes.arrayOf(PropTypes.string),
-    options: PropTypes.arrayOf(PropTypes.object)
+    options: PropTypes.arrayOf(PropTypes.shape({
+        text: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired,
+    })).isRequired,
 };
 
 export default SelectInput;
