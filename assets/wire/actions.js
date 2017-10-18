@@ -170,14 +170,26 @@ export function selectNone() {
 export function bookmarkItems(items) {
     return () =>
         server.post('/wire_bookmark', {items})
-            .then(() => notify.success(gettext('Items were bookmarked successfully.')))
+            .then(() => {
+                if (items.length > 1) {
+                    notify.success(gettext('Items were bookmarked successfully.'));
+                } else {
+                    notify.success(gettext('Item was bookmarked successfully.'));
+                }
+            })
             .catch(errorHandler);
 }
 
 export function removeBookmarks(items) {
     return (dispatch) =>
-        server.del('/wire_bookmark', {items: items})
-            .then(() => notify.success(gettext('Items were removed from bookmarks successfully.')))
+        server.del('/wire_bookmark', {items})
+            .then(() => {
+                if (items.length > 1) {
+                    notify.success(gettext('Items were removed from bookmarks successfully.'));
+                } else {
+                    notify.success(gettext('Item was removed from bookmarks successfully.'));
+                }
+            })
             .then(() => dispatch(fetchItems()))
             .catch(errorHandler);
 }
