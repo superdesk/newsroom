@@ -33,25 +33,30 @@ class SearchBar extends React.Component {
 
     render() {
         return (
-            <div className={classNames('search__form input-group', {
-                'searchForm--active': !!this.state.query,
-            })}>
-                <form className='form-inline' onSubmit={this.onSubmit}>
-                    <input type='text'
-                        name='q'
-                        className='search__input form-control'
-                        placeholder='Search for...'
-                        aria-label='Search for...'
-                        value={this.state.query}
-                        onChange={this.onChange}
-                    />
-                    <div className='search__form__buttons'>
-                        <span className='search__clear' onClick={this.onClear}>
-                            <img src='/static/search_clear.png' width='16' height='16'/>
-                        </span>
-                        <button className='btn' type='submit'>{gettext('Search')}</button>
-                    </div>
-                </form>
+            <div className="search form-inline">
+                <span className="search__icon">
+                    <i className="icon--search icon--gray-light"></i>
+                </span>
+                <div className={classNames('search__form input-group', {
+                    'searchForm--active': !!this.state.query,
+                })}>
+                    <form className='form-inline' onSubmit={this.onSubmit}>
+                        <input type='text'
+                            name='q'
+                            className='search__input form-control'
+                            placeholder='Search for...'
+                            aria-label='Search for...'
+                            value={this.state.query}
+                            onChange={this.onChange}
+                        />
+                        <div className='search__form__buttons'>
+                            <span className='search__clear' onClick={this.onClear}>
+                                <img src='/static/search_clear.png' width='16' height='16'/>
+                            </span>
+                            <button className='btn' type='submit'>{gettext('Search')}</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         );
     }

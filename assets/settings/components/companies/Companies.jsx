@@ -51,7 +51,7 @@ class Companies extends React.Component {
         const progressStyle = {width: '25%'};
 
         return (
-            <div className="row">
+            <div className="flex-row">
                 {(this.props.isLoading ?
                     <div className="col d">
                         <div className="progress">
@@ -59,7 +59,7 @@ class Companies extends React.Component {
                         </div>
                     </div>
                     :
-                    <div className="col">
+                    <div className="flex-col">
                         {this.props.activeQuery &&
                         <SearchResultsInfo
                             totalItems={this.props.totalCompanies}

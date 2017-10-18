@@ -15,20 +15,24 @@ function UsersList({users, onClick, activeUserId, companiesById}) {
     );
 
     return (
-        <table className="table table-responsive table-hover">
-            <thead>
-                <tr>
-                    <th>{ gettext('Name') }</th>
-                    <th>{ gettext('Email') }</th>
-                    <th>{ gettext('Telephone') }</th>
-                    <th>{ gettext('User Type') }</th>
-                    <th>{ gettext('Company') }</th>
-                    <th>{ gettext('Status') }</th>
-                    <th>{ gettext('Created On') }</th>
-                </tr>
-            </thead>
-            <tbody>{list}</tbody>
-        </table>
+        <section className="content-main">
+            <div className="list-items-container">
+                <table className="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>{ gettext('Name') }</th>
+                            <th>{ gettext('Email') }</th>
+                            <th>{ gettext('Telephone') }</th>
+                            <th>{ gettext('User Type') }</th>
+                            <th>{ gettext('Company') }</th>
+                            <th>{ gettext('Status') }</th>
+                            <th>{ gettext('Created On') }</th>
+                        </tr>
+                    </thead>
+                    <tbody>{list}</tbody>
+                </table>
+            </div>
+        </section>
     );
 }
 

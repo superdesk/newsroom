@@ -1,9 +1,170 @@
-{% extends "layout.html" %}
+{% extends "layout_settings.html" %}
 
 {% block title %}Users Design{% endblock %}
 
-{% block content %}
-<section>
-    <h1>Users design</h1>
-</section>
+{% block adminNavigation %}
+
+<nav class="side-navigation">
+    <ul>
+        <li><a class="side-navigation__btn" href="#">Companies Management</a></li>
+        <li><a class="side-navigation__btn active" href="#">User Management</a></li>
+        <li><a class="side-navigation__btn" href="#">System Settings</a></li>
+    </ul>
+</nav>
+
+{% endblock %}
+
+{% block contentHeader %}
+
+<nav class="content-bar navbar content-bar--side-padding">
+    <div class="search form-inline">
+        <span class="search__icon">
+            <i class="icon--search icon--gray-light"></i>
+        </span>
+        <div class="search__form input-group">
+            <form class="form-inline">
+
+                <input type="text" class="search__input form-control" placeholder="Search for..." aria-label="Search for...">
+                <div class="search__form__buttons">
+                    <span class="search__clear">
+                        <img src="{{ url_for('static', filename = 'search_clear.png') }}" width="16" height="16"/>
+                    </span>
+                    <button class="btn" type="submit">Search</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <div class="content-bar__right">
+        <button class="wire-button">New User</button>
+    </div>
+</nav>
+
+{% endblock %}
+{% block contentMain %}
+<div class="list-items-container">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Telephone</th>
+                <th>User Type</th>
+                <th>Company</th>
+                <th>Status</th>
+                <th>Created On</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="name">Karel Petrak</td>
+                <td>karel.petrak@sourcefabric.org</td>
+                <td>xx</td>
+                <td>administrator</td>
+                <td>ABC - keep it enabled!</td>
+                <td>Approved -Enabled</td>
+                <td>10/12/2017, 1:41:30 PM</td>
+            </tr>
+            <tr>
+                <td class="name">Mr Admin</td>
+                <td>admin@example.com</td>
+                <td>111111111</td>
+                <td>administrator</td>
+                <td>ABC - keep it enabled!</td>
+                <td>Approved -Enabled</td>
+                <td>9/25/2017, 2:38:36 PM</td>
+            </tr>
+            <tr>
+                <td class="name">Second Admin</td>
+                <td>admin2@example.com</td>
+                <td>111111111</td>
+                <td>public</td>
+                <td>ABC - keep it enabled!</td>
+                <td>Needs Approval -Enabled</td>
+                <td>9/25/2017, 2:44:42 PM</td>
+            </tr>
+            <tr>
+                <td class="name">Dear Admin</td>
+                <td>admin8@example.com</td>
+                <td>444-333</td>
+                <td>administrator</td>
+                <td>ABC - keep it enabled!</td>
+                <td>Approved -Enabled</td>
+                <td>9/27/2017, 3:10:32 PM</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="list-item__preview">
+    <div class="list-item__preview-header">
+        <h3>Edit User</h3>
+        <button id="hide-sidebar" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    <form>
+        <div class="list-item__preview-form">
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <div class="field">
+                    <input type="text" id="first_name" name="first_name" class="form-control" value="Mr">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <div class="field">
+                    <input type="text" id="last_name" name="last_name" class="form-control" value="Admin">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <div class="field">
+                    <input type="text" id="email" name="email" class="form-control" value="admin@example.com">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="phone">Telephone</label>
+                <div class="field">
+                    <input type="text" id="phone" name="phone" class="form-control" value="111111111">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="{name}">User Type</label>
+                <div class="field">
+                    <select name="user_type" class="form-control">
+                        <option value=""></option>
+                        <option value="administrator">Administrator</option>
+                        <option value="internal">Internal</option>
+                        <option value="public">Public</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="{name}">Company</label>
+                <div class="field">
+                    <select name="company" class="form-control">
+                        <option value=""></option>
+                        <option value="59d252485b850c00c87393cf">ABC - keep it enabled!</option>
+                        <option value="59cc22265b850c00ca1d09ef">Sourcefabric</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" name="is_approved" class="form-check-input" value="on"> Approved
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" name="is_enabled" class="form-check-input" value="on"> Enabled
+                </label>
+            </div>
+        </div>
+        <div class="list-item__preview-footer">
+            <input type="button" class="wire-button" value="Reset Password" id="resetPassword">
+            <input type="button" class="wire-button wire-button--active" value="Save">
+            <input type="button" class="wire-button wire-button--active" value="Delete">
+        </div>
+    </form>
+</div>
 {% endblock %}
