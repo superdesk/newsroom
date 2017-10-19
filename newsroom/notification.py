@@ -23,5 +23,4 @@ def notify():
     if not test_signature(flask.request):
         flask.abort(500)
     push_notification('update')
-    print(flask.current_app.notification_client.open)
     return flask.jsonify({})
