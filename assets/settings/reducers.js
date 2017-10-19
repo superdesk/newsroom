@@ -9,9 +9,9 @@ import {
     GET_COMPANY_USERS,
     SAVE_ITEM,
     CANCEL_EDIT,
-    SAVE_ERROR,
     NEW_ITEM,
     SELECT_MENU,
+    SET_ERROR,
 } from './actions';
 
 const initialState = {
@@ -28,13 +28,30 @@ const initialState = {
 export default function itemReducer(state = initialState, action) {
     switch (action.type) {
 
-    case SELECT_ITEM:
+    case SELECT_ITEM: {
+        const defaultItem = {
+            user_type: 'public',
+            is_approved: true,
+            is_enabled: true,
+            _id: null,
+            name: '',
+            email: '',
+            phone: '',
+            company: '',
+            sd_subscriber_id: '',
+            contact_name: '',
+            country: '',
+            contact_email: '',
+            url: '',
+        };
+
         return {
             ...state,
             activeItemId: action.id || null,
-            itemToEdit: action.id ? state.itemsById[action.id] : null,
+            itemToEdit: action.id ? Object.assign(defaultItem, state.itemsById[action.id]) : null,
             errors: null,
         };
+    }
 
     case EDIT_ITEM: {
         const target = action.event.target;
@@ -63,6 +80,8 @@ export default function itemReducer(state = initialState, action) {
             contact_name: '',
             country: '',
             is_enabled: true,
+            contact_email: '',
+            url:'',
         };
 
         return {...state, itemToEdit: action.data === 'users' ? newUser : newCompany, errors: null};
@@ -72,16 +91,15 @@ export default function itemReducer(state = initialState, action) {
         return {...state, itemToEdit: state.itemToEdit, errors: null};
     }
 
-    case SAVE_ERROR: {
-        return {...state, errors: action.data};
-    }
-
     case CANCEL_EDIT: {
-        return {...state, itemToEdit: null};
+        return {...state, itemToEdit: null, errors: null};
     }
 
     case SET_QUERY:
         return {...state, query: action.query};
+
+    case SET_ERROR:
+        return {...state, errors: action.errors};
 
     case QUERY_ITEMS:
         return {...state,

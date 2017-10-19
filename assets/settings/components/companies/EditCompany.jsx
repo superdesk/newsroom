@@ -83,6 +83,13 @@ class EditCompany extends React.Component {
                                         error={this.props.errors ? this.props.errors.name : null}/>
 
                                     <TextInput
+                                        name='url'
+                                        label={gettext('Company Url')}
+                                        value={this.props.company.url}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.url : null}/>
+                                    
+                                    <TextInput
                                         name='sd_subscriber_id'
                                         label={gettext('Superdesk Subscriber Id')}
                                         value={this.props.company.sd_subscriber_id}
@@ -103,6 +110,12 @@ class EditCompany extends React.Component {
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.contact_name : null}/>
 
+                                    <TextInput
+                                        name='contact_email'
+                                        label={gettext('Contact Email')}
+                                        value={this.props.company.contact_email}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.contact_email : null}/>
                                     <SelectInput
                                         name='country'
                                         label={gettext('Country')}

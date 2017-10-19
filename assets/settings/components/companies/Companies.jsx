@@ -3,14 +3,12 @@ import PropTypes from 'prop-types';
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import {setError} from 'settings/actions';
 
 class Companies extends React.Component {
     constructor(props, context) {
         super(props, context);
 
-        this.state = {
-            errors: {},
-        };
         this.isFormValid = this.isFormValid.bind(this);
         this.save = this.save.bind(this);
         this.deleteCompany = this.deleteCompany.bind(this);
@@ -25,7 +23,7 @@ class Companies extends React.Component {
             valid = false;
         }
 
-        this.setState({errors: errors});
+        this.props.dispatch(setError(errors));
         return valid;
     }
 
@@ -102,8 +100,9 @@ Companies.propTypes = {
     isLoading: PropTypes.bool,
     activeQuery: PropTypes.string,
     totalCompanies: PropTypes.number,
-    errors: PropTypes.object,
     fetchCompanyUsers: PropTypes.func,
+    errors: PropTypes.object,
+    dispatch: PropTypes.func,
 };
 
 export default Companies;

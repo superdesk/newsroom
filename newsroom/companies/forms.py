@@ -11,8 +11,10 @@ class CompanyForm(Form):
 
     id = HiddenField('Id')
     name = StringField('Company Name', validators=[DataRequired()])
+    url = StringField('Company Url', validators=[])
     sd_subscriber_id = StringField('Superdesk Subscriber Id', validators=[])
     is_enabled = BooleanField('Account Enabled', default=True, validators=[])
     contact_name = StringField('Contact Name', validators=[])
+    contact_email = StringField('Email', validators=[])
     phone = StringField('Telephone', validators=[])
     country = StringField('Country', validators=[])

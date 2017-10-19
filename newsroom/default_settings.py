@@ -35,8 +35,8 @@ CORE_APPS = [
     'content_api.assets',
     'content_api.search',
     'content_api.auth',
-    'content_api.users',
-    'content_api.companies',
+    'newsroom.users',
+    'newsroom.companies',
     'newsroom.wire',
     'newsroom.topics',
 ]
