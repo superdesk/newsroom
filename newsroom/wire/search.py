@@ -23,8 +23,15 @@ class WireSearchResource(newsroom.Resource):
 
 class WireSearchService(newsroom.Service):
     def get(self, req, lookup):
-        query = {'bool': {'must_not': {'term': {'type': 'composite'}}}}
-        query['bool']['must'] = []
+        query = {
+            'bool': {
+                'must_not': [
+                    {'term': {'type': 'composite'}},
+                    {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
+                ],
+                'must': [],
+            }
+        }
 
         if req.args.get('q'):
             query['bool']['must'].append({
