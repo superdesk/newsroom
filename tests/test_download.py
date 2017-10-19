@@ -3,11 +3,11 @@ import io
 import lxml
 import zipfile
 
-from .fixtures import items, init  # noqa
+from .fixtures import items, init_items, init_auth  # noqa
 
 
 def download_file(client, _format):
-    resp = client.get('/download/%s?format=%s' % (','.join([item['_id'] for item in items]), _format))
+    resp = client.get('/download/%s?format=%s' % (','.join([item['_id'] for item in items[:2]]), _format))
     assert resp.status_code == 200
     assert resp.mimetype == 'application/zip'
     _file = io.BytesIO(resp.get_data())
