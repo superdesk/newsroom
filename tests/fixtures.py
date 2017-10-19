@@ -23,25 +23,15 @@ items = [
         'headline': 'Weather',
         'slugline': 'WEATHER',
         'body_html': '<p>Weather report</p>',
-        'ancestors': ['tag:weather'],
+        'ancestors': ['tag:foo'],
         'firstcreated': datetime.now(),
         'versioncreated': datetime.now(),
-    },
-    {
-        '_id': 'tag:weather',
-        'type': 'text',
-        'version': 2,
-        'nextversion': 'urn:localhost:weather',
     },
 ]
 
 
 @fixture(autouse=True)
-def init_items(app):
+def init(app, client):
     app.data.insert('items', items)
-
-
-@fixture(autouse=True)
-def init_auth(app, client):
     users_init(app)
     test_login_succeeds_for_admin(client)

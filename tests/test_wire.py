@@ -1,7 +1,7 @@
 
 from flask import json
 
-from .fixtures import items, init_items, init_auth  # noqa
+from .fixtures import items, init  # noqa
 
 
 def test_item_detail(client):
@@ -76,11 +76,4 @@ def test_versions(client, app):
     resp = client.get('/wire/%s/versions' % items[1]['_id'])
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
-    assert 'tag:weather' == data['_items'][0]['_id']
-
-
-def test_search_filters_items_with_updates(client, app):
-    resp = client.get('/search')
-    data = json.loads(resp.get_data())
-    assert 2 == len(data['_items'])
-    assert 'tag:weather' not in [item['_id'] for item in data['_items']]
+    assert 'tag:foo' == data['_items'][0]['_id']
