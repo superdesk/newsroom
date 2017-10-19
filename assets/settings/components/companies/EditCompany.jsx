@@ -38,8 +38,8 @@ class EditCompany extends React.Component {
 
     render() {
         return (
-            <div className='col'>
-                <div className='modal-header'>
+            <div className='list-item__preview'>
+                <div className='list-item__preview-header'>
                     <h3>{this.props.company.name}</h3>
                     <button
                         id='hide-sidebar'
@@ -70,63 +70,64 @@ class EditCompany extends React.Component {
                     </li>
                 </ul>
 
-                <div className='tab-content mt-3'>
+                <div className='tab-content'>
                     {this.state.activeTab === 'company-details' ?
                         <div className='tab-pane active' id='company-details'>
                             <form>
-                                <TextInput
-                                    name='name'
-                                    label={gettext('Name')}
-                                    value={this.props.company.name}
-                                    onChange={this.props.onChange}
-                                    error={this.props.errors ? this.props.errors.name : null}/>
+                                <div className="list-item__preview-form">
+                                    <TextInput
+                                        name='name'
+                                        label={gettext('Name')}
+                                        value={this.props.company.name}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.name : null}/>
 
-                                <TextInput
-                                    name='sd_subscriber_id'
-                                    label={gettext('Superdesk Subscriber Id')}
-                                    value={this.props.company.sd_subscriber_id}
-                                    onChange={this.props.onChange}
-                                    error={this.props.errors ? this.props.errors.sd_subscriber_id : null}/>
+                                    <TextInput
+                                        name='sd_subscriber_id'
+                                        label={gettext('Superdesk Subscriber Id')}
+                                        value={this.props.company.sd_subscriber_id}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.sd_subscriber_id : null}/>
 
-                                <TextInput
-                                    name='phone'
-                                    label={gettext('Telephone')}
-                                    value={this.props.company.phone}
-                                    onChange={this.props.onChange}
-                                    error={this.props.errors ? this.props.errors.phone : null}/>
+                                    <TextInput
+                                        name='phone'
+                                        label={gettext('Telephone')}
+                                        value={this.props.company.phone}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.phone : null}/>
 
-                                <TextInput
-                                    name='contact_name'
-                                    label={gettext('Contact Name')}
-                                    value={this.props.company.contact_name}
-                                    onChange={this.props.onChange}
-                                    error={this.props.errors ? this.props.errors.contact_name : null}/>
+                                    <TextInput
+                                        name='contact_name'
+                                        label={gettext('Contact Name')}
+                                        value={this.props.company.contact_name}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.contact_name : null}/>
 
-                                <SelectInput
-                                    name='country'
-                                    label={gettext('Country')}
-                                    value={this.props.company.country}
-                                    defaultOption=''
-                                    options={countries}
-                                    onChange={this.props.onChange}
-                                    error={this.props.errors ? this.props.errors.user_type : null}/>
+                                    <SelectInput
+                                        name='country'
+                                        label={gettext('Country')}
+                                        value={this.props.company.country}
+                                        defaultOption=''
+                                        options={countries}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.user_type : null}/>
 
-                                <CheckboxInput
-                                    name='is_enabled'
-                                    label={gettext('Enabled')}
-                                    value={this.props.company.is_enabled}
-                                    onChange={this.props.onChange}/>
+                                    <CheckboxInput
+                                        name='is_enabled'
+                                        label={gettext('Enabled')}
+                                        value={this.props.company.is_enabled}
+                                        onChange={this.props.onChange}/>
 
-
-                                <div className='modal-footer'>
+                                </div>
+                                <div className='list-item__preview-footer'>
                                     <input
                                         type='button'
-                                        className='btn btn-primary'
+                                        className='wire-button wire-button--active'
                                         value={gettext('Save')}
                                         onClick={this.props.onSave}/>
                                     <input
                                         type='button'
-                                        className='btn btn-primary'
+                                        className='wire-button'
                                         value={gettext('Delete')}
                                         onClick={this.props.onDelete}/>
                                 </div>
@@ -134,7 +135,7 @@ class EditCompany extends React.Component {
 
                             </form>
                         </div> : <div className='tab-pane active' id='users'>
-                            <table className='table table-responsive table-hover'>
+                            <table className='table'>
                                 <tbody>{this.getUsers()}</tbody>
                             </table>
                         </div>}

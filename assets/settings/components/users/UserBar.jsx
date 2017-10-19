@@ -6,12 +6,16 @@ import SearchBar from 'wire/components/SearchBar';
 class UserBar extends React.Component {
     render() {
         return (
-            <nav className="navbar sticky-top navbar-light bg-light">
-                <SearchBar fetchItems={()=>this.props.fetchItems('users')}/>
-                <button
-                    className="btn btn-primary btn-lg active float-right"
-                    onClick={() => this.props.onNewUser('users')}>{gettext('New User')}</button>
-            </nav>
+            <section className="content-header">
+                <nav className="content-bar navbar content-bar--side-padding">
+                    <SearchBar fetchItems={()=>this.props.fetchItems('users')}/>
+                    <div className="content-bar__right">
+                        <button
+                            className="wire-button"
+                            onClick={() => this.props.onNewUser('users')}>{gettext('New User')}</button>
+                    </div>
+                </nav>
+            </section>
         );
     }
 }

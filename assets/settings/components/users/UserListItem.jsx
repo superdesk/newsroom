@@ -6,9 +6,9 @@ import { gettext, shortDate } from 'utils';
 function UserListItem({user, isActive, onClick, companiesById}) {
     return (
         <tr key={user._id}
-            className={isActive?'table-success':null}
+            className={isActive?'table--selected':null}
             onClick={() => onClick(user._id)}>
-            <td>{user.first_name} {user.last_name}</td>
+            <td className="name">{user.first_name} {user.last_name}</td>
             <td>{user.email}</td>
             <td>{user.phone}</td>
             <td>{user.user_type}</td>

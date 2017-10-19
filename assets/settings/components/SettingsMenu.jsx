@@ -5,21 +5,21 @@ import { gettext } from 'utils';
 
 function SettingsMenu({isCompanySettings, isUserSettings, isSystemSettings, onClick}) {
     return (
-        <ul className='nav flex-column'>
-            <li className='nav-item'>
-                <a className={`nav-link ${isCompanySettings?'active':null}`}
+        <ul>
+            <li>
+                <a className={`side-navigation__btn ${isCompanySettings?'active':null}`}
                     href='#'
                     name='companies'
                     onClick={onClick}>{gettext('Company Management')}</a>
             </li>
-            <li className='nav-item'>
-                <a className={`nav-link ${isUserSettings?'active':null}`}
+            <li>
+                <a className={`side-navigation__btn ${isUserSettings?'active':null}`}
                     href='#'
                     name='users'
                     onClick={onClick}>{gettext('User Management')}</a>
             </li>
-            <li className='nav-item'>
-                <a className={`nav-link ${isSystemSettings?'active':null}`}
+            <li>
+                <a className={`side-navigation__btn ${isSystemSettings?'active':null}`}
                     href='#'
                     name='settings'>{gettext('System Settings')}</a>
             </li>

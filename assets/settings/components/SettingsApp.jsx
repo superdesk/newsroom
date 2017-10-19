@@ -30,8 +30,8 @@ class SettingsApp extends React.Component {
 
     render() {
         return (
-            <div className="row">
-                <div className='col-2' id='settings-menu'>
+            <div className="settings-inner">
+                <div className='side-navigation' id='settings-menu'>
                     <SettingsMenu
                         onClick={this.props.selectMenu}
                         isCompanySettings={this.props.selectedMenu === 'companies'}
@@ -40,7 +40,7 @@ class SettingsApp extends React.Component {
                     />
                 </div>
                 {this.props.selectedMenu === 'users' ?
-                    <div className="col">
+                    <div className="content">
                         <UserBar
                             onNewUser={this.props.newItem}
                             fetchItems={this.props.fetchItems}
@@ -65,7 +65,7 @@ class SettingsApp extends React.Component {
                         />
                     </div> : null }
                 {this.props.selectedMenu === 'companies' ?
-                    <div className="col">
+                    <div className="content">
                         <CompanyBar
                             onNewCompany={this.props.newItem}
                             fetchItems={this.props.fetchItems}
@@ -89,7 +89,6 @@ class SettingsApp extends React.Component {
                         />
                     </div> : null }
             </div>
-
         );
     }
 }

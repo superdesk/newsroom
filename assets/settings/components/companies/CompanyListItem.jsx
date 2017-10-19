@@ -6,9 +6,9 @@ import { gettext, shortDate } from 'utils';
 function CompanyListItem({company, isActive, onClick}) {
     return (
         <tr key={company._id}
-            className={isActive?'table-success':null}
+            className={isActive?'table--selected':null}
             onClick={() => onClick(company._id)}>
-            <td>{company.name}</td>
+            <td className="name">{company.name}</td>
             <td>{company.sd_subscriber_id}</td>
             <td>{(company.is_enabled ? gettext('Enabled') : gettext('Disabled'))}</td>
             <td>{company.contact_name}</td>

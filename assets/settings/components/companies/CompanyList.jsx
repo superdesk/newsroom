@@ -14,20 +14,24 @@ function CompanyList({companies, onClick, activeCompanyId}) {
     );
 
     return (
-        <table className="table table-responsive table-hover">
-            <thead>
-                <tr>
-                    <th>{ gettext('Name') }</th>
-                    <th>{ gettext('Superdesk Subscriber Id') }</th>
-                    <th>{ gettext('Status') }</th>
-                    <th>{ gettext('Contact') }</th>
-                    <th>{ gettext('Telephone') }</th>
-                    <th>{ gettext('Country') }</th>
-                    <th>{ gettext('Created On') }</th>
-                </tr>
-            </thead>
-            <tbody>{list}</tbody>
-        </table>
+        <section className="content-main">
+            <div className="list-items-container">
+                <table className="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>{ gettext('Name') }</th>
+                            <th>{ gettext('Superdesk Subscriber Id') }</th>
+                            <th>{ gettext('Status') }</th>
+                            <th>{ gettext('Contact') }</th>
+                            <th>{ gettext('Telephone') }</th>
+                            <th>{ gettext('Country') }</th>
+                            <th>{ gettext('Created On') }</th>
+                        </tr>
+                    </thead>
+                    <tbody>{list}</tbody>
+                </table>
+            </div>
+        </section>
     );
 }
 
