@@ -31,11 +31,6 @@ export function cancelEdit(event) {
 
 export const SAVE_ITEM = 'SAVE_ITEM';
 
-export const SAVE_ERROR = 'SAVE_ERROR';
-export function saveError(data) {
-    return {type: SAVE_ERROR, data};
-}
-
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query) {
     return {type: SET_QUERY, query};
@@ -61,6 +56,11 @@ export function getItems(data) {
     return {type: GET_ITEMS, data};
 }
 
+export const SET_ERROR = 'SET_ERROR';
+export function setError(errors) {
+    return {type: SET_ERROR, errors};
+}
+
 export function updateMenu(data) {
     return function (dispatch) {
         dispatch(fetchItems(data.target.name));
@@ -81,7 +81,7 @@ function errorHandler(error, dispatch) {
         return;
     }
     error.response.json().then(function(data) {
-        dispatch(saveError(data));
+        dispatch(setError(data));
     });
 }
 

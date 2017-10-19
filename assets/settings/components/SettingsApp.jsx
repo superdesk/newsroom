@@ -22,10 +22,6 @@ import CompanyBar from './companies/CompanyBar';
 class SettingsApp extends React.Component {
     constructor(props, context) {
         super(props, context);
-
-        this.state = {
-            errors: {},
-        };
     }
 
     render() {
@@ -62,6 +58,8 @@ class SettingsApp extends React.Component {
                             companyOptions={this.props.companyOptions}
                             companiesById={this.props.companiesById}
                             errors={this.props.errors}
+                            dispatch={this.props.dispatch}
+
                         />
                     </div> : null }
                 {this.props.selectedMenu === 'companies' ?
@@ -84,8 +82,10 @@ class SettingsApp extends React.Component {
                             isLoading={this.props.isLoading}
                             activeQuery={this.props.activeQuery}
                             totalCompanies={this.props.totalItems}
-                            errors={this.props.errors}
                             fetchCompanyUsers={this.props.fetchCompanyUsers}
+                            errors={this.props.errors}
+                            dispatch={this.props.dispatch}
+
                         />
                     </div> : null }
             </div>
@@ -110,11 +110,12 @@ SettingsApp.propTypes = {
     companyOptions: PropTypes.arrayOf(PropTypes.object),
     companiesById: PropTypes.object,
     companyUsers: PropTypes.arrayOf(PropTypes.object),
-    errors: PropTypes.object,
     selectMenu: PropTypes.func,
     selectedMenu: PropTypes.string,
     fetchItems: PropTypes.func,
     fetchCompanyUsers: PropTypes.func,
+    errors: PropTypes.object,
+    dispatch: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -142,6 +143,7 @@ const mapDispatchToProps = (dispatch) => ({
     selectMenu: (event) => dispatch(updateMenu(event)),
     fetchItems: (type) => dispatch(fetchItems(type)),
     fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
+    dispatch: dispatch,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsApp);

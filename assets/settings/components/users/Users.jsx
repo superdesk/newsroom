@@ -3,14 +3,12 @@ import PropTypes from 'prop-types';
 import EditUser from './EditUser';
 import UsersList from './UsersList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import {setError} from 'settings/actions';
 
 class Users extends React.Component {
     constructor(props, context) {
         super(props, context);
 
-        this.state = {
-            errors: {},
-        };
         this.isFormValid = this.isFormValid.bind(this);
         this.save = this.save.bind(this);
         this.deleteUser = this.deleteUser.bind(this);
@@ -25,7 +23,7 @@ class Users extends React.Component {
             valid = false;
         }
 
-        this.setState({errors: errors});
+        this.props.dispatch(setError(errors));
         return valid;
     }
 
@@ -106,6 +104,7 @@ Users.propTypes = {
     companyOptions: PropTypes.arrayOf(PropTypes.object),
     companiesById: PropTypes.object,
     errors: PropTypes.object,
+    dispatch: PropTypes.func,
 };
 
 export default Users;
