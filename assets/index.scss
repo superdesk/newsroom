@@ -1181,6 +1181,7 @@ article.list {
 
 .wire-column__preview__content--item-detail-item-text {
     order: 2;
+    flex-grow: 1;
     @include lg {
         margin: 0px 40px 0px 10px;
     }
