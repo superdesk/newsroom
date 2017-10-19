@@ -2,3 +2,4 @@ flake8
 sphinx
 pytest
 pytest-cov
+pytest-mock

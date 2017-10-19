@@ -7,6 +7,8 @@ from superdesk.default_settings import (   # noqa
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,
     ELASTIC_DATE_FORMAT,
+    CELERY_BROKER_URL,
+    celery_queue,
 )
 
 XML = False
@@ -19,7 +21,10 @@ X_MAX_AGE = 24 * 3600
 X_HEADERS = ['Content-Type', 'Authorization', 'If-Match']
 
 URL_PREFIX = 'api'
-SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(32))
+
+# keys for signing, shoudl be binary
+SECRET_KEY = os.environ.get('SECRET_KEY', '').encode() or os.urandom(32)
+NOTIFICATION_KEY = os.environ.get('NOTIFICATION_KEY', '').encode() or SECRET_KEY
 
 BLUEPRINTS = [
     'newsroom.wire',
@@ -27,9 +32,11 @@ BLUEPRINTS = [
     'newsroom.users',
     'newsroom.companies',
     'newsroom.design',
+    'newsroom.notification',
 ]
 
 CORE_APPS = [
+    'superdesk.notification',
     'content_api.items',
     'content_api.items_versions',
     'content_api.assets',
@@ -106,3 +113,5 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
+
+WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')

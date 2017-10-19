@@ -103,10 +103,17 @@ class Newsroom(eve.Eve):
         def plain_text(html):
             return get_text(html, lf_on_block=True)
 
+        def newsroom_config():
+            port = int(os.environ.get('PORT', '5000'))
+            return {
+                'websocket': os.environ.get('NEWSROOM_WEBSOCKET_URL', 'ws://localhost:%d' % (port + 100, )),
+            }
+
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
         self.add_template_filter(plain_text)
         self.add_template_global(self.sidenavs, 'sidenavs')
+        self.add_template_global(newsroom_config)
 
     def _setup_webpack(self):
         NewsroomWebpack(self)
