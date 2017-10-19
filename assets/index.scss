@@ -529,6 +529,7 @@ article.list {
     flex-direction: column;
     margin-bottom: 20px;
     cursor: pointer;
+    outline: none; // avoid border on focus
 }
 
 .wire-articles--list {
@@ -563,7 +564,8 @@ article.list {
     }
 }
 
-.wire-articles__item:hover .wire-articles__item--list__select {
+.wire-articles__item:hover .wire-articles__item--list__select,
+.wire-articles__item--selected .wire-articles__item--list__select {
     width: 24px;
     opacity: 1;
     margin-right: 10px;

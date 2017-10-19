@@ -38,10 +38,10 @@ class WireListItem extends React.Component {
 
     render() {
         const {item, onClick} = this.props;
-        const cardClassName = classNames('wire-articles__item-wrap col-12', {
-            'wire-articles__item--list__selected': this.props.isSelected,
-            'border-warning': this.props.isActive,
-            'border-primary': this.props.isSelected && !this.props.isActive,
+        const cardClassName = classNames('wire-articles__item-wrap col-12');
+        const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
+            'wire-articles__item--open': this.props.isActive,
+            'wire-articles__item--selected': this.props.isSelected,
         });
         return (
             <article key={item._id}
@@ -53,7 +53,7 @@ class WireListItem extends React.Component {
                 onKeyDown={this.onKeyDown}
             >
 
-                <div className='wire-articles__item wire-articles__item--list'>
+                <div className={wrapClassName}>
                     <div className='wire-articles__item--list__text'>
 
                         <h4 className='wire-articles__item--list__headline'>
@@ -65,7 +65,7 @@ class WireListItem extends React.Component {
                             </div>
                             {item.headline}
                         </h4>
-    
+
                         <div className='wire-articles__item__meta'>
                             <div className='wire-articles__item__icons'>
                                 <span className='wire-articles__item__icon'>
@@ -77,7 +77,7 @@ class WireListItem extends React.Component {
                                 <span className='wire-articles__item__divider'>
                                 </span>
                             </div>
-    
+
                             <div className='wire-articles__item__meta-info'>
                                 <span className='bold'>{this.slugline}</span>
                                 <span>{gettext('Source: {{ source }}', {source: item.source})}
@@ -86,7 +86,7 @@ class WireListItem extends React.Component {
                                 </span>
                             </div>
                         </div>
-    
+
                         <div className='wire-articles__item__text'>
                             <p>{item.description_text}</p>
                         </div>
@@ -97,7 +97,7 @@ class WireListItem extends React.Component {
                             </div>
                         )}
                     </div>
-                    
+
                     <div className='wire-articles__item--list__actions'>
                         <div className='btn-group'>
                             <span onClick={(event) => this.props.onActionList(event, this.props.item)}>
