@@ -1,0 +1,32 @@
+// Breakpoints
+
+// Extra small devices (portrait phones, less than 576px)
+// No media query since this is the default in Bootstrap
+
+// Small devices (landscape phones, 576px and up)
+@mixin sm() {
+    @media only screen and (min-width: 576px) {
+        @content;
+    }
+}
+
+// Medium devices (tablets, 768px and up)
+@mixin md() {
+    @media only screen and (min-width: 768px) {
+        @content;
+    }
+}
+
+// Large devices (desktops, 992px and up)
+@mixin lg() {
+    @media only screen and (min-width: 992px) {
+        @content;
+    }
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@mixin xl() {
+    @media only screen and (min-width: 1200px) {
+        @content;
+    }
+}
