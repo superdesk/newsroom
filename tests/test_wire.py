@@ -8,7 +8,7 @@ def test_item_detail(client):
     resp = client.get('/wire/tag:foo')
     assert resp.status_code == 200
     html = resp.get_data().decode('utf-8')
-    assert '<h1>Amazon Is Opening More Bookstores</h1>' in html
+    assert 'Amazon Is Opening More Bookstores' in html
 
 
 def test_share_items(client, app):
