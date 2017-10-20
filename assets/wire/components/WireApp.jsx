@@ -14,6 +14,7 @@ import {
     bookmarkItems,
     removeBookmarks,
     downloadItems,
+    refreshItems,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -159,6 +160,16 @@ class WireApp extends React.Component {
                                     />
                             }
 
+                            {!!this.props.newItemsCount && (
+                                <nav className="navbar">
+                                    <div className="form-inline">
+                                        <button className="btn" onClick={this.props.refreshItems}>
+                                            {gettext('Refresh')} <span className="badge badge-secondary">{this.props.newItemsCount}</span>
+                                        </button>
+                                    </div>
+                                </nav>
+                            )}
+
                             <ItemsList actions={this.props.actions.filter(previewActionFilter)}/>
                         </div>
                     )}
@@ -200,6 +211,8 @@ WireApp.propTypes = {
     selectAll: PropTypes.func,
     selectNone: PropTypes.func,
     bookmarks: PropTypes.bool,
+    newItemsCount: PropTypes.number,
+    refreshItems: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -213,6 +226,7 @@ const mapStateToProps = (state) => ({
     topics: state.topics,
     selectedItems: state.selectedItems,
     bookmarks: state.bookmarks,
+    newItemsCount: state.newItemsCount,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -224,6 +238,7 @@ const mapDispatchToProps = (dispatch) => ({
     },
     selectAll: () => dispatch(selectAll()),
     selectNone: () => dispatch(selectNone()),
+    refreshItems: () => dispatch(refreshItems()),
     actions: [
         {
             name: gettext('Open'),

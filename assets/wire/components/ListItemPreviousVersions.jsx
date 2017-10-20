@@ -57,7 +57,7 @@ class ListItemPreviousVersions extends React.Component {
 
 ListItemPreviousVersions.propTypes = {
     item: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
+        _id: PropTypes.string,
         ancestors: PropTypes.array,
     }).isRequired,
     isPreview: PropTypes.bool.isRequired

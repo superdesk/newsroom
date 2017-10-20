@@ -68,4 +68,16 @@ describe('wire actions', () => {
         store.dispatch(actions.removeBookmarks('foo'));
         expect(fetchMock.called('/wire_bookmark')).toBeTruthy();
     });
+
+    it('can populate new items on update notification', () => {
+        expect(store.getState().newItemsCount).toBe(0);
+        return store.dispatch(actions.pushNotification({event: 'update'}))
+            .then(() => {
+                expect(fetchMock.called('/search?q=')).toBeTruthy();
+                expect(store.getState().newItemsCount).toBe(1);
+                store.dispatch(actions.refreshItems());
+                expect(store.getState().newItemsCount).toBe(0);
+                expect(store.getState().items.length).toBe(1);
+            });
+    });
 });

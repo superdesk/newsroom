@@ -78,14 +78,24 @@ export function copyPreviewContents() {
 }
 
 /**
+ * Search server request
+ *
+ * @param {Object} state
+ * @return {Promise}
+ */
+function search(state) {
+    const query = state.query || '';
+    const bookmarks = state.bookmarks ? `&bookmarks=${state.user}` : '';
+    return server.get(`/search?q=${query}${bookmarks}`);
+}
+
+/**
  * Fetch items for current query
  */
 export function fetchItems() {
     return (dispatch, getState) => {
         dispatch(queryItems());
-        const query = getState().query || '';
-        const bookmarks = getState().bookmarks ? `&bookmarks=${getState().user}` : '';
-        return server.get(`/search?q=${query}${bookmarks}`)
+        return search(getState())
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
                 const params = new URLSearchParams(window.location.search);
@@ -227,5 +237,33 @@ export function submitDownloadItems(items, format) {
     return (dispatch) => {
         window.open(`/download/${items.join(',')}?format=${format}`, '_blank');
         dispatch(closeModal());
+    };
+}
+
+export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
+export function setNewItems(newItems, data) {
+    return {type: SET_NEW_ITEMS, newItems, data};
+}
+
+export const REFRESH_ITEMS = 'REFRESH_ITEMS';
+export function refreshItems() {
+    return {type: REFRESH_ITEMS};
+}
+
+/**
+ * Handle server push notification
+ *
+ * @param {Object} data
+ */
+export function pushNotification(push) {
+    return (dispatch, getState) => {
+        const state = getState();
+        switch (push.event) {
+        case 'update':
+            return search(state).then((data) => {
+                const newItems = data._items.filter((item) => !state.itemsById[item._id]);
+                return dispatch(setNewItems(newItems, data));
+            });
+        }
     };
 }

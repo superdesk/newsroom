@@ -15,6 +15,8 @@ import {
     SELECT_NONE,
     BOOKMARK_ITEMS,
     REMOVE_BOOKMARK,
+    SET_NEW_ITEMS,
+    REFRESH_ITEMS,
 } from './actions';
 
 import { toggleValue } from 'utils';
@@ -33,7 +35,19 @@ const initialState = {
     selectedItems: [],
     bookmarks: false,
     formats: [],
+    newItemsCount: 0,
+    newItemsData: null,
 };
+
+function recieveItems(state, data) {
+    const itemsById = Object.assign({}, state.itemsById);
+    const items = data._items.map((item) => {
+        itemsById[item._id] = item;
+        return item._id;
+    });
+
+    return {...state, items, itemsById, isLoading: false, totalItems: data._meta.total};
+}
 
 export default function wireReducer(state = initialState, action) {
     switch (action.type) {
@@ -74,15 +88,8 @@ export default function wireReducer(state = initialState, action) {
     case QUERY_ITEMS:
         return {...state, isLoading: true, totalItems: null, activeQuery: state.query};
 
-    case RECIEVE_ITEMS: {
-        const itemsById = Object.assign({}, state.itemsById);
-        const items = action.data._items.map((item) => {
-            itemsById[item._id] = item;
-            return item._id;
-        });
-
-        return {...state, items, itemsById, isLoading: false, totalItems: action.data._meta.total};
-    }
+    case RECIEVE_ITEMS:
+        return recieveItems(state, action.data);
 
     case SET_STATE:
         return Object.assign({}, action.state);
@@ -140,6 +147,21 @@ export default function wireReducer(state = initialState, action) {
             ...state,
             bookmarkedItems: state.bookmarkedItems.filter((val) => val !== action.item),
         };
+
+    case SET_NEW_ITEMS:
+        return {
+            ...state,
+            newItemsCount: action.newItems.length,
+            newItemsData: action.newItems.length ? action.data : null,
+        };
+
+    case REFRESH_ITEMS: {
+        const nextState = recieveItems(state, state.newItemsData);
+        return Object.assign(nextState, {
+            newItemsCount: 0,
+            newItemsData: null,
+        });
+    }
 
     default:
         return state;
