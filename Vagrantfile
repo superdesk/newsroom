@@ -10,20 +10,9 @@ if ! [ -d /etc/apt/sources.list.d/yarn.list ]; then
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 fi
 
-if ! [ -d /etc/apt/sources.list.d/mongodb.list ]; then
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
-    echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | tee /etc/apt/sources.list.d/mongodb.list
-fi
-
-if ! [ -d /tmp/elasticsearch-1.7.6.deb ]; then
-    cd /tmp
-    wget -q https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.6.deb
-    dpkg -i /tmp/elasticsearch-1.7.6.deb
-fi
-
 # install build dependencies
 apt-get update
-apt-get install -y python3-venv python3-pip yarn npm mongodb-org-server
+apt-get install -y python3-venv python3-pip yarn npm docker docker-compose
 
 # use node lts
 npm install -g n
@@ -44,6 +33,9 @@ cd /vagrant
 
 # install javascript dependencies
 yarn install --no-bin-links --modules-folder /opt/node_modules
+
+# start services
+docker-compose -f /vagrant/docker-compose.yml up -d
 SCRIPT
 
 $start = <<SCRIPT
@@ -82,14 +74,15 @@ echo 'done.'
 # start server
 source /opt/venv/bin/activate
 python manage.py create_user admin@localhost.com admin admin admin true
-python app.py &
+honcho start &
 echo $! >> /tmp/server.pid
 SCRIPT
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
 
-  config.vm.network "forwarded_port", guest: 5050, host: 5050
+  config.vm.network "forwarded_port", guest: 5000, host: 5050
+  config.vm.network "forwarded_port", guest: 5100, host: 5100
   config.vm.network "forwarded_port", guest: 8080, host: 8080
 
   config.vm.provision :shell, inline: $bootstrap
