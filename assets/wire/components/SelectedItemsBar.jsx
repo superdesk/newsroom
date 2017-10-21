@@ -20,7 +20,7 @@ class SelectedItemsBar extends React.Component {
                 key={action.name}
                 onClick={(e) => this.onAction(e, action)}
             >
-                <i className={`icon--${action.name.toLowerCase()}`}></i>
+                <i className={`icon--${action.icon}`}></i>
             </a>
         ));
         return (
