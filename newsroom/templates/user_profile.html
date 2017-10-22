@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ config.SITE_NAME }} - User Profile{% endblock %}
+
+{% block contentHeader %}
+
+{% endblock %}
+
+{% block content %}
+    <div id="user-profile-app" class="settingsWrap">
+
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script>
+        profileData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('user_profile_js') | safe }}
+{% endblock %}

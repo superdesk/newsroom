@@ -6,8 +6,10 @@ from newsroom.users.forms import UserForm
 from superdesk import get_resource_service
 from newsroom.users import blueprint
 from flask_babel import gettext
-from newsroom.auth.decorator import admin_only
+from newsroom.auth import get_user
+from newsroom.auth.decorator import admin_only, login_required
 from newsroom.auth.views import send_token, add_token_data, send_reset_password_email
+from newsroom.topics import get_user_topics
 from flask import jsonify, current_app as app
 import re
 
@@ -16,6 +18,21 @@ import re
 @admin_only
 def settings():
     return flask.render_template('settings.html')
+
+
+def get_view_data():
+    user = get_user()
+    return {
+        'user': user if user else None,
+        'company': str(user['company']) if user and user.get('company') else None,
+        'topics': get_user_topics(user['_id']) if user else [],
+    }
+
+
+@blueprint.route('/myprofile', methods=['GET'])
+@login_required
+def user_profile():
+    return flask.render_template('user_profile.html', data=get_view_data())
 
 
 @blueprint.route('/users/search', methods=['GET'])
@@ -118,3 +135,12 @@ def delete(id):
     """ Deletes the user by given id """
     get_resource_service('users').delete({'_id': ObjectId(id)})
     return jsonify({'success': True}), 200
+
+
+@blueprint.route('/users/<id>/topics', methods=['GET'])
+@login_required
+def get_topics(id):
+    """ Returns list of followed topics of given user """
+    if flask.session['user'] != str(id):
+        flask.abort(401)
+    return jsonify({'_items': get_user_topics(id)}), 200

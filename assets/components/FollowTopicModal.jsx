@@ -1,13 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { gettext } from 'utils';
-import { closeModal, submitFollowTopic } from 'wire/actions';
 
-import Modal, { ModalPrimaryButton, ModalSecondaryButton } from 'components/Modal';
-import CloseButton from 'components/CloseButton';
-import TextInput from 'components/TextInput';
-import CheckboxInput from 'components/CheckboxInput';
+import Modal, { ModalPrimaryButton, ModalSecondaryButton } from './Modal';
+import CloseButton from './CloseButton';
+import TextInput from './TextInput';
+import CheckboxInput from './CheckboxInput';
 
 const TOPIC_NAME_MAXLENGTH = 30;
 
@@ -15,9 +13,7 @@ class FollowTopicModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            query: this.props.data.topic,
-            label: '',
-            notifications: false,
+            topic: this.props.data.topic || null,
         };
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -25,44 +21,45 @@ class FollowTopicModal extends React.Component {
 
     onSubmit(event) {
         event.preventDefault();
-        if (this.state.label) {
-            this.props.submit(this.state);
+        if (this.state.topic.label) {
+            this.props.submit(this.state.topic);
         }
     }
 
     onChangeHandler(field) {
         return (event) => {
-            this.setState({
-                [field]: event.target.value,
-            });
+            const topic = Object.assign(this.state.topic, {[field]: event.target.value});
+            this.setState({topic});
         };
     }
 
     toggleNotifications() {
-        this.setState({notifications: !this.state.notifications});
+        const topic = Object.assign(this.state.topic, {notifications: !this.state.topic.notifications});
+        this.setState({topic});
     }
 
     render() {
         return (
-            <Modal onClose={closeModal}>
+            <Modal onClose={this.props.closeModal}>
                 <CloseButton onClick={this.props.closeModal} />
                 <h1>{gettext('Follow topic')}</h1>
                 <form onSubmit={this.onSubmit}>
                     <TextInput
                         label={gettext('Name')}
                         required={true}
-                        value={this.state.label}
+                        value={this.state.topic.label}
                         onChange={this.onChangeHandler('label')}
                         maxLength={TOPIC_NAME_MAXLENGTH}
                     />
                     <TextInput
                         label={gettext('Query')}
-                        value={this.state.query}
-                        readOnly={true}
+                        value={this.state.topic.query}
+                        onChange={this.onChangeHandler('query')}
+                        readOnly={!this.props.isEditable}
                     />
                     <CheckboxInput
                         label={gettext('Send me notifications')}
-                        value={this.state.notifications}
+                        value={this.state.topic.notifications || false}
                         onChange={() => this.toggleNotifications()}
                     />
                     <ModalSecondaryButton
@@ -84,13 +81,9 @@ FollowTopicModal.propTypes = {
     closeModal: PropTypes.func.isRequired,
     submit: PropTypes.func.isRequired,
     data: PropTypes.shape({
-        topic: PropTypes.string.isRequired,
+        topic: PropTypes.object.isRequired,
     }),
+    isEditable: PropTypes.bool.isRequired,
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    closeModal: () => dispatch(closeModal()),
-    submit: (data) => dispatch(submitFollowTopic(data)),
-});
-
-export default connect(null, mapDispatchToProps)(FollowTopicModal);
+export default FollowTopicModal;

@@ -117,7 +117,7 @@ export function fetchItems() {
  * @param {String} topic
  */
 export function followTopic(topic) {
-    return renderModal('followTopic', {topic});
+    return renderModal('followTopic', {topic: {query: topic}});
 }
 
 export function submitFollowTopic(data) {
