@@ -23,7 +23,7 @@ npm install
 ## Run application
 
 ```
-python app.py
+honcho start -p 5050
 ```
 
 Will make it available on `http://localhost:5050` by default.
