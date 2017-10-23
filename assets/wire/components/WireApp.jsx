@@ -242,36 +242,43 @@ const mapDispatchToProps = (dispatch) => ({
     actions: [
         {
             name: gettext('Open'),
+            icon: 'text',
             action: (item) => window.open(`/wire/${item._id}`, '_blank'),
         },
         {
             name: gettext('Share'),
+            icon: 'share',
             multi: true,
             when: (state) => state.user && state.company,
             action: (items) => dispatch(shareItems(items)),
         },
         {
             name: gettext('Print'),
+            icon: 'print',
             action: (item) => window.open(`/wire/${item._id}?print`, '_blank'),
         },
         {
             name: gettext('Copy'),
+            icon: 'copy',
             action: copyPreviewContents,
         },
         {
             name: gettext('Download'),
+            icon: 'download',
             multi: true,
             when: (state) => state.user && state.company,
             action: (items) => dispatch(downloadItems(items)),
         },
         {
             name: gettext('Bookmark'),
+            icon: 'bookmark',
             multi: true,
             when: (state) => state.user && !state.bookmarks,
             action: (items) => dispatch(bookmarkItems(items)),
         },
         {
             name: gettext('Remove from bookmarks'),
+            icon: 'bookmark-remove',
             multi: true,
             when: (state) => state.user && state.bookmarks,
             action: (items) => dispatch(removeBookmarks(items)),

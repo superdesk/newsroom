@@ -10,12 +10,12 @@ import eve
 import flask
 import importlib
 
-from flask_babel import Babel, format_time
+from flask_babel import Babel, format_time, format_date
 from eve.io.mongo import MongoJSONEncoder
 
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
-from superdesk.text_utils import get_text
+from superdesk.text_utils import get_text, get_word_count
 from newsroom.auth import SessionAuth
 from flask_mail import Mail
 from flask_limiter import Limiter
@@ -100,8 +100,17 @@ class Newsroom(eve.Eve):
             if datetime:
                 return format_time(datetime, 'long')
 
+        def time_short(datetime):
+            return format_time(datetime, 'hh:mm')
+
+        def date_short(datetime):
+            return format_date(datetime, 'short')
+
         def plain_text(html):
             return get_text(html, lf_on_block=True)
+
+        def word_count(html):
+            return get_word_count(html or '')
 
         def newsroom_config():
             port = int(os.environ.get('PORT', '5000'))
@@ -112,6 +121,9 @@ class Newsroom(eve.Eve):
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
         self.add_template_filter(plain_text)
+        self.add_template_filter(time_short)
+        self.add_template_filter(date_short)
+        self.add_template_filter(word_count)
         self.add_template_global(self.sidenavs, 'sidenavs')
         self.add_template_global(newsroom_config)
 

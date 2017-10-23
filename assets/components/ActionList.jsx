@@ -11,7 +11,7 @@ function ActionList({item, actions}) {
                     type='button'
                     className='dropdown-item'
                     onClick={() => action.action(action.multi ? [item._id] : item)}>
-                    <i className={`icon--${action.name.toLowerCase()}`}></i>
+                    <i className={`icon--${action.icon}`}></i>
                     {action.name}</button>
             )}
         </div>
@@ -21,8 +21,9 @@ function ActionList({item, actions}) {
 ActionList.propTypes = {
     item: PropTypes.object,
     actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        action: PropTypes.func,
+        name: PropTypes.string.isRequired,
+        icon: PropTypes.string.isRequired,
+        action: PropTypes.func.isRequired,
     }))
 };
 

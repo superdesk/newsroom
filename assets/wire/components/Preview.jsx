@@ -19,7 +19,7 @@ function Preview({item, actions}) {
             <span className='wire-column__preview__icon'
                 key={action.name}
                 onClick={() => action.action(payload)}>
-                <i className={`icon--${action.name.toLowerCase()}`}></i>
+                <i className={`icon--${action.icon}`}></i>
             </span>
         );
     });
