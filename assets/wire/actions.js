@@ -22,6 +22,11 @@ export function previewItem(item) {
     return {type: PREVIEW_ITEM, item};
 }
 
+export const OPEN_ITEM = 'OPEN_ITEM';
+export function openItem(item) {
+    return {type: OPEN_ITEM, item};
+}
+
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query) {
     return {type: SET_QUERY, query};

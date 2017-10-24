@@ -1,5 +1,6 @@
 import {
     PREVIEW_ITEM,
+    OPEN_ITEM,
     SET_ITEMS,
     SET_QUERY,
     QUERY_ITEMS,
@@ -26,6 +27,7 @@ const initialState = {
     itemsById: {},
     activeItem: null,
     previewItem: null,
+    openItem: null,
     isLoading: false,
     totalItems: null,
     activeQuery: null,
@@ -80,6 +82,12 @@ export default function wireReducer(state = initialState, action) {
         return {
             ...state,
             previewItem: action.item || null,
+        };
+
+    case OPEN_ITEM:
+        return {
+            ...state,
+            openItem: action.item || null,
         };
 
     case SET_QUERY:

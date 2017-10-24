@@ -6,11 +6,12 @@ This module implements WSGI application extending eve.Eve
 """
 
 import os
+
 import eve
 import flask
 import importlib
 
-from flask_babel import Babel, format_time, format_date
+from flask_babel import Babel, format_time, format_date, format_datetime
 from eve.io.mongo import MongoJSONEncoder
 
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
@@ -94,11 +95,11 @@ class Newsroom(eve.Eve):
     def _setup_jinja(self):
         def datetime_short(datetime):
             if datetime:
-                return format_time(datetime, 'short')
+                return format_datetime(datetime, 'short')
 
         def datetime_long(datetime):
             if datetime:
-                return format_time(datetime, 'long')
+                return format_datetime(datetime, "dd/MM/yyyy HH:mm")
 
         def time_short(datetime):
             return format_time(datetime, 'hh:mm')
