@@ -23,13 +23,13 @@
 
     <article class="wire-column__preview__content--item-detal-wrap">
         <div class="wire-column__preview__content">
-            {% if item.associations %}
+            {% if get_picture(item) %}
             <figure class="wire-column__preview__image">
                 <span class="wire-column__preview__image-icon">
                     <i class="icon--resize icon--white"></i>
                 </span>
-                <img src="/static/article_preview.png" width="438" height="249">
-                <figcaption class="wire-column__preview__caption">Lorem ipsum dolor sit amet, consectetur adipiscing elit</figcaption>
+                <img src="{{ get_picture(item).renditions.baseImage.href }}">
+                <figcaption class="wire-column__preview__caption">{{ get_picture(item).description_text }}</figcaption>
             </figure>
             {% endif %}
 
@@ -49,9 +49,11 @@
                         <span class="wire-articles__item__icon">
                             <i class="icon--text icon--gray-light"></i>
                         </span>
+                        {% if get_picture(item) %}
                         <span class="wire-articles__item__icon">
                             <i class="icon--photo icon--gray-light"></i>
                         </span>
+                        {% endif %}
                     </div>
 
                     <div class="wire-articles__item__meta-info">

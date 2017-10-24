@@ -17,7 +17,15 @@ def detail():
         'genre': [{'name': 'Article (news)'}],
         'subject': [{'name': 'International News'}, {'name': 'Politics'}],
         'associations': {
-            'featuremedia': {},
+            'featuremedia': {
+                'description_text': 'Lorem ipsum etc.',
+                'renditions': {
+                    'baseImage': {
+                        'href': flask.url_for('static', filename='article_preview.png')
+                    }
+                }
+
+            },
         }
     }
     previous_versions = [

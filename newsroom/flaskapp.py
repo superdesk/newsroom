@@ -11,12 +11,11 @@ import eve
 import flask
 import importlib
 
-from flask_babel import Babel, format_time, format_date, format_datetime
+from flask_babel import Babel
 from eve.io.mongo import MongoJSONEncoder
 
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
-from superdesk.text_utils import get_text, get_word_count
 from newsroom.auth import SessionAuth
 from flask_mail import Mail
 from flask_limiter import Limiter
@@ -24,6 +23,10 @@ from flask_limiter.util import get_remote_address
 from flask_cache import Cache
 
 from newsroom.webpack import NewsroomWebpack
+from newsroom.template_filters import (
+    datetime_short, datetime_long, time_short, date_short,
+    plain_text, word_count, newsroom_config, get_picture,
+)
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -93,32 +96,6 @@ class Newsroom(eve.Eve):
         Babel(self)
 
     def _setup_jinja(self):
-        def datetime_short(datetime):
-            if datetime:
-                return format_datetime(datetime, 'short')
-
-        def datetime_long(datetime):
-            if datetime:
-                return format_datetime(datetime, "dd/MM/yyyy HH:mm")
-
-        def time_short(datetime):
-            return format_time(datetime, 'hh:mm')
-
-        def date_short(datetime):
-            return format_date(datetime, 'short')
-
-        def plain_text(html):
-            return get_text(html, lf_on_block=True)
-
-        def word_count(html):
-            return get_word_count(html or '')
-
-        def newsroom_config():
-            port = int(os.environ.get('PORT', '5000'))
-            return {
-                'websocket': os.environ.get('NEWSROOM_WEBSOCKET_URL', 'ws://localhost:%d' % (port + 100, )),
-            }
-
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
         self.add_template_filter(plain_text)
@@ -127,6 +104,7 @@ class Newsroom(eve.Eve):
         self.add_template_filter(word_count)
         self.add_template_global(self.sidenavs, 'sidenavs')
         self.add_template_global(newsroom_config)
+        self.add_template_global(get_picture)
 
     def _setup_webpack(self):
         NewsroomWebpack(self)

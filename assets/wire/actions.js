@@ -220,7 +220,10 @@ function errorHandler(reason) {
  * @return {Promise}
  */
 export function fetchVersions(item) {
-    return server.get(`/wire/${item._id}/versions`).then((data) => data._items.reverse());
+    return () => server.get(`/wire/${item._id}/versions`)
+        .then((data) => {
+            return data._items.reverse();
+        });
 }
 
 /**

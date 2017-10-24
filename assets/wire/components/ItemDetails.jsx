@@ -4,9 +4,11 @@ import PreviewActionButtons from './PreviewActionButtons';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
-import {gettext, fullDate} from '../../utils';
+import {gettext, fullDate} from 'utils';
+import { getPicture } from 'wire/utils';
 
 function ItemDetails({item, actions, onClose}) {
+    const picture = getPicture(item);
     return (
         <div className='content--item-detail'>
             <section className='content-header'>
@@ -23,13 +25,12 @@ function ItemDetails({item, actions, onClose}) {
 
             <article id='preview-article' className="wire-column__preview__content--item-detal-wrap">
                 <div className="wire-column__preview__content">
-                    {/*<figure className="wire-column__preview__image">*/}
-                    {/*<span className="wire-column__preview__image-icon">*/}
-                    {/*<i className="icon--resize icon--white"></i>*/}
-                    {/*</span>*/}
-                    {/*<img src="/static/article_preview.png" width="438" height="249">*/}
-                    {/*<figcaption className="wire-column__preview__caption">Lorem ipsum dolor sit amet, consectetur adipiscing elit</figcaption>*/}
-                    {/*</figure>*/}
+                    {picture && (
+                        <figure className="wire-column__preview__image">
+                            <img src={picture.renditions.baseImage.href} />
+                            <figcaption className="wire-column__preview__caption">{picture.description_text}</figcaption>
+                        </figure>
+                    )}
 
                     <div className="wire-column__preview__content--item-detail-text-wrap">
                         <div className="wire-column__preview__content--item-detail-item-text">

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
+import { getPicture } from 'wire/utils';
 import ActionList from 'components/ActionList';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
@@ -43,6 +44,7 @@ class WireListItem extends React.Component {
             'wire-articles__item--open': this.props.isActive,
             'wire-articles__item--selected': this.props.isSelected,
         });
+        const picture = getPicture(item);
         return (
             <article key={item._id}
                 className={cardClassName}
@@ -71,9 +73,11 @@ class WireListItem extends React.Component {
                                 <span className='wire-articles__item__icon'>
                                     <i className='icon--text icon--gray-light'></i>
                                 </span>
-                                {/*<span className='wire-articles__item__icon'>*/}
-                                {/*<i className='icon--photo icon--gray-light'></i>*/}
-                                {/*</span>*/}
+                                {picture &&
+                                    <span className='wire-articles__item__icon'>
+                                        <i className='icon--photo icon--gray-light'></i>
+                                    </span>
+                                }
                                 <span className='wire-articles__item__divider'>
                                 </span>
                             </div>
@@ -91,12 +95,22 @@ class WireListItem extends React.Component {
                             <p>{item.description_text}</p>
                         </div>
 
+
+
                         {item.ancestors && item.ancestors.length && (
                             <div className="no-bindable wire-articles__item__versions-btn" onClick={this.togglePreviousVersions}>
                                 {gettext('Show previous versions({{ count }})', {count: item.ancestors.length})}
                             </div>
                         )}
                     </div>
+
+                    {picture && (
+                        <div className="wire-articles__item--list__image">
+                            <figure>
+                                <img src={picture.renditions.thumbnail.href} />
+                            </figure>
+                        </div>
+                    )}
 
                     <div className='wire-articles__item--list__actions'>
                         <div className='btn-group'>
