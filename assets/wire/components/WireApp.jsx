@@ -63,7 +63,6 @@ class WireApp extends React.Component {
         const previewActionFilter = (action) => !action.when || action.when(this.props);
         const multiActionFilter = (action) => action.multi && previewActionFilter(action);
         return (
-
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 actions={this.props.actions.filter(previewActionFilter)}
@@ -223,7 +222,7 @@ const mapStateToProps = (state) => ({
     totalItems: state.totalItems,
     activeQuery: state.activeQuery,
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
-    itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
+    itemToOpen: state.openItem ? state.openItem : null,
     modal: state.modal,
     user: state.user,
     company: state.company,

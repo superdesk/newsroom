@@ -1,7 +1,8 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
 
 import 'tests/setup';
 
@@ -9,7 +10,7 @@ import WireApp from '../components/WireApp';
 
 
 function setup(state) {
-    const store = createStore(() => state);
+    const store = createStore(() => state, applyMiddleware(thunk));
     const enzymeWrapper = mount(<Provider store={store}><WireApp /></Provider>);
     return enzymeWrapper;
 }

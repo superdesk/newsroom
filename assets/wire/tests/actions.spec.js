@@ -80,4 +80,20 @@ describe('wire actions', () => {
                 expect(store.getState().items.length).toBe(1);
             });
     });
+
+    it('can open item', () => {
+        store.dispatch(actions.openItem({_id: 'foo'}));
+        expect(store.getState().openItem._id).toBe('foo');
+    });
+
+    it('can fetch item previous versions', () => {
+        const item = {_id: 'foo'};
+        fetchMock.get(`/wire/${item._id}/versions`, {_items: [{_id: 'bar'}, {_id: 'baz'}]});
+
+        return store.dispatch(actions.fetchVersions(item))
+            .then((versions) => {
+                expect(versions.length).toBe(2);
+                expect(versions[0]._id).toBe('baz');
+            });
+    });
 });

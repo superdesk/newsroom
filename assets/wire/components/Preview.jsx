@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { gettext, fullDate } from 'utils';
+import { getPicture } from 'wire/utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from './PreviewActionButtons';
 import PreviewTags from './PreviewTags';
@@ -9,6 +10,7 @@ import PreviewMeta from './PreviewMeta';
 
 
 function Preview({item, actions}) {
+    const picture = getPicture(item);
     return (
         <div className='wire-column__preview__items'>
 
@@ -24,15 +26,14 @@ function Preview({item, actions}) {
                     <span className='bold'>{item.byline}</span>{' '}
                     <span>{gettext('in {{ located}}', {located: item.located})}</span>
                 </p>
-                {/*<figure className='wire-column__preview__image'>*/}
-                {/*<span className='wire-column__preview__image-icon'>*/}
-                {/*<i className='icon--resize icon--white'></i>*/}
-                {/*</span>*/}
-                {/*<img src='/static/article_preview.png' width='438' height='249'/>*/}
-                {/*<figcaption className='wire-column__preview__caption'>Lorem ipsum dolor sit amet, consectetur adipiscing elit</figcaption>*/}
-                {/*</figure>*/}
-                <PreviewMeta item={item} isItemDetail={false}/>
+                {picture && (
+                    <figure className='wire-column__preview__image'>
+                        <img src={picture.renditions.viewImage.href} />
+                        <figcaption className='wire-column__preview__caption'>{picture.description_text}</figcaption>
+                    </figure>
+                )}
 
+                <PreviewMeta item={item} isItemDetail={false}/>
                 {item.description_text &&
                         <p className='wire-column__preview__lead'>{item.description_text}</p>
                 }
