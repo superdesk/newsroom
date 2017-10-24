@@ -94,20 +94,20 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                     {user._id ?
                         <input
                             type='button'
-                            className='wire-button'
+                            className='aap-button'
                             value={gettext('Reset Password')}
                             id='resetPassword'
                             onClick={onResetPassword} /> : null}
 
                     <input
                         type='button'
-                        className='wire-button wire-button--active'
+                        className='aap-button aap-button--active'
                         value={gettext('Save')}
                         onClick={onSave} />
 
                     <input
                         type='button'
-                        className='wire-button wire-button--active'
+                        className='aap-button aap-button--active'
                         value={gettext('Delete')}
                         onClick={onDelete} />
                 </div>

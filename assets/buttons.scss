@@ -1,0 +1,176 @@
+// Buttons
+
+// Usage (classes)
+
+// Default (gray): 'aap-button'
+// Active and primary (blue): 'aap-button aap-button--active' or 'aap-button aap-button--primary'
+// Expanded (full width): 'aap-button aap-button--expanded'
+// UI-dark (use for dark background): 'aap-button aap-button--ui-dark' 
+// Disabled state: 'aap-button aap-button--disabled'
+
+// Variables
+$button-padding: 0.5rem 1.25rem !default;
+$button-margin: 0 !default;
+$button-color: #868e96 !default;
+$button-color-alt: white !default;
+$button-radius: 3px !default;
+$button-background: transparent !default;
+$button-background-hover: #868e96 !default;
+$button-opacity-disabled: 0.35 !default;
+$button-transition: background-color 0.1s ease-out, color 0.1s ease-out !default;
+
+/// Sizes for buttons / Font size
+/// @type Map
+$button-sizes: (
+    small: 0.625rem,
+    default: 0.75rem,
+) !default;
+
+// Button-base() mixin
+@mixin button-base {
+    display: inline-block;
+    vertical-align: middle;
+    margin: $button-margin;
+    padding: $button-padding;
+    position: relative;
+  
+    -webkit-appearance: none;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    border-radius: $button-radius;
+    transition: $button-transition;
+  
+    font-size: map-get($button-sizes, default);
+    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
+    text-transform: uppercase;
+    line-height: 140%;
+    letter-spacing: 0.1em;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+// Sets the visual style of a button.
+@mixin button-style(
+    $background: $button-background,
+    $background-hover: $button-background-hover,
+    $color: $button-color,
+    $border-color: $button-color
+) {
+  
+    background-color: $background;
+    color: $color;
+    border-color: $border-color;
+    
+    &:hover, &:focus, &:active {
+        background-color: $background-hover;
+        color: $button-color-alt;
+        text-decoration: none;
+    }
+}
+
+// Expands a button to make it full-width.
+@mixin button-expand($expand: true) {
+    @if $expand {
+      display: block;
+      width: 100%;
+      margin-right: 0;
+      margin-left: 0;
+    }
+    @else {
+      display: inline-block;
+      width: auto;
+      margin: $button-margin;
+    }
+}
+
+// // Adds disabled styles to a button by fading the element, reseting the cursor, and disabling pointer events.
+@mixin button-disabled(
+    $background-color: $button-background,
+    $color: $button-color
+    ) {
+    opacity: $button-opacity-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+    color: $color;
+  
+    &:hover, &:focus {
+      background-color: $background-color;
+      color: $color;
+      box-shadow: none;
+      outline: none;
+    }
+  }
+
+// Adds all styles for a button.
+@mixin button(
+    $expand: false,
+    $background: $button-background,
+    $background-hover: $button-background-hover,
+    $color: $button-color
+  ) {
+    @include button-base;
+  
+    @include button-style($background, $background-hover, $color);
+  
+    @if $expand {
+      @include button-expand;
+    }
+  }
+
+  .aap-button {
+    @include button;
+    
+    // Expanded button (full width)
+    &.aap-button--expanded {
+        @include button-expand;
+    }
+    
+    // Disabled style
+    &.aap-button--disabled,
+    &[disabled] {
+        @include button-disabled;
+    }
+
+    // UI dark buttons
+    &.aap-button--ui-dark {
+        @include button($color: $button-color-alt);
+        
+        &:hover, &:focus, &:active {
+            background: rgba(134,142,150, .4);
+            border-color: transparent;
+        }
+        
+        &.aap-button--disabled,
+        &[disabled] {
+            @include button-disabled;
+
+            &:hover {
+                border-color: $button-color;
+            }
+        }
+    }
+
+    // Active, primary button style
+    &.aap-button--active, &.aap-button--primary {
+        @include button($color: $main-blue);
+        border-color: $main-blue;
+        
+        &:hover, &:active, &:focus {
+           background: $main-blue;
+           color: $button-color-alt;
+        }
+
+        &.aap-button--disabled,
+        &[disabled] {
+            @include button-disabled($color: $main-blue);
+
+            &:hover, &:active, &:focus {
+                border-color: $main-blue;
+            }
+        }
+    }
+
+  }
+  
