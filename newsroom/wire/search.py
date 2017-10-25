@@ -14,6 +14,8 @@ class WireSearchResource(newsroom.Resource):
             'body_html': 1,
             'versioncreated': 1,
             'headline': 1,
+            'nextversion': 1,
+            'ancestors': 1,
         }
     }
 

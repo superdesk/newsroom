@@ -11,6 +11,12 @@ def test_item_detail(client):
     assert 'Amazon Is Opening More Bookstores' in html
 
 
+def test_item_json(client):
+    resp = client.get('/wire/tag:foo?format=json')
+    data = json.loads(resp.get_data())
+    assert 'headline' in data
+
+
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',

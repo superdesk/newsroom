@@ -4,6 +4,7 @@ import PreviewActionButtons from './PreviewActionButtons';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
+import ListItemNextVersion from './ListItemNextVersion';
 import {gettext, fullDate} from 'utils';
 import { getPicture } from 'wire/utils';
 
@@ -55,6 +56,7 @@ function ItemDetails({item, actions, onClose}) {
 
                             <PreviewTags item={item} isItemDetail={true}/>
 
+                            <ListItemNextVersion item={item} />
                             <ListItemPreviousVersions item={item} isPreview={true}/>
                         </div>
 

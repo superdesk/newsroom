@@ -96,4 +96,23 @@ describe('wire actions', () => {
                 expect(versions[0]._id).toBe('baz');
             });
     });
+
+    it('can fetch next item version', () => {
+        const item = {nextversion: 'bar'};
+        const next = {};
+        fetchMock.get('/wire/bar?format=json', next);
+
+        return store.dispatch(actions.fetchNext(item))
+            .then((_next) => {
+                expect(_next).toEqual(next);
+            });
+    });
+
+    it('can reject if item has no next version', () => {
+        return store.dispatch(actions.fetchNext({})).then(() => {
+            expect(true).toBe(false); // this should not be called
+        }, () => {
+            expect(fetchMock.called()).toBeFalsy();
+        });
+    });
 });
