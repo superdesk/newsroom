@@ -43,6 +43,7 @@ class WireSearchService(newsroom.Service):
                     'lenient': True,
                 }
             })
+            query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
 
         if req.args.get('bookmarks'):
             query['bool']['must'].append({
