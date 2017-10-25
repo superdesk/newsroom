@@ -18,6 +18,8 @@ import {
     REMOVE_BOOKMARK,
     SET_NEW_ITEMS,
     REFRESH_ITEMS,
+    SET_SERVICE,
+    SET_FILTER,
 } from './actions';
 
 import { toggleValue } from 'utils';
@@ -25,6 +27,7 @@ import { toggleValue } from 'utils';
 const initialState = {
     items: [],
     itemsById: {},
+    aggregations: null,
     activeItem: null,
     previewItem: null,
     openItem: null,
@@ -39,6 +42,11 @@ const initialState = {
     formats: [],
     newItemsCount: 0,
     newItemsData: null,
+    wire: {
+        services: [],
+        activeService: null,
+        activeFilter: {},
+    },
 };
 
 function recieveItems(state, data) {
@@ -48,7 +56,54 @@ function recieveItems(state, data) {
         return item._id;
     });
 
-    return {...state, items, itemsById, isLoading: false, totalItems: data._meta.total};
+    return {
+        ...state,
+        items,
+        itemsById,
+        isLoading: false,
+        totalItems: data._meta.total,
+        aggregations: data._aggregations || null,
+    };
+}
+
+function _wireReducer(state, action) {
+    switch (action.type) {
+    case SET_SERVICE:
+        return {
+            ...state,
+            activeFilter: {},
+            activeService: action.service,
+        };
+
+    case SET_FILTER: {
+        const activeFilter = Object.assign({}, state.activeFilter);
+        if (activeFilter[action.key] === action.val) {
+            activeFilter[action.key] = null;
+        } else {
+            activeFilter[action.key] = action.val;
+        }
+        return {
+            ...state,
+            activeFilter: activeFilter,
+        };
+    }
+
+    default:
+        return state;
+    }
+}
+
+function _modalReducer(state, action) {
+    switch (action.type) {
+    case RENDER_MODAL:
+        return {modal: action.modal, data: action.data};
+
+    case CLOSE_MODAL:
+        return null;
+
+    default:
+        return state;
+    }
 }
 
 export default function wireReducer(state = initialState, action) {
@@ -103,10 +158,8 @@ export default function wireReducer(state = initialState, action) {
         return Object.assign({}, action.state);
 
     case RENDER_MODAL:
-        return {...state, modal: {modal: action.modal, data: action.data}};
-
     case CLOSE_MODAL:
-        return {...state, modal: null};
+        return {...state, modal: _modalReducer(state.modal, action)};
 
     case INIT_DATA:
         return {
@@ -116,6 +169,7 @@ export default function wireReducer(state = initialState, action) {
             company: action.data.company || null,
             bookmarks: action.data.bookmarks || false,
             formats: action.data.formats || [],
+            wire: Object.assign(state.wire, {services: action.data.services}),
         };
 
     case ADD_TOPIC:
@@ -170,6 +224,10 @@ export default function wireReducer(state = initialState, action) {
             newItemsData: null,
         });
     }
+
+    case SET_FILTER:
+    case SET_SERVICE:
+        return {...state, wire: _wireReducer(state.wire, action)};
 
     default:
         return state;

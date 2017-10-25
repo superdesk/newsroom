@@ -2,84 +2,146 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 import { gettext } from 'utils';
-import CloseButton from 'components/CloseButton';
+import { setService, setFilter } from 'wire/actions';
 
-import { removeBookmark } from '../actions';
+class SearchSidebar extends React.Component {
+    constructor(props) {
+        super(props);
+        this.tabs = [
+            {label: gettext('Navigation'), content: NavigationTab},
+            {label: gettext('Filters'), content: FiltersTab},
+        ];
+        this.state = {active: this.tabs[0]};
+        this.selectService = this.selectService.bind(this);
+        this.selectFilter = this.selectFilter.bind(this);
+    }
 
-function SearchSidebar(props) {
+    selectService(event, service) {
+        event.preventDefault();
+        this.props.dispatch(setService(service));
+    }
 
-    const query = (e, topic) => {
-        e.preventDefault();
-        props.setQuery(topic.query);
-    };
+    selectFilter(event, field, value) {
+        event.preventDefault();
+        this.props.dispatch(setFilter(field, value));
+    }
 
-    const topicsList = props.topics.map((topic) => (
-        <a href='#' key={topic._id}
-            className={classNames('wire-button', {
-                active: topic.query === props.activeQuery,
-            })}
-            onClick={(e) => query(e, topic)}>
-            {topic.label} <span className='wire-button__notif'>8</span></a>
-    ));
+    render() {
+        const tabContents = this.tabs.map((tab) => {
+            const Tab = tab.content;
+            const className = classNames('tab-pane', 'fade', {'show active': this.state.active === tab});
+            return (
+                <div className='tab-content' key={tab.label}>
+                    <div className={className} role='tabpanel'>
+                        <Tab
+                            services={this.props.services}
+                            activeService={this.props.activeService}
+                            selectService={this.selectService}
+                            activeFilter={this.props.activeFilter}
+                            selectFilter={this.selectFilter}
+                            aggregations={this.props.aggregations}
+                        />
+                    </div>
+                </div>
+            );
+        });
 
-    const bookmarks = props.bookmarkedItems.map((_id) => {
-        const item = props.itemsById[_id];
         return (
-            <li key={_id} className='list-group-item'>
-                {item.headline}
-                <CloseButton onClick={() => props.removeBookmark(_id)} />
-            </li>
-        );
-    });
-
-    return (
-        <div className='wire-column__nav__items'>
-            <ul className='nav justify-content-center mb-3' id='pills-tab' role='tablist'>
-                <li className='wire-column__nav__tab nav-item'>
-                    <a className='nav-link active' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-expanded='true'>Navigation</a>
-                </li>
-                <li className='wire-column__nav__tab nav-item'>
-                    <a className='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-expanded='true'>Filters</a>
-                </li>
-            </ul>
-            <div className='tab-content' id='pills-tabContent'>
-                <div className='tab-pane fade show active' id='pills-home' role='tabpanel' aria-labelledby='pills-home-tab'>
-                    <a href='#' className='wire-button wire-button--active'>All</a>
-                    <a href='#' className='wire-button'>National</a>
-                    <a href='#' className='wire-button'>Courts</a>
-                    <a href='#' className='wire-button'>Entertainment</a>
-
-                    <span className='wire-column__nav__divider'></span>
-                    <h5>{gettext('Followed topics')}</h5>
-
-                    {topicsList}
-
-                    {topicsList.length === 0 &&
-                            <i>{gettext('There are no followed topics yet.')}</i>
-                    }
-
-                    <span className='wire-column__nav__divider'></span>
-                    <h5>{gettext('Bookmarks')}</h5>
-
-                    {bookmarks}
-
-                    {bookmarks.length === 0 &&
-                            <i>{gettext('There are no bookmarks yet.')}</i>
-                    }
-
-                </div>
-                <div className='tab-pane fade' id='pills-profile' role='tabpanel' aria-labelledby='pills-profile-tab'>
-                    <a href='#' className='wire-button wire-button--active'>All</a>
-                    <a href='#' className='wire-button'>Filter 1</a>
-                    <a href='#' className='wire-button'>Filter 2</a>
-                    <a href='#' className='wire-button'>Filter 3</a>
-                </div>
+            <div className='wire-column__nav__items'>
+                <ul className='nav justify-content-center mb-3' id='pills-tab' role='tablist'>
+                    {this.tabs.map((tab) => (
+                        <li className='wire-column__nav__tab nav-item' key={tab.label}>
+                            <a className={`nav-link ${this.state.active === tab && 'active'}`}
+                                role='tab'
+                                href=''
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    this.setState({active: tab});
+                                }}>{tab.label}</a>
+                        </li>
+                    ))}
+                </ul>
+                {tabContents}
             </div>
-        </div>
-    );
+        );
+    }
 }
+
+function NavigationTab({services, activeService, selectService}) {
+    const allServices = [
+        {label: gettext('All'), code: null}
+    ].concat(services);
+
+    const isActive = (service) => service === activeService || (!activeService && service.code === null);
+
+    return allServices.map((service) => (
+        <a key={service.label}
+            href=''
+            className={classNames('wire-button', {'wire-button--active': isActive(service)})}
+            onClick={(event) => selectService(event, service)}
+        >{service.label}</a>
+    ));
+}
+
+NavigationTab.propTypes = {
+    services: PropTypes.arrayOf(PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        code: PropTypes.string.isRequired,
+    })),
+    activeService: PropTypes.object,
+    selectService: PropTypes.func.isRequired,
+};
+
+function FiltersTab({aggregations, activeFilter, selectFilter}) {
+    const groups = [
+        {
+            field: 'service',
+            label: gettext('Category'),
+        },
+        {
+            field: 'subject',
+            label: gettext('Subject'),
+        },
+        {
+            field: 'genre',
+            label: gettext('Genre'),
+        },
+        {
+            field: 'urgency',
+            label: gettext('News Value'),
+        }
+    ];
+
+    return groups.map((group) => {
+        const activeKey = get(activeFilter, group.field);
+        const buckets = aggregations[group.field].buckets.map((bucket) => (
+            <a key={bucket.key}
+                href=''
+                className={classNames('wire-button', {'wire-button--active': activeKey === bucket.key})}
+                onClick={(event) => selectFilter(event, group.field, bucket.key)}>{bucket.key}</a>
+        ));
+
+        if (!buckets.length) {
+            return;
+        }
+
+        return (
+            <div key={group.field} className="wire-column__nav__group">
+                <h5>{group.label}</h5>
+                {buckets}
+            </div>
+        );
+    }).filter((group) => !!group);
+}
+
+FiltersTab.propTypes = {
+    aggregations: PropTypes.object,
+    activeFilter: PropTypes.object,
+    selectFilter: PropTypes.func.isRequired,
+};
 
 SearchSidebar.propTypes = {
     activeQuery: PropTypes.string,
@@ -87,16 +149,20 @@ SearchSidebar.propTypes = {
     setQuery: PropTypes.func.isRequired,
     bookmarkedItems: PropTypes.array.isRequired,
     itemsById: PropTypes.object.isRequired,
-    removeBookmark: PropTypes.func.isRequired,
+    services: PropTypes.array.isRequired,
+    aggregations: PropTypes.object,
+    dispatch: PropTypes.func.isRequired,
+    activeService: PropTypes.object,
+    activeFilter: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
     bookmarkedItems: state.bookmarkedItems || [],
     itemsById: state.itemsById,
+    services: state.wire.services,
+    activeService: state.wire.activeService,
+    activeFilter: state.wire.activeFilter,
+    aggregations: state.aggregations,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    removeBookmark: (bookmark) => dispatch(removeBookmark(bookmark)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(SearchSidebar);
+export default connect(mapStateToProps)(SearchSidebar);
