@@ -1,0 +1,88 @@
+{% extends "layout_profile.html" %}
+
+{% block title %}Users Design{% endblock %}
+
+{% block profileNavigation %}
+
+<nav class="profile-side-navigation">
+    <div class="profile-side-navigation__info">
+        <figure class="profile-side-navigation__avatar">
+            <img src="{{ url_for('static', filename = 'article_preview.png') }}"/>
+        </figure>
+        <h5 class="profile-side-navigation__name">Jeff Dudeowsky</h5>
+        <span class="profile-side-navigation__username">jeffthedude</span>
+    </div>
+    <div class="profile-side-navigation__items">
+        <a href="#" class="wire-button wire-button--active">All</a>
+        <a href="#" class="wire-button">National</a>
+        <a href="#" class="wire-button">Courts</a>
+    </div>
+</nav>
+
+{% endblock %}
+
+{% block contentHeader %}
+
+<nav class="profile-nav content-bar navbar content-bar--side-padding">
+    <h4>My profile</h4>
+    <div class="content-bar__right">
+        <span class="content-bar__menu">
+            <i class="icon--close-thin"></i>
+        </span>
+    </div>
+</nav>
+
+{% endblock %}
+{% block contentMain %}
+    <form class="profile-content container-fluid">
+        <div class="form-row">
+            
+            <div class="col-lg-2">
+                <figure class="profile-side-navigation__avatar">
+                    <img src="{{ url_for('static', filename = 'article_preview.png') }}"/>
+                </figure>
+                <input type='file' id="upload" >                
+            </div>
+
+            <div class="col-lg-8">
+                <div class="form-row">
+                    <div class="form-group col-lg-6">
+                        <label for="first_name">First Name</label>
+                        <div class="field">
+                            <input type="text" id="first_name" name="first_name" class="form-control" value="Jeff">
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="last_name">Last Name</label>
+                        <div class="field">
+                            <input type="text" id="last_name" name="last_name" class="form-control" value="Dudeowsky">
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-6">
+                            <label for="last_name">Username</label>
+                            <div class="field">
+                                <input type="text" id="username" name="username" class="form-control" value="jeffthedude">
+                            </div>  
+                        </div>
+                    <div class="form-group col-lg-6">
+                        <label for="email">Email</label>
+                        <div class="field">
+                            <input type="text" id="email" name="email" class="form-control" value="admin@example.com">
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="email">Email</label>
+                        <div class="field">
+                            <input type="text" id="email" name="email" class="form-control" value="admin@example.com">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="profile-content__footer">
+            <input type="button" class="wire-button" value="Discard changes">
+            <input type="button" class="wire-button wire-button--active" value="Save changes">
+        </div>
+    </form>
+
+{% endblock %}
