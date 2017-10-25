@@ -1,0 +1,28 @@
+{% extends "layout_without_bars.html" %}
+
+{% block content %}
+<div class="profileWrap">
+    {% block profileNavigation %}
+
+    {% endblock %}
+
+    <div class="content">
+
+        <section class="content-header">
+            {% block contentHeader %}
+
+            {% endblock %}
+        </section>
+
+        <section class="content-main">
+
+                {% include "flash_messages.html" %}
+
+                {% block contentMain %}{% endblock %}
+
+            {% block sidebar %}{% endblock %}
+        </section>
+
+    </div>
+</div>
+{% endblock %}

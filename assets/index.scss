@@ -1245,4 +1245,70 @@ article.list {
     padding: 10px 0px;
 }
 
+.profileWrap {
+    display: flex;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.profile-side-navigation {
+    width: 300px;
+    padding: 30px 40px;
+    overflow: hidden;
+    overflow-y: auto;
+    background: #3e4557;
+}
+
+.profile-side-navigation__info {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-side-navigation__avatar {
+    img {
+        object-fit: cover;
+        width: 125px;
+        height: 125px;
+        border-radius: 100%;
+        border: 2px solid #8b8f9a;
+    }
+}
+
+.profile-side-navigation__name {
+    color: #fff;
+}
+
+.profile-side-navigation__username {
+    color: #9296a0;
+}
+
+.profile-side-navigation__items {
+    
+}
+
+.profile-nav {
+
+}
+
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    .form-row {
+        display: flex;
+        flex-grow: 1;
+        overflow: auto;
+    }
+}
+
+.profile-content__footer {
+    display: flex;
+    background: #f8f8f8;
+    margin: 0 -15px;
+    padding: 15px;
+    > input + input {
+        margin-left: 20px;
+    }
+}
+
 // End Wire BEM classes
