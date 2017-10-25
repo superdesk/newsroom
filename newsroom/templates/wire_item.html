@@ -84,7 +84,7 @@
                         {% endif %}
                     </div>
 
-                    {% if previous_versions %}
+                    {% if previous_versions and item.get('pubstatus') != 'canceled' %}
                     <div class="wire-column__preview__versions">
                         <span class="wire-column__preview__versions__box-headline">{{ _('Previous versions') }}</span>
                         {% for prev in previous_versions %}

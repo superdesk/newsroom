@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
-import { getPicture, showPreviousVersions } from 'wire/utils';
+import { getPicture, showItemVersions } from 'wire/utils';
 import ActionList from 'components/ActionList';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
@@ -97,7 +97,7 @@ class WireListItem extends React.Component {
 
 
 
-                        {showPreviousVersions(item) && (
+                        {showItemVersions(item) && (
                             <div className="no-bindable wire-articles__item__versions-btn" onClick={this.togglePreviousVersions}>
                                 {gettext('Show previous versions({{ count }})', {count: item.ancestors.length})}
                             </div>
