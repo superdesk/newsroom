@@ -8,8 +8,6 @@ import {
     editTopic,
     shareTopic,
     deleteTopic,
-    submitFollowTopic,
-    closeModal,
 } from '../actions';
 import FollowedTopics from './topics/FollowedTopics';
 import UserProfileMenu from './UserProfileMenu';
@@ -18,7 +16,6 @@ import FollowTopicModal from 'components/FollowTopicModal';
 
 const modals = {
     followTopic: FollowTopicModal,
-
 };
 
 class UserProfileApp extends React.Component {
@@ -31,9 +28,6 @@ class UserProfileApp extends React.Component {
             const Modal = modals[specs.modal];
             return <Modal
                 data={specs.data}
-                closeModal={this.props.closeModal}
-                submit={this.props.submitModal}
-                isEditable={true}
             />;
         }
     }
@@ -78,8 +72,6 @@ UserProfileApp.propTypes = {
         action: PropTypes.func,
     })),
     modal: PropTypes.object,
-    closeModal: PropTypes.func,
-    submitModal: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -96,8 +88,6 @@ const mapDispatchToProps = (dispatch) => ({
     selectMenu: (event) => dispatch(updateMenu(event)),
     fetchTopics: (userId) => dispatch(fetchTopics(userId)),
     fetchUser: (userId) => dispatch(fetchUser(userId)),
-    closeModal: () => dispatch(closeModal()),
-    submitModal: (data) => dispatch(submitFollowTopic(data)),
     actions: [
         {
             name: gettext('Edit'),

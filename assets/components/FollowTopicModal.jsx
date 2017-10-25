@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { gettext } from 'utils';
+import { closeModal, submitFollowTopic as submitWireFollowTopic } from 'wire/actions';
+import { submitFollowTopic as submitProfileFollowTopic } from 'user-profile/actions';
 
 import Modal, { ModalPrimaryButton, ModalSecondaryButton } from './Modal';
 import CloseButton from './CloseButton';
@@ -22,7 +25,7 @@ class FollowTopicModal extends React.Component {
     onSubmit(event) {
         event.preventDefault();
         if (this.state.topic.label) {
-            this.props.submit(this.state.topic);
+            this.props.submit(this.isNewTopic(), this.state.topic);
         }
     }
 
@@ -36,6 +39,10 @@ class FollowTopicModal extends React.Component {
     toggleNotifications() {
         const topic = Object.assign(this.state.topic, {notifications: !this.state.topic.notifications});
         this.setState({topic});
+    }
+
+    isNewTopic() {
+        return this.state.topic && !this.state.topic._id;
     }
 
     render() {
@@ -55,7 +62,7 @@ class FollowTopicModal extends React.Component {
                         label={gettext('Query')}
                         value={this.state.topic.query}
                         onChange={this.onChangeHandler('query')}
-                        readOnly={!this.props.isEditable}
+                        readOnly={this.isNewTopic()}
                     />
                     <CheckboxInput
                         label={gettext('Send me notifications')}
@@ -83,7 +90,11 @@ FollowTopicModal.propTypes = {
     data: PropTypes.shape({
         topic: PropTypes.object.isRequired,
     }),
-    isEditable: PropTypes.bool.isRequired,
 };
 
-export default FollowTopicModal;
+const mapDispatchToProps = (dispatch) => ({
+    closeModal: () => dispatch(closeModal()),
+    submit: (isNew, data) => isNew ? dispatch(submitWireFollowTopic(data)) : dispatch(submitProfileFollowTopic(data)),
+});
+
+export default connect(null, mapDispatchToProps)(FollowTopicModal);

@@ -16,8 +16,6 @@ import {
     downloadItems,
     refreshItems,
     openItem,
-    submitFollowTopic,
-    closeModal,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -53,9 +51,6 @@ class WireApp extends React.Component {
             return <Modal
                 key="modal"
                 data={specs.data}
-                closeModal={this.props.closeModal}
-                submit={this.props.submitModal}
-                isEditable={false}
             />;
         }
     }
@@ -223,8 +218,6 @@ WireApp.propTypes = {
     bookmarks: PropTypes.bool,
     newItemsCount: PropTypes.number,
     refreshItems: PropTypes.func,
-    closeModal: PropTypes.func,
-    submitModal: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -252,8 +245,6 @@ const mapDispatchToProps = (dispatch) => ({
     selectAll: () => dispatch(selectAll()),
     selectNone: () => dispatch(selectNone()),
     refreshItems: () => dispatch(refreshItems()),
-    closeModal: () => dispatch(closeModal()),
-    submitModal: (data) => dispatch(submitFollowTopic(data)),
     actions: [
         {
             id: 'open',
