@@ -14,6 +14,8 @@ class WireSearchResource(newsroom.Resource):
             'body_html': 1,
             'versioncreated': 1,
             'headline': 1,
+            'nextversion': 1,
+            'ancestors': 1,
         }
     }
 
@@ -41,6 +43,7 @@ class WireSearchService(newsroom.Service):
                     'lenient': True,
                 }
             })
+            query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
 
         if req.args.get('bookmarks'):
             query['bool']['must'].append({

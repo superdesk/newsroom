@@ -275,3 +275,13 @@ export function pushNotification(push) {
         }
     };
 }
+
+export function fetchNext(item) {
+    return () => {
+        if (!item.nextversion) {
+            return Promise.reject();
+        }
+
+        return server.get(`/wire/${item.nextversion}?format=json`);
+    };
+}

@@ -41,8 +41,7 @@ def get_view_data():
 
 def get_previous_versions(item):
     if item.get('ancestors'):
-        projection = {'slugline': 1, 'versioncreated': 1, 'body_html': 1, 'headline': 1}
-        return list(app.data.find_list_of_ids('wire_search', item['ancestors'], projection))
+        return list(app.data.find_list_of_ids('wire_search', item['ancestors']))
     return []
 
 
@@ -145,6 +144,8 @@ def versions(_id):
 @blueprint.route('/wire/<_id>')
 def item(_id):
     item = get_item_or_404(_id)
+    if flask.request.args.get('format') == 'json':
+        return flask.jsonify(item)
     previous_versions = get_previous_versions(item)
     template = 'wire_item_print.html' if 'print' in flask.request.args else 'wire_item.html'
     return flask.render_template(template, item=item, previous_versions=previous_versions)

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { gettext, fullDate } from 'utils';
-import { getPicture } from 'wire/utils';
+import { getPicture, showItemVersions } from 'wire/utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from './PreviewActionButtons';
 import PreviewTags from './PreviewTags';
@@ -43,7 +43,9 @@ function Preview({item, actions}) {
 
                 <PreviewTags item={item} isItemDetail={false} />
 
-                <ListItemPreviousVersions item={item} isPreview={true} />
+                {showItemVersions(item) &&
+                    <ListItemPreviousVersions item={item} isPreview={true} />
+                }
 
             </div>
         </div>

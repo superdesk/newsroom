@@ -11,6 +11,12 @@ def test_item_detail(client):
     assert 'Amazon Is Opening More Bookstores' in html
 
 
+def test_item_json(client):
+    resp = client.get('/wire/tag:foo?format=json')
+    data = json.loads(resp.get_data())
+    assert 'headline' in data
+
+
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -84,3 +90,10 @@ def test_search_filters_items_with_updates(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert 'tag:weather' not in [item['_id'] for item in data['_items']]
+
+
+def test_search_filters_killed_items(client, app):
+    app.data.insert('items', [{'_id': 'foo', 'pubstatus': 'canceled', 'headline': 'killed'}])
+    resp = client.get('/search?q=headline:killed')
+    data = json.loads(resp.get_data())
+    assert 0 == len(data['_items'])

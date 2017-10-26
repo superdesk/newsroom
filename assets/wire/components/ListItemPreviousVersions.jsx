@@ -2,21 +2,35 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { gettext, formatTime, formatDate, wordCount } from 'utils';
+import { gettext } from 'utils';
 import { fetchVersions, openItem } from '../actions';
+
+import ItemVersion from './ItemVersion';
 
 class ListItemPreviousVersions extends React.Component {
     constructor(props) {
         super(props);
         this.state = {versions: [], loading: true, error: false};
         this.baseClass = this.props.isPreview ? 'wire-column__preview' : 'wire-articles';
-        this.props.dispatch(fetchVersions(props.item))
-            .then((versions) => this.setState({versions, loading: false}))
-            .catch(() => this.setState({error: true}));
+        this.open = this.open.bind(this);
+        this.fetch(props);
     }
 
-    open(version) {
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.item._id !== this.props.item._id) {
+            this.fetch(nextProps);
+        }
+    }
+
+    open(version, event) {
+        event.stopPropagation();
         this.props.dispatch(openItem(version));
+    }
+
+    fetch(props) {
+        props.dispatch(fetchVersions(props.item))
+            .then((versions) => this.setState({versions, loading: false}))
+            .catch(() => this.setState({error: true}));
     }
 
     render() {
@@ -29,31 +43,19 @@ class ListItemPreviousVersions extends React.Component {
         }
 
         const versions = this.state.versions.map((version) => (
-            <div key={version._id} className={`${this.baseClass}__versions__item`} onClick={() => this.open(version)}>
-                <div className={`${this.baseClass}__versions__wrap`}>
-                    <div className={`${this.baseClass}__versions__time`}>
-                        <span>{formatTime(version.versioncreated)}</span>
-                    </div>
-                    <div className={`${this.baseClass}__versions__meta`}>
-                        <div className={`${this.baseClass}__item__meta-info`}>
-                            <span className="bold">{version.slugline}</span>
-                            <span>{formatDate(version.versioncreated)} {' // '}
-                                <span className="bold">{wordCount(version.body_html)}</span> {gettext('words')}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                {!this.props.isPreview ? <span className={`${this.baseClass}__item__divider`}></span> : null}
-                <div className={`${this.baseClass}__versions__name`}>
-                    <h5 className={`${this.baseClass}__versions__headline`}>{version.headline}</h5>
-                </div>
-            </div>
+            <ItemVersion
+                key={version._id}
+                version={version}
+                baseClass={this.baseClass}
+                withDivider={this.props.isPreview}
+                onClick={this.open}
+            />
         ));
 
         return (
             this.props.item.ancestors ?
                 <div className={`${this.baseClass}__versions`}>
-                    {this.props.isPreview ? <span className="wire-column__preview__versions__box-headline">Previous versions</span> : null }
+                    {this.props.isPreview ? <span className="wire-column__preview__versions__box-headline">{gettext('Previous versions')}</span> : null }
                     {versions}
                 </div> : null
         );
