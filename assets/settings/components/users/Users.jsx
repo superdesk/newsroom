@@ -4,6 +4,7 @@ import EditUser from './EditUser';
 import UsersList from './UsersList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
 import {setError} from 'settings/actions';
+import {gettext} from 'utils';
 
 class Users extends React.Component {
     constructor(props, context) {
@@ -40,9 +41,8 @@ class Users extends React.Component {
     deleteUser(event) {
         event.preventDefault();
 
-        if (confirm(`Would you like to delete user: ${this.props.userToEdit.first_name}`)) {
+        confirm(gettext('Would you like to delete user: {{name}}?', {name: this.props.userToEdit.first_name})) &&
             this.props.deleteUser('users');
-        }
     }
 
     render() {

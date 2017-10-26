@@ -4,6 +4,7 @@ import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
 import {setError} from 'settings/actions';
+import {gettext} from 'utils';
 
 class Companies extends React.Component {
     constructor(props, context) {
@@ -40,7 +41,7 @@ class Companies extends React.Component {
     deleteCompany(event) {
         event.preventDefault();
 
-        if (confirm(`Would you like to delete company: ${this.props.companyToEdit.name}`)) {
+        if (confirm(gettext('Would you like to delete company: {{name}}', {name: this.props.companyToEdit.name}))) {
             this.props.deleteCompany('companies');
         }
     }

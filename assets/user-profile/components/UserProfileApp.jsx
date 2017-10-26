@@ -102,7 +102,7 @@ const mapDispatchToProps = (dispatch) => ({
         {
             name: gettext('Delete'),
             icon: 'trash',
-            action: (topic) => dispatch(deleteTopic(topic)),
+            action: (topic) => confirm(gettext('Would you like to delete topic {{name}}?', {name: topic.label})) && dispatch(deleteTopic(topic)),
         },
     ],
 });
