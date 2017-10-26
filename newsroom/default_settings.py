@@ -34,13 +34,13 @@ BLUEPRINTS = [
     'newsroom.design',
     'newsroom.push',
     'newsroom.topics',
+    'newsroom.upload',
 ]
 
 CORE_APPS = [
     'superdesk.notification',
     'content_api.items',
     'content_api.items_versions',
-    'content_api.assets',
     'content_api.search',
     'content_api.auth',
     'content_api.publish',
@@ -48,6 +48,7 @@ CORE_APPS = [
     'newsroom.companies',
     'newsroom.wire',
     'newsroom.topics',
+    'newsroom.upload',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -95,7 +96,7 @@ SIGNUP_EMAIL_RECIPIENTS = os.environ.get('SIGNUP_EMAIL_RECIPIENTS')
 #: public client url - used to create links within emails etc
 CLIENT_URL = 'http://localhost:5050'
 
-MEDIA_PREFIX = os.environ.get('MEDIA_PREFIX', '')
+MEDIA_PREFIX = os.environ.get('MEDIA_PREFIX', '/assets')
 
 # Flask Limiter Settings
 RATELIMIT_DEFAULT = '60/hour'

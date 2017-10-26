@@ -13,14 +13,21 @@ def get_signature_headers(data, key):
 
 def test_push_item_inserts_missing(client, app):
     assert not app.config['PUSH_KEY']
-    item = {'guid': 'foo', 'type': 'text'}
+    item = {'guid': 'foo', 'type': 'text', 'renditions': {
+        'thumbnail': {
+            'href': 'http://example.com/foo',
+            'media': 'foo',
+        }
+    }}
     resp = client.post('/push', data=json.dumps(item), content_type='application/json')
     assert 200 == resp.status_code
-    resp = client.get('wire/foo')
+    resp = client.get('wire/foo?format=json')
     assert 200 == resp.status_code
+    data = json.loads(resp.get_data())
+    assert '/assets/foo' == data['renditions']['thumbnail']['href']
 
 
-def test_notify_valid_signature(client, app, mocker):
+def test_push_valid_signature(client, app, mocker):
     key = b'something random'
     app.config['PUSH_KEY'] = key
     data = json.dumps({'guid': 'foo', 'type': 'text'})
@@ -52,6 +59,9 @@ def test_push_binary(client, app):
     assert 201 == resp.status_code
 
     resp = client.get('/push_binary/%s' % media_id)
+    assert 200 == resp.status_code
+
+    resp = client.get('/assets/%s' % media_id)
     assert 200 == resp.status_code
 
 

@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
 
 
+ASSETS_RESOURCE = 'upload'
 KEY = 'PUSH_KEY'
 
 
@@ -45,6 +46,10 @@ def publish_item(doc):
             doc['bookmarks'] = parent_item.get('bookmarks', [])
         else:
             logger.warning("Failed to find evolvedfrom item %s for %s", doc['evolvedfrom'], doc['guid'])
+    if doc.get('renditions'):
+        for key, rendition in doc['renditions'].items():
+            if rendition.get('media'):
+                rendition['href'] = app.upload_url(rendition['media'])
     logger.info('publishing %s', doc['guid'])
     _id = service.create([doc])[0]
     if 'evolvedfrom' in doc and parent_item:
@@ -72,13 +77,13 @@ def push_binary():
         flask.abort(500)
     media_id = flask.request.form['media_id']
     media = flask.request.files['media']
-    print('_id', app.media.put(media, resource='wire_search', _id=media_id))
+    app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id)
     return flask.jsonify({'status': 'OK'}), 201
 
 
 @blueprint.route('/push_binary/<media_id>')
 def push_binary_get(media_id):
-    if app.media.get(media_id, resource='wire_search'):
+    if app.media.get(media_id, resource=ASSETS_RESOURCE):
         return flask.jsonify({})
     else:
         flask.abort(404)
