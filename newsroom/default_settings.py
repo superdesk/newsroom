@@ -24,7 +24,7 @@ URL_PREFIX = 'api'
 
 # keys for signing, shoudl be binary
 SECRET_KEY = os.environ.get('SECRET_KEY', '').encode() or os.urandom(32)
-NOTIFICATION_KEY = os.environ.get('NOTIFICATION_KEY', '').encode() or SECRET_KEY
+PUSH_KEY = os.environ.get('PUSH_KEY', '').encode()
 
 BLUEPRINTS = [
     'newsroom.wire',
@@ -32,7 +32,7 @@ BLUEPRINTS = [
     'newsroom.users',
     'newsroom.companies',
     'newsroom.design',
-    'newsroom.notification',
+    'newsroom.push',
     'newsroom.topics',
 ]
 
@@ -43,6 +43,7 @@ CORE_APPS = [
     'content_api.assets',
     'content_api.search',
     'content_api.auth',
+    'content_api.publish',
     'newsroom.users',
     'newsroom.companies',
     'newsroom.wire',
