@@ -28,3 +28,24 @@ def test_post_topic_user(client):
         assert 200 == resp.status_code
         data = json.loads(resp.get_data())
         assert 1 == data['_meta']['total']
+
+
+def test_update_topic(client):
+    with client as app:
+        with client.session_transaction() as session:
+            session['user'] = str(ObjectId())
+        resp = app.post(topics_url, data=topic)
+        assert 201 == resp.status_code
+
+        resp = app.get(topics_url)
+        data = json.loads(resp.get_data())
+        id = data['_items'][0]['_id']
+
+        with client.session_transaction() as session:
+            session['name'] = 'tester'
+        resp = app.post('topics/{}'.format(id), data=json.dumps({'label': 'test123'}), content_type='application/json')
+        assert 200 == resp.status_code
+
+        resp = app.get(topics_url)
+        data = json.loads(resp.get_data())
+        assert 'test123' == data['_items'][0]['label']

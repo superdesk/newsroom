@@ -33,6 +33,7 @@ BLUEPRINTS = [
     'newsroom.companies',
     'newsroom.design',
     'newsroom.notification',
+    'newsroom.topics',
 ]
 
 CORE_APPS = [

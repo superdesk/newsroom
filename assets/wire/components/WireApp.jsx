@@ -15,7 +15,7 @@ import {
     removeBookmarks,
     downloadItems,
     refreshItems,
-    openItem
+    openItem,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -25,7 +25,7 @@ import SearchResultsInfo from './SearchResultsInfo';
 import SearchSidebar from './SearchSidebar';
 import SelectedItemsBar from './SelectedItemsBar';
 
-import FollowTopicModal from './FollowTopicModal';
+import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from './ShareItemModal';
 import DownloadItemsModal from './DownloadItemsModal';
 import ItemDetails from './ItemDetails';
@@ -48,7 +48,10 @@ class WireApp extends React.Component {
     renderModal(specs) {
         if (specs) {
             const Modal = modals[specs.modal];
-            return <Modal key="modal" data={specs.data} />;
+            return <Modal
+                key="modal"
+                data={specs.data}
+            />;
         }
     }
 
