@@ -135,12 +135,12 @@ class EditCompany extends React.Component {
                                 <div className='list-item__preview-footer'>
                                     <input
                                         type='button'
-                                        className='wire-button wire-button--active'
+                                        className='btn btn-outline-primary'
                                         value={gettext('Save')}
                                         onClick={this.props.onSave}/>
                                     <input
                                         type='button'
-                                        className='wire-button'
+                                        className='btn btn-outline-secondary'
                                         value={gettext('Delete')}
                                         onClick={this.props.onDelete}/>
                                 </div>

@@ -11,7 +11,7 @@ class UserBar extends React.Component {
                     <SearchBar fetchItems={()=>this.props.fetchItems('users')}/>
                     <div className="content-bar__right">
                         <button
-                            className="wire-button"
+                            className="btn btn-outline-secondary"
                             onClick={() => this.props.onNewUser('users')}>{gettext('New User')}</button>
                     </div>
                 </nav>
