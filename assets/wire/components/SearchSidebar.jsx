@@ -17,7 +17,7 @@ function SearchSidebar(props) {
 
     const topicsList = props.topics.map((topic) => (
         <a href='#' key={topic._id}
-            className={classNames('wire-button', {
+            className={classNames('btn btn-outline-secondary', {
                 active: topic.query === props.activeQuery,
             })}
             onClick={(e) => query(e, topic)}>
@@ -46,10 +46,10 @@ function SearchSidebar(props) {
             </ul>
             <div className='tab-content' id='pills-tabContent'>
                 <div className='tab-pane fade show active' id='pills-home' role='tabpanel' aria-labelledby='pills-home-tab'>
-                    <a href='#' className='wire-button wire-button--active'>All</a>
-                    <a href='#' className='wire-button'>National</a>
-                    <a href='#' className='wire-button'>Courts</a>
-                    <a href='#' className='wire-button'>Entertainment</a>
+                    <a href='#' className='btn btn-outline-primary'>All</a>
+                    <a href='#' className='btn btn-outline-secondary'>National</a>
+                    <a href='#' className='btn btn-outline-secondary'>Courts</a>
+                    <a href='#' className='btn btn-outline-secondary'>Entertainment</a>
 
                     <span className='wire-column__nav__divider'></span>
                     <h5>{gettext('Followed topics')}</h5>
@@ -71,10 +71,10 @@ function SearchSidebar(props) {
 
                 </div>
                 <div className='tab-pane fade' id='pills-profile' role='tabpanel' aria-labelledby='pills-profile-tab'>
-                    <a href='#' className='wire-button wire-button--active'>All</a>
-                    <a href='#' className='wire-button'>Filter 1</a>
-                    <a href='#' className='wire-button'>Filter 2</a>
-                    <a href='#' className='wire-button'>Filter 3</a>
+                    <a href='#' className='btn btn-outline-primary'>All</a>
+                    <a href='#' className='btn btn-outline-secondary'>Filter 1</a>
+                    <a href='#' className='btn btn-outline-secondary'>Filter 2</a>
+                    <a href='#' className='btn btn-outline-secondary'>Filter 3</a>
                 </div>
             </div>
         </div>
