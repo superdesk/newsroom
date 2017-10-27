@@ -72,6 +72,7 @@ class Newsroom(eve.Eve):
         self._setup_webpack()
         self._setup_email()
         self._setup_cache()
+        self._setup_error_handlers()
 
     def load_config(self):
         """Override Eve.load_config in order to get default_settings."""
@@ -118,6 +119,12 @@ class Newsroom(eve.Eve):
     def _setup_cache(self):
         # configuring for in-memory cache for now
         self.cache = Cache(self)
+
+    def _setup_error_handlers(self):
+        def assertion_error(err):
+            return flask.jsonify({'error': err.args[0] if err.args else 1}), 400
+
+        self.register_error_handler(AssertionError, assertion_error)
 
     def sidenav(self, name, endpoint, icon=None):
         """Register an item in sidebar menu."""
