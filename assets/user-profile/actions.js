@@ -1,4 +1,4 @@
-import { notify } from 'utils';
+import { gettext, notify } from 'utils';
 import server from 'server';
 
 
@@ -59,8 +59,6 @@ function errorHandler(error, dispatch) {
 }
 
 
-
-
 /**
  * Fetches user details
  */
@@ -92,9 +90,19 @@ export function editTopic(topic) {
     return renderModal('followTopic', topic);
 }
 
+/**
+ * Deletes the given followed topic
+ *
+ */
 export function deleteTopic(topic) {
-    return () => {
-        return topic;
+    return function (dispatch) {
+        const url = `/topics/${topic._id}`;
+        return server.del(url)
+            .then(() => {
+                notify.success(gettext('Topic deleted successfully'));
+                dispatch(fetchTopics());
+            })
+            .catch((error) => errorHandler(error, dispatch));
     };
 }
 
@@ -108,10 +116,10 @@ export function shareTopic(topic) {
  * Updates a followed topic
  *
  */
-export function submitFollowTopic(data) {
+export function submitFollowTopic(topic) {
     return (dispatch) => {
-        const url = `/topics/${data._id}`;
-        return server.post(url, data)
+        const url = `/topics/${topic._id}`;
+        return server.post(url, topic)
             .then(() => dispatch(fetchTopics()))
             .then(() => dispatch(closeModal()))
             .catch(errorHandler);
