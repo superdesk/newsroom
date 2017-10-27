@@ -15,6 +15,7 @@ items = [
         'body_html': '<p>New stores will open in DC and Austin in 2018.</p><p>Next line</p>',
         'firstcreated': datetime.now(),
         'versioncreated': datetime.now(),
+        'service': [{'code': 'a', 'name': 'Service A'}],
     },
     {
         '_id': 'urn:localhost:weather',
@@ -26,6 +27,7 @@ items = [
         'ancestors': ['tag:weather'],
         'firstcreated': datetime.now(),
         'versioncreated': datetime.now(),
+        'service': [{'code': 'b', 'name': 'Service B'}],
     },
     {
         '_id': 'tag:weather',

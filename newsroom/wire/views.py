@@ -36,6 +36,16 @@ def get_view_data():
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': get_user_topics(user['_id']) if user else [],
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()],
+        'services': [
+            {'label': 'National', 'code': 'f'},
+            {'label': 'Courts', 'code': 'c'},
+            {'label': 'Entertainment', 'code': 'e'},
+            {'label': 'Finance', 'code': ''},
+            {'label': 'Politics', 'code': 'p'},
+            {'label': 'Sport', 'code': 's'},
+            {'label': 'World', 'code': 'w'},
+            {'label': 'Featured Story', 'code': ''},
+        ]
     }
 
 

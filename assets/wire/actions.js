@@ -1,4 +1,6 @@
 
+import { get, isEmpty } from 'lodash';
+
 import server from 'server';
 import { gettext, notify } from 'utils';
 
@@ -89,9 +91,19 @@ export function copyPreviewContents() {
  * @return {Promise}
  */
 function search(state) {
-    const query = state.query || '';
-    const bookmarks = state.bookmarks ? `&bookmarks=${state.user}` : '';
-    return server.get(`/search?q=${query}${bookmarks}`);
+    const params = {
+        q: state.query,
+        bookmarks: state.bookmarks && state.user,
+        service: get(state, 'wire.activeService.code'),
+        filter: !isEmpty(state.wire.activeFilter) ? JSON.stringify(state.wire.activeFilter) : null,
+    };
+
+    const queryString = Object.keys(params)
+        .filter((key) => params[key])
+        .map((key) => [key, params[key]].join('='))
+        .join('&');
+
+    return server.get(`/search?${queryString}`);
 }
 
 /**
@@ -283,5 +295,21 @@ export function fetchNext(item) {
         }
 
         return server.get(`/wire/${item.nextversion}?format=json`);
+    };
+}
+
+export const SET_SERVICE = 'SET_SERVICE';
+export function setService(service) {
+    return (dispatch) => {
+        dispatch({type: SET_SERVICE, service});
+        dispatch(fetchItems());
+    };
+}
+
+export const SET_FILTER = 'SET_FILTER';
+export function setFilter(key, val) {
+    return (dispatch) => {
+        dispatch({type: SET_FILTER, key, val});
+        dispatch(fetchItems());
     };
 }

@@ -15,7 +15,7 @@ describe('wire actions', () => {
     };
 
     beforeEach(() => {
-        fetchMock.get('/search?q=', response);
+        fetchMock.get('/search?', response);
         fetchMock.get('/search?q=foo', response);
         store = createStore(wireApp, applyMiddleware(thunk));
     });
@@ -73,7 +73,7 @@ describe('wire actions', () => {
         expect(store.getState().newItemsCount).toBe(0);
         return store.dispatch(actions.pushNotification({event: 'update'}))
             .then(() => {
-                expect(fetchMock.called('/search?q=')).toBeTruthy();
+                expect(fetchMock.called('/search?')).toBeTruthy();
                 expect(store.getState().newItemsCount).toBe(1);
                 store.dispatch(actions.refreshItems());
                 expect(store.getState().newItemsCount).toBe(0);
