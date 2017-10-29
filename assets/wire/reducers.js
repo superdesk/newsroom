@@ -5,6 +5,7 @@ import {
     SET_QUERY,
     QUERY_ITEMS,
     RECIEVE_ITEMS,
+    REMOVE_NEW_ITEMS,
     SET_STATE,
     SET_ACTIVE,
     RENDER_MODAL,
@@ -17,7 +18,6 @@ import {
     BOOKMARK_ITEMS,
     REMOVE_BOOKMARK,
     SET_NEW_ITEMS,
-    REFRESH_ITEMS,
     SET_SERVICE,
     SET_FILTER,
 } from './actions';
@@ -40,8 +40,8 @@ const initialState = {
     selectedItems: [],
     bookmarks: false,
     formats: [],
-    newItemsCount: 0,
-    newItemsData: null,
+    newItems: [],
+    newItemsByTopic: {},
     wire: {
         services: [],
         activeService: null,
@@ -210,19 +210,43 @@ export default function wireReducer(state = initialState, action) {
             bookmarkedItems: state.bookmarkedItems.filter((val) => val !== action.item),
         };
 
-    case SET_NEW_ITEMS:
+    case SET_NEW_ITEMS: {
+        const newItemsByTopic = state.newItemsByTopic || {};
+        action.data.topics.map((topic) => {
+            newItemsByTopic[topic] = newItemsByTopic[topic] || [];
+            newItemsByTopic[topic].push(action.data.item);
+        });
+
+        const newItems = state.newItems ?
+            state.newItems.slice(0, state.newItems.length) : [];
+        newItems.push(action.data.item);
+
         return {
             ...state,
-            newItemsCount: action.newItems.length,
-            newItemsData: action.newItems.length ? action.data : null,
+            newItems,
+            newItemsByTopic
         };
+    }
 
-    case REFRESH_ITEMS: {
-        const nextState = recieveItems(state, state.newItemsData);
-        return Object.assign(nextState, {
-            newItemsCount: 0,
-            newItemsData: null,
-        });
+
+    case REMOVE_NEW_ITEMS: {
+        const newItemsByTopic = state.newItemsByTopic || {};
+        let newItems = state.newItems || [];
+
+        if (state.newItemsByTopic[action.data]) {
+
+            newItemsByTopic[action.data].map((item) => {
+                newItems = newItems.filter((newItem) => newItem._id !== item._id);
+            });
+        }
+
+        newItemsByTopic[action.data] = null;
+
+        return {
+            ...state,
+            newItems,
+            newItemsByTopic
+        };
     }
 
     case SET_FILTER:

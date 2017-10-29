@@ -30,25 +30,6 @@ class SearchSidebar extends React.Component {
     }
 
     render() {
-        const tabContents = this.tabs.map((tab) => {
-            const Tab = tab.content;
-            const className = classNames('tab-pane', 'fade', {'show active': this.state.active === tab});
-            return (
-                <div className='tab-content' key={tab.label}>
-                    <div className={className} role='tabpanel'>
-                        <Tab
-                            services={this.props.services}
-                            activeService={this.props.activeService}
-                            selectService={this.selectService}
-                            activeFilter={this.props.activeFilter}
-                            selectFilter={this.selectFilter}
-                            aggregations={this.props.aggregations}
-                        />
-                    </div>
-                </div>
-            );
-        });
-
         return (
             <div className='wire-column__nav__items'>
                 <ul className='nav justify-content-center mb-3' id='pills-tab' role='tablist'>
@@ -64,7 +45,38 @@ class SearchSidebar extends React.Component {
                         </li>
                     ))}
                 </ul>
-                {tabContents}
+                <div className='tab-content' key={gettext('Navigation')}>
+                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[0]})} role='tabpanel'>
+                        <NavigationTab
+                            services={this.props.services}
+                            activeService={this.props.activeService}
+                            selectService={this.selectService}
+                            activeFilter={this.props.activeFilter}
+                            selectFilter={this.selectFilter}
+                            aggregations={this.props.aggregations}
+                        />
+                        {this.props.topics.length && <span className='wire-column__nav__divider'></span>}
+                        <TopicsTab
+                            topics={this.props.topics}
+                            setQuery={this.props.setQuery}
+                            activeQuery={this.props.activeQuery}
+                            newItemsByTopic={this.props.newItemsByTopic}
+                            removeNewItems={this.props.removeNewItems}
+                        />
+                    </div>
+                </div>
+                <div className='tab-content' key={gettext('Filters')}>
+                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[1]})} role='tabpanel'>
+                        <FiltersTab
+                            services={this.props.services}
+                            activeService={this.props.activeService}
+                            selectService={this.selectService}
+                            activeFilter={this.props.activeFilter}
+                            selectFilter={this.selectFilter}
+                            aggregations={this.props.aggregations}
+                        />
+                    </div>
+                </div>
             </div>
         );
     }
@@ -129,7 +141,7 @@ function FiltersTab({aggregations, activeFilter, selectFilter}) {
         }
 
         return (
-            <div key={group.field} className="wire-column__nav__group">
+            <div key={group.field} className='wire-column__nav__group'>
                 <h5>{group.label}</h5>
                 {buckets}
             </div>
@@ -143,10 +155,39 @@ FiltersTab.propTypes = {
     selectFilter: PropTypes.func.isRequired,
 };
 
+function TopicsTab({topics, setQuery, activeQuery, newItemsByTopic, removeNewItems}) {
+    const query = (e, topic) => {
+        e.preventDefault();
+        removeNewItems(topic._id);
+        setQuery(topic.query);
+    };
+    return topics.map((topic) => (
+        <a href='#' key={topic._id}
+            className={classNames('wire-button', {
+                active: topic.query === activeQuery,
+            })}
+            onClick={(e) => query(e, topic)}>
+            {topic.label}
+            {newItemsByTopic && newItemsByTopic[topic._id] && <span className='wire-button__notif'>
+                {newItemsByTopic[topic._id].length}
+            </span>}
+        </a>
+    ));
+}
+
+TopicsTab.propTypes = {
+    topics: PropTypes.array.isRequired,
+    setQuery: PropTypes.func.isRequired,
+    activeQuery: PropTypes.string,
+    removeNewItems: PropTypes.func,
+    newItemsByTopic: PropTypes.object,
+};
+
 SearchSidebar.propTypes = {
     activeQuery: PropTypes.string,
     topics: PropTypes.array.isRequired,
     setQuery: PropTypes.func.isRequired,
+    removeNewItems: PropTypes.func,
     bookmarkedItems: PropTypes.array.isRequired,
     itemsById: PropTypes.object.isRequired,
     services: PropTypes.array.isRequired,
@@ -154,6 +195,7 @@ SearchSidebar.propTypes = {
     dispatch: PropTypes.func.isRequired,
     activeService: PropTypes.object,
     activeFilter: PropTypes.object,
+    newItemsByTopic: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -163,6 +205,7 @@ const mapStateToProps = (state) => ({
     activeService: state.wire.activeService,
     activeFilter: state.wire.activeFilter,
     aggregations: state.aggregations,
+    newItemsByTopic: state.newItemsByTopic,
 });
 
 export default connect(mapStateToProps)(SearchSidebar);

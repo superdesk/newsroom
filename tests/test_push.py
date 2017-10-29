@@ -31,11 +31,9 @@ def test_push_valid_signature(client, app, mocker):
     key = b'something random'
     app.config['PUSH_KEY'] = key
     data = json.dumps({'guid': 'foo', 'type': 'text'})
-    push_mock = mocker.patch('newsroom.push.push_notification')
     headers = get_signature_headers(data, key)
     resp = client.post('/push', data=data, content_type='application/json', headers=headers)
     assert 200 == resp.status_code
-    push_mock.assert_called_once_with('update', item='foo')
 
 
 def test_notify_invalid_signature(client, app):
@@ -46,7 +44,7 @@ def test_notify_invalid_signature(client, app):
     assert 500 == resp.status_code
 
 
-def test_push_binary(client, app):
+def test_push_binary(client):
     media_id = str(bson.ObjectId())
 
     resp = client.get('/push_binary/%s' % media_id)
@@ -72,3 +70,22 @@ def test_push_binary_invalid_signature(client, app):
         media=(io.BytesIO(b'foo'), 'foo'),
     ))
     assert 500 == resp.status_code
+
+
+def test_notify_for_new_item(client, app, mocker):
+    with client as cli:
+        with client.session_transaction() as session:
+            user = str(bson.ObjectId())
+            session['user'] = user
+        resp = cli.post('api/users/%s/topics' % user, data={'label': 'bar', 'query': 'test', 'notifications': True})
+        assert 201 == resp.status_code
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+    data = json.dumps({'guid': 'foo', 'type': 'text', 'headline': 'this is a test'})
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args[1]['item']['_id'] == 'foo'
+    assert len(push_mock.call_args[1]['topics']) == 1
