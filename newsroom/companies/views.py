@@ -59,6 +59,14 @@ def edit(id):
         return jsonify(form.errors), 400
 
 
+@blueprint.route('/companies/<id>/services', methods=['POST'])
+@admin_only
+def update_services(id):
+    updates = flask.request.get_json()
+    get_resource_service('companies').patch(id=ObjectId(id), updates=updates)
+    return jsonify({'success': True}), 200
+
+
 @blueprint.route('/companies/<id>', methods=['DELETE'])
 @admin_only
 def delete(id):

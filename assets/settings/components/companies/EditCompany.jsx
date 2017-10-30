@@ -17,7 +17,14 @@ class EditCompany extends React.Component {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getUsers = this.getUsers.bind(this);
-        this.state = {activeTab: 'company-details'};
+        this.onServiceChange = this.onServiceChange.bind(this);
+        this.saveServices = this.saveServices.bind(this);
+        this.state = {activeTab: 'company-details', services: props.company.services || {}};
+        this.tabs = [
+            {label: gettext('Company'), name: 'company-details'},
+            {label: gettext('Users'), name: 'users'},
+            {label: gettext('Subscription'), name: 'subscription'},
+        ];
     }
 
     handleTabClick(event) {
@@ -34,6 +41,18 @@ class EditCompany extends React.Component {
                 <td>{shortDate(user._created)}</td>
             </tr>));
         }
+    }
+
+    onServiceChange(event) {
+        const service = event.target.name;
+        const services = Object.assign({}, this.state.services);
+        services[service] = !services[service];
+        this.setState({services});
+    }
+
+    saveServices(event) {
+        event.preventDefault();
+        this.props.saveServices(this.state.services);
     }
 
     render() {
@@ -53,25 +72,20 @@ class EditCompany extends React.Component {
                 </div>
 
                 <ul className='nav nav-tabs'>
-                    <li className='nav-item'>
-                        <a 
-                            name='company-details' 
-                            className={`nav-link ${this.state.activeTab !== 'users'?'active':'null'}`} 
-                            href='#' 
-                            onClick={this.handleTabClick}>Company
-                        </a>
-                    </li>
-                    <li className='nav-item'>
-                        <a 
-                            name='users'
-                            className={`nav-link ${this.state.activeTab === 'users'?'active':'null'}`}
-                            href='#'
-                            onClick={this.handleTabClick}>Users</a>
-                    </li>
+                    {this.tabs.map((tab) => (
+                        <li key={tab.name} className='nav-item'>
+                            <a
+                                name={tab.name}
+                                className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
+                                href='#'
+                                onClick={this.handleTabClick}>{tab.label}
+                            </a>
+                        </li>
+                    ))}
                 </ul>
 
                 <div className='tab-content'>
-                    {this.state.activeTab === 'company-details' ?
+                    {this.state.activeTab === 'company-details' &&
                         <div className='tab-pane active' id='company-details'>
                             <form>
                                 <div className="list-item__preview-form">
@@ -88,7 +102,7 @@ class EditCompany extends React.Component {
                                         value={this.props.company.url}
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.url : null}/>
-                                    
+
                                     <TextInput
                                         name='sd_subscriber_id'
                                         label={gettext('Superdesk Subscriber Id')}
@@ -144,17 +158,43 @@ class EditCompany extends React.Component {
                                         value={gettext('Delete')}
                                         onClick={this.props.onDelete}/>
                                 </div>
-
-
                             </form>
-                        </div> : <div className='tab-pane active' id='users'>
+                        </div>
+                    }
+                    {this.state.activeTab === 'users' &&
+                        <div className='tab-pane active' id='users'>
                             <table className='table'>
                                 <tbody>{this.getUsers()}</tbody>
                             </table>
-                        </div>}
+                        </div>
+                    }
+                    {this.state.activeTab === 'subscription' &&
+                        <div className='tab-pane active' id='subscription'>
+                            <form onSubmit={this.saveServices}>
+                                <div className="list-item__preview-form">
+                                    <ul>
+                                        {this.props.services.map((service) => (
+                                            <li key={service.name}>
+                                                <CheckboxInput
+                                                    name={service.code}
+                                                    label={service.name}
+                                                    value={!!this.state.services[service.code]  }
+                                                    onChange={this.onServiceChange} />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className='list-item__preview-footer'>
+                                    <input
+                                        type='submit'
+                                        className='wire-button wire-button--active'
+                                        value={gettext('Save')}
+                                    />
+                                </div>
+                            </form>
+                        </div>
+                    }
                 </div>
-
-
             </div>
         );
     }
@@ -169,6 +209,8 @@ EditCompany.propTypes = {
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     fetchCompanyUsers: PropTypes.func.isRequired,
+    services: PropTypes.array.isRequired,
+    saveServices: PropTypes.func.isRequired,
 };
 
 export default EditCompany;

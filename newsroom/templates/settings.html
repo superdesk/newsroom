@@ -7,10 +7,14 @@
 {% endblock %}
 
 {% block content %}
-    <div id="settings-app" class="settingsWrap">
-
-    </div>
-
+<div id="settings-app" class="settingsWrap"></div>
 {% endblock %}
 
-{% block script %} {{ javascript_tag('settings_js') | safe }} {% endblock %}
+{% block script %}
+<script>
+var viewData = {{ data | tojson | safe }};
+</script>
+
+{{ javascript_tag('settings_js') | safe }}
+
+{% endblock %}

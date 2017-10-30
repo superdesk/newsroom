@@ -35,7 +35,10 @@ class CompaniesResource(newsroom.Resource):
         },
         'country': {
             'type': 'string'
-        }
+        },
+        'services': {
+            'type': 'object',
+        },
     }
     datasource = {
         'source': 'companies',

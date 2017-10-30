@@ -118,3 +118,14 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 
 WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
+
+SERVICES = [
+    {'name': 'National', 'code': 'n'},
+    {'name': 'Courts', 'code': 'c'},
+    {'name': 'Entertainment', 'code': 'e'},
+    {'name': 'Finance', 'code': 'f'},
+    {'name': 'Politics', 'code': 'p'},
+    {'name': 'Sport', 'code': 's'},
+    {'name': 'World', 'code': 'w'},
+    {'name': 'Featured Story', 'code': 'feat'},
+]
