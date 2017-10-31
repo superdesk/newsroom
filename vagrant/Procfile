@@ -1,0 +1,4 @@
+web: python app.py
+websocket: python -m newsroom.websocket
+webpack: /opt/node_modules/webpack-dev-server/bin/webpack-dev-server.js --host 0.0.0.0 --port 8080 --public localhost:8080 --watch-poll 1000
+
