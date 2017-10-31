@@ -43,8 +43,6 @@ def upload_url(media_id):
 def init_app(app):
     app.upload_url = upload_url
     app.config['DOMAIN'].setdefault('upload', {
-        'datasource': {
-            'mongo_prefix': newsroom.MONGO_PREFIX,
-        },
         'authentication': None,
+        'mongo_prefix': newsroom.MONGO_PREFIX,
     })
