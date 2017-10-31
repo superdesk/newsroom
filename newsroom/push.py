@@ -8,6 +8,7 @@ from copy import copy
 from flask import current_app as app
 from superdesk.utc import utcnow
 from newsroom.notification import push_notification
+from newsroom.topics.topics import get_notification_topics
 
 logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
@@ -66,9 +67,31 @@ def push():
     assert 'type' in item, {'type': 1}
     orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
     if not orig:
-        publish_item(item)
-    push_notification('update', item=item['guid'])
+        item['_id'] = publish_item(item)
+        notify_new_item(item)
+    else:
+        push_notification('update', item=item['guid'])
     return flask.jsonify({})
+
+
+def notify_new_item(item):
+    if item.get('pubstatus') == 'canceled' or item.get('type') == 'composite':
+        return
+    topics = get_notification_topics()
+    topic_matches = superdesk.get_resource_service('wire_search').\
+        test_new_item(item['guid'], topics)
+    if topic_matches:
+        push_notification('update',
+                          item=item,
+                          topics=topic_matches)
+
+
+# keeping this for testing
+# @blueprint.route('/notify', methods=['POST'])
+# def notify():
+#     data = flask.json.loads(flask.request.get_data())
+#     notify_new_item(data['item'])
+#     return flask.jsonify({'status': 'OK'}), 200
 
 
 @blueprint.route('/push_binary', methods=['POST'])

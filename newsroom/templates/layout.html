@@ -37,6 +37,7 @@
         <div class="form-inline my-lg-0 ml-auto p-2">
             <a class="nav-link" href="{{ url_for('users.settings') }}">{{ gettext('Settings') }}</a>
             <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
+            <div class="nav-link" id="header-notification"></div>
             <a href="{{ url_for('users.user_profile') }}"><span class="badge badge-success">{{ session['name'] }}</span></a>
         </div>
         {% else %}

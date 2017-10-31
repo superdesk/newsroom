@@ -4,6 +4,14 @@ from flask import json
 from eve.utils import ParsedRequest
 
 
+aggregations = {
+    'genre': {'terms': {'field': 'genre.name'}},
+    'service': {'terms': {'field': 'service.name'}},
+    'subject': {'terms': {'field': 'subject.name'}},
+    'urgency': {'terms': {'field': 'urgency'}},
+}
+
+
 class WireSearchResource(newsroom.Resource):
     datasource = {
         'search_backend': 'elastic',
@@ -17,12 +25,6 @@ class WireSearchResource(newsroom.Resource):
             'nextversion': 1,
             'ancestors': 1,
         },
-        'aggregations': {
-            'genre': {'terms': {'field': 'genre.name'}},
-            'service': {'terms': {'field': 'service.name'}},
-            'subject': {'terms': {'field': 'subject.name'}},
-            'urgency': {'terms': {'field': 'urgency'}},
-        },
     }
 
     item_methods = ['GET']
@@ -30,8 +32,7 @@ class WireSearchResource(newsroom.Resource):
 
 
 def get_aggregation_field(key):
-    aggs = WireSearchResource.datasource['aggregations']
-    return aggs[key]['terms']['field']
+    return aggregations[key]['terms']['field']
 
 
 class WireSearchService(newsroom.Service):
@@ -68,6 +69,7 @@ class WireSearchService(newsroom.Service):
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
+        source['aggs'] = aggregations
         source['size'] = 25
 
         if req.args.get('filter'):
@@ -83,3 +85,54 @@ class WireSearchService(newsroom.Service):
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
+
+    def test_new_item(self, item_id, topics):
+        query = {
+            'bool': {
+                'must_not': [
+                    {'term': {'type': 'composite'}},
+                    {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
+                    {'term': {'pubstatus': 'canceled'}}
+                ],
+                'must': [
+                    {'term': {'_id': item_id}},
+                ],
+            }
+        }
+        aggs = {
+            'topics': {
+                'filters': {
+                    'filters': {}
+                }
+            }
+        }
+
+        for topic in topics:
+            filter = {
+                'bool': {
+                    'must': [{
+                        'query_string': {
+                            'query': topic['query'],
+                            'default_operator': 'AND',
+                            'lenient': True,
+                        },
+                        }
+                    ],
+                }
+            }
+            aggs['topics']['filters']['filters'][topic['label']] = filter
+
+        source = {'query': query}
+        source['aggs'] = aggs
+        source['size'] = 0
+
+        req = ParsedRequest()
+        req.args = {'source': json.dumps(source)}
+
+        search_results = super().get(req, None)
+
+        topic_matches = []
+        for topic in topics:
+            if search_results.hits['aggregations']['topics']['buckets'][topic['label']]['doc_count'] > 0:
+                topic_matches.append(topic['_id'])
+        return topic_matches

@@ -21,3 +21,7 @@ class TopicsService(newsroom.Service):
 
 def get_user_topics(user_id):
     return list(superdesk.get_resource_service('topics').get(req=None, lookup={'user': user_id}))
+
+
+def get_notification_topics():
+    return list(superdesk.get_resource_service('topics').get(req=None, lookup={'notifications': True}))

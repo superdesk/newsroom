@@ -70,15 +70,11 @@ describe('wire actions', () => {
     });
 
     it('can populate new items on update notification', () => {
-        expect(store.getState().newItemsCount).toBe(0);
-        return store.dispatch(actions.pushNotification({event: 'update'}))
-            .then(() => {
-                expect(fetchMock.called('/search?')).toBeTruthy();
-                expect(store.getState().newItemsCount).toBe(1);
-                store.dispatch(actions.refreshItems());
-                expect(store.getState().newItemsCount).toBe(0);
-                expect(store.getState().items.length).toBe(1);
-            });
+        expect(store.getState().newItems.length).toBe(0);
+        store.dispatch(actions.pushNotification({
+            event: 'update', extra: {topics: [1], item:{'_id': 'a'}}}));
+        expect(store.getState().newItems.length).toBe(1);
+        expect(store.getState().newItemsByTopic[1].length).toBe(1);
     });
 
     it('can open item', () => {

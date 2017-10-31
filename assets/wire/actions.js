@@ -261,13 +261,14 @@ export function submitDownloadItems(items, format) {
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
-export function setNewItems(newItems, data) {
-    return {type: SET_NEW_ITEMS, newItems, data};
+export function setNewItems(data) {
+    return {type: SET_NEW_ITEMS, data};
 }
 
-export const REFRESH_ITEMS = 'REFRESH_ITEMS';
-export function refreshItems() {
-    return {type: REFRESH_ITEMS};
+
+export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
+export function removeNewItems(data) {
+    return {type: REMOVE_NEW_ITEMS, data};
 }
 
 /**
@@ -280,10 +281,10 @@ export function pushNotification(push) {
         const state = getState();
         switch (push.event) {
         case 'update':
-            return search(state).then((data) => {
-                const newItems = data._items.filter((item) => !state.itemsById[item._id]);
-                return dispatch(setNewItems(newItems, data));
-            });
+            if (state.itemsById[push.extra.item._id]){
+                state.itemsById[push.extra.item._id] = push.extra.item;
+            }
+            return dispatch(setNewItems(push.extra));
         }
     };
 }

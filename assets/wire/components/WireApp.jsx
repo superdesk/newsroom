@@ -14,7 +14,7 @@ import {
     bookmarkItems,
     removeBookmarks,
     downloadItems,
-    refreshItems,
+    removeNewItems,
     openItem,
 } from 'wire/actions';
 
@@ -29,6 +29,7 @@ import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from './ShareItemModal';
 import DownloadItemsModal from './DownloadItemsModal';
 import ItemDetails from './ItemDetails';
+import NotificationList from 'components/NotificationList';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -70,7 +71,8 @@ class WireApp extends React.Component {
                 item={this.props.itemToOpen}
                 actions={this.props.actions.filter(previewActionFilter)}
                 onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
-            />, modal] : [
+            />, modal,
+            <NotificationList key="notificationList" newItems={this.props.newItems}/>] : [
                 <section key="contentHeader" className='content-header'>
                     {this.props.selectedItems && this.props.selectedItems.length > 0 &&
                         <SelectedItemsBar
@@ -142,6 +144,7 @@ class WireApp extends React.Component {
                                 topics={this.props.topics}
                                 setQuery={this.props.setQuery}
                                 activeQuery={this.props.activeQuery}
+                                removeNewItems={this.props.removeNewItems}
                             />
                             }
 
@@ -165,16 +168,6 @@ class WireApp extends React.Component {
                                     />
                                 }
 
-                                {!!this.props.newItemsCount && (
-                                    <nav className="navbar">
-                                        <div className="form-inline">
-                                            <button className="btn" onClick={this.props.refreshItems}>
-                                                {gettext('Refresh')} <span className="badge badge-secondary">{this.props.newItemsCount}</span>
-                                            </button>
-                                        </div>
-                                    </nav>
-                                )}
-
                                 <ItemsList actions={this.props.actions.filter(previewActionFilter)}/>
                             </div>
                         )}
@@ -190,6 +183,7 @@ class WireApp extends React.Component {
                         </div>
                     </div>
                     {modal}
+                    <NotificationList newItems={this.props.newItems}/>
                 </section>])
         );
     }
@@ -216,8 +210,8 @@ WireApp.propTypes = {
     selectAll: PropTypes.func,
     selectNone: PropTypes.func,
     bookmarks: PropTypes.bool,
-    newItemsCount: PropTypes.number,
-    refreshItems: PropTypes.func,
+    newItems: PropTypes.array,
+    removeNewItems: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -232,7 +226,7 @@ const mapStateToProps = (state) => ({
     topics: state.topics,
     selectedItems: state.selectedItems,
     bookmarks: state.bookmarks,
-    newItemsCount: state.newItemsCount,
+    newItems: state.newItems,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -244,7 +238,7 @@ const mapDispatchToProps = (dispatch) => ({
     },
     selectAll: () => dispatch(selectAll()),
     selectNone: () => dispatch(selectNone()),
-    refreshItems: () => dispatch(refreshItems()),
+    removeNewItems: (topicId) => dispatch(removeNewItems(topicId)),
     actions: [
         {
             id: 'open',
