@@ -170,7 +170,7 @@ export default function wireReducer(state = initialState, action) {
     }
 
     case SET_STATE:
-        return Object.assign({}, action.state);
+        return Object.assign({}, action.state || initialState);
 
     case RENDER_MODAL:
     case CLOSE_MODAL:

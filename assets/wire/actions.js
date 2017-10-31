@@ -2,7 +2,7 @@
 import { get, isEmpty } from 'lodash';
 
 import server from 'server';
-import { gettext, notify } from 'utils';
+import { gettext, notify, updateRouteParams } from 'utils';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -117,9 +117,11 @@ export function fetchItems() {
         return search(getState())
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
-                const params = new URLSearchParams(window.location.search);
-                params.set('q', getState().query || '');
-                history.pushState(getState(), null, '?' + params.toString());
+                const state = getState();
+                updateRouteParams({
+                    q: state.query,
+                    service: get(state, 'wire.activeService.code'),
+                }, state);
             })
             .catch(errorHandler);
     };
@@ -341,5 +343,25 @@ export function fetchMoreItems() {
         return search(getState(), true)
             .then((data) => dispatch(recieveNextItems(data)))
             .catch(errorHandler);
+    };
+}
+
+/**
+ * Set state on app init using url params
+ *
+ * @param {URLSearchParams} params
+ */
+export function initParams(params) {
+    return (dispatch, getState) => {
+        const state = getState();
+
+        if (params.get('q')) {
+            dispatch(setQuery(params.get('q')));
+        }
+
+        if (params.get('service')) {
+            const service = state.wire.services.find((service) => service.code === params.get('service'));
+            dispatch({type: SET_SERVICE, service});
+        }
     };
 }
