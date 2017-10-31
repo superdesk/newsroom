@@ -33,49 +33,23 @@ cd /vagrant
 
 # install javascript dependencies
 yarn install --no-bin-links --modules-folder /opt/node_modules
-
-# start services
-docker-compose -f /vagrant/docker-compose.yml up -d
 SCRIPT
 
 $start = <<SCRIPT
 #!/usr/bin/env bash
 
+docker-compose -f /vagrant/docker-compose.yml up -d
+
 cd /vagrant
-
-systemctl start mongod
-
-if [ -f /tmp/server.pid ]; then
-    kill `cat /tmp/server.pid`
-    rm /tmp/server.pid
-fi
-
-if [ -f /tmp/client.pid ]; then
-    kill `cat /tmp/client.pid`
-    rm /tmp/client.pid
-fi
 
 export NODE_PATH=/opt/node_modules
 export NODE_MODULES=/opt/node_modules
-/opt/node_modules/webpack-dev-server/bin/webpack-dev-server.js \
-    --quiet \
-    --host 0.0.0.0 \
-    --port 8080 \
-    --public localhost:8080 \
-    --watch-poll 1000 &
+export PYTHONUNBUFFERED=true
 
-echo $! >> /tmp/client.pid
-
-echo 'webpack: building..'
-# wait for initial webpack build
-while ! curl -sfo /dev/null 'http://localhost:8080/manifest.json'; do echo -n '.' && sleep .5; done
-echo 'done.'
-
-# start server
 source /opt/venv/bin/activate
 python manage.py create_user admin@localhost.com admin admin admin true
-honcho start &
-echo $! >> /tmp/server.pid
+
+honcho start -f vagrant/Procfile
 SCRIPT
 
 Vagrant.configure("2") do |config|
