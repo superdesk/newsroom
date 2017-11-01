@@ -16,6 +16,7 @@ import {
     downloadItems,
     removeNewItems,
     openItem,
+    fetchNextItems,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -44,21 +45,31 @@ class WireApp extends React.Component {
             withSidebar: false,
         };
         this.toggleSidebar = this.toggleSidebar.bind(this);
+        this.onListScroll = this.onListScroll.bind(this);
     }
 
     renderModal(specs) {
         if (specs) {
             const Modal = modals[specs.modal];
-            return <Modal
-                key="modal"
-                data={specs.data}
-            />;
+            return (
+                <Modal key="modal" data={specs.data} />
+            );
         }
     }
 
     toggleSidebar(event) {
         event.preventDefault();
         this.setState({withSidebar: !this.state.withSidebar});
+    }
+
+    onListScroll(event) {
+        const BUFFER = 10;
+        const container = event.target;
+        if (container.scrollTop + container.offsetHeight + BUFFER >= container.scrollHeight) {
+            this.props.fetchNextItems();
+            event.preventDefault();
+            event.stopPropagation();
+        }
     }
 
     render() {
@@ -156,7 +167,7 @@ class WireApp extends React.Component {
                                 </div>
                             </div>
                             :
-                            <div className='wire-column__main container-fluid'>
+                            <div className='wire-column__main container-fluid' onScroll={this.onListScroll}>
                                 {this.props.activeQuery && !this.props.selectedItems.length &&
                                     <SearchResultsInfo
                                         user={this.props.user}
@@ -212,6 +223,7 @@ WireApp.propTypes = {
     bookmarks: PropTypes.bool,
     newItems: PropTypes.array,
     removeNewItems: PropTypes.func,
+    fetchNextItems: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -285,6 +297,7 @@ const mapDispatchToProps = (dispatch) => ({
             action: (items) => dispatch(removeBookmarks(items)),
         },
     ],
+    fetchNextItems: () => dispatch(fetchNextItems()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
