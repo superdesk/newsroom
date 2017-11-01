@@ -100,19 +100,6 @@ class WireApp extends React.Component {
                             {/*<i className='icon--close-thin icon--white' onClick={this.toggleSidebar}></i>*/}
                         </span>
                         <div className='search form-inline'>
-                            <div className='dropdown'>
-                                <button className='content-bar__dropdown-btn btn dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                Simple search
-                                </button>
-                                <div className='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                    <a className='dropdown-item' href='#'>Simple search</a>
-                                    <a className='dropdown-item' href='#'>Advanced search</a>
-                                </div>
-                            </div>
-                            <span className='search__icon'>
-                                <i className='icon--search icon--gray-light'></i>
-                            </span>
-
                             <SearchBar
                                 fetchItems={this.props.fetchItems}
                                 setQuery={this.props.setQuery} />
