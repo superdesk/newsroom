@@ -107,7 +107,7 @@ class WireApp extends React.Component {
                                 setQuery={this.props.setQuery} />
                         </div>
 
-                        <div className='content-bar__right ml-auto'>
+                        <div className='content-bar__right'>
                             <div className='content-bar__sort btn-group'>
                                 <div className='form-control-plaintext'>
                                 Sort by:
