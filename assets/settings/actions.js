@@ -183,3 +183,22 @@ export function deleteItem(type) {
             .catch((error) => errorHandler(error, dispatch));
     };
 }
+
+export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
+export function initViewData(data) {
+    return {type: INIT_VIEW_DATA, data};
+}
+
+export const UPDATE_ITEM_SERVICES = 'UPDATE_ITEM_SERVICES';
+export function updateItemServices(item, services) {
+    return {type: UPDATE_ITEM_SERVICES, item, services};
+}
+
+export function saveServices(services) {
+    return function (dispatch, getState) {
+        const item = getState().itemToEdit;
+        return server.post(`/companies/${item._id}/services`, {services})
+            .then(() => dispatch(updateItemServices(item, services)))
+            .catch((error) => errorHandler(error, dispatch));
+    };
+}

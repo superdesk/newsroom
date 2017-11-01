@@ -12,6 +12,8 @@ import {
     NEW_ITEM,
     SELECT_MENU,
     SET_ERROR,
+    INIT_VIEW_DATA,
+    UPDATE_ITEM_SERVICES,
 } from './actions';
 
 const initialState = {
@@ -23,6 +25,7 @@ const initialState = {
     totalItems: null,
     activeQuery: null,
     selectedMenu: 'companies',
+    services: [],
 };
 
 export default function itemReducer(state = initialState, action) {
@@ -142,6 +145,15 @@ export default function itemReducer(state = initialState, action) {
             errors: null,
             selectedMenu: action.data.target.name
         };
+    }
+
+    case INIT_VIEW_DATA:
+        return Object.assign({}, state, action.data);
+
+    case UPDATE_ITEM_SERVICES: {
+        const itemsById = Object.assign({}, itemsById);
+        itemsById[action.item._id] = Object.assign({}, action.item, {services: action.services});
+        return {...state, itemsById};
     }
 
     default:

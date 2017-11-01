@@ -17,7 +17,10 @@ import re
 @blueprint.route('/settings', methods=['GET'])
 @admin_only
 def settings():
-    return flask.render_template('settings.html')
+    data = {
+        'services': app.config['SERVICES'],
+    }
+    return flask.render_template('settings.html', data=data)
 
 
 def get_view_data():

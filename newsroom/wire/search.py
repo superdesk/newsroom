@@ -2,6 +2,8 @@
 import newsroom
 from flask import json
 from eve.utils import ParsedRequest
+from newsroom.auth import get_user
+from newsroom.companies import get_user_company
 
 
 aggregations = {
@@ -46,6 +48,12 @@ class WireSearchService(newsroom.Service):
                 'must': [],
             }
         }
+
+        user = get_user()
+        company = get_user_company(user)
+        if company and company.get('services'):
+            services = [code for code, is_active in company['services'].items() if is_active]
+            query['bool']['must'].append({'terms': {'service.code': services}})
 
         if req.args.get('q'):
             query['bool']['must'].append({

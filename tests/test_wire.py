@@ -1,5 +1,6 @@
 
 from flask import json
+from bson import ObjectId
 
 from .fixtures import items, init_items, init_auth  # noqa
 
@@ -105,5 +106,20 @@ def test_search_filter_by_category(client, app):
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
     resp = client.get('/search?filter=%s' % json.dumps({'service': 'Service A'}))
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+
+
+def test_company_user_gets_company_services(client, app):
+    resp = client.post('companies/new', data={'name': 'Test'})
+    company_id = json.loads(resp.get_data()).get('_id')
+    resp = client.post('companies/%s/services' % company_id,
+                       data=json.dumps({'services': {'b': True}}),
+                       content_type='application/json')
+    assert 200 == resp.status_code
+    users = list(app.data.find_all('users'))
+    assert 1 == len(users)
+    app.data.update('users', users[0]['_id'], {'company': ObjectId(company_id)}, users[0])
+    resp = client.get('/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])

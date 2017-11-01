@@ -10,7 +10,7 @@ import { createLogger } from 'redux-logger';
 
 import userReducer from './reducers';
 import SettingsApp from './components/SettingsApp';
-import { fetchItems } from './actions';
+import { fetchItems, initViewData } from './actions';
 
 const loggerMiddleware = createLogger({
     duration: true,
@@ -25,6 +25,10 @@ const store = createStore(
         loggerMiddleware
     )
 );
+
+if (window.viewData) {
+    store.dispatch(initViewData(window.viewData));
+}
 
 // init companies
 store.dispatch(fetchItems('companies'));

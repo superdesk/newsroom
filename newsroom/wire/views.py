@@ -13,6 +13,7 @@ from newsroom.wire import blueprint
 from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
+from newsroom.companies import get_user_company
 
 
 def get_item_or_404(_id):
@@ -29,6 +30,17 @@ def get_json_or_400():
     return data
 
 
+def get_services(user):
+    services = app.config['SERVICES']
+    for service in services:
+        service.setdefault('is_active', True)
+    company = get_user_company(user)
+    if company and company.get('services'):
+        for service in services:
+            service['is_active'] = bool(company['services'].get(service['code']))
+    return services
+
+
 def get_view_data():
     user = get_user()
     return {
@@ -36,16 +48,7 @@ def get_view_data():
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': get_user_topics(user['_id']) if user else [],
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()],
-        'services': [
-            {'label': 'National', 'code': 'f'},
-            {'label': 'Courts', 'code': 'c'},
-            {'label': 'Entertainment', 'code': 'e'},
-            {'label': 'Finance', 'code': ''},
-            {'label': 'Politics', 'code': 'p'},
-            {'label': 'Sport', 'code': 's'},
-            {'label': 'World', 'code': 'w'},
-            {'label': 'Featured Story', 'code': ''},
-        ]
+        'services': get_services(user),
     }
 
 
