@@ -32,6 +32,15 @@ def test_signature(request):
     )
 
 
+def fix_hrefs(doc):
+    if doc.get('renditions'):
+        for key, rendition in doc['renditions'].items():
+            if rendition.get('media'):
+                rendition['href'] = app.upload_url(rendition['media'])
+    for assoc in doc.get('associations', {}).values():
+        fix_hrefs(assoc)
+
+
 def publish_item(doc):
     """Duplicating the logic from content_api.publish service."""
     now = utcnow()
@@ -47,10 +56,7 @@ def publish_item(doc):
             doc['bookmarks'] = parent_item.get('bookmarks', [])
         else:
             logger.warning("Failed to find evolvedfrom item %s for %s", doc['evolvedfrom'], doc['guid'])
-    if doc.get('renditions'):
-        for key, rendition in doc['renditions'].items():
-            if rendition.get('media'):
-                rendition['href'] = app.upload_url(rendition['media'])
+    fix_hrefs(doc)
     logger.info('publishing %s', doc['guid'])
     for assoc in doc.get('associations', {}).values():
         if assoc:
