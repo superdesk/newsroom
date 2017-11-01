@@ -46,9 +46,11 @@
 
                 <div class="wire-articles__item__meta">
                     <div class="wire-articles__item__icons">
+                        {% if item.type == 'text' %}
                         <span class="wire-articles__item__icon">
                             <i class="icon--text icon--gray-light"></i>
                         </span>
+                        {% endif %}
                         {% if get_picture(item) %}
                         <span class="wire-articles__item__icon">
                             <i class="icon--photo icon--gray-light"></i>

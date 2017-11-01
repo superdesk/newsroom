@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { gettext, fullDate } from 'utils';
-import { getPicture, showItemVersions } from 'wire/utils';
+import { getPicture, getPreviewRendition, showItemVersions } from 'wire/utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from './PreviewActionButtons';
 import PreviewTags from './PreviewTags';
@@ -26,9 +26,9 @@ function Preview({item, actions}) {
                     <span className='bold'>{item.byline}</span>{' '}
                     <span>{gettext('in {{ located}}', {located: item.located})}</span>
                 </p>
-                {picture && (
+                {getPreviewRendition(picture) && (
                     <figure className='wire-column__preview__image'>
-                        <img src={picture.renditions.viewImage.href} />
+                        <img src={getPreviewRendition(picture).href} />
                         <figcaption className='wire-column__preview__caption'>{picture.description_text}</figcaption>
                     </figure>
                 )}

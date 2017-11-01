@@ -3,6 +3,7 @@ import superdesk
 from flask import Blueprint
 from flask_babel import gettext
 from newsroom.wire.search import WireSearchResource, WireSearchService
+from . import utils
 
 blueprint = Blueprint('wire', __name__)
 
@@ -18,3 +19,5 @@ def init_app(app):
     app.add_download_formatter('text', TextFormatter(), gettext('Plain Text'))
     app.add_download_formatter('nitf', NITFFormatter(), 'NITF')
     app.add_download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2')
+
+    app.add_template_global(utils.get_picture, 'get_picture')
