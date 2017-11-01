@@ -22,7 +22,13 @@ item = {
     },
     'associations': {
         'featured': {
-            'type': 'text',
+            'type': 'picture',
+            'renditions': {
+                'thumbnail': {
+                    'href': 'http://example.com/bar',
+                    'media': 'bar',
+                }
+            }
         }
     }
 }
@@ -37,6 +43,7 @@ def test_push_item_inserts_missing(client, app):
     assert 200 == resp.status_code
     data = json.loads(resp.get_data())
     assert '/assets/foo' == data['renditions']['thumbnail']['href']
+    assert '/assets/bar' == data['associations']['featured']['renditions']['thumbnail']['href']
 
 
 def test_push_valid_signature(client, app, mocker):
