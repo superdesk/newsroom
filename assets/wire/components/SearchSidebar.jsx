@@ -92,7 +92,7 @@ function NavigationTab({services, activeService, selectService}) {
     return allServices.map((service) => (
         <a key={service.name}
             href=''
-            className={classNames('wire-button', {'wire-button--active': isActive(service)})}
+            className={classNames('btn', {'btn-outline-secondary': !isActive(service)}, {'btn-outline-primary': isActive(service)})}
             onClick={(event) => selectService(event, service.code !== null ? service : null)}
         >{service.name}</a>
     ));
@@ -132,7 +132,7 @@ function FiltersTab({aggregations, activeFilter, selectFilter}) {
         const buckets = aggregations[group.field].buckets.map((bucket) => (
             <a key={bucket.key}
                 href=''
-                className={classNames('wire-button', {'wire-button--active': activeKey === bucket.key})}
+                className={classNames('btn', {'btn-outline-secondary': activeKey !== bucket.key}, {'btn-outline-primary': activeKey === bucket.key})}
                 onClick={(event) => selectFilter(event, group.field, bucket.key)}>{bucket.key}</a>
         ));
 
@@ -163,8 +163,8 @@ function TopicsTab({topics, setQuery, activeQuery, newItemsByTopic, removeNewIte
     };
     return topics.map((topic) => (
         <a href='#' key={topic._id}
-            className={classNames('wire-button', {
-                active: topic.query === activeQuery,
+            className={classNames('btn btn-outline-secondary', {
+                'btn-outline-primary': topic.query === activeQuery,
             })}
             onClick={(e) => query(e, topic)}>
             {topic.label}

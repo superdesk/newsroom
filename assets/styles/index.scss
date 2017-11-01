@@ -4,7 +4,7 @@ html {
 }
 
 body {
-    font-family: 'Merriweather', serif;
+    font-family: $font-family-serif;;
     color: $body-text;
     background-color: $background-color;
     overflow: hidden;
@@ -433,15 +433,18 @@ article.list {
     justify-content: flex-end;
     padding: 20px;
     border-top: 1px solid #ddd;
-    .wire-button {
-        + .wire-button {
-            margin-left: 20px;
+    .btn {
+        + .btn {
+            margin-left: 12px;
         }
     }
 }
 
 .search {
     flex: 1 1 auto;
+    + .content-bar__right {
+        margin-left: 10px;
+    }
 }
 
 .search__form {
@@ -451,21 +454,6 @@ article.list {
     }
     input {
 
-    }
-    button {
-        font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
-        font-size: 0.8rem;
-        color: #707070;
-        padding: 7px 20px;
-        margin-left: 15px;
-        margin-right: 15px;
-        text-transform: uppercase;
-        border: 1px solid #bababa;
-        border-radius: 3px !important;
-        background: transparent;
-        &:hover {
-            cursor: pointer;
-        }
     }
 }
 
@@ -609,6 +597,7 @@ article.list {
 
 .wire-column__preview--open {
     width: 480px;
+    border-left: 2px solid #919191;
 }
 
 .wire-column__nav__items, .wire-column__preview__items {
@@ -627,9 +616,6 @@ article.list {
 .wire-column__nav {
     background: #3e4557;
     max-width: 260px;
-    a {
-        color: #fff;
-    }
 }
 
 .wire-column__nav__items {
@@ -638,8 +624,8 @@ article.list {
         margin-right: -20px;
         border-bottom: 1px solid #323847;
     }
-    .wire-button {
-        margin-bottom: 10px;
+    .btn {
+        margin-bottom: 12px;
     }
 }
 
@@ -681,29 +667,6 @@ article.list {
     color: #fff;
 }
 
-.wire-button {
-    position: relative;
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
-    font-size: 0.8rem;
-    color: #707070;
-    padding: 8px 20px;
-    display: block;
-    width: 100%;
-    text-transform: uppercase;
-    border: 1px solid #bababa;
-    border-radius: 3px;
-    background: transparent;
-    text-align: center;
-    &:hover {
-        text-decoration: none;
-        cursor: pointer;
-    }
-    &.wire-button--active {
-        color: $main-blue;
-        border: 1px solid #1982b0;
-    }
-}
-
 .wire-button__notif {
     position: absolute;
     top: -10px;
@@ -714,6 +677,7 @@ article.list {
     border-radius: 100%;
     width: 20px;
     height: 20px;
+    line-height: 1.3rem;
 }
 
 .wire-articles {
@@ -936,7 +900,6 @@ article.list {
 
 .wire-column__preview {
     background: #fff;
-    border-left: 2px solid #919191;
 }
 
 .wire-column__preview__items {

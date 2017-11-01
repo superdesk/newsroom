@@ -11,7 +11,7 @@ class CompanyBar extends React.Component {
                     <SearchBar fetchItems={()=>this.props.fetchItems('companies')}/>
                     <div className="content-bar__right">
                         <button
-                            className="wire-button"
+                            className="btn btn-outline-secondary"
                             onClick={() => this.props.onNewCompany('companies')}>{gettext('New Company')}</button>
                     </div>
                 </nav>
