@@ -73,7 +73,6 @@ class WireApp extends React.Component {
     }
 
     render() {
-        const progressStyle = {width: '25%'};
         const modal = this.renderModal(this.props.modal);
         const previewActionFilter = (action) => !action.when || action.when(this.props);
         const multiActionFilter = (action) => action.multi && previewActionFilter(action);
@@ -147,28 +146,20 @@ class WireApp extends React.Component {
                             }
 
                         </div>
-                        {(this.props.isLoading ?
-                            <div className='col'>
-                                <div className='progress'>
-                                    <div className='progress-bar' style={progressStyle} />
-                                </div>
-                            </div>
-                            :
-                            <div className='wire-column__main container-fluid' onScroll={this.onListScroll}>
-                                {this.props.activeQuery && !this.props.selectedItems.length &&
-                                    <SearchResultsInfo
-                                        user={this.props.user}
-                                        query={this.props.activeQuery}
-                                        bookmarks={this.props.bookmarks}
-                                        totalItems={this.props.totalItems}
-                                        followTopic={this.props.followTopic}
-                                        topics={this.props.topics}
-                                    />
-                                }
+                        <div className='wire-column__main container-fluid' onScroll={this.onListScroll}>
+                            {this.props.activeQuery && !this.props.selectedItems.length &&
+                                <SearchResultsInfo
+                                    user={this.props.user}
+                                    query={this.props.activeQuery}
+                                    bookmarks={this.props.bookmarks}
+                                    totalItems={this.props.totalItems}
+                                    followTopic={this.props.followTopic}
+                                    topics={this.props.topics}
+                                />
+                            }
 
-                                <ItemsList actions={this.props.actions.filter(previewActionFilter)}/>
-                            </div>
-                        )}
+                            <ItemsList actions={this.props.actions.filter(previewActionFilter)}/>
+                        </div>
 
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
