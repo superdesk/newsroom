@@ -6,7 +6,7 @@ import PreviewTags from './PreviewTags';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import { gettext, fullDate } from 'utils';
-import { getPicture, showItemVersions } from 'wire/utils';
+import { getPicture, getDetailRendition, showItemVersions } from 'wire/utils';
 
 function ItemDetails({item, actions, onClose}) {
     const picture = getPicture(item);
@@ -26,9 +26,9 @@ function ItemDetails({item, actions, onClose}) {
 
             <article id='preview-article' className="wire-column__preview__content--item-detal-wrap">
                 <div className="wire-column__preview__content">
-                    {picture && (
+                    {getDetailRendition(picture) && (
                         <figure className="wire-column__preview__image">
-                            <img src={picture.renditions.baseImage.href} />
+                            <img src={getDetailRendition(picture).href} />
                             <figcaption className="wire-column__preview__caption">{picture.description_text}</figcaption>
                         </figure>
                     )}

@@ -11,9 +11,11 @@ function PreviewMeta({item, isItemDetail}) {
     return (
         <div className='wire-articles__item__meta'>
             <div className='wire-articles__item__icons'>
-                <span className='wire-articles__item__icon'>
-                    <i className='icon--text icon--gray-light'></i>
-                </span>
+                {item.type === 'text' &&
+                    <span className='wire-articles__item__icon'>
+                        <i className='icon--text icon--gray-light'></i>
+                    </span>
+                }
                 {picture && (
                     <span className='wire-articles__item__icon'>
                         <i className='icon--photo icon--gray-light'></i>

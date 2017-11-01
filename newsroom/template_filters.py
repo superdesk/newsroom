@@ -35,7 +35,3 @@ def newsroom_config():
     return {
         'websocket': os.environ.get('NEWSROOM_WEBSOCKET_URL', 'ws://localhost:%d' % (port + 100, )),
     }
-
-
-def get_picture(item):
-    return item.get('associations', {}).get('featuremedia')

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
-import { getPicture, showItemVersions } from 'wire/utils';
+import { getPicture, getThumbnailRendition, showItemVersions } from 'wire/utils';
 import ActionList from 'components/ActionList';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
@@ -70,9 +70,11 @@ class WireListItem extends React.Component {
 
                         <div className='wire-articles__item__meta'>
                             <div className='wire-articles__item__icons'>
-                                <span className='wire-articles__item__icon'>
-                                    <i className='icon--text icon--gray-light'></i>
-                                </span>
+                                {item.type === 'text' &&
+                                    <span className='wire-articles__item__icon'>
+                                        <i className='icon--text icon--gray-light'></i>
+                                    </span>
+                                }
                                 {picture &&
                                     <span className='wire-articles__item__icon'>
                                         <i className='icon--photo icon--gray-light'></i>
@@ -104,10 +106,10 @@ class WireListItem extends React.Component {
                         )}
                     </div>
 
-                    {picture && (
+                    {getThumbnailRendition(picture) && (
                         <div className="wire-articles__item--list__image">
                             <figure>
-                                <img src={picture.renditions.thumbnail.href} />
+                                <img src={getThumbnailRendition(picture).href} />
                             </figure>
                         </div>
                     )}

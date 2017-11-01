@@ -25,7 +25,7 @@ from flask_cache import Cache
 from newsroom.webpack import NewsroomWebpack
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
-    plain_text, word_count, newsroom_config, get_picture,
+    plain_text, word_count, newsroom_config,
 )
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -105,7 +105,6 @@ class Newsroom(eve.Eve):
         self.add_template_filter(word_count)
         self.add_template_global(self.sidenavs, 'sidenavs')
         self.add_template_global(newsroom_config)
-        self.add_template_global(get_picture)
 
     def _setup_webpack(self):
         NewsroomWebpack(self)
