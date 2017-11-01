@@ -11,14 +11,26 @@ def get_signature_headers(data, key):
     return {'x-superdesk-signature': 'sha1=%s' % mac.hexdigest()}
 
 
-def test_push_item_inserts_missing(client, app):
-    assert not app.config['PUSH_KEY']
-    item = {'guid': 'foo', 'type': 'text', 'renditions': {
+item = {
+    'guid': 'foo',
+    'type': 'text',
+    'renditions': {
         'thumbnail': {
             'href': 'http://example.com/foo',
             'media': 'foo',
         }
-    }}
+    },
+    'associations': {
+        'featured': {
+            'type': 'text',
+        }
+    }
+}
+
+
+def test_push_item_inserts_missing(client, app):
+    assert not app.config['PUSH_KEY']
+
     resp = client.post('/push', data=json.dumps(item), content_type='application/json')
     assert 200 == resp.status_code
     resp = client.get('wire/foo?format=json')

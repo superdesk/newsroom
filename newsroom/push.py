@@ -52,6 +52,9 @@ def publish_item(doc):
             if rendition.get('media'):
                 rendition['href'] = app.upload_url(rendition['media'])
     logger.info('publishing %s', doc['guid'])
+    for assoc in doc.get('associations', {}).values():
+        if assoc:
+            assoc.setdefault('subscribers', [])
     _id = service.create([doc])[0]
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
