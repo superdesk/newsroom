@@ -16,7 +16,7 @@ import {
     downloadItems,
     removeNewItems,
     openItem,
-    fetchNextItems,
+    fetchMoreItems,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -66,9 +66,8 @@ class WireApp extends React.Component {
         const BUFFER = 10;
         const container = event.target;
         if (container.scrollTop + container.offsetHeight + BUFFER >= container.scrollHeight) {
-            this.props.fetchNextItems();
-            event.preventDefault();
-            event.stopPropagation();
+            this.props.fetchMoreItems()
+                .catch(() => null); // ignore
         }
     }
 
@@ -201,7 +200,7 @@ WireApp.propTypes = {
     bookmarks: PropTypes.bool,
     newItems: PropTypes.array,
     removeNewItems: PropTypes.func,
-    fetchNextItems: PropTypes.func,
+    fetchMoreItems: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -275,7 +274,7 @@ const mapDispatchToProps = (dispatch) => ({
             action: (items) => dispatch(removeBookmarks(items)),
         },
     ],
-    fetchNextItems: () => dispatch(fetchNextItems()),
+    fetchMoreItems: () => dispatch(fetchMoreItems()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

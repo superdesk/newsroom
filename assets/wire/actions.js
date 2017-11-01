@@ -327,14 +327,14 @@ export function recieveNextItems(data) {
     return {type: RECIEVE_NEXT_ITEMS, data};
 }
 
-export function fetchNextItems() {
+const MAX_ITEMS = 1000; // server limit
+export function fetchMoreItems() {
     return (dispatch, getState) => {
-        if (getState().isLoading) {
-            return;
-        }
+        const state = getState();
+        const limit = Math.min(MAX_ITEMS, state.totalItems);
 
-        if (getState().items.length >= 1000) { // server limit
-            return;
+        if (state.isLoading || state.items.length >= limit) {
+            return Promise.reject();
         }
 
         dispatch(startLoading());
