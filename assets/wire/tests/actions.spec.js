@@ -10,7 +10,7 @@ import * as actions from '../actions';
 describe('wire actions', () => {
     let store;
     const response = {
-        _meta: {total: 1},
+        _meta: {total: 2},
         _items: [{_id: 'foo'}],
     };
 
@@ -110,5 +110,25 @@ describe('wire actions', () => {
         }, () => {
             expect(fetchMock.called()).toBeFalsy();
         });
+    });
+
+    it('can fetch more items', (done) => {
+        fetchMock.get('/search?from=1', {_items: [{_id: 'bar'}]});
+        return store.dispatch(actions.fetchItems())
+            .then(() => {
+                expect(store.getState().totalItems).toBe(2);
+                const promise = store.dispatch(actions.fetchMoreItems())
+                    .then(() => {
+                        expect(store.getState().isLoading).toBeFalsy();
+                        expect(store.getState().items.length).toBe(2);
+                        return store.dispatch(actions.fetchMoreItems())
+                            .then(
+                                () => expect(true).toBeFalsy(),  // should reject after fetching all
+                                () => done()
+                            );
+                    });
+                expect(store.getState().isLoading).toBeTruthy();
+                return promise;
+            });
     });
 });

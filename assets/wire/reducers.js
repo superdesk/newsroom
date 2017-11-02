@@ -20,6 +20,8 @@ import {
     SET_NEW_ITEMS,
     SET_SERVICE,
     SET_FILTER,
+    START_LOADING,
+    RECIEVE_NEXT_ITEMS,
 } from './actions';
 
 import { toggleValue } from 'utils';
@@ -154,6 +156,19 @@ export default function wireReducer(state = initialState, action) {
     case RECIEVE_ITEMS:
         return recieveItems(state, action.data);
 
+    case RECIEVE_NEXT_ITEMS: {
+        const itemsById = Object.assign({}, state.itemsById);
+        const items = state.items.concat(action.data._items.map((item) => {
+            if (itemsById[item._id] && state.items.indexOf(item._id) !== -1) {
+                return;
+            }
+
+            itemsById[item._id] = item;
+            return item._id;
+        }).filter((_id) => _id));
+        return {...state, items, itemsById, isLoading: false};
+    }
+
     case SET_STATE:
         return Object.assign({}, action.state);
 
@@ -252,6 +267,9 @@ export default function wireReducer(state = initialState, action) {
     case SET_FILTER:
     case SET_SERVICE:
         return {...state, wire: _wireReducer(state.wire, action)};
+
+    case START_LOADING:
+        return {...state, isLoading: true};
 
     default:
         return state;

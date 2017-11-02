@@ -88,14 +88,16 @@ export function copyPreviewContents() {
  * Search server request
  *
  * @param {Object} state
+ * @param {bool} next
  * @return {Promise}
  */
-function search(state) {
+function search(state, next) {
     const params = {
         q: state.query,
         bookmarks: state.bookmarks && state.user,
         service: get(state, 'wire.activeService.code'),
         filter: !isEmpty(state.wire.activeFilter) ? JSON.stringify(state.wire.activeFilter) : null,
+        from: next ? state.items.length : 0,
     };
 
     const queryString = Object.keys(params)
@@ -312,5 +314,32 @@ export function setFilter(key, val) {
     return (dispatch) => {
         dispatch({type: SET_FILTER, key, val});
         dispatch(fetchItems());
+    };
+}
+
+export const START_LOADING = 'START_LOADING';
+export function startLoading() {
+    return {type: START_LOADING};
+}
+
+export const RECIEVE_NEXT_ITEMS = 'RECIEVE_NEXT_ITEMS';
+export function recieveNextItems(data) {
+    return {type: RECIEVE_NEXT_ITEMS, data};
+}
+
+const MAX_ITEMS = 1000; // server limit
+export function fetchMoreItems() {
+    return (dispatch, getState) => {
+        const state = getState();
+        const limit = Math.min(MAX_ITEMS, state.totalItems);
+
+        if (state.isLoading || state.items.length >= limit) {
+            return Promise.reject();
+        }
+
+        dispatch(startLoading());
+        return search(getState(), true)
+            .then((data) => dispatch(recieveNextItems(data)))
+            .catch(errorHandler);
     };
 }

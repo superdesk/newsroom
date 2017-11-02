@@ -123,3 +123,14 @@ def test_company_user_gets_company_services(client, app):
     resp = client.get('/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
+
+
+def test_search_pagination(client):
+    resp = client.get('/search?from=25')
+    assert 200 == resp.status_code
+    data = json.loads(resp.get_data())
+    assert 0 == len(data['_items'])
+    assert '_aggregations' not in data
+
+    resp = client.get('/search?from=2000')
+    assert 400 == resp.status_code

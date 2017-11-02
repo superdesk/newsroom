@@ -16,6 +16,7 @@ import {
     downloadItems,
     removeNewItems,
     openItem,
+    fetchMoreItems,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -44,15 +45,15 @@ class WireApp extends React.Component {
             withSidebar: false,
         };
         this.toggleSidebar = this.toggleSidebar.bind(this);
+        this.onListScroll = this.onListScroll.bind(this);
     }
 
     renderModal(specs) {
         if (specs) {
             const Modal = modals[specs.modal];
-            return <Modal
-                key="modal"
-                data={specs.data}
-            />;
+            return (
+                <Modal key="modal" data={specs.data} />
+            );
         }
     }
 
@@ -61,8 +62,16 @@ class WireApp extends React.Component {
         this.setState({withSidebar: !this.state.withSidebar});
     }
 
+    onListScroll(event) {
+        const BUFFER = 10;
+        const container = event.target;
+        if (container.scrollTop + container.offsetHeight + BUFFER >= container.scrollHeight) {
+            this.props.fetchMoreItems()
+                .catch(() => null); // ignore
+        }
+    }
+
     render() {
-        const progressStyle = {width: '25%'};
         const modal = this.renderModal(this.props.modal);
         const previewActionFilter = (action) => !action.when || action.when(this.props);
         const multiActionFilter = (action) => action.multi && previewActionFilter(action);
@@ -89,19 +98,6 @@ class WireApp extends React.Component {
                             {/*<i className='icon--close-thin icon--white' onClick={this.toggleSidebar}></i>*/}
                         </span>
                         <div className='search form-inline'>
-                            <div className='dropdown'>
-                                <button className='content-bar__dropdown-btn btn dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                Simple search
-                                </button>
-                                <div className='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                    <a className='dropdown-item' href='#'>Simple search</a>
-                                    <a className='dropdown-item' href='#'>Advanced search</a>
-                                </div>
-                            </div>
-                            <span className='search__icon'>
-                                <i className='icon--search icon--gray-light'></i>
-                            </span>
-
                             <SearchBar
                                 fetchItems={this.props.fetchItems}
                                 setQuery={this.props.setQuery} />
@@ -149,28 +145,20 @@ class WireApp extends React.Component {
                             }
 
                         </div>
-                        {(this.props.isLoading ?
-                            <div className='col'>
-                                <div className='progress'>
-                                    <div className='progress-bar' style={progressStyle} />
-                                </div>
-                            </div>
-                            :
-                            <div className='wire-column__main container-fluid'>
-                                {this.props.activeQuery && !this.props.selectedItems.length &&
-                                    <SearchResultsInfo
-                                        user={this.props.user}
-                                        query={this.props.activeQuery}
-                                        bookmarks={this.props.bookmarks}
-                                        totalItems={this.props.totalItems}
-                                        followTopic={this.props.followTopic}
-                                        topics={this.props.topics}
-                                    />
-                                }
+                        <div className='wire-column__main container-fluid' onScroll={this.onListScroll}>
+                            {this.props.activeQuery && !this.props.selectedItems.length &&
+                                <SearchResultsInfo
+                                    user={this.props.user}
+                                    query={this.props.activeQuery}
+                                    bookmarks={this.props.bookmarks}
+                                    totalItems={this.props.totalItems}
+                                    followTopic={this.props.followTopic}
+                                    topics={this.props.topics}
+                                />
+                            }
 
-                                <ItemsList actions={this.props.actions.filter(previewActionFilter)}/>
-                            </div>
-                        )}
+                            <ItemsList actions={this.props.actions.filter(previewActionFilter)}/>
+                        </div>
 
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
@@ -212,6 +200,7 @@ WireApp.propTypes = {
     bookmarks: PropTypes.bool,
     newItems: PropTypes.array,
     removeNewItems: PropTypes.func,
+    fetchMoreItems: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -285,6 +274,7 @@ const mapDispatchToProps = (dispatch) => ({
             action: (items) => dispatch(removeBookmarks(items)),
         },
     ],
+    fetchMoreItems: () => dispatch(fetchMoreItems()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

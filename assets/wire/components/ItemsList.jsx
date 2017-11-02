@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { gettext } from 'utils';
 import WireListItem from './WireListItem';
 import { setActive, previewItem, toggleSelected } from '../actions';
 
@@ -96,6 +97,11 @@ class ItemsList extends React.Component {
         return (
             <div className="wire-articles wire-articles--list row" onKeyDown={this.onKeyDown}>
                 {articles}
+                {!articles.length &&
+                    <div className="wire-articles__item-wrap col-12">
+                        <div className="alert alert-secondary">{gettext('No items found.')}</div>
+                    </div>
+                }
             </div>
         );
     }

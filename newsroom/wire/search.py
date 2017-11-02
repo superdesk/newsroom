@@ -1,6 +1,6 @@
 
 import newsroom
-from flask import json
+from flask import json, abort
 from eve.utils import ParsedRequest
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
@@ -77,8 +77,15 @@ class WireSearchService(newsroom.Service):
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
-        source['aggs'] = aggregations
         source['size'] = 25
+        source['from'] = int(req.args.get('from', 0))
+
+        if source['from'] >= 1000:
+            # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
+            return abort(400)
+
+        if not source['from']:  # avoid aggregations when handling pagination
+            source['aggs'] = aggregations
 
         if req.args.get('filter'):
             filters = json.loads(req.args['filter'])
