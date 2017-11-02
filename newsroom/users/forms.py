@@ -25,3 +25,4 @@ class UserForm(FlaskForm):
     is_validated = BooleanField('Email Validated', validators=[])
     is_enabled = BooleanField('Account Enabled', default=True, validators=[])
     is_approved = BooleanField('Account Approved', validators=[])
+    receive_email = BooleanField('Receive notifications via email', validators=[])

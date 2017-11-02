@@ -1,0 +1,23 @@
+Hi {{user.first_name}},
+
+There is a new story for your followed topic: {{topic_name}}
+
+
+{{ item.slugline }}
+{{ item.headline }}
+{% if item.byline %}By: {{ item.byline }}{% endif %}
+
+{% if item.description_html %}
+{{ item.description_html | plain_text }}
+{% else %}
+{{ item.description_text }}
+{% endif %}
+
+
+
+You can navigate to {{url}} to view that story.
+
+
+Regards,
+{{app_name}}
+

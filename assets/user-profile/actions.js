@@ -12,6 +12,11 @@ export function getUser(user) {
     return {type: GET_USER, user};
 }
 
+export const EDIT_USER = 'EDIT_USER';
+export function editUser(event) {
+    return {type: EDIT_USER, event};
+}
+
 export const INIT_DATA = 'INIT_DATA';
 export function initData(data) {
     return {type: INIT_DATA, data};
@@ -69,6 +74,26 @@ export function fetchUser() {
                 dispatch(getUser(data));
             })
             .catch((error) => errorHandler(error, dispatch));
+    };
+}
+
+/**
+ * Saves a user
+ *
+ */
+export function saveUser() {
+    return function (dispatch, getState) {
+
+        const user = getState().user;
+        const url = `/users/${user._id}`;
+
+        return server.post(url, user)
+            .then(function() {
+                notify.success(gettext('User updated successfully'));
+                dispatch(fetchUser());
+            })
+            .catch((error) => errorHandler(error, dispatch));
+
     };
 }
 
