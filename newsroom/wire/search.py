@@ -1,9 +1,13 @@
 
 import newsroom
+import logging
+
 from flask import json, abort
 from eve.utils import ParsedRequest
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
+
+logger = logging.getLogger(__name__)
 
 
 aggregations = {
@@ -135,7 +139,7 @@ class WireSearchService(newsroom.Service):
                     ],
                 }
             }
-            aggs['topics']['filters']['filters'][topic['label']] = filter
+            aggs['topics']['filters']['filters'][str(topic['_id'])] = filter
 
         source = {'query': query}
         source['aggs'] = aggs
@@ -143,11 +147,17 @@ class WireSearchService(newsroom.Service):
 
         req = ParsedRequest()
         req.args = {'source': json.dumps(source)}
-
-        search_results = super().get(req, None)
-
         topic_matches = []
-        for topic in topics:
-            if search_results.hits['aggregations']['topics']['buckets'][topic['label']]['doc_count'] > 0:
-                topic_matches.append(topic['_id'])
+
+        try:
+            search_results = super().get(req, None)
+
+            for topic in topics:
+                if search_results.hits['aggregations']['topics']['buckets'][str(topic['_id'])]['doc_count'] > 0:
+                    topic_matches.append(topic['_id'])
+
+        except Exception as exc:
+            logger.error('Error in test_new_item for query: {}'.format(json.dumps(source)),
+                         exc, exc_info=True)
+
         return topic_matches
