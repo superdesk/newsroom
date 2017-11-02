@@ -27,11 +27,10 @@ class NewsroomWebpack(Webpack):
 
         if app.debug:
             try:
-                self.assets_url = 'http://localhost:8080/'
-                self.assets = requests.get('{0}{1}'.format(self.assets_url, 'manifest.json')).json()
+                self.assets = requests.get('{0}{1}'.format(app.config['WEBPACK_SERVER_URL'], 'manifest.json')).json()
                 return
             except requests.exceptions.ConnectionError:
-                self.assets_url = '/static/'  # no ui server, server via flask
+                pass
 
         try:
             with app.open_resource(webpack_stats, 'r') as stats_json:
