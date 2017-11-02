@@ -18,8 +18,8 @@ import {
     BOOKMARK_ITEMS,
     REMOVE_BOOKMARK,
     SET_NEW_ITEMS,
-    SET_SERVICE,
-    SET_FILTER,
+    TOGGLE_SERVICE,
+    TOGGLE_FILTER,
     START_LOADING,
     RECIEVE_NEXT_ITEMS,
 } from './actions';
@@ -46,7 +46,7 @@ const initialState = {
     newItemsByTopic: {},
     wire: {
         services: [],
-        activeService: null,
+        activeService: {},
         activeFilter: {},
     },
 };
@@ -70,19 +70,21 @@ function recieveItems(state, data) {
 
 function _wireReducer(state, action) {
     switch (action.type) {
-    case SET_SERVICE:
+    case TOGGLE_SERVICE: {
+        const activeService = Object.assign({}, state.activeService);
+        activeService[action.service.code] = !activeService[action.service.code];
         return {
             ...state,
             activeFilter: {},
-            activeService: action.service,
+            activeService,
         };
+    }
 
-    case SET_FILTER: {
+    case TOGGLE_FILTER: {
         const activeFilter = Object.assign({}, state.activeFilter);
-        if (activeFilter[action.key] === action.val) {
-            activeFilter[action.key] = null;
-        } else {
-            activeFilter[action.key] = action.val;
+        activeFilter[action.key] = toggleValue(activeFilter[action.key], action.val);
+        if (action.single) {
+            activeFilter[action.key] = activeFilter[action.key].filter((val) => val === action.val);
         }
         return {
             ...state,
@@ -264,8 +266,8 @@ export default function wireReducer(state = initialState, action) {
         };
     }
 
-    case SET_FILTER:
-    case SET_SERVICE:
+    case TOGGLE_SERVICE:
+    case TOGGLE_FILTER:
         return {...state, wire: _wireReducer(state.wire, action)};
 
     case START_LOADING:

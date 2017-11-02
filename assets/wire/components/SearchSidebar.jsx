@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 import { gettext } from 'utils';
-import { setService, setFilter } from 'wire/actions';
+import { toggleService, toggleFilter } from 'wire/actions';
 
 class SearchSidebar extends React.Component {
     constructor(props) {
@@ -15,18 +15,18 @@ class SearchSidebar extends React.Component {
             {label: gettext('Filters'), content: FiltersTab},
         ];
         this.state = {active: this.tabs[0]};
-        this.selectService = this.selectService.bind(this);
-        this.selectFilter = this.selectFilter.bind(this);
+        this.toggleService = this.toggleService.bind(this);
+        this.toggleFilter = this.toggleFilter.bind(this);
     }
 
-    selectService(event, service) {
+    toggleService(event, service) {
         event.preventDefault();
-        this.props.dispatch(setService(service));
+        this.props.dispatch(toggleService(service));
     }
 
-    selectFilter(event, field, value) {
+    toggleFilter(event, field, value, single) {
         event.preventDefault();
-        this.props.dispatch(setFilter(field, value));
+        this.props.dispatch(toggleFilter(field, value, single));
     }
 
     render() {
@@ -50,9 +50,8 @@ class SearchSidebar extends React.Component {
                         <NavigationTab
                             services={this.props.services}
                             activeService={this.props.activeService}
-                            selectService={this.selectService}
+                            toggleService={this.toggleService}
                             activeFilter={this.props.activeFilter}
-                            selectFilter={this.selectFilter}
                             aggregations={this.props.aggregations}
                         />
                         {this.props.topics.length && <span className='wire-column__nav__divider'></span>}
@@ -70,9 +69,8 @@ class SearchSidebar extends React.Component {
                         <FiltersTab
                             services={this.props.services}
                             activeService={this.props.activeService}
-                            selectService={this.selectService}
                             activeFilter={this.props.activeFilter}
-                            selectFilter={this.selectFilter}
+                            toggleFilter={this.toggleFilter}
                             aggregations={this.props.aggregations}
                         />
                     </div>
@@ -82,18 +80,17 @@ class SearchSidebar extends React.Component {
     }
 }
 
-function NavigationTab({services, activeService, selectService}) {
-    const allServices = [
-        {name: gettext('All'), code: null}
-    ].concat(services.filter((service) => service.is_active));
+function NavigationTab({services, activeService, toggleService}) {
+    const isActive = (service) => !!activeService[service.code];
 
-    const isActive = (service) => service === activeService || (!activeService && service.code === null);
-
-    return allServices.map((service) => (
+    return services.map((service) => (
         <a key={service.name}
             href=''
-            className={classNames('btn btn-block', {'btn-outline-secondary': !isActive(service)}, {'btn-outline-primary': isActive(service)})}
-            onClick={(event) => selectService(event, service.code !== null ? service : null)}
+            className={classNames('btn btn-block', {
+                'btn-outline-primary': isActive(service),
+                'btn-outline-secondary': !isActive(service),
+            })}
+            onClick={(event) => toggleService(event, service)}
         >{service.name}</a>
     ));
 }
@@ -104,10 +101,10 @@ NavigationTab.propTypes = {
         code: PropTypes.string.isRequired,
     })),
     activeService: PropTypes.object,
-    selectService: PropTypes.func.isRequired,
+    toggleService: PropTypes.func.isRequired,
 };
 
-function FiltersTab({aggregations, activeFilter, selectFilter}) {
+function FiltersTab({aggregations, activeFilter, toggleFilter}) {
     const groups = [
         {
             field: 'service',
@@ -124,17 +121,33 @@ function FiltersTab({aggregations, activeFilter, selectFilter}) {
         {
             field: 'urgency',
             label: gettext('News Value'),
-        }
+        },
+        {
+            field: 'versioncreated',
+            label: gettext('Created'),
+            single: true,
+            buckets: [
+                {key: 'now-24h', label: gettext('last day')},
+                {key: 'now-1w', label: gettext('last week')},
+                {key: 'now-1M', label: gettext('last month')},
+            ],
+        },
     ];
 
     return groups.map((group) => {
-        const activeKey = get(activeFilter, group.field);
-        const buckets = aggregations[group.field].buckets.map((bucket) => (
-            <a key={bucket.key}
-                href=''
-                className={classNames('btn btn-block', {'btn-outline-secondary': activeKey !== bucket.key}, {'btn-outline-primary': activeKey === bucket.key})}
-                onClick={(event) => selectFilter(event, group.field, bucket.key)}>{bucket.key}</a>
-        ));
+        const groupFilter = get(activeFilter, group.field, []);
+        const buckets = get(aggregations[group.field], 'buckets', group.buckets).map((bucket) => {
+            const isActive = groupFilter.indexOf(bucket.key) !== -1;
+            return (
+                <a key={bucket.key}
+                    href=''
+                    className={classNames('btn btn-block', {
+                        'btn-outline-primary': isActive,
+                        'btn-outline-secondary': !isActive,
+                    })}
+                    onClick={(event) => toggleFilter(event, group.field, bucket.key, group.single)}>{bucket.label || bucket.key}</a>
+            );
+        });
 
         if (!buckets.length) {
             return;
@@ -152,7 +165,7 @@ function FiltersTab({aggregations, activeFilter, selectFilter}) {
 FiltersTab.propTypes = {
     aggregations: PropTypes.object,
     activeFilter: PropTypes.object,
-    selectFilter: PropTypes.func.isRequired,
+    toggleFilter: PropTypes.func.isRequired,
 };
 
 function TopicsTab({topics, setQuery, activeQuery, newItemsByTopic, removeNewItems}) {

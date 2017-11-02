@@ -75,9 +75,12 @@ class WireSearchService(newsroom.Service):
             })
 
         if req.args.get('service'):
-            query['bool']['must'].append({
-                'term': {'service.code': req.args['service']},
-            })
+            services = json.loads(req.args['service'])
+            selected_services = [key for key in services if services[key]]
+            if selected_services:
+                query['bool']['must'].append({
+                    'terms': {'service.code': selected_services},
+                })
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
@@ -97,9 +100,16 @@ class WireSearchService(newsroom.Service):
                 source['post_filter'] = {'bool': {'must': []}}
                 for key, val in filters.items():
                     if val:
-                        source['post_filter']['bool']['must'].append({
-                            'term': {get_aggregation_field(key): val}
-                        })
+                        try:
+                            query = {'terms': {get_aggregation_field(key): val}}
+                            source['post_filter']['bool']['must'].append(query)
+                        except KeyError:
+                            if key == 'versioncreated':
+                                for date in val:
+                                    query = {'range': {key: {'gte': date}}}
+                                    source['post_filter']['bool']['must'].append(query)
+                            else:
+                                raise
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}

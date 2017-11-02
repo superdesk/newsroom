@@ -161,6 +161,10 @@ export function wordCount(html) {
  * @return {Array}
  */
 export function toggleValue(items, value) {
+    if (!items) {
+        return [value];
+    }
+
     const without = items.filter((x) => value !== x);
     return without.length === items.length ? without.concat([value]) : without;
 }
