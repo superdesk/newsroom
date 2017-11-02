@@ -164,3 +164,22 @@ export function toggleValue(items, value) {
     const without = items.filter((x) => value !== x);
     return without.length === items.length ? without.concat([value]) : without;
 }
+
+export function updateRouteParams(updates, state) {
+    const params = new URLSearchParams(window.location.search);
+    let dirty = false;
+
+    Object.keys(updates).forEach((key) => {
+        if (updates[key]) {
+            dirty = dirty || updates[key] !== params.get(key);
+            params.set(key, updates[key]);
+        } else {
+            dirty = dirty || params.has(key);
+            params.delete(key);
+        }
+    });
+
+    if (dirty) {
+        history.pushState(state, null, '?' + params.toString());
+    }
+}
