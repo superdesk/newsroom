@@ -88,7 +88,7 @@ def notify_new_item(item):
         return
     topics = get_notification_topics()
     topic_matches = superdesk.get_resource_service('wire_search').\
-        test_new_item(item['guid'], topics)
+        test_new_item(item['_id'], topics)
     if topic_matches:
         push_notification('update',
                           item=item,
