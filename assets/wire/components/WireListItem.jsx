@@ -37,6 +37,12 @@ class WireListItem extends React.Component {
         this.setState({previousVersions: !this.state.previousVersions});
     }
 
+    componentDidUpdate(nextProps) {
+        if (nextProps.isActive) {
+            this.articleElem.focus();
+        }
+    }
+
     render() {
         const {item, onClick} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12');
@@ -49,6 +55,7 @@ class WireListItem extends React.Component {
             <article key={item._id}
                 className={cardClassName}
                 tabIndex='0'
+                ref={(elem) => this.articleElem = elem}
                 onClick={() => !this.props.isActive && onClick(item._id)}
                 onMouseEnter={() => this.setState({isHover: true})}
                 onMouseLeave={() => this.setState({isHover: false})}
@@ -96,8 +103,6 @@ class WireListItem extends React.Component {
                         <div className='wire-articles__item__text'>
                             <p>{item.description_text}</p>
                         </div>
-
-
 
                         {showItemVersions(item) && (
                             <div className="no-bindable wire-articles__item__versions-btn" onClick={this.togglePreviousVersions}>
