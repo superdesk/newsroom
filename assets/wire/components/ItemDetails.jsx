@@ -56,7 +56,7 @@ function ItemDetails({item, actions, onClose}) {
 
                             <PreviewTags item={item} isItemDetail={true}/>
 
-                            {showItemVersions(item) &&
+                            {showItemVersions(item, true) &&
                                 <ListItemNextVersion item={item} />
                             }
                             {showItemVersions(item) &&
