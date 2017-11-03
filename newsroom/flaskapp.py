@@ -40,6 +40,7 @@ class Newsroom(eve.Eve):
         """
         self.sidenavs = []
         self.download_formatters = {}
+        self.extensions = {}
 
         app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
 
@@ -94,6 +95,10 @@ class Newsroom(eve.Eve):
                 mod.init_app(self)
 
     def _setup_babel(self):
+        # avoid events on this
+        self.babel_tzinfo = None
+        self.babel_locale = None
+        self.babel_translations = None
         Babel(self)
 
     def _setup_jinja(self):

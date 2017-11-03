@@ -1,25 +1,39 @@
 import os
+import arrow
 
+from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
 from superdesk.text_utils import get_text, get_word_count
 
 
+def parse_date(datetime):
+    """Return datetime instance for datetime."""
+    if isinstance(datetime, str):
+        try:
+            return str_to_date(datetime)
+        except ValueError:
+            return arrow.get(datetime).datetime
+    return datetime
+
+
 def datetime_short(datetime):
     if datetime:
-        return format_datetime(datetime, 'short')
+        return format_datetime(parse_date(datetime), 'short')
 
 
 def datetime_long(datetime):
     if datetime:
-        return format_datetime(datetime, "dd/MM/yyyy HH:mm")
+        return format_datetime(parse_date(datetime), "dd/MM/yyyy HH:mm")
 
 
 def time_short(datetime):
-    return format_time(datetime, 'hh:mm')
+    if datetime:
+        return format_time(parse_date(datetime), 'hh:mm')
 
 
 def date_short(datetime):
-    return format_date(datetime, 'short')
+    if datetime:
+        return format_date(parse_date(datetime), 'short')
 
 
 def plain_text(html):
