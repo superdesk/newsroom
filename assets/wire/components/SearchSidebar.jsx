@@ -7,6 +7,10 @@ import { get } from 'lodash';
 import { gettext } from 'utils';
 import { toggleService, toggleFilter } from 'wire/actions';
 
+import NavLink from './NavLink';
+import NavGroup from './NavGroup';
+import NavCreatedPicker from './NavCreatedPicker';
+
 class SearchSidebar extends React.Component {
     constructor(props) {
         super(props);
@@ -82,16 +86,12 @@ class SearchSidebar extends React.Component {
 
 function NavigationTab({services, activeService, toggleService}) {
     const isActive = (service) => !!activeService[service.code];
-
     return services.map((service) => (
-        <a key={service.name}
-            href=''
-            className={classNames('btn btn-block', {
-                'btn-outline-primary': isActive(service),
-                'btn-outline-secondary': !isActive(service),
-            })}
+        <NavLink key={service.name}
+            isActive={isActive(service)}
             onClick={(event) => toggleService(event, service)}
-        >{service.name}</a>
+            label={service.name}
+        />
     ));
 }
 
@@ -122,16 +122,6 @@ function FiltersTab({aggregations, activeFilter, toggleFilter}) {
             field: 'urgency',
             label: gettext('News Value'),
         },
-        {
-            field: 'versioncreated',
-            label: gettext('Created'),
-            single: true,
-            buckets: [
-                {key: 'now-24h', label: gettext('last day')},
-                {key: 'now-1w', label: gettext('last week')},
-                {key: 'now-1M', label: gettext('last month')},
-            ],
-        },
     ];
 
     return groups.map((group) => {
@@ -139,13 +129,11 @@ function FiltersTab({aggregations, activeFilter, toggleFilter}) {
         const buckets = get(aggregations[group.field], 'buckets', group.buckets).map((bucket) => {
             const isActive = groupFilter.indexOf(bucket.key) !== -1;
             return (
-                <a key={bucket.key}
-                    href=''
-                    className={classNames('btn btn-block', {
-                        'btn-outline-primary': isActive,
-                        'btn-outline-secondary': !isActive,
-                    })}
-                    onClick={(event) => toggleFilter(event, group.field, bucket.key, group.single)}>{bucket.label || bucket.key}</a>
+                <NavLink key={bucket.key}
+                    isActive={isActive}
+                    onClick={(event) => toggleFilter(event, group.field, bucket.key, group.single)}
+                    label={bucket.label || '' + bucket.key}
+                />
             );
         });
 
@@ -154,12 +142,11 @@ function FiltersTab({aggregations, activeFilter, toggleFilter}) {
         }
 
         return (
-            <div key={group.field} className='wire-column__nav__group'>
-                <h5>{group.label}</h5>
-                {buckets}
-            </div>
+            <NavGroup key={group.field} label={group.label}>{buckets}</NavGroup>
         );
-    }).filter((group) => !!group);
+    }).filter((group) => !!group).concat([
+        <NavCreatedPicker key="created" />
+    ]);
 }
 
 FiltersTab.propTypes = {

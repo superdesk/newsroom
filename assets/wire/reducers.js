@@ -22,6 +22,7 @@ import {
     TOGGLE_FILTER,
     START_LOADING,
     RECIEVE_NEXT_ITEMS,
+    SET_CREATED_FILTER,
 } from './actions';
 
 import { toggleValue } from 'utils';
@@ -48,6 +49,7 @@ const initialState = {
         services: [],
         activeService: {},
         activeFilter: {},
+        createdFilter: {},
     },
 };
 
@@ -89,6 +91,14 @@ function _wireReducer(state, action) {
         return {
             ...state,
             activeFilter: activeFilter,
+        };
+    }
+
+    case SET_CREATED_FILTER: {
+        const createdFilter = Object.assign({}, state.createdFilter, action.filter);
+        return {
+            ...state,
+            createdFilter,
         };
     }
 
@@ -268,6 +278,7 @@ export default function wireReducer(state = initialState, action) {
 
     case TOGGLE_SERVICE:
     case TOGGLE_FILTER:
+    case SET_CREATED_FILTER:
         return {...state, wire: _wireReducer(state.wire, action)};
 
     case START_LOADING:
