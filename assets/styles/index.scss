@@ -198,10 +198,15 @@ body.print {
 }
 
 .navbar__logo {
-  width: 56px;
-  height: 56px;
-  background: #006f99;
-  padding: 11px 0 0 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: #006f99;
+    img {
+        opacity: 0.8;
+    }
 }
 .navbar-brand {
     margin-left: 2rem;
@@ -460,6 +465,9 @@ article.list {
 .searchForm--active {
     .search__form__buttons {
         display: block;
+        > * {
+            margin: 0px 10px;
+        }
     }
 }
 
