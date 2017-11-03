@@ -25,6 +25,7 @@ import {
 } from './actions';
 
 import { toggleValue } from 'utils';
+import { get } from 'lodash';
 
 const initialState = {
     items: [],
@@ -52,7 +53,7 @@ const initialState = {
 };
 
 function recieveItems(state, data) {
-    const itemsById = Object.assign({}, state.itemsById);
+    const itemsById = {};
     const items = data._items.map((item) => {
         itemsById[item._id] = item;
         return item._id;
@@ -161,7 +162,7 @@ export default function wireReducer(state = initialState, action) {
     case RECIEVE_NEXT_ITEMS: {
         const itemsById = Object.assign({}, state.itemsById);
         const items = state.items.concat(action.data._items.map((item) => {
-            if (itemsById[item._id] && state.items.indexOf(item._id) !== -1) {
+            if (itemsById[item._id]) {
                 return;
             }
 
@@ -238,10 +239,17 @@ export default function wireReducer(state = initialState, action) {
             state.newItems.slice(0, state.newItems.length) : [];
         newItems.push(action.data.item);
 
+        let itemsById = state.itemsById;
+        if (get(action.data, 'item._id') && state.itemsById[action.data.item._id]) {
+            itemsById = Object.assign({}, itemsById);
+            itemsById[action.data.item._id] = action.data.item;
+        }
+
         return {
             ...state,
             newItems,
-            newItemsByTopic
+            newItemsByTopic,
+            itemsById,
         };
     }
 
