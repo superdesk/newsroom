@@ -1169,6 +1169,7 @@ article.list {
 .wire-column__preview__content--item-detail-item-text {
     order: 2;
     flex: 1 1 100%;
+    overflow: auto;
     @include lg {
         margin: 0px 40px 0px 10px;
     }
