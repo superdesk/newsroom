@@ -28,6 +28,7 @@ class NewsroomWebpack(Webpack):
         if app.debug:
             try:
                 self.assets = requests.get('{0}{1}'.format(app.config['WEBPACK_SERVER_URL'], 'manifest.json')).json()
+                self.assets_url = 'http://localhost:8080/'
                 return
             except requests.exceptions.ConnectionError:
                 pass
