@@ -529,6 +529,11 @@ article.list {
     background-color: #d9f2fc;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
     z-index: 1003;
+    .btn {
+        + .btn {
+            margin-left: 10px;
+        }
+    }
 }
 
 .multi-action-bar--open {
@@ -539,18 +544,6 @@ article.list {
 @keyframes dropOut {
     0% {transform: translateY(-48px);}
     100% {transform: translateY(0);}
-}
-
-.multi-action-bar__button {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
-    font-size: 0.8rem;
-    color: #707070;
-    padding: 7px 20px;
-    margin-right: 5px;
-    text-transform: uppercase;
-    border: 1px solid #bababa;
-    border-radius: 3px;
-    background: transparent;
 }
 
 .multi-action-bar__count {

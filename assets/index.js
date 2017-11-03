@@ -38,7 +38,7 @@ $('.wire-articles__item--list__select input').click(function(){
     $('.multi-action-bar').toggleClass('multi-action-bar--open');
 });
 
-$('.multi-action-bar__button').click(function(){
+$('.multi-action-bar .btn').click(function(){
     $('.multi-action-bar').removeClass('multi-action-bar--open');
 });
 

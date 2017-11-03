@@ -25,10 +25,10 @@ class SelectedItemsBar extends React.Component {
         ));
         return (
             <div className='multi-action-bar multi-action-bar--open'>
-                <button className='multi-action-bar__button'
+                <button className='btn btn-outline-secondary'
                     onClick={this.props.selectNone}>{gettext('Cancel')}
                 </button>
-                <button className='multi-action-bar__button'
+                <button className='btn btn-outline-primary'
                     onClick={this.props.selectAll}>{gettext('Select All')}
                 </button>
                 <span className='multi-action-bar__count'>
