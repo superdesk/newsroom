@@ -241,7 +241,7 @@ article.list {
     background: #fff;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
     padding: 0px;
-    z-index: 1;
+    z-index: 11;
 }
 
 .content-bar__dropdown-btn {
@@ -503,7 +503,7 @@ article.list {
 .content-bar__sort .content-bar__dropdown-btn {
     font-size: 0.89rem;
     color: #444;
-    padding: 18px 20px;
+    padding: 17px 20px;
 }
 
 .multi-action-bar {
@@ -520,6 +520,7 @@ article.list {
     padding: 0 16px;
     background-color: #d9f2fc;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+    z-index: 1003;
 }
 
 .multi-action-bar--open {
@@ -721,7 +722,6 @@ article.list {
 .wire-articles__item--list {
     display: flex;
     flex-direction: row;
-    z-index: 10; // display above versions
 }
 
 .wire-articles__item--list__text {
@@ -851,6 +851,7 @@ article.list {
     background: #fafafa;
     box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2);
     transition: all .2s ease-out;
+    z-index: -1;
     > * {
         opacity: 1;
         transition: all .2s ease-out;
