@@ -5,7 +5,7 @@ import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
-import { gettext, fullDate } from 'utils';
+import { gettext, fullDate, formatHTML } from 'utils';
 import { getPicture, getDetailRendition, showItemVersions } from 'wire/utils';
 
 function ItemDetails({item, actions, onClose}) {
@@ -46,7 +46,7 @@ function ItemDetails({item, actions, onClose}) {
 
                             {item.body_html &&
                           <div className="wire-column__preview__text"
-                              dangerouslySetInnerHTML={({__html: item.body_html})}/>
+                              dangerouslySetInnerHTML={({__html: formatHTML(item.body_html)})}/>
                             }
                         </div>
 
