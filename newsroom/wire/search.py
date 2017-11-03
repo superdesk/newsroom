@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 
 
 aggregations = {
-    'genre': {'terms': {'field': 'genre.name'}},
-    'service': {'terms': {'field': 'service.name'}},
-    'subject': {'terms': {'field': 'subject.name'}},
+    'genre': {'terms': {'field': 'genre.name', 'size': 50}},
+    'service': {'terms': {'field': 'service.name', 'size': 50}},
+    'subject': {'terms': {'field': 'subject.name', 'size': 20}},
     'urgency': {'terms': {'field': 'urgency'}},
 }
 

@@ -84,15 +84,18 @@ class SearchSidebar extends React.Component {
     }
 }
 
-function NavigationTab({services, activeService, toggleService}) {
+function NavigationTab({services, activeService, toggleService, aggregations}) {
     const isActive = (service) => !!activeService[service.code];
-    return services.map((service) => (
-        <NavLink key={service.name}
-            isActive={isActive(service)}
-            onClick={(event) => toggleService(event, service)}
-            label={service.name}
-        />
-    ));
+    const buckets = get(aggregations, 'service.buckets');
+    return services
+        .filter((service) => !buckets || buckets.find((bucket) => bucket.key === service.code))
+        .map((service) => (
+            <NavLink key={service.name}
+                isActive={isActive(service)}
+                onClick={(event) => toggleService(event, service)}
+                label={service.name}
+            />
+        ));
 }
 
 NavigationTab.propTypes = {
@@ -102,6 +105,7 @@ NavigationTab.propTypes = {
     })),
     activeService: PropTypes.object,
     toggleService: PropTypes.func.isRequired,
+    aggregations: PropTypes.object,
 };
 
 function FiltersTab({aggregations, activeFilter, toggleFilter}) {
@@ -125,17 +129,20 @@ function FiltersTab({aggregations, activeFilter, toggleFilter}) {
     ];
 
     return groups.map((group) => {
+        const compareFunction = (a, b) => group.sorted ? -1 : a.key.localeCompare(b.key);
         const groupFilter = get(activeFilter, group.field, []);
-        const buckets = get(aggregations[group.field], 'buckets', group.buckets).map((bucket) => {
-            const isActive = groupFilter.indexOf(bucket.key) !== -1;
-            return (
-                <NavLink key={bucket.key}
-                    isActive={isActive}
-                    onClick={(event) => toggleFilter(event, group.field, bucket.key, group.single)}
-                    label={bucket.label || '' + bucket.key}
-                />
-            );
-        });
+        const buckets = get(aggregations[group.field], 'buckets', group.buckets)
+            .sort(compareFunction)
+            .map((bucket) => {
+                const isActive = groupFilter.indexOf(bucket.key) !== -1;
+                return (
+                    <NavLink key={bucket.key}
+                        isActive={isActive}
+                        onClick={(event) => toggleFilter(event, group.field, bucket.key, group.single)}
+                        label={bucket.label || '' + bucket.key}
+                    />
+                );
+            });
 
         if (!buckets.length) {
             return;
