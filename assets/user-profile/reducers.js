@@ -12,6 +12,7 @@ import {
 
 const initialState = {
     user: null,
+    editedUser: null,
     company: null,
     topics: null,
     topicsById: {},
@@ -43,6 +44,7 @@ export default function itemReducer(state = initialState, action) {
         return {
             ...state,
             user: action.user,
+            editedUser: action.user,
         };
     }
 
@@ -50,9 +52,9 @@ export default function itemReducer(state = initialState, action) {
         
         const target = action.event.target;
         const field = target.name;
-        const user = Object.assign({}, state.user);
-        user[field] = target.type === 'checkbox' ? target.checked : target.value;
-        return {...state, user, errors: null};
+        const editedUser = Object.assign({}, state.editedUser);
+        editedUser[field] = target.type === 'checkbox' ? target.checked : target.value;
+        return {...state, editedUser, errors: null};
     }
 
     
@@ -60,6 +62,7 @@ export default function itemReducer(state = initialState, action) {
         return {
             ...state,
             user: action.data.user || null,
+            editedUser: action.data.user || null,
             topics: action.data.topics || [],
             company: action.data.company || null,
         };

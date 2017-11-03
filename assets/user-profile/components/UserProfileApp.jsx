@@ -43,12 +43,12 @@ class UserProfileApp extends React.Component {
         let errors = {};
 
         if (!this.props.user.first_name) {
-            errors.first_name = ['Please provide first name'];
+            errors.first_name = [gettext('Please provide first name')];
             valid = false;
         }
 
         if (!this.props.user.last_name) {
-            errors.last_name = ['Please provide last name'];
+            errors.last_name = [gettext('Please provide last name')];
             valid = false;
         }
 
@@ -81,7 +81,7 @@ class UserProfileApp extends React.Component {
                 {this.props.selectedMenu === 'profile' ?
                     <div className="content">
                         <UserProfile
-                            user={this.props.user}
+                            user={this.props.editedUser}
                             onSave={this.save}
                             onChange={this.props.editUser}
                             onCancel={() => this.props.fetchUser(this.props.user._id)}
@@ -102,6 +102,7 @@ class UserProfileApp extends React.Component {
 
 UserProfileApp.propTypes = {
     user: PropTypes.object,
+    editedUser: PropTypes.object,
     topics: PropTypes.arrayOf(PropTypes.object),
     topicsById: PropTypes.object,
     activeTopicId: PropTypes.string,
@@ -123,6 +124,7 @@ UserProfileApp.propTypes = {
 
 const mapStateToProps = (state) => ({
     user: state.user,
+    editedUser: state.editedUser,
     topics: state.topics,
     topicsById: state.topicsById,
     activeTopicId: state.activeTopicId,
@@ -135,7 +137,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     selectMenu: (event) => dispatch(updateMenu(event)),
     fetchTopics: (userId) => dispatch(fetchTopics(userId)),
-    fetchUser: (userId) => dispatch(fetchUser(userId)),
+    fetchUser: (id) => dispatch(fetchUser(id)),
     saveUser: () => dispatch(saveUser()),
     editUser: (event) => dispatch(editUser(event)),
     setError: (errors) => dispatch(setError(errors)),

@@ -67,9 +67,9 @@ function errorHandler(error, dispatch) {
 /**
  * Fetches user details
  */
-export function fetchUser() {
-    return function (dispatch, getState) {
-        return server.get(`/users/${getState().user._id}`)
+export function fetchUser(id) {
+    return function (dispatch) {
+        return server.get(`/users/${id}`)
             .then((data) => {
                 dispatch(getUser(data));
             })
@@ -84,13 +84,13 @@ export function fetchUser() {
 export function saveUser() {
     return function (dispatch, getState) {
 
-        const user = getState().user;
-        const url = `/users/${user._id}`;
+        const editedUser = getState().editedUser;
+        const url = `/users/${editedUser._id}`;
 
-        return server.post(url, user)
+        return server.post(url, editedUser)
             .then(function() {
                 notify.success(gettext('User updated successfully'));
-                dispatch(fetchUser());
+                dispatch(fetchUser(editedUser._id));
             })
             .catch((error) => errorHandler(error, dispatch));
 
