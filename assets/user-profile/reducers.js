@@ -5,12 +5,14 @@ import {
     INIT_DATA,
     SET_ERROR,
     GET_USER,
+    EDIT_USER,
     RENDER_MODAL,
     CLOSE_MODAL,
 } from './actions';
 
 const initialState = {
     user: null,
+    editedUser: null,
     company: null,
     topics: null,
     topicsById: {},
@@ -42,13 +44,25 @@ export default function itemReducer(state = initialState, action) {
         return {
             ...state,
             user: action.user,
+            editedUser: action.user,
         };
     }
+
+    case EDIT_USER: {
+        
+        const target = action.event.target;
+        const field = target.name;
+        const editedUser = Object.assign({}, state.editedUser);
+        editedUser[field] = target.type === 'checkbox' ? target.checked : target.value;
+        return {...state, editedUser, errors: null};
+    }
+
     
     case INIT_DATA: {
         return {
             ...state,
             user: action.data.user || null,
+            editedUser: action.data.user || null,
             topics: action.data.topics || [],
             company: action.data.company || null,
         };

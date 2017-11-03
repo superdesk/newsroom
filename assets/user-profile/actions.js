@@ -12,6 +12,11 @@ export function getUser(user) {
     return {type: GET_USER, user};
 }
 
+export const EDIT_USER = 'EDIT_USER';
+export function editUser(event) {
+    return {type: EDIT_USER, event};
+}
+
 export const INIT_DATA = 'INIT_DATA';
 export function initData(data) {
     return {type: INIT_DATA, data};
@@ -62,13 +67,33 @@ function errorHandler(error, dispatch) {
 /**
  * Fetches user details
  */
-export function fetchUser() {
-    return function (dispatch, getState) {
-        return server.get(`/users/${getState().user._id}`)
+export function fetchUser(id) {
+    return function (dispatch) {
+        return server.get(`/users/${id}`)
             .then((data) => {
                 dispatch(getUser(data));
             })
             .catch((error) => errorHandler(error, dispatch));
+    };
+}
+
+/**
+ * Saves a user
+ *
+ */
+export function saveUser() {
+    return function (dispatch, getState) {
+
+        const editedUser = getState().editedUser;
+        const url = `/users/${editedUser._id}`;
+
+        return server.post(url, editedUser)
+            .then(function() {
+                notify.success(gettext('User updated successfully'));
+                dispatch(fetchUser(editedUser._id));
+            })
+            .catch((error) => errorHandler(error, dispatch));
+
     };
 }
 

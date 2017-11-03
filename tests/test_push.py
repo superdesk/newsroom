@@ -108,3 +108,29 @@ def test_notify_for_new_item(client, app, mocker):
     assert 200 == resp.status_code
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['topics']) == 1
+
+
+def test_send_notification_emails(client, app):
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+    }])
+
+    app.data.insert('topics', [
+        {'label': 'topic-1', 'query': 'test', 'user': user_ids[0], 'notifications': True},
+        {'label': 'topic-2', 'query': 'mock', 'user': user_ids[0], 'notifications': True}])
+
+    with client.session_transaction() as session:
+        user = str(user_ids[0])
+        session['user'] = user
+
+    with app.mail.record_messages() as outbox:
+        key = b'something random'
+        app.config['PUSH_KEY'] = key
+        data = json.dumps({'guid': 'foo', 'type': 'text', 'headline': 'this is a test'})
+        headers = get_signature_headers(data, key)
+        resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+        assert 200 == resp.status_code
+    assert len(outbox) == 1

@@ -75,3 +75,19 @@ def send_reset_password_email(user_name, user_email, token):
                                 email=user_email, expires=hours, url=url)
 
     send_email(to=[user_email], subject=subject, text_body=text_body, html_body=html_body)
+
+
+def send_new_item_notification_email(user, topic_name, item):
+    app_name = current_app.config['SITE_NAME']
+    url = '{}/item/{}'.format(current_app.config['CLIENT_URL'], item['guid'])
+    recipients = [user['email']]
+    subject = 'New story for followed topic: {}'.format(topic_name)
+    text_body = render_template(
+        'new_item_notification.txt',
+        app_name=app_name,
+        topic_name=topic_name,
+        user=user,
+        item=item,
+        url=url)
+
+    send_email(to=recipients, subject=subject, text_body=text_body)

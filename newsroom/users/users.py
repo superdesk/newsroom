@@ -60,6 +60,10 @@ class UsersResource(newsroom.Resource):
         },
         'token_expiry_date': {
             'type': 'datetime',
+        },
+        'receive_email': {
+            'type': 'boolean',
+            'default': False
         }
     }
 

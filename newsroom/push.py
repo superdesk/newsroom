@@ -9,6 +9,8 @@ from flask import current_app as app
 from superdesk.utc import utcnow
 from newsroom.notification import push_notification
 from newsroom.topics.topics import get_notification_topics
+from newsroom.utils import query_resource
+from newsroom.email import send_new_item_notification_email
 
 logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
@@ -93,14 +95,25 @@ def notify_new_item(item):
         push_notification('update',
                           item=item,
                           topics=topic_matches)
+        send_notification_emails(item, topics, topic_matches)
+
+
+def send_notification_emails(item, topics, topic_matches):
+    lookup = {'is_enabled': True, 'receive_email': True}
+    all_users = list(query_resource('users', lookup=lookup, max_results=200))
+    users = {str(user['_id']): user for user in all_users}
+    for topic in topics:
+        user = users.get(str(topic['user']))
+        if topic['_id'] in topic_matches and user:
+            send_new_item_notification_email(user, topic['label'], item=item)
 
 
 # keeping this for testing
-# @blueprint.route('/notify', methods=['POST'])
-# def notify():
-#     data = flask.json.loads(flask.request.get_data())
-#     notify_new_item(data['item'])
-#     return flask.jsonify({'status': 'OK'}), 200
+@blueprint.route('/notify', methods=['POST'])
+def notify():
+    data = flask.json.loads(flask.request.get_data())
+    notify_new_item(data['item'])
+    return flask.jsonify({'status': 'OK'}), 200
 
 
 @blueprint.route('/push_binary', methods=['POST'])

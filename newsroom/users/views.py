@@ -8,7 +8,8 @@ from newsroom.users import blueprint
 from flask_babel import gettext
 from newsroom.auth import get_user
 from newsroom.auth.decorator import admin_only, login_required
-from newsroom.auth.views import send_token, add_token_data, send_reset_password_email
+from newsroom.auth.views import send_token, add_token_data, send_reset_password_email, \
+    is_current_user_admin, is_current_user
 from newsroom.topics import get_user_topics
 from flask import jsonify, current_app as app
 import re
@@ -75,14 +76,16 @@ def _is_email_address_valid(email):
 
 
 @blueprint.route('/users/<id>', methods=['GET', 'POST'])
-@admin_only
+@login_required
 def edit(id):
+    if not is_current_user_admin() and not is_current_user(id):
+        flask.abort(401)
+
     user = find_one('users', _id=ObjectId(id))
 
     if not user:
         return NotFound(gettext('User not found'))
 
-    user['id'] = str(user['_id'])
     if flask.request.method == 'POST':
         form = UserForm(user=user)
         if form.validate_on_submit():
@@ -97,6 +100,7 @@ def edit(id):
             app.cache.delete(user.get('email'))
             return jsonify({'success': True}), 200
         return jsonify(form.errors), 400
+    return jsonify(user), 200
 
 
 @blueprint.route('/users/<id>/validate', methods=['POST'])
