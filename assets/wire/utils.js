@@ -58,8 +58,9 @@ export function isKilled(item) {
  * Test if other item versions should be visible
  *
  * @param {Object} item
+ * @param {bool} next toggle if checking for next or previous versions
  * @return {Boolean}
  */
-export function showItemVersions(item) {
-    return item.ancestors && item.ancestors.length && !isKilled(item);
+export function showItemVersions(item, next) {
+    return !isKilled(item) && (next || item.ancestors && item.ancestors.length);
 }
