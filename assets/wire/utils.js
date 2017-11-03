@@ -1,4 +1,5 @@
 import { get } from 'lodash';
+import { getTextFromHtml } from 'utils';
 
 const STATUS_KILLED = 'canceled';
 
@@ -62,4 +63,17 @@ export function isKilled(item) {
  */
 export function showItemVersions(item) {
     return item.ancestors && item.ancestors.length && !isKilled(item);
+}
+
+/**
+ * Get short text for lists
+ *
+ * @param {Item} item
+ * @return {Node}
+ */
+export function shortText(item, length=40) {
+    const html = item.description_html || item.body_html || '<p></p>';
+    const text = item.description_text || getTextFromHtml(html);
+    const words = text.split(' ');
+    return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
 }

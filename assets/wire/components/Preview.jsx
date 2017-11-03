@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { gettext, fullDate } from 'utils';
+import { gettext, fullDate, formatHTML } from 'utils';
 import { getPicture, getPreviewRendition, showItemVersions } from 'wire/utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from './PreviewActionButtons';
@@ -38,7 +38,7 @@ function Preview({item, actions}) {
                         <p className='wire-column__preview__lead'>{item.description_text}</p>
                 }
                 {item.body_html &&
-                        <div className='wire-column__preview__text' id='preview-body' dangerouslySetInnerHTML={({__html: item.body_html})} />
+                        <div className='wire-column__preview__text' id='preview-body' dangerouslySetInnerHTML={({__html: formatHTML(item.body_html)})} />
                 }
 
                 <PreviewTags item={item} isItemDetail={false} />

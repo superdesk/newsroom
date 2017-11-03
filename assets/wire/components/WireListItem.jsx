@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
-import { getPicture, getThumbnailRendition, showItemVersions } from 'wire/utils';
+import { getPicture, getThumbnailRendition, showItemVersions, shortText } from 'wire/utils';
 import ActionList from 'components/ActionList';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
@@ -101,7 +101,7 @@ class WireListItem extends React.Component {
                         </div>
 
                         <div className='wire-articles__item__text'>
-                            <p>{item.description_text}</p>
+                            <p>{shortText(item)}</p>
                         </div>
 
                         {showItemVersions(item) && (

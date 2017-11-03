@@ -130,9 +130,9 @@ export const notify = {
  * @param {string} html
  * @return {string}
  */
-function getTextFromHtml(html) {
+export function getTextFromHtml(html) {
     const div = document.createElement('div');
-    div.innerHTML = html;
+    div.innerHTML = formatHTML(html);
     return div.textContent || div.innerText || '';
 }
 
@@ -186,4 +186,16 @@ export function updateRouteParams(updates, state) {
     if (dirty) {
         history.pushState(state, null, '?' + params.toString());
     }
+}
+
+const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
+
+/**
+ * Replace some white characters in html
+ *
+ * @param {String} html
+ * @return {String}
+ */
+export function formatHTML(html) {
+    return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
