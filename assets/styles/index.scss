@@ -198,10 +198,15 @@ body.print {
 }
 
 .navbar__logo {
-  width: 56px;
-  height: 56px;
-  background: #006f99;
-  padding: 11px 0 0 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: #006f99;
+    img {
+        opacity: 0.8;
+    }
 }
 .navbar-brand {
     margin-left: 2rem;
@@ -241,7 +246,7 @@ article.list {
     background: #fff;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
     padding: 0px;
-    z-index: 1;
+    z-index: 11;
 }
 
 .content-bar__dropdown-btn {
@@ -460,6 +465,9 @@ article.list {
 .searchForm--active {
     .search__form__buttons {
         display: block;
+        > * {
+            margin: 0px 10px;
+        }
     }
 }
 
@@ -503,7 +511,7 @@ article.list {
 .content-bar__sort .content-bar__dropdown-btn {
     font-size: 0.89rem;
     color: #444;
-    padding: 18px 20px;
+    padding: 17px 20px;
 }
 
 .multi-action-bar {
@@ -520,6 +528,7 @@ article.list {
     padding: 0 16px;
     background-color: #d9f2fc;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+    z-index: 1003;
 }
 
 .multi-action-bar--open {
@@ -619,10 +628,24 @@ article.list {
 }
 
 .wire-column__nav__items {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding: 10px 0px 0px 0px;
     .nav {
-        margin-left: -20px;
-        margin-right: -20px;
+        flex: 0 0 44px;
+        margin-left: 0px;
+        margin-right: 0px;
         border-bottom: 1px solid #323847;
+    }
+    .tab-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        overflow: auto;
+        .tab-pane {
+            padding: 20px 20px 0px 20px;
+        }
     }
     .btn {
         margin-bottom: 12px;
@@ -721,7 +744,6 @@ article.list {
 .wire-articles__item--list {
     display: flex;
     flex-direction: row;
-    z-index: 10; // display above versions
 }
 
 .wire-articles__item--list__text {
@@ -845,12 +867,17 @@ article.list {
     }
 }
 
+.wire-articles__item--open + .wire-articles__versions, .wire-articles__item--selected + .wire-articles__versions {
+    outline: 1px solid #00aceb;
+}
+
 .wire-articles__versions {
     max-height: 400px;
     flex-direction: column;
     background: #fafafa;
     box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2);
     transition: all .2s ease-out;
+    z-index: 0;
     > * {
         opacity: 1;
         transition: all .2s ease-out;
@@ -1043,6 +1070,7 @@ article.list {
     padding: 5px 20px;
     margin-bottom: 5px;
     border-radius: 2px;
+    margin-right: 10px;
     &:hover {
         color: #444444;
         text-decoration: none;
@@ -1168,6 +1196,7 @@ article.list {
 .wire-column__preview__content--item-detail-item-text {
     order: 2;
     flex: 1 1 100%;
+    overflow: auto;
     @include lg {
         margin: 0px 40px 0px 10px;
     }

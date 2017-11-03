@@ -53,7 +53,7 @@ class SearchBar extends React.Component {
                             <span className='search__clear' onClick={this.onClear}>
                                 <img src='/static/search_clear.png' width='16' height='16'/>
                             </span>
-                            <button className='btn' type='submit'>{gettext('Search')}</button>
+                            <button className='btn btn-outline-secondary' type='submit'>{gettext('Search')}</button>
                         </div>
                     </form>
                 </div>
