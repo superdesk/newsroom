@@ -286,13 +286,9 @@ export function removeNewItems(data) {
  * @param {Object} data
  */
 export function pushNotification(push) {
-    return (dispatch, getState) => {
-        const state = getState();
+    return (dispatch) => {
         switch (push.event) {
         case 'update':
-            if (state.itemsById[push.extra.item._id]){
-                state.itemsById[push.extra.item._id] = push.extra.item;
-            }
             return dispatch(setNewItems(push.extra));
         }
     };
