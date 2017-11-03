@@ -134,3 +134,15 @@ def test_search_pagination(client):
 
     resp = client.get('/search?from=2000')
     assert 400 == resp.status_code
+
+
+def test_search_created_from(client):
+    resp = client.get('/search?created_from=now/d')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+
+
+def test_search_created_to(client):
+    resp = client.get('/search?created_to=now-1d/d')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])

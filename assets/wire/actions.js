@@ -94,6 +94,7 @@ export function copyPreviewContents() {
 function search(state, next) {
     const activeFilter = get(state, 'wire.activeFilter', {});
     const activeService = get(state, 'wire.activeService', {});
+    const createdFilter = get(state, 'wire.createdFilter', {});
 
     const params = {
         q: state.query,
@@ -101,6 +102,8 @@ function search(state, next) {
         service: !isEmpty(activeService) && JSON.stringify(activeService),
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
+        created_from: createdFilter.from,
+        created_to: createdFilter.to,
     };
 
     const queryString = Object.keys(params)
@@ -358,5 +361,13 @@ export function initParams(params) {
         if (params.get('q')) {
             dispatch(setQuery(params.get('q')));
         }
+    };
+}
+
+export const SET_CREATED_FILTER = 'SET_CREATED_FILTER';
+export function setCreatedFilter(filter) {
+    return (dispatch) => {
+        dispatch({type: SET_CREATED_FILTER, filter});
+        dispatch(fetchItems());
     };
 }

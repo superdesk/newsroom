@@ -2,10 +2,13 @@
 import newsroom
 import logging
 
+from datetime import datetime
 from flask import json, abort
+from flask_babel import get_timezone
 from eve.utils import ParsedRequest
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
+from superdesk.utc import utc
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +19,13 @@ aggregations = {
     'subject': {'terms': {'field': 'subject.name'}},
     'urgency': {'terms': {'field': 'urgency'}},
 }
+
+
+def get_user_timezone():
+    """Get user timezone for date range query."""
+    user_timezone = get_timezone()
+    now = datetime.utcnow().replace(tzinfo=utc).astimezone(user_timezone)
+    return now.strftime('%z')
 
 
 class WireSearchResource(newsroom.Resource):
@@ -86,6 +96,7 @@ class WireSearchService(newsroom.Service):
         source['sort'] = [{'versioncreated': 'desc'}]
         source['size'] = 25
         source['from'] = int(req.args.get('from', 0))
+        source['post_filter'] = {'bool': {'must': []}}
 
         if source['from'] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
@@ -97,19 +108,22 @@ class WireSearchService(newsroom.Service):
         if req.args.get('filter'):
             filters = json.loads(req.args['filter'])
             if filters:
-                source['post_filter'] = {'bool': {'must': []}}
                 for key, val in filters.items():
                     if val:
-                        try:
-                            query = {'terms': {get_aggregation_field(key): val}}
-                            source['post_filter']['bool']['must'].append(query)
-                        except KeyError:
-                            if key == 'versioncreated':
-                                for date in val:
-                                    query = {'range': {key: {'gte': date}}}
-                                    source['post_filter']['bool']['must'].append(query)
-                            else:
-                                raise
+                        query = {'terms': {get_aggregation_field(key): val}}
+                        source['post_filter']['bool']['must'].append(query)
+
+        if req.args.get('created_from') or req.args.get('created_to'):
+            _range = {'time_zone': get_user_timezone()}
+            if req.args.get('created_from'):
+                _range['gte'] = req.args['created_from']
+            if req.args.get('created_to'):
+                _range['lte'] = req.args['created_to']
+            source['post_filter']['bool']['must'].append(
+                {'range': {'versioncreated': _range}}
+            )
+
+            print(source['post_filter'])
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}

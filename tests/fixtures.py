@@ -1,6 +1,6 @@
 
 from pytest import fixture
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from tests.test_users import test_login_succeeds_for_admin, init as users_init
 
@@ -25,8 +25,8 @@ items = [
         'slugline': 'WEATHER',
         'body_html': '<p>Weather report</p>',
         'ancestors': ['tag:weather'],
-        'firstcreated': datetime.now(),
-        'versioncreated': datetime.now(),
+        'firstcreated': datetime.now() - timedelta(days=5),
+        'versioncreated': datetime.now() - timedelta(days=5),
         'service': [{'code': 'b', 'name': 'Service B'}],
     },
     {
