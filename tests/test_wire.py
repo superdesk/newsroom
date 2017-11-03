@@ -101,11 +101,11 @@ def test_search_filters_killed_items(client, app):
 
 
 def test_search_filter_by_category(client, app):
-    resp = client.get('/search?service=a')
+    resp = client.get('/search?service=%s' % json.dumps({'a': True}))
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/search?filter=%s' % json.dumps({'service': 'Service A'}))
+    resp = client.get('/search?filter=%s' % json.dumps({'service': ['Service A']}))
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 

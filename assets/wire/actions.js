@@ -92,11 +92,14 @@ export function copyPreviewContents() {
  * @return {Promise}
  */
 function search(state, next) {
+    const activeFilter = get(state, 'wire.activeFilter', {});
+    const activeService = get(state, 'wire.activeService', {});
+
     const params = {
         q: state.query,
         bookmarks: state.bookmarks && state.user,
-        service: get(state, 'wire.activeService.code'),
-        filter: !isEmpty(state.wire.activeFilter) ? JSON.stringify(state.wire.activeFilter) : null,
+        service: !isEmpty(activeService) && JSON.stringify(activeService),
+        filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
     };
 
@@ -120,7 +123,6 @@ export function fetchItems() {
                 const state = getState();
                 updateRouteParams({
                     q: state.query,
-                    service: get(state, 'wire.activeService.code'),
                 }, state);
             })
             .catch(errorHandler);
@@ -303,18 +305,18 @@ export function fetchNext(item) {
     };
 }
 
-export const SET_SERVICE = 'SET_SERVICE';
-export function setService(service) {
+export const TOGGLE_SERVICE = 'TOGGLE_SERVICE';
+export function toggleService(service) {
     return (dispatch) => {
-        dispatch({type: SET_SERVICE, service});
+        dispatch({type: TOGGLE_SERVICE, service});
         dispatch(fetchItems());
     };
 }
 
-export const SET_FILTER = 'SET_FILTER';
-export function setFilter(key, val) {
+export const TOGGLE_FILTER = 'TOGGLE_FILTER';
+export function toggleFilter(key, val, single) {
     return (dispatch) => {
-        dispatch({type: SET_FILTER, key, val});
+        dispatch({type: TOGGLE_FILTER, key, val, single});
         dispatch(fetchItems());
     };
 }
@@ -352,16 +354,9 @@ export function fetchMoreItems() {
  * @param {URLSearchParams} params
  */
 export function initParams(params) {
-    return (dispatch, getState) => {
-        const state = getState();
-
+    return (dispatch) => {
         if (params.get('q')) {
             dispatch(setQuery(params.get('q')));
-        }
-
-        if (params.get('service')) {
-            const service = state.wire.services.find((service) => service.code === params.get('service'));
-            dispatch({type: SET_SERVICE, service});
         }
     };
 }

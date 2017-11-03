@@ -121,7 +121,7 @@ PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
 
 SERVICES = [
-    {'name': 'National', 'code': 'n'},
+    {'name': 'National', 'code': 'a'},
     {'name': 'Courts', 'code': 'c'},
     {'name': 'Entertainment', 'code': 'e'},
     {'name': 'Finance', 'code': 'f'},
