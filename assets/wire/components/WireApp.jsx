@@ -104,19 +104,6 @@ class WireApp extends React.Component {
                         </div>
 
                         <div className='content-bar__right'>
-                            <div className='content-bar__sort btn-group'>
-                                <div className='form-control-plaintext'>
-                                Sort by:
-                                </div>
-                                <button type='button' className='content-bar__dropdown-btn btn dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                Date
-                                </button>
-                                <div className='dropdown-menu dropdown-menu-right'>
-                                    <button className='dropdown-item' type='button'>Date</button>
-                                    <button className='dropdown-item' type='button'>Author</button>
-                                </div>
-                            </div>
-
                             <div className='btn-group'>
                                 <span className='content-bar__menu' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                                     <i className='icon--list-view'></i>
