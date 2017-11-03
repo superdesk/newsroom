@@ -642,8 +642,10 @@ article.list {
         display: flex;
         flex-direction: column;
         flex: 1 1 auto;
-        padding: 20px 20px 0px 20px;
         overflow: auto;
+        .tab-pane {
+            padding: 20px 20px 0px 20px;
+        }
     }
     .btn {
         margin-bottom: 12px;
