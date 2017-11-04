@@ -34,7 +34,9 @@
 
         {% if session.get('name') %}
         <div class="form-inline my-lg-0 ml-auto p-2">
-            <a class="nav-link" href="{{ url_for('users.settings') }}">{{ gettext('Settings') }}</a>
+            {% if is_admin() %}
+                <a class="nav-link" href="{{ url_for('users.settings') }}">{{ gettext('Settings') }}</a>
+            {% endif %}
             <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
             <div class="nav-link" id="header-notification"></div>
             <a href="{{ url_for('users.user_profile') }}"><span class="badge badge-success">{{ session['name'] }}</span></a>
@@ -52,17 +54,23 @@
         <nav class="sidenav">
 
             <ul class="sidenav-icons">
-              <li class="sidenav-icons__item sidenav-icons__item--admin"><a href="#" title=""><i class="icon--cog icon--mid-blue"></i></a></li>
+                {% if is_admin() %}
+                <li class="sidenav-icons__item sidenav-icons__item--admin">
+                  <a href="{{ url_for('users.settings') }}" title="">
+                      <i class="icon--cog icon--mid-blue"></i>
+                  </a>
+                </li>
+                {% endif %}
 
-              {% for nav in sidenavs %}
-              <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %}">
+                {% for nav in sidenavs %}
+                <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %}">
                   {% if request.endpoint == nav.endpoint %}
                   <span><i class="icon--{{ nav.name }} icon--white"></i></span>
                   {% else %}
                   <a href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}"><i class="icon--{{ nav.name }} icon--mid-blue"></i></a>
                   {% endif %}
-              </li>
-              {% endfor %}
+                </li>
+                {% endfor %}
             </ul>
 
             {% block sidenav %}

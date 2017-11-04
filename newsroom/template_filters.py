@@ -1,5 +1,6 @@
 import os
 import arrow
+import flask
 
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
@@ -42,6 +43,10 @@ def plain_text(html):
 
 def word_count(html):
     return get_word_count(html or '')
+
+
+def is_admin():
+    return flask.session.get('user_type') == 'administrator'
 
 
 def newsroom_config():
