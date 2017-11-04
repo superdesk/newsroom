@@ -25,8 +25,17 @@ export function previewItem(item) {
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItem(item) {
+export function openItemDetails(item) {
     return {type: OPEN_ITEM, item};
+}
+
+export function openItem(item) {
+    return (dispatch, getState) => {
+        dispatch(openItemDetails(item));
+        updateRouteParams({
+            item: item ? item._id : null
+        }, getState());
+    };
 }
 
 export const SET_QUERY = 'SET_QUERY';
@@ -42,6 +51,11 @@ export function queryItems() {
 export const RECIEVE_ITEMS = 'RECIEVE_ITEMS';
 export function recieveItems(data) {
     return {type: RECIEVE_ITEMS, data};
+}
+
+export const RECIEVE_ITEM = 'RECIEVE_ITEM';
+export function recieveItem(data) {
+    return {type: RECIEVE_ITEM, data};
 }
 
 export const RENDER_MODAL = 'RENDER_MODAL';
@@ -128,6 +142,15 @@ export function fetchItems() {
                     q: state.query,
                 }, state);
             })
+            .catch(errorHandler);
+    };
+}
+
+
+export function fetchItem(id) {
+    return (dispatch) => {
+        return server.get(`/wire/${id}?format=json`)
+            .then((data) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
 }
@@ -353,9 +376,16 @@ export function fetchMoreItems() {
  * @param {URLSearchParams} params
  */
 export function initParams(params) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         if (params.get('q')) {
             dispatch(setQuery(params.get('q')));
+        }
+        if (params.get('item')) {
+            dispatch(fetchItem(params.get('item')))
+                .then(() => {
+                    const item = getState().itemsById[params.get('item')];
+                    dispatch(openItem(item));
+                });
         }
     };
 }

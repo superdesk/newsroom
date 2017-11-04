@@ -5,6 +5,7 @@ import {
     SET_QUERY,
     QUERY_ITEMS,
     RECIEVE_ITEMS,
+    RECIEVE_ITEM,
     REMOVE_NEW_ITEMS,
     SET_STATE,
     SET_ACTIVE,
@@ -168,6 +169,12 @@ export default function wireReducer(state = initialState, action) {
 
     case RECIEVE_ITEMS:
         return recieveItems(state, action.data);
+
+    case RECIEVE_ITEM: {
+        const itemsById = Object.assign({}, state.itemsById);
+        itemsById[action.data._id] = action.data;
+        return  {...state, itemsById};
+    }
 
     case RECIEVE_NEXT_ITEMS: {
         const itemsById = Object.assign({}, state.itemsById);
