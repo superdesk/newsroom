@@ -77,7 +77,7 @@ export default function itemReducer(state = initialState, action) {
     }
 
     case RENDER_MODAL:
-        return {...state, modal: {modal: action.modal, data: {topic: action.data}}};
+        return {...state, modal: {modal: action.modal, data: action.data}};
 
     case CLOSE_MODAL:
         return {...state, modal: null};

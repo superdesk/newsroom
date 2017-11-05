@@ -112,7 +112,7 @@ export function fetchTopics() {
 }
 
 export function editTopic(topic) {
-    return renderModal('followTopic', topic);
+    return renderModal('followTopic', {topic});
 }
 
 /**
@@ -131,11 +131,38 @@ export function deleteTopic(topic) {
     };
 }
 
-export function shareTopic(topic) {
-    return () => {
-        return topic;
+/**
+ * Start share followed topic - display modal to pick users
+ *
+ * @return {function}
+ */
+export function shareTopic(items) {
+    return (dispatch, getState) => {
+        const user = getState().user;
+        const company = getState().company;
+        return server.get(`/companies/${company}/users`)
+            .then((users) => users.filter((u) => u._id !== user._id))
+            .then((users) => dispatch(renderModal('shareItem', {items, users})))
+            .catch(errorHandler);
     };
 }
+
+/**
+ * Submit share followed topic form and close modal if that works
+ *
+ * @param {Object} data
+ */
+export function submitShareTopic(data) {
+    return (dispatch) => {
+        return server.post('/topic_share', data)
+            .then(() => {
+                notify.success(gettext('Topic was shared successfully.'));
+                dispatch(closeModal());
+            })
+            .catch(errorHandler);
+    };
+}
+
 
 /**
  * Updates a followed topic

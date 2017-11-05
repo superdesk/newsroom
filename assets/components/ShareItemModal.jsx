@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { gettext, toggleValue } from 'utils';
 import { closeModal, submitShareItem } from 'wire/actions';
+import { submitShareTopic } from 'user-profile/actions';
 
 import Modal, { ModalPrimaryButton, ModalSecondaryButton } from 'components/Modal';
 import CloseButton from 'components/CloseButton';
@@ -19,7 +20,7 @@ class ShareItemModal extends React.Component {
     onSubmit(event) {
         event.preventDefault();
         if (this.state.users.length) {
-            this.props.submit(this.state);
+            this.props.submit(this.isFollowedTopic(), this.state);
         }
     }
 
@@ -41,6 +42,10 @@ class ShareItemModal extends React.Component {
         this.setState({
             users: this.users.length === this.state.users.length ? [] : this.users.map((u) => u._id),
         });
+    }
+
+    isFollowedTopic() {
+        return !!this.state.items[0].query;
     }
 
     render() {
@@ -110,7 +115,7 @@ ShareItemModal.propTypes = {
     closeModal: PropTypes.func.isRequired,
     submit: PropTypes.func.isRequired,
     data: PropTypes.shape({
-        items: PropTypes.arrayOf(PropTypes.string).isRequired,
+        items: PropTypes.arrayOf(PropTypes.object).isRequired,
         users: PropTypes.arrayOf(PropTypes.shape({
             _id: PropTypes.string.isRequired,
             first_name: PropTypes.string.isRequired,
@@ -121,7 +126,7 @@ ShareItemModal.propTypes = {
 
 const mapDispatchToProps = (dispatch) => ({
     closeModal: () => dispatch(closeModal()),
-    submit: (data) => dispatch(submitShareItem(data)),
+    submit: (isFolllowedTopic, data) => isFolllowedTopic ? dispatch(submitShareTopic(data)) : dispatch(submitShareItem(data)),
 });
 
 export default connect(null, mapDispatchToProps)(ShareItemModal);
