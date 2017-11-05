@@ -106,7 +106,7 @@ class WireListItem extends React.Component {
 
                         {showItemVersions(item) && (
                             <div className="no-bindable wire-articles__item__versions-btn" onClick={this.togglePreviousVersions}>
-                                {gettext('Show previous versions({{ count }})', {count: item.ancestors.length})}
+                                {gettext('Show previous versions ({{ count }})', {count: item.ancestors.length})}
                             </div>
                         )}
                     </div>
