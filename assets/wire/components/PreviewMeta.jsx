@@ -5,13 +5,15 @@ import { getPicture } from 'wire/utils';
 
 const DEFAULT_URGENCY = 4;
 
-const onClick = () => {
-    const previousVersions = document.getElementById('previous-versions');
-    previousVersions && previousVersions.scrollIntoView();
-};
 
-function PreviewMeta({item, isItemDetail}) {
+
+function PreviewMeta({item, isItemDetail, inputRef}) {
     const picture = getPicture(item);
+    const onClick = () => {
+        const previousVersions = document.getElementById(inputRef);
+        previousVersions && previousVersions.scrollIntoView();
+    };
+
     return (
         <div className='wire-articles__item__meta'>
             <div className='wire-articles__item__icons'>
@@ -45,6 +47,7 @@ function PreviewMeta({item, isItemDetail}) {
 PreviewMeta.propTypes = {
     item: PropTypes.object,
     isItemDetail: PropTypes.bool,
+    inputRef: PropTypes.string,
 };
 
 export default PreviewMeta;
