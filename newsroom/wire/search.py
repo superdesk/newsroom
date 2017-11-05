@@ -51,6 +51,12 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
+def set_service_query(query, company):
+    if company and company.get('services'):
+        services = [code for code, is_active in company['services'].items() if is_active]
+        query['bool']['must'].append({'terms': {'service.code': services}})
+
+
 class WireSearchService(newsroom.Service):
     def get(self, req, lookup):
         query = {
@@ -65,9 +71,7 @@ class WireSearchService(newsroom.Service):
 
         user = get_user()
         company = get_user_company(user)
-        if company and company.get('services'):
-            services = [code for code, is_active in company['services'].items() if is_active]
-            query['bool']['must'].append({'terms': {'service.code': services}})
+        set_service_query(query, company)
 
         if req.args.get('q'):
             query['bool']['must'].append({
@@ -129,7 +133,7 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
 
-    def test_new_item(self, item_id, topics):
+    def test_new_item(self, item_id, topics, users, companies):
         query = {
             'bool': {
                 'must_not': [
@@ -138,7 +142,7 @@ class WireSearchService(newsroom.Service):
                     {'term': {'pubstatus': 'canceled'}}
                 ],
                 'must': [
-                    {'term': {'_id': item_id}},
+                    {'term': {'_id': item_id}}
                 ],
             }
         }
@@ -150,8 +154,16 @@ class WireSearchService(newsroom.Service):
             }
         }
 
+        queried_topics = []
+
         for topic in topics:
-            filter = {
+            query['bool']['must'] = [{'term': {'_id': item_id}}]
+
+            user = users.get(str(topic['user']))
+            if not user:
+                continue
+
+            topic_filter = {
                 'bool': {
                     'must': [{
                         'query_string': {
@@ -163,7 +175,15 @@ class WireSearchService(newsroom.Service):
                     ],
                 }
             }
-            aggs['topics']['filters']['filters'][str(topic['_id'])] = filter
+
+            company = companies.get(str(user.get('company', '')))
+
+            # for now even if there's no active company matching for the user
+            # continuing with the search
+            set_service_query(topic_filter, company)
+
+            aggs['topics']['filters']['filters'][str(topic['_id'])] = topic_filter
+            queried_topics.append(topic)
 
         source = {'query': query}
         source['aggs'] = aggs
@@ -176,7 +196,7 @@ class WireSearchService(newsroom.Service):
         try:
             search_results = super().get(req, None)
 
-            for topic in topics:
+            for topic in queried_topics:
                 if search_results.hits['aggregations']['topics']['buckets'][str(topic['_id'])]['doc_count'] > 0:
                     topic_matches.append(topic['_id'])
 
