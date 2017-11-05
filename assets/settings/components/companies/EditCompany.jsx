@@ -134,7 +134,6 @@ class EditCompany extends React.Component {
                                         name='country'
                                         label={gettext('Country')}
                                         value={this.props.company.country}
-                                        defaultOption=''
                                         options={countries}
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.user_type : null}/>

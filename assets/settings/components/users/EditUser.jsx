@@ -62,7 +62,6 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         name='user_type'
                         label={gettext('User Type')}
                         value={user.user_type}
-                        defaultOption=''
                         options={userTypes}
                         onChange={onChange}
                         error={errors ? errors.user_type : null} />
@@ -71,7 +70,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         name='company'
                         label={gettext('Company')}
                         value={user.company}
-                        defaultOption=''
+                        defaultOption={''}
                         options={companies}
                         onChange={onChange}
                         error={errors ? errors.company : null} />
