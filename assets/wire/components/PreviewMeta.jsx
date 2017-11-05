@@ -5,6 +5,10 @@ import { getPicture } from 'wire/utils';
 
 const DEFAULT_URGENCY = 4;
 
+const onClick = () => {
+    const previousVersions = document.getElementById('previous-versions');
+    previousVersions && previousVersions.scrollIntoView();
+};
 
 function PreviewMeta({item, isItemDetail}) {
     const picture = getPicture(item);
@@ -29,7 +33,7 @@ function PreviewMeta({item, isItemDetail}) {
                 <span><span className='bold'>{wordCount(item.body_html)}</span> {gettext('words')}</span>
                 <span>{gettext('Source: {{ source }}', {source: item.source})}
                     {!isItemDetail && ' // '}
-                    {!isItemDetail && <span className="blue-text">
+                    {!isItemDetail && <span className="blue-text" onClick={onClick}>
                         {gettext('{{ count }} previous versions', {count: item.ancestors ? item.ancestors.length : '0'})}
                     </span>}
                 </span>
