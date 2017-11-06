@@ -178,7 +178,7 @@ export function updateRouteParams(updates, state) {
             dirty = dirty || updates[key] !== params.get(key);
             params.set(key, updates[key]);
         } else {
-            dirty = dirty || params.has(key);
+            dirty = dirty || params.has(key) || params.entries.length == 0;
             params.delete(key);
         }
     });
