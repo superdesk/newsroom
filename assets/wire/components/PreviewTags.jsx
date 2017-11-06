@@ -2,15 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext } from 'utils';
 
-function formatCV(items) {
+function formatCV(items, field) {
     return items && items.map((item) => (
-        <a key={item.code} className='wire-column__preview__tag' href="#">{item.name}</a>
+        <a key={item.code}
+            className='wire-column__preview__tag'
+            href={`/?q=${field}:${item.code}`}
+        >{item.name}</a>
     ));
 }
 
 function PreviewTags({item, isItemDetail}) {
-    const genres = item.genre && formatCV(item.genre);
-    const subjects = item.subject && formatCV(item.subject);
+    const genres = item.genre && formatCV(item.genre, 'genre.code');
+    const subjects = item.subject && formatCV(item.subject, 'subject.code');
 
     return (
         <div className='wire-column__preview__tags'>
