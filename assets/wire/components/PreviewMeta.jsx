@@ -6,8 +6,14 @@ import { getPicture } from 'wire/utils';
 const DEFAULT_URGENCY = 4;
 
 
-function PreviewMeta({item, isItemDetail}) {
+
+function PreviewMeta({item, isItemDetail, inputRef}) {
     const picture = getPicture(item);
+    const onClick = () => {
+        const previousVersions = document.getElementById(inputRef);
+        previousVersions && previousVersions.scrollIntoView();
+    };
+
     return (
         <div className='wire-articles__item__meta'>
             <div className='wire-articles__item__icons'>
@@ -29,7 +35,7 @@ function PreviewMeta({item, isItemDetail}) {
                 <span><span className='bold'>{wordCount(item.body_html)}</span> {gettext('words')}</span>
                 <span>{gettext('Source: {{ source }}', {source: item.source})}
                     {!isItemDetail && ' // '}
-                    {!isItemDetail && <span className="blue-text">
+                    {!isItemDetail && <span className="blue-text" onClick={onClick}>
                         {gettext('{{ count }} previous versions', {count: item.ancestors ? item.ancestors.length : '0'})}
                     </span>}
                 </span>
@@ -41,6 +47,7 @@ function PreviewMeta({item, isItemDetail}) {
 PreviewMeta.propTypes = {
     item: PropTypes.object,
     isItemDetail: PropTypes.bool,
+    inputRef: PropTypes.string,
 };
 
 export default PreviewMeta;

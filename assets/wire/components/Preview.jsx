@@ -11,6 +11,7 @@ import PreviewMeta from './PreviewMeta';
 
 function Preview({item, actions}) {
     const picture = getPicture(item);
+    const previousVersions = 'preview_versions';
     return (
         <div className='wire-column__preview__items'>
 
@@ -33,7 +34,7 @@ function Preview({item, actions}) {
                     </figure>
                 )}
 
-                <PreviewMeta item={item} isItemDetail={false}/>
+                <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions}/>
                 {item.description_text &&
                         <p className='wire-column__preview__lead'>{item.description_text}</p>
                 }
@@ -44,7 +45,11 @@ function Preview({item, actions}) {
                 <PreviewTags item={item} isItemDetail={false} />
 
                 {showItemVersions(item) &&
-                    <ListItemPreviousVersions item={item} isPreview={true} />
+                    <ListItemPreviousVersions
+                        item={item}
+                        isPreview={true}
+                        inputId={previousVersions}
+                    />
                 }
 
             </div>
