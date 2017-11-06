@@ -40,10 +40,6 @@ button {
         }
     }
 }
-.btn.focus, .btn:focus {
-    outline: 0px;
-    box-shadow: none;
-}
 
 .dropdown-menu-right {
     right: 0;
@@ -938,6 +934,7 @@ article.list {
     align-items: center;
     justify-content: space-between;
     padding: 20px;
+    flex-shrink: 0;
 }
 
 .wire-column__preview__date {
@@ -946,11 +943,6 @@ article.list {
 
 .wire-column__preview__buttons {
 
-}
-
-.wire-column__preview__icon {
-    margin-left: 15px;
-    cursor: pointer;
 }
 
 .wire-column__preview__content {
@@ -1146,8 +1138,7 @@ article.list {
 
 }
 
-.content--item-detail .wire-column__preview__icon {
-    margin-left: 0px;
+.content--item-detail .wire-column__preview__buttons {
     margin-right: 15px;
 }
 

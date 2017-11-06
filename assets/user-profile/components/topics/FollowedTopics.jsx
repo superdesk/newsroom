@@ -11,7 +11,7 @@ class FollowedTopics extends React.Component {
 
     getActionButtons(topic) {
         return this.props.actions.map((action) => (
-            <span className='wire-column__preview__icon'
+            <span className='icon-button'
                 key={action.name}
                 onClick={() => action.action(topic)}>
                 <i className={`icon--${action.icon}`}></i>
