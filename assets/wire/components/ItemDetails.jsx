@@ -37,9 +37,16 @@ function ItemDetails({item, actions, onClose}) {
                         <div className="wire-column__preview__content--item-detail-item-text">
                             <span className="wire-column__preview__slug">{item.slugline}</span>
                             <h2 className="wire-column__preview__headline">{item.headline}</h2>
-                            <p className="wire-column__preview__author">{gettext('By')}{' '}
-                                <span className="bold">{item.byline}</span>{' on '}
-                                {fullDate(item.versioncreated)}</p>
+
+                            <p className="wire-column__preview__author">
+                                {item.byline && (
+                                    <span>{gettext('By')}{' '}
+                                        <b>{item.byline}</b>
+                                    </span>
+                                )}
+                                {' on '}
+                                {fullDate(item.versioncreated)}
+                            </p>
 
                             {item.description_text &&
                                 <p className="wire-column__preview__lead">{item.description_text}</p>}
