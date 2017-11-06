@@ -14,20 +14,7 @@ from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
-
-
-def get_item_or_404(_id):
-    item = superdesk.get_resource_service('items').find_one(req=None, _id=_id)
-    if not item:
-        flask.abort(404)
-    return item
-
-
-def get_json_or_400():
-    data = flask.request.get_json()
-    if not isinstance(data, dict):
-        flask.abort(400)
-    return data
+from newsroom.utils import get_entity_or_404, get_json_or_400
 
 
 def get_services(user):
@@ -79,7 +66,7 @@ def search():
 
 @blueprint.route('/download/<_ids>')
 def download(_ids):
-    items = [get_item_or_404(_id) for _id in _ids.split(',')]
+    items = [get_entity_or_404(_id, 'items') for _id in _ids.split(',')]
     _file = io.BytesIO()
     _format = flask.request.args.get('format', 'text')
     formatter = app.download_formatters[_format]['formatter']
@@ -100,7 +87,7 @@ def share():
     data = get_json_or_400()
     assert data.get('users')
     assert data.get('items')
-    items = [get_item_or_404(_id) for _id in data.get('items')]
+    items = [get_entity_or_404(_id, 'items') for _id in data.get('items')]
     with app.mail.connect() as connection:
         for user_id in data['users']:
             user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
@@ -149,14 +136,14 @@ def bookmark():
 
 @blueprint.route('/wire/<_id>/versions')
 def versions(_id):
-    item = get_item_or_404(_id)
+    item = get_entity_or_404(_id, 'items')
     items = get_previous_versions(item)
     return flask.jsonify({'_items': items})
 
 
 @blueprint.route('/wire/<_id>')
 def item(_id):
-    item = get_item_or_404(_id)
+    item = get_entity_or_404(_id, 'items')
     if flask.request.args.get('format') == 'json':
         return flask.jsonify(item)
     previous_versions = get_previous_versions(item)

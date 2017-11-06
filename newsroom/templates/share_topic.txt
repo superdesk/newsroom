@@ -1,0 +1,12 @@
+Hi {{ recipient.first_name }} {{ recipient.last_name }},
+{{ sender.first_name }} {{ sender.last_name }} shared the following topic with you:
+
+{{ topic.label }}
+{{ url }}
+
+
+{{ message }}
+
+Regards,
+
+The {{app_name}} Team

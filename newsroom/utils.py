@@ -1,5 +1,5 @@
-
-from flask import current_app as app, json
+import superdesk
+from flask import current_app as app, json, abort, request
 from eve.utils import parse_request
 from uuid import uuid4
 from datetime import datetime
@@ -32,3 +32,17 @@ def json_serialize_datetime_objectId(obj):
 
     if isinstance(obj, ObjectId):
         return str(obj)
+
+
+def get_entity_or_404(_id, resource):
+    item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    if not item:
+        abort(404)
+    return item
+
+
+def get_json_or_400():
+    data = request.get_json()
+    if not isinstance(data, dict):
+        abort(400)
+    return data

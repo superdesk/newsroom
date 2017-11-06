@@ -27,7 +27,7 @@ import SearchSidebar from './SearchSidebar';
 import SelectedItemsBar from './SelectedItemsBar';
 
 import FollowTopicModal from 'components/FollowTopicModal';
-import ShareItemModal from './ShareItemModal';
+import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from './DownloadItemsModal';
 import ItemDetails from './ItemDetails';
 import NotificationList from 'components/NotificationList';

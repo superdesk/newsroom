@@ -16,10 +16,12 @@ import FollowedTopics from './topics/FollowedTopics';
 import UserProfileMenu from './UserProfileMenu';
 import { gettext } from 'utils';
 import FollowTopicModal from 'components/FollowTopicModal';
+import ShareItemModal from 'components/ShareItemModal';
 import UserProfile from './profile/UserProfile';
 
 const modals = {
     followTopic: FollowTopicModal,
+    shareItem: ShareItemModal,
 };
 
 class UserProfileApp extends React.Component {
@@ -150,7 +152,7 @@ const mapDispatchToProps = (dispatch) => ({
         {
             name: gettext('Share'),
             icon: 'share',
-            action: (topic) => dispatch(shareTopic(topic)),
+            action: (topic) => dispatch(shareTopic([topic])),
         },
         {
             name: gettext('Delete'),
