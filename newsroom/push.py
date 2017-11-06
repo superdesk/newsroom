@@ -89,22 +89,28 @@ def notify_new_item(item):
     if item.get('pubstatus') == 'canceled' or item.get('type') == 'composite':
         return
     topics = get_notification_topics()
+
+    lookup = {'is_enabled': True}
+    all_users = list(query_resource('users', lookup=lookup, max_results=200))
+    users = {str(user['_id']): user for user in all_users}
+
+    all_companies = list(query_resource('companies', lookup=lookup, max_results=200))
+    companies = {str(company['_id']): company for company in all_companies}
+
     topic_matches = superdesk.get_resource_service('wire_search').\
-        test_new_item(item['_id'], topics)
+        test_new_item(item['_id'], topics, users, companies)
+
     if topic_matches:
         push_notification('update',
                           item=item,
                           topics=topic_matches)
-        send_notification_emails(item, topics, topic_matches)
+        send_notification_emails(item, topics, topic_matches, users)
 
 
-def send_notification_emails(item, topics, topic_matches):
-    lookup = {'is_enabled': True, 'receive_email': True}
-    all_users = list(query_resource('users', lookup=lookup, max_results=200))
-    users = {str(user['_id']): user for user in all_users}
+def send_notification_emails(item, topics, topic_matches, users):
     for topic in topics:
         user = users.get(str(topic['user']))
-        if topic['_id'] in topic_matches and user:
+        if topic['_id'] in topic_matches and user and user.get('receive_email'):
             send_new_item_notification_email(user, topic['label'], item=item)
 
 

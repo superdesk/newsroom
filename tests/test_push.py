@@ -92,9 +92,16 @@ def test_push_binary_invalid_signature(client, app):
 
 
 def test_notify_for_new_item(client, app, mocker):
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+    }])
+
     with client as cli:
         with client.session_transaction() as session:
-            user = str(bson.ObjectId())
+            user = str(user_ids[0])
             session['user'] = user
         resp = cli.post('api/users/%s/topics' % user, data={'label': 'bar', 'query': 'test', 'notifications': True})
         assert 201 == resp.status_code
@@ -108,6 +115,78 @@ def test_notify_for_new_item(client, app, mocker):
     assert 200 == resp.status_code
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['topics']) == 1
+
+
+def test_do_not_notify_inactive_user(client, app, mocker):
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': False,
+        'receive_email': True,
+    }])
+
+    with client as cli:
+        with client.session_transaction() as session:
+            user = str(user_ids[0])
+            session['user'] = user
+        resp = cli.post('api/users/%s/topics' % user, data={'label': 'bar', 'query': 'test', 'notifications': True})
+        assert 201 == resp.status_code
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+    data = json.dumps({'guid': 'foo', 'type': 'text', 'headline': 'this is a test'})
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args is None
+
+
+def test_notify_checks_service_subscriptions(client, app, mocker):
+    app.data.insert('companies', [{
+        '_id': 1,
+        'name': 'Press co.',
+        'is_enabled': True,
+        'services': {
+            'a': True
+        }
+    }])
+
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'company': 1
+    }])
+
+    app.data.insert('topics', [
+        {'label': 'topic-1', 'query': 'test', 'user': user_ids[0], 'notifications': True},
+        {'label': 'topic-2', 'query': 'mock', 'user': user_ids[0], 'notifications': True}])
+
+    with client.session_transaction() as session:
+        user = str(user_ids[0])
+        session['user'] = user
+
+    with app.mail.record_messages() as outbox:
+        key = b'something random'
+        app.config['PUSH_KEY'] = key
+        data = json.dumps(
+            {
+                'guid': 'foo',
+                'type': 'text',
+                'headline': 'this is a test',
+                'service': [
+                    {
+                        'name': 'Australian Weather',
+                        'code': 'b'
+                    }
+                ]
+            })
+        headers = get_signature_headers(data, key)
+        resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+        assert 200 == resp.status_code
+    assert len(outbox) == 0
 
 
 def test_send_notification_emails(client, app):
