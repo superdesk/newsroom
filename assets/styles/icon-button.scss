@@ -1,0 +1,29 @@
+// Icon buttons
+
+@mixin icon-button-base () {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 38px;
+    cursor: pointer;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 1px;
+    border-radius: $border-radius;
+    transition: border-color .15s;
+}
+
+.icon-button {
+    @include icon-button-base();
+    &:hover {
+        border-color: $main-blue;
+    }
+    &:focus {
+        outline: 0;
+        box-shadow: 0 0 0 2px rgba(0, 172, 236, .4);
+    }
+    &:active {
+        box-shadow: inset 0 1px 0 0 $main-blue;
+    }
+}
