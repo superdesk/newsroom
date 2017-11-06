@@ -55,8 +55,6 @@ class SearchSidebar extends React.Component {
                             services={this.props.services}
                             activeService={this.props.activeService}
                             toggleService={this.toggleService}
-                            activeFilter={this.props.activeFilter}
-                            aggregations={this.props.aggregations}
                         />
                         {this.props.topics.length && <span className='wire-column__nav__divider'></span>}
                         <TopicsTab
@@ -84,18 +82,15 @@ class SearchSidebar extends React.Component {
     }
 }
 
-function NavigationTab({services, activeService, toggleService, aggregations}) {
+function NavigationTab({services, activeService, toggleService}) {
     const isActive = (service) => !!activeService[service.code];
-    const buckets = get(aggregations, 'service.buckets');
-    return services
-        .filter((service) => !buckets || buckets.find((bucket) => bucket.key === service.code))
-        .map((service) => (
-            <NavLink key={service.name}
-                isActive={isActive(service)}
-                onClick={(event) => toggleService(event, service)}
-                label={service.name}
-            />
-        ));
+    return services.map((service) => (
+        <NavLink key={service.name}
+            isActive={isActive(service)}
+            onClick={(event) => toggleService(event, service)}
+            label={service.name}
+        />
+    ));
 }
 
 NavigationTab.propTypes = {
@@ -105,7 +100,6 @@ NavigationTab.propTypes = {
     })),
     activeService: PropTypes.object,
     toggleService: PropTypes.func.isRequired,
-    aggregations: PropTypes.object,
 };
 
 class FiltersTab extends React.Component {
@@ -145,7 +139,7 @@ class FiltersTab extends React.Component {
         const LIMIT = 5;
         const {aggregations, activeFilter, toggleFilter} = this.props;
         return this.state.groups.map((group) => {
-            const compareFunction = (a, b) => group.sorted ? -1 : a.key.localeCompare(b.key);
+            const compareFunction = (a, b) => group.sorted ? -1 : String(a.key).localeCompare(String(b.key));
             const groupFilter = get(activeFilter, group.field, []);
             const buckets = get(aggregations[group.field], 'buckets', group.buckets)
                 .sort(compareFunction)
