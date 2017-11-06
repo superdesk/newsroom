@@ -6,6 +6,7 @@ from superdesk.default_settings import (   # noqa
     CONTENTAPI_MONGO_URI,
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,
+    ELASTICSEARCH_SETTINGS,
     ELASTIC_DATE_FORMAT,
     CELERY_BROKER_URL,
     celery_queue,
