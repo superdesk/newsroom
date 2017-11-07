@@ -298,9 +298,21 @@ export function setNewItems(data) {
 }
 
 
-export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
-export function removeNewItems(data) {
-    return {type: REMOVE_NEW_ITEMS, data};
+export const REMOVE_NEW_ITEMS_BY_TOPIC = 'REMOVE_NEW_ITEMS_BY_TOPIC';
+export function removeNewItemsByTopic(data) {
+    return {type: REMOVE_NEW_ITEMS_BY_TOPIC, data};
+}
+
+
+export const CLEAR_ALL_NEW_ITEMS = 'CLEAR_ALL_NEW_ITEMS';
+export function clearAllNewItems() {
+    return {type: CLEAR_ALL_NEW_ITEMS};
+}
+
+
+export const CLEAR_NEW_ITEM = 'CLEAR_NEW_ITEM';
+export function clearNewItem(id) {
+    return {type: CLEAR_NEW_ITEM, id};
 }
 
 /**
