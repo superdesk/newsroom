@@ -72,7 +72,9 @@
                         <div class="column__preview__tags__column">
                             <span class="wire-column__preview__tags__headline">{{ _('Category') }}</span>
                             {% for subj in item.subject %}
-                            <a class="wire-column__preview__tag">{{ subj.name }}</a>
+                            <a class="wire-column__preview__tag"
+                                href="{{ url_for('wire.index') }}?q=subject.code:{{ subj.code }}"
+                            >{{ subj.name }}</a>
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -80,7 +82,9 @@
                         <div class="column__preview__tags__column">
                             <span class="wire-column__preview__tags__headline">{{ _('Genre') }}</span>
                             {% for genre in item.genre %}
-                            <a class="wire-column__preview__tag">{{ genre.name }}</a>
+                            <a class="wire-column__preview__tag"
+                                href="{{ url_for('wire.index') }}?q=genre.code:{{ genre.code }}"
+                            >{{ genre.name }}</a>
                             {% endfor %}
                         </div>
                         {% endif %}
