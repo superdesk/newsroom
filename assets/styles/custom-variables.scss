@@ -1,5 +1,14 @@
 // Custom variables
 
+$body-text: #444;
+$gray-light: #c9c9c9;
+$gray-mid: #9a9a9a;
+$background-color: #f8f8f8;
+$main-blue: #00acec;
+$mid-blue: #006f98;
+
+// Custom bootstrap variables
+
 $blue: #00acec;
 $line-height-sm: 1.25;
 $border-radius: .1875rem;
@@ -12,7 +21,23 @@ $font-weight-medium: 500 !default;
 $font-family-base: $font-family-serif;
 
 // Buttons
+
 $input-btn-padding-y: .5rem;
 $input-btn-padding-x: 1rem;
 $btn-font-weight: $font-weight-medium;
 $btn-border-radius: $border-radius;
+$input-btn-focus-box-shadow:  0 0 0 0;
+$btn-block-spacing-y: .625rem;
+
+// Forms
+
+$input-focus-border-color: $blue;
+$input-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .15);
+$input-bg: $background-color;
+
+// Modals
+
+$modal-backdrop-bg: #fff;
+$modal-backdrop-opacity: .9;
+$modal-content-border-width: 0px;
+$modal-content-bg: transparent;

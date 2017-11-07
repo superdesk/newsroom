@@ -5,17 +5,17 @@
 {% block profileNavigation %}
 
 <nav class="profile-side-navigation">
-    <div class="profile-side-navigation__info">
-        <figure class="profile-side-navigation__avatar">
-            <img src="{{ url_for('static', filename = 'article_preview.png') }}"/>
+    <div class="profile__group profile__group--dark-bck">
+        <figure class="profile__avatar initials">
+            <span class="profile__characters">JD</span>
         </figure>
-        <h5 class="profile-side-navigation__name">Jeff Dudeowsky</h5>
-        <span class="profile-side-navigation__username">jeffthedude</span>
+        <h5 class="profile__name">Jeff Dudeowsky</h5>
+        <span class="profile__info">jeffthedude</span>
     </div>
     <div class="profile-side-navigation__items">
-        <a href="#" class="btn btn-outline-primary">All</a>
-        <a href="#" class="btn btn-outline-secondary">National</a>
-        <a href="#" class="btn btn-outline-secondary">Courts</a>
+        <a href="#" class="btn btn-block btn-outline-primary">My profile</a>
+        <a href="#" class="btn btn-block btn-outline-secondary">Followed topics</a>
+        <a href="#" class="btn btn-block btn-outline-secondary">Download history</a>
     </div>
 </nav>
 
@@ -23,8 +23,8 @@
 
 {% block contentHeader %}
 
-<nav class="profile-nav content-bar navbar content-bar--side-padding">
-    <h4>My profile</h4>
+<nav class="profile-nav content-bar navbar content-bar--side-padding pr-0">
+    <h5 class="ml-lg-4 mb-0">My profile</h5>
     <div class="content-bar__right">
         <span class="content-bar__menu">
             <i class="icon--close-thin"></i>
@@ -34,18 +34,11 @@
 
 {% endblock %}
 {% block contentMain %}
-    <form class="profile-content container-fluid">
-        <div class="form-row">
-            
-            <div class="col-lg-2">
-                <figure class="profile-side-navigation__avatar">
-                    <img src="{{ url_for('static', filename = 'article_preview.png') }}"/>
-                </figure>
-                <input type='file' id="upload" >                
-            </div>
+    <form class="profile-content container-fluid ml-lg-4">
+        <div class="row">
 
-            <div class="col-lg-8">
-                <div class="form-row">
+            <div class="col-12 col-xl-7 mt-lg-4">
+                <div class="row">
                     <div class="form-group col-lg-6">
                         <label for="first_name">First Name</label>
                         <div class="field">
@@ -64,18 +57,24 @@
                                 <input type="text" id="username" name="username" class="form-control" value="jeffthedude">
                             </div>  
                         </div>
-                    <div class="form-group col-lg-6">
-                        <label for="email">Email</label>
-                        <div class="field">
-                            <input type="text" id="email" name="email" class="form-control" value="admin@example.com">
-                        </div>
-                    </div>
                     <div class="form-group col-lg-12">
                         <label for="email">Email</label>
                         <div class="field">
                             <input type="text" id="email" name="email" class="form-control" value="admin@example.com">
                         </div>
                     </div>
+
+                    <div class="form-group col-lg-6">
+                        <label for="email">Password</label>
+                        <div class="field">
+                            <input type="password" id="password" name="password" class="form-control" value="">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-6 d-flex align-items-end">
+                        <input type="button" class="btn btn-outline-secondary" value="Change password" data-toggle="modal" data-target="#changePassword">
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -84,5 +83,49 @@
             <input type="button" class="btn btn-outline-primary" value="Save changes">
         </div>
     </form>
+
+    <!-- Modal -->
+    <div class="modal fade mt-xl-5" id="changePassword" tabindex="-1" role="dialog" aria-labelledby="changePasswordLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="changePasswordLabel">Change your password</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="icon--close-thin"></i></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="">
+                        <div class="form-group">
+                            <label for="email">Old password</label>
+                            <div class="field">
+                                <input type="password" id="password" name="password" class="form-control" value="">
+                            </div>
+                            <a class="modal-forgot-password" href="#">Forgot your password?</a>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">New password</label>
+                            <div class="field">
+                                <input type="password" id="password" name="password" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Confirm new password</label>
+                            <div class="field">
+                                <input type="password" id="password" name="password" class="form-control" value="">
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary">Cancel</button>
+                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Change password</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
