@@ -77,7 +77,7 @@ class Modal extends React.Component {
 
     render() {
         return (
-            <div className="modal"
+            <div className="modal mt-xl-5"
                 ref={(elem) => this.elem = elem}>
                 <div className="modal-dialog">
                     <div className="modal-content">

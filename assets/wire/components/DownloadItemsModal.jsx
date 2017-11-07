@@ -33,7 +33,7 @@ class DownloadItemsModal extends React.Component {
         return (
             <Modal onClose={closeModal}>
                 <CloseButton onClick={this.props.closeModal} />
-                <h1>{gettext('Download Items')}</h1>
+                <h4 className='modal-title'>{gettext('Download Items')}</h4>
                 <form onSubmit={this.onSubmit}>
                     <SelectInput
                         name='format'
