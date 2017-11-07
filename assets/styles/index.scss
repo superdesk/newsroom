@@ -16,6 +16,11 @@ button {
 }
 
 
+// variables
+$nav-sidebar-bg: #3e4557;
+$nav-sidebar-border: #323847;
+
+
 // Bootstrap overwrite
 .dropdown-menu {
     margin-top: 0px;
@@ -612,7 +617,7 @@ article.list {
 }
 
 .wire-column__nav {
-    background: #3e4557;
+    background: $nav-sidebar-bg;
     max-width: 260px;
 }
 
@@ -621,19 +626,36 @@ article.list {
     flex-direction: column;
     flex: 1 1 auto;
     padding: 10px 0px 0px 0px;
+    position: relative;
     .nav {
         flex: 0 0 44px;
         margin-left: 0px;
         margin-right: 0px;
-        border-bottom: 1px solid #323847;
+        border-bottom: 1px solid $nav-sidebar-border;
     }
     .tab-content {
         display: flex;
         flex-direction: column;
         flex: 1 1 auto;
         overflow: auto;
+
         .tab-pane {
-            padding: 20px 20px 0px 20px;
+            padding: 20px 20px 0 20px;
+
+            #reset-filter-buffer {
+                height: 80px;
+            }
+
+            #reset-filter {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 15px;
+                padding: 20px 20px 0 20px;
+                background: $nav-sidebar-bg;
+                border-top: 1px solid $nav-sidebar-border;
+                opacity: 0.8;
+            }
         }
     }
     .btn {
@@ -1238,7 +1260,7 @@ article.list {
     padding: 30px 40px;
     overflow: hidden;
     overflow-y: auto;
-    background: #3e4557;
+    background: $nav-sidebar-bg;
 }
 
 .profile-side-navigation__info {

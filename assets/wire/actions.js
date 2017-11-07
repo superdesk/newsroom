@@ -397,3 +397,11 @@ export function setCreatedFilter(filter) {
         dispatch(fetchItems());
     };
 }
+
+export const RESET_FILTER = 'RESET_FILTER';
+export function resetFilter() {
+    return (dispatch) => {
+        dispatch({type: RESET_FILTER});
+        dispatch(fetchItems());
+    };
+}

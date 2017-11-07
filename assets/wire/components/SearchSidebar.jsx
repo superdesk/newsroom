@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 
 import { gettext } from 'utils';
-import { toggleService, toggleFilter } from 'wire/actions';
+import { toggleService, toggleFilter, resetFilter } from 'wire/actions';
 
 import NavLink from './NavLink';
 import FiltersTab from './FiltersTab';
@@ -19,6 +19,7 @@ class SearchSidebar extends React.Component {
         this.state = {active: this.tabs[0]};
         this.toggleService = this.toggleService.bind(this);
         this.toggleFilter = this.toggleFilter.bind(this);
+        this.resetFilter = this.resetFilter.bind(this);
     }
 
     toggleService(event, service) {
@@ -29,6 +30,11 @@ class SearchSidebar extends React.Component {
     toggleFilter(event, field, value, single) {
         event.preventDefault();
         this.props.dispatch(toggleFilter(field, value, single));
+    }
+
+    resetFilter(event) {
+        event.preventDefault();
+        this.props.dispatch(resetFilter());
     }
 
     render() {
@@ -70,8 +76,11 @@ class SearchSidebar extends React.Component {
                             services={this.props.services}
                             activeService={this.props.activeService}
                             activeFilter={this.props.activeFilter}
-                            toggleFilter={this.toggleFilter}
                             aggregations={this.props.aggregations}
+                            toggleFilter={this.toggleFilter}
+                            resetFilter={this.resetFilter}
+                            dispatch={this.props.dispatch}
+                            createdFilter={this.props.createdFilter}
                         />
                     </div>
                 </div>
@@ -141,6 +150,7 @@ SearchSidebar.propTypes = {
     activeService: PropTypes.object,
     activeFilter: PropTypes.object,
     newItemsByTopic: PropTypes.object,
+    createdFilter: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -151,6 +161,7 @@ const mapStateToProps = (state) => ({
     activeFilter: state.wire.activeFilter,
     aggregations: state.aggregations,
     newItemsByTopic: state.newItemsByTopic,
+    createdFilter: state.wire.createdFilter,
 });
 
 export default connect(mapStateToProps)(SearchSidebar);
