@@ -91,13 +91,20 @@ class SearchSidebar extends React.Component {
 
 function NavigationTab({services, activeService, toggleService}) {
     const isActive = (service) => !!activeService[service.code];
-    return services.map((service) => (
+    const isAllActive = !Object.keys(activeService).find((key) => !!activeService[key]);
+    return [
+        <NavLink key="all"
+            isActive={isAllActive}
+            onClick={(event) => toggleService(event)}
+            label={gettext('All')}
+        />
+    ].concat(services.map((service) => (
         <NavLink key={service.name}
             isActive={isActive(service)}
             onClick={(event) => toggleService(event, service)}
             label={service.name}
         />
-    ));
+    )));
 }
 
 NavigationTab.propTypes = {

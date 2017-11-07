@@ -1,5 +1,5 @@
 
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, pickBy } from 'lodash';
 
 import server from 'server';
 import { gettext, notify, updateRouteParams } from 'utils';
@@ -107,7 +107,7 @@ export function copyPreviewContents() {
  */
 function search(state, next) {
     const activeFilter = get(state, 'wire.activeFilter', {});
-    const activeService = get(state, 'wire.activeService', {});
+    const activeService = pickBy(get(state, 'wire.activeService', {}));
     const createdFilter = get(state, 'wire.createdFilter', {});
 
     const params = {
@@ -331,7 +331,7 @@ export const TOGGLE_SERVICE = 'TOGGLE_SERVICE';
 export function toggleService(service) {
     return (dispatch) => {
         dispatch({type: TOGGLE_SERVICE, service});
-        dispatch(fetchItems());
+        return dispatch(fetchItems());
     };
 }
 
