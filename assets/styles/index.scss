@@ -657,7 +657,7 @@ article.list {
                 opacity: 0.8;
             }
         }
-    }
+    } 
     .btn {
         margin-bottom: 12px;
     }
@@ -1253,6 +1253,7 @@ article.list {
 .profileWrap {
     display: flex;
     flex-grow: 1;
+    background: #fff;
     overflow-y: auto;
 }
 
@@ -1264,27 +1265,56 @@ article.list {
     background: $nav-sidebar-bg;
 }
 
-.profile-side-navigation__info {
+.profile__group {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
 }
 
-.profile-side-navigation__avatar {
-    img {
-        object-fit: cover;
-        width: 125px;
-        height: 125px;
-        border-radius: 100%;
-        border: 2px solid #8b8f9a;
+.profile__avatar.initials {    
+    width: 100%;
+    max-width: 128px;
+    margin: 0 auto 20px auto;
+    border-radius: 100%;
+    background: #e9ecf3;
+    color: #3e4658;
+    border: 2px solid #c5cad6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:after {
+        content: "";
+        display: table;
+        padding-bottom: 100%;
     }
 }
 
-.profile-side-navigation__name {
-    color: #fff;
+.profile__characters {
+    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;    
+    font-size: 2.125rem; // 34px
 }
 
-.profile-side-navigation__username {
-    color: #9296a0;
+.profile__name {
+    font-size: 1rem; // 16px
+    margin-bottom: 2px;
+}
+
+.profile__info {
+    font-size: 0.8125rem; // 13px    
+    color: $gray-mid;
+}
+
+.profile__group.profile__group--dark-bck {
+    .profile__avatar.initials {
+        border: 2px solid #8b8f9a;
+        background: #333a4a;
+        color: #fff;
+    }
+    .profile__name {
+        color: #fff;
+    }
+    .profile__info {
+        color: #9296a0;
+    }
 }
 
 .profile-side-navigation__items {
@@ -1299,7 +1329,7 @@ article.list {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    .form-row {
+    > .row {
         display: flex;
         flex-grow: 1;
         overflow: auto;
@@ -1308,12 +1338,17 @@ article.list {
 
 .profile-content__footer {
     display: flex;
-    background: #f8f8f8;
-    margin: 0 -15px;
-    padding: 15px;
+    flex-shrink: 0;
+    padding: 15px 0px;
     > input + input {
         margin-left: 20px;
     }
+}
+
+.modal-forgot-password {
+    font-size: 0.875rem; // 14px
+    margin-top: 4px;
+    float: right;
 }
 
 // End Wire BEM classes

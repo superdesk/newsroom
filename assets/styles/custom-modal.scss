@@ -1,0 +1,30 @@
+// Modal header
+// Top section of the modal w/ title and dismiss
+.modal-header {
+  .close {
+    i {
+      color: $black;
+      opacity: .5;
+    }
+  }
+}
+
+// Title text within header
+.modal-title {
+  font-weight: 700;
+}
+
+// Shell div to position the modal with bottom padding
+.modal-dialog {
+  // When fading in the modal, animate it to slide down
+  .modal.fade & {
+    transform: translate(0, 0);
+  }
+}
+
+// Footer (for actions)
+.modal-footer {
+  // Easily place margin between footer elements
+  > :not(:first-child) { margin-left: 10px; }
+  > :not(:last-child) { margin-right: 10px; }
+}
