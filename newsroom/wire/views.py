@@ -3,6 +3,7 @@ import flask
 import zipfile
 import superdesk
 
+from operator import itemgetter
 from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal
@@ -41,7 +42,11 @@ def get_view_data():
 
 def get_previous_versions(item):
     if item.get('ancestors'):
-        return list(app.data.find_list_of_ids('wire_search', item['ancestors']))
+        return sorted(
+            list(app.data.find_list_of_ids('wire_search', item['ancestors'])),
+            key=itemgetter('versioncreated'),
+            reverse=True
+        )
     return []
 
 

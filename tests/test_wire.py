@@ -82,7 +82,7 @@ def test_versions(client, app):
 
     resp = client.get('/wire/%s/versions' % items[1]['_id'])
     data = json.loads(resp.get_data())
-    assert 1 == len(data['_items'])
+    assert 2 == len(data['_items'])
     assert 'tag:weather' == data['_items'][0]['_id']
 
 

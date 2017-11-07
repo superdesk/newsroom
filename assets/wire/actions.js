@@ -266,7 +266,7 @@ function errorHandler(reason) {
 export function fetchVersions(item) {
     return () => server.get(`/wire/${item._id}/versions`)
         .then((data) => {
-            return data._items.reverse();
+            return data._items;
         });
 }
 

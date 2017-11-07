@@ -89,7 +89,7 @@ describe('wire actions', () => {
         return store.dispatch(actions.fetchVersions(item))
             .then((versions) => {
                 expect(versions.length).toBe(2);
-                expect(versions[0]._id).toBe('baz');
+                expect(versions[0]._id).toBe('bar');
             });
     });
 

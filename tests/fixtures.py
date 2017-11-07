@@ -24,7 +24,7 @@ items = [
         'headline': 'Weather',
         'slugline': 'WEATHER',
         'body_html': '<p>Weather report</p>',
-        'ancestors': ['tag:weather'],
+        'ancestors': ['tag:weather', 'tag:weather:old'],
         'firstcreated': datetime.now() - timedelta(days=5),
         'versioncreated': datetime.now() - timedelta(days=5),
         'service': [{'code': 'b', 'name': 'Service B'}],
@@ -34,7 +34,15 @@ items = [
         'type': 'text',
         'version': 2,
         'nextversion': 'urn:localhost:weather',
+        'versioncreated': datetime.now() - timedelta(days=8),
     },
+    {
+        '_id': 'tag:weather:old',
+        'type': 'text',
+        'version': 2,
+        'nextversion': 'tag:weather',
+        'versioncreated': datetime.now() - timedelta(days=10),
+    }
 ]
 
 
