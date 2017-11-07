@@ -171,7 +171,7 @@ class EditCompany extends React.Component {
                         <div className='tab-pane active' id='subscription'>
                             <form onSubmit={this.saveServices}>
                                 <div className="list-item__preview-form">
-                                    <ul>
+                                    <ul className="list-unstyled">
                                         {this.props.services.map((service) => (
                                             <li key={service.name}>
                                                 <CheckboxInput

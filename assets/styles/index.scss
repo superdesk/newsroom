@@ -590,12 +590,12 @@ article.list {
 }
 
 .wire-column__nav--open, .wire-column__preview--open {
-    width: 25%;
+    //width: 25%;
     flex-shrink: 1;
 }
 
 .wire-column__nav--open {
-    max-width: 260px;
+    width: 320px;
 }
 
 .wire-column__preview--open {
@@ -618,7 +618,6 @@ article.list {
 
 .wire-column__nav {
     background: $nav-sidebar-bg;
-    max-width: 260px;
 }
 
 .wire-column__nav__items {
