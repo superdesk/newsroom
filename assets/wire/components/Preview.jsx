@@ -16,7 +16,7 @@ function Preview({item, actions}) {
         <div className='wire-column__preview__items'>
 
             <div className='wire-column__preview__top-bar'>
-                <span className='wire-column__preview__date'>{gettext('Created {{ date }}' , {date: fullDate(item.versioncreated)})}</span>
+                <span className='wire-column__preview__date'>{gettext('Created')}<br />{fullDate(item.versioncreated)}</span>
                 <PreviewActionButtons item={item} actions={actions} />
             </div>
 

@@ -955,12 +955,13 @@ article.list {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
+    padding: 20px 10px 20px 20px;
     flex-shrink: 0;
 }
 
 .wire-column__preview__date {
     color: #747474;
+    line-height: 1rem;
 }
 
 .wire-column__preview__buttons {
