@@ -78,3 +78,13 @@ export function shortText(item, length=40) {
     const words = text.split(' ');
     return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
 }
+
+/**
+ * Get caption for picture
+ *
+ * @param {Object} picture
+ * @return {String}
+ */
+export function getCaption(picture) {
+    return picture.body_text || picture.description_text;
+}

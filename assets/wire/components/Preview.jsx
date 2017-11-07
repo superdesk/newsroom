@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { gettext, fullDate, formatHTML } from 'utils';
-import { getPicture, getPreviewRendition, showItemVersions } from 'wire/utils';
+import { getPicture, getPreviewRendition, showItemVersions, getCaption } from 'wire/utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from './PreviewActionButtons';
 import PreviewTags from './PreviewTags';
@@ -30,7 +30,7 @@ function Preview({item, actions}) {
                 {getPreviewRendition(picture) && (
                     <figure className='wire-column__preview__image'>
                         <img src={getPreviewRendition(picture).href} />
-                        <figcaption className='wire-column__preview__caption'>{picture.description_text}</figcaption>
+                        <figcaption className='wire-column__preview__caption'>{getCaption(picture)}</figcaption>
                     </figure>
                 )}
 

@@ -21,3 +21,4 @@ def init_app(app):
     app.add_download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2')
 
     app.add_template_global(utils.get_picture, 'get_picture')
+    app.add_template_global(utils.get_caption, 'get_caption')
