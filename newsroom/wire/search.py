@@ -1,14 +1,13 @@
 
+import pytz
 import newsroom
 import logging
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import json, abort
-from flask_babel import get_timezone
 from eve.utils import ParsedRequest
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
-from superdesk.utc import utc
 
 logger = logging.getLogger(__name__)
 
@@ -21,11 +20,27 @@ aggregations = {
 }
 
 
-def get_user_timezone():
-    """Get user timezone for date range query."""
-    user_timezone = get_timezone()
-    now = datetime.utcnow().replace(tzinfo=utc).astimezone(user_timezone)
-    return now.strftime('%z')
+def today(offset):
+    return datetime.utcnow() + timedelta(minutes=offset)
+
+
+def format_date(date, offset):
+    FORMAT = '%Y-%m-%d'
+    if date == 'now/d':
+        return today(offset).strftime(FORMAT)
+    if date == 'now/w':
+        _today = today(offset)
+        monday = _today - timedelta(days=_today.weekday())
+        return monday.strftime(FORMAT)
+    if date == 'now/M':
+        month = today(offset).replace(day=1)
+        return month.strftime(FORMAT)
+    return date
+
+
+def get_local_date(date, time, offset):
+    local_dt = datetime.strptime('%sT%s' % (format_date(date, offset), time), '%Y-%m-%dT%H:%M:%S')
+    return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
 
 
 class WireSearchResource(newsroom.Resource):
@@ -118,16 +133,15 @@ class WireSearchService(newsroom.Service):
                         source['post_filter']['bool']['must'].append(query)
 
         if req.args.get('created_from') or req.args.get('created_to'):
-            _range = {'time_zone': get_user_timezone()}
+            _range = {}
+            offset = int(req.args.get('timezone_offset', '0'))
             if req.args.get('created_from'):
-                _range['gte'] = req.args['created_from']
+                _range['gte'] = get_local_date(req.args['created_from'], '00:00:00', offset)
             if req.args.get('created_to'):
-                _range['lte'] = req.args['created_to']
+                _range['lte'] = get_local_date(req.args['created_to'], '23:59:59', offset)
             source['post_filter']['bool']['must'].append(
                 {'range': {'versioncreated': _range}}
             )
-
-            print(source['post_filter'])
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}

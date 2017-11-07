@@ -26,7 +26,7 @@ items = [
         'body_html': '<p>Weather report</p>',
         'ancestors': ['tag:weather', 'tag:weather:old'],
         'firstcreated': datetime.now() - timedelta(days=5),
-        'versioncreated': datetime.now() - timedelta(days=5),
+        'versioncreated': datetime.now().replace(hour=23, minute=55) - timedelta(days=5),
         'service': [{'code': 'b', 'name': 'Service B'}],
     },
     {
