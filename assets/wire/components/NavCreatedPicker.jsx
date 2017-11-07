@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext } from 'utils';
-import { connect } from 'react-redux';
 
 import NavLink from './NavLink';
 import NavGroup from './NavGroup';
@@ -60,8 +59,4 @@ NavCreatedPicker.propTypes = {
     createdFilter: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-    createdFilter: state.wire.createdFilter,
-});
-
-export default connect(mapStateToProps)(NavCreatedPicker);
+export default NavCreatedPicker;

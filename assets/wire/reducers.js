@@ -24,6 +24,7 @@ import {
     START_LOADING,
     RECIEVE_NEXT_ITEMS,
     SET_CREATED_FILTER,
+    RESET_FILTER,
 } from './actions';
 
 import { toggleValue } from 'utils';
@@ -75,8 +76,12 @@ function recieveItems(state, data) {
 function _wireReducer(state, action) {
     switch (action.type) {
     case TOGGLE_SERVICE: {
-        const activeService = Object.assign({}, state.activeService);
-        activeService[action.service.code] = !activeService[action.service.code];
+        let activeService = Object.assign({}, state.activeService);
+        if (action.service) {
+            activeService[action.service.code] = !activeService[action.service.code];
+        } else { // toggle all off
+            activeService = {};
+        }
         return {
             ...state,
             activeFilter: {},
@@ -103,6 +108,13 @@ function _wireReducer(state, action) {
             createdFilter,
         };
     }
+
+    case RESET_FILTER:
+        return {
+            ...state,
+            activeFilter: {},
+            createdFilter: {},
+        };
 
     default:
         return state;
@@ -294,6 +306,7 @@ export default function wireReducer(state = initialState, action) {
     case TOGGLE_SERVICE:
     case TOGGLE_FILTER:
     case SET_CREATED_FILTER:
+    case RESET_FILTER:
         return {...state, wire: _wireReducer(state.wire, action)};
 
     case START_LOADING:

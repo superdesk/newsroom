@@ -131,4 +131,20 @@ describe('wire actions', () => {
                 return promise;
             });
     });
+
+    it('can set and reset service filter', () => {
+        fetchMock.get('/search?service={"foo":true}', {_items: [{_id: 'foo'}]});
+        return store.dispatch(actions.toggleService({code: 'foo'}))
+            .then(() => {
+                expect(store.getState().wire.activeService).toEqual({'foo': true});
+                return store.dispatch(actions.toggleService({code: 'foo'}));
+            })
+            .then(() => {
+                expect(store.getState().wire.activeService).toEqual({'foo': false});
+                return store.dispatch(actions.toggleService());
+            })
+            .then(() => {
+                expect(store.getState().wire.activeService).toEqual({});
+            });
+    });
 });

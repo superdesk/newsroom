@@ -2,14 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
 
 import { gettext } from 'utils';
-import { toggleService, toggleFilter } from 'wire/actions';
+import { toggleService, toggleFilter, resetFilter } from 'wire/actions';
 
 import NavLink from './NavLink';
-import NavGroup from './NavGroup';
-import NavCreatedPicker from './NavCreatedPicker';
+import FiltersTab from './FiltersTab';
 
 class SearchSidebar extends React.Component {
     constructor(props) {
@@ -21,6 +19,7 @@ class SearchSidebar extends React.Component {
         this.state = {active: this.tabs[0]};
         this.toggleService = this.toggleService.bind(this);
         this.toggleFilter = this.toggleFilter.bind(this);
+        this.resetFilter = this.resetFilter.bind(this);
     }
 
     toggleService(event, service) {
@@ -31,6 +30,11 @@ class SearchSidebar extends React.Component {
     toggleFilter(event, field, value, single) {
         event.preventDefault();
         this.props.dispatch(toggleFilter(field, value, single));
+    }
+
+    resetFilter(event) {
+        event.preventDefault();
+        this.props.dispatch(resetFilter());
     }
 
     render() {
@@ -72,8 +76,11 @@ class SearchSidebar extends React.Component {
                             services={this.props.services}
                             activeService={this.props.activeService}
                             activeFilter={this.props.activeFilter}
-                            toggleFilter={this.toggleFilter}
                             aggregations={this.props.aggregations}
+                            toggleFilter={this.toggleFilter}
+                            resetFilter={this.resetFilter}
+                            dispatch={this.props.dispatch}
+                            createdFilter={this.props.createdFilter}
                         />
                     </div>
                 </div>
@@ -84,13 +91,20 @@ class SearchSidebar extends React.Component {
 
 function NavigationTab({services, activeService, toggleService}) {
     const isActive = (service) => !!activeService[service.code];
-    return services.map((service) => (
+    const isAllActive = !Object.keys(activeService).find((key) => !!activeService[key]);
+    return [
+        <NavLink key="all"
+            isActive={isAllActive}
+            onClick={(event) => toggleService(event)}
+            label={gettext('All')}
+        />
+    ].concat(services.map((service) => (
         <NavLink key={service.name}
             isActive={isActive(service)}
             onClick={(event) => toggleService(event, service)}
             label={service.name}
         />
-    ));
+    )));
 }
 
 NavigationTab.propTypes = {
@@ -100,84 +114,6 @@ NavigationTab.propTypes = {
     })),
     activeService: PropTypes.object,
     toggleService: PropTypes.func.isRequired,
-};
-
-class FiltersTab extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {groups: [
-            {
-                field: 'service',
-                label: gettext('Category'),
-            },
-            {
-                field: 'subject',
-                label: gettext('Subject'),
-            },
-            {
-                field: 'genre',
-                label: gettext('Genre'),
-            },
-            {
-                field: 'urgency',
-                label: gettext('News Value'),
-            },
-        ]};
-
-        this.toggleGroup = this.toggleGroup.bind(this);
-    }
-
-    toggleGroup(event, group) {
-        event.preventDefault();
-        this.setState({groups: this.state.groups.map((_group) =>
-            _group === group ? Object.assign({}, _group, {isOpen: !_group.isOpen}) : _group
-        )});
-    }
-
-    render() {
-        const LIMIT = 5;
-        const {aggregations, activeFilter, toggleFilter} = this.props;
-        return this.state.groups.map((group) => {
-            const compareFunction = (a, b) => group.sorted ? -1 : String(a.key).localeCompare(String(b.key));
-            const groupFilter = get(activeFilter, group.field, []);
-            const buckets = get(aggregations[group.field], 'buckets', group.buckets)
-                .sort(compareFunction)
-                .map((bucket) => {
-                    const isActive = groupFilter.indexOf(bucket.key) !== -1;
-                    return (
-                        <NavLink key={bucket.key}
-                            isActive={isActive}
-                            onClick={(event) => toggleFilter(event, group.field, bucket.key, group.single)}
-                            label={bucket.label || '' + bucket.key}
-                        />
-                    );
-                });
-
-            if (!buckets.length) {
-                return;
-            }
-
-            let visibleBuckets = buckets;
-            if (buckets.length > LIMIT && !group.isOpen) {
-                visibleBuckets = buckets.slice(0, LIMIT).concat([
-                    <NavLink key={'more'} isActive={false} onClick={(event) => this.toggleGroup(event, group)} label={'...'} />
-                ]);
-            }
-
-            return (
-                <NavGroup key={group.field} label={group.label}>{visibleBuckets}</NavGroup>
-            );
-        }).filter((group) => !!group).concat([
-            <NavCreatedPicker key="created" />
-        ]);
-    }
-}
-
-FiltersTab.propTypes = {
-    aggregations: PropTypes.object,
-    activeFilter: PropTypes.object,
-    toggleFilter: PropTypes.func.isRequired,
 };
 
 function TopicsTab({topics, setQuery, activeQuery, newItemsByTopic, removeNewItems}) {
@@ -221,6 +157,7 @@ SearchSidebar.propTypes = {
     activeService: PropTypes.object,
     activeFilter: PropTypes.object,
     newItemsByTopic: PropTypes.object,
+    createdFilter: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -231,6 +168,7 @@ const mapStateToProps = (state) => ({
     activeFilter: state.wire.activeFilter,
     aggregations: state.aggregations,
     newItemsByTopic: state.newItemsByTopic,
+    createdFilter: state.wire.createdFilter,
 });
 
 export default connect(mapStateToProps)(SearchSidebar);
