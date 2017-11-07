@@ -23,10 +23,18 @@ function Preview({item, actions}) {
             <div id='preview-article' className='wire-column__preview__content'>
                 <span className='wire-column__preview__slug'>{item.slugline}</span>
                 <h2 className='wire-column__preview__headline'>{item.headline}</h2>
-                <p className='wire-column__preview__author'>{gettext('By')}{' '}
-                    <span className='bold'>{item.byline}</span>{' '}
-                    <span>{gettext('in {{ located}}', {located: item.located})}</span>
-                </p>
+                {(item.byline || item.located) && (
+                    <p className='wire-column__preview__author'>
+                        {item.byline && (
+                            <span>{gettext('By')}{' '}
+                                <b>{item.byline}</b>{' '}
+                            </span>
+                        )}
+                        {item.located && (
+                            <span>{gettext('in {{ located}}', {located: item.located})}</span>
+                        )}
+                    </p>
+                )}
                 {getPreviewRendition(picture) && (
                     <figure className='wire-column__preview__image'>
                         <img src={getPreviewRendition(picture).href} />
