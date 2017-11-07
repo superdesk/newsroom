@@ -4,3 +4,28 @@ $enable-shadows:true;
   padding: 0.345rem 1rem;
   @include form-control-focus();
 }
+
+// Custom checkbox style
+.custom-control-indicator {
+  border-width: 1px;
+  border-style: solid;
+  border-color: $gray-600;
+}
+.custom-control-description {
+  line-height: 1.6rem;
+}
+.custom-control-input:checked ~ .custom-control-indicator {
+  border-color: $blue;
+}
+// UI dark
+.custom-control {
+  &.ui-dark {
+    .custom-control-description {
+      color: $gray-500;
+      font-weight: 300;
+    }
+    .custom-control-input:checked ~ .custom-control-description {
+      color: $gray-200;
+    }
+  }
+}
