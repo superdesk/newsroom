@@ -50,6 +50,7 @@ CORE_APPS = [
     'newsroom.wire',
     'newsroom.topics',
     'newsroom.upload',
+    'newsroom.history',
 ]
 
 SITE_NAME = 'AAP Newsroom'

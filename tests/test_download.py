@@ -3,11 +3,16 @@ import io
 import lxml
 import zipfile
 
+from datetime import timedelta
+from superdesk.utc import utcnow
+
 from .fixtures import items, init_items, init_auth  # noqa
+
+items_ids = [item['_id'] for item in items[:2]]
 
 
 def download_file(client, _format):
-    resp = client.get('/download/%s?format=%s' % (','.join([item['_id'] for item in items[:2]]), _format))
+    resp = client.get('/download/%s?format=%s' % (','.join(items_ids), _format))
     assert resp.status_code == 200
     assert resp.mimetype == 'application/zip'
     _file = io.BytesIO(resp.get_data())
@@ -55,10 +60,18 @@ formats = [
 ]
 
 
-def test_item_download(client):
+def test_item_download(client, app):
     for _format in formats:
         _file = download_file(client, _format['format'])
         with zipfile.ZipFile(_file) as zf:
             assert _format['filename'] in zf.namelist()
             content = zf.open(_format['filename']).read()
             _format['test_content'](content)
+    history = app.data.find('history', None, None)
+    assert len(formats) * len(items_ids) == history.count()
+    assert 'download' == history[0]['action']
+    assert history[0].get('user')
+    assert history[0].get('created') + timedelta(seconds=2) >= utcnow()
+    assert history[0].get('item') in items_ids
+    assert history[0].get('version')
+    assert history[0].get('company') is None
