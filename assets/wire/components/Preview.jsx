@@ -9,60 +9,71 @@ import PreviewTags from './PreviewTags';
 import PreviewMeta from './PreviewMeta';
 
 
-function Preview({item, actions}) {
-    const picture = getPicture(item);
-    const previousVersions = 'preview_versions';
-    return (
-        <div className='wire-column__preview__items'>
+class Preview extends React.PureComponent {
+    constructor(props) {
+        super(props);
+    }
 
-            <div className='wire-column__preview__top-bar'>
-                <span className='wire-column__preview__date'>{gettext('Created')}<br />{fullDate(item.versioncreated)}</span>
-                <PreviewActionButtons item={item} actions={actions} />
+    componentDidUpdate() {
+        this.preview.scrollTop = 0; // reset scroll on change
+    }
+
+    render() {
+        const {item, actions} = this.props;
+        const picture = getPicture(item);
+        const previousVersions = 'preview_versions';
+        return (
+            <div className='wire-column__preview__items'>
+
+                <div className='wire-column__preview__top-bar'>
+                    <span className='wire-column__preview__date'>{gettext('Created')}<br />{fullDate(item.versioncreated)}</span>
+                    <PreviewActionButtons item={item} actions={actions} />
+                </div>
+
+                <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
+                    <span className='wire-column__preview__slug'>{item.slugline}</span>
+                    <h2 className='wire-column__preview__headline'>{item.headline}</h2>
+                    {(item.byline || item.located) && (
+                        <p className='wire-column__preview__author'>
+                            {item.byline && (
+                                <span>{gettext('By')}{' '}
+                                    <b>{item.byline}</b>{' '}
+                                </span>
+                            )}
+                            {item.located && (
+                                <span>{gettext('in {{ located}}', {located: item.located})}</span>
+                            )}
+                        </p>
+                    )}
+                    {getPreviewRendition(picture) && (
+                        <figure className='wire-column__preview__image'>
+                            <img src={getPreviewRendition(picture).href} />
+                            <figcaption className='wire-column__preview__caption'>{getCaption(picture)}</figcaption>
+                        </figure>
+                    )}
+
+                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions}/>
+                    {item.description_text &&
+                            <p className='wire-column__preview__lead'>{item.description_text}</p>
+                    }
+                    {item.body_html &&
+                            <div className='wire-column__preview__text' id='preview-body' dangerouslySetInnerHTML={({__html: formatHTML(item.body_html)})} />
+                    }
+
+                    <PreviewTags item={item} isItemDetail={false} />
+
+                    {showItemVersions(item) &&
+                        <ListItemPreviousVersions
+                            item={item}
+                            isPreview={true}
+                            inputId={previousVersions}
+                        />
+                    }
+
+                </div>
             </div>
-
-            <div id='preview-article' className='wire-column__preview__content'>
-                <span className='wire-column__preview__slug'>{item.slugline}</span>
-                <h2 className='wire-column__preview__headline'>{item.headline}</h2>
-                {(item.byline || item.located) && (
-                    <p className='wire-column__preview__author'>
-                        {item.byline && (
-                            <span>{gettext('By')}{' '}
-                                <b>{item.byline}</b>{' '}
-                            </span>
-                        )}
-                        {item.located && (
-                            <span>{gettext('in {{ located}}', {located: item.located})}</span>
-                        )}
-                    </p>
-                )}
-                {getPreviewRendition(picture) && (
-                    <figure className='wire-column__preview__image'>
-                        <img src={getPreviewRendition(picture).href} />
-                        <figcaption className='wire-column__preview__caption'>{getCaption(picture)}</figcaption>
-                    </figure>
-                )}
-
-                <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions}/>
-                {item.description_text &&
-                        <p className='wire-column__preview__lead'>{item.description_text}</p>
-                }
-                {item.body_html &&
-                        <div className='wire-column__preview__text' id='preview-body' dangerouslySetInnerHTML={({__html: formatHTML(item.body_html)})} />
-                }
-
-                <PreviewTags item={item} isItemDetail={false} />
-
-                {showItemVersions(item) &&
-                    <ListItemPreviousVersions
-                        item={item}
-                        isPreview={true}
-                        inputId={previousVersions}
-                    />
-                }
-
-            </div>
-        </div>
-    );
+        );
+    }
 }
 
 Preview.propTypes = {
