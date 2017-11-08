@@ -6,7 +6,9 @@ import {
     QUERY_ITEMS,
     RECIEVE_ITEMS,
     RECIEVE_ITEM,
-    REMOVE_NEW_ITEMS,
+    REMOVE_NEW_ITEMS_BY_TOPIC,
+    CLEAR_ALL_NEW_ITEMS,
+    CLEAR_NEW_ITEM,
     SET_STATE,
     SET_ACTIVE,
     RENDER_MODAL,
@@ -283,8 +285,8 @@ export default function wireReducer(state = initialState, action) {
     }
 
 
-    case REMOVE_NEW_ITEMS: {
-        const newItemsByTopic = state.newItemsByTopic || {};
+    case REMOVE_NEW_ITEMS_BY_TOPIC: {
+        const newItemsByTopic = Object.assign({}, state.newItemsByTopic);
         let newItems = state.newItems || [];
 
         if (state.newItemsByTopic[action.data]) {
@@ -300,6 +302,32 @@ export default function wireReducer(state = initialState, action) {
             ...state,
             newItems,
             newItemsByTopic
+        };
+    }
+
+
+    case CLEAR_ALL_NEW_ITEMS:
+        return {
+            ...state,
+            newItems:[],
+            newItemsByTopic:{}
+        };
+
+
+    case CLEAR_NEW_ITEM: {
+
+        const newItems = state.newItems.filter((newItem) => newItem._id !== action.id);
+
+        const newItemsByTopic = Object.assign({}, state.newItemsByTopic);
+
+        for (const key in newItemsByTopic) {
+            newItemsByTopic[key] = newItemsByTopic[key].filter((newItem) => newItem._id !== action.id);
+        }
+
+        return {
+            ...state,
+            newItems,
+            newItemsByTopic,
         };
     }
 

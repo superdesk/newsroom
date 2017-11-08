@@ -66,7 +66,7 @@ class SearchSidebar extends React.Component {
                             setQuery={this.props.setQuery}
                             activeQuery={this.props.activeQuery}
                             newItemsByTopic={this.props.newItemsByTopic}
-                            removeNewItems={this.props.removeNewItems}
+                            removeNewItemsByTopic={this.props.removeNewItemsByTopic}
                         />
                     </div>
                 </div>
@@ -116,10 +116,10 @@ NavigationTab.propTypes = {
     toggleService: PropTypes.func.isRequired,
 };
 
-function TopicsTab({topics, setQuery, activeQuery, newItemsByTopic, removeNewItems}) {
+function TopicsTab({topics, setQuery, activeQuery, newItemsByTopic, removeNewItemsByTopic}) {
     const query = (e, topic) => {
         e.preventDefault();
-        removeNewItems(topic._id);
+        removeNewItemsByTopic(topic._id);
         setQuery(topic.query);
     };
     return topics.map((topic) => (
@@ -129,7 +129,8 @@ function TopicsTab({topics, setQuery, activeQuery, newItemsByTopic, removeNewIte
             })}
             onClick={(e) => query(e, topic)}>
             {topic.label}
-            {newItemsByTopic && newItemsByTopic[topic._id] && <span className='wire-button__notif'>
+            {newItemsByTopic && newItemsByTopic[topic._id] && newItemsByTopic[topic._id].length > 0 &&
+            <span className='wire-button__notif'>
                 {newItemsByTopic[topic._id].length}
             </span>}
         </a>
@@ -140,7 +141,7 @@ TopicsTab.propTypes = {
     topics: PropTypes.array.isRequired,
     setQuery: PropTypes.func.isRequired,
     activeQuery: PropTypes.string,
-    removeNewItems: PropTypes.func,
+    removeNewItemsByTopic: PropTypes.func,
     newItemsByTopic: PropTypes.object,
 };
 
@@ -148,7 +149,7 @@ SearchSidebar.propTypes = {
     activeQuery: PropTypes.string,
     topics: PropTypes.array.isRequired,
     setQuery: PropTypes.func.isRequired,
-    removeNewItems: PropTypes.func,
+    removeNewItemsByTopic: PropTypes.func,
     bookmarkedItems: PropTypes.array.isRequired,
     itemsById: PropTypes.object.isRequired,
     services: PropTypes.array.isRequired,

@@ -14,7 +14,9 @@ import {
     bookmarkItems,
     removeBookmarks,
     downloadItems,
-    removeNewItems,
+    removeNewItemsByTopic,
+    clearAllNewItems,
+    clearNewItem,
     openItem,
     fetchMoreItems,
 } from 'wire/actions';
@@ -81,7 +83,11 @@ class WireApp extends React.Component {
                 actions={this.props.actions.filter(previewActionFilter)}
                 onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
             />, modal,
-            <NotificationList key="notificationList" newItems={this.props.newItems}/>] : [
+            <NotificationList
+                key="notificationList"
+                newItems={this.props.newItems}
+                clearAll={this.props.clearAllNewItems}
+                clearNewItem={this.props.clearNewItem}/>] : [
                 <section key="contentHeader" className='content-header'>
                     {this.props.selectedItems && this.props.selectedItems.length > 0 &&
                         <SelectedItemsBar
@@ -127,7 +133,7 @@ class WireApp extends React.Component {
                                 topics={this.props.topics}
                                 setQuery={this.props.setQuery}
                                 activeQuery={this.props.activeQuery}
-                                removeNewItems={this.props.removeNewItems}
+                                removeNewItemsByTopic={this.props.removeNewItemsByTopic}
                             />
                             }
 
@@ -158,7 +164,11 @@ class WireApp extends React.Component {
                         </div>
                     </div>
                     {modal}
-                    <NotificationList newItems={this.props.newItems}/>
+                    <NotificationList
+                        newItems={this.props.newItems}
+                        clearAll={this.props.clearAllNewItems}
+                        clearNewItem={this.props.clearNewItem}
+                    />
                 </section>])
         );
     }
@@ -186,7 +196,9 @@ WireApp.propTypes = {
     selectNone: PropTypes.func,
     bookmarks: PropTypes.bool,
     newItems: PropTypes.array,
-    removeNewItems: PropTypes.func,
+    removeNewItemsByTopic: PropTypes.func,
+    clearAllNewItems: PropTypes.func,
+    clearNewItem: PropTypes.func,
     fetchMoreItems: PropTypes.func,
 };
 
@@ -214,7 +226,9 @@ const mapDispatchToProps = (dispatch) => ({
     },
     selectAll: () => dispatch(selectAll()),
     selectNone: () => dispatch(selectNone()),
-    removeNewItems: (topicId) => dispatch(removeNewItems(topicId)),
+    removeNewItemsByTopic: (topicId) => dispatch(removeNewItemsByTopic(topicId)),
+    clearAllNewItems: () => dispatch(clearAllNewItems()),
+    clearNewItem: (id) => dispatch(clearNewItem(id)),
     actions: [
         {
             id: 'open',
