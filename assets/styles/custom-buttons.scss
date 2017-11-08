@@ -30,6 +30,8 @@
     &:disabled {
       color: $color;
       background-color: transparent;
+      opacity: .4;
+      cursor: not-allowed;
     }
   
     &:not([disabled]):not(.disabled):active,
