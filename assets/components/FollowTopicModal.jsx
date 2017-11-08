@@ -20,6 +20,7 @@ class FollowTopicModal extends React.Component {
         };
 
         this.onSubmit = this.onSubmit.bind(this);
+        this.onChangeHandler = this.onChangeHandler.bind(this);
     }
 
     onSubmit(event) {
@@ -31,7 +32,7 @@ class FollowTopicModal extends React.Component {
 
     onChangeHandler(field) {
         return (event) => {
-            const topic = Object.assign(this.state.topic, {[field]: event.target.value});
+            const topic = Object.assign({}, this.state.topic, {[field]: event.target.value});
             this.setState({topic});
         };
     }
@@ -57,12 +58,6 @@ class FollowTopicModal extends React.Component {
                         value={this.state.topic.label}
                         onChange={this.onChangeHandler('label')}
                         maxLength={TOPIC_NAME_MAXLENGTH}
-                    />
-                    <TextInput
-                        label={gettext('Query')}
-                        value={this.state.topic.query}
-                        onChange={this.onChangeHandler('query')}
-                        readOnly={this.isNewTopic()}
                     />
                     <CheckboxInput
                         label={gettext('Send me notifications')}

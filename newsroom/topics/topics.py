@@ -9,7 +9,9 @@ class TopicsResource(newsroom.Resource):
     item_methods = ['GET', 'PATCH', 'DELETE']
     schema = {
         'label': {'type': 'string', 'required': True},
-        'query': {'type': 'string', 'required': True},
+        'query': {'type': 'string', 'nullable': True},
+        'filter': {'type': 'dict', 'nullable': True},
+        'created': {'type': 'dict', 'nullable': True},
         'notifications': {'type': 'boolean', 'default': False},
         'user': {'type': 'objectid'},
     }

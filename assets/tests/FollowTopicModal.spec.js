@@ -27,29 +27,9 @@ describe('FollowTopicModal', () => {
         }
     };
 
-    const oldTopic = {
-        data: {
-            topic: {
-                _id: 1,
-                label: 'test-label',
-                query: 'foo',
-                notifications: true,
-            }
-        }
-    };
-
-    it('renders query readonly if topic is new', () => {
+    it('renders form for new topic', () => {
         const { wrapper } = setup(newTopic);
-        expect(wrapper.find('label').length).toBe(3);
-        expect(wrapper.find('input').length).toBe(3);
-        const input = wrapper.find('input').get(1);
-        expect(input.props.readOnly).toBe(true);
+        expect(wrapper.find('label').length).toBe(2);
+        expect(wrapper.find('input').length).toBe(2);
     });
-
-    it('renders query editable if existing topic', () => {
-        const { wrapper } = setup(oldTopic);
-        const input = wrapper.find('input').get(1);
-        expect(input.props.readOnly).toBe(false);
-    });
-
 });

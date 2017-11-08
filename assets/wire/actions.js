@@ -162,7 +162,7 @@ export function fetchItem(id) {
  * @param {String} topic
  */
 export function followTopic(topic) {
-    return renderModal('followTopic', {topic: {query: topic}});
+    return renderModal('followTopic', {topic});
 }
 
 export function submitFollowTopic(data) {
@@ -391,18 +391,41 @@ export function initParams(params) {
     };
 }
 
+function _setCreatedFilter(filter) {
+    return {type: SET_CREATED_FILTER, filter};
+}
+
 export const SET_CREATED_FILTER = 'SET_CREATED_FILTER';
 export function setCreatedFilter(filter) {
     return (dispatch) => {
-        dispatch({type: SET_CREATED_FILTER, filter});
+        dispatch(_setCreatedFilter(filter));
         dispatch(fetchItems());
     };
 }
 
+function _resetFilter(filter) {
+    return {type: RESET_FILTER, filter};
+}
+
 export const RESET_FILTER = 'RESET_FILTER';
-export function resetFilter() {
+export function resetFilter(filter) {
     return (dispatch) => {
-        dispatch({type: RESET_FILTER});
+        dispatch(_resetFilter(filter));
         dispatch(fetchItems());
+    };
+}
+
+/**
+ * Set query for given topic
+ *
+ * @param {Object} topic
+ * @return {Promise}
+ */
+export function setTopicQuery(topic) {
+    return (dispatch) => {
+        dispatch(setQuery(topic.query || ''));
+        dispatch(_resetFilter(topic.filter));
+        dispatch(_setCreatedFilter(topic.created));
+        return dispatch(fetchItems());
     };
 }
