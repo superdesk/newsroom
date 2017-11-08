@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 function NavGroup({label, children}) {
     return (
         <div className='wire-column__nav__group'>
-            <h5>{label}</h5>
+            <h6>{label}</h6>
             {children}
         </div>
     );

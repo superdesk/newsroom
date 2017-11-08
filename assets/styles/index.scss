@@ -610,8 +610,7 @@ article.list {
 }
 
 .wire-column__nav--open, .wire-column__preview--open {
-    //width: 25%;
-    flex-shrink: 1;
+    flex-shrink: 0;
 }
 
 .wire-column__nav--open {
@@ -718,6 +717,7 @@ article.list {
 
 .wire-column__nav__group {
     color: #fff;
+    margin-bottom: 20px;
 }
 
 .wire-button__notif {
