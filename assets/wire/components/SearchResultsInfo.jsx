@@ -8,7 +8,7 @@ import './SearchResultsInfo.scss';
 function SearchResultsInfo({user, query, totalItems, followTopic, topics, bookmarks}) {
     const isFollowing = user && topics.find((topic) => topic.query === query);
     return (
-        <div className="navbar">
+        <div className="navbar mt-3 p-0">
             <div className="navbar-text search-results-info">
                 <span className="search-results-info__num">{totalItems}</span>
                 {gettext('search results for:')}<br />
