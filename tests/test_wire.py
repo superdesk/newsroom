@@ -1,6 +1,7 @@
 
 from flask import json
 from bson import ObjectId
+from datetime import datetime, timedelta
 
 from .fixtures import items, init_items, init_auth  # noqa
 
@@ -141,8 +142,23 @@ def test_search_created_from(client):
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
+    resp = client.get('/search?created_from=now/w')
+    data = json.loads(resp.get_data())
+    assert 1 <= len(data['_items'])
+
+    resp = client.get('/search?created_from=now/M')
+    data = json.loads(resp.get_data())
+    assert 1 <= len(data['_items'])
+
 
 def test_search_created_to(client):
-    resp = client.get('/search?created_to=now-1d/d')
+    resp = client.get('/search?created_to=%s' % datetime.now().strftime('%Y-%m-%d'))
     data = json.loads(resp.get_data())
-    assert 1 == len(data['_items'])
+    assert 2 == len(data['_items'])
+
+    resp = client.get('/search?created_to=%s&timezone_offset=%s' % (
+        (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d'),
+        -120
+    ))
+    data = json.loads(resp.get_data())
+    assert 0 == len(data['_items'])

@@ -6,6 +6,7 @@ import fetchMock from 'fetch-mock';
 
 import wireApp from '../reducers';
 import * as actions from '../actions';
+import { now } from 'utils';
 
 describe('wire actions', () => {
     let store;
@@ -15,6 +16,7 @@ describe('wire actions', () => {
     };
 
     beforeEach(() => {
+        now.getTimezoneOffset = () => ''; // it doesn't work with jasmine.createSpy :/
         fetchMock.get('/search?', response);
         fetchMock.get('/search?q=foo', response);
         store = createStore(wireApp, applyMiddleware(thunk));
@@ -22,6 +24,10 @@ describe('wire actions', () => {
 
     afterEach(() => {
         fetchMock.restore();
+    });
+
+    it('test now.getTimezoneOffset mock', () => {
+        expect(now.getTimezoneOffset()).toBe('');
     });
 
     it('can fetch items', () => {

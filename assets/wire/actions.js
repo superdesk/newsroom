@@ -2,7 +2,7 @@
 import { get, isEmpty, pickBy } from 'lodash';
 
 import server from 'server';
-import { gettext, notify, updateRouteParams } from 'utils';
+import { gettext, notify, updateRouteParams, now } from 'utils';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -118,6 +118,7 @@ function search(state, next) {
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to: createdFilter.to,
+        timezone_offset: now.getTimezoneOffset(),
     };
 
     const queryString = Object.keys(params)

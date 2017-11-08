@@ -199,3 +199,8 @@ const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
 export function formatHTML(html) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
+
+/**
+ * To enable some mocking in tests
+ */
+export const now = new Date();
