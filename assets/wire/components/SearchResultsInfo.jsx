@@ -17,7 +17,7 @@ function SearchResultsInfo({user, query, totalItems, followTopic, topics, bookma
                 {query && (
                     <span>
                         {gettext('search results for:')}<br />
-                        <b>{'"'}{query}{'"'}</b>
+                        <b>{query}</b>
                     </span>
                 )}
             </div>
