@@ -16,7 +16,7 @@ function UserProfileMenu({isProfile, isFollowedTopics, isDownloadHistory, onClic
                 <a className={`side-navigation__btn ${isFollowedTopics?'active':null}`}
                     href='#'
                     name='topics'
-                    onClick={onClick}>{gettext('Followed Topics')}</a>
+                    onClick={onClick}>{gettext('My Topics')}</a>
             </li>
             <li>
                 <a className={`side-navigation__btn ${isDownloadHistory?'active':null}`}

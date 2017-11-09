@@ -50,7 +50,7 @@ class FollowTopicModal extends React.Component {
         return (
             <Modal onClose={this.props.closeModal}>
                 <CloseButton onClick={this.props.closeModal} />
-                <h1>{gettext('Follow topic')}</h1>
+                <h1>{gettext('Save as topic')}</h1>
                 <form onSubmit={this.onSubmit}>
                     <TextInput
                         label={gettext('Name')}
