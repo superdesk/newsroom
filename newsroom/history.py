@@ -18,6 +18,11 @@ class HistoryResource(newsroom.Resource):
         'version': {'type': 'string'},
     }
 
+    mongo_indexes = {
+        'item': ([('item', 1)], ),
+        'company_user': ([('company', 1), ('user', 1)], ),
+    }
+
 
 class HistoryService(newsroom.Service):
     def create(self, docs, action, **kwargs):
