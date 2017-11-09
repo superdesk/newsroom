@@ -73,7 +73,7 @@
                             <span class="wire-column__preview__tags__headline">{{ _('Category') }}</span>
                             {% for subj in item.subject %}
                             <a class="wire-column__preview__tag"
-                                href="{{ url_for('wire.index') }}?q=subject.code:{{ subj.code }}"
+                                href='{{ url_for('wire.index') }}?q=subject.name:"{{ subj.name }}"'
                             >{{ subj.name }}</a>
                             {% endfor %}
                         </div>
@@ -83,7 +83,7 @@
                             <span class="wire-column__preview__tags__headline">{{ _('Genre') }}</span>
                             {% for genre in item.genre %}
                             <a class="wire-column__preview__tag"
-                                href="{{ url_for('wire.index') }}?q=genre.code:{{ genre.code }}"
+                                href='{{ url_for('wire.index') }}?q=genre.name:"{{ genre.name }}"'
                             >{{ genre.name }}</a>
                             {% endfor %}
                         </div>

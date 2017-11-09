@@ -6,14 +6,14 @@ function formatCV(items, field) {
     return items && items.map((item) => (
         <a key={item.code}
             className='wire-column__preview__tag'
-            href={`/?q=${field}:${item.code}`}
+            href={`/?q=${field}:"${item.name}"`}
         >{item.name}</a>
     ));
 }
 
 function PreviewTags({item, isItemDetail}) {
-    const genres = item.genre && formatCV(item.genre, 'genre.code');
-    const subjects = item.subject && formatCV(item.subject, 'subject.code');
+    const genres = item.genre && formatCV(item.genre, 'genre.name');
+    const subjects = item.subject && formatCV(item.subject, 'subject.name');
 
     return (
         <div className='wire-column__preview__tags'>
