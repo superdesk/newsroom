@@ -16,12 +16,12 @@ class SelectedItemsBar extends React.Component {
 
     render() {
         const actions = this.props.actions.map((action) => (
-            <a className='multi-action-bar__icon' href='#'
+            <button className='icon-button'
                 key={action.name}
                 onClick={(e) => this.onAction(e, action)}
             >
                 <i className={`icon--${action.icon}`}></i>
-            </a>
+            </button>
         ));
         return (
             <div className='multi-action-bar multi-action-bar--open'>

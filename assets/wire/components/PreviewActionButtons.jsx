@@ -6,11 +6,11 @@ function PreviewActionButtons({item, actions}) {
     const actionButtons = actions.map((action) => {
         const payload = action.multi ? [item._id] : item;
         return (
-            <span className='icon-button'
+            <button className='icon-button'
                 key={action.name}
                 onClick={() => action.action(payload)}>
                 <i className={`icon--${action.icon}`}></i>
-            </span>
+            </button>
         );
     });
 
