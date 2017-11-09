@@ -72,8 +72,8 @@ class FiltersTab extends React.Component {
 
             let visibleBuckets = buckets;
             if (buckets.length > LIMIT && !group.isOpen) {
-                visibleBuckets = buckets.slice(0, LIMIT).concat([
-                    <NavLink key={'more'} isActive={false} onClick={(event) => this.toggleGroup(event, group)} label={'...'} />
+                visibleBuckets = buckets.slice(0, LIMIT).concat([                    
+                    <a key={'more'} isActive={false} onClick={(event) => this.toggleGroup(event, group)} className="small" href="">{gettext('Show all')}</a>
                 ]);
             }
 
