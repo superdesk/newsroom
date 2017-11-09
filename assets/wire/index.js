@@ -2,7 +2,7 @@ import { createStore, render } from 'utils';
 
 import wireReducer from './reducers';
 import WireApp from './components/WireApp';
-import { fetchItems, setState, initData, initParams, pushNotification } from './actions';
+import { fetchItems, setState, initData, initParams, pushNotification, setView } from './actions';
 
 const store = createStore(wireReducer);
 
@@ -13,6 +13,11 @@ if (window.wireData) {
 // init query
 const params = new URLSearchParams(window.location.search);
 store.dispatch(initParams(params));
+
+// init view
+if (localStorage.getItem('view')) {
+    store.dispatch(setView(localStorage.getItem('view')));
+}
 
 // handle history
 window.onpopstate = function(event) {

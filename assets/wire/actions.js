@@ -429,3 +429,9 @@ export function setTopicQuery(topic) {
         return dispatch(fetchItems());
     };
 }
+
+export const SET_VIEW = 'SET_VIEW';
+export function setView(view) {
+    localStorage.setItem('view', view);
+    return {type: SET_VIEW, view};
+}

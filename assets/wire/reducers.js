@@ -25,10 +25,12 @@ import {
     RECIEVE_NEXT_ITEMS,
     SET_CREATED_FILTER,
     RESET_FILTER,
+    SET_VIEW,
 } from './actions';
 
 import { toggleValue } from 'utils';
 import { get } from 'lodash';
+import { EXTENDED_VIEW } from './defaults';
 
 const initialState = {
     items: [],
@@ -53,6 +55,7 @@ const initialState = {
         activeService: {},
         activeFilter: {},
         createdFilter: {},
+        activeView: EXTENDED_VIEW,
     },
 };
 
@@ -114,6 +117,12 @@ function _wireReducer(state, action) {
             ...state,
             activeFilter: Object.assign({}, action.filter),
             createdFilter: {},
+        };
+
+    case SET_VIEW:
+        return {
+            ...state,
+            activeView: action.view,
         };
 
     default:
@@ -307,6 +316,7 @@ export default function wireReducer(state = initialState, action) {
     case TOGGLE_FILTER:
     case SET_CREATED_FILTER:
     case RESET_FILTER:
+    case SET_VIEW:
         return {...state, wire: _wireReducer(state.wire, action)};
 
     case START_LOADING:
