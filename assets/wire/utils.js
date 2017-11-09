@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, isEmpty, isEqual, pickBy } from 'lodash';
 import { getTextFromHtml } from 'utils';
 
 const STATUS_KILLED = 'canceled';
@@ -87,4 +87,18 @@ export function shortText(item, length=40) {
  */
 export function getCaption(picture) {
     return picture.body_text || picture.description_text;
+}
+
+export function getActiveQuery(query, activeFilter, createdFilter) {
+    const queryParams = {
+        query: query || null,
+        filter: pickBy(activeFilter),
+        created: pickBy(createdFilter),
+    };
+
+    return pickBy(queryParams, (val) => !isEmpty(val));
+}
+
+export function isTopicActive(topic, activeQuery) {
+    return !isEmpty(activeQuery) && Object.keys(activeQuery).every((key) => isEqual(topic[key], activeQuery[key]));
 }

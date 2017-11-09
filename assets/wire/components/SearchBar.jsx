@@ -31,6 +31,10 @@ class SearchBar extends React.Component {
         this.setState({query: ''});
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.setState({query: nextProps.query});
+    }
+
     render() {
         return (
             <div className="search form-inline">

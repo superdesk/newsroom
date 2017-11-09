@@ -1,26 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { isEmpty } from 'lodash';
 import { gettext } from 'utils';
+import { getActiveQuery, isTopicActive } from 'wire/utils';
 
 import './SearchResultsInfo.scss';
 
-function SearchResultsInfo({user, query, totalItems, followTopic, topics, bookmarks}) {
-    const isFollowing = user && topics.find((topic) => topic.query === query);
+function SearchResultsInfo({user, query, totalItems, followTopic, topics, bookmarks, activeFilter, createdFilter}) {
+    const activeQuery = getActiveQuery(query, activeFilter, createdFilter);
+    const isFollowing = user && topics.find((topic) => isTopicActive(topic, activeQuery));
     return (
         <div className="navbar mt-3 p-0">
             <div className="navbar-text search-results-info">
                 <span className="search-results-info__num">{totalItems}</span>
-                {gettext('search results for:')}<br />
-                <b>{'"'}{query}{'"'}</b>
+                {query && (
+                    <span>
+                        {gettext('search results for:')}<br />
+                        <b>{'"'}{query}{'"'}</b>
+                    </span>
+                )}
             </div>
-            {user && !bookmarks &&
-            <button
-                disabled={isFollowing}
-                className="btn btn-outline-primary"
-                onClick={() => followTopic(query)}
-            >{gettext('Follow Topic')}</button>
-            }
+            {user && !bookmarks && !isEmpty(activeQuery) && (
+                <button
+                    disabled={isFollowing}
+                    className="btn btn-outline-primary"
+                    onClick={() => followTopic(activeQuery)}
+                >{gettext('Follow Topic')}</button>
+            )}
         </div>
     );
 }
@@ -32,6 +39,8 @@ SearchResultsInfo.propTypes = {
     totalItems: PropTypes.number,
     followTopic: PropTypes.func,
     bookmarks: PropTypes.bool,
+    activeFilter: PropTypes.object,
+    createdFilter: PropTypes.object,
 };
 
 export default SearchResultsInfo;

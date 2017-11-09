@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
+import { get } from 'lodash';
 
 import {
     followTopic,
@@ -14,7 +15,6 @@ import {
     bookmarkItems,
     removeBookmarks,
     downloadItems,
-    removeNewItems,
     openItem,
     fetchMoreItems,
 } from 'wire/actions';
@@ -127,13 +127,12 @@ class WireApp extends React.Component {
                                 topics={this.props.topics}
                                 setQuery={this.props.setQuery}
                                 activeQuery={this.props.activeQuery}
-                                removeNewItems={this.props.removeNewItems}
                             />
                             }
 
                         </div>
                         <div className='wire-column__main container-fluid' onScroll={this.onListScroll}>
-                            {this.props.activeQuery && !this.props.selectedItems.length &&
+                            {!this.props.selectedItems.length &&
                                 <SearchResultsInfo
                                     user={this.props.user}
                                     query={this.props.activeQuery}
@@ -141,6 +140,8 @@ class WireApp extends React.Component {
                                     totalItems={this.props.totalItems}
                                     followTopic={this.props.followTopic}
                                     topics={this.props.topics}
+                                    activeFilter={this.props.activeFilter}
+                                    createdFilter={this.props.createdFilter}
                                 />
                             }
 
@@ -168,6 +169,8 @@ WireApp.propTypes = {
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
     activeQuery: PropTypes.string,
+    activeFilter: PropTypes.object,
+    createdFilter: PropTypes.object,
     itemToPreview: PropTypes.object,
     itemToOpen: PropTypes.object,
     followTopic: PropTypes.func,
@@ -186,7 +189,6 @@ WireApp.propTypes = {
     selectNone: PropTypes.func,
     bookmarks: PropTypes.bool,
     newItems: PropTypes.array,
-    removeNewItems: PropTypes.func,
     fetchMoreItems: PropTypes.func,
 };
 
@@ -194,6 +196,8 @@ const mapStateToProps = (state) => ({
     isLoading: state.isLoading,
     totalItems: state.totalItems,
     activeQuery: state.activeQuery,
+    activeFilter: get(state, 'wire.activeFilter'),
+    createdFilter: get(state, 'wire.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.openItem : null,
     modal: state.modal,
@@ -206,7 +210,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    followTopic: (topic) => dispatch(followTopic(topic)),
+    followTopic: (query) => dispatch(followTopic(query)),
     fetchItems: () => dispatch(fetchItems()),
     setQuery: (query) => {
         dispatch(setQuery(query));
@@ -214,7 +218,6 @@ const mapDispatchToProps = (dispatch) => ({
     },
     selectAll: () => dispatch(selectAll()),
     selectNone: () => dispatch(selectNone()),
-    removeNewItems: (topicId) => dispatch(removeNewItems(topicId)),
     actions: [
         {
             id: 'open',

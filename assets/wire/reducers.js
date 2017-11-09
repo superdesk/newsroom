@@ -112,7 +112,7 @@ function _wireReducer(state, action) {
     case RESET_FILTER:
         return {
             ...state,
-            activeFilter: {},
+            activeFilter: Object.assign({}, action.filter),
             createdFilter: {},
         };
 
