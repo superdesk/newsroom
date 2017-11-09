@@ -26,7 +26,7 @@ function SearchResultsInfo({user, query, totalItems, followTopic, topics, bookma
                     disabled={isFollowing}
                     className="btn btn-outline-primary"
                     onClick={() => followTopic(activeQuery)}
-                >{gettext('Follow Topic')}</button>
+                >{gettext('Save as topic')}</button>
             )}
         </div>
     );
