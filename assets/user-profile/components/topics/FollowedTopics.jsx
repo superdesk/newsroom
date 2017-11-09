@@ -11,11 +11,11 @@ class FollowedTopics extends React.Component {
 
     getActionButtons(topic) {
         return this.props.actions.map((action) => (
-            <span className='icon-button'
+            <button className='icon-button'
                 key={action.name}
                 onClick={() => action.action(topic)}>
                 <i className={`icon--${action.icon}`}></i>
-            </span>)
+            </button>)
         );
     }
 
