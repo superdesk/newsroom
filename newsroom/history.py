@@ -1,5 +1,7 @@
 
 import newsroom
+import pymongo.errors
+import werkzeug.exceptions
 
 from newsroom.auth import get_user
 from superdesk.utc import utcnow
@@ -10,6 +12,7 @@ class HistoryResource(newsroom.Resource):
     resource_methods = ['GET']
 
     schema = {
+        '_id': {type: 'string', 'unique': True},
         'action': {type: 'string'},
         'created': {'type': 'datetime'},
         'user': newsroom.Resource.rel('users'),
@@ -31,6 +34,7 @@ class HistoryService(newsroom.Service):
 
         def transform(item):
             return {
+                '_id': '_'.join(map(str, [user['_id'], item['_id'], action])),
                 'action': action,
                 'created': now,
                 'user': user,
@@ -39,7 +43,11 @@ class HistoryService(newsroom.Service):
                 'version': item['version'],
             }
 
-        return super().create(list(map(transform, docs)))
+        for doc in docs:
+            try:
+                super().create([transform(doc)])
+            except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
+                continue
 
 
 def init_app(app):
