@@ -82,7 +82,9 @@ def download(_ids):
                 formatter.format_item(item)
             )
     _file.seek(0)
-    app.data.insert('history', items, action='download')
+    user = get_user(required=False)
+    if user:
+        app.data.insert('history', items, action='download', user=user)
     return flask.send_file(_file, attachment_filename='newsroom.zip', as_attachment=True)
 
 

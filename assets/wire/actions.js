@@ -312,7 +312,7 @@ export function removeNewItems(data) {
 export function pushNotification(push) {
     return (dispatch) => {
         switch (push.event) {
-        case 'update':
+        case 'topic_matches':
             return dispatch(setNewItems(push.extra));
         }
     };

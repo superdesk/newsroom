@@ -3,8 +3,8 @@ import newsroom
 import pymongo.errors
 import werkzeug.exceptions
 
-from newsroom.auth import get_user
 from superdesk.utc import utcnow
+from newsroom.utils import query_resource
 
 
 class HistoryResource(newsroom.Resource):
@@ -28,16 +28,15 @@ class HistoryResource(newsroom.Resource):
 
 
 class HistoryService(newsroom.Service):
-    def create(self, docs, action, **kwargs):
+    def create(self, docs, action, user, **kwargs):
         now = utcnow()
-        user = get_user()
 
         def transform(item):
             return {
                 '_id': '_'.join(map(str, [user['_id'], item['_id'], action])),
                 'action': action,
                 'created': now,
-                'user': user,
+                'user': user['_id'],
                 'company': user.get('company'),
                 'item': item['_id'],
                 'version': item['version'],
@@ -48,6 +47,20 @@ class HistoryService(newsroom.Service):
                 super().create([transform(doc)])
             except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
                 continue
+
+
+def get_history_users(item_ids, users, companies):
+
+    lookup = {'item': {'$in': item_ids}}
+
+    histories = query_resource('history', lookup=lookup, max_results=200)
+
+    user_matches = []
+    for history in histories:
+        if str(history.get('user', '')) in users and str(history.get('company', '')) in companies:
+            user_matches.append(str(history['user']))
+
+    return user_matches
 
 
 def init_app(app):

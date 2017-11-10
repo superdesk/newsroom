@@ -2,7 +2,7 @@
 import io
 import hmac
 import bson
-
+from superdesk import get_resource_service
 from flask import json
 
 
@@ -91,7 +91,7 @@ def test_push_binary_invalid_signature(client, app):
     assert 500 == resp.status_code
 
 
-def test_notify_for_new_item(client, app, mocker):
+def test_notify_topic_matches_for_new_item(client, app, mocker):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
         'first_name': 'Foo',
@@ -115,6 +115,72 @@ def test_notify_for_new_item(client, app, mocker):
     assert 200 == resp.status_code
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['topics']) == 1
+
+
+def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
+    company_ids = app.data.insert('companies', [{
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
+    user = {
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'company': company_ids[0],
+    }
+
+    user_ids = app.data.insert('users', [user])
+    user['_id'] = user_ids[0]
+
+    app.data.insert('history', docs=[{
+        'version': '1',
+        '_id': 'bar',
+    }], action='download', user=user)
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+    data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args[1]['item']['_id'] == 'bar'
+    assert len(push_mock.call_args[1]['users']) == 1
+
+    notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+    assert notification['item'] == 'bar'
+
+
+def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
+    company_ids = app.data.insert('companies', [{
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
+    user = {
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'company': company_ids[0],
+    }
+
+    user_ids = app.data.insert('users', [user])
+    user['_id'] = user_ids[0]
+
+    app.data.insert('items', [{'_id': 'bar', 'headline': 'testing', 'bookmarks': [user_ids[0]]}])
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+    data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args[1]['item']['_id'] == 'bar'
+    assert len(push_mock.call_args[1]['users']) == 1
 
 
 def test_do_not_notify_inactive_user(client, app, mocker):

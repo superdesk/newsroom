@@ -1,10 +1,12 @@
 import os
 import arrow
 import flask
+import superdesk
 
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
 from superdesk.text_utils import get_text, get_word_count
+from newsroom.notifications.notifications import get_user_notifications
 
 
 def parse_date(datetime):
@@ -53,4 +55,16 @@ def newsroom_config():
     port = int(os.environ.get('PORT', '5000'))
     return {
         'websocket': os.environ.get('NEWSROOM_WEBSOCKET_URL', 'ws://localhost:%d' % (port + 100, )),
+    }
+
+
+def get_initial_notifications():
+    if not flask.session.get('user'):
+        return None
+
+    saved_notifications = get_user_notifications(flask.session['user'])
+    items = superdesk.get_resource_service('wire_search').get_items([n['item'] for n in saved_notifications])
+    return {
+        'user': str(flask.session['user']) if flask.session['user'] else None,
+        'notifications': list(items)
     }

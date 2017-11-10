@@ -32,7 +32,6 @@ import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from './DownloadItemsModal';
 import ItemDetails from './ItemDetails';
-import NotificationList from 'components/NotificationList';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -85,8 +84,7 @@ class WireApp extends React.Component {
                 item={this.props.itemToOpen}
                 actions={this.props.actions.filter(previewActionFilter)}
                 onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
-            />, modal,
-            <NotificationList key="notificationList" newItems={this.props.newItems}/>] : [
+            />, modal] : [
                 <section key="contentHeader" className='content-header'>
                     {this.props.selectedItems && this.props.selectedItems.length > 0 &&
                         <SelectedItemsBar
@@ -160,7 +158,6 @@ class WireApp extends React.Component {
                         </div>
                     </div>
                     {modal}
-                    <NotificationList newItems={this.props.newItems}/>
                 </section>])
         );
     }
@@ -189,7 +186,6 @@ WireApp.propTypes = {
     selectAll: PropTypes.func,
     selectNone: PropTypes.func,
     bookmarks: PropTypes.bool,
-    newItems: PropTypes.array,
     fetchMoreItems: PropTypes.func,
     activeView: PropTypes.string,
     setView: PropTypes.func,
@@ -210,7 +206,6 @@ const mapStateToProps = (state) => ({
     topics: state.topics,
     selectedItems: state.selectedItems,
     bookmarks: state.bookmarks,
-    newItems: state.newItems,
     activeView: get(state, 'wire.activeView'),
 });
 

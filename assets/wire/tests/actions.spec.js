@@ -78,7 +78,7 @@ describe('wire actions', () => {
     it('can populate new items on update notification', () => {
         expect(store.getState().newItems.length).toBe(0);
         store.dispatch(actions.pushNotification({
-            event: 'update', extra: {topics: [1], item:{'_id': 'a'}}}));
+            event: 'topic_matches', extra: {topics: [1], item:{'_id': 'a'}}}));
         expect(store.getState().newItems.length).toBe(1);
         expect(store.getState().newItemsByTopic[1].length).toBe(1);
     });

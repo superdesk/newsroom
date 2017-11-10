@@ -85,7 +85,24 @@ def send_new_item_notification_email(user, topic_name, item):
     text_body = render_template(
         'new_item_notification.txt',
         app_name=app_name,
+        is_topic=True,
         topic_name=topic_name,
+        user=user,
+        item=item,
+        url=url)
+
+    send_email(to=recipients, subject=subject, text_body=text_body)
+
+
+def send_history_match_notification_email(user, item):
+    app_name = current_app.config['SITE_NAME']
+    url = '{}/item/{}'.format(current_app.config['CLIENT_URL'], item['guid'])
+    recipients = [user['email']]
+    subject = 'New update for your previously accessed story: {}'.format(item['headline'])
+    text_body = render_template(
+        'new_item_notification.txt',
+        app_name=app_name,
+        is_topic=False,
         user=user,
         item=item,
         url=url)
