@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import { getPicture, getThumbnailRendition, showItemVersions, shortText } from 'wire/utils';
+import { EXTENDED_VIEW } from 'wire/defaults';
 import ActionList from 'components/ActionList';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
@@ -44,13 +45,14 @@ class WireListItem extends React.Component {
     }
 
     render() {
-        const {item, onClick} = this.props;
+        const {item, onClick, activeView} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--open': this.props.isActive,
             'wire-articles__item--selected': this.props.isSelected,
         });
         const picture = getPicture(item);
+        const isExtended = activeView === EXTENDED_VIEW;
         return (
             <article key={item._id}
                 className={cardClassName}
@@ -100,9 +102,11 @@ class WireListItem extends React.Component {
                             </div>
                         </div>
 
-                        <div className='wire-articles__item__text'>
-                            <p>{shortText(item)}</p>
-                        </div>
+                        {isExtended && (
+                            <div className='wire-articles__item__text'>
+                                <p>{shortText(item)}</p>
+                            </div>
+                        )}
 
                         {showItemVersions(item) && (
                             <div className="no-bindable wire-articles__item__versions-btn" onClick={this.togglePreviousVersions}>
@@ -111,7 +115,7 @@ class WireListItem extends React.Component {
                         )}
                     </div>
 
-                    {getThumbnailRendition(picture) && (
+                    {isExtended && getThumbnailRendition(picture) && (
                         <div className="wire-articles__item--list__image">
                             <figure>
                                 <img src={getThumbnailRendition(picture).href} />
@@ -150,6 +154,7 @@ WireListItem.propTypes = {
         name: PropTypes.string,
         action: PropTypes.func,
     })),
+    activeView: PropTypes.string,
 };
 
 export default WireListItem;

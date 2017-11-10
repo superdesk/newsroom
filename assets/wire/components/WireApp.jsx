@@ -17,6 +17,7 @@ import {
     downloadItems,
     openItem,
     fetchMoreItems,
+    setView,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -25,6 +26,7 @@ import SearchBar from './SearchBar';
 import SearchResultsInfo from './SearchResultsInfo';
 import SearchSidebar from './SearchSidebar';
 import SelectedItemsBar from './SelectedItemsBar';
+import ListViewControls from './ListViewControls';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
@@ -97,26 +99,16 @@ class WireApp extends React.Component {
                             <i className={this.state.withSidebar ? 'icon--close-thin icon--white' : 'icon--hamburger'}></i>
                             {/*<i className='icon--close-thin icon--white' onClick={this.toggleSidebar}></i>*/}
                         </span>
-                        <div className='search form-inline'>
-                            <SearchBar
-                                fetchItems={this.props.fetchItems}
-                                setQuery={this.props.setQuery} />
-                        </div>
 
-                        <div className='content-bar__right'>
-                            <div className='btn-group'>
-                                <span className='content-bar__menu' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                    <i className='icon--list-view'></i>
-                                </span>
-                                <div className='dropdown-menu dropdown-menu-right'>
-                                    <h6 className='dropdown-header'>Change view</h6>
-                                    <button className='dropdown-item' type='button'>Large list</button>
-                                    <button className='dropdown-item' type='button'>Compact list</button>
-                                    <button className='dropdown-item' type='button'>Grid</button>
-                                </div>
-                            </div>
-                        </div>
+                        <SearchBar
+                            fetchItems={this.props.fetchItems}
+                            setQuery={this.props.setQuery}
+                        />
 
+                        <ListViewControls
+                            activeView={this.props.activeView}
+                            setView={this.props.setView}
+                        />
                     </nav>
                 </section>,
                 <section key="contentMain" className='content-main'>
@@ -145,7 +137,10 @@ class WireApp extends React.Component {
                                 />
                             }
 
-                            <ItemsList actions={this.props.actions.filter(previewActionFilter)}/>
+                            <ItemsList
+                                actions={this.props.actions.filter(previewActionFilter)}
+                                activeView={this.props.activeView}
+                            />
                         </div>
 
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
@@ -190,6 +185,8 @@ WireApp.propTypes = {
     bookmarks: PropTypes.bool,
     newItems: PropTypes.array,
     fetchMoreItems: PropTypes.func,
+    activeView: PropTypes.string,
+    setView: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -207,6 +204,7 @@ const mapStateToProps = (state) => ({
     selectedItems: state.selectedItems,
     bookmarks: state.bookmarks,
     newItems: state.newItems,
+    activeView: get(state, 'wire.activeView'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -265,6 +263,7 @@ const mapDispatchToProps = (dispatch) => ({
         },
     ],
     fetchMoreItems: () => dispatch(fetchMoreItems()),
+    setView: (view) => dispatch(setView(view)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

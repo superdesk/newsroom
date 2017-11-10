@@ -91,6 +91,7 @@ class ItemsList extends React.Component {
                 showActions={!!this.state.actioningItem && this.state.actioningItem._id === _id}
                 toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
                 actions={filteredActions}
+                activeView={this.props.activeView}
             />
         );
 
@@ -120,6 +121,7 @@ ItemsList.propTypes = {
     bookmarks: PropTypes.bool,
     user: PropTypes.string,
     company: PropTypes.string,
+    activeView: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
