@@ -670,7 +670,7 @@ article.list {
                 opacity: 0.8;
             }
         }
-    } 
+    }
     .btn {
         margin-bottom: 12px;
     }
@@ -970,6 +970,7 @@ article.list {
 .wire-column__preview__date {
     color: #747474;
     line-height: 1rem;
+    padding: 0 10px 20px 20px;
 }
 
 .wire-column__preview__buttons {
@@ -1278,7 +1279,7 @@ article.list {
     margin-bottom: 40px;
 }
 
-.profile__avatar.initials {    
+.profile__avatar.initials {
     width: 100%;
     max-width: 128px;
     margin: 0 auto 20px auto;
@@ -1297,7 +1298,7 @@ article.list {
 }
 
 .profile__characters {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;    
+    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 2.125rem; // 34px
 }
 
@@ -1307,7 +1308,7 @@ article.list {
 }
 
 .profile__info {
-    font-size: 0.8125rem; // 13px    
+    font-size: 0.8125rem; // 13px
     color: $gray-mid;
 }
 
