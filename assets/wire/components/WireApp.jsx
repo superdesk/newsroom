@@ -77,6 +77,9 @@ class WireApp extends React.Component {
         const modal = this.renderModal(this.props.modal);
         const previewActionFilter = (action) => !action.when || action.when(this.props);
         const multiActionFilter = (action) => action.multi && previewActionFilter(action);
+
+        const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
+            this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
@@ -147,7 +150,10 @@ class WireApp extends React.Component {
                             {this.props.itemToPreview &&
                             <Preview
                                 item={this.props.itemToPreview}
+                                user={this.props.user}
                                 actions={this.props.actions.filter(previewActionFilter)}
+                                followStory={this.props.followStory}
+                                isFollowing={!!isFollowing}
                             />
                             }
 
@@ -187,6 +193,7 @@ WireApp.propTypes = {
     fetchMoreItems: PropTypes.func,
     activeView: PropTypes.string,
     setView: PropTypes.func,
+    followStory: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -209,6 +216,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     followTopic: (query) => dispatch(followTopic(query)),
+    followStory: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`})),
     fetchItems: () => dispatch(fetchItems()),
     setQuery: (query) => {
         dispatch(setQuery(query));

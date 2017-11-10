@@ -13,8 +13,7 @@ class WireListItem extends React.Component {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item.body_html);
-        this.slugline = props.item.slugline && props.item.slugline.trim() ||
-          props.item.headline && props.item.headline.replace(/ /g, '-');
+        this.slugline = props.item.slugline && props.item.slugline.trim();
         this.state = {isHover: false, previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);

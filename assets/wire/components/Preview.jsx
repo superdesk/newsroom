@@ -19,19 +19,33 @@ class Preview extends React.PureComponent {
     }
 
     render() {
-        const {item, actions} = this.props;
+        const {item, user, actions, followStory, isFollowing} = this.props;
         const picture = getPicture(item);
         const previousVersions = 'preview_versions';
         return (
             <div className='wire-column__preview__items'>
 
                 <div className='wire-column__preview__top-bar'>
-                    <span className='wire-column__preview__date'>{gettext('Created')}<br />{fullDate(item.versioncreated)}</span>
+                    <div>
+                        {user && item.slugline && item.slugline.trim() &&
+                            <button type="button"
+                                disabled={isFollowing}
+                                className="btn btn-outline-primary"
+                                onClick={() => followStory(item)}>
+                                {gettext('Follow story')}
+                            </button>
+                        }
+                    </div>
+
                     <PreviewActionButtons item={item} actions={actions} />
                 </div>
 
+                <div className='wire-column__preview__date'>{gettext('Created')}{' '}{fullDate(item.versioncreated)}</div>
+
                 <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
-                    <span className='wire-column__preview__slug'>{item.slugline}</span>
+                    {item.slugline &&
+                        <span className='wire-column__preview__slug'>{item.slugline}</span>
+                    }
                     <h2 className='wire-column__preview__headline'>{item.headline}</h2>
                     {(item.byline || item.located) && (
                         <p className='wire-column__preview__author'>
@@ -77,12 +91,15 @@ class Preview extends React.PureComponent {
 }
 
 Preview.propTypes = {
+    user: PropTypes.string,
     item: PropTypes.object.isRequired,
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         action: PropTypes.func,
         url: PropTypes.func,
     })),
+    followStory: PropTypes.func,
+    isFollowing: PropTypes.bool,
 };
 
 export default Preview;
