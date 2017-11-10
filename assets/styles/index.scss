@@ -839,7 +839,7 @@ article.list {
     display: flex;
     flex-direction: column;
     .bold {
-        color: #444;
+        color: $body-text;
         font-weight: 700;
     }
     .blue-text {
@@ -1341,6 +1341,7 @@ article.list {
     > .row {
         display: flex;
         flex-grow: 1;
+        align-content: flex-start;
         overflow: auto;
     }
 }
@@ -1358,6 +1359,83 @@ article.list {
     font-size: 0.875rem; // 14px
     margin-top: 4px;
     float: right;
+}
+
+.simple-card-wrap {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.simple-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #fff;
+    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2);
+    padding: 10px 25px 16px 25px;
+    border: 4px solid transparent;
+    outline: 1px solid transparent;
+    transition: all .2s ease-out;
+    &:hover {
+        border: 4px solid #f5f5f5;
+        outline: 1px solid #c6c6c6;
+    }
+    p {
+        font-size: 14px;
+        margin-bottom: auto;
+    }
+}
+
+.simple-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.simple-card__headline {
+    flex: 1 1 auto;
+    color: #5f94a7;
+    font-weight: 700;
+    margin: 8px 0px;
+    padding-right: 15px;
+}
+
+.simple-card__icons {
+    display: flex;
+    flex: 0 0 auto;    
+    max-width: 0px;    
+    overflow: hidden;
+    transition: max-width 0.2s;
+    > .icon-button {
+        opacity: 0;
+    }
+}
+
+.simple-card:hover .simple-card__icons {
+    max-width: 400px;
+    padding-left: 15px;
+    > .icon-button {
+        opacity: 1;
+        transition: opacity 0.2s;
+        transition-delay: 0.2s;
+    }
+}
+
+.simple-card__header-with-icons {
+    .simple-card__headline {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.simple-card__date {
+    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size: 0.8125rem;
+    margin-top: 10px;
+    span {
+        color: #747474;
+    }
 }
 
 // End Wire BEM classes

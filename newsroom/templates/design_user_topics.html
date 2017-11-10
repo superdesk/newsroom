@@ -1,0 +1,147 @@
+{% extends "layout_profile.html" %}
+
+{% block title %}User Profile / Followed Topics{% endblock %}
+
+{% block profileNavigation %}
+
+<nav class="profile-side-navigation">
+    <div class="profile__group profile__group--dark-bck">
+        <figure class="profile__avatar initials">
+            <span class="profile__characters">JD</span>
+        </figure>
+        <h5 class="profile__name">Jeff Dudeowsky</h5>
+        <span class="profile__info">jeffthedude</span>
+    </div>
+    <div class="profile-side-navigation__items">
+        <a href="#" class="btn btn-block btn-outline-secondary">My profile</a>
+        <a href="#" class="btn btn-block btn-outline-primary">Followed topics</a>
+        <a href="#" class="btn btn-block btn-outline-secondary">Download history</a>
+    </div>
+</nav>
+
+{% endblock %}
+
+{% block contentHeader %}
+
+<nav class="profile-nav content-bar navbar content-bar--side-padding pr-0">
+    <h5 class="pl-xl-4 mb-0">Followed topics</h5>
+    <div class="content-bar__right">
+        <span class="content-bar__menu">
+            <i class="icon--close-thin"></i>
+        </span>
+    </div>
+</nav>
+
+{% endblock %}
+{% block contentMain %}
+    <div class="profile-content container-fluid">
+        <div class="row pt-xl-4 pt-3 px-xl-4">
+            <div class="simple-card-wrap col-12 col-lg-6">
+                <div class="simple-card">
+                    <div class="simple-card__header simple-card__header-with-icons">
+                        <h6 class="simple-card__headline">My New Topic</h6>
+                        <span class="badge badge-pill badge-secondary">9</span>
+                        <div class="simple-card__icons">
+                            <span class="icon-button"><i class="icon--share"></i></span>
+                            <span class="icon-button"><i class="icon--edit"></i></span>
+                            <span class="icon-button"><i class="icon--trash"></i></span>
+                        </div>
+                    </div>
+                    <p>Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum. Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum.</p>
+                    <span class="simple-card__date">Created <span class="bold">12.06.2017 at 14:25</span></span>
+                </div>
+            </div>
+            
+            <div class="simple-card-wrap col-12 col-lg-6">
+                <div class="simple-card">
+                    <div class="simple-card__header simple-card__header-with-icons">
+                        <h6 class="simple-card__headline">My New Topic</h6>
+                        <span class="badge badge-pill badge-secondary">9</span>
+                        <div class="simple-card__icons">
+                            <span class="icon-button"><i class="icon--share"></i></span>
+                            <span class="icon-button"><i class="icon--edit"></i></span>
+                            <span class="icon-button"><i class="icon--trash"></i></span>
+                        </div>
+                    </div>
+                    <p>Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum.</p>
+                    <span class="simple-card__date">Created <span class="bold">12.06.2017 at 14:25</span></span>
+                </div>
+            </div>
+            <div class="simple-card-wrap col-12 col-lg-6">
+                <div class="simple-card">
+                    <div class="simple-card__header simple-card__header-with-icons">
+                        <h6 class="simple-card__headline">My New Topic</h6>
+                        <span class="badge badge-pill badge-secondary">9</span>
+                        <div class="simple-card__icons">
+                            <span class="icon-button"><i class="icon--share"></i></span>
+                            <span class="icon-button"><i class="icon--edit"></i></span>
+                            <span class="icon-button"><i class="icon--trash"></i></span>
+                        </div>
+                    </div>
+                    <p>Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum.</p>
+                    <span class="simple-card__date">Created <span class="bold">12.06.2017 at 14:25</span></span>
+                </div>
+            </div>
+            <div class="simple-card-wrap col-12 col-lg-6">
+                <div class="simple-card">
+                    <div class="simple-card__header simple-card__header-with-icons">
+                        <h6 class="simple-card__headline">My New Topic</h6>
+                        <span class="badge badge-pill badge-secondary">9</span>
+                        <div class="simple-card__icons">
+                            <span class="icon-button"><i class="icon--share"></i></span>
+                            <span class="icon-button"><i class="icon--edit"></i></span>
+                            <span class="icon-button"><i class="icon--trash"></i></span>
+                        </div>
+                    </div>
+                    <p>Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum.</p>
+                    <span class="simple-card__date">Created <span class="bold">12.06.2017 at 14:25</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade mt-xl-5" id="changePassword" tabindex="-1" role="dialog" aria-labelledby="changePasswordLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="changePasswordLabel">Change your password</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="icon--close-thin"></i></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="">
+                        <div class="form-group">
+                            <label for="email">Old password</label>
+                            <div class="field">
+                                <input type="password" id="password" name="password" class="form-control" value="">
+                            </div>
+                            <a class="modal-forgot-password" href="#">Forgot your password?</a>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">New password</label>
+                            <div class="field">
+                                <input type="password" id="password" name="password" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Confirm new password</label>
+                            <div class="field">
+                                <input type="password" id="password" name="password" class="form-control" value="">
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary">Cancel</button>
+                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Change password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
