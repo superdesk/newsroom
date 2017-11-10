@@ -9,13 +9,15 @@ function CheckboxInput({name, label, onChange, value}) {
 
     return (
         <div className='form-check'>
-            <label className='form-check-label'>
+            <label className='custom-control custom-checkbox'>
                 <input type="checkbox"
                     name={name}
-                    className="form-check-input"
+                    className="custom-control-input"
                     checked={value}
                     onChange={onChange} />
-                {' '}{label}</label>
+                <span className="custom-control-indicator"></span>
+                <span className="custom-control-description">{' '}{label}</span>
+            </label>
         </div>
     );
 }
