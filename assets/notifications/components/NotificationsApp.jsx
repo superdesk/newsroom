@@ -34,7 +34,6 @@ NotificationsApp.propTypes = {
 const mapStateToProps = (state) => ({
     user: state.user,
     notifications: state.notifications,
-    modal: state.modal,
 });
 
 const mapDispatchToProps = (dispatch) => ({

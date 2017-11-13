@@ -234,7 +234,6 @@ class WireSearchService(newsroom.Service):
                 'bool': {
                     'must_not': [
                         {'term': {'type': 'composite'}},
-                        {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
                         {'term': {'pubstatus': 'canceled'}}
                     ],
                     'must': [
@@ -255,7 +254,7 @@ class WireSearchService(newsroom.Service):
             logger.error('Error in get_matching_bookmarks for query: {}'.format(json.dumps(source)),
                          exc, exc_info=True)
 
-    def get_matching_bookmarks(self, item_ids, users, companies):
+    def get_matching_bookmarks(self, item_ids, active_users, active_companies):
         """
         Returns a list of user ids bookmarked any of the given items
         :param item_id: list of ids of items to be searched
@@ -273,8 +272,8 @@ class WireSearchService(newsroom.Service):
         for result in search_results.hits['hits']['hits']:
             bookmarks = result['_source'].get('bookmarks', [])
             for bookmark in bookmarks:
-                user = users.get(bookmark)
-                if user and str(user.get('company', '')) in companies:
+                user = active_users.get(bookmark)
+                if user and str(user.get('company', '')) in active_companies:
                     bookmark_users.append(bookmark)
 
         return bookmark_users

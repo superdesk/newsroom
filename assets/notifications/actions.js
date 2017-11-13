@@ -47,7 +47,7 @@ function errorHandler(error) {
 export function deleteNotification(id) {
     return function (dispatch, getState) {
         const user = getState().user;
-        const url = `/notifications/${user}_${id}`;
+        const url = `/users/${user}/notifications/${user}_${id}`;
         return server.del(url)
             .then(() => {
                 notify.success(gettext('Notification cleared successfully'));

@@ -49,7 +49,7 @@ class HistoryService(newsroom.Service):
                 continue
 
 
-def get_history_users(item_ids, users, companies):
+def get_history_users(item_ids, active_users, active_companies):
 
     lookup = {'item': {'$in': item_ids}}
 
@@ -57,7 +57,7 @@ def get_history_users(item_ids, users, companies):
 
     user_matches = []
     for history in histories:
-        if str(history.get('user', '')) in users and str(history.get('company', '')) in companies:
+        if str(history.get('user', '')) in active_users and str(history.get('company', '')) in active_companies:
             user_matches.append(str(history['user']))
 
     return user_matches

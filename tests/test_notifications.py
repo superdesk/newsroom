@@ -52,7 +52,7 @@ def test_delete_notification_fails_for_different_user(client):
     with client.session_transaction() as session:
         session['name'] = 'tester'
 
-    resp = client.delete('notifications/{}'.format(id))
+    resp = client.delete('/users/{}/notifications/{}'.format(user, id))
     assert 403 == resp.status_code
 
 
@@ -67,7 +67,7 @@ def test_delete_notification(client):
     data = json.loads(resp.get_data())
     id = data['_items'][0]['_id']
 
-    resp = client.delete('notifications/{}'.format(id))
+    resp = client.delete('/users/{}/notifications/{}'.format(user, id))
     assert 200 == resp.status_code
 
     resp = client.get(notifications_url)

@@ -23,9 +23,10 @@ from flask_limiter.util import get_remote_address
 from flask_cache import Cache
 
 from newsroom.webpack import NewsroomWebpack
+from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
-    plain_text, word_count, newsroom_config, is_admin, get_initial_notifications
+    plain_text, word_count, newsroom_config, is_admin
 )
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))

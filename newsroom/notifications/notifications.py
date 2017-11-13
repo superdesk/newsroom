@@ -5,7 +5,7 @@ import datetime
 from bson import ObjectId
 
 from superdesk.utc import utcnow
-from flask import current_app as app
+from flask import current_app as app, session
 import pymongo.errors
 import werkzeug.exceptions
 
@@ -13,7 +13,7 @@ import werkzeug.exceptions
 class NotificationsResource(newsroom.Resource):
     url = 'users/<regex("[a-f0-9]{24}"):user>/notifications'
 
-    resource_methods = ['GET', 'POST']
+    resource_methods = ['GET']
     item_methods = ['GET', 'PATCH', 'DELETE']
 
     schema = {
@@ -24,7 +24,7 @@ class NotificationsResource(newsroom.Resource):
     }
 
     datasource = {
-        'default_sort': [('_created', -1)]
+        'default_sort': [('created', -1)]
     }
 
     mongo_indexes = {
@@ -52,7 +52,23 @@ def get_user_notifications(user_id):
     ttl = app.config.get('NOTIFICATIONS_TTL', 1)
     lookup = {
         'user': user_id,
-        '_created': {'$gte': utcnow() - datetime.timedelta(days=ttl)}
+        'created': {'$gte': utcnow() - datetime.timedelta(days=ttl)}
     }
 
     return list(superdesk.get_resource_service('notifications').get(req=None, lookup=lookup))
+
+
+def get_initial_notifications():
+    """
+    Returns the stories that user has notifications for
+    :return: List of stories
+    """
+    if not session.get('user'):
+        return None
+
+    saved_notifications = get_user_notifications(session['user'])
+    items = superdesk.get_resource_service('wire_search').get_items([n['item'] for n in saved_notifications])
+    return {
+        'user': str(session['user']) if session['user'] else None,
+        'notifications': list(items)
+    }

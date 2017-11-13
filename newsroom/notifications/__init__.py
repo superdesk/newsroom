@@ -11,5 +11,4 @@ def init_app(app):
     superdesk.register_resource('notifications', NotificationsResource, NotificationsService, _app=app)
 
 
-from . import views  # noqa
 from superdesk.notification import push_notification  # noqa

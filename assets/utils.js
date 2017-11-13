@@ -204,3 +204,22 @@ export function formatHTML(html) {
  * To enable some mocking in tests
  */
 export const now = new Date();
+
+
+/**
+ * Initializes the web socket listener
+ * @param store
+ */
+export function initWebSocket(store, action) {
+    if (window.newsroom) {
+        const ws = new WebSocket(window.newsroom.websocket);
+        ws.onmessage = (message) => {
+            const data = JSON.parse(message.data);
+            if (data.event) {
+                store.dispatch(action(data));
+            }
+        };
+    }
+}
+
+
