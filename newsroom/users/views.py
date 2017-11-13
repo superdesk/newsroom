@@ -6,6 +6,7 @@ from newsroom.users.forms import UserForm
 from superdesk import get_resource_service
 from newsroom.users import blueprint
 from flask_babel import gettext
+from newsroom.notifications.notifications import get_user_notifications
 from newsroom.auth import get_user
 from newsroom.auth.decorator import admin_only, login_required
 from newsroom.auth.views import send_token, add_token_data, send_reset_password_email, \
@@ -149,5 +150,35 @@ def delete(id):
 def get_topics(id):
     """ Returns list of followed topics of given user """
     if flask.session['user'] != str(id):
-        flask.abort(401)
+        flask.abort(403)
     return jsonify({'_items': get_user_topics(id)}), 200
+
+
+@blueprint.route('/users/<user_id>/notifications', methods=['GET'])
+@login_required
+def get_notifications(user_id):
+    if flask.session['user'] != str(user_id):
+        flask.abort(403)
+    return jsonify({'_items': get_user_notifications(user_id)}), 200
+
+
+@blueprint.route('/users/<user_id>/notifications', methods=['DELETE'])
+@login_required
+def delete_all(user_id):
+    """ Deletes all notification by given user id """
+    if flask.session['user'] != str(user_id):
+        flask.abort(403)
+
+    get_resource_service('notifications').delete({'user': ObjectId(user_id)})
+    return jsonify({'success': True}), 200
+
+
+@blueprint.route('/users/<user_id>/notifications/<notification_id>', methods=['DELETE'])
+@login_required
+def delete_notification(user_id, notification_id):
+    """ Deletes the notification by given id """
+    if flask.session['user'] != str(user_id):
+        flask.abort(403)
+
+    get_resource_service('notifications').delete({'_id': notification_id})
+    return jsonify({'success': True}), 200

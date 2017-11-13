@@ -36,6 +36,7 @@ BLUEPRINTS = [
     'newsroom.push',
     'newsroom.topics',
     'newsroom.upload',
+    'newsroom.notifications',
 ]
 
 CORE_APPS = [
@@ -51,6 +52,7 @@ CORE_APPS = [
     'newsroom.topics',
     'newsroom.upload',
     'newsroom.history',
+    'newsroom.notifications',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -119,6 +121,9 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
+
+# the time to live value in days for user notifications
+NOTIFICATIONS_TTL = 1
 
 WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
 

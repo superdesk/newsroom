@@ -88,9 +88,11 @@
 
 <script>
     window.newsroom = {{ newsroom_config() | tojson | safe }};
+    window.notificationData = {{ get_initial_notifications() | tojson | safe }};
 </script>
 
 {{ javascript_tag('newsroom_js') | safe }}
+{{ javascript_tag('notifications_js') | safe }}
 
 {% block script %}{% endblock %}
 

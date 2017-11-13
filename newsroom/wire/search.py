@@ -147,7 +147,15 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
 
-    def test_new_item(self, item_id, topics, users, companies):
+    def get_matching_topics(self, item_id, topics, users, companies):
+        """
+        Returns a list of topic ids matching to the given item_id
+        :param item_id: item id to be tested against all topics
+        :param topics: list of topics
+        :param users: user_id, user dictionary
+        :param companies: company_id, company dictionary
+        :return:
+        """
         query = {
             'bool': {
                 'must_not': [
@@ -215,7 +223,57 @@ class WireSearchService(newsroom.Service):
                     topic_matches.append(topic['_id'])
 
         except Exception as exc:
-            logger.error('Error in test_new_item for query: {}'.format(json.dumps(source)),
+            logger.error('Error in get_matching_topics for query: {}'.format(json.dumps(source)),
                          exc, exc_info=True)
 
         return topic_matches
+
+    def get_items(self, item_ids):
+        try:
+            query = {
+                'bool': {
+                    'must_not': [
+                        {'term': {'type': 'composite'}},
+                        {'term': {'pubstatus': 'canceled'}}
+                    ],
+                    'must': [
+                        {'terms': {'_id': item_ids}}
+                    ],
+                }
+            }
+
+            source = {'query': query}
+            source['size'] = len(item_ids)
+
+            req = ParsedRequest()
+            req.args = {'source': json.dumps(source)}
+
+            return super().get(req, None)
+
+        except Exception as exc:
+            logger.error('Error in get_matching_bookmarks for query: {}'.format(json.dumps(source)),
+                         exc, exc_info=True)
+
+    def get_matching_bookmarks(self, item_ids, active_users, active_companies):
+        """
+        Returns a list of user ids bookmarked any of the given items
+        :param item_id: list of ids of items to be searched
+        :param users: user_id, user dictionary
+        :param companies: company_id, company dictionary
+        :return:
+        """
+        bookmark_users = []
+
+        search_results = self.get_items(item_ids)
+
+        if not search_results:
+            return bookmark_users
+
+        for result in search_results.hits['hits']['hits']:
+            bookmarks = result['_source'].get('bookmarks', [])
+            for bookmark in bookmarks:
+                user = active_users.get(bookmark)
+                if user and str(user.get('company', '')) in active_companies:
+                    bookmark_users.append(bookmark)
+
+        return bookmark_users

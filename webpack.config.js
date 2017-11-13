@@ -7,10 +7,11 @@ const NODE_MODULES = process.env.NODE_MODULES || 'node_modules';
 module.exports = {
     entry: {
         newsroom_js: './assets/index.js',
-        settings_js: ['babel-polyfill', './assets/settings/index.js'],
-        user_profile_js: ['babel-polyfill', './assets/user-profile/index.js'],
+        settings_js: './assets/settings/index.js',
+        user_profile_js: './assets/user-profile/index.js',
         newsroom_css: './assets/style.js',
-        wire_js: ['babel-polyfill', './assets/wire/index.js'],
+        wire_js: './assets/wire/index.js',
+        notifications_js: './assets/notifications/index.js',
     },
     output: {
         path: path.resolve(__dirname, 'newsroom', 'static'),

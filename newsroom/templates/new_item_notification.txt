@@ -1,7 +1,10 @@
 Hi {{user.first_name}},
 
+{% if is_topic %}
 There is a new story for your followed topic: {{topic_name}}
-
+{% else %}
+There is a new update for your previously accessed story
+{% endif %}
 
 {{ item.slugline }}
 {{ item.headline }}

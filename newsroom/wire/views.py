@@ -70,7 +70,9 @@ def search():
 
 
 @blueprint.route('/download/<_ids>')
+@login_required
 def download(_ids):
+    user = get_user(required=True)
     items = [get_entity_or_404(_id, 'items') for _id in _ids.split(',')]
     _file = io.BytesIO()
     _format = flask.request.args.get('format', 'text')
@@ -82,7 +84,8 @@ def download(_ids):
                 formatter.format_item(item)
             )
     _file.seek(0)
-    app.data.insert('history', items, action='download')
+
+    app.data.insert('history', items, action='download', user=user)
     return flask.send_file(_file, attachment_filename='newsroom.zip', as_attachment=True)
 
 

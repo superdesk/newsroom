@@ -1,4 +1,4 @@
-import { createStore, render } from 'utils';
+import { createStore, render, initWebSocket } from 'utils';
 
 import wireReducer from './reducers';
 import WireApp from './components/WireApp';
@@ -29,12 +29,5 @@ store.dispatch(fetchItems()).then(() =>
     render(store, WireApp, document.getElementById('wire-app'))
 );
 
-if (window.newsroom) {
-    const ws = new WebSocket(window.newsroom.websocket);
-    ws.onmessage = (message) => {
-        const data = JSON.parse(message.data);
-        if (data.event) {
-            store.dispatch(pushNotification(data));
-        }
-    };
-}
+// initialize web socket listener
+initWebSocket(store, pushNotification);
