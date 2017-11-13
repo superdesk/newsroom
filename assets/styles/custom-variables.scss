@@ -10,6 +10,9 @@ $pink: #d50089;
 
 // Custom bootstrap variables
 
+
+$info: $pink;
+
 $blue: #00acec;
 $line-height-sm: 1.25;
 $border-radius: .1875rem;
@@ -45,3 +48,7 @@ $modal-backdrop-opacity: .9;
 $modal-content-border-width: 0px;
 $modal-content-bg: transparent;
 
+// Badge
+
+$badge-font-size: 0.8125rem;
+$badge-font-weight: 400;
