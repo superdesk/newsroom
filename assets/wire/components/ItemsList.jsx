@@ -4,9 +4,10 @@ import { connect } from 'react-redux';
 
 import { gettext } from 'utils';
 import WireListItem from './WireListItem';
-import { setActive, previewItem, toggleSelected } from '../actions';
+import { setActive, previewItem, toggleSelected, openItem } from '../actions';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
+const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
 class ItemsList extends React.Component {
     constructor(props) {
@@ -16,6 +17,7 @@ class ItemsList extends React.Component {
 
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onItemClick = this.onItemClick.bind(this);
+        this.onItemDoubleClick = this.onItemDoubleClick.bind(this);
         this.onActionList = this.onActionList.bind(this);
         this.filterActions = this.filterActions.bind(this);
     }
@@ -58,10 +60,32 @@ class ItemsList extends React.Component {
         }
     }
 
+    cancelClickTimeout() {
+        if (this.clickTimeout) {
+            clearTimeout(this.clickTimeout);
+            this.clickTimeout = null;
+        }
+    }
+
     onItemClick(item) {
+        const itemId = item._id;
         this.cancelPreviewTimeout();
-        this.props.dispatch(setActive(item));
-        this.props.dispatch(previewItem(item));
+        this.cancelClickTimeout();
+
+        this.clickTimeout = setTimeout(() => {
+            this.props.dispatch(setActive(itemId));
+
+            if (this.props.previewItem !== itemId) {
+                this.props.dispatch(previewItem(itemId));
+            } else {
+                this.props.dispatch(previewItem(null));
+            }
+        }, CLICK_TIMEOUT);
+    }
+
+    onItemDoubleClick(item) {
+        this.cancelClickTimeout();
+        this.props.dispatch(openItem(item));
     }
 
     onActionList(event, item) {
@@ -87,6 +111,7 @@ class ItemsList extends React.Component {
                 isActive={activeItem === _id}
                 isSelected={this.props.selectedItems.indexOf(_id) !== -1}
                 onClick={this.onItemClick}
+                onDoubleClick={this.onItemDoubleClick}
                 onActionList={this.onActionList}
                 showActions={!!this.state.actioningItem && this.state.actioningItem._id === _id}
                 toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
@@ -112,6 +137,7 @@ ItemsList.propTypes = {
     items: PropTypes.array.isRequired,
     itemsById: PropTypes.object,
     activeItem: PropTypes.string,
+    previewItem: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
     selectedItems: PropTypes.array,
     actions: PropTypes.arrayOf(PropTypes.shape({
@@ -128,6 +154,7 @@ const mapStateToProps = (state) => ({
     items: state.items,
     itemsById: state.itemsById,
     activeItem: state.activeItem,
+    previewItem: state.previewItem,
     selectedItems: state.selectedItems,
     bookmarks: state.bookmarks,
     user: state.user,
