@@ -1,3 +1,4 @@
+from urllib import parse
 from bson import ObjectId
 from superdesk import get_resource_service
 from newsroom.topics import blueprint
@@ -67,7 +68,7 @@ def share():
                 'recipient': user,
                 'sender': current_user,
                 'topic': topic,
-                'url': '{}/?q={}'.format(app.config['CLIENT_URL'], topic['query']),
+                'url': '{}/?q={}'.format(app.config['CLIENT_URL'], parse.quote(topic['query'])),
                 'message': data.get('message'),
                 'app_name': app.config['SITE_NAME'],
             }
