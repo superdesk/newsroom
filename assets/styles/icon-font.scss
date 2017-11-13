@@ -55,6 +55,9 @@
     &.icon--white {
         color: #fff;
     }
+    &.icon--pink {
+        color: $pink;
+    }
 }
 
 .icon--alert:before {

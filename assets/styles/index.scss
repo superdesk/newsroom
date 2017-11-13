@@ -515,13 +515,14 @@ article.list {
 
 .content-bar__right {
     display: flex;
+    border-left: 1px solid #ebebeb;
 }
 
 .content-bar__sort {
     font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.89rem;
-    border-right: 1px solid #ebebeb;
     align-items: center;
+    padding-left: 10px;
 }
 
 .content-bar__sort .content-bar__dropdown-btn {
@@ -1435,6 +1436,15 @@ article.list {
     margin-top: 10px;
     span {
         color: #747474;
+    }
+}
+
+.button__reset-styles {
+    background: transparent;
+    border: none;
+    padding: 0px;
+    &:focus {
+        outline: none;
     }
 }
 
