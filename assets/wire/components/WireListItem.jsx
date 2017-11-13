@@ -44,7 +44,7 @@ class WireListItem extends React.Component {
     }
 
     render() {
-        const {item, onClick, activeView} = this.props;
+        const {item, onClick, onDoubleClick, activeView} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--open': this.props.isActive,
@@ -57,7 +57,8 @@ class WireListItem extends React.Component {
                 className={cardClassName}
                 tabIndex='0'
                 ref={(elem) => this.articleElem = elem}
-                onClick={() => !this.props.isActive && onClick(item._id)}
+                onClick={() => onClick(item)}
+                onDoubleClick={() => onDoubleClick(item)}
                 onMouseEnter={() => this.setState({isHover: true})}
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
@@ -146,6 +147,7 @@ WireListItem.propTypes = {
     isActive: PropTypes.bool.isRequired,
     isSelected: PropTypes.bool.isRequired,
     onClick: PropTypes.func.isRequired,
+    onDoubleClick: PropTypes.func.isRequired,
     onActionList: PropTypes.func.isRequired,
     showActions: PropTypes.bool.isRequired,
     toggleSelected: PropTypes.func.isRequired,
