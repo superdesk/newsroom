@@ -331,6 +331,7 @@ export function fetchNext(item) {
 export const TOGGLE_SERVICE = 'TOGGLE_SERVICE';
 export function toggleService(service) {
     return (dispatch) => {
+        dispatch(setQuery(''));
         dispatch({type: TOGGLE_SERVICE, service});
         return dispatch(fetchItems());
     };
@@ -423,6 +424,7 @@ export function resetFilter(filter) {
  */
 export function setTopicQuery(topic) {
     return (dispatch) => {
+        dispatch(toggleService());
         dispatch(setQuery(topic.query || ''));
         dispatch(_resetFilter(topic.filter));
         dispatch(_setCreatedFilter(topic.created));

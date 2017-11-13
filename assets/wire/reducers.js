@@ -79,15 +79,14 @@ function recieveItems(state, data) {
 function _wireReducer(state, action) {
     switch (action.type) {
     case TOGGLE_SERVICE: {
-        let activeService = Object.assign({}, state.activeService);
+        const activeService = {};
         if (action.service) {
-            activeService[action.service.code] = !activeService[action.service.code];
-        } else { // toggle all off
-            activeService = {};
+            activeService[action.service.code] = true;
         }
         return {
             ...state,
             activeFilter: {},
+            createdFilter: {},
             activeService,
         };
     }

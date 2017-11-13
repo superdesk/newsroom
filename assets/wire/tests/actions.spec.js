@@ -140,13 +140,14 @@ describe('wire actions', () => {
 
     it('can set and reset service filter', () => {
         fetchMock.get('/search?service={"foo":true}', {_items: [{_id: 'foo'}]});
+        fetchMock.get('/search?service={"bar":true}', {_items: [{_id: 'bar'}]});
         return store.dispatch(actions.toggleService({code: 'foo'}))
             .then(() => {
                 expect(store.getState().wire.activeService).toEqual({'foo': true});
-                return store.dispatch(actions.toggleService({code: 'foo'}));
+                return store.dispatch(actions.toggleService({code: 'bar'}));
             })
             .then(() => {
-                expect(store.getState().wire.activeService).toEqual({'foo': false});
+                expect(store.getState().wire.activeService).toEqual({'bar': true});
                 return store.dispatch(actions.toggleService());
             })
             .then(() => {
