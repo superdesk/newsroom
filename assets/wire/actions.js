@@ -329,10 +329,14 @@ export function fetchNext(item) {
 }
 
 export const TOGGLE_SERVICE = 'TOGGLE_SERVICE';
+function _toggleService(service) {
+    return {type: TOGGLE_SERVICE, service};
+}
+
 export function toggleService(service) {
     return (dispatch) => {
         dispatch(setQuery(''));
-        dispatch({type: TOGGLE_SERVICE, service});
+        dispatch(_toggleService(service));
         return dispatch(fetchItems());
     };
 }
@@ -424,7 +428,7 @@ export function resetFilter(filter) {
  */
 export function setTopicQuery(topic) {
     return (dispatch) => {
-        dispatch(toggleService());
+        dispatch(_toggleService());
         dispatch(setQuery(topic.query || ''));
         dispatch(_resetFilter(topic.filter));
         dispatch(_setCreatedFilter(topic.created));

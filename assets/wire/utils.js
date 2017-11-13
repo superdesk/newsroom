@@ -100,5 +100,6 @@ export function getActiveQuery(query, activeFilter, createdFilter) {
 }
 
 export function isTopicActive(topic, activeQuery) {
-    return !isEmpty(activeQuery) && Object.keys(activeQuery).every((key) => isEqual(topic[key], activeQuery[key]));
+    const topicQuery = getActiveQuery(topic.query, topic.filter, topic.created);
+    return !isEmpty(activeQuery) && isEqual(topicQuery, activeQuery);
 }
