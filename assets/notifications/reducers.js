@@ -15,9 +15,7 @@ export default function notificationReducer(state = initialState, action) {
     switch (action.type) {
 
     case NEW_NOTIFICATION: {
-        const notifications = state.notifications.length ?
-            state.notifications.slice(0, state.notifications.length) : [];
-        notifications.push(action.notification.item);
+        const notifications = state.notifications.concat([action.notification.item]);
 
         return {
             ...state,

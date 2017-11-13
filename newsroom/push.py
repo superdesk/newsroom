@@ -90,24 +90,26 @@ def notify_new_item(item, check_topics=True):
 
     lookup = {'is_enabled': True}
     all_users = list(query_resource('users', lookup=lookup, max_results=200))
-    users = {str(user['_id']): user for user in all_users}
+    user_ids = [u['_id'] for u in all_users]
+    users_dict = {str(user['_id']): user for user in all_users}
 
     all_companies = list(query_resource('companies', lookup=lookup, max_results=200))
-    companies = {str(company['_id']): company for company in all_companies}
+    company_ids = [c['_id'] for c in all_companies]
+    companies_dict = {str(company['_id']): company for company in all_companies}
 
     if check_topics:
-        notify_topic_matches(item, users, companies)
-    notify_user_matches(item, users, companies)
+        notify_topic_matches(item, users_dict, companies_dict)
+    notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
 
 
-def notify_user_matches(item, users, companies):
+def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids):
 
     related_items = item.get('ancestors', [])
     related_items.append(item['_id'])
 
-    history_users = get_history_users(related_items, users, companies)
+    history_users = get_history_users(related_items, user_ids, company_ids)
     bookmark_users = superdesk.get_resource_service('wire_search'). \
-        get_matching_bookmarks(related_items, users, companies)
+        get_matching_bookmarks(related_items, users_dict, companies_dict)
 
     history_users.extend(bookmark_users)
     history_users = list(set(history_users))
@@ -121,7 +123,7 @@ def notify_user_matches(item, users, companies):
         push_notification('history_matches',
                           item=item,
                           users=history_users)
-        send_user_notification_emails(item, history_users, users)
+        send_user_notification_emails(item, history_users, users_dict)
 
 
 def send_user_notification_emails(item, user_matches, users):
@@ -131,17 +133,17 @@ def send_user_notification_emails(item, user_matches, users):
             send_history_match_notification_email(user, item=item)
 
 
-def notify_topic_matches(item, users, companies):
+def notify_topic_matches(item, users_dict, companies_dict):
     topics = get_notification_topics()
 
     topic_matches = superdesk.get_resource_service('wire_search'). \
-        get_matching_topics(item['_id'], topics, users, companies)
+        get_matching_topics(item['_id'], topics, users_dict, companies_dict)
 
     if topic_matches:
         push_notification('topic_matches',
                           item=item,
                           topics=topic_matches)
-        send_topic_notification_emails(item, topics, topic_matches, users)
+        send_topic_notification_emails(item, topics, topic_matches, users_dict)
 
 
 def send_topic_notification_emails(item, topics, topic_matches, users):
