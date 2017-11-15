@@ -72,6 +72,30 @@ def set_service_query(query, company):
         query['bool']['must'].append({'terms': {'service.code': services}})
 
 
+def _query_string(query):
+    return {
+        'query_string': {
+            'query': query,
+            'default_operator': 'AND',
+            'lenient': True,
+        }
+    }
+
+
+def _versioncreated_range(created):
+    _range = {}
+    offset = int(created.get('timezone_offset', '0'))
+    if created.get('created_from'):
+        _range['gte'] = get_local_date(created['created_from'], '00:00:00', offset)
+    if created.get('created_to'):
+        _range['lte'] = get_local_date(created['created_to'], '23:59:59', offset)
+    return {'range': {'versioncreated': _range}}
+
+
+def _filter_terms(filters):
+    return [{'terms': {get_aggregation_field(key): val}} for key, val in filters.items() if val]
+
+
 class WireSearchService(newsroom.Service):
     def get(self, req, lookup):
         query = {
@@ -89,13 +113,7 @@ class WireSearchService(newsroom.Service):
         set_service_query(query, company)
 
         if req.args.get('q'):
-            query['bool']['must'].append({
-                'query_string': {
-                    'query': req.args.get('q'),
-                    'default_operator': 'AND',
-                    'lenient': True,
-                }
-            })
+            query['bool']['must'].append(_query_string(req.args['q']))
             query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
 
         if req.args.get('bookmarks'):
@@ -127,21 +145,10 @@ class WireSearchService(newsroom.Service):
         if req.args.get('filter'):
             filters = json.loads(req.args['filter'])
             if filters:
-                for key, val in filters.items():
-                    if val:
-                        query = {'terms': {get_aggregation_field(key): val}}
-                        source['post_filter']['bool']['must'].append(query)
+                source['post_filter']['bool']['must'] += _filter_terms(filters)
 
         if req.args.get('created_from') or req.args.get('created_to'):
-            _range = {}
-            offset = int(req.args.get('timezone_offset', '0'))
-            if req.args.get('created_from'):
-                _range['gte'] = get_local_date(req.args['created_from'], '00:00:00', offset)
-            if req.args.get('created_to'):
-                _range['lte'] = get_local_date(req.args['created_to'], '23:59:59', offset)
-            source['post_filter']['bool']['must'].append(
-                {'range': {'versioncreated': _range}}
-            )
+            source['post_filter']['bool']['must'].append(_versioncreated_range(req.args))
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
@@ -185,18 +192,20 @@ class WireSearchService(newsroom.Service):
             if not user:
                 continue
 
-            topic_filter = {
-                'bool': {
-                    'must': [{
-                        'query_string': {
-                            'query': topic['query'],
-                            'default_operator': 'AND',
-                            'lenient': True,
-                        },
-                        }
-                    ],
-                }
-            }
+            topic_filter = {'bool': {'must': []}}
+
+            if topic.get('query'):
+                topic_filter['bool']['must'].append(_query_string(topic['query']))
+
+            if topic.get('created'):
+                topic_filter['bool']['must'].append(_versioncreated_range(dict(
+                    created_from=topic['created'].get('from'),
+                    created_to=topic['created'].get('to'),
+                    timezone_offset=topic.get('timezone_offset', '0')
+                )))
+
+            if topic.get('filter'):
+                topic_filter['bool']['must'] += _filter_terms(topic['filter'])
 
             company = companies.get(str(user.get('company', '')))
 
