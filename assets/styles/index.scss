@@ -884,7 +884,13 @@ article.list {
 }
 
 .wire-articles__item--list__actions {
-    margin-left: 20px;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    > * {
+        margin-bottom: 5px;
+    }
     .btn-group {
         &:hover {
             > span > [class^="icon--"], [class*=" icon--"] {
