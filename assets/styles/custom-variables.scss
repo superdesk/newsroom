@@ -41,6 +41,16 @@ $input-bg: $background-color;
 $custom-checkbox-indicator-border-radius: 2px;
 $custom-control-indicator-bg: transparent;
 
+// Dropdowns
+
+$dropdown-padding-y: 0;
+$dropdown-item-padding-y: 1rem;
+$dropdown-item-padding-x: 1rem;
+$dropdown-link-hover-bg: #eff4f6;
+$dropdown-border-width: 0;
+$dropdown-min-width: 12rem;
+
+
 // Modals
 
 $modal-backdrop-bg: #fff;

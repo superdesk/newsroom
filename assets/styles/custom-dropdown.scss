@@ -1,0 +1,38 @@
+// Custom dropdowns
+
+.dropdown-menu {
+  font-size: 0.875rem; // 14px
+  margin-top: 0px;
+  border-radius: 0px;
+  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
+
+  [class^="icon--"], [class*=" icon--"] {
+      vertical-align: middle;
+  }
+}
+.dropdown-item {
+  [class^="icon--"], [class*=" icon--"] {
+      margin-right: 1rem;
+  }
+  &:active {
+      background-color: $main-blue;
+      [class^="icon--"], [class*=" icon--"] {
+          color: white;
+      }
+  }
+}
+
+.dropdown-menu-right {
+  right: 0;
+  left: auto !important;
+  transform: initial !important;
+  top: 100% !important;
+}
+
+.dropdown-header {
+  font-size: 1rem;
+  color: $body-text;
+  font-weight: 700;
+  padding: 1rem;
+  border-bottom: 1px solid #e7e7e7;
+}

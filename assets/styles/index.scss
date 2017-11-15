@@ -15,38 +15,7 @@ body {
 $nav-sidebar-bg: #3e4557;
 $nav-sidebar-border: #323847;
 
-
 // Bootstrap overwrite
-.dropdown-menu {
-    margin-top: 0px;
-    border-radius: 0px;
-    border: 0px;
-    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
-    font-size: 0.875rem;
-
-    [class^="icon--"], [class*=" icon--"] {
-        vertical-align: middle;
-    }
-}
-.dropdown-item {
-    padding: .25rem 1rem;
-    [class^="icon--"], [class*=" icon--"] {
-        margin-right: 1rem;
-    }
-    &:active {
-        background-color: $main-blue;
-        [class^="icon--"], [class*=" icon--"] {
-            color: white;
-        }
-    }
-}
-
-.dropdown-menu-right {
-    right: 0;
-    left: auto !important;
-    transform: initial !important;
-    top: 100% !important;
-}
 
 .form-alert {
     width: 450px;
