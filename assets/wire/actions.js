@@ -169,6 +169,7 @@ export function submitFollowTopic(data) {
     return (dispatch, getState) => {
         const user = getState().user;
         const url = `/api/users/${user}/topics`;
+        data.timezone_offset = now.getTimezoneOffset();
         return server.post(url, data)
             .then((updates) => dispatch(addTopic(Object.assign(data, updates))))
             .then(() => dispatch(closeModal()))

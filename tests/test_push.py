@@ -14,12 +14,14 @@ def get_signature_headers(data, key):
 item = {
     'guid': 'foo',
     'type': 'text',
+    'headline': 'Foo',
     'renditions': {
         'thumbnail': {
             'href': 'http://example.com/foo',
             'media': 'foo',
         }
     },
+    'genre': [{'name': 'News', 'code': 'news'}],
     'associations': {
         'featured': {
             'type': 'picture',
@@ -279,3 +281,18 @@ def test_send_notification_emails(client, app):
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
     assert len(outbox) == 1
+
+
+def test_matching_topics(client, app):
+    client.post('/push', data=json.dumps(item), content_type='application/json')
+    search = get_resource_service('wire_search')
+    users = {'foo': {'company': None}}
+    companies = {}
+    topics = [
+        {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'foo'},
+        {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},
+        {'_id': 'filter', 'filter': {'genre': ['other']}, 'user': 'foo'},
+        {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
+    ]
+    matching = search.get_matching_topics(item['guid'], topics, users, companies)
+    assert ['query'] == matching
