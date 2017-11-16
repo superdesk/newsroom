@@ -1,8 +1,8 @@
 
 import { get, isEmpty, pickBy } from 'lodash';
-
 import server from 'server';
 import { gettext, notify, updateRouteParams, now } from 'utils';
+import { markItemAsRead } from './utils';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -20,8 +20,15 @@ export function setActive(item) {
 }
 
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function previewItem(item) {
+export function preview(item) {
     return {type: PREVIEW_ITEM, item};
+}
+
+export function previewItem(item) {
+    return (dispatch, getState) => {
+        markItemAsRead(item, getState());
+        dispatch(preview(item));
+    };
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
@@ -31,6 +38,7 @@ export function openItemDetails(item) {
 
 export function openItem(item) {
     return (dispatch, getState) => {
+        markItemAsRead(item, getState());
         dispatch(openItemDetails(item));
         updateRouteParams({
             item: item ? item._id : null
@@ -69,8 +77,8 @@ export function closeModal() {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data) {
-    return {type: INIT_DATA, data};
+export function initData(wireData, readData) {
+    return {type: INIT_DATA, wireData, readData};
 }
 
 export const ADD_TOPIC = 'ADD_TOPIC';

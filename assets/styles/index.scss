@@ -718,6 +718,10 @@ article.list {
     outline: 1px solid #00aceb;
 }
 
+.wire-articles__item--visited {
+    background-color: rgba(227, 227, 227, 0.57);
+}
+
 .wire-articles__item.wire-articles__item--selected {
     border: 4px solid #e6f7fd;
     outline: 1px solid #00aceb;
