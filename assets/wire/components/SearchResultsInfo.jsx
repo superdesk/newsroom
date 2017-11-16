@@ -5,7 +5,6 @@ import { isEmpty } from 'lodash';
 import { gettext } from 'utils';
 import { getActiveQuery, isTopicActive } from 'wire/utils';
 
-import './SearchResultsInfo.scss';
 
 function SearchResultsInfo({user, query, totalItems, followTopic, topics, bookmarks, activeFilter, createdFilter}) {
     const activeQuery = getActiveQuery(query, activeFilter, createdFilter);

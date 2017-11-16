@@ -554,6 +554,27 @@ article.list {
     flex-grow: 1;
 }
 
+.search-results-info {
+    font-size: 0.875rem; // 14px
+    line-height: 1.4;
+    display: flex;
+    margin-right: 40px;
+}
+
+.search-results-info__num {
+    font-size: 2.375rem; // 38px
+    font-weight: 300;
+    line-height: 1em;
+    margin-right: 10px;
+}
+
+.search-results-info__text {
+    color: #6e6e6e;
+    b {
+        color: $body-text;    
+    }
+}
+
 .wire-column--3 {
     opacity: 1;
     transition: opacity .2s ease-in;
