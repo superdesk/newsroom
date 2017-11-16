@@ -761,6 +761,19 @@ article.list {
     flex-direction: row;
 }
 
+.wire-articles--list-compact {
+    .wire-articles__item {
+        padding: 6px 15px;
+    }
+    .wire-articles__item--list__headline {
+        font-size: 0.875rem; // 14px    
+        margin-bottom: 0px;
+        label {
+            margin-bottom: 2px;
+        }
+    }
+}
+
 .wire-articles__item--list__text {
     display: flex;
     flex-direction: column;
