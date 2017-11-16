@@ -2,64 +2,63 @@
 
 {% block contentMain %}
 
-<div class="container py-6">
+<div class="container-fluid py-5 overflow-auto">
     <div class="row">
-        <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-6 mx-auto">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="mb-0">{{ gettext("Newsroom sign up") }}</h3>
-                        </div>
-                        <div class="card-body">
-                            <form class="form" method="post">
-
-                                {{ form.csrf_token }}
-
-                                {% include "form_alerts.html" %}
-
-                                <div class="form-group">
-                                    <label for="first_name">{{ gettext(form.first_name.label.text) }}</label>
-                                    {{ form.first_name(class="form-control", id="first_name", required="true") }}
-                                </div>
-                                <div class="form-group">
-                                    <label for="last_name">{{ gettext(form.last_name.label.text) }}</label>
-                                    {{ form.last_name(class="form-control", id="last_name", required="true") }}
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">{{ gettext(form.email.label.text) }}</label>
-                                    {{ form.email(class="form-control", id="email", required="true") }}
-                                </div>
-                                <div class="form-group">
-                                    <label for="phone">{{ gettext(form.phone.label.text) }}</label>
-                                    {{ form.phone(class="form-control", id="phone", required="true") }}
-                                </div>
-                                <div class="form-group">
-                                    <label for="country">{{ gettext(form.country.label.text) }}</label>
-                                    {{ form.country(class="form-control", id="country", required="true") }}
-                                </div>
-                                <div class="form-group">
-                                    <label for="company">{{ gettext(form.company.label.text) }}</label>
-                                    {{ form.company(class="form-control", id="company", required="true") }}
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="occupation">{{ gettext(form.occupation.label.text) }}</label>
-                                    {{ form.occupation(class="form-control", id="occupation", required="true") }}
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="company_size">{{ gettext(form.company_size.label.text) }}</label>
-                                    {{ form.company_size(class="form-control", id="company_size", required="true") }}
-                                </div>
-
-                                <div class="g-recaptcha" data-sitekey={{ sitekey }} data-callback="enableSubmitButton"></div>
-
-                                <button type="submit" class="btn btn-primary btn-lg float-right" id="signup-submit" disabled>
-                                    {{ gettext("Sign up") }}</button>
-                            </form>
-                        </div>
+        <div class="col-12 col-md-8 col-lg-6 col-xxl-4 mx-auto">
+            <div class="card border-0 bg-white box-shadow--z1">
+                <div class="card-header pt-4 border-0 bg-white">
+                    <div class="text-center mb-4">
+                            <img src="{{ url_for('static', filename = 'logo-aap.svg') }}" width="120"/>
                     </div>
+                    <h5 class="mb-0">{{ gettext("Sign up") }}</h5>
+                </div>
+                <div class="card-body pt-1">
+                    <form class="form" method="post">
+
+                        {{ form.csrf_token }}
+
+                        {% include "form_alerts.html" %}
+
+                        <div class="form-group">
+                            <label for="first_name">{{ gettext(form.first_name.label.text) }}</label>
+                            {{ form.first_name(class="form-control", id="first_name", required="true") }}
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">{{ gettext(form.last_name.label.text) }}</label>
+                            {{ form.last_name(class="form-control", id="last_name", required="true") }}
+                        </div>
+                        <div class="form-group">
+                            <label for="email">{{ gettext(form.email.label.text) }}</label>
+                            {{ form.email(class="form-control", id="email", required="true") }}
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">{{ gettext(form.phone.label.text) }}</label>
+                            {{ form.phone(class="form-control", id="phone", required="true") }}
+                        </div>
+                        <div class="form-group">
+                            <label for="country">{{ gettext(form.country.label.text) }}</label>
+                            {{ form.country(class="form-control", id="country", required="true") }}
+                        </div>
+                        <div class="form-group">
+                            <label for="company">{{ gettext(form.company.label.text) }}</label>
+                            {{ form.company(class="form-control", id="company", required="true") }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="occupation">{{ gettext(form.occupation.label.text) }}</label>
+                            {{ form.occupation(class="form-control", id="occupation", required="true") }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="company_size">{{ gettext(form.company_size.label.text) }}</label>
+                            {{ form.company_size(class="form-control", id="company_size", required="true") }}
+                        </div>
+
+                        <div class="g-recaptcha mb-4" data-sitekey={{ sitekey }} data-callback="enableSubmitButton"></div>
+
+                        <button type="submit" class="btn btn-primary btn-block" id="signup-submit" disabled>
+                            {{ gettext("Sign up") }}</button>
+                    </form>
                 </div>
             </div>
         </div>

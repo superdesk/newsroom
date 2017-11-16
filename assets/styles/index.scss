@@ -4,7 +4,6 @@ html {
 }
 
 body {
-    font-family: $font-family-serif;;
     color: $body-text;
     background-color: $background-color;
     overflow: hidden;
@@ -81,10 +80,10 @@ label {
         padding: 1rem .75rem;
         border-top: none;
         &.name {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
-            font-family: initial;
-            line-height: 110%;
+            font-family: $font-family-serif;
+            line-height: 120%;
         }
     }
 }
