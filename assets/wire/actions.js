@@ -293,9 +293,9 @@ export function submitDownloadItems(items, format) {
     };
 }
 
-export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
-export function setNewItems(data) {
-    return {type: SET_NEW_ITEMS, data};
+export const SET_NEW_ITEMS_BY_TOPIC = 'SET_NEW_ITEMS_BY_TOPIC';
+export function setNewItemsByTopic(data) {
+    return {type: SET_NEW_ITEMS_BY_TOPIC, data};
 }
 
 
@@ -313,9 +313,24 @@ export function pushNotification(push) {
     return (dispatch) => {
         switch (push.event) {
         case 'topic_matches':
-            return dispatch(setNewItems(push.extra));
+            return dispatch(setNewItemsByTopic(push.extra));
+
+        case 'new_item':
+            return new Promise((resolve, reject) => {
+                dispatch(fetchNewItems()).then(resolve).catch(reject);
+            });
         }
     };
+}
+
+export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
+export function setNewItems(data) {
+    return {type: SET_NEW_ITEMS, data};
+}
+
+export function fetchNewItems() {
+    return (dispatch, getState) => search(getState())
+        .then((response) => dispatch(setNewItems(response)));
 }
 
 export function fetchNext(item) {
@@ -440,4 +455,8 @@ export const SET_VIEW = 'SET_VIEW';
 export function setView(view) {
     localStorage.setItem('view', view);
     return {type: SET_VIEW, view};
+}
+
+export function refresh() {
+    return (dispatch, getState) => dispatch(recieveItems(getState().newItemsData));
 }

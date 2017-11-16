@@ -75,12 +75,19 @@ describe('wire actions', () => {
         expect(fetchMock.called('/wire_bookmark')).toBeTruthy();
     });
 
-    it('can populate new items on update notification', () => {
-        expect(store.getState().newItems.length).toBe(0);
+    it('can populate new items on update notification by topic', () => {
+        expect(store.getState().newItemsByTopic).toEqual({});
         store.dispatch(actions.pushNotification({
             event: 'topic_matches', extra: {topics: [1], item:{'_id': 'a'}}}));
-        expect(store.getState().newItems.length).toBe(1);
-        expect(store.getState().newItemsByTopic[1].length).toBe(1);
+        expect(store.getState().newItemsByTopic).toEqual({1: [{'_id': 'a'}]});
+    });
+
+    it('can populate new items on update', () => {
+        expect(store.getState().newItems).toEqual([]);
+        return store.dispatch(actions.pushNotification({event: 'new_item'}))
+            .then(() => {
+                expect(store.getState().newItems).toEqual(['foo']);
+            });
     });
 
     it('can open item', () => {

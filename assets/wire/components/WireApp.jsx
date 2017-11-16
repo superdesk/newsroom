@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 import {
     followTopic,
@@ -18,6 +18,7 @@ import {
     openItem,
     fetchMoreItems,
     setView,
+    refresh,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -27,11 +28,12 @@ import SearchResultsInfo from './SearchResultsInfo';
 import SearchSidebar from './SearchSidebar';
 import SelectedItemsBar from './SelectedItemsBar';
 import ListViewControls from './ListViewControls';
+import DownloadItemsModal from './DownloadItemsModal';
+import ItemDetails from './ItemDetails';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
-import DownloadItemsModal from './DownloadItemsModal';
-import ItemDetails from './ItemDetails';
+import RefreshButton from 'components/RefreshButton';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -138,6 +140,10 @@ class WireApp extends React.Component {
                                 />
                             }
 
+                            {!isEmpty(this.props.newItems) &&
+                                <RefreshButton count={this.props.newItems.length} onClick={this.props.refresh} />
+                            }
+
                             <ItemsList
                                 actions={this.props.actions.filter(previewActionFilter)}
                                 activeView={this.props.activeView}
@@ -190,6 +196,8 @@ WireApp.propTypes = {
     activeView: PropTypes.string,
     setView: PropTypes.func,
     followStory: PropTypes.func,
+    newItems: PropTypes.array,
+    refresh: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -207,6 +215,7 @@ const mapStateToProps = (state) => ({
     selectedItems: state.selectedItems,
     bookmarks: state.bookmarks,
     activeView: get(state, 'wire.activeView'),
+    newItems: state.newItems,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -267,6 +276,7 @@ const mapDispatchToProps = (dispatch) => ({
     ],
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
+    refresh: () => dispatch(refresh()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

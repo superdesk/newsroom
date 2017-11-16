@@ -84,7 +84,6 @@ def push():
 
 
 def notify_new_item(item, check_topics=True):
-
     if item.get('pubstatus') == 'canceled' or item.get('type') == 'composite':
         return
 
@@ -96,6 +95,8 @@ def notify_new_item(item, check_topics=True):
     all_companies = list(query_resource('companies', lookup=lookup, max_results=200))
     company_ids = [c['_id'] for c in all_companies]
     companies_dict = {str(company['_id']): company for company in all_companies}
+
+    push_notification('new_item', item=item['_id'])
 
     if check_topics:
         notify_topic_matches(item, users_dict, companies_dict)

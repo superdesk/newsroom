@@ -18,7 +18,7 @@ import {
     SELECT_NONE,
     BOOKMARK_ITEMS,
     REMOVE_BOOKMARK,
-    SET_NEW_ITEMS,
+    SET_NEW_ITEMS_BY_TOPIC,
     TOGGLE_SERVICE,
     TOGGLE_FILTER,
     START_LOADING,
@@ -26,6 +26,7 @@ import {
     SET_CREATED_FILTER,
     RESET_FILTER,
     SET_VIEW,
+    SET_NEW_ITEMS,
 } from './actions';
 
 import { toggleValue } from 'utils';
@@ -49,6 +50,7 @@ const initialState = {
     bookmarks: false,
     formats: [],
     newItems: [],
+    newItemsData: null,
     newItemsByTopic: {},
     wire: {
         services: [],
@@ -73,6 +75,8 @@ function recieveItems(state, data) {
         isLoading: false,
         totalItems: data._meta.total,
         aggregations: data._aggregations || null,
+        newItems: [],
+        newItemsData: null,
     };
 }
 
@@ -265,16 +269,12 @@ export default function wireReducer(state = initialState, action) {
             bookmarkedItems: state.bookmarkedItems.filter((val) => val !== action.item),
         };
 
-    case SET_NEW_ITEMS: {
-        const newItemsByTopic = state.newItemsByTopic || {};
+    case SET_NEW_ITEMS_BY_TOPIC: {
+        const newItemsByTopic = Object.assign({}, state.newItemsByTopic);
         action.data.topics.map((topic) => {
-            newItemsByTopic[topic] = newItemsByTopic[topic] || [];
-            newItemsByTopic[topic].push(action.data.item);
+            const previous = newItemsByTopic[topic] || [];
+            newItemsByTopic[topic] = previous.concat([action.data.item]);
         });
-
-        const newItems = state.newItems ?
-            state.newItems.slice(0, state.newItems.length) : [];
-        newItems.push(action.data.item);
 
         let itemsById = state.itemsById;
         if (get(action.data, 'item._id') && state.itemsById[action.data.item._id]) {
@@ -284,30 +284,27 @@ export default function wireReducer(state = initialState, action) {
 
         return {
             ...state,
-            newItems,
-            newItemsByTopic,
             itemsById,
+            newItemsByTopic,
         };
     }
 
-
     case REMOVE_NEW_ITEMS: {
-        const newItemsByTopic = state.newItemsByTopic || {};
-        let newItems = state.newItems || [];
-
-        if (state.newItemsByTopic[action.data]) {
-
-            newItemsByTopic[action.data].map((item) => {
-                newItems = newItems.filter((newItem) => newItem._id !== item._id);
-            });
-        }
-
+        const newItemsByTopic = Object.extend({}, state.newItemsByTopic);
         newItemsByTopic[action.data] = null;
+        return {
+            ...state,
+            newItemsByTopic
+        };
+    }
 
+    case SET_NEW_ITEMS: {
+        const newItems = action.data._items.map((item) => item._id).filter((_id) => !state.itemsById[_id]);
+        const newItemsData = action.data;
         return {
             ...state,
             newItems,
-            newItemsByTopic
+            newItemsData,
         };
     }
 
