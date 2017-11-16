@@ -1,0 +1,48 @@
+// Shadow helper classes
+// --------------------------------------------------
+    
+.box-shadow--z1 {
+    box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 0 1px rgba(0,0,0,.08) !important;
+    transition: box-shadow 0.3s ease-out; 
+    &.btn:active {
+        box-shadow: none !important;
+        transition: box-shadow 0.4s ease-out;        
+    }
+}
+.box-shadow--z2 {
+    box-shadow: 0 1px 4px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.16) !important;
+    transition: box-shadow 0.3s ease-out; 
+    &.btn:active {
+        box-shadow: none !important;
+        transition: box-shadow 0.4s ease-out;        
+    }
+}
+.box-shadow--z3 {
+    box-shadow: 0 1px 6px rgba(0,0,0,.1), 0 3px 8px rgba(0,0,0,.24) !important;
+    transition: box-shadow 0.3s ease-out; 
+    &.btn:active {
+        box-shadow: none !important;
+        transition: box-shadow 0.4s ease-out;        
+    }
+}
+.box-shadow--z4 {
+    box-shadow: 0 2px 10px rgba(0,0,0,.2), 0 6px 16px rgba(0,0,0,.3) !important;
+    transition: box-shadow 0.3s ease-out; 
+    &.btn:active {
+        box-shadow: none !important;
+        transition: box-shadow 0.4s ease-out;        
+    }
+}
+
+// Overflow helper classes
+// --------------------------------------------------
+
+.overflow-auto {
+    overflow: auto !important;
+}
+.overflow-hidden {
+    overflow: hidden !important;
+}
+.overflow-visible {
+    overflow: visible !important;
+}

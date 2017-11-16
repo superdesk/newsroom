@@ -2,43 +2,43 @@
 
 {% block contentMain %}
 
-<div class="container py-5">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-6 mx-auto">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="mb-0">{{ gettext("Newsroom login") }}</h3>
-                        </div>
-                        <div class="card-body">
-                            <form class="form" role="form" id="formLogin" method="post">
-
-                                {{ form.csrf_token }}
-
-                                {% include "form_alerts.html" %}
-
-                                <div class="form-group">
-                                    <label for="email">{{ gettext(form.email.label.text) }}</label>
-                                    {{ form.email(class="form-control", id="email", required="true") }}
-                                </div>
-                                <div class="form-group">
-                                    <label for="password">{{ gettext(form.password.label.text) }}</label>
-                                    {{ form.password(class="form-control", id="password", required="true") }}
-                                </div>
-                                <div class="form-check">
-                                    <label class="form-check-label">
-                                        {{ form.remember_me(class="form-check-input", id="remember_me") }}
-                                        {{ gettext(form.remember_me.label.text) }}
-                                    </label>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-lg float-right">{{ gettext("Login") }}</button>
-                            </form>
-                        </div>
-                        <div class="card-footer text-muted">
-                            <p>Forgot your password? <a href="{{ url_for('auth.token', token_type='reset_password') }}">Click here</a> to reset</p>
-                        </div>
+<div class="container-fluid py-5 overflow-auto">
+    <div class="row">        
+        <div class="col-12 col-md-8 col-lg-6 col-xxl-4 mx-auto">
+            <div class="card border-0 bg-white box-shadow--z1">
+                <div class="card-header pt-4 border-0 bg-white">
+                    <div class="text-center mb-4">
+                        <img src="{{ url_for('static', filename = 'logo-aap.svg') }}" width="120"/>
                     </div>
+                    <h5 class="mb-0">{{ gettext("Login") }}</h5>
+                </div>
+                <div class="card-body pt-1">
+                    <form class="form" role="form" id="formLogin" method="post">
+
+                        {{ form.csrf_token }}
+
+                        {% include "form_alerts.html" %}
+
+                        <div class="form-group">
+                            <label for="email">{{ gettext(form.email.label.text) }}</label>
+                            {{ form.email(class="form-control", id="email", required="true") }}
+                        </div>
+                        <div class="form-group">
+                            <label for="password">{{ gettext(form.password.label.text) }}</label>
+                            {{ form.password(class="form-control", id="password", required="true") }}
+                        </div>
+                        <div class="form-check mb-4">
+                            <label class="custom-control custom-checkbox">
+                                {{ form.remember_me(class="custom-control-input", id="remember_me") }}
+                                <span class="custom-control-indicator"></span>
+                                <span class="custom-control-description">{{ gettext(form.remember_me.label.text) }}</span>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">{{ gettext("Login") }}</button>
+                    </form>
+                </div>
+                <div class="card-footer bg-white border-0 text-muted small">
+                    <p>Forgot your password? <a href="{{ url_for('auth.token', token_type='reset_password') }}">Click here</a> to reset</p>
                 </div>
             </div>
         </div>

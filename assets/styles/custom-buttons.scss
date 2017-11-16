@@ -7,6 +7,12 @@
     letter-spacing: 0.04rem;
     white-space: normal;
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, 1.2rem, $btn-border-radius);
+    
+    &.disabled,
+    &:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
 }
 
 @mixin button-outline-variant($color, $color-hover: #fff, $border-color: $color) {
