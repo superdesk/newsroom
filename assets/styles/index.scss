@@ -842,6 +842,8 @@ article.list {
     figure {
         margin-left: 20px;
         margin-bottom: 0px;
+
+        img { max-width: 200px; }
     }
 }
 
@@ -1378,8 +1380,8 @@ article.list {
 
 .simple-card__icons {
     display: flex;
-    flex: 0 0 auto;    
-    max-width: 0px;    
+    flex: 0 0 auto;
+    max-width: 0px;
     overflow: hidden;
     transition: max-width 0.2s;
     > .icon-button {
