@@ -29,8 +29,8 @@ import {
     SET_NEW_ITEMS,
 } from './actions';
 
-import { toggleValue } from 'utils';
 import { get } from 'lodash';
+import { toggleValue } from 'utils';
 import { EXTENDED_VIEW } from './defaults';
 
 const initialState = {
@@ -299,7 +299,7 @@ export default function wireReducer(state = initialState, action) {
     }
 
     case SET_NEW_ITEMS: {
-        const newItems = action.data._items.map((item) => item._id).filter((_id) => !state.itemsById[_id]);
+        const newItems = action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id);
         const newItemsData = action.data;
         return {
             ...state,

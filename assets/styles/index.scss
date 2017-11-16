@@ -1378,8 +1378,8 @@ article.list {
 
 .simple-card__icons {
     display: flex;
-    flex: 0 0 auto;    
-    max-width: 0px;    
+    flex: 0 0 auto;
+    max-width: 0px;
     overflow: hidden;
     transition: max-width 0.2s;
     > .icon-button {
@@ -1418,6 +1418,7 @@ article.list {
     background: transparent;
     border: none;
     padding: 0px;
+    cursor: pointer;
     &:focus {
         outline: none;
     }
