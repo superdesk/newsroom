@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 
 import { gettext } from 'utils';
 import WireListItem from './WireListItem';
 import { setActive, previewItem, toggleSelected, openItem } from '../actions';
+import { EXTENDED_VIEW } from '../defaults';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
@@ -102,8 +104,10 @@ class ItemsList extends React.Component {
     }
 
     render() {
-        const {items, itemsById, activeItem} = this.props;
+        const {items, itemsById, activeItem, activeView} = this.props;
         const filteredActions = this.filterActions();
+        const isExtended = activeView === EXTENDED_VIEW;
+
         const articles = items.map((_id) =>
             <WireListItem
                 key={_id}
@@ -116,12 +120,16 @@ class ItemsList extends React.Component {
                 showActions={!!this.state.actioningItem && this.state.actioningItem._id === _id}
                 toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
                 actions={filteredActions}
-                activeView={this.props.activeView}
+                isExtended={isExtended}
             />
         );
 
+        const listClassName = classNames('wire-articles wire-articles--list row', {
+            'wire-articles--list-compact': !isExtended,
+        });
+
         return (
-            <div className="wire-articles wire-articles--list row" onKeyDown={this.onKeyDown}>
+            <div className={listClassName} onKeyDown={this.onKeyDown}>
                 {articles}
                 {!articles.length &&
                     <div className="wire-articles__item-wrap col-12">

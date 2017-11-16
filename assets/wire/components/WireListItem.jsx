@@ -4,7 +4,6 @@ import classNames from 'classnames';
 
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import { getPicture, getThumbnailRendition, showItemVersions, shortText } from 'wire/utils';
-import { EXTENDED_VIEW } from 'wire/defaults';
 import ActionList from 'components/ActionList';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
@@ -44,14 +43,13 @@ class WireListItem extends React.Component {
     }
 
     render() {
-        const {item, onClick, onDoubleClick, activeView} = this.props;
+        const {item, onClick, onDoubleClick, isExtended} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--open': this.props.isActive,
             'wire-articles__item--selected': this.props.isSelected,
         });
         const picture = getPicture(item);
-        const isExtended = activeView === EXTENDED_VIEW;
         return (
             <article key={item._id}
                 className={cardClassName}
@@ -155,7 +153,7 @@ WireListItem.propTypes = {
         name: PropTypes.string,
         action: PropTypes.func,
     })),
-    activeView: PropTypes.string,
+    isExtended: PropTypes.bool.isRequired,
 };
 
 export default WireListItem;
