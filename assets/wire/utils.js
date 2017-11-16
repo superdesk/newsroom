@@ -1,7 +1,58 @@
+import Store from 'store';
+import localStorage from 'store/storages/localStorage';
+import operationsPlugin from 'store/plugins/operations';
+
 import { get, isEmpty, isEqual, pickBy } from 'lodash';
 import { getTextFromHtml } from 'utils';
 
 const STATUS_KILLED = 'canceled';
+const READ_ITEMS_STORE = 'read_items';
+
+const store = Store.createStore([localStorage], [operationsPlugin]);
+
+/**
+ * Get read items
+ *
+ * @returns {Object}
+ */
+export function getReadItems() {
+    return store.get(READ_ITEMS_STORE);
+}
+
+/**
+ * Marks the given item as read
+ *
+ * @param {Object} item
+ * @param {Object} state
+ */
+export function markItemAsRead(item, state) {
+    if (item && item._id && item.version) {
+        store.assign(READ_ITEMS_STORE, {[item._id]: getMaxVersion(state.readItems[item._id], item.version)});
+    }
+}
+
+/**
+ * Returns the greater version
+ *
+ * @param versionA
+ * @param versionB
+ * @returns {number}
+ */
+export function getMaxVersion(versionA, versionB) {
+    return Math.max(parseInt(versionA, 10) || 0, parseInt(versionB, 10) || 0);
+}
+
+/**
+ * Returns the item version as integer
+ *
+ * @param {Object} item
+ * @returns {number}
+ */
+export function getIntVersion(item) {
+    if (item) {
+        return parseInt(item.version, 10) || 0;
+    }
+}
 
 /**
  * Get picture for an item

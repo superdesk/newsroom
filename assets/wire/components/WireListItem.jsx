@@ -46,6 +46,7 @@ class WireListItem extends React.Component {
         const {item, onClick, onDoubleClick, isExtended} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
+            'wire-articles__item--visited': this.props.isRead,
             'wire-articles__item--open': this.props.isActive,
             'wire-articles__item--selected': this.props.isSelected,
         });
@@ -144,6 +145,7 @@ WireListItem.propTypes = {
     item: PropTypes.object.isRequired,
     isActive: PropTypes.bool.isRequired,
     isSelected: PropTypes.bool.isRequired,
+    isRead: PropTypes.bool.isRequired,
     onClick: PropTypes.func.isRequired,
     onDoubleClick: PropTypes.func.isRequired,
     onActionList: PropTypes.func.isRequired,

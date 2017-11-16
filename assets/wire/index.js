@@ -1,14 +1,14 @@
 import { createStore, render, initWebSocket } from 'utils';
 
 import wireReducer from './reducers';
+import { getReadItems} from './utils';
 import WireApp from './components/WireApp';
 import { fetchItems, setState, initData, initParams, pushNotification, setView } from './actions';
 
 const store = createStore(wireReducer);
 
-if (window.wireData) {
-    store.dispatch(initData(window.wireData));
-}
+// init data
+store.dispatch(initData(window.wireData || {}, getReadItems()));
 
 // init query
 const params = new URLSearchParams(window.location.search);

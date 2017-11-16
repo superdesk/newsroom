@@ -7,6 +7,7 @@ import { gettext } from 'utils';
 import WireListItem from './WireListItem';
 import { setActive, previewItem, toggleSelected, openItem } from '../actions';
 import { EXTENDED_VIEW } from '../defaults';
+import { getIntVersion } from '../utils';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
@@ -44,9 +45,10 @@ class ItemsList extends React.Component {
 
         // keep it within <0, items.length) interval
         const nextIndex = Math.max(0, Math.min(activeIndex + diff, this.props.items.length - 1));
-        const nextItem = this.props.items[nextIndex];
+        const nextItemId = this.props.items[nextIndex];
+        const nextItem = this.props.itemsById[nextItemId];
 
-        this.props.dispatch(setActive(nextItem));
+        this.props.dispatch(setActive(nextItemId));
 
         if (this.previewTimeout) {
             clearTimeout(this.previewTimeout);
@@ -78,7 +80,7 @@ class ItemsList extends React.Component {
             this.props.dispatch(setActive(itemId));
 
             if (this.props.previewItem !== itemId) {
-                this.props.dispatch(previewItem(itemId));
+                this.props.dispatch(previewItem(item));
             } else {
                 this.props.dispatch(previewItem(null));
             }
@@ -104,7 +106,7 @@ class ItemsList extends React.Component {
     }
 
     render() {
-        const {items, itemsById, activeItem, activeView} = this.props;
+        const {items, itemsById, activeItem, activeView, selectedItems, readItems} = this.props;
         const filteredActions = this.filterActions();
         const isExtended = activeView === EXTENDED_VIEW;
 
@@ -113,7 +115,8 @@ class ItemsList extends React.Component {
                 key={_id}
                 item={itemsById[_id]}
                 isActive={activeItem === _id}
-                isSelected={this.props.selectedItems.indexOf(_id) !== -1}
+                isSelected={selectedItems.indexOf(_id) !== -1}
+                isRead={readItems[_id] === getIntVersion(itemsById[_id])}
                 onClick={this.onItemClick}
                 onDoubleClick={this.onItemDoubleClick}
                 onActionList={this.onActionList}
@@ -148,6 +151,7 @@ ItemsList.propTypes = {
     previewItem: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
     selectedItems: PropTypes.array,
+    readItems: PropTypes.object,
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         action: PropTypes.func,
@@ -164,6 +168,7 @@ const mapStateToProps = (state) => ({
     activeItem: state.activeItem,
     previewItem: state.previewItem,
     selectedItems: state.selectedItems,
+    readItems: state.readItems,
     bookmarks: state.bookmarks,
     user: state.user,
     company: state.company,

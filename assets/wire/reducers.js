@@ -32,6 +32,7 @@ import {
 import { get } from 'lodash';
 import { toggleValue } from 'utils';
 import { EXTENDED_VIEW } from './defaults';
+import { getMaxVersion } from './utils';
 
 const initialState = {
     items: [],
@@ -52,6 +53,7 @@ const initialState = {
     newItems: [],
     newItemsData: null,
     newItemsByTopic: {},
+    readItems: {},
     wire: {
         services: [],
         activeService: {},
@@ -78,6 +80,16 @@ function recieveItems(state, data) {
         newItems: [],
         newItemsData: null,
     };
+}
+
+function getReadItems(state, item) {
+    const readItems = Object.assign({}, state.readItems);
+
+    if (item) {
+        readItems[item._id] = getMaxVersion(readItems[item._id], item.version);
+    }
+
+    return readItems;
 }
 
 function _wireReducer(state, action) {
@@ -173,17 +185,26 @@ export default function wireReducer(state = initialState, action) {
             activeItem: action.item || null,
         };
 
-    case PREVIEW_ITEM:
-        return {
-            ...state,
-            previewItem: action.item || null,
-        };
+    case PREVIEW_ITEM: {
+        const readItems = getReadItems(state, action.item);
 
-    case OPEN_ITEM:
         return {
             ...state,
+            readItems,
+            previewItem: action.item ? action.item._id : null,
+        };
+    }
+
+    case OPEN_ITEM:{
+        const readItems = getReadItems(state, action.item);
+
+        return {
+            ...state,
+            readItems,
             openItem: action.item || null,
         };
+    }
+
 
     case SET_QUERY:
         return {...state, query: action.query};
@@ -223,12 +244,13 @@ export default function wireReducer(state = initialState, action) {
     case INIT_DATA:
         return {
             ...state,
-            user: action.data.user || null,
-            topics: action.data.topics || [],
-            company: action.data.company || null,
-            bookmarks: action.data.bookmarks || false,
-            formats: action.data.formats || [],
-            wire: Object.assign(state.wire, {services: action.data.services}),
+            readItems: action.readData || {},
+            user: action.wireData.user || null,
+            topics: action.wireData.topics || [],
+            company: action.wireData.company || null,
+            bookmarks: action.wireData.bookmarks || false,
+            formats: action.wireData.formats || [],
+            wire: Object.assign(state.wire, {services: action.wireData.services || []}),
         };
 
     case ADD_TOPIC:
