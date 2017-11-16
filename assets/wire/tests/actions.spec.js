@@ -90,6 +90,17 @@ describe('wire actions', () => {
             });
     });
 
+    it('can filter out updated items from newItems', () => {
+        store.dispatch(actions.setNewItems({
+            _items: [
+                {_id: 'foo'},
+                {_id: 'bar', 'nextversion': 'x'},
+                {_id: 'baz'}
+            ]
+        }));
+        expect(store.getState().newItems).toEqual(['foo', 'baz']);
+    });
+
     it('can open item', () => {
         store.dispatch(actions.openItem({_id: 'foo'}));
         expect(store.getState().openItem._id).toBe('foo');
