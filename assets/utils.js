@@ -133,7 +133,36 @@ export const notify = {
 export function getTextFromHtml(html) {
     const div = document.createElement('div');
     div.innerHTML = formatHTML(html);
-    return div.textContent || div.innerText || '';
+    const tree = document.createTreeWalker(div, NodeFilter.SHOW_TEXT);
+    const text = [];
+    while (tree.nextNode()) {
+        text.push(tree.currentNode.textContent);
+        if (tree.currentNode.nextSibling) {
+            switch(tree.currentNode.nextSibling.nodeName) {
+            case 'BR':
+            case 'HR':
+                text.push('\n');
+            }
+
+            continue;
+        }
+
+        switch (tree.currentNode.parentNode.nodeName) {
+        case 'P':
+        case 'LI':
+        case 'H1':
+        case 'H2':
+        case 'H3':
+        case 'H4':
+        case 'H5':
+        case 'DIV':
+        case 'TABLE':
+        case 'BLOCKQUOTE':
+            text.push('\n');
+        }
+    }
+
+    return text.join('');
 }
 
 /**
@@ -221,5 +250,3 @@ export function initWebSocket(store, action) {
         };
     }
 }
-
-

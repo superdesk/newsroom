@@ -25,3 +25,14 @@ describe('toggleValue', () => {
         expect(items).toEqual(['foo', 'bar']);
     });
 });
+
+describe('html text utils', () => {
+    const html = '<p>Rolling News Bulletin</p><p></p><p></p><p>Parliament (CANBERRA)</p><p>Labor is still</p>';
+    const text = 'Rolling News Bulletin\nParliament (CANBERRA)\nLabor is still\n';
+
+    it('can get text from html', () => {
+        expect(utils.getTextFromHtml(html)).toBe(text);
+        expect(utils.getTextFromHtml('<p>foo<br>bar</p>')).toBe('foo\nbar\n');
+        expect(utils.getTextFromHtml('<p>foo<span>bar</span></p>')).toBe('foobar');
+    });
+});

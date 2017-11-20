@@ -126,7 +126,7 @@ export function showItemVersions(item, next) {
 export function shortText(item, length=40) {
     const html = item.description_html || item.body_html || '<p></p>';
     const text = item.description_text || getTextFromHtml(html);
-    const words = text.split(' ');
+    const words = text.split(/\s/).filter((w) => w);
     return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
 }
 
