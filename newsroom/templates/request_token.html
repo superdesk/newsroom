@@ -19,7 +19,7 @@
                                 {% include "form_alerts.html" %}
 
                                 <div class="form-group">
-                                    <label for="email">{{ gettext(form.email.label.text) }}</label>
+                                    <label for="email">{{ form.email.label.text }}</label>
                                     {{ form.email(class="form-control", id="email", required="true") }}
                                 </div>
 
