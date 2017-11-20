@@ -29,6 +29,10 @@ class FiltersTab extends React.Component {
                 field: 'urgency',
                 label: gettext('News Value'),
             },
+            {
+                field: 'place',
+                label: gettext('Place'),
+            },
         ]};
 
         this.toggleGroup = this.toggleGroup.bind(this);

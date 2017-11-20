@@ -17,6 +17,7 @@ aggregations = {
     'service': {'terms': {'field': 'service.name', 'size': 50}},
     'subject': {'terms': {'field': 'subject.name', 'size': 20}},
     'urgency': {'terms': {'field': 'urgency'}},
+    'place': {'terms': {'field': 'place.name', 'size': 50}},
 }
 
 
@@ -52,7 +53,6 @@ class WireSearchResource(newsroom.Resource):
             'headline': 1,
             'body_html': 1,
             'versioncreated': 1,
-            'headline': 1,
             'nextversion': 1,
             'ancestors': 1,
         },
