@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
-import { closeModal, submitDownloadItems } from 'wire/actions';
+import { submitDownloadItems } from 'wire/actions';
 
-import Modal, { ModalPrimaryButton, ModalSecondaryButton } from 'components/Modal';
-import CloseButton from 'components/CloseButton';
+import Modal from 'components/Modal';
 import SelectInput from 'components/SelectInput';
 
 class DownloadItemsModal extends React.Component {
@@ -31,9 +30,7 @@ class DownloadItemsModal extends React.Component {
 
     render() {
         return (
-            <Modal onClose={closeModal}>
-                <CloseButton onClick={this.props.closeModal} />
-                <h4 className='modal-title'>{gettext('Download Items')}</h4>
+            <Modal onSubmit={this.onSubmit} title={gettext('Download Items')} onSubmitLabel={gettext('Download')}>
                 <form onSubmit={this.onSubmit}>
                     <SelectInput
                         name='format'
@@ -43,15 +40,6 @@ class DownloadItemsModal extends React.Component {
                         onChange={this.onChange}
                         options={this.props.options}
                     />
-                    <ModalSecondaryButton
-                        onClick={this.props.closeModal}
-                        label={gettext('Cancel')}
-                    />
-                    {' '}
-                    <ModalPrimaryButton
-                        type="submit"
-                        label={gettext('Download')}
-                    />
                 </form>
             </Modal>
         );
@@ -60,7 +48,6 @@ class DownloadItemsModal extends React.Component {
 
 DownloadItemsModal.propTypes = {
     options: PropTypes.array.isRequired,
-    closeModal: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     data: PropTypes.shape({
         items: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -72,7 +59,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    closeModal: () => dispatch(closeModal()),
     onSubmit: ({items, format}) => dispatch(submitDownloadItems(items, format)),
 });
 

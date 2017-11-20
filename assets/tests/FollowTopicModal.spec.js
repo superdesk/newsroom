@@ -1,6 +1,7 @@
 import expect from 'expect';
 import React from 'react';
 import { mount } from 'enzyme';
+import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import FollowTopicModal from '../components/FollowTopicModal';
 import thunk from 'redux-thunk';
@@ -12,7 +13,7 @@ function setup(props) {
 
     return {
         submit: props.submit,
-        wrapper: mount(<FollowTopicModal {...props} store={store} />),
+        wrapper: mount(<Provider store={store}><FollowTopicModal {...props} /></Provider>),
     };
 }
 

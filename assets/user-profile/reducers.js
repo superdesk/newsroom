@@ -6,9 +6,14 @@ import {
     SET_ERROR,
     GET_USER,
     EDIT_USER,
+} from './actions';
+
+import {
     RENDER_MODAL,
     CLOSE_MODAL,
-} from './actions';
+} from 'actions';
+
+import { modalReducer } from 'reducers';
 
 const initialState = {
     user: null,
@@ -49,7 +54,7 @@ export default function itemReducer(state = initialState, action) {
     }
 
     case EDIT_USER: {
-        
+
         const target = action.event.target;
         const field = target.name;
         const editedUser = Object.assign({}, state.editedUser);
@@ -57,7 +62,7 @@ export default function itemReducer(state = initialState, action) {
         return {...state, editedUser, errors: null};
     }
 
-    
+
     case INIT_DATA: {
         return {
             ...state,
@@ -77,10 +82,8 @@ export default function itemReducer(state = initialState, action) {
     }
 
     case RENDER_MODAL:
-        return {...state, modal: {modal: action.modal, data: action.data}};
-
     case CLOSE_MODAL:
-        return {...state, modal: null};
+        return {...state, modal: modalReducer(state.modal, action)};
 
     case SET_ERROR:
         return {...state, errors: action.errors};

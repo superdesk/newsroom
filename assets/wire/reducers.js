@@ -9,8 +9,6 @@ import {
     REMOVE_NEW_ITEMS,
     SET_STATE,
     SET_ACTIVE,
-    RENDER_MODAL,
-    CLOSE_MODAL,
     INIT_DATA,
     ADD_TOPIC,
     TOGGLE_SELECTED,
@@ -28,6 +26,9 @@ import {
     SET_VIEW,
     SET_NEW_ITEMS,
 } from './actions';
+
+import { RENDER_MODAL, CLOSE_MODAL } from 'actions';
+import { modalReducer } from 'reducers';
 
 import { get } from 'lodash';
 import { toggleValue } from 'utils';
@@ -145,19 +146,6 @@ function _wireReducer(state, action) {
     }
 }
 
-function _modalReducer(state, action) {
-    switch (action.type) {
-    case RENDER_MODAL:
-        return {modal: action.modal, data: action.data};
-
-    case CLOSE_MODAL:
-        return null;
-
-    default:
-        return state;
-    }
-}
-
 export default function wireReducer(state = initialState, action) {
     switch (action.type) {
 
@@ -239,7 +227,7 @@ export default function wireReducer(state = initialState, action) {
 
     case RENDER_MODAL:
     case CLOSE_MODAL:
-        return {...state, modal: _modalReducer(state.modal, action)};
+        return {...state, modal: modalReducer(state.modal, action)};
 
     case INIT_DATA:
         return {

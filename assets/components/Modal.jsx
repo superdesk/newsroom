@@ -1,6 +1,11 @@
 import 'bootstrap';
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gettext } from 'utils';
+import { connect } from 'react-redux';
+import { closeModal } from 'actions';
+
+import CloseButton from './CloseButton';
 
 /**
  * Primary modal button for actions like save/send/etc
@@ -67,7 +72,7 @@ class Modal extends React.Component {
     componentDidMount() {
         $(this.elem).modal();
         $(this.elem).on('hidden.bs.modal', () => {
-            this.props.onClose();
+            this.props.closeModal();
         });
     }
 
@@ -81,8 +86,25 @@ class Modal extends React.Component {
                 ref={(elem) => this.elem = elem}>
                 <div className="modal-dialog">
                     <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">{this.props.title}</h5>
+                            <CloseButton onClick={this.props.closeModal} />
+                        </div>
                         <div className="modal-body">
                             {this.props.children}
+                        </div>
+                        <div className="modal-footer">
+                            <ModalSecondaryButton
+                                type="reset"
+                                label={this.props.onCancelLabel}
+                                onClick={this.props.closeModal}
+                            />
+                            {' '}
+                            <ModalPrimaryButton
+                                type="submit"
+                                label={this.props.onSubmitLabel}
+                                onClick={this.props.onSubmit}
+                            />
                         </div>
                     </div>
                 </div>
@@ -92,8 +114,17 @@ class Modal extends React.Component {
 }
 
 Modal.propTypes = {
-    onClose: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onSubmitLabel: PropTypes.string,
+    onCancelLabel: PropTypes.string,
+    closeModal: PropTypes.func.isRequired,
 };
 
-export default Modal;
+Modal.defaultProps = {
+    onSubmitLabel: gettext('Save'),
+    onCancelLabel: gettext('Cancel'),
+};
+
+export default connect(null, {closeModal})(Modal);

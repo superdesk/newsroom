@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
-import { closeModal, submitFollowTopic as submitWireFollowTopic } from 'wire/actions';
+import { submitFollowTopic as submitWireFollowTopic } from 'wire/actions';
 import { submitFollowTopic as submitProfileFollowTopic } from 'user-profile/actions';
 
-import Modal, { ModalPrimaryButton, ModalSecondaryButton } from './Modal';
-import CloseButton from './CloseButton';
+import Modal from './Modal';
 import TextInput from './TextInput';
 import CheckboxInput from './CheckboxInput';
 
@@ -48,9 +47,7 @@ class FollowTopicModal extends React.Component {
 
     render() {
         return (
-            <Modal onClose={this.props.closeModal}>
-                <CloseButton onClick={this.props.closeModal} />
-                <h1>{gettext('Save as topic')}</h1>
+            <Modal title={gettext('Save as topic')} onSubmit={this.onSubmit}>
                 <form onSubmit={this.onSubmit}>
                     <TextInput
                         label={gettext('Name')}
@@ -64,15 +61,6 @@ class FollowTopicModal extends React.Component {
                         value={this.state.topic.notifications || false}
                         onChange={() => this.toggleNotifications()}
                     />
-                    <ModalSecondaryButton
-                        onClick={this.props.closeModal}
-                        label={gettext('Cancel')}
-                    />
-                    {' '}
-                    <ModalPrimaryButton
-                        type="submit"
-                        label={gettext('Save')}
-                    />
                 </form>
             </Modal>
         );
@@ -80,7 +68,6 @@ class FollowTopicModal extends React.Component {
 }
 
 FollowTopicModal.propTypes = {
-    closeModal: PropTypes.func.isRequired,
     submit: PropTypes.func.isRequired,
     data: PropTypes.shape({
         topic: PropTypes.object.isRequired,
@@ -88,7 +75,6 @@ FollowTopicModal.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-    closeModal: () => dispatch(closeModal()),
     submit: (isNew, data) => isNew ? dispatch(submitWireFollowTopic(data)) : dispatch(submitProfileFollowTopic(data)),
 });
 
