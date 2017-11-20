@@ -3,11 +3,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { gettext, toggleValue } from 'utils';
-import { closeModal, submitShareItem } from 'wire/actions';
+import { submitShareItem } from 'wire/actions';
 import { submitShareTopic } from 'user-profile/actions';
 
-import Modal, { ModalPrimaryButton, ModalSecondaryButton } from 'components/Modal';
-import CloseButton from 'components/CloseButton';
+import Modal from 'components/Modal';
 
 class ShareItemModal extends React.Component {
     constructor(props) {
@@ -63,9 +62,7 @@ class ShareItemModal extends React.Component {
         ));
 
         return (
-            <Modal onClose={this.props.closeModal}>
-                <CloseButton onClick={this.props.closeModal} />
-                <h1>{gettext('Share Item')}</h1>
+            <Modal onSubmit={this.onSubmit} title={gettext('Share Item')} onSubmitLabel={gettext('Share')}>
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group">
                         <label htmlFor="users">{gettext('People')}</label>
@@ -96,15 +93,6 @@ class ShareItemModal extends React.Component {
                             onChange={this.onChangeHandler('message')}
                         />
                     </div>
-                    <ModalSecondaryButton
-                        onClick={this.props.closeModal}
-                        label={gettext('Cancel')}
-                    />
-                    {' '}
-                    <ModalPrimaryButton
-                        type="submit"
-                        label={gettext('Share')}
-                    />
                 </form>
             </Modal>
         );
@@ -112,7 +100,6 @@ class ShareItemModal extends React.Component {
 }
 
 ShareItemModal.propTypes = {
-    closeModal: PropTypes.func.isRequired,
     submit: PropTypes.func.isRequired,
     data: PropTypes.shape({
         items: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -125,7 +112,6 @@ ShareItemModal.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-    closeModal: () => dispatch(closeModal()),
     submit: (isFolllowedTopic, data) => isFolllowedTopic ? dispatch(submitShareTopic(data)) : dispatch(submitShareItem(data)),
 });
 

@@ -1,6 +1,6 @@
 import { gettext, notify } from 'utils';
 import server from 'server';
-
+import { renderModal, closeModal } from 'actions';
 
 export const GET_TOPICS = 'GET_TOPICS';
 export function getTopics(topics) {
@@ -25,16 +25,6 @@ export function initData(data) {
 export const SET_ERROR = 'SET_ERROR';
 export function setError(errors) {
     return {type: SET_ERROR, errors};
-}
-
-export const RENDER_MODAL = 'RENDER_MODAL';
-export function renderModal(modal, data) {
-    return {type: RENDER_MODAL, modal, data};
-}
-
-export const CLOSE_MODAL = 'CLOSE_MODAL';
-export function closeModal() {
-    return {type: CLOSE_MODAL};
 }
 
 export function updateMenu(data) {

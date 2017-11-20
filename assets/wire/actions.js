@@ -3,6 +3,7 @@ import { get, isEmpty, pickBy } from 'lodash';
 import server from 'server';
 import { gettext, notify, updateRouteParams, now } from 'utils';
 import { markItemAsRead } from './utils';
+import { renderModal, closeModal } from 'actions';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -64,16 +65,6 @@ export function recieveItems(data) {
 export const RECIEVE_ITEM = 'RECIEVE_ITEM';
 export function recieveItem(data) {
     return {type: RECIEVE_ITEM, data};
-}
-
-export const RENDER_MODAL = 'RENDER_MODAL';
-export function renderModal(modal, data) {
-    return {type: RENDER_MODAL, modal, data};
-}
-
-export const CLOSE_MODAL = 'CLOSE_MODAL';
-export function closeModal() {
-    return {type: CLOSE_MODAL};
 }
 
 export const INIT_DATA = 'INIT_DATA';
