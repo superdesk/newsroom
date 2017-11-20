@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 
 import {
     followTopic,
@@ -33,7 +33,6 @@ import ItemDetails from './ItemDetails';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
-import RefreshButton from 'components/RefreshButton';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -137,11 +136,9 @@ class WireApp extends React.Component {
                                     topics={this.props.topics}
                                     activeFilter={this.props.activeFilter}
                                     createdFilter={this.props.createdFilter}
+                                    newItems={this.props.newItems}
+                                    refresh={this.props.refresh}
                                 />
-                            }
-
-                            {!isEmpty(this.props.newItems) &&
-                                <RefreshButton count={this.props.newItems.length} onClick={this.props.refresh} />
                             }
 
                             <ItemsList
