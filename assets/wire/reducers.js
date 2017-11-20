@@ -312,7 +312,7 @@ export default function wireReducer(state = initialState, action) {
     }
 
     case REMOVE_NEW_ITEMS: {
-        const newItemsByTopic = Object.extend({}, state.newItemsByTopic);
+        const newItemsByTopic = Object.assign({}, state.newItemsByTopic);
         newItemsByTopic[action.data] = null;
         return {
             ...state,
