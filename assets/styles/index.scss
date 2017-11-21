@@ -766,15 +766,29 @@ article.list {
 }
 
 .wire-articles--list-compact {
+    .wire-articles__item-wrap {
+        margin-bottom: 10px;
+    }
     .wire-articles__item {
-        padding: 6px 15px;
+        padding: 4px 10px;
+    }
+    .wire-articles__item--list__text {
+        flex-direction: row;
+        align-items: center;
     }
     .wire-articles__item--list__headline {
         font-size: 0.875rem; // 14px    
+        margin-right: 20px;
         margin-bottom: 0px;
         label {
-            margin-bottom: 2px;
+            margin-bottom: 0px;
         }
+    }
+    .wire-articles__item__versions-btn {
+        margin-left: auto;
+    }
+    .wire-articles__item--list__actions > * {
+        margin-bottom: 0px;
     }
 }
 
