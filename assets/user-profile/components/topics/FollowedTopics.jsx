@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext, shortDate} from 'utils';
+import ActionButton from 'components/ActionButton';
 
 class FollowedTopics extends React.Component {
     constructor(props, context) {
@@ -11,11 +12,14 @@ class FollowedTopics extends React.Component {
 
     getActionButtons(topic) {
         return this.props.actions.map((action) => (
-            <button className='icon-button'
+            <ActionButton
                 key={action.name}
-                onClick={() => action.action(topic)}>
-                <i className={`icon--${action.icon}`}></i>
-            </button>)
+                item={topic}
+                className='icon-button'
+                displayName={false}
+                action={action}
+            />
+        )
         );
     }
 

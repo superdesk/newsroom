@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 function ActionButton({item, className, displayName, action}) {
     return (
         <button
-            key={action.name}
             type='button'
             className={className}
             onClick={() => action.action(action.multi ? [item._id] : item)}

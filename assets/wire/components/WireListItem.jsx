@@ -134,7 +134,7 @@ class WireListItem extends React.Component {
                             /> : null }
                         </div>
 
-                        { this.props.actions.map((action) =>
+                        { this.props.isExtended && this.props.actions.map((action) =>
                             action.shortcut &&
                           <ActionButton
                               key={action.name}

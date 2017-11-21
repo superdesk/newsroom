@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ActionButton from '../../components/ActionButton';
 
 
 function PreviewActionButtons({item, actions}) {
-    const actionButtons = actions.map((action) => {
-        const payload = action.multi ? [item._id] : item;
-        return (
-            <button className='icon-button'
-                key={action.name}
-                onClick={() => action.action(payload)}>
-                <i className={`icon--${action.icon}`}></i>
-            </button>
-        );
-    });
+    const actionButtons = actions.map((action) =>
+        <ActionButton
+            key={action.name}
+            item={item}
+            className='icon-button'
+            displayName={false}
+            action={action}
+        />
+    );
 
     return (
         <div className='wire-column__preview__buttons'>

@@ -101,13 +101,12 @@ class ItemsList extends React.Component {
         }
     }
 
-    filterActions() {
-        return this.props.actions.filter((action) => !action.when || action.when(this.props));
+    filterActions(item) {
+        return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
     }
 
     render() {
         const {items, itemsById, activeItem, activeView, selectedItems, readItems} = this.props;
-        const filteredActions = this.filterActions();
         const isExtended = activeView === EXTENDED_VIEW;
 
         const articles = items.map((_id) =>
@@ -122,7 +121,7 @@ class ItemsList extends React.Component {
                 onActionList={this.onActionList}
                 showActions={!!this.state.actioningItem && this.state.actioningItem._id === _id}
                 toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
-                actions={filteredActions}
+                actions={this.filterActions(itemsById[_id])}
                 isExtended={isExtended}
             />
         );

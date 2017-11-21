@@ -8,7 +8,7 @@ class CompanyBar extends React.Component {
         return (
             <section className="content-header">
                 <nav className="content-bar navbar content-bar--side-padding">
-                    <SearchBar fetchItems={()=>this.props.fetchItems('companies')}/>
+                    <SearchBar setQuery={this.props.setQuery} fetchItems={()=>this.props.fetchItems('companies')}/>
                     <div className="content-bar__right">
                         <button
                             className="btn btn-outline-secondary"
