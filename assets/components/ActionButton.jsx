@@ -8,6 +8,7 @@ function ActionButton({item, className, displayName, action}) {
             type='button'
             className={className}
             onClick={() => action.action(action.multi ? [item._id] : item)}
+            ref={(elem) => $(elem).tooltip()}
             title={!displayName && action.name}>
             <i className={`icon--${action.icon}`}></i>
             {displayName && action.name}</button>

@@ -227,8 +227,18 @@ export function selectNone() {
     return {type: SELECT_NONE};
 }
 
+export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
+export function setBookmarkItems(items) {
+    return {type: BOOKMARK_ITEMS, items};
+}
+
+export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
+export function removeBookmarkItems(items) {
+    return {type: REMOVE_BOOKMARK, items};
+}
+
 export function bookmarkItems(items) {
-    return () =>
+    return (dispatch) =>
         server.post('/wire_bookmark', {items})
             .then(() => {
                 if (items.length > 1) {
@@ -237,6 +247,7 @@ export function bookmarkItems(items) {
                     notify.success(gettext('Item was bookmarked successfully.'));
                 }
             })
+            .then(() => dispatch(setBookmarkItems(items)))
             .catch(errorHandler);
 }
 
@@ -250,6 +261,7 @@ export function removeBookmarks(items) {
                     notify.success(gettext('Item was removed from bookmarks successfully.'));
                 }
             })
+            .then(() => dispatch(removeBookmarkItems(items)))
             .then(() => dispatch(fetchItems()))
             .catch(errorHandler);
 }
