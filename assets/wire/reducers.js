@@ -270,6 +270,7 @@ export default function wireReducer(state = initialState, action) {
         const bookmarkedItems = state.bookmarkedItems || [];
 
         const missing = action.items.filter((item) => {
+            itemsById[item] = Object.assign({}, itemsById[item]);
             itemsById[item].bookmarks = (itemsById[item].bookmarks || []).concat([state.user]);
             return bookmarkedItems.indexOf(item) === -1;
         });
@@ -286,6 +287,7 @@ export default function wireReducer(state = initialState, action) {
         const bookmarkedItems = state.bookmarkedItems || [];
 
         const bookmarks = action.items.filter((item) => {
+            itemsById[item] = Object.assign({}, itemsById[item]);
             itemsById[item].bookmarks = (itemsById[item].bookmarks || []).filter((val) => val !== state.user);
             return bookmarkedItems.indexOf(item) === -1;
         });

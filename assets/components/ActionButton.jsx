@@ -2,17 +2,27 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
-function ActionButton({item, className, displayName, action}) {
-    return (
-        <button
-            type='button'
-            className={className}
-            onClick={() => action.action(action.multi ? [item._id] : item)}
-            ref={(elem) => $(elem).tooltip()}
-            title={!displayName && action.name}>
-            <i className={`icon--${action.icon}`}></i>
-            {displayName && action.name}</button>
-    );
+class ActionButton extends React.Component {
+    componentDidMount() {
+        $(this.elem).tooltip();
+    }
+
+    componentWillUnmount() {
+        $(this.elem).tooltip('dispose'); // make sure it's gone
+    }
+
+    render() {
+        return (
+            <button
+                type='button'
+                className={this.props.className}
+                onClick={() => this.props.action.action(this.props.action.multi ? [this.props.item._id] : this.props.item)}
+                ref={(elem) => this.elem = elem}
+                title={!this.props.displayName && this.props.action.name}>
+                <i className={`icon--${this.props.action.icon}`}></i>
+                {this.props.displayName && this.props.action.name}</button>
+        );
+    }
 }
 
 ActionButton.propTypes = {
@@ -23,6 +33,7 @@ ActionButton.propTypes = {
         name: PropTypes.string.isRequired,
         icon: PropTypes.string.isRequired,
         action: PropTypes.func.isRequired,
+        multi: PropTypes.bool,
     })
 };
 

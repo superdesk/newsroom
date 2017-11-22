@@ -252,7 +252,7 @@ export function bookmarkItems(items) {
 }
 
 export function removeBookmarks(items) {
-    return (dispatch) =>
+    return (dispatch, getState) =>
         server.del('/wire_bookmark', {items})
             .then(() => {
                 if (items.length > 1) {
@@ -262,7 +262,7 @@ export function removeBookmarks(items) {
                 }
             })
             .then(() => dispatch(removeBookmarkItems(items)))
-            .then(() => dispatch(fetchItems()))
+            .then(() => getState().bookmarks && dispatch(fetchItems()))
             .catch(errorHandler);
 }
 
