@@ -77,30 +77,40 @@ class WireListItem extends React.Component {
                             {item.headline}
                         </h4>
 
-                        <div className='wire-articles__item__meta'>
-                            <div className='wire-articles__item__icons'>
-                                {item.type === 'text' &&
-                                    <span className='wire-articles__item__icon'>
-                                        <i className='icon--text icon--gray-light'></i>
+                        {isExtended && (
+                            <div className='wire-articles__item__meta'>
+                                <div className='wire-articles__item__icons'>
+                                    {item.type === 'text' &&
+                                        <span className='wire-articles__item__icon'>
+                                            <i className='icon--text icon--gray-light'></i>
+                                        </span>
+                                    }
+                                    {picture &&
+                                        <span className='wire-articles__item__icon'>
+                                            <i className='icon--photo icon--gray-light'></i>
+                                        </span>
+                                    }
+                                    <span className='wire-articles__item__divider'>
                                     </span>
-                                }
-                                {picture &&
-                                    <span className='wire-articles__item__icon'>
-                                        <i className='icon--photo icon--gray-light'></i>
-                                    </span>
-                                }
-                                <span className='wire-articles__item__divider'>
-                                </span>
-                            </div>
+                                </div>
 
-                            <div className='wire-articles__item__meta-info'>
-                                <span className='bold'>{this.slugline}</span>
-                                <span>{gettext('Source: {{ source }}', {source: item.source})}
-                                    {' // '}<span className='bold'>{this.wordCount}</span> {gettext('words')}
-                                    {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
-                                </span>
+                                <div className='wire-articles__item__meta-info'>
+                                    <span className='bold'>{this.slugline}</span>
+                                    <span>{gettext('Source: {{ source }}', {source: item.source})}
+                                        {' // '}<span className='bold'>{this.wordCount}</span> {gettext('words')}
+                                        {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                                    </span>
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {!isExtended && (
+                            <div className='wire-articles__item__meta'>
+                                <div className='wire-articles__item__meta-info'>
+                                    <time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                                </div>
+                            </div>
+                        )}
 
                         {isExtended && (
                             <div className='wire-articles__item__text'>
@@ -134,7 +144,7 @@ class WireListItem extends React.Component {
                             /> : null }
                         </div>
 
-                        { this.props.isExtended && this.props.actions.map((action) =>
+                        {isExtended && this.props.actions.map((action) =>
                             action.shortcut &&
                           <ActionButton
                               key={action.name}

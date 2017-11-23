@@ -7,6 +7,11 @@ import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
 
 /**
+ * To enable some mocking in tests
+ */
+export const now = new Date();
+
+/**
  * Create redux store with default middleware
  *
  * @param {func} reducer
@@ -80,7 +85,19 @@ function parseDate(dateString) {
  */
 export function shortDate(dateString) {
     const date = parseDate(dateString);
-    return date.toLocaleString();
+    return isToday(date) ? date.toLocaleTimeString() : date.toLocaleDateString();
+}
+
+/**
+ * Test if given day is today
+ *
+ * @param {Date} date
+ * @return {Boolean}
+ */
+function isToday(date) {
+    return date.getUTCDate() === now.getUTCDate() &&
+        date.getUTCMonth() === now.getUTCMonth() &&
+        date.getUTCDate() === now.getUTCDate();
 }
 
 /**
@@ -228,12 +245,6 @@ const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
 export function formatHTML(html) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
-
-/**
- * To enable some mocking in tests
- */
-export const now = new Date();
-
 
 /**
  * Initializes the web socket listener
