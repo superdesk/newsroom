@@ -266,18 +266,38 @@ export default function wireReducer(state = initialState, action) {
         };
 
     case BOOKMARK_ITEMS: {
-        const missing = action.items.filter((item) => state.bookmarkedItems.indexOf(item) === -1);
+        const itemsById = Object.assign({}, state.itemsById);
+        const bookmarkedItems = state.bookmarkedItems || [];
+
+        const missing = action.items.filter((item) => {
+            itemsById[item] = Object.assign({}, itemsById[item]);
+            itemsById[item].bookmarks = (itemsById[item].bookmarks || []).concat([state.user]);
+            return bookmarkedItems.indexOf(item) === -1;
+        });
+
         return {
             ...state,
-            bookmarkedItems: state.bookmarkedItems.concat(missing),
+            itemsById,
+            bookmarkedItems: bookmarkedItems.concat(missing),
         };
     }
 
-    case REMOVE_BOOKMARK:
+    case REMOVE_BOOKMARK: {
+        const itemsById = Object.assign({}, state.itemsById);
+        const bookmarkedItems = state.bookmarkedItems || [];
+
+        const bookmarks = action.items.filter((item) => {
+            itemsById[item] = Object.assign({}, itemsById[item]);
+            itemsById[item].bookmarks = (itemsById[item].bookmarks || []).filter((val) => val !== state.user);
+            return bookmarkedItems.indexOf(item) === -1;
+        });
+
         return {
             ...state,
-            bookmarkedItems: state.bookmarkedItems.filter((val) => val !== action.item),
+            itemsById,
+            bookmarkedItems: bookmarks,
         };
+    }
 
     case SET_NEW_ITEMS_BY_TOPIC: {
         const newItemsByTopic = Object.assign({}, state.newItemsByTopic);

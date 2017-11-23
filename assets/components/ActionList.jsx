@@ -1,18 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ActionButton from './ActionButton';
 
 
 function ActionList({item, actions}) {
     return (
         <div className='dropdown-menu dropdown-menu-right show'>
             {actions.map((action) =>
-                <button
+                <ActionButton
                     key={action.name}
-                    type='button'
+                    action={action}
                     className='dropdown-item'
-                    onClick={() => action.action(action.multi ? [item._id] : item)}>
-                    <i className={`icon--${action.icon}`}></i>
-                    {action.name}</button>
+                    displayName={true}
+                    item={item}
+                />
             )}
         </div>
     );

@@ -7,6 +7,7 @@ import { getPicture, getThumbnailRendition, showItemVersions, shortText } from '
 import ActionList from 'components/ActionList';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
+import ActionButton from 'components/ActionButton';
 
 class WireListItem extends React.Component {
     constructor(props) {
@@ -132,6 +133,16 @@ class WireListItem extends React.Component {
                                 actions={this.props.actions}
                             /> : null }
                         </div>
+
+                        { this.props.isExtended && this.props.actions.map((action) =>
+                            action.shortcut &&
+                          <ActionButton
+                              key={action.name}
+                              className="icon-button"
+                              action={action}
+                              item={this.props.item} />
+                        )}
+
                     </div>
                 </div>
 

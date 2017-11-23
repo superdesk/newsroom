@@ -48,6 +48,7 @@ class WireApp extends React.Component {
         };
         this.toggleSidebar = this.toggleSidebar.bind(this);
         this.onListScroll = this.onListScroll.bind(this);
+        this.filterActions = this.filterActions.bind(this);
     }
 
     renderModal(specs) {
@@ -73,6 +74,10 @@ class WireApp extends React.Component {
         }
     }
 
+    filterActions(item) {
+        return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
+    }
+
     render() {
         const modal = this.renderModal(this.props.modal);
         const previewActionFilter = (action) => !action.when || action.when(this.props);
@@ -83,7 +88,7 @@ class WireApp extends React.Component {
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
-                actions={this.props.actions.filter(previewActionFilter)}
+                actions={this.filterActions(this.props.itemToOpen)}
                 onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
             />, modal] : [
                 <section key="contentHeader" className='content-header'>
@@ -142,7 +147,7 @@ class WireApp extends React.Component {
                             }
 
                             <ItemsList
-                                actions={this.props.actions.filter(previewActionFilter)}
+                                actions={this.props.actions}
                                 activeView={this.props.activeView}
                             />
                         </div>
@@ -152,7 +157,7 @@ class WireApp extends React.Component {
                             <Preview
                                 item={this.props.itemToPreview}
                                 user={this.props.user}
-                                actions={this.props.actions.filter(previewActionFilter)}
+                                actions={this.filterActions(this.props.itemToPreview)}
                                 followStory={this.props.followStory}
                                 isFollowing={!!isFollowing}
                             />
@@ -210,7 +215,6 @@ const mapStateToProps = (state) => ({
     company: state.company,
     topics: state.topics,
     selectedItems: state.selectedItems,
-    bookmarks: state.bookmarks,
     activeView: get(state, 'wire.activeView'),
     newItems: state.newItems,
 });
@@ -236,6 +240,7 @@ const mapDispatchToProps = (dispatch) => ({
             name: gettext('Share'),
             icon: 'share',
             multi: true,
+            shortcut: true,
             when: (state) => state.user && state.company,
             action: (items) => dispatch(shareItems(items)),
         },
@@ -258,16 +263,18 @@ const mapDispatchToProps = (dispatch) => ({
         },
         {
             name: gettext('Bookmark'),
-            icon: 'bookmark',
+            icon: 'bookmark-add',
             multi: true,
-            when: (state) => state.user && !state.bookmarks,
+            shortcut: true,
+            when: (state, item) => state.user && (!item || !item.bookmarks ||  !item.bookmarks.includes(state.user)),
             action: (items) => dispatch(bookmarkItems(items)),
         },
         {
             name: gettext('Remove from bookmarks'),
             icon: 'bookmark-remove',
             multi: true,
-            when: (state) => state.user && state.bookmarks,
+            shortcut: true,
+            when: (state, item) => state.user && item && item.bookmarks && item.bookmarks.includes(state.user),
             action: (items) => dispatch(removeBookmarks(items)),
         },
     ],

@@ -8,7 +8,7 @@ class UserBar extends React.Component {
         return (
             <section className="content-header">
                 <nav className="content-bar navbar content-bar--side-padding">
-                    <SearchBar fetchItems={()=>this.props.fetchItems('users')}/>
+                    <SearchBar setQuery={this.props.setQuery} fetchItems={()=>this.props.fetchItems('users')}/>
                     <div className="content-bar__right">
                         <button
                             className="btn btn-outline-secondary"

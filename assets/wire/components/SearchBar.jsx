@@ -50,7 +50,7 @@ class SearchBar extends React.Component {
                             className='search__input form-control'
                             placeholder='Search for...'
                             aria-label='Search for...'
-                            value={this.state.query}
+                            value={this.state.query || ''}
                             onChange={this.onChange}
                         />
                         <div className='search__form__buttons'>
