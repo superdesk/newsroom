@@ -133,7 +133,7 @@ export const notify = {
 export function getTextFromHtml(html) {
     const div = document.createElement('div');
     div.innerHTML = formatHTML(html);
-    const tree = document.createTreeWalker(div, NodeFilter.SHOW_TEXT);
+    const tree = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false); // ie requires all params
     const text = [];
     while (tree.nextNode()) {
         text.push(tree.currentNode.textContent);
