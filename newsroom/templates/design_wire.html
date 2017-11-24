@@ -27,7 +27,7 @@
         <i class="icon--close-thin icon--white"></i>
     </span>
     <div class="search form-inline">
-        <div class="dropdown">
+        <!--div class="dropdown">
             <button class="content-bar__dropdown-btn btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Simple search
             </button>
@@ -35,7 +35,7 @@
                 <a class="dropdown-item" href="#">Simple search</a>
                 <a class="dropdown-item" href="#">Advanced search</a>
             </div>
-        </div>
+        </div--> 
         <span class="search__icon">
             <i class="icon--search icon--gray-light"></i>
         </span>
@@ -90,6 +90,7 @@
   <div class="wire-column--3">
 
     <div class="wire-column__nav">
+    <!--div class="wire-column__nav wire-column__nav--open"-->
         <div class="wire-column__nav__items">
             <ul class="nav justify-content-center" id="pills-tab" role="tablist">
                 <li class="wire-column__nav__tab nav-item">
@@ -157,7 +158,8 @@
                 <span class="search-results-info__text">search results for:<br><b>search</b></span>
             </div>
 
-            <button class="btn btn-outline-primary mr-auto">Save as topic</button>
+            <button class="btn btn-outline-primary d-none d-xxl-block mr-auto">Save as topic</button>
+            <button class="btn btn-outline-primary btn-sm d-xxl-none mr-auto">Save as topic</button>
             <button type="button" class="button__reset-styles d-flex align-items-center ml-auto">
                 <i class="icon--refresh icon--pink"></i>
                 <span class="badge badge-pill badge-info badge-secondary ml-2">21</span>
@@ -165,9 +167,9 @@
         </div>
 
         <div class="wire-articles wire-articles--list row">
-            
+
             <article class="wire-articles__item-wrap col-12">
-                <div class="wire-articles__item wire-articles__item--list">
+                <div class="wire-articles__item wire-articles__item--list"> <!-- open class here -->
                     <div class="wire-articles__item--list__text">
                         <h4 class="wire-articles__item--list__headline">
                             <div class="no-bindable-select wire-articles__item--list__select">
@@ -194,7 +196,7 @@
                             </div>
                         </div>
                         <div class="wire-articles__item__text">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vel dui metus. Sed tincidunt urna vitae imperdiet sollicitudin. Maecenas sit amet sem vitae arcu luctus vestibulum ut in dolor. Aliquam turpis ligula, ornare non justo vitae, consectetur iaculis leo. Mauris at sapien libero. Donec feugiat pellentesque mi vel dignissim. Morbi id nulla libero. Nulla ornare libero congue ex euismod lacinia. Fusce efficitur mauris nec mauris efficitur, id porttitor risus eleifend. Curabitur varius nibh ut ligula vulputate, a bibendum magna suscipit. Aenean ut massa vel ex facilisis dictum quis id elit. Fusce in aliquam dolor. Mauris finibus sem felis, placerat suscipit nibh sollicitudin at. Duis in nisi sit amet lectus iaculis blandit sed non felis.</p>
+                            <p>MANDURAH GREYHOUND QLD TAB DIVS FOR $1.00 Race 1: 6 Chicago Nights $3.10 $2.00 3 Barrio Monelli $3.50 4 Sunset Candy NTD. Q: $4.70. E: $11.70. T: $18.80. Scr: 5. Race 2: 3 Dynamic Gold $4.20 $1.10 2 Dahlia Monelli...</p>
                         </div>
                         <div class="no-bindable wire-articles__item__versions-btn">
                             Show previous versions (3)
@@ -205,7 +207,7 @@
                             <i class="icon--resize icon--white"></i>
                         </span>
                         <figure>
-                            <img src="{{ url_for('static', filename = 'list_image.png') }}" width="157" height="157"/>
+                            <img src="{{ url_for('static', filename = 'list_image_800x600.jpg') }}"/>
                         </figure>
                     </div>
                     <div class="wire-articles__item--list__actions">
@@ -221,9 +223,7 @@
                                 <button class="dropdown-item" type="button"><i class="icon--share"></i> Share</button>
                                 <button class="dropdown-item" type="button"><i class="icon--bookmark-add"></i> Add to Bookmarks</button>
                             </div>
-                        </div>
-
-                        
+                        </div>                     
 
                         <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share"></i></button>
                         <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
@@ -294,7 +294,7 @@
                             </div>
                         </div>
                         <div class="wire-articles__item__text">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vel dui metus. Sed tincidunt urna vitae imperdiet sollicitudin. Maecenas sit amet sem vitae arcu luctus vestibulum ut in dolor. Aliquam turpis ligula, ornare non justo vitae, consectetur iaculis leo. Mauris at sapien libero. Donec feugiat pellentesque mi vel dignissim. Morbi id nulla libero. Nulla ornare libero congue ex euismod lacinia. Fusce efficitur mauris nec mauris efficitur, id porttitor risus eleifend. Curabitur varius nibh ut ligula vulputate, a bibendum magna suscipit. Aenean ut massa vel ex facilisis dictum quis id elit. Fusce in aliquam dolor. Mauris finibus sem felis, placerat suscipit nibh sollicitudin at. Duis in nisi sit amet lectus iaculis blandit sed non felis.</p>
+                            <p>AAP Rolling News Bulletin for Nov 22 at 0000 Nigeria Mosque (YOLA) A suicide bomber has killed at least 50 people at a mosque in northeastern Nigeria in the biggest mass killing this year in a region facing an insurgency...</p>
                         </div>
                         <div class="no-bindable wire-articles__item__versions-btn">
                             Show previous versions (3)
@@ -305,7 +305,7 @@
                             <i class="icon--resize icon--white"></i>
                         </span>
                         <figure>
-                            <img src="{{ url_for('static', filename = 'list_image.png') }}" width="157" height="157"/>
+                            <img src="{{ url_for('static', filename = 'list_image_800x600.jpg') }}"/>
                         </figure>
                     </div>
                     <div class="wire-articles__item--list__actions">
@@ -552,7 +552,10 @@
     <div class="wire-column__preview">
       <div class="wire-column__preview__items">
         <div class="wire-column__preview__top-bar">
-            <span class="wire-column__preview__date">Created<br />12.06.2017 at 14:25</span>
+            <div>
+                <button type="button" class="btn btn-outline-primary d-none d-xxl-block">Follow story</button>
+                <button type="button" class="btn btn-sm btn-outline-primary d-xxl-none">Follow story</button>
+            </div>
             <div class="wire-column__preview__buttons">
                 <button class="icon-button"><i class="icon--text"></i></button>
                 <button class="icon-button"><i class="icon--share"></i></button>
@@ -562,6 +565,7 @@
                 <button class="icon-button"><i class="icon--bookmark"></i></button>
             </div>
         </div>
+        <div class="wire-column__preview__date">Created 11/17/2017, 11:21:20 AM</div>
         <div class="wire-column__preview__content">
             <span class="wire-column__preview__slug">Trump-Comey</span>
             <h2 class="wire-column__preview__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit</h2>
@@ -570,7 +574,7 @@
                 <span class="wire-column__preview__image-icon">
                     <i class="icon--resize icon--white"></i>
                 </span>
-                <img src="{{ url_for('static', filename = 'article_preview.png') }}" width="438" height="249"/>
+                <img src="{{ url_for('static', filename = 'list_image_800x600.jpg') }}"/>
                 <figcaption class="wire-column__preview__caption">Lorem ipsum dolor sit amet, consectetur adipiscing elit</figcaption>
             </figure>
             <div class="wire-articles__item__meta">

@@ -30,3 +30,10 @@
         @content;
     }
 }
+
+// Extra extra large devices (large desktops, 1440px and up)
+@mixin xxl() {
+    @media only screen and (min-width: 1440px) {
+        @content;
+    }
+}
