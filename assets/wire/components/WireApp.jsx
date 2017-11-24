@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import { get } from 'lodash';
@@ -85,6 +86,11 @@ class WireApp extends React.Component {
 
         const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
             this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
+        const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
+        const mainClassName = classNames('wire-column__main container-fluid', {
+            'wire-articles__one-side-pane': panesCount === 1,
+            'wire-articles__two-side-panes': panesCount === 2,
+        });
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
@@ -130,7 +136,7 @@ class WireApp extends React.Component {
                             }
 
                         </div>
-                        <div className='wire-column__main container-fluid' onScroll={this.onListScroll}>
+                        <div className={mainClassName} onScroll={this.onListScroll}>
                             {!this.props.selectedItems.length &&
                                 <SearchResultsInfo
                                     user={this.props.user}

@@ -34,7 +34,7 @@ function SearchResultsInfo({
             {user && !bookmarks && !isEmpty(activeQuery) && (
                 <button
                     disabled={isFollowing}
-                    className="btn btn-outline-primary mr-auto"
+                    className="btn btn-outline-primary btn-responsive"
                     onClick={() => followTopic(activeQuery)}
                 >{gettext('Save as topic')}</button>
             )}
