@@ -82,19 +82,35 @@ export function addTopic(topic) {
  *
  * This is an initial version, should be updated with preview markup changes.
  */
-export function copyPreviewContents() {
-    const preview = document.getElementById('preview-article');
-    const selection = window.getSelection();
-    const range = document.createRange();
-    selection.removeAllRanges();
-    range.selectNode(preview);
-    selection.addRange(range);
-    if (document.execCommand('copy')) {
-        notify.success(gettext('Item copied successfully.'));
-    } else {
-        notify.error(gettext('Sorry, Copy is not supported.'));
-    }
-    selection.removeAllRanges();
+export function copyPreviewContents(item) {
+    return (dispatch, getState) => {
+        const preview = document.getElementById('preview-article');
+        const selection = window.getSelection();
+        const range = document.createRange();
+        selection.removeAllRanges();
+        range.selectNode(preview);
+        selection.addRange(range);
+        if (document.execCommand('copy')) {
+            notify.success(gettext('Item copied successfully.'));
+        } else {
+            notify.error(gettext('Sorry, Copy is not supported.'));
+        }
+        selection.removeAllRanges();
+        if (getState().user) {
+            server.post(`/wire/${item._id}/copy`)
+                .then(dispatch(setCopyItem(item._id)))
+                .catch(errorHandler);
+        }
+    };
+}
+
+export function printItem(item) {
+    return (dispatch, getState) => {
+        window.open(`/wire/${item._id}?print`, '_blank');
+        if (getState().user) {
+            dispatch(setPrintItem(item._id));
+        }
+    };
 }
 
 /**
@@ -208,6 +224,7 @@ export function submitShareItem(data) {
                 }
                 dispatch(closeModal());
             })
+            .then(() => dispatch(setShareItems(data.items)))
             .catch(errorHandler);
     };
 }
@@ -225,6 +242,26 @@ export function selectAll() {
 export const SELECT_NONE = 'SELECT_NONE';
 export function selectNone() {
     return {type: SELECT_NONE};
+}
+
+export const SHARE_ITEMS = 'SHARE_ITEMS';
+export function setShareItems(items) {
+    return {type: SHARE_ITEMS, items};
+}
+
+export const DOWNLOAD_ITEMS = 'DOWNLOAD_ITEMS';
+export function setDownloadItems(items) {
+    return {type: DOWNLOAD_ITEMS, items};
+}
+
+export const COPY_ITEMS = 'COPY_ITEMS';
+export function setCopyItem(item) {
+    return {type: COPY_ITEMS, items: [item]};
+}
+
+export const PRINT_ITEMS = 'PRINT_ITEMS';
+export function setPrintItem(item) {
+    return {type: PRINT_ITEMS, items: [item]};
 }
 
 export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
@@ -301,6 +338,7 @@ export function downloadItems(items) {
 export function submitDownloadItems(items, format) {
     return (dispatch) => {
         window.open(`/download/${items.join(',')}?format=${format}`, '_blank');
+        dispatch(setDownloadItems(items));
         dispatch(closeModal());
     };
 }

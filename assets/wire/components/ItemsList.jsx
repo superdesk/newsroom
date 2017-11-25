@@ -123,6 +123,7 @@ class ItemsList extends React.Component {
                 toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
                 actions={this.filterActions(itemsById[_id])}
                 isExtended={isExtended}
+                user={this.props.user}
             />
         );
 

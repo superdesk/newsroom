@@ -19,6 +19,7 @@ import {
     fetchMoreItems,
     setView,
     refresh,
+    printItem,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -88,6 +89,7 @@ class WireApp extends React.Component {
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
+                user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
                 onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
             />, modal] : [
@@ -209,7 +211,7 @@ const mapStateToProps = (state) => ({
     activeFilter: get(state, 'wire.activeFilter'),
     createdFilter: get(state, 'wire.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
-    itemToOpen: state.openItem ? state.openItem : null,
+    itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     modal: state.modal,
     user: state.user,
     company: state.company,
@@ -241,23 +243,27 @@ const mapDispatchToProps = (dispatch) => ({
             icon: 'share',
             multi: true,
             shortcut: true,
+            visited: (user, item) => user && item && item.shares &&  item.shares.includes(user),
             when: (state) => state.user && state.company,
             action: (items) => dispatch(shareItems(items)),
         },
         {
             name: gettext('Print'),
             icon: 'print',
-            action: (item) => window.open(`/wire/${item._id}?print`, '_blank'),
+            visited: (user, item) => user && item && item.prints &&  item.prints.includes(user),
+            action: (item) => dispatch(printItem(item)),
         },
         {
             name: gettext('Copy'),
             icon: 'copy',
-            action: copyPreviewContents,
+            visited: (user, item) => user && item && item.copies &&  item.copies.includes(user),
+            action: (item) => dispatch(copyPreviewContents(item)),
         },
         {
             name: gettext('Download'),
             icon: 'download',
             multi: true,
+            visited: (user, item) => user && item && item.downloads &&  item.downloads.includes(user),
             when: (state) => state.user && state.company,
             action: (items) => dispatch(downloadItems(items)),
         },
