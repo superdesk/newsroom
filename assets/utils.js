@@ -89,6 +89,16 @@ export function shortDate(dateString) {
 }
 
 /**
+ * Return locale date
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function getLocaleDate(dateString) {
+    return parseDate(dateString).toLocaleDateString();
+}
+
+/**
  * Test if given day is today
  *
  * @param {Date} date
