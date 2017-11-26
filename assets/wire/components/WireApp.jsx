@@ -81,8 +81,8 @@ class WireApp extends React.Component {
 
     render() {
         const modal = this.renderModal(this.props.modal);
-        const previewActionFilter = (action) => !action.when || action.when(this.props);
-        const multiActionFilter = (action) => action.multi && previewActionFilter(action);
+        const multiActionFilter = (action) => action.multi &&
+            this.props.selectedItems.every((item) => !action.when || action.when(this.props, this.props.itemsById[item]));
 
         const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
             this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
@@ -181,6 +181,7 @@ WireApp.propTypes = {
     createdFilter: PropTypes.object,
     itemToPreview: PropTypes.object,
     itemToOpen: PropTypes.object,
+    itemsById: PropTypes.object,
     followTopic: PropTypes.func,
     modal: PropTypes.object,
     user: PropTypes.string,
@@ -212,6 +213,7 @@ const mapStateToProps = (state) => ({
     createdFilter: get(state, 'wire.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
+    itemsById: state.itemsById,
     modal: state.modal,
     user: state.user,
     company: state.company,

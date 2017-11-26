@@ -102,7 +102,7 @@ function updateItemActions(state, items, action) {
 
     items.map((item) => {
         itemsById[item] = Object.assign({}, itemsById[item]);
-        itemsById[item][action] = (itemsById[item].bookmarks || []).concat([state.user]);
+        itemsById[item][action] = (itemsById[item][action] || []).concat([state.user]);
     });
 
     return itemsById;
