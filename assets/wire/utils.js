@@ -137,7 +137,7 @@ export function shortText(item, length=40) {
  * @return {String}
  */
 export function getCaption(picture) {
-    return picture.body_text || picture.description_text;
+    return getTextFromHtml(picture.body_text || picture.description_text || '').trim();
 }
 
 export function getActiveQuery(query, activeFilter, createdFilter) {
