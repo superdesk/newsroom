@@ -1,7 +1,8 @@
 
 import pytz
-import newsroom
 import logging
+import newsroom
+import superdesk
 
 from datetime import datetime, timedelta
 from flask import json, abort
@@ -42,6 +43,10 @@ def format_date(date, offset):
 def get_local_date(date, time, offset):
     local_dt = datetime.strptime('%sT%s' % (format_date(date, offset), time), '%Y-%m-%dT%H:%M:%S')
     return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
+
+
+def get_bookmarks_count(user_id):
+    return superdesk.get_resource_service('wire_search').get_bookmarks_count(user_id)
 
 
 class WireSearchResource(newsroom.Resource):
@@ -96,18 +101,35 @@ def _filter_terms(filters):
     return [{'terms': {get_aggregation_field(key): val}} for key, val in filters.items() if val]
 
 
-class WireSearchService(newsroom.Service):
-    def get(self, req, lookup):
-        query = {
-            'bool': {
-                'must_not': [
-                    {'term': {'type': 'composite'}},
-                    {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
-                ],
-                'must': [],
-            }
-        }
+def _set_bookmarks_query(query, user_id):
+    query['bool']['must'].append({
+        'term': {'bookmarks': str(user_id)},
+    })
 
+
+def _items_query():
+    return {
+        'bool': {
+            'must_not': [
+                {'term': {'type': 'composite'}},
+                {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
+            ],
+            'must': [],
+        }
+    }
+
+
+class WireSearchService(newsroom.Service):
+    def get_bookmarks_count(self, user_id):
+        query = _items_query()
+        _set_bookmarks_query(query, user_id)
+        source = {'query': query, 'size': 0}
+        internal_req = ParsedRequest()
+        internal_req.args = {'source': json.dumps(source)}
+        return super().get(internal_req, None).count()
+
+    def get(self, req, lookup):
+        query = _items_query()
         user = get_user()
         company = get_user_company(user)
         set_service_query(query, company)
@@ -117,9 +139,7 @@ class WireSearchService(newsroom.Service):
             query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
 
         if req.args.get('bookmarks'):
-            query['bool']['must'].append({
-                'term': {'bookmarks': req.args['bookmarks']},
-            })
+            _set_bookmarks_query(query, req.args['bookmarks'])
 
         if req.args.get('service'):
             services = json.loads(req.args['service'])

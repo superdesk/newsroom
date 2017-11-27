@@ -5,11 +5,11 @@ import classNames from 'classnames';
 
 class ActionButton extends React.Component {
     componentDidMount() {
-        $(this.elem).tooltip();
+        this.elem && $(this.elem).tooltip();
     }
 
     componentWillUnmount() {
-        $(this.elem).tooltip('dispose'); // make sure it's gone
+        this.elem && $(this.elem).tooltip('dispose'); // make sure it's gone
     }
 
     render() {

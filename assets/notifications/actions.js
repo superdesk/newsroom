@@ -83,11 +83,20 @@ export function deleteAllNotifications() {
  */
 export function pushNotification(push) {
     return (dispatch, getState) => {
+        const user = getState().user;
         switch (push.event) {
         case 'history_matches':
             if (push.extra.users && push.extra.users.includes(getState().user)) {
                 return dispatch(newNotification(push.extra));
             }
+            break;
+        case `bookmarks:${user}`:
+            return dispatch((setBookmarksCount(push.extra.count)));
         }
     };
+}
+
+export const SET_BOOKMARKS_COUNT = 'SET_BOOKMARKS_COUNT';
+function setBookmarksCount(count) {
+    return {type: SET_BOOKMARKS_COUNT, count};
 }
