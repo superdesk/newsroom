@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext, shortDate} from 'utils';
+import {gettext, getLocaleDate} from 'utils';
 import ActionButton from 'components/ActionButton';
 
 class FollowedTopics extends React.Component {
@@ -36,7 +36,7 @@ class FollowedTopics extends React.Component {
                     </div>
                     <div className='card-block'>
                         <p>{topic.description}</p>
-                        <footer>{gettext('Created on')} {shortDate(topic._created)}</footer>
+                        <footer>{gettext('Created on')} {getLocaleDate(topic._created)}</footer>
                     </div>
                 </div>)));
     }
