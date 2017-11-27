@@ -9,7 +9,7 @@ from flask import current_app as app
 from superdesk.utc import utcnow
 from newsroom.notifications import push_notification
 from newsroom.topics.topics import get_notification_topics
-from newsroom.utils import query_resource
+from newsroom.utils import query_resource, parse_dates
 from newsroom.email import send_new_item_notification_email, send_history_match_notification_email
 from newsroom.history import get_history_users
 
@@ -47,6 +47,7 @@ def fix_hrefs(doc):
 def publish_item(doc):
     """Duplicating the logic from content_api.publish service."""
     now = utcnow()
+    parse_dates(doc)
     doc.setdefault('firstcreated', now)
     doc.setdefault('versioncreated', now)
     doc.setdefault(app.config['VERSION'], 1)
