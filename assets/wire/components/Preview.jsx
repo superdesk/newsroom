@@ -30,7 +30,7 @@ class Preview extends React.PureComponent {
                         {user && item.slugline && item.slugline.trim() &&
                             <button type="button"
                                 disabled={isFollowing}
-                                className="btn btn-outline-primary"
+                                className="btn btn-outline-primary btn-responsive"
                                 onClick={() => followStory(item)}>
                                 {gettext('Follow story')}
                             </button>
