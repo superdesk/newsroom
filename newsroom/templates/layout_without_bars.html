@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shring-to-fit=no">
 
     <title>{{ config.SITE_NAME }} - {% block title %}{% endblock %}</title>
-    
+
     <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/alertify.min.css"/>
@@ -38,7 +38,6 @@
 </script>
 
 {{ javascript_tag('newsroom_js') | safe }}
-{{ javascript_tag('notifications_js') | safe }}
 
 {% block script %}{% endblock %}
 

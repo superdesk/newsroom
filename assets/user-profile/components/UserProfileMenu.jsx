@@ -1,37 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
 
-
-function UserProfileMenu({isProfile, isFollowedTopics, isDownloadHistory, onClick}) {
+function UserProfileMenu({links, onClick}) {
     return (
-        <ul>
-            <li>
-                <a className={`side-navigation__btn ${isProfile?'active':null}`}
-                    href='#'
-                    name='profile'
-                    onClick={onClick}>{gettext('My Profile')}</a>
-            </li>
-            <li>
-                <a className={`side-navigation__btn ${isFollowedTopics?'active':null}`}
-                    href='#'
-                    name='topics'
-                    onClick={onClick}>{gettext('My Topics')}</a>
-            </li>
-            <li>
-                <a className={`side-navigation__btn ${isDownloadHistory?'active':null}`}
-                    href='#'
-                    name='history'>{gettext('Download History')}</a>
-            </li>
-        </ul>
+        <div className="profile-side-navigation__items">
+            {links.map((link) => (
+                <a key={link.name}
+                    href=""
+                    className={`btn btn-block btn-outline-${link.active ? 'primary' : 'secondary'}`}
+                    name={link.name}
+                    onClick={(event) => {
+                        event.preventDefault();
+                        onClick(link.name);
+                    }}
+                >{link.label}</a>
+            ))}
+        </div>
     );
 }
 
 UserProfileMenu.propTypes = {
-    isProfile: PropTypes.bool,
-    isFollowedTopics: PropTypes.bool,
-    isDownloadHistory: PropTypes.bool,
-    onClick: PropTypes.func
+    links: PropTypes.array,
+    onClick: PropTypes.func,
 };
 
 export default UserProfileMenu;

@@ -136,7 +136,7 @@ def test_login_for_user_with_enabled_company_succeeds(app, client):
         data={'email': 'test@sourcefabric.org', 'password': 'admin'},
         follow_redirects=True
     )
-    assert 'John Doe' in response.get_data(as_text=True)
+    assert 'John' in response.get_data(as_text=True)
 
 
 def test_login_fails_for_not_approved_user(app, client):

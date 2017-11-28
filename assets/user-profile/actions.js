@@ -27,12 +27,10 @@ export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
-export function updateMenu(data) {
+export function updateMenu(event) {
     return function (dispatch) {
-        if (data.target.name == 'topics') {
-            dispatch(fetchTopics());
-        }
-        dispatch(selectMenu(data));
+        event.preventDefault();
+        dispatch(selectMenu(event));
     };
 }
 

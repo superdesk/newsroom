@@ -29,6 +29,7 @@ import {
     DOWNLOAD_ITEMS,
     COPY_ITEMS,
     PRINT_ITEMS,
+    SET_TOPICS,
 } from './actions';
 
 import { RENDER_MODAL, CLOSE_MODAL } from 'actions';
@@ -398,6 +399,9 @@ export default function wireReducer(state = initialState, action) {
 
     case START_LOADING:
         return {...state, isLoading: true};
+
+    case SET_TOPICS:
+        return {...state, topics: action.topics};
 
     default:
         return state;

@@ -1,9 +1,14 @@
+import flask
 import superdesk
 
-from flask import Blueprint
 from superdesk.notification import push_notification  # noqa
+from newsroom.auth import get_user_id
 
-blueprint = Blueprint('notifications', __name__)
+blueprint = flask.Blueprint('notifications', __name__)
+
+
+def push_user_notification(name, **kwargs):
+    push_notification(':'.join(map(str, [name, get_user_id()])), **kwargs)
 
 
 from .notifications import NotificationsResource, NotificationsService, get_user_notifications  # noqa

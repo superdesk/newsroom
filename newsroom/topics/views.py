@@ -8,6 +8,7 @@ from newsroom.auth.decorator import login_required
 from flask import jsonify, abort, session, render_template, current_app as app
 from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.email import send_email
+from newsroom.notifications import push_user_notification
 from flask_babel import gettext
 
 
@@ -27,6 +28,7 @@ def update_topic(id):
     }
 
     get_resource_service('topics').patch(id=ObjectId(id), updates=updates)
+    push_user_notification('topics')
     return jsonify({'success': True}), 200
 
 
@@ -38,6 +40,7 @@ def delete(id):
         abort(403)
 
     get_resource_service('topics').delete({'_id': ObjectId(id)})
+    push_user_notification('topics')
     return jsonify({'success': True}), 200
 
 

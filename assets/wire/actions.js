@@ -360,7 +360,8 @@ export function removeNewItems(data) {
  * @param {Object} data
  */
 export function pushNotification(push) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
+        const user = getState().user;
         switch (push.event) {
         case 'topic_matches':
             return dispatch(setNewItemsByTopic(push.extra));
@@ -369,8 +370,26 @@ export function pushNotification(push) {
             return new Promise((resolve, reject) => {
                 dispatch(fetchNewItems()).then(resolve).catch(reject);
             });
+
+        case `topics:${user}`:
+            return dispatch(reloadTopics(user));
         }
     };
+}
+
+function reloadTopics(user) {
+    return function (dispatch) {
+        return server.get(`/users/${user}/topics`)
+            .then((data) => {
+                return dispatch(setTopics(data._items));
+            })
+            .catch(errorHandler);
+    };
+}
+
+export const SET_TOPICS = 'SET_TOPICS';
+function setTopics(topics) {
+    return {type: SET_TOPICS, topics};
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
