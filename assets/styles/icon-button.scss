@@ -33,4 +33,9 @@
     &:active {
         box-shadow: inset 0 1px 0 0 $main-blue;
     }
+    &--gray-light {
+        &:hover {
+            border-color: $gray-light;
+        }
+    }
 }
