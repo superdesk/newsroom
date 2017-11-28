@@ -1,10 +1,10 @@
 import superdesk
 from flask import current_app as app, json, abort, request
-from eve.utils import parse_request
 from uuid import uuid4
 from datetime import datetime
 from bson import ObjectId
-from eve.utils import config
+from eve.utils import config, parse_request
+from eve_elastic.elastic import parse_date
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None):
@@ -46,3 +46,9 @@ def get_json_or_400():
     if not isinstance(data, dict):
         abort(400)
     return data
+
+
+def parse_dates(item):
+    for field in ['firstcreated', 'versioncreated']:
+        if item.get(field) and type(item[field]) == str:
+            item[field] = parse_date(item[field])

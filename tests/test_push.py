@@ -2,8 +2,10 @@
 import io
 import hmac
 import bson
-from superdesk import get_resource_service
 from flask import json
+from datetime import datetime
+from superdesk import get_resource_service
+from newsroom.utils import get_entity_or_404
 
 
 def get_signature_headers(data, key):
@@ -15,6 +17,7 @@ item = {
     'guid': 'foo',
     'type': 'text',
     'headline': 'Foo',
+    'firstcreated': '2017-11-27T08:00:57+0000',
     'renditions': {
         'thumbnail': {
             'href': 'http://example.com/foo',
@@ -296,3 +299,9 @@ def test_matching_topics(client, app):
     ]
     matching = search.get_matching_topics(item['guid'], topics, users, companies)
     assert ['query'] == matching
+
+
+def test_push_parsed_dates(client, app):
+    client.post('/push', data=json.dumps(item), content_type='application/json')
+    parsed = get_entity_or_404(item['guid'], 'items')
+    assert type(parsed['firstcreated']) == datetime

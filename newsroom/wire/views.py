@@ -15,7 +15,7 @@ from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
-from newsroom.utils import get_entity_or_404, get_json_or_400
+from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates
 
 
 def get_services(user):
@@ -79,6 +79,7 @@ def download(_ids):
     formatter = app.download_formatters[_format]['formatter']
     with zipfile.ZipFile(_file, mode='w') as zf:
         for item in items:
+            parse_dates(item)  # fix for old items
             zf.writestr(
                 secure_filename(formatter.format_filename(item)),
                 formatter.format_item(item)

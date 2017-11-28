@@ -13,7 +13,7 @@ items = [
         'headline': 'Amazon Is Opening More Bookstores',
         'slugline': 'AMAZON-BOOKSTORE-OPENING',
         'body_html': '<p>New stores will open in DC and Austin in 2018.</p><p>Next line</p>',
-        'firstcreated': datetime.now(),
+        'firstcreated': '2017-11-27T08:00:57+0000',
         'versioncreated': datetime.now(),
         'service': [{'code': 'a', 'name': 'Service A'}],
     },
