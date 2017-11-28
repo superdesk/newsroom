@@ -1,0 +1,382 @@
+{% extends "layout_wire.html" %}
+
+{% block title %}Wire Design / Article list{% endblock %}
+
+{% block contentHeader %}
+
+<div class="multi-action-bar">
+    <button class="btn btn-outline-secondary">Cancel</button>
+    <button class="btn btn-outline-primary">Select all</button>
+    <span class="multi-action-bar__count">2 Items selected</span>
+    <div class="multi-action-bar__icons">
+        <button class="icon-button">
+            <i class="icon--bookmark-add"></i>
+        </button>
+        <button class="icon-button">
+            <i class="icon--share"></i>
+        </button>
+        <button class="icon-button">
+            <i class="icon--download"></i>
+        </button>
+    </div>
+</div>
+
+<nav class="content-bar navbar justify-content-start">
+    <span class="content-bar__menu content-bar__menu--nav">
+        <i class="icon--hamburger"></i>
+        <i class="icon--close-thin icon--white"></i>
+    </span>
+    <div class="search form-inline">       
+        <span class="search__icon">
+            <i class="icon--search icon--gray-light"></i>
+        </span>
+        <div class="search__form input-group">
+            <form class="form-inline">
+
+                <input type="text" class="search__input form-control" placeholder="Search for..." aria-label="Search for...">
+                <div class="search__form__buttons">
+                    <span class="search__clear">
+                        <img src="{{ url_for('static', filename = 'search_clear.png') }}" width="16" height="16"/>
+                    </span>
+                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="content-bar__right">
+        <div class="content-bar__sort btn-group">
+            <div class="form-control-plaintext">
+                Sort by:
+            </div>
+            <button type="button" class="content-bar__dropdown-btn btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Date
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <button class="dropdown-item" type="button">Date</button>
+                <button class="dropdown-item" type="button">Author</button>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <span class="content-bar__menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="icon--list-view"></i>
+            </span>
+            <div class="dropdown-menu dropdown-menu-right">
+                <h6 class="dropdown-header">Change view</h6>
+                <button class="dropdown-item" type="button"><i class="icon--list-view icon--gray"></i> Large list</button>
+                <button class="dropdown-item" type="button"><i class="icon--list-view-compact icon--gray"></i> Compact list</button>
+                <button class="dropdown-item" type="button"><i class="icon--grid-view icon--gray"></i> Grid</button>
+            </div>
+        </div>
+    </div>
+
+</nav>
+
+{% endblock %}
+
+{% block contentMain %}
+
+  <div class="wire-column--3">
+
+    <div class="wire-column__nav">
+    <!--div class="wire-column__nav wire-column__nav--open"-->
+        <div class="wire-column__nav__items">
+            <ul class="nav justify-content-center" id="pills-tab" role="tablist">
+                <li class="wire-column__nav__tab nav-item">
+                    <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-expanded="true">Navigation</a>
+                </li>
+                <li class="wire-column__nav__tab nav-item">
+                    <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-expanded="true">Filters</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <a href="#" class="btn btn-outline-primary btn-block">All</a>
+                    <a href="#" class="btn btn-outline-secondary btn-block">National</a>
+                    <a href="#" class="btn btn-outline-secondary btn-block">Courts</a>
+                    <a href="#" class="btn btn-outline-secondary btn-block">Entertainment</a>
+
+                    <span class="wire-column__nav__divider"></span>
+
+                    <a href="#" class="btn btn-outline-secondary btn-block">Followed topics <span class="wire-button__notif">8</span></a>
+
+                </div>
+                <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                    <div class="wire-column__nav__group">
+                        <h5>Category</h5>
+                        <div>
+                            <label class="custom-control custom-checkbox ui-dark">
+                                <input type="checkbox" class="custom-control-input">
+                                <span class="custom-control-indicator"></span>
+                                <span class="custom-control-description">Advisories</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="custom-control custom-checkbox ui-dark">
+                                <input type="checkbox" class="custom-control-input">
+                                <span class="custom-control-indicator"></span>
+                                <span class="custom-control-description">Australian General News</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="custom-control custom-checkbox ui-dark">
+                                <input type="checkbox" class="custom-control-input">
+                                <span class="custom-control-indicator"></span>
+                                <span class="custom-control-description">Medianet Investor Relations Wire</span>
+                            </label>
+                        </div>
+                        <div>                           
+                            <label class="custom-control custom-checkbox ui-dark">
+                                <input type="checkbox" class="custom-control-input">
+                                <span class="custom-control-indicator"></span>
+                                <span class="custom-control-description">NZN</span>
+                            </label>
+                        </div>
+                        <a href="#" class="small">Show all</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wire-column__main container-fluid">
+
+        <div class="d-flex mt-3 p-0 align-items-center">
+            <div class="navbar-text search-results-info">
+                <span class="search-results-info__num">147</span>
+                <span class="search-results-info__text">search results for:<br><b>search</b></span>
+            </div>
+
+            <button class="btn btn-outline-primary btn-responsive">Save as topic</button>            
+            <button type="button" class="button__reset-styles d-flex align-items-center ml-auto">
+                <i class="icon--refresh icon--pink"></i>
+                <span class="badge badge-pill badge-info badge-secondary ml-2">21</span>
+            </button>
+        </div>
+
+        <div class="wire-articles wire-articles--list row wire-articles--list-compact">
+
+            <article class="wire-articles__item-wrap col-12">
+                <div class="wire-articles__item wire-articles__item--list">
+                    <div class="wire-articles__item--list__text">                        
+                        <h4 class="wire-articles__item--list__headline">
+                            <div class="no-bindable-select wire-articles__item--list__select">
+                                <label class="circle-checkbox">
+                                    <input type="checkbox" class="css-checkbox">
+                                    <i></i>
+                                </label>
+                            </div>
+                            <div class="wire-articles__item__icons">
+                                <span class="wire-articles__item__icon">
+                                    <i class="icon--text icon--gray-light"></i>
+                                </span>
+                                <span class="wire-articles__item__icon">
+                                    <i class="icon--photo icon--gray-light"></i>
+                                </span>
+                            </div>Saudis hire coach Pizzi for World Cup
+                        </h4>
+                        <div class="wire-articles__item__meta">
+                            <div class="wire-articles__item__meta-info">
+                                <time datetime="11/28/2017, 10:36:04 AM">10:36:04 AM</time>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="no-bindable wire-articles__item__versions-btn">Show previous versions (7)</div>
+                    <div class="wire-articles__item--list__actions">
+                        <button class="icon-button icon-button--gray-light" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share icon--gray-light"></i></button>
+                        <button class="icon-button icon-button--gray-light" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add icon--gray-light"></i></button>
+                        <div class="btn-group">
+                            <span><i class="icon--more icon--gray-light"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <article class="wire-articles__item-wrap col-12">
+                    <div class="wire-articles__item wire-articles__item--list">
+                        <div class="wire-articles__item--list__text">                        
+                            <h4 class="wire-articles__item--list__headline">
+                                <div class="no-bindable-select wire-articles__item--list__select">
+                                    <label class="circle-checkbox">
+                                        <input type="checkbox" class="css-checkbox">
+                                        <i></i>
+                                    </label>
+                                </div>
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>                                    
+                                </div>Mandurah Greyhound NSW TAB DIVS 1-7 Tuesday
+                            </h4>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__meta-info">
+                                    <time datetime="11/28/2017, 10:36:04 AM">10:36:04 AM</time>
+                                </div>
+                            </div>
+                        </div>                        
+                        <div class="wire-articles__item--list__actions">
+                            <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share"></i></button>
+                            <button class="icon-button icon-button--gray-light" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add icon--gray-light"></i></button>
+                            <div class="btn-group">
+                                <span><i class="icon--more icon--gray-light"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <article class="wire-articles__item-wrap col-12">
+                        <div class="wire-articles__item wire-articles__item--list">
+                            <div class="wire-articles__item--list__text">                        
+                                <h4 class="wire-articles__item--list__headline">
+                                    <div class="no-bindable-select wire-articles__item--list__select">
+                                        <label class="circle-checkbox">
+                                            <input type="checkbox" class="css-checkbox">
+                                            <i></i>
+                                        </label>
+                                    </div>
+                                    <div class="wire-articles__item__icons">
+                                        <span class="wire-articles__item__icon">
+                                            <i class="icon--text icon--gray-light"></i>
+                                        </span>
+                                        <span class="wire-articles__item__icon">
+                                            <i class="icon--photo icon--gray-light"></i>
+                                        </span>
+                                    </div>AAP Rolling News Bulletin Nov 28, 2300
+                                </h4>
+                                <div class="wire-articles__item__meta">
+                                    <div class="wire-articles__item__meta-info">
+                                        <time datetime="11/28/2017, 10:36:04 AM">10:36:04 AM</time>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="no-bindable wire-articles__item__versions-btn">Show previous versions (1)</div>
+                            <div class="wire-articles__item--list__actions">
+                                <button class="icon-button icon-button--gray-light" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share icon--gray-light"></i></button>
+                                <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
+                                <div class="btn-group">
+                                    <span><i class="icon--more icon--gray-light"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+        </div>
+    </div>
+
+    <div class="wire-column__preview">
+      <div class="wire-column__preview__items">
+        <div class="wire-column__preview__top-bar">
+            <div>
+                <button type="button" class="btn btn-outline-primary btn-responsive">Follow story</button>
+            </div>
+            <div class="wire-column__preview__buttons">
+                <button class="icon-button"><i class="icon--text"></i></button>
+                <button class="icon-button"><i class="icon--share"></i></button>
+                <button class="icon-button"><i class="icon--print"></i></button>
+                <button class="icon-button"><i class="icon--copy"></i></button>
+                <button class="icon-button"><i class="icon--download"></i></button>
+                <button class="icon-button"><i class="icon--bookmark"></i></button>
+            </div>
+        </div>
+        <div class="wire-column__preview__date">Created 11/17/2017, 11:21:20 AM</div>
+        <div class="wire-column__preview__content">
+            <span class="wire-column__preview__slug">Trump-Comey</span>
+            <h2 class="wire-column__preview__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit</h2>
+            <p class="wire-column__preview__author">By <span class="bold">Justin McCurry</span> in London</p>
+            <figure class="wire-column__preview__image">
+                <span class="wire-column__preview__image-icon">
+                    <i class="icon--resize icon--white"></i>
+                </span>
+                <img src="{{ url_for('static', filename = 'list_image_800x600.jpg') }}"/>
+                <figcaption class="wire-column__preview__caption">Lorem ipsum dolor sit amet, consectetur adipiscing elit</figcaption>
+            </figure>
+            <div class="wire-articles__item__meta">
+                <div class="wire-articles__item__icons">
+                    <span class="wire-articles__item__icon">
+                        <i class="icon--text icon--gray-light"></i>
+                    </span>
+                    <span class="wire-articles__item__icon">
+                        <i class="icon--photo icon--gray-light"></i>
+                    </span>
+                    <span class="wire-articles__item__divider">
+                    </span>
+                </div>
+                <div class="wire-articles__item__meta-info">
+                    <span><span class="bold">345</span> words</span>
+                    <span>Source: AAP // <span class="blue-text">3 previous versions</span></span>
+                </div>
+            </div>
+            <p class="wire-column__preview__lead">At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.</p>
+            <div class="wire-column__preview__text">
+                <p>Washington DC, US – Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</p>
+                <p>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus.</p>
+            </div>
+
+            <div class="wire-column__preview__tags">
+                <div class="column__preview__tags__column">
+                    <span class="wire-column__preview__tags__headline">Category</span>
+                    <a class="wire-column__preview__tag" href="#">International News</a>
+                    <a class="wire-column__preview__tag" href="#">Politics</a>
+                    <a class="wire-column__preview__tag" href="#">Something</a>
+                </div>
+                <div class="column__preview__tags__column">
+                    <span class="wire-column__preview__tags__headline">Genre</span>
+                    <a class="wire-column__preview__tag" href="#">Article (news)</a>
+                </div>
+            </div>
+
+            <div class="wire-column__preview__versions">
+                <span class="wire-column__preview__versions__box-headline">Previous versions</span>
+                <div class="wire-column__preview__versions__item">
+                    <div class="wire-column__preview__versions__wrap">
+                        <div class="wire-column__preview__versions__time">
+                            <span>14:15</span>
+                        </div>
+                        <div class="wire-column__preview__versions__meta">
+                            <div class="wire-column__preview__item__meta-info">
+                                <span class="bold">London</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wire-column__preview__versions__name">
+                        <h5 class="wire-column__preview__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                    </div>
+                </div>
+                <div class="wire-column__preview__versions__item">
+                    <div class="wire-column__preview__versions__wrap">
+                        <div class="wire-column__preview__versions__time">
+                            <span>14:15</span>
+                        </div>
+                        <div class="wire-column__preview__versions__meta">
+                            <div class="wire-column__preview__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>06.06.2017 // <span class="bold">345</span> words</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wire-column__preview__versions__name">
+                        <h5 class="wire-column__preview__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  
+  {% endblock %}
+  
+  {% block script %}
+    <script>
+        $(document).ready(function() {
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+        });
+    </script>
+  {% endblock %}

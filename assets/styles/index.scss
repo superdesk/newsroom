@@ -785,18 +785,22 @@ article.list {
     }
 }
 
+// compact view
 .wire-articles--list-compact {
     .wire-articles__item-wrap {
         margin-bottom: 10px;
     }
-    .wire-articles__item {
+    .wire-articles__item--list {
         padding: 4px 10px;
     }
     .wire-articles__item--list__text {
         flex-direction: row;
         align-items: center;
+        flex-basis: auto;
     }
     .wire-articles__item--list__headline {
+        display: flex;
+        align-items: center;
         font-size: 0.875rem; // 14px    
         margin-right: 20px;
         margin-bottom: 0px;
@@ -806,9 +810,20 @@ article.list {
     }
     .wire-articles__item__versions-btn {
         margin-left: auto;
+        align-self: center;
     }
-    .wire-articles__item--list__actions > * {
-        margin-bottom: 0px;
+    .wire-articles__item--list__actions {
+        flex-direction: row;
+        align-items: center;
+        > * {
+            margin-bottom: 0px;
+        }
+        > .icon-button {
+            height: 32px;
+        }
+    }
+    .wire-articles__item__icons {
+        margin-right: 6px;
     }
 }
 
@@ -878,6 +893,15 @@ article.list {
             width: 38px;
         }
     }
+    // compact view 
+    .wire-articles--list-compact {
+        .wire-articles__item--list {
+            padding: 4px 10px;
+        }
+        .wire-articles__item--list__actions {
+            flex-direction: row;
+        }
+    }
 }
 
 // two panes open (filter and preview), responsive
@@ -937,11 +961,13 @@ article.list {
         }
     }
     .wire-articles__item--list__headline {
+        margin-right: 0;
         @include xl {
             line-height: 1;
         }
         @include xxl {
             line-height: 1.2;
+            margin-right: 20px;
         }
     }
     .icon-button {
@@ -960,6 +986,19 @@ article.list {
         }
         @include xxl {
             margin-right: 40px;
+        }
+    }
+    // compact view 
+    .wire-articles--list-compact {
+        .wire-articles__item--list {
+            padding: 4px 10px;
+        }
+        .wire-articles__item--list__actions {
+            flex-direction: row;
+        }
+        .wire-articles__item__meta {
+            margin: 0 10px;
+            flex-shrink: 0;
         }
     }
 }
