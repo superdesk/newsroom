@@ -1,4 +1,6 @@
-var webpackConfig = require('./webpack.config.js');
+
+const webpack = require('webpack');
+const webpackConfig = require('./webpack.config.js');
 
 module.exports = function(config) {
     config.set({
@@ -15,7 +17,7 @@ module.exports = function(config) {
         webpack: {
             module: webpackConfig.module,
             resolve: webpackConfig.resolve,
-            plugins: webpackConfig.plugins,
+            plugins: webpackConfig.plugins.filter((plugin) => plugin instanceof webpack.ProvidePlugin),
             devtool: 'inline-source-map',
         },
 
