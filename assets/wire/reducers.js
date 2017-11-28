@@ -14,6 +14,7 @@ import {
     TOGGLE_SELECTED,
     SELECT_ALL,
     SELECT_NONE,
+    SHARE_ITEMS,
     BOOKMARK_ITEMS,
     REMOVE_BOOKMARK,
     SET_NEW_ITEMS_BY_TOPIC,
@@ -25,6 +26,9 @@ import {
     RESET_FILTER,
     SET_VIEW,
     SET_NEW_ITEMS,
+    DOWNLOAD_ITEMS,
+    COPY_ITEMS,
+    PRINT_ITEMS,
 } from './actions';
 
 import { RENDER_MODAL, CLOSE_MODAL } from 'actions';
@@ -91,6 +95,17 @@ function getReadItems(state, item) {
     }
 
     return readItems;
+}
+
+function updateItemActions(state, items, action) {
+    const itemsById = Object.assign({}, state.itemsById);
+
+    items.map((item) => {
+        itemsById[item] = Object.assign({}, itemsById[item]);
+        itemsById[item][action] = (itemsById[item][action] || []).concat([state.user]);
+    });
+
+    return itemsById;
 }
 
 function _wireReducer(state, action) {
@@ -264,6 +279,42 @@ export default function wireReducer(state = initialState, action) {
             ...state,
             selectedItems: [],
         };
+
+    case SHARE_ITEMS: {
+        const itemsById = updateItemActions(state, action.items, 'shares');
+
+        return {
+            ...state,
+            itemsById
+        };
+    }
+
+    case DOWNLOAD_ITEMS: {
+        const itemsById = updateItemActions(state, action.items, 'downloads');
+
+        return {
+            ...state,
+            itemsById
+        };
+    }
+
+    case COPY_ITEMS: {
+        const itemsById = updateItemActions(state, action.items, 'copies');
+
+        return {
+            ...state,
+            itemsById
+        };
+    }
+
+    case PRINT_ITEMS: {
+        const itemsById = updateItemActions(state, action.items, 'prints');
+
+        return {
+            ...state,
+            itemsById
+        };
+    }
 
     case BOOKMARK_ITEMS: {
         const itemsById = Object.assign({}, state.itemsById);

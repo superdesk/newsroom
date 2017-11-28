@@ -46,6 +46,13 @@ def test_share_items(client, app):
         assert 'http://localhost:5050/wire/%s' % items[1]['_id'] in outbox[0].body
         assert 'Some info message' in outbox[0].body
 
+    resp = client.get('/wire/{}?format=json'.format(items[0]['_id']))
+    data = json.loads(resp.get_data())
+    assert 'shares' in data
+
+    user_id = app.data.find_all('users')[0]['_id']
+    assert str(user_id) in data['shares']
+
 
 def get_bookmarks_count(client, user):
     resp = client.get('/api/wire_search?bookmarks=%s' % str(user))
@@ -73,6 +80,18 @@ def test_bookmarks(client, app):
     assert resp.status_code == 200
 
     assert 0 == get_bookmarks_count(client, user_id)
+
+
+def test_item_copy(client, app):
+    resp = client.post('/wire/{}/copy'.format(items[0]['_id']), content_type='application/json')
+    assert resp.status_code == 200
+
+    resp = client.get('/wire/tag:foo?format=json')
+    data = json.loads(resp.get_data())
+    assert 'copies' in data
+
+    user_id = app.data.find_all('users')[0]['_id']
+    assert str(user_id) in data['copies']
 
 
 def test_versions(client, app):

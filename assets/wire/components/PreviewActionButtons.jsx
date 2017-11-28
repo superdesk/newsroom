@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import ActionButton from '../../components/ActionButton';
 
 
-function PreviewActionButtons({item, actions}) {
+function PreviewActionButtons({item, user, actions}) {
     const actionButtons = actions.map((action) =>
         <ActionButton
             key={action.name}
             item={item}
             className='icon-button'
+            isVisited={action.visited && action.visited(user, item)}
             displayName={false}
             action={action}
         />
@@ -23,6 +24,7 @@ function PreviewActionButtons({item, actions}) {
 
 PreviewActionButtons.propTypes = {
     item: PropTypes.object,
+    user: PropTypes.string,
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         action: PropTypes.func,

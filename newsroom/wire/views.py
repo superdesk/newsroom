@@ -85,6 +85,7 @@ def download(_ids):
             )
     _file.seek(0)
 
+    update_action_list(_ids.split(','), 'downloads', force_insert=True)
     app.data.insert('history', items, action='download', user=user)
     return flask.send_file(_file, attachment_filename='newsroom.zip', as_attachment=True)
 
@@ -115,6 +116,7 @@ def share():
                 sender=current_user['email'],
                 connection=connection
             )
+    update_action_list(data.get('items'), 'shares')
     return flask.jsonify(), 201
 
 
@@ -126,20 +128,39 @@ def bookmark():
     Stores user id into item.bookmarks array.
     Uses mongodb to update the array and then pushes updated array to elastic.
     """
-    user_id = get_user_id()
     data = get_json_or_400()
     assert data.get('items')
-    db = app.data.get_mongo_collection('items')
-    elastic = app.data._search_backend('items')
-    if flask.request.method == 'POST':
-        updates = {'$addToSet': {'bookmarks': user_id}}
-    else:
-        updates = {'$pull': {'bookmarks': user_id}}
-    for item_id in data.get('items'):
-        result = db.update_one({'_id': item_id}, updates)
-        if result.modified_count:
-            modified = db.find_one({'_id': item_id})
-            elastic.update('items', item_id, {'bookmarks': modified['bookmarks']})
+    update_action_list(data.get('items'), 'bookmarks')
+    return flask.jsonify(), 200
+
+
+def update_action_list(items, action_list, force_insert=False):
+    """
+    Stores user id into array of action_list of an item
+    :param items: items to be updated
+    :param action_list: field name of the list
+    :param force_insert: inserts into list regardless of the http method
+    :return:
+    """
+    user_id = get_user_id()
+    if user_id:
+        db = app.data.get_mongo_collection('items')
+        elastic = app.data._search_backend('items')
+        if flask.request.method == 'POST' or force_insert:
+            updates = {'$addToSet': {action_list: user_id}}
+        else:
+            updates = {'$pull': {action_list: user_id}}
+        for item_id in items:
+            result = db.update_one({'_id': item_id}, updates)
+            if result.modified_count:
+                modified = db.find_one({'_id': item_id})
+                elastic.update('items', item_id, {action_list: modified[action_list]})
+
+
+@blueprint.route('/wire/<_id>/copy', methods=['POST'])
+def copy(_id):
+    get_entity_or_404(_id, 'items')
+    update_action_list([_id], 'copies')
     return flask.jsonify(), 200
 
 
@@ -156,5 +177,9 @@ def item(_id):
     if flask.request.args.get('format') == 'json':
         return flask.jsonify(item)
     previous_versions = get_previous_versions(item)
-    template = 'wire_item_print.html' if 'print' in flask.request.args else 'wire_item.html'
+    if 'print' in flask.request.args:
+        template = 'wire_item_print.html'
+        update_action_list([_id], 'prints', force_insert=True)
+    else:
+        template = 'wire_item.html'
     return flask.render_template(template, item=item, previous_versions=previous_versions)

@@ -140,6 +140,7 @@ class WireListItem extends React.Component {
                             </span>
                             { this.props.showActions ? <ActionList
                                 item={this.props.item}
+                                user={this.props.user}
                                 actions={this.props.actions}
                             /> : null }
                         </div>
@@ -150,6 +151,7 @@ class WireListItem extends React.Component {
                               key={action.name}
                               className="icon-button"
                               action={action}
+                              isVisited={action.visited && action.visited(this.props.user, this.props.item)}
                               item={this.props.item} />
                         )}
 
@@ -177,6 +179,7 @@ WireListItem.propTypes = {
         action: PropTypes.func,
     })),
     isExtended: PropTypes.bool.isRequired,
+    user: PropTypes.string,
 };
 
 export default WireListItem;

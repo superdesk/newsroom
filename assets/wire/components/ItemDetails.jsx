@@ -8,7 +8,7 @@ import ListItemNextVersion from './ListItemNextVersion';
 import { gettext, fullDate, formatHTML } from 'utils';
 import { getPicture, getDetailRendition, showItemVersions, getCaption } from 'wire/utils';
 
-function ItemDetails({item, actions, onClose}) {
+function ItemDetails({item, user, actions, onClose}) {
     const picture = getPicture(item);
     return (
         <div className='content--item-detail'>
@@ -19,7 +19,7 @@ function ItemDetails({item, actions, onClose}) {
                         <i className='icon--close-thin'></i>
                     </span>
 
-                    <PreviewActionButtons item={item} actions={actions}/>
+                    <PreviewActionButtons item={item} user={user} actions={actions}/>
                 </div>
 
             </section>
@@ -81,6 +81,7 @@ function ItemDetails({item, actions, onClose}) {
 
 ItemDetails.propTypes = {
     item: PropTypes.object.isRequired,
+    user: PropTypes.string.isRequired,
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         action: PropTypes.func,
