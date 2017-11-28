@@ -4,10 +4,12 @@ import classNames from 'classnames';
 
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import { getPicture, getThumbnailRendition, showItemVersions, shortText } from 'wire/utils';
+
 import ActionList from 'components/ActionList';
+import ActionButton from 'components/ActionButton';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
-import ActionButton from 'components/ActionButton';
+import WireListItemIcons from './WireListItemIcons';
 
 class WireListItem extends React.Component {
     constructor(props) {
@@ -74,26 +76,15 @@ class WireListItem extends React.Component {
                                     <i></i>
                                 </label>
                             </div>
+                            {!isExtended && (
+                                <WireListItemIcons item={item} picture={picture} divider={false} />
+                            )}
                             {item.headline}
                         </h4>
 
                         {isExtended && (
                             <div className='wire-articles__item__meta'>
-                                <div className='wire-articles__item__icons'>
-                                    {item.type === 'text' &&
-                                        <span className='wire-articles__item__icon'>
-                                            <i className='icon--text icon--gray-light'></i>
-                                        </span>
-                                    }
-                                    {picture &&
-                                        <span className='wire-articles__item__icon'>
-                                            <i className='icon--photo icon--gray-light'></i>
-                                        </span>
-                                    }
-                                    <span className='wire-articles__item__divider'>
-                                    </span>
-                                </div>
-
+                                <WireListItemIcons item={item} picture={picture} divider={true} />
                                 <div className='wire-articles__item__meta-info'>
                                     <span className='bold'>{this.slugline}</span>
                                     <span>{gettext('Source: {{ source }}', {source: item.source})}
@@ -145,7 +136,7 @@ class WireListItem extends React.Component {
                             /> : null }
                         </div>
 
-                        {isExtended && this.props.actions.map((action) =>
+                        {this.props.actions.map((action) =>
                             action.shortcut &&
                           <ActionButton
                               key={action.name}
@@ -154,11 +145,12 @@ class WireListItem extends React.Component {
                               isVisited={action.visited && action.visited(this.props.user, this.props.item)}
                               item={this.props.item} />
                         )}
-
                     </div>
                 </div>
 
-                {this.state.previousVersions && <ListItemPreviousVersions item={this.props.item} isPreview={false} />}
+                {this.state.previousVersions &&
+                    <ListItemPreviousVersions item={this.props.item} isPreview={false} />
+                }
             </article>
         );
     }
