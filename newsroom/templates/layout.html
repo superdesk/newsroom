@@ -21,11 +21,12 @@
 <body>
 
 <div class="newsroomWrap">
-    <nav class="main navbar justify-content-start">
+
+    <nav class="main navbar justify-content-start align-items-stretch">
         <div class="navbar__logo">
             <img src="{{ url_for('static', filename = 'logo.svg') }}" width="34" height="34"/>
         </div>
-        <div class="navbar-brand">
+        <div class="navbar-brand d-flex align-items-center">
             <nav>
                 <a class="breadcrumb-item text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }}</a>
                 {% block breadcrumb %}{% endblock %}
@@ -33,19 +34,35 @@
         </div>
 
         {% if session.get('name') %}
-        <div class="form-inline my-lg-0 ml-auto p-2">
+        <div class="form-inline my-lg-0 ml-auto pr-3">
             {% if is_admin() %}
                 <a class="nav-link" href="{{ url_for('users.settings') }}">{{ gettext('Settings') }}</a>
             {% endif %}
             <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
-            <div class="nav-link" id="header-notification"></div>
-
+            <div class="notif" id="header-notification">
+                <div class="badge--top-right">
+                </div>
+            </div>
             <div id="header-profile-toggle"></div>
         </div>
         {% else %}
-        <div class="form-inline my-lg-0 ml-auto p-2">
+        <div class="form-inline my-lg-0 ml-auto pr-3">
             <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             <a class="nav-link"href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
+
+            <!-- Petr you can delete this once you implement it in react, it's just for the preview purpose -->
+
+            <div class="notif" id="header-notification">
+                <div class="badge--top-right">
+                    <div class="badge badge-pill badge-info badge-secondary">2</div>
+                    <span class="notif__circle">
+                        <i class="icon--alert icon--white"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- end of preview markup -->
+
         </div>
         {% endif %}
     </nav>
@@ -62,7 +79,7 @@
                 {% endif %}
 
                 {% for nav in sidenavs %}
-                <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %}">
+                <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %} badge--top-right">
                   <a href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}">
                     {% if nav.name == 'Bookmarks' %}
                     <div id="bookmarks-count" class="badge badge-pill badge-info badge-secondary"></div>

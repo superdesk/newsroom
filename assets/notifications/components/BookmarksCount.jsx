@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 function BookmarksCount({count}) {
     return ReactDOM.createPortal(
-        <b>{count}</b>,
+        <b className='font-weight-normal'>{count}</b>,
         document.getElementById('bookmarks-count')
     );
 }

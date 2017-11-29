@@ -33,7 +33,7 @@ class NotificationList extends React.Component {
 
     render() {
         return (
-            <span>
+            <span className='notif__circle'>
                 <i className='icon--alert icon--white' onClick={this.toggleDisplay} >
                     {this.props.notifications && this.props.notifications.length}
                 </i>
