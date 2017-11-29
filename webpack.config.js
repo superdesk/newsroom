@@ -12,6 +12,19 @@ module.exports = {
         newsroom_css: './assets/style.js',
         wire_js: './assets/wire/index.js',
         notifications_js: './assets/notifications/index.js',
+        vendor: [
+            'alertifyjs',
+            'bootstrap',
+            'classnames',
+            'lodash',
+            'prop-types',
+            'react',
+            'react-dom',
+            'react-redux',
+            'redux',
+            'redux-thunk',
+            'redux-logger',
+        ],
     },
     output: {
         path: path.resolve(__dirname, 'newsroom', 'static'),
@@ -60,6 +73,10 @@ module.exports = {
             $: 'jquery',
             jQuery: 'jquery',
             Popper: ['popper.js', 'default'],
-        })
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'vendor',
+            minChunks: Infinity,
+        }),
     ]
 };
