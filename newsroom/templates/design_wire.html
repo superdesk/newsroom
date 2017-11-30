@@ -5,8 +5,8 @@
 {% block contentHeader %}
 
 <div class="multi-action-bar">
-    <button class="btn btn-outline-secondary">Cancel</button>
-    <button class="btn btn-outline-primary">Select all</button>
+    <button class="btn btn-outline-secondary btn-responsive">Cancel</button>
+    <button class="btn btn-outline-primary btn-responsive">Select all</button>
     <span class="multi-action-bar__count">2 Items selected</span>
     <div class="multi-action-bar__icons">
         <button class="icon-button">
@@ -21,22 +21,13 @@
     </div>
 </div>
 
-<nav class="content-bar navbar justify-content-start">
+<nav class="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
     <span class="content-bar__menu content-bar__menu--nav">
         <i class="icon--hamburger"></i>
         <i class="icon--close-thin icon--white"></i>
     </span>
     <div class="search form-inline">
-        <!--div class="dropdown">
-            <button class="content-bar__dropdown-btn btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Simple search
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">Simple search</a>
-                <a class="dropdown-item" href="#">Advanced search</a>
-            </div>
-        </div--> 
-        <span class="search__icon">
+        <span class="search__icon d-none d-sm-block">
             <i class="icon--search icon--gray-light"></i>
         </span>
         <div class="search__form input-group">
@@ -55,7 +46,7 @@
     </div>
 
     <div class="content-bar__right">
-        <div class="content-bar__sort btn-group">
+        <div class="content-bar__sort btn-group d-none"><!-- sort bar hidden -->
             <div class="form-control-plaintext">
                 Sort by:
             </div>
@@ -152,7 +143,7 @@
 
     <div class="wire-column__main container-fluid">
 
-        <div class="d-flex mt-3 p-0 align-items-center">
+        <div class="d-flex mt-1 mt-sm-3 p-0 align-items-center flex-wrap flex-sm-nowrap">
             <div class="navbar-text search-results-info">
                 <span class="search-results-info__num">147</span>
                 <span class="search-results-info__text">search results for:<br><b>search</b></span>
@@ -550,6 +541,9 @@
 
     <div class="wire-column__preview">
       <div class="wire-column__preview__items">
+        <div class="wire-column__preview__mobile-bar">
+            <button class="icon-button"><i class="icon--close-large"></i></button>
+        </div>
         <div class="wire-column__preview__top-bar">
             <div>
                 <button type="button" class="btn btn-outline-primary btn-responsive">Follow story</button>

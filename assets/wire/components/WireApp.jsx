@@ -108,7 +108,7 @@ class WireApp extends React.Component {
                             actions={this.props.actions.filter(multiActionFilter)}
                         />
                     }
-                    <nav className='content-bar navbar justify-content-start'>
+                    <nav className='content-bar navbar justify-content-start flex-nowrap flex-sm-wrap'>
                         <span className={`content-bar__menu content-bar__menu--nav${this.state.withSidebar?'--open':''}`}
                             onClick={this.toggleSidebar}>
                             <i className={this.state.withSidebar ? 'icon--close-thin icon--white' : 'icon--hamburger'}></i>

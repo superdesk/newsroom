@@ -24,6 +24,10 @@ class Preview extends React.PureComponent {
         const previousVersions = 'preview_versions';
         return (
             <div className='wire-column__preview__items'>
+            
+                <div className="wire-column__preview__mobile-bar">
+                    <button className="icon-button"><i className="icon--close-large"></i></button>
+                </div>
 
                 <div className='wire-column__preview__top-bar'>
                     <div>
