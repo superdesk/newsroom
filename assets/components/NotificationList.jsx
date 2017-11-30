@@ -33,28 +33,34 @@ class NotificationList extends React.Component {
 
     render() {
         return (
-            <span className='notif__circle'>
-                <i className='icon--alert icon--white' onClick={this.toggleDisplay} >
+            <div className="badge--top-right">
+                <div className="badge badge-pill badge-info badge-secondary">
                     {this.props.notifications && this.props.notifications.length}
-                </i>
+                </div>
+
+                <span className="notif__circle">
+                    <i className='icon--alert icon--white' onClick={this.toggleDisplay} />
+                </span>
+
                 {this.state.displayItems && this.props.notifications && this.props.notifications.length > 0 &&
-                <div style={{
-                    position:'absolute',
-                    right: '17px',
-                    top: '56px',
-                    backgroundColor: 'white',
-                    border: '1px solid #cecece'
-                }}>
-                    <div className='p-1'>
-                        <span className='ml-2'>{gettext('Notifications')}</span>
-                        <button type="button"
-                            className="btn btn-secondary btn-xs float-right mr-1"
-                            onClick={this.props.clearAll}>{gettext('Clear All')}
-                        </button>
+                    <div style={{
+                        position:'absolute',
+                        right: '17px',
+                        top: '56px',
+                        backgroundColor: 'white',
+                        border: '1px solid #cecece'
+                    }}>
+                        <div className='p-1'>
+                            <span className='ml-2'>{gettext('Notifications')}</span>
+                            <button type="button"
+                                className="btn btn-secondary btn-xs float-right mr-1"
+                                onClick={this.props.clearAll}>{gettext('Clear All')}
+                            </button>
+                        </div>
+                        {this.props.notifications.map((notification) => this.renderNotification(notification))}
                     </div>
-                    {this.props.notifications.map((notification) => this.renderNotification(notification))}
-                </div>}
-            </span>
+                }
+            </div>
         );
     }
 }

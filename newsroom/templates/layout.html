@@ -39,30 +39,13 @@
                 <a class="nav-link" href="{{ url_for('users.settings') }}">{{ gettext('Settings') }}</a>
             {% endif %}
             <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
-            <div class="notif" id="header-notification">
-                <div class="badge--top-right">
-                </div>
-            </div>
+            <div class="notif" id="header-notification"></div>
             <div id="header-profile-toggle"></div>
         </div>
         {% else %}
         <div class="form-inline my-lg-0 ml-auto pr-3">
             <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             <a class="nav-link"href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
-
-            <!-- Petr you can delete this once you implement it in react, it's just for the preview purpose -->
-
-            <div class="notif" id="header-notification">
-                <div class="badge--top-right">
-                    <div class="badge badge-pill badge-info badge-secondary">2</div>
-                    <span class="notif__circle">
-                        <i class="icon--alert icon--white"></i>
-                    </span>
-                </div>
-            </div>
-
-            <!-- end of preview markup -->
-
         </div>
         {% endif %}
     </nav>
