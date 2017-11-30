@@ -1,7 +1,6 @@
 
 import {
     GET_TOPICS,
-    SELECT_MENU,
     INIT_DATA,
     SET_ERROR,
     GET_USER,
@@ -22,7 +21,6 @@ const initialState = {
     topics: null,
     topicsById: {},
     activeTopicId: null,
-    selectedMenu: 'topics',
     isLoading: false,
 };
 
@@ -62,7 +60,6 @@ export default function itemReducer(state = initialState, action) {
         return {...state, editedUser, errors: null};
     }
 
-
     case INIT_DATA: {
         return {
             ...state,
@@ -70,14 +67,6 @@ export default function itemReducer(state = initialState, action) {
             editedUser: action.data.user || null,
             topics: action.data.topics || [],
             company: action.data.company || null,
-        };
-    }
-
-    case SELECT_MENU: {
-        return {
-            ...state,
-            activeTopicId: null,
-            selectedMenu: action.data.target.name
         };
     }
 

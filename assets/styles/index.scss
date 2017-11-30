@@ -210,6 +210,19 @@ article.list {
     flex-grow: 1;
     overflow-y: auto;
 }
+
+.profile-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1010;
+    display: flex;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
 .flex-col {
     overflow-x: auto;
 }
@@ -574,7 +587,7 @@ article.list {
 .search-results-info__text {
     color: #6e6e6e;
     b {
-        color: $body-text;    
+        color: $body-text;
     }
 }
 
@@ -849,7 +862,7 @@ article.list {
             margin-bottom: 20px;
             @include lg {
                 margin-left: 12px;
-                margin-bottom: 0px;        
+                margin-bottom: 0px;
             }
             img {
                 max-width: none;
@@ -890,7 +903,7 @@ article.list {
     }
     .icon-button {
         @include lg {
-            width: 32px;            
+            width: 32px;
         }
         @include xl {
             width: 38px;
@@ -926,7 +939,7 @@ article.list {
             margin-bottom: 20px;
             @include xl {
                 margin-left: 12px;
-                margin-bottom: 0px;        
+                margin-bottom: 0px;
             }
             img {
                 max-width: none;
@@ -950,7 +963,7 @@ article.list {
     .wire-articles__item__text {
         font-size: 0.8125rem;
         @include xxl {
-            font-size: 0.875rem; 
+            font-size: 0.875rem;
         }
     }
     .wire-articles__item--list__actions {
@@ -1114,7 +1127,7 @@ article.list {
         margin-bottom: 20px;
         @include md {
             margin-left: 12px;
-            margin-bottom: 0px;        
+            margin-bottom: 0px;
         }
         img {
             max-width: none;
@@ -1363,7 +1376,7 @@ article.list {
     margin-right: 10px;
     &:hover {
         color: #444444;
-        background: #e2e1e1;    
+        background: #e2e1e1;
         text-decoration: none;
     }
 }
@@ -1683,7 +1696,7 @@ article.list {
     }
 }
 
-.simple-card:hover .simple-card__icons {
+.simple-card .simple-card__icons {
     max-width: 400px;
     padding-left: 15px;
     > .icon-button {
@@ -1718,6 +1731,10 @@ article.list {
     &:focus {
         outline: none;
     }
+}
+
+.modal, .modal-backdrop {
+    position: absolute;
 }
 
 // End Wire BEM classes

@@ -179,12 +179,12 @@ def test_create_new_user_succeeds(app, client):
         follow_redirects=True
     )
     assert response.status_code == 200
-    assert 'John Doe' in response.get_data(as_text=True)
+    assert 'John' in response.get_data(as_text=True)
 
     # Logout
     response = client.get(url_for('auth.logout'), follow_redirects=True)
     txt = response.get_data(as_text=True)
-    assert 'John Doe' not in txt
+    assert 'John' not in txt
     assert 'Login' in txt
 
 

@@ -16,7 +16,7 @@ from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates
-from newsroom.notifications import push_notification
+from newsroom.notifications import push_user_notification
 from .search import get_bookmarks_count
 
 
@@ -135,7 +135,7 @@ def bookmark():
     assert data.get('items')
     update_action_list(data.get('items'), 'bookmarks')
     user_id = get_user_id()
-    push_notification('bookmarks:%s' % str(user_id), count=get_bookmarks_count(user_id))
+    push_user_notification('bookmarks', count=get_bookmarks_count(user_id))
     return flask.jsonify(), 200
 
 
