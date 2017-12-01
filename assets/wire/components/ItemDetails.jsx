@@ -28,7 +28,9 @@ function ItemDetails({item, user, actions, onClose}) {
                 <div className="wire-column__preview__content">
                     {getDetailRendition(picture) && (
                         <figure className="wire-column__preview__image">
-                            <img src={getDetailRendition(picture).href} />
+                            <span>
+                                <img src={getDetailRendition(picture).href} />
+                            </span>
                             <figcaption className="wire-column__preview__caption">{getCaption(picture)}</figcaption>
                         </figure>
                     )}
