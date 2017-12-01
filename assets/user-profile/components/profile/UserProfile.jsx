@@ -93,7 +93,7 @@ class UserProfile extends React.Component {
                     </div>
                 </div>
 
-                <div className='profile-content__footer'>
+                <div className='profile-content__footer px-xl-4'>
                     <input
                         type='button'
                         className='btn btn-outline-secondary'
