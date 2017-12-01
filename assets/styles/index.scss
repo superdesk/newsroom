@@ -46,6 +46,9 @@ label {
 
 
 .alertify-notifier {
+    .ajs-message {
+        border: none;
+    }
     .ajs-message.ajs-visible {
         font-size: 0.875rem; // 14px
         font-weight: 300;
@@ -188,6 +191,9 @@ body.print {
             top: -7px;
             right: -7px;
         }
+        &:hover .notif__circle {
+            background: #4a4a4a;
+        }
     }
     .notif__circle {
         background: #000;
@@ -198,9 +204,7 @@ body.print {
         justify-content: center;
         align-items: center;
     }
-    &:hover .notif__circle {
-        background: #4a4a4a;
-    }
+
 }
 
 .navbar__logo {
@@ -1500,6 +1504,16 @@ article.list {
     margin-bottom: 10px;
     margin-left: -30px;
     margin-right: -30px;
+    span {
+        display: block;
+        background: #2d2d2d;
+    }
+    img {
+        display: block;
+        width: auto;
+        max-height: 500px;
+        margin: 0 auto;
+    }
 }
 
 .content--item-detail .wire-column__preview__caption {
@@ -1651,7 +1665,6 @@ article.list {
     flex-grow: 1;
     > .row {
         display: flex;
-        flex-grow: 1;
         align-content: flex-start;
         overflow: auto;
     }
@@ -1673,7 +1686,6 @@ article.list {
 }
 
 .simple-card-wrap {
-    display: flex;
     margin-bottom: 20px;
 }
 
