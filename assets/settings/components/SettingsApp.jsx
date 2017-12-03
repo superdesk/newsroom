@@ -9,8 +9,10 @@ import {
     postItem,
     deleteItem,
     newItem,
+    newProduct,
     updateMenu,
     fetchItems,
+    fetchProducts,
     fetchCompanyUsers,
 } from '../actions';
 import UserBar from './users/UserBar';
@@ -18,6 +20,8 @@ import Users from './users/Users';
 import SettingsMenu from './SettingsMenu';
 import Companies from './companies/Companies';
 import CompanyBar from './companies/CompanyBar';
+import ProductBar from './products/ProductBar'
+import Products from './products/Products'
 
 class SettingsApp extends React.Component {
     constructor(props, context) {
@@ -32,6 +36,7 @@ class SettingsApp extends React.Component {
                         onClick={this.props.selectMenu}
                         isCompanySettings={this.props.selectedMenu === 'companies'}
                         isUserSettings={this.props.selectedMenu === 'users'}
+                        isProducts={this.props.selectedMenu === 'products'}
                         isSystemSettings={this.props.selectedMenu === 'system'}
                     />
                 </div>
@@ -88,6 +93,32 @@ class SettingsApp extends React.Component {
 
                         />
                     </div> : null }
+                {this.props.selectedMenu === 'products' ?
+                    <div className="content">
+                        <ProductBar
+                            onNewProduct={this.props.newProduct}
+                            fetchItems={this.props.fetchItems}
+                        />
+                        <Products
+                            products={this.props.items}
+                            productToEdit={this.props.itemToEdit}
+                            productCompanies={this.props.companyUsers}
+                            activeProductId={this.props.activeItemId}
+                            selectProduct={this.props.selectItem}
+                            editProduct={this.props.editItem}
+                            saveProduct={this.props.saveItem}
+                            deleteProduct={this.props.deleteItem}
+                            newProduct={this.props.newProduct}
+                            cancelEdit={this.props.cancelEdit}
+                            isLoading={this.props.isLoading}
+                            activeQuery={this.props.activeQuery}
+                            totalProducts={this.props.totalItems}
+                            fetchProductCompanies={this.props.fetchProductCompanies}
+                            errors={this.props.errors}
+                            dispatch={this.props.dispatch}
+
+                        />
+                    </div> : null }
             </div>
         );
     }
@@ -102,6 +133,7 @@ SettingsApp.propTypes = {
     saveItem: PropTypes.func,
     deleteItem: PropTypes.func,
     newItem: PropTypes.func,
+    newProduct: PropTypes.func,
     resetPassword: PropTypes.func,
     cancelEdit: PropTypes.func,
     isLoading: PropTypes.bool,
@@ -113,7 +145,9 @@ SettingsApp.propTypes = {
     selectMenu: PropTypes.func,
     selectedMenu: PropTypes.string,
     fetchItems: PropTypes.func,
+    fetchProducts: PropTypes.func,
     fetchCompanyUsers: PropTypes.func,
+    fetchProductCompanies: PropTypes.func,
     errors: PropTypes.object,
     dispatch: PropTypes.func,
 };
@@ -138,11 +172,14 @@ const mapDispatchToProps = (dispatch) => ({
     saveItem: (type) => dispatch(postItem(type)),
     deleteItem: (type) => dispatch(deleteItem(type)),
     newItem: (data) => dispatch(newItem(data)),
+    newProduct: () => dispatch(newProduct()),
     cancelEdit: (event) => dispatch(cancelEdit(event)),
     resetPassword: () => dispatch(resetPassword()),
     selectMenu: (event) => dispatch(updateMenu(event)),
     fetchItems: (type) => dispatch(fetchItems(type)),
+    fetchProducts: () => dispatch(fetchProducts()),
     fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
+    fetchProductCompanies: () => dispatch(fetchCompanies()),
     dispatch: dispatch,
 });
 

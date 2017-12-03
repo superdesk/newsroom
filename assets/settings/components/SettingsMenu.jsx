@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gettext } from 'utils';
 
 
-function SettingsMenu({isCompanySettings, isUserSettings, isSystemSettings, onClick}) {
+function SettingsMenu({isCompanySettings, isUserSettings, isProducts, isSystemSettings, onClick}) {
     return (
         <ul>
             <li>
@@ -19,6 +19,12 @@ function SettingsMenu({isCompanySettings, isUserSettings, isSystemSettings, onCl
                     onClick={onClick}>{gettext('User Management')}</a>
             </li>
             <li>
+                <a className={`side-navigation__btn ${isProducts?'active':null}`}
+                    href='#'
+                    name='products'
+                    onClick={onClick}>{gettext('Products')}</a>
+            </li>
+            <li>
                 <a className={`side-navigation__btn ${isSystemSettings?'active':null}`}
                     href='#'
                     name='settings'>{gettext('System Settings')}</a>
@@ -30,6 +36,7 @@ function SettingsMenu({isCompanySettings, isUserSettings, isSystemSettings, onCl
 SettingsMenu.propTypes = {
     isCompanySettings: PropTypes.bool,
     isUserSettings: PropTypes.bool,
+    isProducts: PropTypes.bool,
     isSystemSettings: PropTypes.bool,
     onClick: PropTypes.func
 };

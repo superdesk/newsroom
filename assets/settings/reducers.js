@@ -10,10 +10,12 @@ import {
     SAVE_ITEM,
     CANCEL_EDIT,
     NEW_ITEM,
+    NEW_PRODUCT,
     SELECT_MENU,
     SET_ERROR,
     INIT_VIEW_DATA,
-    UPDATE_ITEM_SERVICES,
+    UPDATE_ITEM,
+    GET_PRODUCTS,
 } from './actions';
 
 const initialState = {
@@ -26,6 +28,7 @@ const initialState = {
     activeQuery: null,
     selectedMenu: 'companies',
     services: [],
+    productsById: {},
 };
 
 export default function itemReducer(state = initialState, action) {
@@ -90,6 +93,24 @@ export default function itemReducer(state = initialState, action) {
         return {...state, itemToEdit: action.data === 'users' ? newUser : newCompany, errors: null};
     }
 
+    case NEW_PRODUCT:{
+          const newProduct = {
+            name: '',
+            description: '',
+            sd_product_id: '',
+            query: '',
+            product_type: 'superdesk',
+            country: '',
+            is_enabled: true,
+            parents: [],
+            companies: [],
+        };
+
+        return {...state, itemToEdit: newProduct, errors: null};
+
+    }
+
+
     case SAVE_ITEM: {
         return {...state, itemToEdit: state.itemToEdit, errors: null};
     }
@@ -133,6 +154,15 @@ export default function itemReducer(state = initialState, action) {
         return {...state, companies, companiesById, companyOptions};
     }
 
+    case GET_PRODUCTS:
+        productsById = {};
+        action.data.map((product) => {
+            productsById[product._id] = product;
+        });
+
+        return {...state, ...productsById};
+
+
     case GET_COMPANY_USERS: {
         return {...state, companyUsers: action.data};
     }
@@ -150,9 +180,9 @@ export default function itemReducer(state = initialState, action) {
     case INIT_VIEW_DATA:
         return Object.assign({}, state, action.data);
 
-    case UPDATE_ITEM_SERVICES: {
+    case UPDATE_ITEM: {
         const itemsById = Object.assign({}, itemsById);
-        itemsById[action.item._id] = Object.assign({}, action.item, {services: action.services});
+        itemsById[action.item._id] = Object.assign({}, action.item, {[action.field]: action.data});
         return {...state, itemsById};
     }
 
