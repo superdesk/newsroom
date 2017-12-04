@@ -34,9 +34,11 @@ class NotificationList extends React.Component {
     render() {
         return (
             <div className="badge--top-right">
-                <div className="badge badge-pill badge-info badge-secondary">
-                    {this.props.notifications && this.props.notifications.length}
-                </div>
+                {this.props.notifications && this.props.notifications.length > 0 &&
+                    <div className="badge badge-pill badge-info badge-secondary">
+                        {this.props.notifications && this.props.notifications.length}
+                    </div>
+                }
 
                 <span className="notif__circle">
                     <i className='icon--alert icon--white' onClick={this.toggleDisplay} />
