@@ -122,6 +122,9 @@ def _items_query():
 class WireSearchService(newsroom.Service):
     def get_bookmarks_count(self, user_id):
         query = _items_query()
+        user = get_user()
+        company = get_user_company(user)
+        set_service_query(query, company)
         _set_bookmarks_query(query, user_id)
         source = {'query': query, 'size': 0}
         internal_req = ParsedRequest()
