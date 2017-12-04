@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { gettext, fullDate, formatHTML } from 'utils';
-import { getPicture, getPreviewRendition, showItemVersions, getCaption } from 'wire/utils';
+import { getPicture, getPreviewRendition, showItemVersions, getCaption, isEqualItem } from 'wire/utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from './PreviewActionButtons';
 import PreviewTags from './PreviewTags';
@@ -14,8 +14,10 @@ class Preview extends React.PureComponent {
         super(props);
     }
 
-    componentDidUpdate() {
-        this.preview.scrollTop = 0; // reset scroll on change
+    componentDidUpdate(nextProps) {
+        if (!isEqualItem(nextProps.item, this.props.item)) {
+            this.preview.scrollTop = 0; // reset scroll on change
+        }
     }
 
     render() {

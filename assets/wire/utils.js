@@ -154,3 +154,14 @@ export function isTopicActive(topic, activeQuery) {
     const topicQuery = getActiveQuery(topic.query, topic.filter, topic.created);
     return !isEmpty(activeQuery) && isEqual(topicQuery, activeQuery);
 }
+
+/**
+ * Test if 2 items are equal
+ *
+ * @param {Object} a
+ * @param {Object} b
+ * @return {Boolean}
+ */
+export function isEqualItem(a, b) {
+    return a && b && a._id === b._id && a.version === b.version;
+}
