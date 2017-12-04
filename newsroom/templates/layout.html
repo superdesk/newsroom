@@ -26,7 +26,7 @@
         <div class="navbar__logo">
             <img src="{{ url_for('static', filename = 'logo.svg') }}" width="34" height="34"/>
         </div>
-        <div class="navbar-brand d-flex align-items-center ml-3 ml-sm-4 mr-0 mr-sm-4">
+        <div class="navbar-brand d-flex align-items-center ml-2 ml-sm-4 mr-0 mr-sm-4">
             <nav>
                 <a class="breadcrumb-item text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }}</a>
                 {% block breadcrumb %}{% endblock %}
@@ -40,7 +40,7 @@
             <div id="header-profile-toggle"></div>
         </div>
         {% else %}
-        <div class="form-inline my-lg-0 ml-auto p-1 pr-1 pr-sm-3 p-sm-2">
+        <div class="form-inline my-lg-0 ml-auto p-1 pr-sm-3 p-sm-2">
             <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             <a class="nav-link"href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
         </div>

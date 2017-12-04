@@ -231,6 +231,17 @@ body.print {
 .navbar-brand {
     margin-left: 2rem;
     opacity: .6;
+    line-height: 1.2rem;
+    @include sm {
+        line-height: inherit;
+    }
+    nav {
+        display: flex;
+        flex-direction: column;
+        @include sm {
+            flex-direction: row;
+        }
+    }
 }
 nav.search {
     width: 100%;
@@ -552,11 +563,20 @@ article.list {
 }
 .form-inline {
     .nav-link {
-        padding: 0.5rem 0.5rem;
+        padding: 0;
         font-size: 0.8125rem;
+        @include sm {
+            padding: 0.5rem 0.5rem;
+        }
         @include lg {
             padding: 0.5rem 1rem;
             font-size: 1rem;
+        }
+        & + .nav-link {
+            margin-left: 10px;
+            @include sm {
+                margin-left: 0;
+            }
         }
     }
 }
