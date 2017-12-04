@@ -24,9 +24,11 @@ class Preview extends React.PureComponent {
         const previousVersions = 'preview_versions';
         return (
             <div className='wire-column__preview__items'>
-            
+
                 <div className="wire-column__preview__mobile-bar">
-                    <button className="icon-button"><i className="icon--close-large"></i></button>
+                    <button className="icon-button" onClick={this.props.closePreview}>
+                        <i className="icon--close-large"></i>
+                    </button>
                 </div>
 
                 <div className='wire-column__preview__top-bar'>
@@ -104,6 +106,7 @@ Preview.propTypes = {
     })),
     followStory: PropTypes.func,
     isFollowing: PropTypes.bool,
+    closePreview: PropTypes.func,
 };
 
 export default Preview;
