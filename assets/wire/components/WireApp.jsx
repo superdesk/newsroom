@@ -21,6 +21,7 @@ import {
     setView,
     refresh,
     printItem,
+    previewItem,
 } from 'wire/actions';
 
 import Preview from './Preview';
@@ -168,6 +169,7 @@ class WireApp extends React.Component {
                                 actions={this.filterActions(this.props.itemToPreview)}
                                 followStory={this.props.followStory}
                                 isFollowing={!!isFollowing}
+                                closePreview={this.props.closePreview}
                             />
                             }
 
@@ -209,6 +211,7 @@ WireApp.propTypes = {
     followStory: PropTypes.func,
     newItems: PropTypes.array,
     refresh: PropTypes.func,
+    closePreview: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -295,6 +298,7 @@ const mapDispatchToProps = (dispatch) => ({
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),
+    closePreview: () => dispatch(previewItem(null)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
