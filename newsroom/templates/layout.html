@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shring-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title>{{ config.SITE_NAME }} - {% block title %}{% endblock %}</title>
 
@@ -26,7 +26,7 @@
         <div class="navbar__logo">
             <img src="{{ url_for('static', filename = 'logo.svg') }}" width="34" height="34"/>
         </div>
-        <div class="navbar-brand d-flex align-items-center">
+        <div class="navbar-brand d-flex align-items-center ml-3 ml-sm-4 mr-0 mr-sm-4">
             <nav>
                 <a class="breadcrumb-item text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }}</a>
                 {% block breadcrumb %}{% endblock %}
@@ -34,7 +34,7 @@
         </div>
 
         {% if session.get('name') %}
-        <div class="form-inline my-lg-0 ml-auto pr-3">
+        <div class="form-inline my-lg-0 ml-auto p-1 pr-3 p-sm-2">
             {% if is_admin() %}
                 <a class="nav-link" href="{{ url_for('users.settings') }}">{{ gettext('Settings') }}</a>
             {% endif %}
@@ -43,14 +43,15 @@
             <div id="header-profile-toggle"></div>
         </div>
         {% else %}
-        <div class="form-inline my-lg-0 ml-auto pr-3">
+        <div class="form-inline my-lg-0 ml-auto p-1 pr-1 pr-sm-3 p-sm-2">
             <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             <a class="nav-link"href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
         </div>
         {% endif %}
     </nav>
 
-    <div class="contentWrap">
+    <div class="contentWrap flex-column flex-sm-row">
+
         <nav class="sidenav">
             <ul class="sidenav-icons">
                 {% if is_admin() %}
@@ -87,8 +88,8 @@
 <div id="modal-container"></div>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
 
 <script>
     window.newsroom = {{ newsroom_config() | tojson | safe }};

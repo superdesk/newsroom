@@ -5,8 +5,8 @@
 {% block contentHeader %}
 
 <div class="multi-action-bar">
-    <button class="btn btn-outline-secondary">Cancel</button>
-    <button class="btn btn-outline-primary">Select all</button>
+    <button class="btn btn-outline-secondary btn-responsive">Cancel</button>
+    <button class="btn btn-outline-primary btn-responsive">Select all</button>
     <span class="multi-action-bar__count">2 Items selected</span>
     <div class="multi-action-bar__icons">
         <button class="icon-button">
@@ -21,13 +21,13 @@
     </div>
 </div>
 
-<nav class="content-bar navbar justify-content-start">
+<nav class="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
     <span class="content-bar__menu content-bar__menu--nav">
         <i class="icon--hamburger"></i>
         <i class="icon--close-thin icon--white"></i>
     </span>
-    <div class="search form-inline">       
-        <span class="search__icon">
+    <div class="search form-inline">
+        <span class="search__icon d-none d-sm-block">
             <i class="icon--search icon--gray-light"></i>
         </span>
         <div class="search__form input-group">
@@ -46,7 +46,7 @@
     </div>
 
     <div class="content-bar__right">
-        <div class="content-bar__sort btn-group">
+        <div class="content-bar__sort btn-group d-none"><!-- sort bar hidden -->
             <div class="form-control-plaintext">
                 Sort by:
             </div>
@@ -71,7 +71,6 @@
             </div>
         </div>
     </div>
-
 </nav>
 
 {% endblock %}
@@ -143,7 +142,7 @@
 
     <div class="wire-column__main container-fluid">
 
-        <div class="d-flex mt-3 p-0 align-items-center">
+        <div class="d-flex mt-1 mt-sm-3 p-0 align-items-center flex-wrap flex-sm-nowrap">
             <div class="navbar-text search-results-info">
                 <span class="search-results-info__num">147</span>
                 <span class="search-results-info__text">search results for:<br><b>search</b></span>
@@ -160,12 +159,11 @@
 
             <article class="wire-articles__item-wrap col-12">
                 <div class="wire-articles__item wire-articles__item--list">
-                    <div class="wire-articles__item--list__text">                        
+                    <div class="wire-articles__item--list__text">
                         <h4 class="wire-articles__item--list__headline">
                             <div class="no-bindable-select wire-articles__item--list__select">
                                 <label class="circle-checkbox">
-                                    <input type="checkbox" class="css-checkbox">
-                                    <i></i>
+                                    <input type="checkbox" class="css-checkbox" value="on"><i></i>
                                 </label>
                             </div>
                             <div class="wire-articles__item__icons">
@@ -175,96 +173,151 @@
                                 <span class="wire-articles__item__icon">
                                     <i class="icon--photo icon--gray-light"></i>
                                 </span>
-                            </div>Saudis hire coach Pizzi for World Cup
+                            </div>BASK: Fulltime Adelaide 36ers 84 bt Brisbane Bullets 83                            
                         </h4>
                         <div class="wire-articles__item__meta">
                             <div class="wire-articles__item__meta-info">
-                                <time datetime="11/28/2017, 10:36:04 AM">10:36:04 AM</time>
+                                <time datetime="12/1/2017, 12:40:53 PM">12:40:53 PM</time>
                             </div>
                         </div>
+                        <div class="no-bindable wire-articles__item__versions-btn">Show previous versions (1)</div>
                     </div>
-                    <div class="no-bindable wire-articles__item__versions-btn">Show previous versions (7)</div>
-                    <div class="wire-articles__item--list__actions">                        
+                    <div class="wire-articles__item--list__actions">
                         <div class="btn-group">
                             <span><i class="icon--more icon--gray-light"></i></span>
                         </div>
-                        <button class="icon-button icon-button--gray-light" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share icon--gray-light"></i></button>
-                        <button class="icon-button icon-button--gray-light" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add icon--gray-light"></i></button>
+                        <button type="button" class="icon-button" title="" data-original-title="">
+                            <i class="icon--share"></i>
+                        </button>
+                        <button type="button" class="icon-button" title="" data-original-title="">
+                            <i class="icon--bookmark-add"></i>
+                        </button>
                     </div>
                 </div>
             </article>
             <article class="wire-articles__item-wrap col-12">
                     <div class="wire-articles__item wire-articles__item--list">
-                        <div class="wire-articles__item--list__text">                        
+                        <div class="wire-articles__item--list__text">
                             <h4 class="wire-articles__item--list__headline">
                                 <div class="no-bindable-select wire-articles__item--list__select">
                                     <label class="circle-checkbox">
-                                        <input type="checkbox" class="css-checkbox">
-                                        <i></i>
+                                        <input type="checkbox" class="css-checkbox" value="on"><i></i>
                                     </label>
                                 </div>
                                 <div class="wire-articles__item__icons">
                                     <span class="wire-articles__item__icon">
                                         <i class="icon--text icon--gray-light"></i>
-                                    </span>                                    
-                                </div>Mandurah Greyhound NSW TAB DIVS 1-7 Tuesday
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>
+                                </div>GOLF: Collated Rd 2 scores from Australian PGA Championship
                             </h4>
                             <div class="wire-articles__item__meta">
                                 <div class="wire-articles__item__meta-info">
-                                    <time datetime="11/28/2017, 10:36:04 AM">10:36:04 AM</time>
+                                    <time datetime="12/1/2017, 12:40:53 PM">12:40:53 PM</time>
                                 </div>
                             </div>
-                        </div>                        
-                        <div class="wire-articles__item--list__actions">                            
+                            <div class="no-bindable wire-articles__item__versions-btn">Show previous versions (1)</div>
+                        </div>
+                        <div class="wire-articles__item--list__actions">
                             <div class="btn-group">
                                 <span><i class="icon--more icon--gray-light"></i></span>
                             </div>
-                            <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share"></i></button>
-                            <button class="icon-button icon-button--gray-light" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add icon--gray-light"></i></button>
+                            <button type="button" class="icon-button" title="" data-original-title="">
+                                <i class="icon--share"></i>
+                            </button>
+                            <button type="button" class="icon-button" title="" data-original-title="">
+                                <i class="icon--bookmark-add"></i>
+                            </button>
                         </div>
                     </div>
                 </article>
                 <article class="wire-articles__item-wrap col-12">
-                        <div class="wire-articles__item wire-articles__item--list">
-                            <div class="wire-articles__item--list__text">                        
-                                <h4 class="wire-articles__item--list__headline">
-                                    <div class="no-bindable-select wire-articles__item--list__select">
-                                        <label class="circle-checkbox">
-                                            <input type="checkbox" class="css-checkbox">
-                                            <i></i>
-                                        </label>
-                                    </div>
-                                    <div class="wire-articles__item__icons">
-                                        <span class="wire-articles__item__icon">
-                                            <i class="icon--text icon--gray-light"></i>
-                                        </span>
-                                        <span class="wire-articles__item__icon">
-                                            <i class="icon--photo icon--gray-light"></i>
-                                        </span>
-                                    </div>AAP Rolling News Bulletin Nov 28, 2300
-                                </h4>
-                                <div class="wire-articles__item__meta">
-                                    <div class="wire-articles__item__meta-info">
-                                        <time datetime="11/28/2017, 10:36:04 AM">10:36:04 AM</time>
-                                    </div>
+                    <div class="wire-articles__item wire-articles__item--list">
+                        <div class="wire-articles__item--list__text">
+                            <h4 class="wire-articles__item--list__headline">
+                                <div class="no-bindable-select wire-articles__item--list__select">
+                                    <label class="circle-checkbox">
+                                        <input type="checkbox" class="css-checkbox" value="on"><i></i>
+                                    </label>
+                                </div>
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>
+                                </div>Honduran vote count enters fifth day                                
+                            </h4>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__meta-info">
+                                    <time datetime="12/1/2017, 12:40:53 PM">12:40:53 PM</time>
                                 </div>
                             </div>
                             <div class="no-bindable wire-articles__item__versions-btn">Show previous versions (1)</div>
-                            <div class="wire-articles__item--list__actions">                               
-                                <div class="btn-group">
-                                    <span><i class="icon--more icon--gray-light"></i></span>
-                                </div>
-                                <button class="icon-button icon-button--gray-light" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share icon--gray-light"></i></button>
-                                <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
-                            </div>
                         </div>
-                    </article>
+                        <div class="wire-articles__item--list__actions">
+                            <div class="btn-group">
+                                <span><i class="icon--more icon--gray-light"></i></span>
+                            </div>
+                            <button type="button" class="icon-button" title="" data-original-title="">
+                                <i class="icon--share"></i>
+                            </button>
+                            <button type="button" class="icon-button" title="" data-original-title="">
+                                <i class="icon--bookmark-remove"></i>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+                <article class="wire-articles__item-wrap col-12">
+                    <div class="wire-articles__item wire-articles__item--list">
+                        <div class="wire-articles__item--list__text">
+                            <h4 class="wire-articles__item--list__headline">
+                                <div class="no-bindable-select wire-articles__item--list__select">
+                                    <label class="circle-checkbox">
+                                        <input type="checkbox" class="css-checkbox" value="on"><i></i>
+                                    </label>
+                                </div>
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>
+                                </div>Sydney FC beat Adelaide United in A-League
+                            </h4>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__meta-info">
+                                    <time datetime="12/1/2017, 12:40:53 PM">12:40:53 PM</time>
+                                </div>
+                            </div>
+                            <div class="no-bindable wire-articles__item__versions-btn">Show previous versions (1)</div>
+                        </div>
+                        <div class="wire-articles__item--list__actions">
+                            <div class="btn-group">
+                                <span><i class="icon--more icon--gray-light"></i></span>
+                            </div>
+                            <button type="button" class="icon-button" title="" data-original-title="">
+                                <i class="icon--share"></i>
+                            </button>
+                            <button type="button" class="icon-button" title="" data-original-title="">
+                                <i class="icon--bookmark-remove"></i>
+                            </button>
+                        </div>
+                    </div>
+                </article>
 
         </div>
     </div>
 
     <div class="wire-column__preview">
       <div class="wire-column__preview__items">
+        <div class="wire-column__preview__mobile-bar">
+            <button class="icon-button"><i class="icon--close-large"></i></button>
+        </div>
         <div class="wire-column__preview__top-bar">
             <div>
                 <button type="button" class="btn btn-outline-primary btn-responsive">Follow story</button>

@@ -85,3 +85,11 @@ searchInput.onfocus = function() {
 document.getElementsByClassName('search__clear')[0].onclick = function() {
     searchInput.value = '';
 };
+
+// close preview on mobile
+$('.wire-column__preview__mobile-bar button').click(function(){
+    $('.wire-column__preview').removeClass('wire-column__preview--open');
+    
+    previewOpen = !previewOpen;
+    responsiveWireItem();
+});
