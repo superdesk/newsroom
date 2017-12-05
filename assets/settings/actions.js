@@ -24,6 +24,11 @@ export function newItem(data) {
     return {type: NEW_ITEM, data};
 }
 
+export const NEW_PRODUCT = 'NEW_PRODUCT';
+export function newProduct() {
+    return {type: NEW_PRODUCT};
+}
+
 export const CANCEL_EDIT = 'CANCEL_EDIT';
 export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
@@ -54,6 +59,11 @@ export function getCompanyUsers(data) {
 export const GET_ITEMS = 'GET_ITEMS';
 export function getItems(data) {
     return {type: GET_ITEMS, data};
+}
+
+export const GET_PRODUCTS = 'GET_PRODUCTS';
+export function getProducts(data) {
+    return {type: GET_PRODUCTS, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
@@ -128,6 +138,40 @@ export function fetchCompanyUsers(companyId) {
     };
 }
 
+/**
+ * Fetches users of a company
+ *
+ * @param {String} companyId
+ */
+export function fetchCompanies() {
+    return function (dispatch, getState) {
+        if (!getState().itemsById[companyId].name) {
+            return;
+        }
+
+        return server.get(`/companies`)
+            .then((data) => {
+                return dispatch(getCompanies(data));
+            })
+            .catch((error) => errorHandler(error, dispatch));
+    };
+}
+
+/**
+ * Fetches products
+ *
+ */
+export function fetchProducts() {
+    return function (dispatch) {
+        return server.get(`/products`)
+            .then((data) => {
+                return dispatch(getItems(data));
+                //return dispatch(getProducts(data));
+            })
+            .catch((error) => errorHandler(error, dispatch));
+    };
+}
+
 
 /**
  * Creates new users and companies for the time being
@@ -189,16 +233,25 @@ export function initViewData(data) {
     return {type: INIT_VIEW_DATA, data};
 }
 
-export const UPDATE_ITEM_SERVICES = 'UPDATE_ITEM_SERVICES';
-export function updateItemServices(item, services) {
-    return {type: UPDATE_ITEM_SERVICES, item, services};
+export const UPDATE_ITEM = 'UPDATE_ITEM';
+export function updateItem(item, field, data) {
+    return {type: UPDATE_ITEM, item, field, data};
 }
 
 export function saveServices(services) {
     return function (dispatch, getState) {
         const item = getState().itemToEdit;
         return server.post(`/companies/${item._id}/services`, {services})
-            .then(() => dispatch(updateItemServices(item, services)))
+            .then(() => dispatch(updateItem(item, 'services', services)))
+            .catch((error) => errorHandler(error, dispatch));
+    };
+}
+
+export function saveCompanies(companies) {
+    return function (dispatch, getState) {
+        const item = getState().itemToEdit;
+        return server.post(`/products/${item._id}/companies`, {companies})
+            .then(() => dispatch(updateItem(item, 'companies', companies)))
             .catch((error) => errorHandler(error, dispatch));
     };
 }
