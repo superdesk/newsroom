@@ -8,7 +8,7 @@ class CompanyBar extends React.Component {
         return (
             <section className="content-header">
                 <nav className="content-bar navbar content-bar--side-padding">
-                    <SearchBar setQuery={this.props.setQuery} fetchItems={()=>this.props.fetchItems('companies')}/>
+                    <SearchBar setQuery={this.props.setQuery} fetchItems={()=>this.props.fetchCompanies()}/>
                     <div className="content-bar__right">
                         <button
                             className="btn btn-outline-secondary"
@@ -21,10 +21,8 @@ class CompanyBar extends React.Component {
 }
 
 CompanyBar.propTypes = {
-    query: PropTypes.string,
     setQuery: PropTypes.func,
-    fetchItems: PropTypes.func,
-    state: PropTypes.object,
+    fetchCompanies: PropTypes.func,
     onNewCompany: PropTypes.func,
 };
 

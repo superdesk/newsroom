@@ -52,8 +52,8 @@
         <nav class="sidenav">
             <ul class="sidenav-icons">
                 {% if is_admin() %}
-                <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.endpoint == 'users.settings' %}active{% endif %}">
-                  <a href="{{ url_for('users.settings') }}" title="">
+                <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.endpoint == 'companies.settings' %}active{% endif %}">
+                  <a href="{{ url_for('companies.settings') }}" title="">
                       <i class="icon--cog icon--mid-blue"></i>
                   </a>
                 </li>

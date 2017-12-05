@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
-import {setError, saveServices} from 'settings/actions';
+import {setError, saveServices} from '../actions';
 import {gettext} from 'utils';
 
 class Companies extends React.Component {

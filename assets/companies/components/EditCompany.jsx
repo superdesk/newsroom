@@ -29,7 +29,7 @@ class EditCompany extends React.Component {
 
     handleTabClick(event) {
         this.setState({activeTab: event.target.name});
-        if(event.target.name === 'users') {
+        if(event.target.name === 'users' && this.props.company._id) {
             this.props.fetchCompanyUsers(this.props.company._id);
         }
     }
@@ -151,11 +151,11 @@ class EditCompany extends React.Component {
                                         className='btn btn-outline-primary'
                                         value={gettext('Save')}
                                         onClick={this.props.onSave}/>
-                                    <input
+                                    {this.props.company._id && <input
                                         type='button'
                                         className='btn btn-outline-secondary'
                                         value={gettext('Delete')}
-                                        onClick={this.props.onDelete}/>
+                                        onClick={this.props.onDelete}/>}
                                 </div>
                             </form>
                         </div>

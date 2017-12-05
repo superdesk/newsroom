@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import EditUser from './EditUser';
 import UsersList from './UsersList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
-import {setError} from 'settings/actions';
+import {setError} from '../actions';
 import {gettext} from 'utils';
 
 class Users extends React.Component {
@@ -75,7 +75,7 @@ class Users extends React.Component {
                         user={this.props.userToEdit}
                         onChange={this.props.editUser}
                         errors={this.props.errors}
-                        companies={this.props.companyOptions}
+                        companies={this.props.companies}
                         onSave={this.save}
                         onResetPassword={this.props.resetPassword}
                         onClose={this.props.cancelEdit}
@@ -101,7 +101,7 @@ Users.propTypes = {
     isLoading: PropTypes.bool,
     activeQuery: PropTypes.string,
     totalUsers: PropTypes.number,
-    companyOptions: PropTypes.arrayOf(PropTypes.object),
+    companies: PropTypes.arrayOf(PropTypes.object),
     companiesById: PropTypes.object,
     errors: PropTypes.object,
     dispatch: PropTypes.func,

@@ -7,7 +7,29 @@
 {% endblock %}
 
 {% block content %}
-<div id="settings-app" class="settingsWrap"></div>
+<div class="settingsWrap">
+    <div class="settings-inner">
+        <div class='side-navigation' id='settings-menu'>
+            <ul>
+                <li>
+                    <a class="side-navigation__btn {{ "active" if setting_type == "companies" }}"
+                        href="{{ url_for('companies.settings') }}">
+                        {{ gettext('Company Management') }}</a>
+                </li>
+                <li>
+                    <a class="side-navigation__btn {{ "active" if setting_type == "users" }}"
+                        href="{{ url_for('users.settings') }}">
+                        {{ gettext('User Management') }}</a>
+                </li>
+                <li>
+                    <a class="side-navigation__btn"
+                        href='#'>{{ gettext('System Settings') }}</a>
+                </li>
+            </ul>
+        </div>
+        <div id="settings-app" class="content"></div>
+    </div>
+</div>
 {% endblock %}
 
 {% block script %}
@@ -15,6 +37,11 @@
 var viewData = {{ data | tojson | safe }};
 </script>
 
-{{ javascript_tag('settings_js') | safe }}
+    {% if setting_type == "companies" %}
+        {{ javascript_tag('companies_js') | safe }}
+    {% endif %}
+    {% if setting_type == "users" %}
+        {{ javascript_tag('users_js') | safe }}
+    {% endif %}
 
 {% endblock %}

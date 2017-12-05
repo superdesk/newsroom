@@ -7,8 +7,18 @@ from werkzeug.exceptions import NotFound
 from superdesk import get_resource_service
 from flask_babel import gettext
 from newsroom.auth.decorator import admin_only, login_required
-from flask import jsonify
+from flask import jsonify, current_app as app
 import re
+
+
+@blueprint.route('/settings/companies', methods=['GET'])
+@admin_only
+def settings():
+    data = {
+        'companies': list(query_resource('companies', max_results=200)),
+        'services': app.config['SERVICES'],
+    }
+    return flask.render_template('settings.html', setting_type="companies", data=data)
 
 
 @blueprint.route('/companies', methods=['GET'])

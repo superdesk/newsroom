@@ -8,7 +8,7 @@ class UserBar extends React.Component {
         return (
             <section className="content-header">
                 <nav className="content-bar navbar content-bar--side-padding">
-                    <SearchBar setQuery={this.props.setQuery} fetchItems={()=>this.props.fetchItems('users')}/>
+                    <SearchBar setQuery={this.props.setQuery} fetchItems={()=>this.props.fetchUsers()}/>
                     <div className="content-bar__right">
                         <button
                             className="btn btn-outline-secondary"
@@ -23,7 +23,7 @@ class UserBar extends React.Component {
 UserBar.propTypes = {
     query: PropTypes.string,
     setQuery: PropTypes.func,
-    fetchItems: PropTypes.func,
+    fetchUsers: PropTypes.func,
     state: PropTypes.object,
     onNewUser: PropTypes.func,
 };
