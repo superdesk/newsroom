@@ -1080,6 +1080,9 @@ article.list {
 
 // two panes open (filter and preview), responsive
 .wire-articles__two-side-panes {
+    .wire-articles__item-wrap {
+        flex-grow: 1;
+    }
     .wire-articles__item--list {
         flex-direction: column;
         padding: 16px 10px 10px 15px;
@@ -1114,6 +1117,7 @@ article.list {
     }
     .wire-articles__item--list__text {
         order: 2;
+        flex-basis: auto;
         @include xl {
             order: 0;
         }

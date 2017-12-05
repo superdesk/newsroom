@@ -13,6 +13,7 @@
     border-radius: $border-radius;
     transition: border-color .15s;
     background-color: transparent;
+    padding: 0 !important;
     @include xl {
         width: 38px;
     }

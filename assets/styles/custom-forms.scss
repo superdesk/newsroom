@@ -2,6 +2,7 @@ $enable-shadows:true;
 
 .form-control {
   padding: 0.345rem 1rem;
+  min-height: 2.5rem; //iPad fix
   @include form-control-focus();
 }
 
