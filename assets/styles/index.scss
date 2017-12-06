@@ -1705,7 +1705,7 @@ article.list {
 .wire-column__preview__content--item-detail-text-wrap {
     display: flex;
     flex-direction: column;
-    margin-top: 10px;
+    margin: 10px 0 20px 0;
     @include lg {
         flex-direction: row;
     }
@@ -1742,7 +1742,12 @@ article.list {
 
 .wire-column__preview__content--item-detail-info-wrap {
     order: 3;
-    flex: 1 0 260px;
+    flex: 1 0 auto;
+    margin-bottom: 20px;
+    @include lg {
+        flex: 1 0 260px;
+        margin-bottom: 0;
+    }
 }
 
 .content--item-detail .wire-column__preview__tags {
