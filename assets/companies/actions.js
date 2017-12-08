@@ -49,6 +49,11 @@ export function getCompanyUsers(data) {
     return {type: GET_COMPANY_USERS, data};
 }
 
+export const GET_PRODUCTS = 'GET_PRODUCTS';
+export function getProducts(data) {
+    return {type: GET_PRODUCTS, data};
+}
+
 export const SET_ERROR = 'SET_ERROR';
 export function setError(errors) {
     return {type: SET_ERROR, errors};
@@ -148,6 +153,7 @@ export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data) {
     return function (dispatch) {
         dispatch(getCompanies(data.companies));
+        dispatch(getProducts(data.products));
         return {type: INIT_VIEW_DATA, data};
     };
 }

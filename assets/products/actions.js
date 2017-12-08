@@ -52,6 +52,11 @@ export function updateProductCompanies(product, companies) {
     return {type: UPDATE_PRODUCT_COMPANIES, product, companies};
 }
 
+export const UPDATE_PRODUCT_NAVIGATIONS = 'UPDATE_PRODUCT_NAVIGATIONS';
+export function updateProductNavigations(product, navigations) {
+    return {type: UPDATE_PRODUCT_NAVIGATIONS, product, navigations};
+}
+
 export const SET_ERROR = 'SET_ERROR';
 export function setError(errors) {
     return {type: SET_ERROR, errors};
@@ -150,6 +155,33 @@ export function saveCompanies(companies) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/companies`, {companies})
             .then(() => dispatch(updateProductCompanies(product, companies)))
+            .catch((error) => errorHandler(error, dispatch));
+    };
+}
+
+/**
+ * Fetches navigations
+ *
+ */
+export function fetchNavigations() {
+    return function (dispatch) {
+        return server.get('/navigations/search')
+            .then((data) => {
+                dispatch(getNavigations(data));
+            })
+            .catch((error) => errorHandler(error, dispatch));
+    };
+}
+
+/**
+ * Saves navigations for a product
+ *
+ */
+export function saveNavigations(navigations) {
+    return function (dispatch, getState) {
+        const product = getState().productToEdit;
+        return server.post(`/products/${product._id}/navigations`, {navigations})
+            .then(() => dispatch(updateProductNavigations(product, navigations)))
             .catch((error) => errorHandler(error, dispatch));
     };
 }

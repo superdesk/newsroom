@@ -104,6 +104,14 @@ def update_companies(id):
     return jsonify({'success': True}), 200
 
 
+@blueprint.route('/products/<id>/navigations', methods=['POST'])
+@admin_only
+def update_navigations(id):
+    updates = flask.request.get_json()
+    get_resource_service('products').patch(id=ObjectId(id), updates=updates)
+    return jsonify({'success': True}), 200
+
+
 @blueprint.route('/products/<id>', methods=['DELETE'])
 @admin_only
 def delete(id):

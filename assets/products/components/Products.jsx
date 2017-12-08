@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import EditProduct from './EditProduct';
 import ProductList from './ProductList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
-import {setError, saveCompanies, fetchCompanies} from '../actions';
+import {setError, saveCompanies, fetchCompanies, fetchNavigations, saveNavigations} from '../actions';
 import {gettext} from 'utils';
 
 class Products extends React.Component {
@@ -80,8 +80,11 @@ class Products extends React.Component {
                         onClose={this.props.cancelEdit}
                         onDelete={this.deleteProduct}
                         fetchCompanies={this.props.fetchCompanies}
+                        fetchNavigations={this.props.fetchNavigations}
                         companies={this.props.companies}
+                        navigations={this.props.navigations}
                         saveCompanies={this.props.saveCompanies}
+                        saveNavigations={this.props.saveNavigations}
                     />
                 }
             </div>
@@ -103,19 +106,25 @@ Products.propTypes = {
     activeQuery: PropTypes.string,
     totalProducts: PropTypes.number,
     fetchCompanies: PropTypes.func,
+    fetchNavigations: PropTypes.func,
     errors: PropTypes.object,
     dispatch: PropTypes.func,
     companies: PropTypes.arrayOf(PropTypes.object),
+    navigations: PropTypes.arrayOf(PropTypes.object),
     saveCompanies: PropTypes.func.isRequired,
+    saveNavigations: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
     companies: state.companies,
+    navigations: state.navigations,
 });
 
 const mapDispatchToProps = (dispatch) => ({
     saveCompanies: (companies) => dispatch(saveCompanies(companies)),
     fetchCompanies: () => dispatch(fetchCompanies()),
+    saveNavigations: (navigations) => dispatch(saveNavigations(navigations)),
+    fetchNavigations: () => dispatch(fetchNavigations()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Products);

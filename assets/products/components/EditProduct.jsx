@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
-import { pickBy } from 'lodash';
 
 import { gettext } from 'utils';
+import EditPanel from '../../components/EditPanel';
 
 const productTypes = [
     {value: 'query', text: gettext('Query')},
@@ -17,14 +17,15 @@ class EditProduct extends React.Component {
     constructor(props) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
-        this.onCompanyChange = this.onCompanyChange.bind(this);
-        this.saveCompanies = this.saveCompanies.bind(this);
-        this.state = {activeTab: 'product-details', activeProduct: props.product._id, companies: {}};
-        this.updateCompanies = this.updateCompanies.bind(this);
+        this.state = {
+            activeTab: 'product-details',
+            activeProduct: props.product._id,
+        };
 
         this.tabs = [
             {label: gettext('Product'), name: 'product-details'},
-            {label: gettext('Companies'), name: 'companies'}
+            {label: gettext('Companies'), name: 'companies'},
+            {label: gettext('Navigations'), name: 'navigations'}
         ];
     }
 
@@ -33,35 +34,8 @@ class EditProduct extends React.Component {
         if(event.target.name === 'companies') {
             this.props.fetchCompanies();
         }
-    }
-
-    updateCompanies(props) {
-        const companies = {};
-        props.companies.map((company) =>
-            companies[company._id] = (props.product.companies || []).includes(company._id));
-
-        this.setState({activeProduct: props.product._id, companies});
-    }
-
-    onCompanyChange(event) {
-        const company = event.target.name;
-        const companies = Object.assign({}, this.state.companies);
-        companies[company] = !companies[company];
-        this.setState({companies});
-    }
-
-    saveCompanies(event) {
-        event.preventDefault();
-        this.props.saveCompanies(Object.keys(pickBy(this.state.companies)));
-    }
-
-    componentWillMount() {
-        this.updateCompanies(this.props);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (this.state.activeProduct !== nextProps.product._id) {
-            this.updateCompanies(nextProps);
+        if(event.target.name === 'navigations') {
+            this.props.fetchNavigations();
         }
     }
 
@@ -158,30 +132,20 @@ class EditProduct extends React.Component {
                         </div>
                     }
                     {this.state.activeTab === 'companies' &&
-                        <div className='tab-pane active' id='companies'>
-                            <form onSubmit={this.saveCompanies}>
-                                <div className="list-item__preview-form">
-                                    <ul className="list-unstyled">
-                                        {this.props.companies.map((company) => (
-                                            <li key={company._id}>
-                                                <CheckboxInput
-                                                    name={company._id}
-                                                    label={company.name}
-                                                    value={!!this.state.companies[company._id]  }
-                                                    onChange={this.onCompanyChange} />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div className='list-item__preview-footer'>
-                                    <input
-                                        type='submit'
-                                        className='btn btn-outline-primary'
-                                        value={gettext('Save')}
-                                    />
-                                </div>
-                            </form>
-                        </div>
+                        <EditPanel
+                            parent={this.props.product}
+                            items={this.props.companies}
+                            field="companies"
+                            onSave={this.props.saveCompanies}
+                        />
+                    }
+                    {this.state.activeTab === 'navigations' &&
+                        <EditPanel
+                            parent={this.props.product}
+                            items={this.props.navigations}
+                            field="navigations"
+                            onSave={this.props.saveNavigations}
+                        />
                     }
                 </div>
             </div>
@@ -194,13 +158,14 @@ EditProduct.propTypes = {
     onChange: PropTypes.func,
     errors: PropTypes.object,
     companies: PropTypes.arrayOf(PropTypes.object),
-    productCompanies: PropTypes.object,
     navigations: PropTypes.arrayOf(PropTypes.object),
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     saveCompanies: PropTypes.func.isRequired,
+    saveNavigations: PropTypes.func.isRequired,
     fetchCompanies: PropTypes.func.isRequired,
+    fetchNavigations: PropTypes.func.isRequired,
 };
 
 export default EditProduct;

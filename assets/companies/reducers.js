@@ -10,7 +10,8 @@ import {
     GET_COMPANY_USERS,
     INIT_VIEW_DATA,
     SET_ERROR,
-    SET_QUERY
+    SET_QUERY,
+    GET_PRODUCTS
 } from './actions';
 
 const initialState = {
@@ -115,8 +116,11 @@ export default function companyReducer(state = initialState, action) {
         return {...state, companyUsers: action.data};
     }
 
+    case GET_PRODUCTS:
+        return {...state, products: action.data};
+
     case INIT_VIEW_DATA:
-        return {...state, services: action.data.services};
+        return {...state, services: action.data.services, products: action.data.products};
 
     case UPDATE_COMPANY_SERVICES: {
         const companiesById = Object.assign({}, state.companiesById);

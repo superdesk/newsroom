@@ -10,7 +10,7 @@ import {
     SET_ERROR,
     GET_COMPANIES,
     GET_NAVIGATIONS,
-    UPDATE_PRODUCT_COMPANIES
+    UPDATE_PRODUCT_COMPANIES, UPDATE_PRODUCT_NAVIGATIONS
 } from './actions';
 
 const initialState = {
@@ -106,7 +106,13 @@ export default function productReducer(state = initialState, action) {
 
     case UPDATE_PRODUCT_COMPANIES: {
         const productsById = Object.assign({}, state.productsById);
-        productsById[action.product._id] = Object.assign({}, action.product, {services: action.companies});
+        productsById[action.product._id] = Object.assign({}, action.product, {companies: action.companies});
+        return {...state, productsById};
+    }
+
+    case UPDATE_PRODUCT_NAVIGATIONS: {
+        const productsById = Object.assign({}, state.productsById);
+        productsById[action.product._id] = Object.assign({}, action.product, {navigations: action.navigations});
         return {...state, productsById};
     }
 

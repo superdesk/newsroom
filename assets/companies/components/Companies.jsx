@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
-import {setError, saveServices} from '../actions';
+import {setError} from '../actions';
 import {gettext} from 'utils';
 
 class Companies extends React.Component {
@@ -81,8 +81,7 @@ class Companies extends React.Component {
                         onDelete={this.deleteCompany}
                         users={this.props.companyUsers}
                         fetchCompanyUsers={this.props.fetchCompanyUsers}
-                        services={this.props.services}
-                        saveServices={this.props.saveServices}
+                        products={this.props.products}
                     />
                 }
             </div>
@@ -107,16 +106,12 @@ Companies.propTypes = {
     fetchCompanyUsers: PropTypes.func,
     errors: PropTypes.object,
     dispatch: PropTypes.func,
-    services: PropTypes.array,
-    saveServices: PropTypes.func.isRequired,
+    products: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
-    services: state.services,
+    products: state.products,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    saveServices: (services) => dispatch(saveServices(services)),
-});
 
-export default connect(mapStateToProps, mapDispatchToProps)(Companies);
+export default connect(mapStateToProps)(Companies);

@@ -17,6 +17,7 @@ def settings():
     data = {
         'companies': list(query_resource('companies', max_results=200)),
         'services': app.config['SERVICES'],
+        'products': list(query_resource('products', max_results=200)),
     }
     return flask.render_template('settings.html', setting_type="companies", data=data)
 
