@@ -13,8 +13,8 @@ export function editProduct(event) {
 }
 
 export const NEW_PRODUCT = 'NEW_PRODUCT';
-export function newProduct(data) {
-    return {type: NEW_PRODUCT, data};
+export function newProduct() {
+    return {type: NEW_PRODUCT};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
@@ -158,6 +158,7 @@ export function initViewData(data) {
     return function (dispatch) {
         dispatch(getProducts(data.products));
         dispatch(getCompanies(data.companies));
+        dispatch(getNavigations(data.navigations));
     };
 }
 

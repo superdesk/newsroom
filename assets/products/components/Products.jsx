@@ -36,7 +36,7 @@ class Products extends React.Component {
             return;
         }
 
-        this.props.saveProduct('products');
+        this.props.saveProduct();
     }
 
     deleteProduct(event) {

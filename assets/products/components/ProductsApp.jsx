@@ -8,8 +8,8 @@ import {
     postProduct,
     deleteProduct,
     newProduct,
-    resetPassword,
-    setQuery, fetchProducts,
+    setQuery,
+    fetchProducts,
 } from '../actions';
 import ProductBar from './ProductBar';
 import Products from './Products';
@@ -37,7 +37,6 @@ class ProductsApp extends React.Component {
                 editProduct={this.props.editProduct}
                 saveProduct={this.props.saveProduct}
                 deleteProduct={this.props.deleteProduct}
-                resetPassword={this.props.resetPassword}
                 newProduct={this.props.newProduct}
                 cancelEdit={this.props.cancelEdit}
                 isLoading={this.props.isLoading}
@@ -62,7 +61,6 @@ ProductsApp.propTypes = {
     saveProduct: PropTypes.func,
     deleteProduct: PropTypes.func,
     newProduct: PropTypes.func,
-    resetPassword: PropTypes.func,
     cancelEdit: PropTypes.func,
     isLoading: PropTypes.bool,
     activeQuery: PropTypes.string,
@@ -93,10 +91,9 @@ const mapDispatchToProps = (dispatch) => ({
     editProduct: (event) => dispatch(editProduct(event)),
     saveProduct: (type) => dispatch(postProduct(type)),
     deleteProduct: (type) => dispatch(deleteProduct(type)),
-    newProduct: (data) => dispatch(newProduct(data)),
+    newProduct: () => dispatch(newProduct()),
     fetchProducts: () => dispatch(fetchProducts()),
     setQuery: (query) => dispatch(setQuery(query)),
-    resetPassword: () => dispatch(resetPassword()),
     cancelEdit: (event) => dispatch(cancelEdit(event)),
     dispatch: dispatch,
 });

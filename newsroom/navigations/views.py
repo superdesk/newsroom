@@ -1,3 +1,5 @@
+import re
+import flask
 from bson import ObjectId
 from flask import jsonify, current_app as app
 from flask_babel import gettext
@@ -10,10 +12,31 @@ from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.utils import query_resource
 
 
+@blueprint.route('/navigations/settings', methods=['GET'])
+@admin_only
+def settings():
+    data = {
+        'products': list(query_resource('products', max_results=200)),
+        "navigations": list(query_resource('navigations', max_results=200)),
+    }
+    return flask.render_template('settings.html', setting_type="navigations", data=data)
+
+
 @blueprint.route('/navigations', methods=['GET'])
 def index():
     navigations = list(query_resource('navigations', lookup=None, max_results=200))
     return jsonify(navigations), 200
+
+
+@blueprint.route('/navigations/search', methods=['GET'])
+@admin_only
+def search():
+    lookup = None
+    if flask.request.args.get('q'):
+        regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
+        lookup = {'name': regex}
+    products = list(query_resource('navigations', lookup=lookup, max_results=200))
+    return jsonify(products), 200
 
 
 @blueprint.route('/navigations/new', methods=['POST'])
