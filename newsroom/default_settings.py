@@ -37,6 +37,8 @@ BLUEPRINTS = [
     'newsroom.topics',
     'newsroom.upload',
     'newsroom.notifications',
+    'newsroom.products',
+    'newsroom.navigations',
 ]
 
 CORE_APPS = [
@@ -53,6 +55,8 @@ CORE_APPS = [
     'newsroom.upload',
     'newsroom.history',
     'newsroom.notifications',
+    'newsroom.products',
+    'newsroom.navigations',
 ]
 
 SITE_NAME = 'AAP Newsroom'

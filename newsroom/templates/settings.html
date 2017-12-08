@@ -21,6 +21,16 @@
                         href="{{ url_for('users.settings') }}">
                         {{ gettext('User Management') }}</a>
                 </li>
+{#                <li>#}
+{#                    <a class="side-navigation__btn {{ "active" if setting_type == "navigation" }}"#}
+{#                        href="{{ url_for('navigation.settings') }}">#}
+{#                        {{ gettext('Navigation') }}</a>#}
+{#                </li>#}
+                <li>
+                    <a class="side-navigation__btn {{ "active" if setting_type == "products" }}"
+                        href="{{ url_for('products.settings') }}">
+                        {{ gettext('Products') }}</a>
+                </li>
                 <li>
                     <a class="side-navigation__btn"
                         href='#'>{{ gettext('System Settings') }}</a>
@@ -42,6 +52,9 @@ var viewData = {{ data | tojson | safe }};
     {% endif %}
     {% if setting_type == "users" %}
         {{ javascript_tag('users_js') | safe }}
+    {% endif %}
+    {% if setting_type == "products" %}
+        {{ javascript_tag('products_js') | safe }}
     {% endif %}
 
 {% endblock %}

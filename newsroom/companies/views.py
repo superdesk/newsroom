@@ -21,15 +21,6 @@ def settings():
     return flask.render_template('settings.html', setting_type="companies", data=data)
 
 
-@blueprint.route('/companies', methods=['GET'])
-@admin_only
-def index():
-    companies = list(query_resource('companies', max_results=50))
-    return flask.render_template(
-        'companies.html',
-        companies=companies)
-
-
 @blueprint.route('/companies/search', methods=['GET'])
 @admin_only
 def search():
@@ -37,7 +28,7 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'name': regex}
-    companies = list(query_resource('companies', lookup=lookup, max_results=50))
+    companies = list(query_resource('companies', lookup=lookup, max_results=200))
     return jsonify(companies), 200
 
 

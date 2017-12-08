@@ -9,6 +9,7 @@ module.exports = {
         newsroom_js: './assets/index.js',
         companies_js: './assets/companies/index.js',
         users_js: './assets/users/index.js',
+        products_js: './assets/products/index.js',
         user_profile_js: './assets/user-profile/index.js',
         newsroom_css: './assets/style.js',
         wire_js: './assets/wire/index.js',
