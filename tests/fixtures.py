@@ -1,4 +1,4 @@
-
+from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
 
@@ -16,6 +16,7 @@ items = [
         'firstcreated': '2017-11-27T08:00:57+0000',
         'versioncreated': datetime.now(),
         'service': [{'code': 'a', 'name': 'Service A'}],
+        'products': [{'id': 1, 'name': 'product-1'}, {'id': 3, 'name': 'product-3'}]
     },
     {
         '_id': 'urn:localhost:weather',
@@ -28,6 +29,19 @@ items = [
         'firstcreated': datetime.now() - timedelta(days=5),
         'versioncreated': datetime.now().replace(hour=23, minute=55) - timedelta(days=5),
         'service': [{'code': 'b', 'name': 'Service B'}],
+        'products': [{'id': 2, 'name': 'product-2'}]
+    },
+    {
+        '_id': 'urn:localhost:flood',
+        'type': 'text',
+        'version': 1,
+        'headline': 'Flood Waters',
+        'slugline': 'Disaster',
+        'body_html': '<p>Water levels keep rising</p>',
+        'firstcreated': datetime.now() - timedelta(days=5),
+        'versioncreated': datetime.now().replace(hour=23, minute=55) - timedelta(days=5),
+        'service': [{'code': 'c', 'name': 'Service C'}],
+        'products': [{'id': 7, 'name': 'product-7'}]
     },
     {
         '_id': 'tag:weather',
@@ -55,3 +69,19 @@ def init_items(app):
 def init_auth(app, client):
     users_init(app)
     test_login_succeeds_for_admin(client)
+
+
+@fixture(autouse=True)
+def init_company(app, client):
+    app.data.insert('companies', [{
+        '_id': 1,
+        'name': 'Grain Corp'
+    }])
+
+    app.data.insert('users', [{
+        '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'last_name': 'Bar',
+        'company': 1,
+    }])

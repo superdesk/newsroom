@@ -18,7 +18,7 @@ import {
     BOOKMARK_ITEMS,
     REMOVE_BOOKMARK,
     SET_NEW_ITEMS_BY_TOPIC,
-    TOGGLE_SERVICE,
+    TOGGLE_NAVIGATION,
     TOGGLE_FILTER,
     START_LOADING,
     RECIEVE_NEXT_ITEMS,
@@ -61,8 +61,9 @@ const initialState = {
     newItemsByTopic: {},
     readItems: {},
     wire: {
-        services: [],
-        activeService: {},
+        navigations: [],
+        activeProducts: {},
+        activeNavigation: {},
         activeFilter: {},
         createdFilter: {},
         activeView: EXTENDED_VIEW,
@@ -111,16 +112,21 @@ function updateItemActions(state, items, action) {
 
 function _wireReducer(state, action) {
     switch (action.type) {
-    case TOGGLE_SERVICE: {
-        const activeService = {};
-        if (action.service) {
-            activeService[action.service.code] = true;
+
+    case TOGGLE_NAVIGATION: {
+        const activeProducts = {};
+        const activeNavigation = {};
+
+        if (action.navigation && action.navigation.products) {
+            action.navigation.products.map((product) => activeProducts[product] = true);
+            activeNavigation[action.navigation._id] = true;
         }
         return {
             ...state,
             activeFilter: {},
             createdFilter: {},
-            activeService,
+            activeNavigation,
+            activeProducts,
         };
     }
 
@@ -254,7 +260,7 @@ export default function wireReducer(state = initialState, action) {
             company: action.wireData.company || null,
             bookmarks: action.wireData.bookmarks || false,
             formats: action.wireData.formats || [],
-            wire: Object.assign(state.wire, {services: action.wireData.services || []}),
+            wire: Object.assign(state.wire, {navigations: action.wireData.navigations || []}),
         };
 
     case ADD_TOPIC:
@@ -390,7 +396,7 @@ export default function wireReducer(state = initialState, action) {
         };
     }
 
-    case TOGGLE_SERVICE:
+    case TOGGLE_NAVIGATION:
     case TOGGLE_FILTER:
     case SET_CREATED_FILTER:
     case RESET_FILTER:

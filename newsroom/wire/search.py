@@ -9,6 +9,7 @@ from flask import json, abort
 from eve.utils import ParsedRequest
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
+from newsroom.products.products import get_products_by_company, get_products_dict_by_company
 
 logger = logging.getLogger(__name__)
 
@@ -71,10 +72,19 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
-def set_service_query(query, company):
-    if company and company.get('services'):
-        services = [code for code, is_active in company['services'].items() if is_active]
-        query['bool']['must'].append({'terms': {'service.code': services}})
+def set_superdesk_product_query(query, company):
+    if company:
+        products = get_products_by_company(company['_id'])
+        product_ids = [p.get('sd_product_id') for p in products if p['product_type'] == 'superdesk']
+        query['bool']['must'].append({'bool': {'should': [{'terms': {'products.id': product_ids}}]}})
+
+
+def set_query_product_query(query, company):
+    if company:
+        products = get_products_by_company(company['_id'])
+        for product in products:
+            if product['product_type'] == 'query' and product.get('query'):
+                query['bool']['must'][0]['bool']['should'].append(_query_string(product['query']))
 
 
 def _query_string(query):
@@ -124,7 +134,8 @@ class WireSearchService(newsroom.Service):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        set_service_query(query, company)
+        set_superdesk_product_query(query, company)
+        set_query_product_query(query, company)
         _set_bookmarks_query(query, user_id)
         source = {'query': query, 'size': 0}
         internal_req = ParsedRequest()
@@ -135,7 +146,8 @@ class WireSearchService(newsroom.Service):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        set_service_query(query, company)
+        set_superdesk_product_query(query, company)
+        set_query_product_query(query, company)
 
         if req.args.get('q'):
             query['bool']['must'].append(_query_string(req.args['q']))
@@ -144,13 +156,23 @@ class WireSearchService(newsroom.Service):
         if req.args.get('bookmarks'):
             _set_bookmarks_query(query, req.args['bookmarks'])
 
-        if req.args.get('service'):
-            services = json.loads(req.args['service'])
-            selected_services = [key for key in services if services[key]]
-            if selected_services:
-                query['bool']['must'].append({
-                    'terms': {'service.code': selected_services},
-                })
+        if req.args.get('products'):
+            if company:
+                products_dict = get_products_dict_by_company(company['_id'])
+                product_ids = json.loads(req.args['products'])
+                selected_products = []
+
+                for p_id in product_ids:
+                    product = products_dict.get(p_id)
+                    if product and product['product_type'] == 'query' and product.get('query'):
+                        query['bool']['must'].append(_query_string(product.get('query')))
+                    if product and product['product_type'] == 'superdesk':
+                        selected_products.append(product.get('sd_product_id'))
+
+                if selected_products:
+                    query['bool']['must'].append({
+                        'terms': {'products.id': selected_products}
+                    })
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
@@ -195,7 +217,7 @@ class WireSearchService(newsroom.Service):
                 ],
                 'must': [
                     {'term': {'_id': item_id}}
-                ],
+                ]
             }
         }
         aggs = {
@@ -234,7 +256,8 @@ class WireSearchService(newsroom.Service):
 
             # for now even if there's no active company matching for the user
             # continuing with the search
-            set_service_query(topic_filter, company)
+            set_superdesk_product_query(topic_filter, company)
+            set_query_product_query(topic_filter, company)
 
             aggs['topics']['filters']['filters'][str(topic['_id'])] = topic_filter
             queried_topics.append(topic)

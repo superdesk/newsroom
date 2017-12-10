@@ -51,4 +51,17 @@ class ProductsService(newsroom.Service):
 
 
 def get_products_by_navigation(navigation_id):
-    return list(superdesk.get_resource_service('products').get(req=None, lookup={'navigations': navigation_id}))
+    return list(superdesk.get_resource_service('products').
+                get(req=None, lookup={'navigations': navigation_id, 'is_enabled': True}))
+
+
+def get_products_by_company(company_id):
+    # TODO(tolga): this lookup by company id is not working
+    products = list(superdesk.get_resource_service('products').get(req=None, lookup={'is_enabled': True}))
+    return [p for p in products if str(company_id) in p.get('companies')]
+
+
+def get_products_dict_by_company(company_id):
+    # TODO(tolga): this lookup by company id is not working
+    products = list(superdesk.get_resource_service('products').get(req=None, lookup={'is_enabled': True}))
+    return {str(p['_id']): p for p in products if str(company_id) in p.get('companies')}

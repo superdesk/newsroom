@@ -158,16 +158,4 @@ export function initViewData(data) {
     };
 }
 
-export const UPDATE_COMPANY_SERVICES = 'UPDATE_COMPANY_SERVICES';
-export function updateCompanyServices(company, services) {
-    return {type: UPDATE_COMPANY_SERVICES, company, services};
-}
 
-export function saveServices(services) {
-    return function (dispatch, getState) {
-        const company = getState().companyToEdit;
-        return server.post(`/companies/${company._id}/services`, {services})
-            .then(() => dispatch(updateCompanyServices(company, services)))
-            .catch((error) => errorHandler(error, dispatch));
-    };
-}

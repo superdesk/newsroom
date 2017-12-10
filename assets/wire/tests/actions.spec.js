@@ -157,19 +157,19 @@ describe('wire actions', () => {
     });
 
     it('can set and reset service filter', () => {
-        fetchMock.get('/search?service={"foo":true}', {_items: [{_id: 'foo'}]});
-        fetchMock.get('/search?service={"bar":true}', {_items: [{_id: 'bar'}]});
-        return store.dispatch(actions.toggleService({code: 'foo'}))
+        fetchMock.get('/search?products={"1":true}', {_items: [{_id: 'foo'}]});
+        fetchMock.get('/search?products={"2":true}', {_items: [{_id: 'bar'}]});
+        return store.dispatch(actions.toggleNavigation({_id: 'foo', 'products': ['1']}))
             .then(() => {
-                expect(store.getState().wire.activeService).toEqual({'foo': true});
-                return store.dispatch(actions.toggleService({code: 'bar'}));
+                expect(store.getState().wire.activeNavigation).toEqual({'foo': true});
+                return store.dispatch(actions.toggleNavigation({_id: 'bar', 'products': ['2']}));
             })
             .then(() => {
-                expect(store.getState().wire.activeService).toEqual({'bar': true});
-                return store.dispatch(actions.toggleService());
+                expect(store.getState().wire.activeNavigation).toEqual({'bar': true});
+                return store.dispatch(actions.toggleNavigation());
             })
             .then(() => {
-                expect(store.getState().wire.activeService).toEqual({});
+                expect(store.getState().wire.activeNavigation).toEqual({});
             });
     });
 });

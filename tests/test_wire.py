@@ -1,9 +1,7 @@
-
 from flask import json
-from bson import ObjectId
 from datetime import datetime, timedelta
 
-from .fixtures import items, init_items, init_auth  # noqa
+from .fixtures import items, init_items, init_auth, init_company  # noqa
 
 
 def test_item_detail(client):
@@ -109,7 +107,7 @@ def test_versions(client, app):
 def test_search_filters_items_with_updates(client, app):
     resp = client.get('/search')
     data = json.loads(resp.get_data())
-    assert 2 == len(data['_items'])
+    assert 3 == len(data['_items'])
     assert 'tag:weather' not in [item['_id'] for item in data['_items']]
 
 
@@ -121,28 +119,99 @@ def test_search_filters_killed_items(client, app):
 
 
 def test_search_filter_by_category(client, app):
-    resp = client.get('/search?service=%s' % json.dumps({'a': True}))
-    data = json.loads(resp.get_data())
-    assert 1 == len(data['_items'])
-    assert '_aggregations' in data
     resp = client.get('/search?filter=%s' % json.dumps({'service': ['Service A']}))
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
 
-def test_company_user_gets_company_services(client, app):
-    resp = client.post('companies/new', data={'name': 'Test'})
-    company_id = json.loads(resp.get_data()).get('_id')
-    resp = client.post('companies/%s/services' % company_id,
-                       data=json.dumps({'services': {'b': True}}),
-                       content_type='application/json')
-    assert 200 == resp.status_code
-    users = list(app.data.find_all('users'))
-    assert 1 == len(users)
-    app.data.update('users', users[0]['_id'], {'company': ObjectId(company_id)}, users[0])
+def test_filter_by_product_anonymous_user_gets_all(client, app):
+    resp = client.get('/search?products=%s' % json.dumps({'10': True}))
+    data = json.loads(resp.get_data())
+    assert 3 == len(data['_items'])
+    assert '_aggregations' in data
+
+
+def test_logged_in_user_no_product_gets_no_results(client, app):
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
+    resp = client.get('/search')
+    data = json.loads(resp.get_data())
+    assert 0 == len(data['_items'])
+
+
+def test_search_filtered_by_users_products(client, app):
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'product test',
+        'product_type': 'superdesk',
+        'sd_product_id': 1,
+        'companies': ['1'],
+        'is_enabled': True,
+    }])
+
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
     resp = client.get('/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
+    assert '_aggregations' in data
+
+
+def test_search_filter_by_individual_product(client, app):
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'product test',
+        'product_type': 'superdesk',
+        'sd_product_id': 1,
+        'companies': ['1'],
+        'is_enabled': True,
+    }, {
+        '_id': 11,
+        'name': 'product test 2',
+        'product_type': 'superdesk',
+        'sd_product_id': 2,
+        'companies': ['1'],
+        'is_enabled': True,
+    }])
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
+    resp = client.get('/search')
+    data = json.loads(resp.get_data())
+    assert 2 == len(data['_items'])
+    assert '_aggregations' in data
+    resp = client.get('/search?products=%s' % json.dumps({'11': True}))
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+    assert '_aggregations' in data
+
+
+def test_search_filtered_by_query_product(client, app):
+    app.data.insert('products', [{
+        '_id': 12,
+        'name': 'product test',
+        'product_type': 'query',
+        'query': 'headline:more',
+        'companies': ['1'],
+        'is_enabled': True,
+    }, {
+        '_id': 13,
+        'name': 'product test 2',
+        'product_type': 'query',
+        'query': 'headline:Weather',
+        'companies': ['1'],
+        'is_enabled': True,
+    }])
+
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
+    resp = client.get('/search')
+    data = json.loads(resp.get_data())
+    assert 2 == len(data['_items'])
+    assert '_aggregations' in data
+    resp = client.get('/search?products=%s' % json.dumps({'13': True}))
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+    assert '_aggregations' in data
 
 
 def test_search_pagination(client):
@@ -173,7 +242,7 @@ def test_search_created_from(client):
 def test_search_created_to(client):
     resp = client.get('/search?created_to=%s' % datetime.now().strftime('%Y-%m-%d'))
     data = json.loads(resp.get_data())
-    assert 2 == len(data['_items'])
+    assert 3 == len(data['_items'])
 
     resp = client.get('/search?created_to=%s&timezone_offset=%s' % (
         (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d'),

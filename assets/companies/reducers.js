@@ -4,7 +4,6 @@ import {
     NEW_COMPANY,
     QUERY_COMPANIES,
     SELECT_COMPANY,
-    UPDATE_COMPANY_SERVICES,
     CANCEL_EDIT,
     GET_COMPANIES,
     GET_COMPANY_USERS,
@@ -121,12 +120,6 @@ export default function companyReducer(state = initialState, action) {
 
     case INIT_VIEW_DATA:
         return {...state, services: action.data.services, products: action.data.products};
-
-    case UPDATE_COMPANY_SERVICES: {
-        const companiesById = Object.assign({}, state.companiesById);
-        companiesById[action.company._id] = Object.assign({}, action.company, {services: action.services});
-        return {...state, companiesById};
-    }
 
     default:
         return state;
