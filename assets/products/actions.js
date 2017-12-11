@@ -103,7 +103,11 @@ export function postProduct() {
 
         return server.post(url, product)
             .then(function() {
-                notify.success(gettext((product._id ? 'Product updated' : 'Product created') + 'successfully'));
+                if (product._id) {
+                    notify.success(gettext('Product updated successfully'));
+                } else {
+                    notify.success(gettext('Product created successfully'));
+                }
                 dispatch(fetchProducts());
             })
             .catch((error) => errorHandler(error, dispatch));

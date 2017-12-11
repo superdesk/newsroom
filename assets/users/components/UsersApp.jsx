@@ -11,8 +11,8 @@ import {
     resetPassword,
     setQuery, fetchUsers,
 } from '../actions';
-import UserBar from './UserBar';
 import Users from './Users';
+import ListBar from 'components/ListBar';
 
 
 class UsersApp extends React.Component {
@@ -22,11 +22,12 @@ class UsersApp extends React.Component {
 
     render() {
         return (
-            [<UserBar
+            [<ListBar
                 key="UserBar"
-                onNewUser={this.props.newUser}
+                onNewItem={this.props.newUser}
                 setQuery={this.props.setQuery}
-                fetchUsers={this.props.fetchUsers}
+                fetch={this.props.fetchUsers}
+                buttonName={'User'}
             />,
             <Users
                 key="Users"

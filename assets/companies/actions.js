@@ -121,7 +121,11 @@ export function postCompany() {
 
         return server.post(url, company)
             .then(function() {
-                notify.success(gettext((company._id ? 'Company updated' : 'Company created') + 'successfully'));
+                if (company._id) {
+                    notify.success(gettext('Company updated successfully'));
+                } else {
+                    notify.success(gettext('Company created successfully'));
+                }
                 dispatch(fetchCompanies());
             })
             .catch((error) => errorHandler(error, dispatch));

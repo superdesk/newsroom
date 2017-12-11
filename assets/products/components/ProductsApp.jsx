@@ -11,8 +11,8 @@ import {
     setQuery,
     fetchProducts,
 } from '../actions';
-import ProductBar from './ProductBar';
 import Products from './Products';
+import ListBar from 'components/ListBar';
 
 
 class ProductsApp extends React.Component {
@@ -22,11 +22,12 @@ class ProductsApp extends React.Component {
 
     render() {
         return (
-            [<ProductBar
+            [<ListBar
                 key="ProductBar"
-                onNewProduct={this.props.newProduct}
+                onNewItem={this.props.newProduct}
                 setQuery={this.props.setQuery}
-                fetchProducts={this.props.fetchProducts}
+                fetch={this.props.fetchProducts}
+                buttonName={'Product'}
             />,
             <Products
                 key="Products"

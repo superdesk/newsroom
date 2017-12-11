@@ -88,7 +88,11 @@ export function postNavigation() {
 
         return server.post(url, navigation)
             .then(function() {
-                notify.success(gettext((navigation._id ? 'Navigation updated' : 'Navigation created') + 'successfully'));
+                if (navigation._id) {
+                    notify.success(gettext('Navigation updated successfully'));
+                } else {
+                    notify.success(gettext('Navigation created successfully'));
+                }
                 dispatch(fetchNavigations());
             })
             .catch((error) => errorHandler(error, dispatch));

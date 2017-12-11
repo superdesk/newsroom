@@ -12,8 +12,8 @@ import {
     fetchCompanyUsers,
     setQuery,
 } from '../actions';
-import Companies from '../../companies/components/Companies';
-import CompanyBar from '../../companies/components/CompanyBar';
+import Companies from './Companies';
+import ListBar from 'components/ListBar';
 
 class CompaniesApp extends React.Component {
     constructor(props, context) {
@@ -22,11 +22,12 @@ class CompaniesApp extends React.Component {
 
     render() {
         return (
-            [<CompanyBar
+            [<ListBar
                 key="CompanyBar"
-                onNewCompany={this.props.newCompany}
+                onNewItem={this.props.newCompany}
                 setQuery={this.props.setQuery}
-                fetchCompanies={this.props.fetchCompanies}
+                fetch={this.props.fetchCompanies}
+                buttonName={'Company'}
             />,
             <Companies
                 key="Companies"

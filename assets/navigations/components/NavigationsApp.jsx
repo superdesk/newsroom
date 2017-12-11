@@ -8,10 +8,11 @@ import {
     postNavigation,
     deleteNavigation,
     newNavigation,
-    setQuery, fetchNavigations,
+    setQuery,
+    fetchNavigations,
 } from '../actions';
-import NavigationBar from './NavigationBar';
 import Navigations from './Navigations';
+import ListBar from 'components/ListBar';
 
 
 class NavigationsApp extends React.Component {
@@ -21,11 +22,12 @@ class NavigationsApp extends React.Component {
 
     render() {
         return (
-            [<NavigationBar
+            [<ListBar
                 key="NavigationBar"
-                onNewNavigation={this.props.newNavigation}
+                onNewItem={this.props.newNavigation}
                 setQuery={this.props.setQuery}
-                fetchNavigations={this.props.fetchNavigations}
+                fetch={this.props.fetchNavigations}
+                buttonName={'Navigation'}
             />,
             <Navigations
                 key="Navigations"

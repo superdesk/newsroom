@@ -94,7 +94,11 @@ export function postUser() {
 
         return server.post(url, user)
             .then(function() {
-                notify.success(gettext((user._id ? 'User updated' : 'User created') + 'successfully'));
+                if (user._id) {
+                    notify.success(gettext('User updated successfully'));
+                } else {
+                    notify.success(gettext('User created successfully'));
+                }
                 dispatch(fetchUsers());
             })
             .catch((error) => errorHandler(error, dispatch));
