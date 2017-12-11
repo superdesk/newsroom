@@ -9,8 +9,10 @@
         <figure class="profile__avatar initials">
             <span class="profile__characters">JD</span>
         </figure>
-        <h5 class="profile__name">Jeff Dudeowsky</h5>
-        <span class="profile__info">jeffthedude</span>
+        <div class="profile__name-container">
+            <h5 class="profile__name">Jeff Dudeowsky</h5>
+            <span class="profile__info">jeffthedude</span>
+        </div>
     </div>
     <div class="profile-side-navigation__items">
         <a href="#" class="btn btn-block btn-outline-secondary">My profile</a>
@@ -23,7 +25,7 @@
 
 {% block contentHeader %}
 
-<nav class="profile-nav content-bar navbar content-bar--side-padding pr-0">
+<nav class="profile-nav content-bar navbar content-bar--side-padding pr-0 d-none d-md-flex">
     <h5 class="pl-xl-4 mb-0">Followed topics</h5>
     <div class="content-bar__right">
         <span class="content-bar__menu">
@@ -39,8 +41,7 @@
             <div class="simple-card-wrap col-12 col-lg-6">
                 <div class="simple-card">
                     <div class="simple-card__header simple-card__header-with-icons">
-                        <h6 class="simple-card__headline">My New Topic</h6>
-                        <span class="badge badge-pill badge-secondary">9</span>
+                        <h6 class="simple-card__headline">My New Topic</h6>                        
                         <div class="simple-card__icons">
                             <span class="icon-button"><i class="icon--share"></i></span>
                             <span class="icon-button"><i class="icon--edit"></i></span>
@@ -55,8 +56,21 @@
             <div class="simple-card-wrap col-12 col-lg-6">
                 <div class="simple-card">
                     <div class="simple-card__header simple-card__header-with-icons">
-                        <h6 class="simple-card__headline">My New Topic</h6>
-                        <span class="badge badge-pill badge-secondary">9</span>
+                        <h6 class="simple-card__headline">My New Topic</h6>                        
+                        <div class="simple-card__icons">
+                            <span class="icon-button"><i class="icon--share"></i></span>
+                            <span class="icon-button"><i class="icon--edit"></i></span>
+                            <span class="icon-button"><i class="icon--trash"></i></span>
+                        </div>
+                    </div>
+                    <p>Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum.</p>
+                    <span class="simple-card__date">Created <span class="bold">12.06.2017 at 14:25</span></span>
+                </div>
+            </div>
+            <div class="simple-card-wrap col-12 col-lg-6">
+                <div class="simple-card">
+                    <div class="simple-card__header simple-card__header-with-icons">
+                        <h6 class="simple-card__headline">My New Topic</h6>                        
                         <div class="simple-card__icons">
                             <span class="icon-button"><i class="icon--share"></i></span>
                             <span class="icon-button"><i class="icon--edit"></i></span>
@@ -71,22 +85,6 @@
                 <div class="simple-card">
                     <div class="simple-card__header simple-card__header-with-icons">
                         <h6 class="simple-card__headline">My New Topic</h6>
-                        <span class="badge badge-pill badge-secondary">9</span>
-                        <div class="simple-card__icons">
-                            <span class="icon-button"><i class="icon--share"></i></span>
-                            <span class="icon-button"><i class="icon--edit"></i></span>
-                            <span class="icon-button"><i class="icon--trash"></i></span>
-                        </div>
-                    </div>
-                    <p>Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum.</p>
-                    <span class="simple-card__date">Created <span class="bold">12.06.2017 at 14:25</span></span>
-                </div>
-            </div>
-            <div class="simple-card-wrap col-12 col-lg-6">
-                <div class="simple-card">
-                    <div class="simple-card__header simple-card__header-with-icons">
-                        <h6 class="simple-card__headline">My New Topic</h6>
-                        <span class="badge badge-pill badge-secondary">9</span>
                         <div class="simple-card__icons">
                             <span class="icon-button"><i class="icon--share"></i></span>
                             <span class="icon-button"><i class="icon--edit"></i></span>

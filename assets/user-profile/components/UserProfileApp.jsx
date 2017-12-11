@@ -74,6 +74,9 @@ class UserProfileApp extends React.Component {
         return (
             <div className="profile-container">
                 <div className="profileWrap">
+                    <div className="profile__mobile-close d-md-none">
+                        <button className="icon-button" onClick={this.close}><i className="icon--close-thin icon--gray-light"></i></button>
+                    </div>
                     <nav className='profile-side-navigation' id='profile-menu'>
                         <UserProfileAvatar
                             user={this.props.user}
@@ -85,7 +88,7 @@ class UserProfileApp extends React.Component {
                     </nav>
                     <div className="content">
                         <section className="content-header">
-                            <nav className="profile-nav content-bar navbar content-bar--side-padding pr-0">
+                            <nav className="profile-nav content-bar navbar content-bar--side-padding pr-0 d-none d-md-flex">
                                 <h5 className="pl-xl-4 mb-0">
                                     {links.find((link) => link.active).label}
                                 </h5>
