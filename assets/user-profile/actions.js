@@ -1,4 +1,4 @@
-import { gettext, notify } from 'utils';
+import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
 import { renderModal, closeModal } from 'actions';
 
@@ -39,18 +39,6 @@ export function selectMenu(data) {
     return {type: SELECT_MENU, data};
 }
 
-function errorHandler(error, dispatch) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText);
-        return;
-    }
-    error.response.json().then(function(data) {
-        dispatch(setError(data));
-    });
-}
-
 
 /**
  * Fetches user details
@@ -61,7 +49,7 @@ export function fetchUser(id) {
             .then((data) => {
                 dispatch(getUser(data));
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -80,7 +68,7 @@ export function saveUser() {
                 notify.success(gettext('User updated successfully'));
                 dispatch(fetchUser(editedUser._id));
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -95,7 +83,7 @@ export function fetchTopics() {
             .then((data) => {
                 return dispatch(getTopics(data._items));
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -115,7 +103,7 @@ export function deleteTopic(topic) {
                 notify.success(gettext('Topic deleted successfully'));
                 dispatch(fetchTopics());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 

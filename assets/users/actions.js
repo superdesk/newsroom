@@ -1,4 +1,4 @@
-import { gettext, notify } from 'utils';
+import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
 
 
@@ -53,18 +53,6 @@ export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
-function errorHandler(error, dispatch) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText);
-        return;
-    }
-    error.response.json().then(function(data) {
-        dispatch(setError(data));
-    });
-}
-
 
 /**
  * Fetches users
@@ -77,7 +65,7 @@ export function fetchUsers() {
 
         return server.get(`/users/search?q=${query}`)
             .then((data) => dispatch(getUsers(data)))
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -101,7 +89,7 @@ export function postUser() {
                 }
                 dispatch(fetchUsers());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -115,7 +103,7 @@ export function resetPassword() {
 
         return server.post(url, {})
             .then(() => notify.success(gettext('Reset password token is sent successfully')))
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -135,7 +123,7 @@ export function deleteUser() {
                 notify.success(gettext('User deleted successfully'));
                 dispatch(fetchUsers());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 

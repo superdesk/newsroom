@@ -1,4 +1,4 @@
-import { gettext, notify } from 'utils';
+import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
 
 
@@ -60,18 +60,6 @@ export function setError(errors) {
 }
 
 
-function errorHandler(error, dispatch) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText);
-        return;
-    }
-    error.response.json().then(function(data) {
-        dispatch(setError(data));
-    });
-}
-
 /**
  * Fetches companies
  *
@@ -85,7 +73,7 @@ export function fetchCompanies() {
             .then((data) => {
                 dispatch(getCompanies(data));
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -104,7 +92,7 @@ export function fetchCompanyUsers(companyId) {
             .then((data) => {
                 return dispatch(getCompanyUsers(data));
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -117,7 +105,7 @@ export function postCompany() {
     return function (dispatch, getState) {
 
         const company = getState().companyToEdit;
-        const url = `/company/${company._id ? company._id : 'new'}`;
+        const url = `/companies/${company._id ? company._id : 'new'}`;
 
         return server.post(url, company)
             .then(function() {
@@ -128,7 +116,7 @@ export function postCompany() {
                 }
                 dispatch(fetchCompanies());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -149,7 +137,7 @@ export function deleteCompany() {
                 notify.success(gettext('Company deleted successfully'));
                 dispatch(fetchCompanies());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 

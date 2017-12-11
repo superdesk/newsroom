@@ -4,7 +4,15 @@ import { connect } from 'react-redux';
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
-import {setError} from '../actions';
+import {
+    cancelEdit,
+    deleteCompany,
+    editCompany,
+    fetchCompanyUsers,
+    postCompany,
+    selectCompany,
+    setError,
+} from '../actions';
 import {gettext} from 'utils';
 
 class Companies extends React.Component {
@@ -110,8 +118,29 @@ Companies.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
+    companies: state.companies.map((id) => state.companiesById[id]),
+    companyToEdit: state.companyToEdit,
+    activeCompanyId: state.activeCompanyId,
+    isLoading: state.isLoading,
     products: state.products,
+    activeQuery: state.activeQuery,
+    totalCompanies: state.totalCompanies,
+    companyOptions: state.companyOptions,
+    companiesById: state.companiesById,
+    companyUsers: state.companyUsers,
+    errors: state.errors,
 });
 
 
-export default connect(mapStateToProps)(Companies);
+const mapDispatchToProps = (dispatch) => ({
+    selectCompany: (id) => dispatch(selectCompany(id)),
+    editCompany: (event) => dispatch(editCompany(event)),
+    saveCompany: () => dispatch(postCompany()),
+    deleteCompany: () => dispatch(deleteCompany()),
+    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
+    dispatch: dispatch,
+});
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Companies);

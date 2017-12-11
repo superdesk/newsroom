@@ -1,4 +1,4 @@
-import { gettext, notify } from 'utils';
+import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
 
 
@@ -62,18 +62,6 @@ export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
-function errorHandler(error, dispatch) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText);
-        return;
-    }
-    error.response.json().then(function(data) {
-        dispatch(setError(data));
-    });
-}
-
 
 /**
  * Fetches products
@@ -86,7 +74,7 @@ export function fetchProducts() {
 
         return server.get(`/products/search?q=${query}`)
             .then((data) => dispatch(getProducts(data)))
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -110,7 +98,7 @@ export function postProduct() {
                 }
                 dispatch(fetchProducts());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -131,7 +119,7 @@ export function deleteProduct() {
                 notify.success(gettext('Product deleted successfully'));
                 dispatch(fetchProducts());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -146,7 +134,7 @@ export function fetchCompanies() {
             .then((data) => {
                 dispatch(getCompanies(data));
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -159,7 +147,7 @@ export function saveCompanies(companies) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/companies`, {companies})
             .then(() => dispatch(updateProductCompanies(product, companies)))
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -173,7 +161,7 @@ export function fetchNavigations() {
             .then((data) => {
                 dispatch(getNavigations(data));
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -186,7 +174,7 @@ export function saveNavigations(navigations) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/navigations`, {navigations})
             .then(() => dispatch(updateProductNavigations(product, navigations)))
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 

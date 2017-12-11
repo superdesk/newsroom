@@ -2,11 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
-    selectProduct,
-    editProduct,
-    cancelEdit,
-    postProduct,
-    deleteProduct,
     newProduct,
     setQuery,
     fetchProducts,
@@ -29,26 +24,8 @@ class ProductsApp extends React.Component {
                 fetch={this.props.fetchProducts}
                 buttonName={'Product'}
             />,
-            <Products
-                key="Products"
-                products={this.props.products}
-                productToEdit={this.props.productToEdit}
-                activeProductId={this.props.activeProductId}
-                selectProduct={this.props.selectProduct}
-                editProduct={this.props.editProduct}
-                saveProduct={this.props.saveProduct}
-                deleteProduct={this.props.deleteProduct}
-                newProduct={this.props.newProduct}
-                cancelEdit={this.props.cancelEdit}
-                isLoading={this.props.isLoading}
-                activeQuery={this.props.activeQuery}
-                totalProducts={this.props.totalProducts}
-                companies={this.props.companies}
-                companiesById={this.props.companiesById}
-                errors={this.props.errors}
-                dispatch={this.props.dispatch}
-
-            />]
+            <Products key="Products" />
+            ]
         );
     }
 }
@@ -75,28 +52,10 @@ ProductsApp.propTypes = {
     dispatch: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
-    products: state.products.map((id) => state.productsById[id]),
-    productToEdit: state.productToEdit,
-    activeProductId: state.activeProductId,
-    isLoading: state.isLoading,
-    activeQuery: state.activeQuery,
-    totalProducts: state.totalProducts,
-    companies: state.companies,
-    companiesById: state.companiesById,
-    errors: state.errors,
-});
-
 const mapDispatchToProps = (dispatch) => ({
-    selectProduct: (_id) => dispatch(selectProduct(_id)),
-    editProduct: (event) => dispatch(editProduct(event)),
-    saveProduct: (type) => dispatch(postProduct(type)),
-    deleteProduct: (type) => dispatch(deleteProduct(type)),
-    newProduct: () => dispatch(newProduct()),
     fetchProducts: () => dispatch(fetchProducts()),
     setQuery: (query) => dispatch(setQuery(query)),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
-    dispatch: dispatch,
+    newProduct: () => dispatch(newProduct()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductsApp);
+export default connect(null, mapDispatchToProps)(ProductsApp);

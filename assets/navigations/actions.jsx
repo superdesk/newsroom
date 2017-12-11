@@ -1,4 +1,4 @@
-import { gettext, notify } from 'utils';
+import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
 
 
@@ -47,18 +47,6 @@ export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
-function errorHandler(error, dispatch) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText);
-        return;
-    }
-    error.response.json().then(function(data) {
-        dispatch(setError(data));
-    });
-}
-
 
 /**
  * Fetches navigations
@@ -71,7 +59,7 @@ export function fetchNavigations() {
 
         return server.get(`/navigations/search?q=${query}`)
             .then((data) => dispatch(getNavigations(data)))
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -95,7 +83,7 @@ export function postNavigation() {
                 }
                 dispatch(fetchNavigations());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -116,7 +104,7 @@ export function deleteNavigation() {
                 notify.success(gettext('Navigation deleted successfully'));
                 dispatch(fetchNavigations());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -131,7 +119,7 @@ export function fetchProducts() {
             .then((data) => {
                 dispatch(getProducts(data));
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 

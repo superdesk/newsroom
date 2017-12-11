@@ -4,7 +4,19 @@ import { connect } from 'react-redux';
 import EditProduct from './EditProduct';
 import ProductList from './ProductList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
-import {setError, saveCompanies, fetchCompanies, fetchNavigations, saveNavigations} from '../actions';
+import {
+    setError,
+    saveCompanies,
+    fetchCompanies,
+    fetchNavigations,
+    saveNavigations,
+    postProduct,
+    editProduct,
+    selectProduct,
+    deleteProduct,
+    newProduct,
+    cancelEdit
+} from '../actions';
 import {gettext} from 'utils';
 
 class Products extends React.Component {
@@ -116,15 +128,29 @@ Products.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
+    products: state.products.map((id) => state.productsById[id]),
+    productToEdit: state.productToEdit,
+    activeProductId: state.activeProductId,
+    isLoading: state.isLoading,
+    activeQuery: state.activeQuery,
+    totalProducts: state.totalProducts,
     companies: state.companies,
-    navigations: state.navigations,
+    companiesById: state.companiesById,
+    errors: state.errors,
 });
 
 const mapDispatchToProps = (dispatch) => ({
+    selectProduct: (_id) => dispatch(selectProduct(_id)),
+    editProduct: (event) => dispatch(editProduct(event)),
+    saveProduct: (type) => dispatch(postProduct(type)),
+    deleteProduct: (type) => dispatch(deleteProduct(type)),
+    newProduct: () => dispatch(newProduct()),
     saveCompanies: (companies) => dispatch(saveCompanies(companies)),
     fetchCompanies: () => dispatch(fetchCompanies()),
     saveNavigations: (navigations) => dispatch(saveNavigations(navigations)),
     fetchNavigations: () => dispatch(fetchNavigations()),
+    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    dispatch: dispatch,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Products);

@@ -2,14 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
-    selectCompany,
-    editCompany,
-    cancelEdit,
-    postCompany,
-    deleteCompany,
     newCompany,
     fetchCompanies,
-    fetchCompanyUsers,
     setQuery,
 } from '../actions';
 import Companies from './Companies';
@@ -29,26 +23,8 @@ class CompaniesApp extends React.Component {
                 fetch={this.props.fetchCompanies}
                 buttonName={'Company'}
             />,
-            <Companies
-                key="Companies"
-                companies={this.props.companies}
-                companyToEdit={this.props.companyToEdit}
-                companyUsers={this.props.companyUsers}
-                activeCompanyId={this.props.activeCompanyId}
-                selectCompany={this.props.selectCompany}
-                editCompany={this.props.editCompany}
-                saveCompany={this.props.saveCompany}
-                deleteCompany={this.props.deleteCompany}
-                newCompany={this.props.newCompany}
-                cancelEdit={this.props.cancelEdit}
-                isLoading={this.props.isLoading}
-                activeQuery={this.props.activeQuery}
-                totalCompanies={this.props.totalCompanies}
-                fetchCompanyUsers={this.props.fetchCompanyUsers}
-                errors={this.props.errors}
-                dispatch={this.props.dispatch}
-
-            />]
+            <Companies key="Companies" />
+            ]
         );
     }
 }
@@ -76,30 +52,11 @@ CompaniesApp.propTypes = {
     dispatch: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
-    companies: state.companies.map((id) => state.companiesById[id]),
-    companyToEdit: state.companyToEdit,
-    activeCompanyId: state.activeCompanyId,
-    isLoading: state.isLoading,
-    activeQuery: state.activeQuery,
-    totalCompanies: state.totalCompanies,
-    companyOptions: state.companyOptions,
-    companiesById: state.companiesById,
-    companyUsers: state.companyUsers,
-    errors: state.errors,
-});
 
 const mapDispatchToProps = (dispatch) => ({
-    selectCompany: (id) => dispatch(selectCompany(id)),
-    editCompany: (event) => dispatch(editCompany(event)),
-    saveCompany: () => dispatch(postCompany()),
-    deleteCompany: () => dispatch(deleteCompany()),
     newCompany: (data) => dispatch(newCompany(data)),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
     fetchCompanies: () => dispatch(fetchCompanies()),
-    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
     setQuery: (query) => dispatch(setQuery(query)),
-    dispatch: dispatch,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CompaniesApp);
+export default connect(null, mapDispatchToProps)(CompaniesApp);

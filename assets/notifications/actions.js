@@ -1,4 +1,4 @@
-import { gettext, notify } from 'utils';
+import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
 
 
@@ -24,19 +24,6 @@ export function clearAllNotifications() {
 export const CLEAR_NOTIFICATION = 'CLEAR_NOTIFICATION';
 export function clearNotification(id) {
     return {type: CLEAR_NOTIFICATION, id};
-}
-
-
-function errorHandler(error) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText);
-        return;
-    }
-    error.response.json().then(function(data) {
-        notify.error(data);
-    });
 }
 
 

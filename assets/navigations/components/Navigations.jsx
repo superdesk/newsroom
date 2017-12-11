@@ -4,7 +4,15 @@ import { connect } from 'react-redux';
 import EditNavigation from './EditNavigation';
 import NavigationList from './NavigationList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
-import {setError} from '../actions';
+import {
+    cancelEdit,
+    deleteNavigation,
+    editNavigation,
+    newNavigation,
+    postNavigation,
+    selectNavigation,
+    setError,
+} from '../actions';
 import {gettext} from 'utils';
 
 class Navigations extends React.Component {
@@ -106,8 +114,24 @@ Navigations.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
+    navigations: state.navigations.map((id) => state.navigationsById[id]),
+    navigationToEdit: state.navigationToEdit,
+    activeNavigationId: state.activeNavigationId,
+    isLoading: state.isLoading,
+    activeQuery: state.activeQuery,
+    totalNavigations: state.totalNavigations,
+    errors: state.errors,
     products: state.products,
 });
 
+const mapDispatchToProps = (dispatch) => ({
+    selectNavigation: (_id) => dispatch(selectNavigation(_id)),
+    editNavigation: (event) => dispatch(editNavigation(event)),
+    saveNavigation: (type) => dispatch(postNavigation(type)),
+    deleteNavigation: (type) => dispatch(deleteNavigation(type)),
+    newNavigation: () => dispatch(newNavigation()),
+    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    dispatch: dispatch,
+});
 
-export default connect(mapStateToProps)(Navigations);
+export default connect(mapStateToProps, mapDispatchToProps)(Navigations);
