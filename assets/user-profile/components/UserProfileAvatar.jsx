@@ -10,8 +10,10 @@ function UserProfileAvatar({user}) {
             <figure className="profile__avatar initials">
                 <span className="profile__characters">{initials}</span>
             </figure>
-            <h5 className="profile__name">{`${user.first_name} ${user.last_name}`}</h5>
-            {user.username && <span className="profile__info">{user.username}</span>}
+            <div className="profile__name-container">
+                <h5 className="profile__name">{`${user.first_name} ${user.last_name}`}</h5>
+                {user.username && <span className="profile__info">{user.username}</span>}
+            </div>
         </div>
     );
 }

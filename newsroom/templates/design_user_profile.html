@@ -9,8 +9,10 @@
         <figure class="profile__avatar initials">
             <span class="profile__characters">JD</span>
         </figure>
-        <h5 class="profile__name">Jeff Dudeowsky</h5>
-        <span class="profile__info">jeffthedude</span>
+        <div class="profile__name-container">
+            <h5 class="profile__name">Jeff Dudeowsky</h5>
+            <span class="profile__info">jeffthedude</span>
+        </div>
     </div>
     <div class="profile-side-navigation__items">
         <a href="#" class="btn btn-block btn-outline-primary">My profile</a>
@@ -23,7 +25,7 @@
 
 {% block contentHeader %}
 
-<nav class="profile-nav content-bar navbar content-bar--side-padding pr-0">
+<nav class="profile-nav content-bar navbar content-bar--side-padding pr-0 d-none d-md-flex">
     <h5 class="pl-xl-4 mb-0">My profile</h5>
     <div class="content-bar__right">
         <span class="content-bar__menu">
@@ -77,7 +79,7 @@
                 </div>
             </div>
         </div>
-        <div class="profile-content__footer">
+        <div class="profile-content__footer px-xl-4">
             <input type="button" class="btn btn-outline-secondary" value="Discard changes">
             <input type="button" class="btn btn-outline-primary" value="Save changes">
         </div>
