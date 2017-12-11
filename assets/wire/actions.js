@@ -122,13 +122,13 @@ export function printItem(item) {
  */
 function search(state, next) {
     const activeFilter = get(state, 'wire.activeFilter', {});
-    const activeProducts = pickBy(get(state, 'wire.activeProducts', {}));
+    const activeNavigations = pickBy(get(state, 'wire.activeNavigation', {}));
     const createdFilter = get(state, 'wire.createdFilter', {});
 
     const params = {
         q: state.query,
         bookmarks: state.bookmarks && state.user,
-        products: !isEmpty(activeProducts) && JSON.stringify(activeProducts),
+        navigations: !isEmpty(activeNavigations) && JSON.stringify(activeNavigations),
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,

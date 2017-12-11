@@ -62,7 +62,6 @@ const initialState = {
     readItems: {},
     wire: {
         navigations: [],
-        activeProducts: {},
         activeNavigation: {},
         activeFilter: {},
         createdFilter: {},
@@ -114,11 +113,9 @@ function _wireReducer(state, action) {
     switch (action.type) {
 
     case TOGGLE_NAVIGATION: {
-        const activeProducts = {};
         const activeNavigation = {};
 
-        if (action.navigation && action.navigation.products) {
-            action.navigation.products.map((product) => activeProducts[product] = true);
+        if (action.navigation) {
             activeNavigation[action.navigation._id] = true;
         }
         return {
@@ -126,7 +123,6 @@ function _wireReducer(state, action) {
             activeFilter: {},
             createdFilter: {},
             activeNavigation,
-            activeProducts,
         };
     }
 

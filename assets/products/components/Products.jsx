@@ -136,6 +136,7 @@ const mapStateToProps = (state) => ({
     totalProducts: state.totalProducts,
     companies: state.companies,
     companiesById: state.companiesById,
+    navigations: state.navigations,
     errors: state.errors,
 });
 

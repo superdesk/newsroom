@@ -143,7 +143,6 @@ def test_search_filtered_by_users_products(client, app):
     app.data.insert('products', [{
         '_id': 10,
         'name': 'product test',
-        'product_type': 'superdesk',
         'sd_product_id': 1,
         'companies': ['1'],
         'is_enabled': True,
@@ -157,20 +156,30 @@ def test_search_filtered_by_users_products(client, app):
     assert '_aggregations' in data
 
 
-def test_search_filter_by_individual_product(client, app):
+def test_search_filter_by_individual_navigation(client, app):
+    app.data.insert('navigations', [{
+        '_id': 51,
+        'name': 'navigation-1',
+        'is_enabled': True,
+    }, {
+        '_id': 52,
+        'name': 'navigation-2',
+        'is_enabled': True,
+    }])
+
     app.data.insert('products', [{
         '_id': 10,
         'name': 'product test',
-        'product_type': 'superdesk',
         'sd_product_id': 1,
         'companies': ['1'],
+        'navigations': ['51'],
         'is_enabled': True,
     }, {
         '_id': 11,
         'name': 'product test 2',
-        'product_type': 'superdesk',
         'sd_product_id': 2,
         'companies': ['1'],
+        'navigations': ['52'],
         'is_enabled': True,
     }])
     with client.session_transaction() as session:
@@ -179,26 +188,36 @@ def test_search_filter_by_individual_product(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/search?products=%s' % json.dumps({'11': True}))
+    resp = client.get('/search?navigations=%s' % json.dumps({'51': True}))
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
 
 
 def test_search_filtered_by_query_product(client, app):
+    app.data.insert('navigations', [{
+        '_id': 51,
+        'name': 'navigation-1',
+        'is_enabled': True,
+    }, {
+        '_id': 52,
+        'name': 'navigation-2',
+        'is_enabled': True,
+    }])
+
     app.data.insert('products', [{
         '_id': 12,
         'name': 'product test',
-        'product_type': 'query',
         'query': 'headline:more',
         'companies': ['1'],
+        'navigations': ['51'],
         'is_enabled': True,
     }, {
         '_id': 13,
         'name': 'product test 2',
-        'product_type': 'query',
         'query': 'headline:Weather',
         'companies': ['1'],
+        'navigations': ['52'],
         'is_enabled': True,
     }])
 
@@ -208,7 +227,7 @@ def test_search_filtered_by_query_product(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/search?products=%s' % json.dumps({'13': True}))
+    resp = client.get('/search?navigations=%s' % json.dumps({'52': True}))
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data

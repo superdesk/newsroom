@@ -25,10 +25,6 @@ class ProductsResource(newsroom.Resource):
             'type': 'boolean',
             'default': True
         },
-        'product_type': {
-            'type': 'string',
-            'allowed': ['query', 'superdesk', 'curated']
-        },
         'navigations': {
             'type': 'list',
             'nullable': True,

@@ -47,17 +47,6 @@
 var viewData = {{ data | tojson | safe }};
 </script>
 
-    {% if setting_type == "companies" %}
-        {{ javascript_tag('companies_js') | safe }}
-    {% endif %}
-    {% if setting_type == "users" %}
-        {{ javascript_tag('users_js') | safe }}
-    {% endif %}
-    {% if setting_type == "navigations" %}
-        {{ javascript_tag('navigations_js') | safe }}
-    {% endif %}
-    {% if setting_type == "products" %}
-        {{ javascript_tag('products_js') | safe }}
-    {% endif %}
+    {{ javascript_tag('%s_js' % setting_type) | safe }}
 
 {% endblock %}

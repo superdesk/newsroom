@@ -12,7 +12,6 @@ def init(app):
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
         'name': 'Sport',
         'description': 'Top level sport product',
-        'product_type': 'superdesk',
         'is_enabled': True,
     }])
 
@@ -29,7 +28,6 @@ def test_return_search_for_products(client):
         'name': 'Breaking',
         'description': 'Breaking news',
         'is_enabled': True,
-        'product_type': 'superdesk',
         'sd_product_id': '123',
     }), content_type='application/json')
 
@@ -40,24 +38,12 @@ def test_return_search_for_products(client):
 def test_create_fails_in_validation(client):
     test_login_succeeds_for_admin(client)
     response = client.post('/products/new', data=json.dumps({
-        'name': 'Breaking',
         'description': 'Breaking news',
         'is_enabled': True,
-        'product_type': 'superdesk',
     }), content_type='application/json')
 
     assert response.status_code == 400
-    assert 'should have sd_product_id' in response.get_data(as_text=True)
-
-    response = client.post('/products/new', data=json.dumps({
-        'name': 'Breaking',
-        'description': 'Breaking news',
-        'is_enabled': True,
-        'product_type': 'query',
-    }), content_type='application/json')
-
-    assert response.status_code == 400
-    assert 'should have query' in response.get_data(as_text=True)
+    assert 'name' in response.get_data(as_text=True)
 
 
 def test_update_products(client):
@@ -66,7 +52,6 @@ def test_update_products(client):
     client.post('/products/59b4c5c61d41c8d736852fbf/',
                 data=json.dumps({'name': 'Sport',
                                  'description': 'foo',
-                                 'product_type': 'superdesk',
                                  'is_enabled': True,
                                  'sd_product_id': '123'}), content_type='application/json')
 
@@ -82,7 +67,6 @@ def test_delete_product(client):
         'description': 'Breaking news',
         'parents': '59b4c5c61d41c8d736852fbf',
         'is_enabled': True,
-        'product_type': 'query',
         'query': 'bar'
     }), content_type='application/json')
 

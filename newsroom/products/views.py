@@ -48,14 +48,6 @@ def validate_product(product):
     if not product.get('name'):
         return jsonify({'name': gettext('Name not found')}), 400
 
-    if product.get('product_type') == 'superdesk' and not product.get('sd_product_id'):
-        return jsonify({
-            'sd_product_id': gettext('Superdesk product type should have sd_product_id field populated')}), \
-               400
-
-    if product.get('product_type') == 'query' and not product.get('query'):
-        return jsonify({'query': gettext('Query product type should have query field populated')}), 400
-
 
 @blueprint.route('/products/new', methods=['POST'])
 @admin_only
@@ -84,7 +76,6 @@ def edit(id):
         'description': data.get('description'),
         'sd_product_id': data.get('sd_product_id'),
         'query': data.get('query'),
-        'product_type': data.get('product_type'),
         'is_enabled': data.get('is_enabled'),
     }
 

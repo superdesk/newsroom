@@ -10,7 +10,8 @@ function ProductListItem({product, isActive, onClick}) {
             onClick={() => onClick(product._id)}>
             <td className="name">{product.name}</td>
             <td>{(product.is_enabled ? gettext('Enabled') : gettext('Disabled'))}</td>
-            <td>{gettext(product.product_type)}</td>
+            <td>{gettext(product.sd_product_id)}</td>
+            <td>{gettext(product.query)}</td>
             <td>{shortDate(product._created)}</td>
         </tr>
     );

@@ -1,17 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TextInput from 'components/TextInput';
-import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 
 import { gettext } from 'utils';
 import EditPanel from '../../components/EditPanel';
 
-const productTypes = [
-    {value: 'query', text: gettext('Query')},
-    {value: 'superdesk', text: gettext('Superdesk')},
-    {value: 'curated', text: gettext('Curated')},
-];
 
 class EditProduct extends React.Component {
     constructor(props) {
@@ -87,27 +81,19 @@ class EditProduct extends React.Component {
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.description : null}/>
 
-                                    { this.props.product.product_type === 'superdesk' && <TextInput
+                                    <TextInput
                                         name='sd_product_id'
                                         label={gettext('Superdesk Product Id')}
                                         value={this.props.product.sd_product_id || ''}
                                         onChange={this.props.onChange}
-                                        error={this.props.errors ? this.props.errors.sd_product_id : null}/> }
+                                        error={this.props.errors ? this.props.errors.sd_product_id : null}/>
 
-                                    { this.props.product.product_type === 'query' && <TextInput
+                                    <TextInput
                                         name='query'
                                         label={gettext('Query')}
                                         value={this.props.product.query || ''}
                                         onChange={this.props.onChange}
-                                        error={this.props.errors ? this.props.errors.query : null}/> }
-
-                                    <SelectInput
-                                        name='product_type'
-                                        label={gettext('Product Type')}
-                                        value={this.props.product.product_type}
-                                        options={productTypes}
-                                        onChange={this.props.onChange}
-                                        error={this.props.errors ? this.props.errors.product_type : null}/>
+                                        error={this.props.errors ? this.props.errors.query : null}/>
 
                                     <CheckboxInput
                                         name='is_enabled'

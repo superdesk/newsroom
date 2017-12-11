@@ -30,7 +30,6 @@ export default function productReducer(state = initialState, action) {
 
     case SELECT_PRODUCT: {
         const defaultProduct = {
-            product_type: 'superdesk',
             is_enabled: true,
             name: '',
             description: '',
@@ -54,7 +53,6 @@ export default function productReducer(state = initialState, action) {
 
     case NEW_PRODUCT: {
         const productToEdit = {
-            product_type: 'superdesk',
             is_enabled: true,
             name: '',
             description: '',

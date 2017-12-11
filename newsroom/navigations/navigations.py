@@ -18,11 +18,15 @@ class NavigationsResource(newsroom.Resource):
         'is_enabled': {
             'type': 'boolean',
             'default': True
+        },
+        'order': {
+            'type': 'integer',
+            'nullable': 'true'
         }
     }
     datasource = {
         'source': 'navigations',
-        'default_sort': [('name', 1)]
+        'default_sort': [('order', 1)]
     }
     item_methods = ['GET', 'PATCH', 'DELETE']
     resource_methods = ['GET', 'POST']
@@ -56,20 +60,4 @@ def get_navigations_by_company(company_id):
     navigations = list(superdesk.get_resource_service('navigations')
                        .get(req=None, lookup={'_id': {'$in': navigation_ids}, 'is_enabled': True}))
 
-    # Create a lookup for navigations
-    navigations_dict = {str(n['_id']): n for n in navigations}
-
-    for product in products:
-        # if product doesn't belong to company then ignore it
-        # if user is not logged in then process all products
-        if company_id and company_id not in product['companies']:
-            continue
-
-        for navigation_id in product.get('navigations', []):
-            if navigation_id in navigations_dict:
-                # Add list of products to the navigations
-                navigation_products = navigations_dict[navigation_id].get('products', [])
-                navigation_products.append(str(product['_id']))
-                navigations_dict[navigation_id]['products'] = navigation_products
-
-    return list(navigations_dict.values())
+    return navigations
