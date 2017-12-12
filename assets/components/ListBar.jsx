@@ -11,7 +11,7 @@ class ListBar extends React.Component {
                     <SearchBar setQuery={this.props.setQuery} fetchItems={()=>this.props.fetch()}/>
                     <div className="content-bar__right">
                         <button
-                            className="btn btn-outline-secondary"
+                            className="btn btn-outline-secondary btn-responsive"
                             onClick={() => this.props.onNewItem()}>
                             {gettext('New {{ buttonName }}', {buttonName: this.props.buttonName})}
                         </button>
