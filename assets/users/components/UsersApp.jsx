@@ -53,10 +53,10 @@ UsersApp.propTypes = {
     dispatch: PropTypes.func,
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    newUser: (data) => dispatch(newUser(data)),
-    fetchUsers: () => dispatch(fetchUsers()),
-    setQuery: (query) => dispatch(setQuery(query)),
-});
+const mapDispatchToProps = {
+    newUser,
+    fetchUsers,
+    setQuery,
+};
 
 export default connect(null, mapDispatchToProps)(UsersApp);

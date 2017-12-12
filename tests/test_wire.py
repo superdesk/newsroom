@@ -188,7 +188,7 @@ def test_search_filter_by_individual_navigation(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/search?navigations=%s' % json.dumps({'51': True}))
+    resp = client.get('/search?navigation=51')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
@@ -227,7 +227,7 @@ def test_search_filtered_by_query_product(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/search?navigations=%s' % json.dumps({'52': True}))
+    resp = client.get('/search?navigation=52')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data

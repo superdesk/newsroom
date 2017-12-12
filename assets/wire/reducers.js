@@ -62,7 +62,7 @@ const initialState = {
     readItems: {},
     wire: {
         navigations: [],
-        activeNavigation: {},
+        activeNavigation: null,
         activeFilter: {},
         createdFilter: {},
         activeView: EXTENDED_VIEW,
@@ -113,11 +113,8 @@ function _wireReducer(state, action) {
     switch (action.type) {
 
     case TOGGLE_NAVIGATION: {
-        const activeNavigation = {};
+        const activeNavigation = action.navigation && action.navigation._id;
 
-        if (action.navigation) {
-            activeNavigation[action.navigation._id] = true;
-        }
         return {
             ...state,
             activeFilter: {},

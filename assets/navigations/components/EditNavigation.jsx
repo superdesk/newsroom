@@ -97,6 +97,7 @@ class EditNavigation extends React.Component {
                             <table className='table'>
                                 <tbody>
                                     {this.props.products.map((product) => (
+                                        product.navigations.includes(this.props.navigation._id) &&
                                         <tr key={product._id}>
                                             <td>{product.name}</td>
                                             <td>{product.description}</td>

@@ -53,10 +53,10 @@ CompaniesApp.propTypes = {
 };
 
 
-const mapDispatchToProps = (dispatch) => ({
-    newCompany: (data) => dispatch(newCompany(data)),
-    fetchCompanies: () => dispatch(fetchCompanies()),
-    setQuery: (query) => dispatch(setQuery(query)),
-});
+const mapDispatchToProps = {
+    newCompany,
+    fetchCompanies,
+    setQuery,
+};
 
 export default connect(null, mapDispatchToProps)(CompaniesApp);

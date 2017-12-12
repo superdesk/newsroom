@@ -1,5 +1,5 @@
 
-import { get, isEmpty, pickBy } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import server from 'server';
 import { gettext, notify, updateRouteParams, now } from 'utils';
 import { markItemAsRead } from './utils';
@@ -122,13 +122,13 @@ export function printItem(item) {
  */
 function search(state, next) {
     const activeFilter = get(state, 'wire.activeFilter', {});
-    const activeNavigations = pickBy(get(state, 'wire.activeNavigation', {}));
+    const activeNavigation = get(state, 'wire.activeNavigation');
     const createdFilter = get(state, 'wire.createdFilter', {});
 
     const params = {
         q: state.query,
         bookmarks: state.bookmarks && state.user,
-        navigations: !isEmpty(activeNavigations) && JSON.stringify(activeNavigations),
+        navigation: activeNavigation,
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,

@@ -36,10 +36,10 @@ NavigationsApp.propTypes = {
     setQuery: PropTypes.func,
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    newNavigation: () => dispatch(newNavigation()),
-    fetchNavigations: () => dispatch(fetchNavigations()),
-    setQuery: (query) => dispatch(setQuery(query)),
-});
+const mapDispatchToProps = {
+    newNavigation,
+    fetchNavigations,
+    setQuery,
+};
 
 export default connect(null, mapDispatchToProps)(NavigationsApp);

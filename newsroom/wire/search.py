@@ -150,14 +150,14 @@ class WireSearchService(newsroom.Service):
         if req.args.get('bookmarks'):
             _set_bookmarks_query(query, req.args['bookmarks'])
 
-        if req.args.get('navigations'):
+        if req.args.get('navigation'):
             if company:
                 products = get_products_by_company(company['_id'])
-                navigation_ids = set(json.loads(req.args.get('navigations', [])))
+                navigation_id = req.args['navigation']
                 selected_products = []
 
                 for product in products:
-                    if len(set(product.get('navigations', [])).intersection(navigation_ids)) > 0:
+                    if navigation_id in product.get('navigations', []):
                         if product and product.get('query'):
                             query['bool']['must'].append(_query_string(product.get('query')))
                         if product and product.get('sd_product_id'):

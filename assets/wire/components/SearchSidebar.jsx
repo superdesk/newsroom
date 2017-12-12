@@ -97,17 +97,15 @@ class SearchSidebar extends React.Component {
 }
 
 function NavigationTab({navigations, activeNavigation, toggleNavigation}) {
-    const isActive = (navigation) => !!activeNavigation[navigation._id];
-    const isAllActive = !Object.keys(activeNavigation).find((key) => !!activeNavigation[key]);
     return [
         <NavLink key="all"
-            isActive={isAllActive}
+            isActive={!activeNavigation}
             onClick={(event) => toggleNavigation(event)}
             label={gettext('All')}
         />
     ].concat(navigations.map((navigation) => (
         <NavLink key={navigation.name}
-            isActive={isActive(navigation)}
+            isActive={activeNavigation === navigation._id}
             onClick={(event) => toggleNavigation(event, navigation)}
             label={navigation.name}
         />
@@ -116,7 +114,7 @@ function NavigationTab({navigations, activeNavigation, toggleNavigation}) {
 
 NavigationTab.propTypes = {
     navigations: PropTypes.arrayOf(PropTypes.object),
-    activeNavigation: PropTypes.object,
+    activeNavigation: PropTypes.string,
     toggleNavigation: PropTypes.func.isRequired,
 };
 
@@ -158,7 +156,7 @@ SearchSidebar.propTypes = {
     navigations: PropTypes.array.isRequired,
     aggregations: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
-    activeNavigation: PropTypes.object,
+    activeNavigation: PropTypes.string,
     activeFilter: PropTypes.object,
     newItemsByTopic: PropTypes.object,
     createdFilter: PropTypes.object.isRequired,

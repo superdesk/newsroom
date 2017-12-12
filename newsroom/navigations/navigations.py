@@ -26,7 +26,7 @@ class NavigationsResource(newsroom.Resource):
     }
     datasource = {
         'source': 'navigations',
-        'default_sort': [('order', 1)]
+        'default_sort': [('order', 1), ('name', 1)]
     }
     item_methods = ['GET', 'PATCH', 'DELETE']
     resource_methods = ['GET', 'POST']

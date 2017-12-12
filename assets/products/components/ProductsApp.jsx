@@ -52,10 +52,10 @@ ProductsApp.propTypes = {
     dispatch: PropTypes.func,
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    fetchProducts: () => dispatch(fetchProducts()),
-    setQuery: (query) => dispatch(setQuery(query)),
-    newProduct: () => dispatch(newProduct()),
-});
+const mapDispatchToProps = {
+    fetchProducts,
+    setQuery,
+    newProduct,
+};
 
 export default connect(null, mapDispatchToProps)(ProductsApp);
