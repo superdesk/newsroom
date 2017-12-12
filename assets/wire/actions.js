@@ -1,5 +1,5 @@
 
-import { get, isEmpty, pickBy } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import server from 'server';
 import { gettext, notify, updateRouteParams, now } from 'utils';
 import { markItemAsRead } from './utils';
@@ -122,13 +122,13 @@ export function printItem(item) {
  */
 function search(state, next) {
     const activeFilter = get(state, 'wire.activeFilter', {});
-    const activeService = pickBy(get(state, 'wire.activeService', {}));
+    const activeNavigation = get(state, 'wire.activeNavigation');
     const createdFilter = get(state, 'wire.createdFilter', {});
 
     const params = {
         q: state.query,
         bookmarks: state.bookmarks && state.user,
-        service: !isEmpty(activeService) && JSON.stringify(activeService),
+        navigation: activeNavigation,
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
@@ -412,15 +412,15 @@ export function fetchNext(item) {
     };
 }
 
-export const TOGGLE_SERVICE = 'TOGGLE_SERVICE';
-function _toggleService(service) {
-    return {type: TOGGLE_SERVICE, service};
+export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
+function _toggleNavigation(navigation) {
+    return {type: TOGGLE_NAVIGATION, navigation};
 }
 
-export function toggleService(service) {
+export function toggleNavigation(navigation) {
     return (dispatch) => {
         dispatch(setQuery(''));
-        dispatch(_toggleService(service));
+        dispatch(_toggleNavigation(navigation));
         return dispatch(fetchItems());
     };
 }
@@ -512,7 +512,7 @@ export function resetFilter(filter) {
  */
 export function setTopicQuery(topic) {
     return (dispatch) => {
-        dispatch(_toggleService());
+        dispatch(_toggleNavigation());
         dispatch(setQuery(topic.query || ''));
         dispatch(_resetFilter(topic.filter));
         dispatch(_setCreatedFilter(topic.created));

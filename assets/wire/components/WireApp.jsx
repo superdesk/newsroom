@@ -26,7 +26,7 @@ import {
 
 import Preview from './Preview';
 import ItemsList from './ItemsList';
-import SearchBar from './SearchBar';
+import SearchBar from '../../components/SearchBar';
 import SearchResultsInfo from './SearchResultsInfo';
 import SearchSidebar from './SearchSidebar';
 import SelectedItemsBar from './SelectedItemsBar';

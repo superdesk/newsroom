@@ -10,6 +10,7 @@ from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
 from flask_babel import gettext
 
+from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.wire import blueprint
 from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
@@ -38,7 +39,7 @@ def get_view_data():
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': get_user_topics(user['_id']) if user else [],
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()],
-        'services': get_services(user),
+        'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None),
     }
 
 

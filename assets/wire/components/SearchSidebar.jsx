@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { gettext } from 'utils';
 
 import {
-    toggleService,
+    toggleNavigation,
     toggleFilter,
     resetFilter,
     setTopicQuery,
@@ -25,14 +25,14 @@ class SearchSidebar extends React.Component {
             {label: gettext('Filters'), content: FiltersTab},
         ];
         this.state = {active: this.tabs[0]};
-        this.toggleService = this.toggleService.bind(this);
+        this.toggleNavigation = this.toggleNavigation.bind(this);
         this.toggleFilter = this.toggleFilter.bind(this);
         this.resetFilter = this.resetFilter.bind(this);
     }
 
-    toggleService(event, service) {
+    toggleNavigation(event, navigation) {
         event.preventDefault();
-        this.props.dispatch(toggleService(service));
+        this.props.dispatch(toggleNavigation(navigation));
     }
 
     toggleFilter(event, field, value, single) {
@@ -64,9 +64,9 @@ class SearchSidebar extends React.Component {
                 <div className='tab-content' key={gettext('Navigation')}>
                     <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[0]})} role='tabpanel'>
                         <NavigationTab
-                            services={this.props.services}
-                            activeService={this.props.activeService}
-                            toggleService={this.toggleService}
+                            navigations={this.props.navigations}
+                            activeNavigation={this.props.activeNavigation}
+                            toggleNavigation={this.toggleNavigation}
                         />
                         {this.props.topics.length && <span className='wire-column__nav__divider'></span>}
                         <TopicsTab
@@ -82,8 +82,6 @@ class SearchSidebar extends React.Component {
                 <div className='tab-content' key={gettext('Filters')}>
                     <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[1]})} role='tabpanel'>
                         <FiltersTab
-                            services={this.props.services}
-                            activeService={this.props.activeService}
                             activeFilter={this.props.activeFilter}
                             aggregations={this.props.aggregations}
                             toggleFilter={this.toggleFilter}
@@ -98,31 +96,26 @@ class SearchSidebar extends React.Component {
     }
 }
 
-function NavigationTab({services, activeService, toggleService}) {
-    const isActive = (service) => !!activeService[service.code];
-    const isAllActive = !Object.keys(activeService).find((key) => !!activeService[key]);
+function NavigationTab({navigations, activeNavigation, toggleNavigation}) {
     return [
         <NavLink key="all"
-            isActive={isAllActive}
-            onClick={(event) => toggleService(event)}
+            isActive={!activeNavigation}
+            onClick={(event) => toggleNavigation(event)}
             label={gettext('All')}
         />
-    ].concat(services.map((service) => (
-        <NavLink key={service.name}
-            isActive={isActive(service)}
-            onClick={(event) => toggleService(event, service)}
-            label={service.name}
+    ].concat(navigations.map((navigation) => (
+        <NavLink key={navigation.name}
+            isActive={activeNavigation === navigation._id}
+            onClick={(event) => toggleNavigation(event, navigation)}
+            label={navigation.name}
         />
     )));
 }
 
 NavigationTab.propTypes = {
-    services: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        code: PropTypes.string.isRequired,
-    })),
-    activeService: PropTypes.object,
-    toggleService: PropTypes.func.isRequired,
+    navigations: PropTypes.arrayOf(PropTypes.object),
+    activeNavigation: PropTypes.string,
+    toggleNavigation: PropTypes.func.isRequired,
 };
 
 function TopicsTab({topics, dispatch, query, activeFilter, createdFilter, newItemsByTopic}) {
@@ -160,10 +153,10 @@ SearchSidebar.propTypes = {
     topics: PropTypes.array.isRequired,
     bookmarkedItems: PropTypes.array.isRequired,
     itemsById: PropTypes.object.isRequired,
-    services: PropTypes.array.isRequired,
+    navigations: PropTypes.array.isRequired,
     aggregations: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
-    activeService: PropTypes.object,
+    activeNavigation: PropTypes.string,
     activeFilter: PropTypes.object,
     newItemsByTopic: PropTypes.object,
     createdFilter: PropTypes.object.isRequired,
@@ -172,8 +165,8 @@ SearchSidebar.propTypes = {
 const mapStateToProps = (state) => ({
     bookmarkedItems: state.bookmarkedItems || [],
     itemsById: state.itemsById,
-    services: state.wire.services,
-    activeService: state.wire.activeService,
+    navigations: state.wire.navigations,
+    activeNavigation: state.wire.activeNavigation,
     activeFilter: state.wire.activeFilter,
     aggregations: state.aggregations,
     newItemsByTopic: state.newItemsByTopic,

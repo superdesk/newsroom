@@ -19,12 +19,6 @@ def init(app):
     }])
 
 
-def test_company_list_fails_for_anonymous_user(client):
-    response = client.get('/companies')
-    assert response.status_code == 403
-    assert b'403 Forbidden' in response.data
-
-
 def test_login_succeeds_for_admin(client):
     response = client.post(
         url_for('auth.login'),

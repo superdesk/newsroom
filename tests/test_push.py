@@ -218,9 +218,6 @@ def test_notify_checks_service_subscriptions(client, app, mocker):
         '_id': 1,
         'name': 'Press co.',
         'is_enabled': True,
-        'services': {
-            'a': True
-        }
     }])
 
     user_ids = app.data.insert('users', [{

@@ -12,6 +12,8 @@ const userTypes = [
     {value: 'public', text: gettext('Public')},
 ];
 
+const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
+
 function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose, onDelete}) {
     return (
         <div className='list-item__preview'>
@@ -71,7 +73,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         label={gettext('Company')}
                         value={user.company}
                         defaultOption={''}
-                        options={companies}
+                        options={getCompanyOptions(companies)}
                         onChange={onChange}
                         error={errors ? errors.company : null} />
 
@@ -104,11 +106,11 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={gettext('Save')}
                         onClick={onSave} />
 
-                    <input
+                    {user._id && <input
                         type='button'
                         className='btn btn-outline-primary'
                         value={gettext('Delete')}
-                        onClick={onDelete} />
+                        onClick={onDelete} />}
                 </div>
 
 

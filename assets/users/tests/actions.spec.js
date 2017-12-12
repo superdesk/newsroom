@@ -4,8 +4,8 @@ import thunk from 'redux-thunk';
 
 import fetchMock from 'fetch-mock';
 
-import wireApp from '../reducers';
-import * as actions from '../actions';
+import wireApp from 'users/reducers';
+import * as actions from 'users/actions';
 
 describe('fetch actions', () => {
     let store;
@@ -22,12 +22,12 @@ describe('fetch actions', () => {
     });
 
     it('can fetch users', () => {
-        const promise = store.dispatch(actions.fetchItems('users'))
+        const promise = store.dispatch(actions.fetchUsers())
             .then(() => {
                 const state = store.getState();
                 expect(state.isLoading).toBe(false);
-                expect(state.items).toEqual(['foo']);
-                expect(state.itemsById).toEqual({'foo': {_id: 'foo'}});
+                expect(state.users).toEqual(['foo']);
+                expect(state.usersById).toEqual({'foo': {_id: 'foo'}});
             });
         expect(store.getState().isLoading).toBe(true);
         return promise;

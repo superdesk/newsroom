@@ -16,13 +16,14 @@ from flask import jsonify, current_app as app
 import re
 
 
-@blueprint.route('/settings', methods=['GET'])
+@blueprint.route('/settings/users', methods=['GET'])
 @admin_only
 def settings():
     data = {
-        'services': app.config['SERVICES'],
+        'users': list(query_resource('users', max_results=200)),
+        "companies": list(query_resource('companies', max_results=200)),
     }
-    return flask.render_template('settings.html', data=data)
+    return flask.render_template('settings.html', setting_type="users", data=data)
 
 
 def get_view_data():

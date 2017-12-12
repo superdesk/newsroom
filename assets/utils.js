@@ -271,3 +271,23 @@ export function initWebSocket(store, action) {
         };
     }
 }
+
+/**
+ * Generic error handler for http requests
+ * @param error
+ * @param dispatch
+ * @param setError
+ */
+export function errorHandler(error, dispatch, setError) {
+    console.error('error', error);
+
+    if (error.response.status !== 400) {
+        notify.error(error.response.statusText);
+        return;
+    }
+    if (setError) {
+        error.response.json().then(function(data) {
+            dispatch(setError(data));
+        });
+    }
+}

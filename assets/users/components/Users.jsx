@@ -3,8 +3,19 @@ import PropTypes from 'prop-types';
 import EditUser from './EditUser';
 import UsersList from './UsersList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
-import {setError} from 'settings/actions';
+import {
+    deleteUser,
+    editUser,
+    newUser,
+    postUser,
+    resetPassword,
+    selectUser,
+    setError,
+    cancelEdit
+} from '../actions';
 import {gettext} from 'utils';
+import {connect} from 'react-redux';
+
 
 class Users extends React.Component {
     constructor(props, context) {
@@ -75,7 +86,7 @@ class Users extends React.Component {
                         user={this.props.userToEdit}
                         onChange={this.props.editUser}
                         errors={this.props.errors}
-                        companies={this.props.companyOptions}
+                        companies={this.props.companies}
                         onSave={this.save}
                         onResetPassword={this.props.resetPassword}
                         onClose={this.props.cancelEdit}
@@ -101,10 +112,33 @@ Users.propTypes = {
     isLoading: PropTypes.bool,
     activeQuery: PropTypes.string,
     totalUsers: PropTypes.number,
-    companyOptions: PropTypes.arrayOf(PropTypes.object),
+    companies: PropTypes.arrayOf(PropTypes.object),
     companiesById: PropTypes.object,
     errors: PropTypes.object,
     dispatch: PropTypes.func,
 };
 
-export default Users;
+const mapStateToProps = (state) => ({
+    users: state.users.map((id) => state.usersById[id]),
+    userToEdit: state.userToEdit,
+    activeUserId: state.activeUserId,
+    isLoading: state.isLoading,
+    activeQuery: state.activeQuery,
+    totalUsers: state.totalUsers,
+    companies: state.companies,
+    companiesById: state.companiesById,
+    errors: state.errors,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    selectUser: (_id) => dispatch(selectUser(_id)),
+    editUser: (event) => dispatch(editUser(event)),
+    saveUser: (type) => dispatch(postUser(type)),
+    deleteUser: (type) => dispatch(deleteUser(type)),
+    newUser: (data) => dispatch(newUser(data)),
+    resetPassword: () => dispatch(resetPassword()),
+    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    dispatch: dispatch,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Users);

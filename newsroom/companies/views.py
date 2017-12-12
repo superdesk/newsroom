@@ -7,17 +7,19 @@ from werkzeug.exceptions import NotFound
 from superdesk import get_resource_service
 from flask_babel import gettext
 from newsroom.auth.decorator import admin_only, login_required
-from flask import jsonify
+from flask import jsonify, current_app as app
 import re
 
 
-@blueprint.route('/companies', methods=['GET'])
+@blueprint.route('/settings/companies', methods=['GET'])
 @admin_only
-def index():
-    companies = list(query_resource('companies', max_results=50))
-    return flask.render_template(
-        'companies.html',
-        companies=companies)
+def settings():
+    data = {
+        'companies': list(query_resource('companies', max_results=200)),
+        'services': app.config['SERVICES'],
+        'products': list(query_resource('products', max_results=200)),
+    }
+    return flask.render_template('settings.html', setting_type="companies", data=data)
 
 
 @blueprint.route('/companies/search', methods=['GET'])
@@ -27,7 +29,7 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'name': regex}
-    companies = list(query_resource('companies', lookup=lookup, max_results=50))
+    companies = list(query_resource('companies', lookup=lookup, max_results=200))
     return jsonify(companies), 200
 
 
@@ -57,14 +59,6 @@ def edit(id):
                                                     updates=form.data)
             return jsonify({'success': True}), 200
         return jsonify(form.errors), 400
-
-
-@blueprint.route('/companies/<id>/services', methods=['POST'])
-@admin_only
-def update_services(id):
-    updates = flask.request.get_json()
-    get_resource_service('companies').patch(id=ObjectId(id), updates=updates)
-    return jsonify({'success': True}), 200
 
 
 @blueprint.route('/companies/<id>', methods=['DELETE'])

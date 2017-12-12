@@ -4,7 +4,15 @@ import { connect } from 'react-redux';
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
-import {setError, saveServices} from 'settings/actions';
+import {
+    cancelEdit,
+    deleteCompany,
+    editCompany,
+    fetchCompanyUsers,
+    postCompany,
+    selectCompany,
+    setError,
+} from '../actions';
 import {gettext} from 'utils';
 
 class Companies extends React.Component {
@@ -81,8 +89,7 @@ class Companies extends React.Component {
                         onDelete={this.deleteCompany}
                         users={this.props.companyUsers}
                         fetchCompanyUsers={this.props.fetchCompanyUsers}
-                        services={this.props.services}
-                        saveServices={this.props.saveServices}
+                        products={this.props.products}
                     />
                 }
             </div>
@@ -107,16 +114,33 @@ Companies.propTypes = {
     fetchCompanyUsers: PropTypes.func,
     errors: PropTypes.object,
     dispatch: PropTypes.func,
-    services: PropTypes.array,
-    saveServices: PropTypes.func.isRequired,
+    products: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
-    services: state.services,
+    companies: state.companies.map((id) => state.companiesById[id]),
+    companyToEdit: state.companyToEdit,
+    activeCompanyId: state.activeCompanyId,
+    isLoading: state.isLoading,
+    products: state.products,
+    activeQuery: state.activeQuery,
+    totalCompanies: state.totalCompanies,
+    companyOptions: state.companyOptions,
+    companiesById: state.companiesById,
+    companyUsers: state.companyUsers,
+    errors: state.errors,
 });
 
+
 const mapDispatchToProps = (dispatch) => ({
-    saveServices: (services) => dispatch(saveServices(services)),
+    selectCompany: (id) => dispatch(selectCompany(id)),
+    editCompany: (event) => dispatch(editCompany(event)),
+    saveCompany: () => dispatch(postCompany()),
+    deleteCompany: () => dispatch(deleteCompany()),
+    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
+    dispatch: dispatch,
 });
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(Companies);
