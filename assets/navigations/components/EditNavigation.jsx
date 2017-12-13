@@ -30,11 +30,11 @@ class EditNavigation extends React.Component {
                     <button
                         id='hide-sidebar'
                         type='button'
-                        className='close'
+                        className='icon-button'
                         data-dismiss='modal'
                         aria-label='Close'
                         onClick={this.props.onClose}>
-                        <span aria-hidden='true'>&times;</span>
+                        <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>
                 </div>
 

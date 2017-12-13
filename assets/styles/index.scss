@@ -261,6 +261,12 @@ article.list {
     flex-grow: 1;
     overflow-y: auto;
 }
+.settings-inner {
+    flex-direction: column;
+    @include md {
+        flex-direction: row;
+    }
+}
 
 .profile-container {
     position: absolute;
@@ -345,19 +351,36 @@ article.list {
     z-index: 1001;
 }
 .content-bar--side-padding {
-    padding: 0 20px;
+    padding: 0 10px;
+    @include sm {
+        padding: 0 20px;
+    }
 }
 
 .side-navigation {
-    width: 220px;
-    overflow: hidden;
+    width: auto;    
     overflow-y: auto;
     border-right: 1px solid $gray-light;
-    background-color: white;
+    border-bottom: 1px solid $gray-light;
+    background-color: white;    
     ul {
         list-style: none;
         margin: 0;
         padding: 0;
+        display: flex;
+        @include md {
+            flex-direction: column;
+        }
+        li {
+            flex-grow: 1;
+            display: flex;            
+            @include sm {
+                flex-direction: column;                
+            }
+        }
+    }
+    @include md {
+        width: 220px;
     }
 }
 .side-navigation__btn {
@@ -371,8 +394,9 @@ article.list {
     line-height: 150%;
     text-decoration: none;
     background-color: rgba(94,169,200,0);
-    padding: 20px;
+    padding: 16px;
     transition: background-color .2s ease-out,color .1s ease-out;
+    text-align: center;
     &:hover {
         background-color: #f1f1f1;
         color: $body-text;
@@ -381,6 +405,12 @@ article.list {
     &.active {
         background-color: #f1f1f1;
         color: $main-blue;
+    }
+    @include sm {
+        padding: 20px;
+    }
+    @include md {
+        text-align: left;        
     }
 }
 .list-items-container {
@@ -394,14 +424,25 @@ article.list {
     background-color: #ccc;
 }
 .list-item__preview {
-    width: 460px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     overflow: hidden;
     overflow-y: auto;
-    border-left: 2px solid $gray-mid;
     background-color: white;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    border: none;
+    z-index: 81;
+    @include lg {
+        width: 420px;
+        border-left: 2px solid $gray-mid;
+        position: static;
+        z-index: auto;
+    }
     form {
         display: flex;
         flex-direction: column;
@@ -431,7 +472,7 @@ article.list {
                 color: #9b9b9b;
                 text-transform: uppercase;
                 letter-spacing: 0.1em;
-                padding: 1rem 2rem;
+                padding: 1rem 1.6rem;
                 &.active, &.active:hover {
                     font-weight: 500;
                     color: $body-text;
@@ -460,13 +501,23 @@ article.list {
     }
 }
 .list-item__preview-header {
-    padding: 25px 20px;
+    padding: 20px;
     display: flex;
     justify-content: space-between;
+    position: relative;
     h3 {
         font-size: 20px;
         font-weight: 700;
         margin-bottom: 0;
+    }
+    .icon-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        @include sm {
+            //padding: 25px 20px;
+            //position: static;
+        }
     }
 }
 .list-item__preview-form {
@@ -481,21 +532,33 @@ article.list {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 20px;
+    padding: 15px;
     border-top: 1px solid #ddd;
     .btn {
+        padding: 0.4rem 0.6rem;
+        flex: 1 0 auto;
+        @include sm {
+            padding: 0.5rem 1rem;
+            flex: 0 1 auto;
+        }
         + .btn {
             margin-left: 12px;
         }
+    }
+    @include sm {
+        padding: 20px;
     }
 }
 
 .search {
     flex-wrap: nowrap;
+    flex: 1 1 0%;
+    @include sm {
+        flex: 1 1 auto;
+    }
     @include lg {
         flex-wrap: wrap;
     }
-    flex: 1 1 auto;
     + .content-bar__right {
         margin-left: 0;
         @include sm {
@@ -505,7 +568,7 @@ article.list {
 }
 
 .search__form {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     margin: 0 10px;
     form {
         flex: 1 1 auto;
@@ -516,6 +579,9 @@ article.list {
             background: #fff;
             box-shadow: inset 0 0px 2px rgba(0, 0, 0, 0.15);
         }
+    }
+    @include sm {
+        flex: 1 1 auto;
     }
 }
 
