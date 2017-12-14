@@ -984,6 +984,15 @@ article.list {
     .icon--gray-light {
         color: #dedede !important;
     }
+    .wire-articles__item--list__actions {
+        .btn-group {
+            &:hover {
+                > span > [class^="icon--"], [class*=" icon--"] {
+                    color: $body-text !important;
+                }
+            }
+        }
+    }
 }
 
 .wire-articles__item.wire-articles__item--selected {
