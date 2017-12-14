@@ -32,15 +32,15 @@
                 {% block breadcrumb %}{% endblock %}
             </nav>
         </div>
-
+        
         {% if session.get('name') %}
-        <div class="form-inline my-lg-0 ml-auto p-1 pr-3 p-sm-2">
+        <div class="form-inline my-lg-0 ml-auto pr-2 pr-sm-3">
             <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ gettext('Logout') }}</a>
             <div class="notif" id="header-notification"></div>
             <div id="header-profile-toggle"></div>
         </div>
         {% else %}
-        <div class="form-inline my-lg-0 ml-auto p-1 pr-sm-3 p-sm-2">
+        <div class="form-inline my-lg-0 ml-auto pr-2 pr-sm-3">
             <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             <a class="nav-link"href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
         </div>
