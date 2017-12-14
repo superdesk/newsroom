@@ -45,6 +45,10 @@ class WireListItem extends React.Component {
         }
     }
 
+    stopPropagation(event) {
+        event.stopPropagation();
+    }
+
     render() {
         const {item, onClick, onDoubleClick, isExtended} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12');
@@ -70,7 +74,7 @@ class WireListItem extends React.Component {
                     <div className='wire-articles__item--list__text'>
 
                         <h4 className='wire-articles__item--list__headline'>
-                            <div className='no-bindable-select wire-articles__item--list__select'>
+                            <div className='no-bindable-select wire-articles__item--list__select' onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
                                     <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
                                     <i></i>
@@ -124,7 +128,7 @@ class WireListItem extends React.Component {
                         </div>
                     )}
 
-                    <div className='wire-articles__item--list__actions'>
+                    <div className='wire-articles__item--list__actions' onClick={this.stopPropagation}>
                         <div className='btn-group'>
                             <span onClick={(event) => this.props.onActionList(event, this.props.item)}>
                                 <i className='icon--more icon--gray-light'></i>
