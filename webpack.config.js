@@ -20,6 +20,7 @@ module.exports = {
             'bootstrap',
             'classnames',
             'lodash',
+            'moment',
             'prop-types',
             'react',
             'react-dom',

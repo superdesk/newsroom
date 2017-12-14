@@ -1,12 +1,11 @@
 
-import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-
 import fetchMock from 'fetch-mock';
+import { createStore, applyMiddleware } from 'redux';
 
 import wireApp from '../reducers';
 import * as actions from '../actions';
-import { now } from 'utils';
+import { getTimezoneOffset, now } from 'utils';
 
 describe('wire actions', () => {
     let store;
@@ -16,7 +15,7 @@ describe('wire actions', () => {
     };
 
     beforeEach(() => {
-        now.getTimezoneOffset = () => ''; // it doesn't work with jasmine.createSpy :/
+        spyOn(now, 'utcOffset').and.returnValue('');
         fetchMock.get('/search?', response);
         fetchMock.get('/search?q=foo', response);
         store = createStore(wireApp, applyMiddleware(thunk));
@@ -26,8 +25,8 @@ describe('wire actions', () => {
         fetchMock.restore();
     });
 
-    it('test now.getTimezoneOffset mock', () => {
-        expect(now.getTimezoneOffset()).toBe('');
+    it('test getTimezoneOffset mock', () => {
+        expect(getTimezoneOffset()).toBe(0);
     });
 
     it('can fetch items', () => {
