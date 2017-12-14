@@ -1,7 +1,7 @@
 
 import { get, isEmpty } from 'lodash';
 import server from 'server';
-import { gettext, notify, updateRouteParams, now } from 'utils';
+import { gettext, notify, updateRouteParams, getTimezoneOffset } from 'utils';
 import { markItemAsRead } from './utils';
 import { renderModal, closeModal } from 'actions';
 
@@ -133,7 +133,7 @@ function search(state, next) {
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to: createdFilter.to,
-        timezone_offset: now.getTimezoneOffset(),
+        timezone_offset: getTimezoneOffset(),
     };
 
     const queryString = Object.keys(params)
@@ -184,7 +184,7 @@ export function submitFollowTopic(data) {
     return (dispatch, getState) => {
         const user = getState().user;
         const url = `/api/users/${user}/topics`;
-        data.timezone_offset = now.getTimezoneOffset();
+        data.timezone_offset = getTimezoneOffset();
         return server.post(url, data)
             .then((updates) => dispatch(addTopic(Object.assign(data, updates))))
             .then(() => dispatch(closeModal()))

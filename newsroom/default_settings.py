@@ -152,3 +152,6 @@ SERVICES = [
     # {"name": "Advisories", "code": "v"},
     # {"name": "Special Events (olympics/ Aus elections)", "code": "x"},
 ]
+
+CLIENT_TIME_FORMAT = 'HH:mm'
+CLIENT_DATE_FORMAT = 'DD/MM/YYYY'

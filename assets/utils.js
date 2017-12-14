@@ -1,15 +1,17 @@
 import React from 'react';
+import { get } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
+import moment from 'moment';
 
-/**
- * To enable some mocking in tests
- */
-export const now = new Date();
+export const now = moment(); // to enable mocking in tests
+const TIME_FORMAT = getConfig('time_format');
+const DATE_FORMAT = getConfig('date_format');
+const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
 
 /**
  * Create redux store with default middleware
@@ -74,7 +76,7 @@ export function gettext(text, params) {
  * @return {Date}
  */
 function parseDate(dateString) {
-    return new Date(dateString);
+    return moment(dateString);
 }
 
 /**
@@ -84,8 +86,8 @@ function parseDate(dateString) {
  * @return {String}
  */
 export function shortDate(dateString) {
-    const date = parseDate(dateString);
-    return isToday(date) ? date.toLocaleTimeString() : date.toLocaleDateString();
+    const parsed = parseDate(dateString);
+    return parsed.format(isToday(parsed) ? TIME_FORMAT : DATE_FORMAT);
 }
 
 /**
@@ -95,7 +97,7 @@ export function shortDate(dateString) {
  * @return {String}
  */
 export function getLocaleDate(dateString) {
-    return parseDate(dateString).toLocaleDateString();
+    return parseDate(dateString).format(DATETIME_FORMAT);
 }
 
 /**
@@ -105,9 +107,7 @@ export function getLocaleDate(dateString) {
  * @return {Boolean}
  */
 function isToday(date) {
-    return date.getUTCDate() === now.getUTCDate() &&
-        date.getUTCMonth() === now.getUTCMonth() &&
-        date.getUTCDate() === now.getUTCDate();
+    return date.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
 }
 
 /**
@@ -117,8 +117,7 @@ function isToday(date) {
  * @return {String}
  */
 export function fullDate(dateString) {
-    const date = parseDate(dateString);
-    return date.toLocaleString();
+    return parseDate(dateString).format(DATETIME_FORMAT);
 }
 
 /**
@@ -128,8 +127,7 @@ export function fullDate(dateString) {
  * @return {String}
  */
 export function formatTime(dateString) {
-    const date = parseDate(dateString);
-    return date.toLocaleTimeString([], {hour12: false, hour: '2-digit', minute:'2-digit'});
+    return parseDate(dateString).format(TIME_FORMAT);
 }
 
 /**
@@ -139,8 +137,7 @@ export function formatTime(dateString) {
  * @return {String}
  */
 export function formatDate(dateString) {
-    const date = parseDate(dateString);
-    return date.toLocaleDateString();
+    return parseDate(dateString).format(DATE_FORMAT);
 }
 
 /**
@@ -290,4 +287,19 @@ export function errorHandler(error, dispatch, setError) {
             dispatch(setError(data));
         });
     }
+}
+
+/**
+ * Get config value
+ *
+ * @param {String} key
+ * @param {Mixed} defaultValue
+ * @return {Mixed}
+ */
+export function getConfig(key, defaultValue) {
+    return get(window.newsroom, key, defaultValue);
+}
+
+export function getTimezoneOffset() {
+    return now.utcOffset() ? now.utcOffset() * -1 : 0; // it's oposite to Date.getTimezoneOffset
 }
