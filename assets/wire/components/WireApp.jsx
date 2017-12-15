@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import { get } from 'lodash';
+import { createPortal } from 'react-dom';
 
 import {
     followTopic,
@@ -23,6 +24,8 @@ import {
     printItem,
     previewItem,
 } from 'wire/actions';
+
+import { getActiveQuery, isTopicActive } from 'wire/utils';
 
 import Preview from './Preview';
 import ItemsList from './ItemsList';
@@ -63,6 +66,20 @@ class WireApp extends React.Component {
         }
     }
 
+    renderNavBreadcrumb(navigations, activeNavigation, activeTopic) {
+        const dest = document.getElementById('nav-breadcrumb');
+        if (!dest) {
+            return null;
+        }
+
+        let name = get(navigations.find((nav) => nav._id === activeNavigation), 'name', '');
+        if (!name && activeTopic) {
+            name = activeTopic.label;
+        }
+
+        return createPortal(name , dest);
+    }
+
     toggleSidebar(event) {
         event.preventDefault();
         this.setState({withSidebar: !this.state.withSidebar});
@@ -93,13 +110,17 @@ class WireApp extends React.Component {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,
         });
+
+        const searchCriteria = getActiveQuery(this.props.activeQuery, this.props.activeFilter, this.props.createdFilter);
+        const activeTopic = this.props.topics.find((topic) => isTopicActive(topic, searchCriteria));
+
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
                 onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
-            />, modal] : [
+            />] : [
                 <section key="contentHeader" className='content-header'>
                     {this.props.selectedItems && this.props.selectedItems.length > 0 &&
                         <SelectedItemsBar
@@ -131,29 +152,28 @@ class WireApp extends React.Component {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                            <SearchSidebar
-                                topics={this.props.topics}
-                                setQuery={this.props.setQuery}
-                                activeQuery={this.props.activeQuery}
-                            />
-                            }
-
-                        </div>
-                        <div className={mainClassName} onScroll={this.onListScroll}>
-                            {!this.props.selectedItems.length &&
-                                <SearchResultsInfo
-                                    user={this.props.user}
-                                    query={this.props.activeQuery}
-                                    bookmarks={this.props.bookmarks}
-                                    totalItems={this.props.totalItems}
-                                    followTopic={this.props.followTopic}
+                                <SearchSidebar
                                     topics={this.props.topics}
-                                    activeFilter={this.props.activeFilter}
-                                    createdFilter={this.props.createdFilter}
-                                    newItems={this.props.newItems}
-                                    refresh={this.props.refresh}
+                                    activeTopic={activeTopic}
+                                    setQuery={this.props.setQuery}
+                                    activeQuery={this.props.activeQuery}
+                                    navigations={this.props.navigations}
+                                    activeNavigation={this.props.activeNavigation}
                                 />
                             }
+                        </div>
+                        <div className={mainClassName} onScroll={this.onListScroll}>
+                            <SearchResultsInfo
+                                user={this.props.user}
+                                query={this.props.activeQuery}
+                                bookmarks={this.props.bookmarks}
+                                totalItems={this.props.totalItems}
+                                followTopic={this.props.followTopic}
+                                newItems={this.props.newItems}
+                                refresh={this.props.refresh}
+                                searchCriteria={searchCriteria}
+                                activeTopic={activeTopic}
+                            />
 
                             <ItemsList
                                 actions={this.props.actions}
@@ -176,7 +196,15 @@ class WireApp extends React.Component {
                         </div>
                     </div>
                     {modal}
-                </section>])
+                </section>
+            ]).concat([
+                modal,
+                this.renderNavBreadcrumb(
+                    this.props.navigations,
+                    this.props.activeNavigation,
+                    activeTopic
+                )
+            ])
         );
     }
 }
@@ -212,6 +240,8 @@ WireApp.propTypes = {
     newItems: PropTypes.array,
     refresh: PropTypes.func,
     closePreview: PropTypes.func,
+    navigations: PropTypes.array.isRequired,
+    activeNavigation: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -226,10 +256,12 @@ const mapStateToProps = (state) => ({
     modal: state.modal,
     user: state.user,
     company: state.company,
-    topics: state.topics,
+    topics: state.topics || [],
     selectedItems: state.selectedItems,
     activeView: get(state, 'wire.activeView'),
     newItems: state.newItems,
+    navigations: get(state, 'wire.navigations', []),
+    activeNavigation: get(state, 'wire.activeNavigation', null),
 });
 
 const mapDispatchToProps = (dispatch) => ({
