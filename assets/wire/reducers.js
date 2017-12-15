@@ -244,7 +244,8 @@ export default function wireReducer(state = initialState, action) {
     case CLOSE_MODAL:
         return {...state, modal: modalReducer(state.modal, action)};
 
-    case INIT_DATA:
+    case INIT_DATA: {
+        const navigations = get(action, 'wireData.navigations', []);
         return {
             ...state,
             readItems: action.readData || {},
@@ -253,8 +254,9 @@ export default function wireReducer(state = initialState, action) {
             company: action.wireData.company || null,
             bookmarks: action.wireData.bookmarks || false,
             formats: action.wireData.formats || [],
-            wire: Object.assign(state.wire, {navigations: action.wireData.navigations || []}),
+            wire: Object.assign(state.wire, {navigations}),
         };
+    }
 
     case ADD_TOPIC:
         return {

@@ -8,14 +8,11 @@ import {
     toggleNavigation,
     toggleFilter,
     resetFilter,
-    setTopicQuery,
-    removeNewItems,
 } from 'wire/actions';
 
-import { getActiveQuery, isTopicActive } from 'wire/utils';
-
-import NavLink from './NavLink';
+import TopicsTab from './TopicsTab';
 import FiltersTab from './FiltersTab';
+import NavigationTab from './NavigationTab';
 
 class SearchSidebar extends React.Component {
     constructor(props) {
@@ -72,10 +69,8 @@ class SearchSidebar extends React.Component {
                         <TopicsTab
                             dispatch={this.props.dispatch}
                             topics={this.props.topics}
-                            query={this.props.activeQuery}
                             newItemsByTopic={this.props.newItemsByTopic}
-                            createdFilter={this.props.createdFilter}
-                            activeFilter={this.props.activeFilter}
+                            activeTopic={this.props.activeTopic}
                         />
                     </div>
                 </div>
@@ -96,77 +91,24 @@ class SearchSidebar extends React.Component {
     }
 }
 
-function NavigationTab({navigations, activeNavigation, toggleNavigation}) {
-    return [
-        <NavLink key="all"
-            isActive={!activeNavigation}
-            onClick={(event) => toggleNavigation(event)}
-            label={gettext('All')}
-        />
-    ].concat(navigations.map((navigation) => (
-        <NavLink key={navigation.name}
-            isActive={activeNavigation === navigation._id}
-            onClick={(event) => toggleNavigation(event, navigation)}
-            label={navigation.name}
-        />
-    )));
-}
-
-NavigationTab.propTypes = {
-    navigations: PropTypes.arrayOf(PropTypes.object),
-    activeNavigation: PropTypes.string,
-    toggleNavigation: PropTypes.func.isRequired,
-};
-
-function TopicsTab({topics, dispatch, query, activeFilter, createdFilter, newItemsByTopic}) {
-    const clickTopic = (e, topic) => {
-        e.preventDefault();
-        dispatch(removeNewItems(topic._id));
-        dispatch(setTopicQuery(topic));
-    };
-
-    const activeQuery = getActiveQuery(query, activeFilter, createdFilter);
-
-    return topics.map((topic) => (
-        <a href='#' key={topic._id}
-            className={`btn btn-block btn-outline-${isTopicActive(topic, activeQuery) ? 'primary' : 'secondary'}`}
-            onClick={(e) => clickTopic(e, topic)}>
-            {topic.label}
-            {newItemsByTopic && newItemsByTopic[topic._id] && <span className='wire-button__notif'>
-                {newItemsByTopic[topic._id].length}
-            </span>}
-        </a>
-    ));
-}
-
-TopicsTab.propTypes = {
-    topics: PropTypes.array.isRequired,
-    dispatch: PropTypes.func.isRequired,
-    activeFilter: PropTypes.object,
-    createdFilter: PropTypes.object,
-    query: PropTypes.string,
-    newItemsByTopic: PropTypes.object,
-};
-
 SearchSidebar.propTypes = {
     activeQuery: PropTypes.string,
     topics: PropTypes.array.isRequired,
     bookmarkedItems: PropTypes.array.isRequired,
     itemsById: PropTypes.object.isRequired,
-    navigations: PropTypes.array.isRequired,
     aggregations: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
+    navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
     activeFilter: PropTypes.object,
     newItemsByTopic: PropTypes.object,
     createdFilter: PropTypes.object.isRequired,
+    activeTopic: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
     bookmarkedItems: state.bookmarkedItems || [],
     itemsById: state.itemsById,
-    navigations: state.wire.navigations,
-    activeNavigation: state.wire.activeNavigation,
     activeFilter: state.wire.activeFilter,
     aggregations: state.aggregations,
     newItemsByTopic: state.newItemsByTopic,

@@ -3,22 +3,19 @@ import PropTypes from 'prop-types';
 
 import { isEmpty } from 'lodash';
 import { gettext } from 'utils';
-import { getActiveQuery, isTopicActive } from 'wire/utils';
 
 function SearchResultsInfo({
     user,
     query,
     totalItems,
     followTopic,
-    topics,
     bookmarks,
-    activeFilter,
-    createdFilter,
+    searchCriteria,
     newItems,
-    refresh
+    refresh,
+    activeTopic,
 }) {
-    const activeQuery = getActiveQuery(query, activeFilter, createdFilter);
-    const isFollowing = user && topics.find((topic) => isTopicActive(topic, activeQuery));
+    const isFollowing = user && activeTopic;
     return (
         <div className="d-flex mt-1 mt-sm-3 p-0 align-items-center flex-wrap flex-sm-nowrap">
             <div className="navbar-text search-results-info">
@@ -31,11 +28,11 @@ function SearchResultsInfo({
                 )}
             </div>
 
-            {user && !bookmarks && !isEmpty(activeQuery) && (
+            {user && !bookmarks && !isEmpty(searchCriteria) && (
                 <button
                     disabled={isFollowing}
                     className="btn btn-outline-primary btn-responsive"
-                    onClick={() => followTopic(activeQuery)}
+                    onClick={() => followTopic(searchCriteria)}
                 >{gettext('Save as topic')}</button>
             )}
 
@@ -52,14 +49,13 @@ function SearchResultsInfo({
 SearchResultsInfo.propTypes = {
     user: PropTypes.string,
     query: PropTypes.string,
-    topics: PropTypes.array,
     totalItems: PropTypes.number,
     followTopic: PropTypes.func,
     bookmarks: PropTypes.bool,
-    activeFilter: PropTypes.object,
-    createdFilter: PropTypes.object,
     newItems: PropTypes.array,
     refresh: PropTypes.func,
+    searchCriteria: PropTypes.object,
+    activeTopic: PropTypes.object,
 };
 
 export default SearchResultsInfo;
