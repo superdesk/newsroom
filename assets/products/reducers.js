@@ -103,15 +103,19 @@ export default function productReducer(state = initialState, action) {
     }
 
     case UPDATE_PRODUCT_COMPANIES: {
+        const product = Object.assign({}, action.product, {companies: action.companies});
         const productsById = Object.assign({}, state.productsById);
-        productsById[action.product._id] = Object.assign({}, action.product, {companies: action.companies});
-        return {...state, productsById};
+        productsById[action.product._id] = product;
+
+        return {...state, productsById, productToEdit: product};
     }
 
     case UPDATE_PRODUCT_NAVIGATIONS: {
+        const product = Object.assign({}, action.product, {navigations: action.navigations});
         const productsById = Object.assign({}, state.productsById);
-        productsById[action.product._id] = Object.assign({}, action.product, {navigations: action.navigations});
-        return {...state, productsById};
+        productsById[action.product._id] = product;
+
+        return {...state, productsById, productToEdit: product};
     }
 
     default:
