@@ -1,5 +1,5 @@
 import React from 'react';
-import { get } from 'lodash';
+import { get, isInteger } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
@@ -192,15 +192,19 @@ export function getTextFromHtml(html) {
 /**
  * Get word count for given item
  *
- * @param {string} html
+ * @param {Object} item
  * @return {number}
  */
-export function wordCount(html) {
-    if (!html) {
+export function wordCount(item) {
+    if (isInteger(item.word_count)) {
+        return item.word_count;
+    }
+
+    if (!item.body_html) {
         return 0;
     }
 
-    const text = getTextFromHtml(html);
+    const text = getTextFromHtml(item.body_html);
     return text.split(' ').filter(x => x.trim()).length || 0;
 }
 

@@ -60,5 +60,5 @@ def client(app):
 def setup(app):
     with app.app_context():
         app.data.init_elastic(app)
-        yield
         clean_databases(app)
+        yield

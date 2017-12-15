@@ -13,7 +13,8 @@ describe('gettext', () => {
 describe('wordCount', () => {
     it('can count words in html', () => {
         const html = '<p class="foo" style="color: red">foo bar</p>';
-        expect(utils.wordCount(html)).toBe(2);
+        expect(utils.wordCount({body_html: html})).toBe(2);
+        expect(utils.wordCount({word_count: 5, body_html: 'foo'})).toBe(5);
     });
 });
 

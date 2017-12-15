@@ -58,9 +58,11 @@ class WireSearchResource(newsroom.Resource):
             'slugline': 1,
             'headline': 1,
             'body_html': 1,
+            'firstcreated': 1,
             'versioncreated': 1,
             'nextversion': 1,
             'ancestors': 1,
+            'word_count': 1,
         },
     }
 

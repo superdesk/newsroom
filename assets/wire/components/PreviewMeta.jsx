@@ -32,7 +32,7 @@ function PreviewMeta({item, isItemDetail, inputRef}) {
             </div>
             <div className='wire-articles__item__meta-info'>
                 <span>{gettext('News Value: {{ value }}', {value: item.urgency || DEFAULT_URGENCY})}</span>
-                <span><span className='bold'>{wordCount(item.body_html)}</span> {gettext('words')}</span>
+                <span><span className='bold'>{wordCount(item)}</span> {gettext('words')}</span>
                 <span>{gettext('Source: {{ source }}', {source: item.source})}
                     {!isItemDetail && ' // '}
                     {!isItemDetail && <span className="blue-text" onClick={onClick}>

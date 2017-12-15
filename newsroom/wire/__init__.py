@@ -11,6 +11,10 @@ from . import views  # noqa
 
 
 def init_app(app):
+    app.config['DOMAIN']['items']['schema'].update({
+        'word_count': {'type': 'integer'},
+    })
+
     superdesk.register_resource('wire_search', WireSearchResource, WireSearchService, _app=app)
 
     app.sidenav('Wire', 'wire.index')
