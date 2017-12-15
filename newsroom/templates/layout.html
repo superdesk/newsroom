@@ -103,5 +103,15 @@
 
 {% block script %}{% endblock %}
 
+<script>
+    function is_touch_device() {
+        return 'ontouchstart' in window        // works on most browsers 
+        || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+    };
+
+    if ( !is_touch_device() ) {
+        $('html').addClass('no-touch');
+    }
+</script>
 </body>
 </html>

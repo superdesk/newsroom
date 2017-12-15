@@ -2,10 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+function is_touch_device() {
+    return 'ontouchstart' in window        // works on most browsers 
+    || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+}
 
 class ActionButton extends React.Component {
-    componentDidMount() {
-        this.elem && $(this.elem).tooltip();
+    componentDidMount() {        
+        if ( !is_touch_device() ) {
+            this.elem && $(this.elem).tooltip();
+        }
     }
 
     componentWillUnmount() {
@@ -22,7 +28,7 @@ class ActionButton extends React.Component {
                 className={this.props.className}
                 onClick={() => this.props.action.action(this.props.action.multi ? [this.props.item._id] : this.props.item)}
                 ref={(elem) => this.elem = elem}
-                title={this.props.displayName ? this.props.action.name : ''}>
+                title={!this.props.displayName ? this.props.action.name : ''}>
                 <i className={classes}></i>
                 {this.props.displayName && this.props.action.name}</button>
         );
