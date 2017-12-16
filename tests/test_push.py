@@ -18,6 +18,7 @@ item = {
     'type': 'text',
     'headline': 'Foo',
     'firstcreated': '2017-11-27T08:00:57+0000',
+    'body_html': '<p>foo bar</p>',
     'renditions': {
         'thumbnail': {
             'href': 'http://example.com/foo',
@@ -298,7 +299,8 @@ def test_matching_topics(client, app):
     assert ['query'] == matching
 
 
-def test_push_parsed_dates(client, app):
+def test_push_parsed_item(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
-    parsed = get_entity_or_404(item['guid'], 'items')
+    parsed = get_entity_or_404(item['guid'], 'wire_search')
     assert type(parsed['firstcreated']) == datetime
+    assert 2 == parsed['word_count']

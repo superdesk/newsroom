@@ -7,6 +7,7 @@ import superdesk
 from copy import copy
 from flask import current_app as app
 from superdesk.utc import utcnow
+from superdesk.text_utils import get_word_count
 from newsroom.notifications import push_notification
 from newsroom.topics.topics import get_notification_topics
 from newsroom.utils import query_resource, parse_dates
@@ -51,6 +52,7 @@ def publish_item(doc):
     doc.setdefault('firstcreated', now)
     doc.setdefault('versioncreated', now)
     doc.setdefault(app.config['VERSION'], 1)
+    doc.setdefault('word_count', get_word_count(doc.get('body_html', '')))
     service = superdesk.get_resource_service('content_api')
     if 'evolvedfrom' in doc:
         parent_item = service.find_one(req=None, _id=doc['evolvedfrom'])
