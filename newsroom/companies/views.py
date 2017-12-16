@@ -1,14 +1,16 @@
+import re
+
 import flask
-from newsroom.utils import query_resource, find_one
+from bson import ObjectId
+from flask import jsonify, current_app as app
+from flask_babel import gettext
+from superdesk import get_resource_service
+from werkzeug.exceptions import NotFound
+
+from newsroom.auth.decorator import admin_only, login_required
 from newsroom.companies import blueprint
 from newsroom.companies.forms import CompanyForm
-from bson import ObjectId
-from werkzeug.exceptions import NotFound
-from superdesk import get_resource_service
-from flask_babel import gettext
-from newsroom.auth.decorator import admin_only, login_required
-from flask import jsonify, current_app as app
-import re
+from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400
 
 
 @blueprint.route('/settings/companies', methods=['GET'])
@@ -78,3 +80,20 @@ def company_users(id):
     """TODO(petr): use projection to hide fields like token/email."""
     users = list(query_resource('users', lookup={'company': ObjectId(id)}, max_results=50))
     return jsonify(users), 200
+
+
+@blueprint.route('/companies/<id>/products', methods=['POST'])
+@admin_only
+def save_company_products(id):
+    get_entity_or_404(id, 'companies')
+    data = get_json_or_400()
+    products = list(query_resource('products', max_results=200))
+
+    db = app.data.get_mongo_collection('products')
+    for product in products:
+        if str(product['_id']) in data.get('products', []):
+            db.update_one({'_id': product['_id']}, {'$addToSet': {'companies': id}})
+        else:
+            db.update_one({'_id': product['_id']}, {'$pull': {'companies': id}})
+
+    return jsonify(), 200

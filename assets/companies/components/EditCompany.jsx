@@ -5,6 +5,7 @@ import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 
 import { gettext, shortDate } from 'utils';
+import EditPanel from 'components/EditPanel';
 
 const countries = [
     {value: 'au', text: gettext('Australia')},
@@ -22,7 +23,7 @@ class EditCompany extends React.Component {
         this.tabs = [
             {label: gettext('Company'), name: 'company-details'},
             {label: gettext('Users'), name: 'users'},
-            {label: gettext('Subscription'), name: 'subscription'},
+            {label: gettext('Products'), name: 'products'},
         ];
     }
 
@@ -30,6 +31,9 @@ class EditCompany extends React.Component {
         this.setState({activeTab: event.target.name});
         if(event.target.name === 'users' && this.props.company._id) {
             this.props.fetchCompanyUsers(this.props.company._id);
+        }
+        if(event.target.name === 'products' && this.props.company._id) {
+            this.props.fetchProducts();
         }
     }
 
@@ -43,7 +47,11 @@ class EditCompany extends React.Component {
     }
 
     getCompanyProducts() {
-        return this.props.products.filter((product) => product.companies.includes(this.props.company._id));
+        const products = this.props.products.filter((product) =>
+            product.companies && product.companies.includes(this.props.company._id)
+        ).map(p => p._id);
+
+        return {_id: this.props.company._id, products};
     }
 
     render() {
@@ -158,18 +166,13 @@ class EditCompany extends React.Component {
                             </table>
                         </div>
                     }
-                    {this.state.activeTab === 'subscription' &&
-                        <div className='tab-pane active' id='subscription'>
-                            <table className='table'>
-                                <tbody>
-                                    {this.getCompanyProducts().map((product) => (
-                                        <tr key={product._id}>
-                                            <td>{product.name}</td>
-                                            <td>{product.description}</td>
-                                        </tr>))}
-                                </tbody>
-                            </table>
-                        </div>
+                    {this.state.activeTab === 'products' &&
+                        <EditPanel
+                            parent={this.getCompanyProducts()}
+                            items={this.props.products}
+                            field="products"
+                            onSave={this.props.saveProducts}
+                        />
                     }
                 </div>
             </div>
@@ -187,6 +190,8 @@ EditCompany.propTypes = {
     onDelete: PropTypes.func.isRequired,
     fetchCompanyUsers: PropTypes.func.isRequired,
     products: PropTypes.array.isRequired,
+    saveProducts: PropTypes.func.isRequired,
+    fetchProducts: PropTypes.func.isRequired,
 };
 
 export default EditCompany;
