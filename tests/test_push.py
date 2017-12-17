@@ -103,12 +103,14 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
+        'user_type': 'administrator'
     }])
 
     with client as cli:
         with client.session_transaction() as session:
             user = str(user_ids[0])
             session['user'] = user
+
         resp = cli.post('api/users/%s/topics' % user, data={'label': 'bar', 'query': 'test', 'notifications': True})
         assert 201 == resp.status_code
 
@@ -264,6 +266,7 @@ def test_send_notification_emails(client, app):
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
+        'user_type': 'administrator'
     }])
 
     app.data.insert('topics', [
@@ -287,8 +290,9 @@ def test_send_notification_emails(client, app):
 def test_matching_topics(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
     search = get_resource_service('wire_search')
-    users = {'foo': {'company': None}}
-    companies = {}
+
+    users = {'foo': {'company': '1', 'user_type': 'administrator'}}
+    companies = {'1': {'_id': 1, 'name': 'test-comp'}}
     topics = [
         {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'foo'},
         {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},

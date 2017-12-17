@@ -45,7 +45,9 @@ def word_count(html):
     return get_word_count(html or '')
 
 
-def is_admin():
+def is_admin(user=None):
+    if user:
+        return user.get('user_type') == 'administrator'
     return flask.session.get('user_type') == 'administrator'
 
 
