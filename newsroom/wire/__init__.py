@@ -4,6 +4,7 @@ from flask import Blueprint
 from flask_babel import gettext
 from newsroom.wire.search import WireSearchResource, WireSearchService
 from . import utils
+from superdesk.metadata.item import not_analyzed
 
 blueprint = Blueprint('wire', __name__)
 
@@ -13,6 +14,19 @@ from . import views  # noqa
 def init_app(app):
     app.config['DOMAIN']['items']['schema'].update({
         'word_count': {'type': 'integer'},
+    })
+
+    app.config['DOMAIN']['items']['schema'].update({
+        'products': {
+            'type': 'list',
+            'mapping': {
+                'type': 'object',
+                'properties': {
+                    'id': not_analyzed,
+                    'name': not_analyzed
+                }
+            }
+        }
     })
 
     superdesk.register_resource('wire_search', WireSearchResource, WireSearchService, _app=app)

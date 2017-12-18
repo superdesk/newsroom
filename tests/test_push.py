@@ -2,6 +2,7 @@
 import io
 import hmac
 import bson
+from bson import ObjectId
 from flask import json
 from datetime import datetime
 from superdesk import get_resource_service
@@ -103,12 +104,14 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
+        'user_type': 'administrator'
     }])
 
     with client as cli:
         with client.session_transaction() as session:
             user = str(user_ids[0])
             session['user'] = user
+
         resp = cli.post('api/users/%s/topics' % user, data={'label': 'bar', 'query': 'test', 'notifications': True})
         assert 201 == resp.status_code
 
@@ -264,6 +267,7 @@ def test_send_notification_emails(client, app):
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
+        'user_type': 'administrator'
     }])
 
     app.data.insert('topics', [
@@ -287,8 +291,35 @@ def test_send_notification_emails(client, app):
 def test_matching_topics(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
     search = get_resource_service('wire_search')
-    users = {'foo': {'company': None}}
-    companies = {}
+
+    users = {'foo': {'company': '1', 'user_type': 'administrator'}}
+    companies = {'1': {'_id': 1, 'name': 'test-comp'}}
+    topics = [
+        {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'foo'},
+        {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},
+        {'_id': 'filter', 'filter': {'genre': ['other']}, 'user': 'foo'},
+        {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
+    ]
+    matching = search.get_matching_topics(item['guid'], topics, users, companies)
+    assert ['query'] == matching
+
+
+def test_matching_topics_for_public_user(client, app):
+    app.data.insert('products', [{
+        '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
+        'name': 'Sport',
+        'description': 'Top level sport product',
+        'sd_product_id': 'p-1',
+        'is_enabled': True,
+        'companies': ['1'],
+    }])
+
+    item['products'] = [{'id': 'p-1'}]
+    client.post('/push', data=json.dumps(item), content_type='application/json')
+    search = get_resource_service('wire_search')
+
+    users = {'foo': {'company': '1', 'user_type': 'public'}}
+    companies = {'1': {'_id': '1', 'name': 'test-comp'}}
     topics = [
         {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'foo'},
         {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},
@@ -304,3 +335,9 @@ def test_push_parsed_item(client, app):
     parsed = get_entity_or_404(item['guid'], 'wire_search')
     assert type(parsed['firstcreated']) == datetime
     assert 2 == parsed['word_count']
+
+
+def test_push_parsed_dates(client, app):
+    client.post('/push', data=json.dumps(item), content_type='application/json')
+    parsed = get_entity_or_404(item['guid'], 'items')
+    assert type(parsed['firstcreated']) == datetime

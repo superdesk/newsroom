@@ -147,6 +147,13 @@ def test_new_user_fails_if_email_is_used_before(client):
 
 def test_create_new_user_succeeds(app, client):
     test_login_succeeds_for_admin(client)
+    company_ids = app.data.insert('companies', [{
+        'phone': '2132132134',
+        'sd_subscriber_id': '12345',
+        'name': 'Press Co.',
+        'is_enabled': True,
+        'contact_name': 'Tom'
+    }])
     # Insert a new user
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
@@ -155,7 +162,7 @@ def test_create_new_user_succeeds(app, client):
         'password': 'abc',
         'country': 'Australia',
         'phone': '1234567',
-        'company': '',
+        'company': company_ids[0],
         'user_type': 'public',
         'is_enabled': True
     })

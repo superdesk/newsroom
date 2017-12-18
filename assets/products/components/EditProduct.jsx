@@ -88,12 +88,23 @@ class EditProduct extends React.Component {
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.sd_product_id : null}/>
 
-                                    <TextInput
-                                        name='query'
-                                        label={gettext('Query')}
-                                        value={this.props.product.query || ''}
-                                        onChange={this.props.onChange}
-                                        error={this.props.errors ? this.props.errors.query : null}/>
+
+                                    <div className="form-group">
+                                        <label htmlFor="query">{gettext('Query')}</label>
+                                        <textarea className="form-control"
+                                            id="query"
+                                            name="query"
+                                            value={this.props.product.query || ''}
+                                            onChange={this.props.onChange}
+                                        />
+                                        {this.props.product.query && <input
+                                            type='button'
+                                            className='btn btn-secondary float-right mt-2'
+                                            value={gettext('Test query')}
+                                            onClick={() => window.open(`/?q=${this.props.product.query}`, '_blank')}
+                                        />}
+
+                                    </div>
 
                                     <CheckboxInput
                                         name='is_enabled'

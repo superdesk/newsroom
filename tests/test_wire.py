@@ -1,4 +1,5 @@
 from flask import json
+from bson import ObjectId
 from datetime import datetime, timedelta
 
 from .fixtures import items, init_items, init_auth, init_company  # noqa
@@ -134,9 +135,29 @@ def test_filter_by_product_anonymous_user_gets_all(client, app):
 def test_logged_in_user_no_product_gets_no_results(client, app):
     with client.session_transaction() as session:
         session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
     resp = client.get('/search')
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
+
+
+def test_logged_in_user_no_company_gets_no_results(client, app):
+    with client.session_transaction() as session:
+        session['user'] = str(ObjectId())
+        session['user_type'] = 'public'
+
+    resp = client.get('/search')
+    assert resp.status_code == 403
+
+
+def test_administrator_gets_all_results(client, app):
+    with client.session_transaction() as session:
+        session['user'] = str(ObjectId())
+        session['user_type'] = 'administrator'
+
+    resp = client.get('/search')
+    data = json.loads(resp.get_data())
+    assert 3 == len(data['_items'])
 
 
 def test_search_filtered_by_users_products(client, app):
@@ -150,6 +171,8 @@ def test_search_filtered_by_users_products(client, app):
 
     with client.session_transaction() as session:
         session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
+
     resp = client.get('/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
@@ -184,6 +207,8 @@ def test_search_filter_by_individual_navigation(client, app):
     }])
     with client.session_transaction() as session:
         session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
+
     resp = client.get('/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
@@ -223,6 +248,8 @@ def test_search_filtered_by_query_product(client, app):
 
     with client.session_transaction() as session:
         session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
+
     resp = client.get('/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])

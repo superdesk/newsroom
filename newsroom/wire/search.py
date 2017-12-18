@@ -7,9 +7,11 @@ import superdesk
 from datetime import datetime, timedelta
 from flask import json, abort
 from eve.utils import ParsedRequest
+from flask_babel import gettext
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.products.products import get_products_by_company
+from newsroom.template_filters import is_admin
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +76,25 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
-def set_product_query(query, company):
+def _set_product_query(query, company, user=None):
+    """
+    Checks the user for admin privileges
+    If user is administrator then there's no filtering
+    If user is not administrator then products apply if user has a company
+    If user is not administrator and has no company then everthing will be filtered
+    :param query: search query
+    :param company: company
+    :param user: user to check against (used for notification checking)
+    If not provided session user will be checked
+    """
+    if user and is_admin(user):
+        # check provided user
+        return
+
+    if not user and is_admin():
+        # check the session user
+        return
+
     if company:
         products = get_products_by_company(company['_id'])
         product_ids = [p['sd_product_id'] for p in products if p.get('sd_product_id')]
@@ -83,6 +103,9 @@ def set_product_query(query, company):
         for product in products:
             if product.get('query'):
                 query['bool']['must'][0]['bool']['should'].append(_query_string(product['query']))
+    else:
+        # user does not belong to a company so blocking all stories
+        abort(403, gettext('user does not belong to a company'))
 
 
 def _query_string(query):
@@ -132,7 +155,7 @@ class WireSearchService(newsroom.Service):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        set_product_query(query, company)
+        _set_product_query(query, company)
         _set_bookmarks_query(query, user_id)
         source = {'query': query, 'size': 0}
         internal_req = ParsedRequest()
@@ -143,7 +166,7 @@ class WireSearchService(newsroom.Service):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        set_product_query(query, company)
+        _set_product_query(query, company)
 
         if req.args.get('q'):
             query['bool']['must'].append(_query_string(req.args['q']))
@@ -252,7 +275,7 @@ class WireSearchService(newsroom.Service):
 
             # for now even if there's no active company matching for the user
             # continuing with the search
-            set_product_query(topic_filter, company)
+            _set_product_query(query, company, user)
 
             aggs['topics']['filters']['filters'][str(topic['_id'])] = topic_filter
             queried_topics.append(topic)
