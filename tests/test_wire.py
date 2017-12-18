@@ -147,8 +147,7 @@ def test_logged_in_user_no_company_gets_no_results(client, app):
         session['user_type'] = 'public'
 
     resp = client.get('/search')
-    data = json.loads(resp.get_data())
-    assert 0 == len(data['_items'])
+    assert resp.status_code == 403
 
 
 def test_administrator_gets_all_results(client, app):

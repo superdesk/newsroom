@@ -13,9 +13,6 @@ def test_api_home(client):
     assert '_error' in data
 
 
-def test_news_search(client):
+def test_news_search_fails_for_anonymous_user(client):
     response = client.get('/search')
-    assert 200 == response.status_code
-    data = json.loads(response.data.decode())
-    assert '_items' in data
-    assert '_meta' in data
+    assert 403 == response.status_code

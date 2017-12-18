@@ -7,6 +7,7 @@ import superdesk
 from datetime import datetime, timedelta
 from flask import json, abort
 from eve.utils import ParsedRequest
+from flask_babel import gettext
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.products.products import get_products_by_company
@@ -104,7 +105,7 @@ def _set_product_query(query, company, user=None):
                 query['bool']['must'][0]['bool']['should'].append(_query_string(product['query']))
     else:
         # user does not belong to a company so blocking all stories
-        query['bool']['must'].append({'bool': {'must': [{'terms': {'products.id': [-1]}}]}})
+        abort(403, gettext('user does not belong to a company'))
 
 
 def _query_string(query):
