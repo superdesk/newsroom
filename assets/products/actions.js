@@ -146,7 +146,10 @@ export function saveCompanies(companies) {
     return function (dispatch, getState) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/companies`, {companies})
-            .then(() => dispatch(updateProductCompanies(product, companies)))
+            .then(() => {
+                notify.success(gettext('Product updated successfully'));
+                dispatch(updateProductCompanies(product, companies));
+            })
             .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
@@ -173,7 +176,10 @@ export function saveNavigations(navigations) {
     return function (dispatch, getState) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/navigations`, {navigations})
-            .then(() => dispatch(updateProductNavigations(product, navigations)))
+            .then(() => {
+                notify.success(gettext('Product updated successfully'));
+                dispatch(updateProductNavigations(product, navigations));
+            })
             .catch((error) => errorHandler(error, dispatch, setError));
     };
 }

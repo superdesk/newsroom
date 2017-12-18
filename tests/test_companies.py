@@ -1,31 +1,13 @@
-from flask import url_for, json
+from flask import json
 from pytest import fixture
 from bson import ObjectId
+from .test_users import test_login_succeeds_for_admin, init as user_init
 from superdesk import get_resource_service
 
 
 @fixture(autouse=True)
 def init(app):
-    app.data.insert('users', [{
-        '_id': ObjectId(),
-        'first_name': 'admin',
-        'last_name': 'admin',
-        'email': 'admin@sourcefabric.org',
-        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
-        'user_type': 'administrator',
-        'is_validated': True,
-        'is_enabled': True,
-        'is_approved': True
-    }])
-
-
-def test_login_succeeds_for_admin(client):
-    response = client.post(
-        url_for('auth.login'),
-        data={'email': 'admin@sourcefabric.org', 'password': 'admin'},
-        follow_redirects=True
-    )
-    assert response.status_code == 200
+    user_init(app)
 
 
 def test_delete_company_deletes_company_and_users(client):
@@ -82,3 +64,35 @@ def test_get_company_users(client):
     users = json.loads(resp.get_data())
     assert 1 == len(users)
     assert 'foo' == users[0].get('first_name'), users[0].keys()
+
+
+def test_save_company_products(client, app):
+    app.data.insert('companies', [{
+        '_id': 'c-1',
+        'phone': '2132132134',
+        'sd_subscriber_id': '12345',
+        'name': 'Press Co.',
+        'is_enabled': True,
+        'contact_name': 'Tom'
+    }])
+
+    app.data.insert('products', [{
+        '_id': 'p-1',
+        'name': 'Sport',
+        'description': 'sport product',
+        'companies': ['c-1'],
+        'is_enabled': True,
+    }, {
+        '_id': 'p-2',
+        'name': 'News',
+        'description': 'news product',
+        'is_enabled': True,
+    }])
+
+    test_login_succeeds_for_admin(client)
+    client.post('companies/c-1/products', data=json.dumps({'products': ['p-2']}), content_type='application/json')
+
+    response = client.get('/products')
+    data = json.loads(response.get_data())
+    assert [p for p in data if p['_id'] == 'p-1'][0]['companies'] == []
+    assert [p for p in data if p['_id'] == 'p-2'][0]['companies'] == ['c-1']

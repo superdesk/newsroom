@@ -123,6 +123,38 @@ export function postCompany() {
 
 
 /**
+ * Fetches products
+ *
+ */
+export function fetchProducts() {
+    return function (dispatch) {
+        return server.get('/products/search')
+            .then((data) => {
+                dispatch(getProducts(data));
+            })
+            .catch((error) => errorHandler(error, dispatch, setError));
+    };
+}
+
+
+/**
+ * Saves products for a company
+ *
+ */
+export function saveProducts(products) {
+    return function (dispatch, getState) {
+        const company = getState().companyToEdit;
+        return server.post(`/companies/${company._id}/products`, {products})
+            .then(() => {
+                notify.success(gettext('Company updated successfully'));
+                dispatch(fetchProducts());
+            })
+            .catch((error) => errorHandler(error, dispatch, setError));
+    };
+}
+
+
+/**
  * Deletes a company
  *
  */
