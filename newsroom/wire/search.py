@@ -274,7 +274,7 @@ class WireSearchService(newsroom.Service):
 
             # for now even if there's no active company matching for the user
             # continuing with the search
-            _set_product_query(topic_filter, company, user)
+            _set_product_query(query, company, user)
 
             aggs['topics']['filters']['filters'][str(topic['_id'])] = topic_filter
             queried_topics.append(topic)
