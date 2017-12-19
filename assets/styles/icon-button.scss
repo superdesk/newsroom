@@ -2,8 +2,11 @@
 
 @mixin icon-button-base () {
     display: inline-flex;
+    display: -webkit-inline-flex;
     justify-content: center;
+    -webkit-justify-content: center;
     align-items: center;
+    -webkit-align-items: center;
     width: 34px;
     height: 38px;
     cursor: pointer;

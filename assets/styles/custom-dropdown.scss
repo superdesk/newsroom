@@ -10,15 +10,37 @@
       vertical-align: middle;
   }
 }
+
 .dropdown-item {
   [class^="icon--"], [class*=" icon--"] {
-      margin-right: 1rem;
+    margin-right: 1rem;
   }
-  &:active {
-      background-color: $main-blue;
+  &:focus {
+    color: #16181b;      
+    background-color: #eff4f6 !important;
+  }
+  &:active, &:hover {
+    color: #fff !important;
+    background-color: $main-blue !important;
+    [class^="icon--"], [class*=" icon--"] {
+      color: white !important;
+    }
+  }
+  .no-touch & {
+    &:hover, &:focus {
+      color: #16181b !important;      
+      background-color: #eff4f6 !important;
       [class^="icon--"], [class*=" icon--"] {
-          color: white;
+        color: $main-blue !important;
       }
+    }
+    &:active {
+      color: #fff !important;
+      background-color: $main-blue !important;
+      [class^="icon--"], [class*=" icon--"] {
+        color: white !important;
+      }
+    }  
   }
 }
 
