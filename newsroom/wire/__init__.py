@@ -22,7 +22,7 @@ def init_app(app):
             'mapping': {
                 'type': 'object',
                 'properties': {
-                    'id': not_analyzed,
+                    'code': not_analyzed,
                     'name': not_analyzed
                 }
             }

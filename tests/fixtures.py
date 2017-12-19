@@ -16,7 +16,7 @@ items = [
         'firstcreated': '2017-11-27T08:00:57+0000',
         'versioncreated': datetime.now(),
         'service': [{'code': 'a', 'name': 'Service A'}],
-        'products': [{'id': 1, 'name': 'product-1'}, {'id': 3, 'name': 'product-3'}]
+        'products': [{'code': 1, 'name': 'product-1'}, {'id': 3, 'name': 'product-3'}]
     },
     {
         '_id': 'urn:localhost:weather',
@@ -29,7 +29,7 @@ items = [
         'firstcreated': datetime.now() - timedelta(days=5),
         'versioncreated': datetime.now().replace(hour=23, minute=55) - timedelta(days=5),
         'service': [{'code': 'b', 'name': 'Service B'}],
-        'products': [{'id': 2, 'name': 'product-2'}]
+        'products': [{'code': 2, 'name': 'product-2'}]
     },
     {
         '_id': 'urn:localhost:flood',
@@ -41,7 +41,7 @@ items = [
         'firstcreated': datetime.now() - timedelta(days=5),
         'versioncreated': datetime.now().replace(hour=23, minute=55) - timedelta(days=5),
         'service': [{'code': 'c', 'name': 'Service C'}],
-        'products': [{'id': 7, 'name': 'product-7'}]
+        'products': [{'code': 7, 'name': 'product-7'}]
     },
     {
         '_id': 'tag:weather',

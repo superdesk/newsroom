@@ -98,7 +98,7 @@ def _set_product_query(query, company, user=None):
     if company:
         products = get_products_by_company(company['_id'])
         product_ids = [p['sd_product_id'] for p in products if p.get('sd_product_id')]
-        query['bool']['must'].append({'bool': {'should': [{'terms': {'products.id': product_ids}}]}})
+        query['bool']['must'].append({'bool': {'should': [{'terms': {'products.code': product_ids}}]}})
 
         for product in products:
             if product.get('query'):
@@ -190,7 +190,7 @@ class WireSearchService(newsroom.Service):
 
                 if selected_products:
                     query['bool']['must'].append({
-                        'terms': {'products.id': selected_products}
+                        'terms': {'products.code': selected_products}
                     })
 
         source = {'query': query}

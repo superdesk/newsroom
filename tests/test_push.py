@@ -314,7 +314,7 @@ def test_matching_topics_for_public_user(client, app):
         'companies': ['1'],
     }])
 
-    item['products'] = [{'id': 'p-1'}]
+    item['products'] = [{'code': 'p-1'}]
     client.post('/push', data=json.dumps(item), content_type='application/json')
     search = get_resource_service('wire_search')
 
