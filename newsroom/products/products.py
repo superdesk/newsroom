@@ -40,6 +40,7 @@ class ProductsResource(newsroom.Resource):
     }
     item_methods = ['GET', 'PATCH', 'DELETE']
     resource_methods = ['GET', 'POST']
+    query_objectid_as_string = True  # needed for companies/navigations lookup to work
 
 
 class ProductsService(newsroom.Service):
@@ -48,16 +49,16 @@ class ProductsService(newsroom.Service):
 
 def get_products_by_navigation(navigation_id):
     return list(superdesk.get_resource_service('products').
-                get(req=None, lookup={'navigations': navigation_id, 'is_enabled': True}))
+                get(req=None, lookup={'navigations': str(navigation_id), 'is_enabled': True}))
 
 
-def get_products_by_company(company_id):
-    # TODO(tolga): this lookup by company id is not working
-    products = list(superdesk.get_resource_service('products').get(req=None, lookup={'is_enabled': True}))
-    return [p for p in products if str(company_id) in p.get('companies', [])]
+def get_products_by_company(company_id, navigation_id=None):
+    lookup = {'is_enabled': True, 'companies': str(company_id)}
+    if navigation_id:
+        lookup['navigations'] = str(navigation_id)
+    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
 
 
 def get_products_dict_by_company(company_id):
-    # TODO(tolga): this lookup by company id is not working
-    products = list(superdesk.get_resource_service('products').get(req=None, lookup={'is_enabled': True}))
-    return {str(p['_id']): p for p in products if str(company_id) in p.get('companies', [])}
+    lookup = {'is_enabled': True, 'companies': str(company_id)}
+    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))

@@ -41,20 +41,12 @@ def get_navigations_by_company(company_id):
     Returns list of navigations for given company id
     Navigations will contain the list of product ids
     """
-
-    product_lookup = {'is_enabled': True}
-
-    # TODO(tolga): this lookup is not working
-    # if company_id:
-    #     product_lookup['companies'] = company_id
-    # products = list(superdesk.get_resource_service('products').get(req=None, lookup=product_lookup))
-
+    product_lookup = {'is_enabled': True, 'companies': str(company_id)}
     products = list(superdesk.get_resource_service('products').get(req=None, lookup=product_lookup))
 
     # Get the navigation ids used across products
     navigation_ids = []
-    [navigation_ids.extend(p.get('navigations', [])) for p in products
-     if not company_id or company_id in p.get('companies', [])]
+    [navigation_ids.extend(p.get('navigations', [])) for p in products]
 
     # Get the list of navigations for navigation_ids
     navigations = list(superdesk.get_resource_service('navigations')

@@ -5,6 +5,7 @@ import newsroom
 import superdesk
 
 from datetime import datetime, timedelta
+from werkzeug.exceptions import Forbidden
 from flask import json, abort
 from eve.utils import ParsedRequest
 from flask_babel import gettext
@@ -76,7 +77,7 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
-def _set_product_query(query, company, user=None):
+def _set_product_query(query, company, user=None, navigation_id=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -85,27 +86,28 @@ def _set_product_query(query, company, user=None):
     :param query: search query
     :param company: company
     :param user: user to check against (used for notification checking)
+    :param navigation_id: navigation to filter products
     If not provided session user will be checked
     """
-    if user and is_admin(user):
-        # check provided user
-        return
-
-    if not user and is_admin():
-        # check the session user
-        return
-
     if company:
-        products = get_products_by_company(company['_id'])
+        query['bool']['should'] = []
+        products = get_products_by_company(company['_id'], navigation_id)
+
         product_ids = [p['sd_product_id'] for p in products if p.get('sd_product_id')]
-        query['bool']['must'].append({'bool': {'should': [{'terms': {'products.code': product_ids}}]}})
+        if product_ids:
+            query['bool']['should'].append({'terms': {'products.code': product_ids}})
 
         for product in products:
             if product.get('query'):
-                query['bool']['must'][0]['bool']['should'].append(_query_string(product['query']))
-    else:
+                query['bool']['should'].append(_query_string(product['query']))
+
+        query['bool']['minimum_should_match'] = 1
+
+        if not query['bool']['should'] and not is_admin(user):
+            abort(403, gettext('Your company doesn\'t have any products defined.'))
+    elif not is_admin(user):
         # user does not belong to a company so blocking all stories
-        abort(403, gettext('user does not belong to a company'))
+        abort(403, gettext('User does not belong to a company.'))
 
 
 def _query_string(query):
@@ -155,7 +157,10 @@ class WireSearchService(newsroom.Service):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        _set_product_query(query, company)
+        try:
+            _set_product_query(query, company)
+        except Forbidden:
+            return 0
         _set_bookmarks_query(query, user_id)
         source = {'query': query, 'size': 0}
         internal_req = ParsedRequest()
@@ -166,7 +171,7 @@ class WireSearchService(newsroom.Service):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        _set_product_query(query, company)
+        _set_product_query(query, company, navigation_id=req.args.get('navigation'))
 
         if req.args.get('q'):
             query['bool']['must'].append(_query_string(req.args['q']))
@@ -174,24 +179,6 @@ class WireSearchService(newsroom.Service):
 
         if req.args.get('bookmarks'):
             _set_bookmarks_query(query, req.args['bookmarks'])
-
-        if req.args.get('navigation'):
-            if company:
-                products = get_products_by_company(company['_id'])
-                navigation_id = req.args['navigation']
-                selected_products = []
-
-                for product in products:
-                    if navigation_id in product.get('navigations', []):
-                        if product and product.get('query'):
-                            query['bool']['must'].append(_query_string(product.get('query')))
-                        if product and product.get('sd_product_id'):
-                            selected_products.append(product.get('sd_product_id'))
-
-                if selected_products:
-                    query['bool']['must'].append({
-                        'terms': {'products.code': selected_products}
-                    })
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
@@ -275,7 +262,10 @@ class WireSearchService(newsroom.Service):
 
             # for now even if there's no active company matching for the user
             # continuing with the search
-            _set_product_query(query, company, user)
+            try:
+                _set_product_query(query, company, user)
+            except Forbidden:
+                return []
 
             aggs['topics']['filters']['filters'][str(topic['_id'])] = topic_filter
             queried_topics.append(topic)
