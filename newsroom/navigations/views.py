@@ -77,9 +77,9 @@ def delete(id):
 
     # remove all references from products
     db = app.data.get_mongo_collection('products')
-    products = get_products_by_navigation(ObjectId(id))
+    products = get_products_by_navigation(id)
     for product in products:
-        db.update_one({'_id': product['_id']}, {'$pull': {'navigations': ObjectId(id)}})
+        db.update_one({'_id': product['_id']}, {'$pull': {'navigations': id}})
 
     get_resource_service('navigations').delete({'_id': ObjectId(id)})
     return jsonify({'success': True}), 200

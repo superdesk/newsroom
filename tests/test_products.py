@@ -49,11 +49,14 @@ def test_create_fails_in_validation(client):
 def test_update_products(client):
     test_login_succeeds_for_admin(client)
 
-    client.post('/products/59b4c5c61d41c8d736852fbf/',
-                data=json.dumps({'name': 'Sport',
-                                 'description': 'foo',
-                                 'is_enabled': True,
-                                 'sd_product_id': '123'}), content_type='application/json')
+    resp = client.post('/products/59b4c5c61d41c8d736852fbf',
+                       data=json.dumps({'name': 'Sport',
+                                        'description': 'foo',
+                                        'is_enabled': True,
+                                        'sd_product_id': '123'}),
+                       content_type='application/json')
+
+    assert 200 == resp.status_code
 
     response = client.get('/products')
     assert 'foo' in response.get_data(as_text=True)
@@ -70,7 +73,8 @@ def test_delete_product(client):
         'query': 'bar'
     }), content_type='application/json')
 
-    client.delete('/products/59b4c5c61d41c8d736852fbf')
+    resp = client.delete('/products/59b4c5c61d41c8d736852fbf')
+    assert 200 == resp.status_code
 
     response = client.get('/products')
     data = json.loads(response.get_data())

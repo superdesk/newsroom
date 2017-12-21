@@ -59,7 +59,7 @@ def create():
         return validation
 
     if product.get('navigations'):
-        product['navigations'] = [get_entity_or_404(_id, 'navigations')['_id']
+        product['navigations'] = [str(get_entity_or_404(_id, 'navigations')['_id'])
                                   for _id in product.get('navigations').split(',')]
 
     ids = get_resource_service('products').post([product])
@@ -69,7 +69,7 @@ def create():
 @blueprint.route('/products/<id>', methods=['POST'])
 @admin_only
 def edit(id):
-    get_entity_or_404(id, 'products')
+    get_entity_or_404(ObjectId(id), 'products')
     data = get_json_or_400()
     updates = {
         'name': data.get('name'),
@@ -107,6 +107,6 @@ def update_navigations(id):
 @admin_only
 def delete(id):
     """ Deletes the products by given id """
-    get_entity_or_404(id, 'products')
+    get_entity_or_404(ObjectId(id), 'products')
     get_resource_service('products').delete({'_id': ObjectId(id)})
     return jsonify({'success': True}), 200

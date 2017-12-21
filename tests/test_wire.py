@@ -137,8 +137,7 @@ def test_logged_in_user_no_product_gets_no_results(client, app):
         session['user'] = '59b4c5c61d41c8d736852fbf'
         session['user_type'] = 'public'
     resp = client.get('/search')
-    data = json.loads(resp.get_data())
-    assert 0 == len(data['_items'])
+    assert 403 == resp.status_code
 
 
 def test_logged_in_user_no_company_gets_no_results(client, app):
