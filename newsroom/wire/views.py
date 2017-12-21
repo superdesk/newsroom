@@ -54,6 +54,7 @@ def get_previous_versions(item):
 
 
 @blueprint.route('/')
+@login_required
 def index():
     return flask.render_template('wire_index.html', data=get_view_data())
 
@@ -164,6 +165,7 @@ def update_action_list(items, action_list, force_insert=False):
 
 
 @blueprint.route('/wire/<_id>/copy', methods=['POST'])
+@login_required
 def copy(_id):
     get_entity_or_404(_id, 'items')
     update_action_list([_id], 'copies')
@@ -171,6 +173,7 @@ def copy(_id):
 
 
 @blueprint.route('/wire/<_id>/versions')
+@login_required
 def versions(_id):
     item = get_entity_or_404(_id, 'items')
     items = get_previous_versions(item)
@@ -178,6 +181,7 @@ def versions(_id):
 
 
 @blueprint.route('/wire/<_id>')
+@login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
     if flask.request.args.get('format') == 'json':

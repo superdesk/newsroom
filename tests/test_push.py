@@ -7,6 +7,7 @@ from flask import json
 from datetime import datetime
 from superdesk import get_resource_service
 from newsroom.utils import get_entity_or_404
+from .fixtures import init_auth
 
 
 def get_signature_headers(data, key):
@@ -43,9 +44,10 @@ item = {
 
 def test_push_item_inserts_missing(client, app):
     assert not app.config['PUSH_KEY']
-
     resp = client.post('/push', data=json.dumps(item), content_type='application/json')
     assert 200 == resp.status_code
+
+    init_auth(app, client)
     resp = client.get('wire/foo?format=json')
     assert 200 == resp.status_code
     data = json.loads(resp.get_data())
