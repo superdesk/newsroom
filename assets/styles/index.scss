@@ -247,6 +247,42 @@ nav.search {
     width: 100%;
 }
 
+.header-profile {
+    display: flex;
+    flex-direction: column;
+    width: 56px;
+    height: 56px;
+    margin-left: 4px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 9px;
+    &:hover {
+        cursor: default;
+        .header-profile__avatar {
+            background: #475166;
+        }
+    }
+    // active state
+    .show & {
+        position: relative;
+        background: #F7F7F7;
+        z-index: 1002;
+    }
+}
+.header-profile__avatar {
+    background: #333a4a;
+    color: #fff;
+    border-radius: 50%;
+    margin: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.header-profile__characters {
+    font-size: 0.875rem;
+}
+
 .card {
     background-color: #fff;
     outline: none;

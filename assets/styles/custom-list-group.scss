@@ -1,0 +1,17 @@
+// Custom list group
+
+.list-group-item--link {
+    padding: 0;
+    a {
+        display: block;
+        padding: $list-group-item-padding-y $list-group-item-padding-x;
+        &:hover {
+            text-decoration: none;
+            background-color: #eff4f6;
+        }
+        [class^="svg-icon--"] {
+            float: right;
+            opacity: 0.5;
+        }
+    }
+}
