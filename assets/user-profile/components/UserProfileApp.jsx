@@ -19,12 +19,32 @@ const modals = {
     shareItem: ShareItemModal,
 };
 
+
+
 class UserProfileApp extends React.Component {
     constructor(props, context) {
         super(props, context);
         this.close = this.close.bind(this);
         this.selectMenu = this.selectMenu.bind(this);
-        this.state = {open: false, selectedMenu: 'profile'};
+        this.state = {dropdown: false, modal: false, selectedMenu: 'profile'};
+        this.links = [
+            {
+                name: 'profile',
+                label: gettext('My Profile'),
+                content: UserProfile,
+            },
+            {
+                name: 'topics',
+                label: gettext('My Topics'),
+                content: FollowedTopics,
+            },
+            /**
+            {
+                name: 'history',
+                label: gettext('Download History'),
+            },
+            */
+        ];
     }
 
     selectMenu(selectedMenu) {
@@ -42,28 +62,11 @@ class UserProfileApp extends React.Component {
     }
 
     close() {
-        this.setState({open: false, selectedMenu: 'profile'});
+        this.setState({modal: false});
     }
 
     renderProfile() {
-        const links = [
-            {
-                name: 'profile',
-                label: gettext('My Profile'),
-                content: UserProfile,
-            },
-            {
-                name: 'topics',
-                label: gettext('My Topics'),
-                content: FollowedTopics,
-            },
-            /**
-            {
-                name: 'history',
-                label: gettext('Download History'),
-            },
-            */
-        ].map((link) => {
+        const links = this.links.map((link) => {
             link.active = link.name === this.state.selectedMenu;
             return link;
         });
@@ -111,15 +114,51 @@ class UserProfileApp extends React.Component {
 
     render() {
         const profile = ReactDOM.createPortal(
-            this.state.open ? this.renderProfile() : null,
+            this.state.modal ? this.renderProfile() : null,
             document.getElementById('user-profile-app')
         );
+
+        const dropdown = this.state.dropdown && (
+            <div key="dropdown" className="dropdown-menu dropdown-menu-right show">
+                <div className="card card--inside-dropdown">
+                    <div className="card-header">
+                        {`${this.props.user.first_name} ${this.props.user.last_name}`}
+                    </div>
+                </div>
+                <ul className="list-group list-group-flush">
+                    {this.links.map((link) => (
+                        <li key={link.name} className="list-group-item list-group-item--link">
+                            <a href="" onClick={(event) => {
+                                event.preventDefault();
+                                this.setState({
+                                    selectedMenu: link.name,
+                                    dropdown: false,
+                                    modal: true,
+                                });
+                            }}>{link.label} <i className="svg-icon--arrow-right" /></a>
+                        </li>
+                    ))}
+                </ul>
+                <div className="card-footer">
+                    <a href="/logout" className="btn btn-outline-secondary">{gettext('Logout')}</a>
+                </div>
+            </div>
+        );
+
+        const toggle = document.getElementById('header-profile-toggle');
+
+        if (this.state.dropdown) {
+            toggle.classList.add('show');
+        } else {
+            toggle.classList.remove('show');
+        }
 
         return [
             <ProfileToggle key="toggle"
                 user={this.props.user}
-                onClick={() => this.setState({open: !this.state.open})}
+                onClick={() => this.setState({dropdown: !this.state.dropdown})}
             />,
+            dropdown,
             profile,
         ];
     }

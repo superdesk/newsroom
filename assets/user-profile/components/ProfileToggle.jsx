@@ -2,13 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function ProfileToggle({user, onClick}) {
+    const initials = user.first_name[0].toLocaleUpperCase() + user.last_name[0].toLocaleUpperCase();
+
     return (
-        <a href="" onClick={(event) => {
+        <div className="header-profile" onClick={(event) => {
             event.preventDefault();
             onClick();
         }}>
-            <span className="badge badge-success">{`${user.first_name} ${user.last_name}`}</span>
-        </a>
+            <figure className="header-profile__avatar">
+                <span className="header-profile__characters">{initials}</span>
+            </figure>
+        </div>
     );
 }
 
