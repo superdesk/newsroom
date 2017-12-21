@@ -1,0 +1,11 @@
+// Custom card
+
+.card--inside-dropdown {
+    border: none;
+    box-shadow: none;
+    min-width: 16rem;
+
+    .card-footer {
+        border-top: none;
+    }
+}

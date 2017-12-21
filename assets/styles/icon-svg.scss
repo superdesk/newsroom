@@ -1,0 +1,12 @@
+// SVG icons 18px
+
+[class^="svg-icon--"], [class*=" svg-icon--"] {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+}
+
+.svg-icon--arrow-right {
+    background-image: url('/static/arrow-right-black.svg');
+}

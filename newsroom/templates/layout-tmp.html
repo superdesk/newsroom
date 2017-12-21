@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>{{ config.SITE_NAME }} - {% block title %}{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/themes/bootstrap.min.css"/>
+
+    <link rel="icon" type="image/x-icon"
+        href="{{ url_for('static', filename='favicon.ico') }}">
+
+    {{ javascript_tag('vendor') | safe }}
+    {{ javascript_tag('newsroom_css') | safe }}
+
+</head>
+<body>
+
+<div class="newsroomWrap">
+
+    <nav class="main navbar justify-content-start align-items-stretch">
+        <div class="navbar__logo">
+            <img src="{{ url_for('static', filename = 'logo.svg') }}" width="34" height="34"/>
+        </div>
+        <div class="navbar-brand d-flex align-items-center ml-2 ml-sm-4 mr-0 mr-sm-4">
+            <nav>
+                <a class="breadcrumb-item text-white" href="/">AAP Newsroom</a>                
+                    <span class="breadcrumb-item active">Wire</span>
+                    <span id="nav-breadcrumb" class="breadcrumb-item active">Business and Finance</span>
+            </nav>
+        </div>
+        
+        <div class="form-inline my-lg-0 ml-auto">            
+            <div class="notif" id="header-notification">
+                <div class="badge--top-right">
+                    <div class="badge badge-pill badge-info badge-secondary">1</div>
+                    <span class="notif__circle"><i class="icon--alert icon--white"></i></span>
+                </div>
+            </div>
+
+            <div id="header-profile-toggle">
+                <div class="header-profile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <figure class="header-profile__avatar">
+                        <span class="header-profile__characters">MA</span>
+                    </figure>
+                </div>
+                <div class="dropdown-menu dropdown-menu-right">                   
+                    <div class="card card--inside-dropdown">
+                        <div class="card-header">
+                            Mr Admin
+                        </div>                        
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item list-group-item--link"><a href="#">My Profile <i class="svg-icon--arrow-right"></i></a></li>
+                            <li class="list-group-item list-group-item--link"><a href="#">My Topics <i class="svg-icon--arrow-right"></i></a></li>                            
+                        </ul>
+                        <div class="card-footer">
+                            <button class="btn btn-outline-secondary float-right">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="contentWrap flex-column flex-sm-row">
+
+        <nav class="sidenav">
+            <ul class="sidenav-icons">
+                {% if is_admin() %}
+                <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.endpoint == 'companies.settings' %}active{% endif %}">
+                  <a href="{{ url_for('companies.settings') }}" title="">
+                      <i class="icon--cog icon--mid-blue"></i>
+                  </a>
+                </li>
+                {% endif %}
+
+                {% for nav in sidenavs %}
+                <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %} badge--top-right">
+                  <a href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}">
+                    {% if nav.name == 'Bookmarks' %}
+                    <div id="bookmarks-count" class="badge badge-pill badge-info badge-secondary"></div>
+                    {% endif %}
+                    <i class="icon--{{ nav.name }} icon--mid-blue"></i>
+                  </a>
+                </li>
+                {% endfor %}
+            </ul>
+
+            {% block sidenav %}
+            {% endblock %}
+        </nav>
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <div id="user-profile-app"></div>
+</div>
+
+<div id="modal-container"></div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+
+<script>
+    window.newsroom = {{ newsroom_config() | tojson | safe }};
+    window.notificationData = {{ get_initial_notifications() | tojson | safe }};
+    window.profileData = {{ get_user_profile_data() | tojson | safe }};
+</script>
+
+{{ javascript_tag('newsroom_js') | safe }}
+
+{% if session.get('name') %}
+    {{ javascript_tag('notifications_js') | safe }}
+    {{ javascript_tag('user_profile_js') | safe }}
+{% endif %}
+
+{% block script %}{% endblock %}
+
+<script>
+    function is_touch_device() {
+        return 'ontouchstart' in window        // works on most browsers 
+        || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+    };
+
+    if ( !is_touch_device() ) {
+        $('html').addClass('no-touch');
+    }
+</script>
+</body>
+</html>

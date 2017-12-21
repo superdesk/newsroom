@@ -1,0 +1,21 @@
+// Custom breadcrumbs
+
+.navbar-brand {
+  span.breadcrumb-item {
+    font-size: 0.75rem; // 12px
+    line-height: 1.1;
+    @include sm {
+      font-size: inherit;
+      line-height: inherit;
+    }
+  }
+  .breadcrumb-item + .breadcrumb-item::before {
+    padding: 0;
+    @include sm {
+      padding: 0 0.5rem;
+    }
+  }
+}
+.breadcrumb-item.active {
+  color: #9ba4ad;
+}
