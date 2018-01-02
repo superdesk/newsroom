@@ -123,24 +123,24 @@ class UserProfileApp extends React.Component {
                 <div className="card card--inside-dropdown">
                     <div className="card-header">
                         {`${this.props.user.first_name} ${this.props.user.last_name}`}
+                    </div>               
+                    <ul className="list-group list-group-flush">
+                        {this.links.map((link) => (
+                            <li key={link.name} className="list-group-item list-group-item--link">
+                                <a href="" onClick={(event) => {
+                                    event.preventDefault();
+                                    this.setState({
+                                        selectedMenu: link.name,
+                                        dropdown: false,
+                                        modal: true,
+                                    });
+                                }}>{link.label} <i className="svg-icon--arrow-right" /></a>
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="card-footer">
+                        <a href="/logout" className="btn btn-outline-secondary float-right">{gettext('Logout')}</a>
                     </div>
-                </div>
-                <ul className="list-group list-group-flush">
-                    {this.links.map((link) => (
-                        <li key={link.name} className="list-group-item list-group-item--link">
-                            <a href="" onClick={(event) => {
-                                event.preventDefault();
-                                this.setState({
-                                    selectedMenu: link.name,
-                                    dropdown: false,
-                                    modal: true,
-                                });
-                            }}>{link.label} <i className="svg-icon--arrow-right" /></a>
-                        </li>
-                    ))}
-                </ul>
-                <div className="card-footer">
-                    <a href="/logout" className="btn btn-outline-secondary">{gettext('Logout')}</a>
                 </div>
             </div>
         );
