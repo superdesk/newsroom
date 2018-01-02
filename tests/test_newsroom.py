@@ -1,9 +1,10 @@
 import json
 
 
-def test_homepage(client):
+def test_homepage_requires_auth(client):
     response = client.get('/')
-    assert b'Newsroom' in response.data
+    assert 302 == response.status_code
+    assert b'login' in response.data
 
 
 def test_api_home(client):
