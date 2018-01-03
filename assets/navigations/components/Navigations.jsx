@@ -12,6 +12,8 @@ import {
     postNavigation,
     selectNavigation,
     setError,
+    fetchProducts,
+    saveProducts,
 } from '../actions';
 import {gettext} from 'utils';
 
@@ -88,6 +90,8 @@ class Navigations extends React.Component {
                         onClose={this.props.cancelEdit}
                         onDelete={this.deleteNavigation}
                         products={this.props.products}
+                        saveProducts={this.props.saveProducts}
+                        fetchProducts={this.props.fetchProducts}
                     />
                 }
             </div>
@@ -111,6 +115,8 @@ Navigations.propTypes = {
     errors: PropTypes.object,
     dispatch: PropTypes.func,
     products: PropTypes.arrayOf(PropTypes.object),
+    saveProducts: PropTypes.func.isRequired,
+    fetchProducts: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -131,6 +137,8 @@ const mapDispatchToProps = (dispatch) => ({
     deleteNavigation: (type) => dispatch(deleteNavigation(type)),
     newNavigation: () => dispatch(newNavigation()),
     cancelEdit: (event) => dispatch(cancelEdit(event)),
+    saveProducts: (products) => dispatch(saveProducts(products)),
+    fetchProducts: () => dispatch(fetchProducts()),
     dispatch: dispatch,
 });
 

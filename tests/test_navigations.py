@@ -66,3 +66,32 @@ def test_delete_navigation_removes_references(client):
     assert 1 == len(data)
     assert data[0]['name'] == 'Breaking'
     assert data[0]['navigations'] == []
+
+
+def test_save_navigation_products(client, app):
+    app.data.insert('navigations', [{
+        '_id': 'n-1',
+        'name': 'Navigation 1',
+        'is_enabled': True,
+    }])
+
+    app.data.insert('products', [{
+        '_id': 'p-1',
+        'name': 'Sport',
+        'description': 'sport product',
+        'navigations': ['n-1'],
+        'is_enabled': True,
+    }, {
+        '_id': 'p-2',
+        'name': 'News',
+        'description': 'news product',
+        'is_enabled': True,
+    }])
+
+    test_login_succeeds_for_admin(client)
+    client.post('navigations/n-1/products', data=json.dumps({'products': ['p-2']}), content_type='application/json')
+
+    response = client.get('/products')
+    data = json.loads(response.get_data())
+    assert [p for p in data if p['_id'] == 'p-1'][0]['navigations'] == []
+    assert [p for p in data if p['_id'] == 'p-2'][0]['navigations'] == ['n-1']

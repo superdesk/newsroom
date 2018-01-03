@@ -83,3 +83,20 @@ def delete(id):
 
     get_resource_service('navigations').delete({'_id': ObjectId(id)})
     return jsonify({'success': True}), 200
+
+
+@blueprint.route('/navigations/<id>/products', methods=['POST'])
+@admin_only
+def save_navigation_products(id):
+    get_entity_or_404(id, 'navigations')
+    data = get_json_or_400()
+    products = list(query_resource('products', max_results=200))
+
+    db = app.data.get_mongo_collection('products')
+    for product in products:
+        if str(product['_id']) in data.get('products', []):
+            db.update_one({'_id': product['_id']}, {'$addToSet': {'navigations': id}})
+        else:
+            db.update_one({'_id': product['_id']}, {'$pull': {'navigations': id}})
+
+    return jsonify(), 200
