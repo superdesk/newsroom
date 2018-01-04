@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
+import EditPanel from 'components/EditPanel';
 
 import { gettext } from 'utils';
 
@@ -20,6 +21,17 @@ class EditNavigation extends React.Component {
 
     handleTabClick(event) {
         this.setState({activeTab: event.target.name});
+        if(event.target.name === 'products' && this.props.navigation._id) {
+            this.props.fetchProducts();
+        }
+    }
+
+    getNavigationProducts() {
+        const products = this.props.products.filter((product) =>
+            product.navigations && product.navigations.includes(this.props.navigation._id)
+        ).map(p => p._id);
+
+        return {_id: this.props.navigation._id, products};
     }
 
     render() {
@@ -93,18 +105,12 @@ class EditNavigation extends React.Component {
                         </div>
                     }
                     {this.state.activeTab === 'products' &&
-                        <div className='tab-pane active' id='products'>
-                            <table className='table'>
-                                <tbody>
-                                    {this.props.products.map((product) => (
-                                        product.navigations.includes(this.props.navigation._id) &&
-                                        <tr key={product._id}>
-                                            <td>{product.name}</td>
-                                            <td>{product.description}</td>
-                                        </tr>))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <EditPanel
+                            parent={this.getNavigationProducts()}
+                            items={this.props.products}
+                            field="products"
+                            onSave={this.props.saveProducts}
+                        />
                     }
                 </div>
             </div>
@@ -120,6 +126,8 @@ EditNavigation.propTypes = {
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+    saveProducts: PropTypes.func.isRequired,
+    fetchProducts: PropTypes.func.isRequired,
 };
 
 export default EditNavigation;
