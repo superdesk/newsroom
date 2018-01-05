@@ -81,13 +81,21 @@ class EditProduct extends React.Component {
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.description : null}/>
 
-                                    <TextInput
-                                        name='sd_product_id'
-                                        label={gettext('Superdesk Product Id')}
-                                        value={this.props.product.sd_product_id || ''}
-                                        onChange={this.props.onChange}
-                                        error={this.props.errors ? this.props.errors.sd_product_id : null}/>
-
+                                    <div className="form-group">
+                                        <label htmlFor="sd_product_id">{gettext('Superdesk Product Id')}</label>
+                                        <input className="form-control"
+                                            id="sd_product_id"
+                                            name="sd_product_id"
+                                            value={this.props.product.sd_product_id || ''}
+                                            onChange={this.props.onChange}
+                                        />
+                                        {this.props.product.sd_product_id && <input
+                                            type='button'
+                                            className='btn btn-secondary float-right mt-2'
+                                            value={gettext('Test product')}
+                                            onClick={() => window.open(`/?q=products.code:${this.props.product.sd_product_id}`, '_blank')}
+                                        />}
+                                    </div>
 
                                     <div className="form-group">
                                         <label htmlFor="query">{gettext('Query')}</label>
