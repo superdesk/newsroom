@@ -89,12 +89,10 @@ class EditProduct extends React.Component {
                                             value={this.props.product.sd_product_id || ''}
                                             onChange={this.props.onChange}
                                         />
-                                        {this.props.product.sd_product_id && <input
-                                            type='button'
-                                            className='btn btn-secondary float-right mt-2'
-                                            value={gettext('Test product')}
-                                            onClick={() => window.open(`/?q=products.code:${this.props.product.sd_product_id}`, '_blank')}
-                                        />}
+                                        {this.props.product.sd_product_id &&
+                                        <a href={`/?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
+                                            className='btn btn-secondary float-right mt-2'>{gettext('Test product')}
+                                        </a>}
                                     </div>
 
                                     <div className="form-group">
@@ -105,13 +103,10 @@ class EditProduct extends React.Component {
                                             value={this.props.product.query || ''}
                                             onChange={this.props.onChange}
                                         />
-                                        {this.props.product.query && <input
-                                            type='button'
-                                            className='btn btn-secondary float-right mt-2'
-                                            value={gettext('Test query')}
-                                            onClick={() => window.open(`/?q=${this.props.product.query}`, '_blank')}
-                                        />}
-
+                                        {this.props.product.query &&
+                                        <a href={`/?q=${this.props.product.query}`} target="_blank"
+                                            className='btn btn-secondary float-right mt-2'>{gettext('Test query')}
+                                        </a>}
                                     </div>
 
                                     <CheckboxInput
