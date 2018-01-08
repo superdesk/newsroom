@@ -119,6 +119,13 @@ def test_search_filters_killed_items(client, app):
     assert 0 == len(data['_items'])
 
 
+def test_search_by_products_id(client, app):
+    app.data.insert('items', [{'_id': 'foo', 'headline': 'product test', 'products': [{'code': '12345'}]}])
+    resp = client.get('/search?q=products.code:12345')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+
+
 def test_search_filter_by_category(client, app):
     resp = client.get('/search?filter=%s' % json.dumps({'service': ['Service A']}))
     data = json.loads(resp.get_data())

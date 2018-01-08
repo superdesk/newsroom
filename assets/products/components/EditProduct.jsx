@@ -81,13 +81,19 @@ class EditProduct extends React.Component {
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.description : null}/>
 
-                                    <TextInput
-                                        name='sd_product_id'
-                                        label={gettext('Superdesk Product Id')}
-                                        value={this.props.product.sd_product_id || ''}
-                                        onChange={this.props.onChange}
-                                        error={this.props.errors ? this.props.errors.sd_product_id : null}/>
-
+                                    <div className="form-group">
+                                        <label htmlFor="sd_product_id">{gettext('Superdesk Product Id')}</label>
+                                        <input className="form-control"
+                                            id="sd_product_id"
+                                            name="sd_product_id"
+                                            value={this.props.product.sd_product_id || ''}
+                                            onChange={this.props.onChange}
+                                        />
+                                        {this.props.product.sd_product_id &&
+                                        <a href={`/?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
+                                            className='btn btn-secondary float-right mt-2'>{gettext('Test product')}
+                                        </a>}
+                                    </div>
 
                                     <div className="form-group">
                                         <label htmlFor="query">{gettext('Query')}</label>
@@ -97,13 +103,10 @@ class EditProduct extends React.Component {
                                             value={this.props.product.query || ''}
                                             onChange={this.props.onChange}
                                         />
-                                        {this.props.product.query && <input
-                                            type='button'
-                                            className='btn btn-secondary float-right mt-2'
-                                            value={gettext('Test query')}
-                                            onClick={() => window.open(`/?q=${this.props.product.query}`, '_blank')}
-                                        />}
-
+                                        {this.props.product.query &&
+                                        <a href={`/?q=${this.props.product.query}`} target="_blank"
+                                            className='btn btn-secondary float-right mt-2'>{gettext('Test query')}
+                                        </a>}
                                     </div>
 
                                     <CheckboxInput
