@@ -3,7 +3,106 @@
 {% block title %}Item Detail{% endblock %}
 
 {% block content %}
-<section>
-    <h1>Item Detail design</h1>
-</section>
+<div class="content content--item-detail">
+
+    <section class="content-header">
+        <div class="content-bar navbar justify-content-between">
+
+            <span class="content-bar__menu">
+                <i class="icon--close-thin"></i>
+            </span>
+
+            <div class="wire-column__preview__buttons">
+                <button class="icon-button"><i class="icon--share"></i></button>
+                <button class="icon-button"><i class="icon--print"></i></button>
+                <button class="icon-button"><i class="icon--copy"></i></button>
+                <button class="icon-button"><i class="icon--download"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <article class="wire-column__preview__content--item-detal-wrap">
+        <div class="wire-column__preview__content">            
+            <figure class="wire-column__preview__image">
+                <span>
+                    <img src="{{ url_for('static', filename = 'item_detail_img.jpg') }}">
+                </span>
+                <figcaption class="wire-column__preview__caption">ParkRun participant Tim Appleton cools off after a 5km run.</figcaption>
+                <div class="wire-column__preview-image-link">
+                    <span class="logo"></span>
+                    <a href="#">available in external gallery</a>
+                    <i class="svg-icon--external-link-blue"></i>
+                </div>                
+            </figure>            
+
+            <div class="wire-column__preview__content--item-detail-text-wrap">
+                <div class="wire-column__preview__content--item-detail-item-text">
+                    <span class="wire-column__preview__slug">ParkRun</span>
+                    <h2 class="wire-column__preview__headline">Presents can wait as runners sweat it out</h2>
+                    <p class="wire-column__preview__author">By: <b>By Jim Morton</b> on 09:22 25/12/2017</p>
+                    <p class="wire-column__preview__lead">Santa hats and reindeer antlers adorned record numbers of fun runners who started their Christmas day by enjoying 73 ParkRuns around the country.</p>
+                    <div class="wire-column__preview__text">
+                        <p>Unwrapping presents under the tree isn't the only reason to get up early on December 25, as shown by the surge of energetic people making a 5km fun run part of their Christmas tradition.</p><p>Huge numbers of runners took to 73 free ParkRun events around the country on Monday morning, where Santa hats, reindeer antlers, festive running shirts and even full St Nick suits sweated in the summer heat.</p><p>Brisbane's South Bank ParkRun, among the first to schedule a Christmas event five years ago, blew away their old record despite the mercury reaching 28C at their 7am start time.</p><p>Almost 800 people, old and young alike, as well as the speedy and the slower, did the picturesque 5km CBD loop around the Brisbane River.</p><p>"This is insane! I thought the heat would keep everybody away today as well," said run director Mathew Egan.&nbsp;</p><p>South Bank is the largest attended ParkRun in the country and typically sees about 500 runners turn out for their weekly Saturday morning event, all run by volunteers.</p><p>Pioneer run director Gareth Saunders doubted they would get half that number when he first scheduled a South Bank Christmas run in 2013.</p><p>"I didn't think we'd get many at all but 500 turned up," he told AAP.</p><p>"It works really well. A lot of family Christmas proceedings don't happen until lunch ... so you can rack up a few calorie credits and then get stuck in to the Christmas turkey."</p><p>For Josh and Mel Campbell it was a no-brainer they would take nine-month-old son Paddy to ParkRun for his first Christmas.</p><p>"We did it this time last year when I was pregnant and we thought we'd start a tradition," Mel said.</p><p>"Our family tradition is wake up, open presents and then go out (to ParkRun) and spend Christmas morning with all our friends," Josh added.</p><p>"I also figure how much we are going to eat today, this is a good way to start the day!" Mel said.</p><p>Among the volunteers was 12-year-old Bara Abdrabbou who was the official timekeeper while his father was the photographer.</p><p>For Cameron and Susan Staib - who ran with children Luke, 13, and Niamh, 11 - it was the second year of their Christmas morning tradition - waking at 5am.</p><p>"We were going to wait until after ParkRun to open the presents but we couldn't help ourselves," Susan said.&nbsp;</p><p>"We'll enjoy Christmas lunch all the more now."</p>
+                    </div>
+                </div>
+
+                <div class="wire-articles__item__meta">
+                    <div class="wire-articles__item__icons">                        
+                        <span class="wire-articles__item__icon">
+                            <i class="icon--text icon--gray-light"></i>
+                        </span>
+                        <span class="wire-articles__item__icon">
+                            <i class="icon--photo icon--gray-light"></i>
+                        </span>
+                    </div>
+
+                    <div class="wire-articles__item__meta-info">
+                        <span><span class="bold">442</span> words</span>
+                        <span>Source: AAP</span>
+                    </div>
+                </div>
+
+                <div class="wire-column__preview__content--item-detail-info-wrap">
+
+                    <div class="wire-column__preview__tags">
+                        <span class="column__preview__tags__box-headline">Metadata</span>
+                        <div class="column__preview__tags__column">
+                            <span class="wire-column__preview__tags__headline">Category</span>
+                            <a class="wire-column__preview__tag" href="/?q=subject.name:&quot;human interest&quot;">human interest</a>
+                            <a class="wire-column__preview__tag" href="/?q=subject.name:&quot;public holiday&quot;">public holiday</a>
+                            <a class="wire-column__preview__tag" href="/?q=subject.name:&quot;religious festival or holiday&quot;">religious festival or holiday</a>
+                        </div>
+                        <div class="column__preview__tags__column">
+                            <span class="wire-column__preview__tags__headline">Genre</span>
+                            <a class="wire-column__preview__tag" href="/?q=genre.name:&quot;Article (news)&quot;">Article (news)</a>
+                        </div>
+                    </div>
+
+                    <div class="wire-column__preview__versions">
+                        <span class="wire-column__preview__versions__box-headline">Previous versions</span>
+                        <div class="wire-column__preview__versions__item">
+                            <div class="wire-column__preview__versions__wrap">
+                                <div class="wire-column__preview__versions__time">
+                                    <span>01:45</span>
+                                </div>
+                                <div class="wire-column__preview__versions__meta">
+                                    <div class="wire-column__preview__item__meta-info">
+                                        <span class="bold">ParkRun</span>
+                                        <span>25/12/2017  // <span class="bold">414</span> words</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="wire-column__preview__versions__name">
+                                <h5 class="wire-column__preview__versions__headline">Presents can wait as runners sweat it out</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </article>
+
+</div>
 {% endblock %}
