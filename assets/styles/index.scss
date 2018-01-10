@@ -10,6 +10,13 @@ body {
     height: 100%;
 }
 
+h3.home-section-heading {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #006f99;
+    margin-bottom: 1rem;
+}
+
 // variables
 $nav-sidebar-bg: #3e4557;
 $nav-sidebar-border: #323847;
@@ -753,6 +760,10 @@ article.list {
     display: flex;
     overflow-y: auto;
     flex-grow: 1;
+
+    .row + .row {
+        margin-top: 20px;        
+    }
 }
 
 .search-results-info {
