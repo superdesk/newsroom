@@ -1,0 +1,481 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="content">
+    <section class="content-main d-block py-4 px-2 p-md-3 p-lg-4">
+        <div class="container-fluid">
+
+            <!-- Top News 2 + 2 -->
+            <div class="row">
+                <div class="col-6 col-sm-8">
+                    <h3 class="home-section-heading">Top News 2 + 2</h3>
+                </div>
+                <div class="col-6 col-sm-4 d-flex align-items-start justify-content-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-3">More news</button>
+                </div>
+                <div class="col-sm-6 col-md-9 d-flex mb-4">
+                    <div class="card card--home card--horizontal">
+                        <div class="card-image-left">
+                            <img src="{{ url_for('static', filename = 'photos/home-photo-01.jpeg') }}" alt="Card image cap">
+                        </div>                        
+                        <div class="card-body">
+                            <h2 class="card-title">Hanks, Streep back Winfrey for president</h2>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__divider">
+                                    </span>
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Winfrey</span>
+                                    <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
+                                </div>
+                            </div>
+                            <div class="wire-articles__item__text">
+                                <p class="card-text">Two of Hollywood's royalty, Tom Hanks and Meryl Streep, are backing Oprah Winfrey for a possible run for the US presidency. </p>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-3 d-flex mb-4">
+                    <div class="card card--home">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-02.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <h4 class="card-title">China stops fighting Iranian tanker blaze</h4>
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">China Shipping</span>
+                                    <span>Source: PA // 06.06.2017 14:25</span>
+                                </div>
+                            </div>                        
+                        </div>
+                        <div class="card-footer">
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>                                
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span><span class="bold">250</span> words</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-9 d-flex mb-4">
+                    <div class="card card--home card--horizontal">
+                        <div class="card-image-left">
+                            <img src="{{ url_for('static', filename = 'photos/home-photo-03.jpeg') }}" alt="Card image cap">
+                        </div>
+                        <div class="card-body">
+                            <h2 class="card-title">Late goal denies Gombau win over Adelaide</h2>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__divider">
+                                    </span>
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Soc AL Wanderers</span>
+                                    <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
+                                </div>
+                            </div>
+                            <div class="wire-articles__item__text">
+                                <p class="card-text">A late equaliser for Adelaide United has denied their former coach Josep Gombau and the Wanderers an A-League win at Spotless Stadium. </p>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-3 d-flex mb-4">
+                    <div class="card card--home">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-04.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <h4 class="card-title">SA flags cuts to keep budget on track</h4>
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Budget SA</span>
+                                    <span>Source: AAP // 06.06.2017 14:25</span>
+                                </div>
+                            </div>                        
+                        </div>
+                        <div class="card-footer">
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>                                
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span><span class="bold">446</span> words</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top News 1 + 1  -->
+            <div class="row">
+                <div class="col-6 col-sm-8">
+                    <h3 class="home-section-heading">Top News 1 + 1</h3>
+                </div>
+                <div class="col-6 col-sm-4 d-flex align-items-start justify-content-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-3">More news</button>
+                </div>
+                <div class="col-sm-12 col-md-6 d-flex mb-4">
+                    <div class="card card--home">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-05.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <h4 class="card-title">Ben Cousins walks free from WA prison</h4>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__divider">
+                                    </span>
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Cousins</span>
+                                    <span>Source: AAP // <span class="bold">490</span> words // 06.06.2017 14:25</span>
+                                </div>
+                            </div>
+                            <div class="wire-articles__item__text">
+                                <p class="card-text small">Troubled AFL premiership player Ben Cousins has been released from prison about 10 months into his one-year sentence for stalking.</p>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 d-flex mb-4">
+                    <div class="card card--home">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-06.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <h4 class="card-title">Police tight-lipped on Thompson drug probe</h4>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__divider">
+                                    </span>
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">in Melbourne</span>
+                                    <span>Source: AAP // <span class="bold">259</span> words // 06.06.2017 14:25</span>
+                                </div>
+                            </div>
+                            <div class="wire-articles__item__text">
+                                <p class="card-text small">Former AFL player and coach Mark Thompson has been arrested and released without charge following an investigation into drug trafficking in Melbourne.</p>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 pictures and text tiles -->
+            <div class="row">
+                <div class="col-6 col-sm-8">
+                    <h3 class="home-section-heading">4 pictures and text tiles</h3>
+                </div>
+                <div class="col-6 col-sm-4 d-flex align-items-start justify-content-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-3">More news</button>
+                </div>
+                <div class="col-sm-6 col-lg-3 d-flex mb-4">
+                    <div class="card card--home">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-07.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <h4 class="card-title">Bitcoin falls 30%, worst week since 2013</h4>
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Bitcoin</span>
+                                    <span>Source: AAP // 06.06.2017 14:25</span>
+                                </div>
+                            </div>                        
+                        </div>
+                        <div class="card-footer">
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>                                
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span><span class="bold">345</span> words</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3 d-flex mb-4">
+                    <div class="card card--home">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-08.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <h4 class="card-title">James Franco says allegations inaccurate</h4>
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Franco</span>
+                                    <span>Source: AAP // 06.06.2017 14:25</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>                                
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span><span class="bold">348</span> words</span>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>                    
+                </div>
+                <div class="col-sm-6 col-lg-3 d-flex mb-4">
+                    <div class="card card--home">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-09.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <h4 class="card-title">Michael Douglas denies sex harassment</h4>
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Douglas</span>
+                                    <span>Source: AAP // 06.06.2017 14:25</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>                                
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span><span class="bold">106</span> words</span>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>                    
+                </div>
+                <div class="col-sm-6 col-lg-3 d-flex mb-4">
+                    <div class="card card--home">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-10.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <h4 class="card-title">Gavrilova downs Stosur, into Sydney semis</h4>
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Ten Inter Gavrilova</span>
+                                    <span>Source: AAP // 06.06.2017 14:25</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__icons">
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--text icon--gray-light"></i>
+                                    </span>
+                                    <span class="wire-articles__item__icon">
+                                        <i class="icon--photo icon--gray-light"></i>
+                                    </span>                                
+                                </div>
+                                <div class="wire-articles__item__meta-info">
+                                    <span><span class="bold">568</span> words</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6 text only tiles -->
+            <div class="row">
+                <div class="col-6 col-sm-8">
+                    <h3 class="home-section-heading">6 text only tiles</h3>
+                </div>
+                <div class="col-6 col-sm-4 d-flex align-items-start justify-content-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-3">More news</button>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2 d-flex mb-4">
+                    <div class="card card--home">                        
+                        <div class="card-body">
+                            <h5 class="card-title">Cause of two Melbourne fires probed</h5>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Melbourne</span>
+                                    <span>Source: PMF // <span class="bold">145</span> words // 08.11.2017 12:32</span>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2 d-flex mb-4">
+                    <div class="card card--home">
+                        <div class="card-body">
+                            <h5 class="card-title">Severe storms, flash flood warning for WA</h5>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Weather</span>
+                                    <span>Source: PMF // <span class="bold">269</span> words // 08.11.2017 12:32</span>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>                    
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2 d-flex mb-4">
+                    <div class="card card--home">
+                        <div class="card-body">
+                            <h5 class="card-title">Security beefed up for Sydney NYE crowds</h5>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Sydney</span>
+                                    <span>Source: PMF // <span class="bold">378</span> words // 08.11.2017 12:32</span>
+                                </div>
+                            </div>                    
+                        </div>                        
+                    </div>                    
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2 d-flex mb-4">
+                    <div class="card card--home">
+                        <div class="card-body">
+                            <h5 class="card-title">Police angered as NSW road toll hits 21</h5>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">NSW</span>
+                                    <span>Source: PMF // <span class="bold">23</span> words // 08.11.2017 12:32</span>
+                                </div>
+                            </div>
+                        </div>                       
+                    </div>                    
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2 d-flex mb-4">
+                    <div class="card card--home">
+                        <div class="card-body">
+                            <h5 class="card-title">Qld man to face court on car park bashing</h5>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Slugline</span>
+                                    <span>Source: PMF // <span class="bold">63</span> words // 08.11.2017 12:32</span>
+                                </div>
+                            </div>                                             
+                        </div>
+                    </div>                    
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2 d-flex mb-4">
+                    <div class="card card--home">
+                        <div class="card-body">
+                            <h5 class="card-title">QR warns party revellers to be careful</h5>
+                            <div class="wire-articles__item__meta">
+                                <div class="wire-articles__item__meta-info">
+                                    <span class="bold">Slugline</span>
+                                    <span>Source: PMF // <span class="bold">222</span> words // 08.11.2017 12:32</span>
+                                </div>
+                            </div>                         
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Latest media 4 gallery teasers -->
+            <div class="row">
+                <div class="col-6 col-sm-8">
+                    <h3 class="home-section-heading">Latest media 4 gallery teasers</h3>
+                </div>
+                <div class="col-6 col-sm-4 d-flex align-items-start justify-content-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-3">More news</button>
+                </div>
+                <div class="col-sm-6 col-lg-3 d-flex mb-4">
+                    <div class="card card--home card--gallery">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-01.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">                                    
+                                    <span>Source: AAP // 06.06.2017 14:25</span>
+                                </div>
+                            </div>                        
+                            <h4 class="card-title">Aute magna proident mollit occaecat consequat.</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3 d-flex mb-4">
+                    <div class="card card--home card--gallery">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-02.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">                                    
+                                    <span>Source: AAP // 06.06.2017 14:25</span>
+                                </div>
+                            </div>                        
+                            <h4 class="card-title">Fugiat sunt et minim labore incididunt pariatur.</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3 d-flex mb-4">
+                    <div class="card card--home card--gallery">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-03.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">                                    
+                                    <span>Source: AAP // 06.06.2017 14:25</span>
+                                </div>
+                            </div>                        
+                            <h4 class="card-title">Eiusmod cillum enim sit dolore labore pariatur aliqua ea.</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3 d-flex mb-4">
+                    <div class="card card--home card--gallery">
+                        <img class="card-img-top" src="{{ url_for('static', filename = 'photos/home-photo-04.jpeg') }}" alt="Card image cap">
+                        <div class="card-body">
+                            <div class="wire-articles__item__meta">                                
+                                <div class="wire-articles__item__meta-info">                                    
+                                    <span>Source: AAP // 06.06.2017 14:25</span>
+                                </div>
+                            </div>                        
+                            <h4 class="card-title">Pariatur mollit commodo ullamco velit minim.</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+{% endblock %}
