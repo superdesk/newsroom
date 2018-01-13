@@ -208,6 +208,30 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
 
+    def get_product_items(self, product_id, size):
+        query = _items_query()
+
+        product = superdesk.get_resource_service('products').find_one(req=None, _id=product_id)
+
+        if not product:
+            return
+
+        query['bool']['should'] = []
+        query['bool']['should'].append({'term': {'products.code': product['_id']}})
+        query['bool']['should'].append(_query_string(product['query']))
+        query['bool']['minimum_should_match'] = 1
+        query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
+
+        source = {'query': query}
+        source['sort'] = [{'versioncreated': 'desc'}]
+        source['size'] = size
+        source['from'] = 0
+        source['post_filter'] = {'bool': {'must': []}}
+
+        internal_req = ParsedRequest()
+        internal_req.args = {'source': json.dumps(source)}
+        return list(super().get(internal_req, None))
+
     def get_matching_topics(self, item_id, topics, users, companies):
         """
         Returns a list of topic ids matching to the given item_id

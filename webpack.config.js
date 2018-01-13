@@ -14,6 +14,7 @@ module.exports = {
         user_profile_js: './assets/user-profile/index.js',
         newsroom_css: './assets/style.js',
         wire_js: './assets/wire/index.js',
+        home_js: './assets/home/index.js',
         notifications_js: './assets/notifications/index.js',
         vendor: [
             'alertifyjs',
