@@ -9,6 +9,9 @@ const cardTypes = [
     {value: '', text: ''},
     {value: '6-text-only', text: gettext('6-text-only')},
     {value: '4-picture-text', text: gettext('4-picture-text')},
+    {value: '4-media-gallery', text: gettext('4-media-gallery')},
+    {value: '1x1-top-news', text: gettext('1x1-top-news')},
+    {value: '2x2-top-news', text: gettext('2x2-top-news')},
 ];
 
 

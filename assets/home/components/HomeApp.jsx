@@ -3,11 +3,17 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import TextOnlyCard from './TextOnlyCard';
 import PictureTextCard from './PictureTextCard';
+import MediaGalleryCard from './MediaGalleryCard';
+import TopNewsOneByOneCard from './TopNewsOneByOneCard';
+import TopNewsTwoByTwoCard from './TopNewsTwoByTwoCard';
 import { gettext } from 'utils';
 
 const panels = {
     '6-text-only': TextOnlyCard,
     '4-picture-text': PictureTextCard,
+    '4-media-gallery': MediaGalleryCard,
+    '1x1-top-news': TopNewsOneByOneCard,
+    '2x2-top-news': TopNewsTwoByTwoCard,
 };
 
 class HomeApp extends React.Component {

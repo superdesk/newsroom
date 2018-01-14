@@ -15,7 +15,13 @@ class CardsResource(newsroom.Resource):
             'type': 'string',
             'required': True,
             'nullable': False,
-            'allowed': ['6-text-only', '4-picture-text'],
+            'allowed': [
+                '6-text-only',
+                '4-picture-text',
+                '4-media-gallery',
+                '1x1-top-news',
+                '2x2-top-news',
+            ],
         },
         'config': {
             'type': 'dict',

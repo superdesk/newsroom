@@ -31,7 +31,7 @@ const getPictureTextPanel = (item, picture) => {
                         </span>
                     </div>
                     <div className="wire-articles__item__meta-info">
-                        <span><span className="bold">{wordCount(item)}</span> words</span>
+                        <span><span className="bold">{wordCount(item)}</span> {gettext('words')}</span>
                     </div>
                 </div>
             </div>

@@ -45,12 +45,6 @@ def get_view_data():
 
 
 def get_home_data():
-    # cards = [
-    #     {'label': 'Something', 'type': '6-text-only', 'config': {'product': '5a23c1131d41c82b8dd4267d', 'size': 6}},
-    #     {'label': 'Other Stories', 'type': '4-picture-text',
-    #      'config': {'product': '5a23c1131d41c82b8dd4267d', 'size': 4}},
-    # ]
-
     cards = list(superdesk.get_resource_service('cards').get(None, None))
 
     itemsByCard = {}

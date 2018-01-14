@@ -25,6 +25,9 @@ const initialState = {
 const cardSizes = {
     '6-text-only': 6,
     '4-picture-text': 4,
+    '4-media-gallery': 4,
+    '1x1-top-news': 2,
+    '2x2-top-news': 4,
 };
 
 export default function cardReducer(state = initialState, action) {
