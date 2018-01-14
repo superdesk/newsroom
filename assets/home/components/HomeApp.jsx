@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import TextOnlyCard from './TextOnlyCard';
 import PictureTextCard from './PictureTextCard';
+import { gettext } from 'utils';
 
 const panels = {
     '6-text-only': TextOnlyCard,
@@ -25,7 +26,12 @@ class HomeApp extends React.Component {
         return (
             <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4">
                 <div className="container-fluid">
-                    {this.props.cards.map((card) => this.getPanels(card))}
+                    {this.props.cards.length > 0 && this.props.cards.map((card) => this.getPanels(card))}
+                    {this.props.cards.length === 0 &&
+                        <div className="alert alert-warning" role="alert">
+                            <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for home page!')}
+                        </div>
+                    }
                 </div>
             </section>
         );
