@@ -69,6 +69,7 @@ def edit(id):
         'label': data.get('label'),
         'type': data.get('type'),
         'config': data.get('config'),
+        'order': data.get('order'),
     }
 
     get_resource_service('cards').patch(id=ObjectId(id), updates=updates)

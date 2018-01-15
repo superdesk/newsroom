@@ -11,9 +11,9 @@ const getTopNewsLeftPanel = (item, picture) => {
 
     return (<div key={item._id} className='col-sm-6 col-md-9 d-flex mb-4'>
         <div className='card card--home card--horizontal'>
-            <div className='card-image-left'>
+            {imageUrl && <div className='card-image-left'>
                 <img src={imageUrl} alt={caption} />
-            </div>                        
+            </div>}
             <div className='card-body'>
                 <h2 className='card-title'>{item.headline}</h2>
                 <div className='wire-articles__item__meta'>
@@ -85,7 +85,7 @@ const getTopNews = (items) => {
     const topNews = [];
     for(var i=0; i<items.length; i+=2) {
         topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i])));
-        if (i+1 < length) {
+        if (i+1 < items.length) {
             topNews.push(getTopNewsRightPanel(items[i+1], getPicture(items[i+1])));
         }
     }

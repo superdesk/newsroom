@@ -23,6 +23,7 @@ function CardList({cards, products, onClick, activeCardId}) {
                             <th>{ gettext('Label') }</th>
                             <th>{ gettext('Type') }</th>
                             <th>{ gettext('Product') }</th>
+                            <th>{ gettext('Order') }</th>
                             <th>{ gettext('Created On') }</th>
                         </tr>
                     </thead>

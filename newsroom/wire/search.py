@@ -217,8 +217,13 @@ class WireSearchService(newsroom.Service):
             return
 
         query['bool']['should'] = []
-        query['bool']['should'].append({'term': {'products.code': product['_id']}})
-        query['bool']['should'].append(_query_string(product['query']))
+
+        if product.get('sd_product_id'):
+            query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
+
+        if product.get('query'):
+            query['bool']['should'].append(_query_string(product['query']))
+
         query['bool']['minimum_should_match'] = 1
         query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
 
