@@ -9,6 +9,7 @@ from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
 from flask_babel import gettext
+from bson import ObjectId
 
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.wire import blueprint
@@ -43,6 +44,20 @@ def get_view_data():
     }
 
 
+def get_home_data():
+    cards = list(superdesk.get_resource_service('cards').get(None, None))
+
+    itemsByCard = {}
+    for card in cards:
+        itemsByCard[card['label']] = superdesk.get_resource_service('wire_search').\
+            get_product_items(ObjectId(card['config']['product']), card['config']['size'])
+
+    return {
+        'cards': cards,
+        'itemsByCard': itemsByCard
+    }
+
+
 def get_previous_versions(item):
     if item.get('ancestors'):
         return sorted(
@@ -56,6 +71,13 @@ def get_previous_versions(item):
 @blueprint.route('/')
 @login_required
 def index():
+    # return flask.render_template('wire_index.html', data=get_view_data())
+    return flask.render_template('home.html', data=get_home_data())
+
+
+@blueprint.route('/wire')
+@login_required
+def wire():
     return flask.render_template('wire_index.html', data=get_view_data())
 
 

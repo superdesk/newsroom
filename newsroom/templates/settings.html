@@ -32,6 +32,11 @@
                         {{ gettext('Products') }}</a>
                 </li>
                 <li>
+                    <a class="side-navigation__btn {{ "active" if setting_type == "cards" }}"
+                        href="{{ url_for('cards.settings') }}">
+                        {{ gettext('Home Page Cards') }}</a>
+                </li>
+                <li>
                     <a class="side-navigation__btn"
                         href='#'>{{ gettext('System Settings') }}</a>
                 </li>

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ gettext('Home') }}{% endblock %}
+
+{% block breadcrumb %}
+<span class="breadcrumb-item active">{{ gettext('Home') }}</span>
+<span id="nav-breadcrumb" class="breadcrumb-item active"></span>
+{% endblock %}
+
+{% block content %}
+<div id="home-app" class="content"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        homeData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('home_js') | safe }}
+{% endblock %}
