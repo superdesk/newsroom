@@ -6,7 +6,7 @@ function formatCV(items, field) {
     return items && items.map((item) => (
         <a key={item.code}
             className='wire-column__preview__tag'
-            href={`/?q=${field}:"${item.name}"`}
+            href={`/wire?q=${field}:"${item.name}"`}
         >{item.name}</a>
     ));
 }

@@ -90,7 +90,7 @@ class EditProduct extends React.Component {
                                             onChange={this.props.onChange}
                                         />
                                         {this.props.product.sd_product_id &&
-                                        <a href={`/?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
+                                        <a href={`/wire?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
                                             className='btn btn-secondary float-right mt-2'>{gettext('Test product')}
                                         </a>}
                                     </div>

@@ -71,7 +71,6 @@ def get_previous_versions(item):
 @blueprint.route('/')
 @login_required
 def index():
-    # return flask.render_template('wire_index.html', data=get_view_data())
     return flask.render_template('home.html', data=get_home_data())
 
 

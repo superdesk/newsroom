@@ -15,6 +15,7 @@ function CardListItem({card, products, isActive, onClick}) {
             <td className="name">{card.label}</td>
             <td>{card.type}</td>
             <td>{getProductName(products, card.config.product)}</td>
+            <td>{card.order}</td>
             <td>{shortDate(card._created)}</td>
         </tr>
     );

@@ -54,7 +54,7 @@ class EditCard extends React.Component {
                             label={gettext('Label')}
                             value={this.props.card.label}
                             onChange={this.props.onChange}
-                            error={this.props.errors ? this.props.errors.name : null}/>
+                            error={this.props.errors ? this.props.errors.label : null}/>
 
                         <SelectInput
                             name='type'
@@ -71,6 +71,13 @@ class EditCard extends React.Component {
                             options={this.getProducts()}
                             onChange={this.props.onChange}
                             error={this.props.errors ? this.props.errors.product : null} />
+
+                        <TextInput
+                            name='order'
+                            label={gettext('Order')}
+                            value={this.props.card.order}
+                            onChange={this.props.onChange}
+                            error={this.props.errors ? this.props.errors.order : null}/>
 
 
                     </div>
