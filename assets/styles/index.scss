@@ -221,6 +221,41 @@ body.print {
         justify-content: center;
         align-items: center;
     }
+    .notif__list {
+        position: absolute;
+        top: 44px;
+        right: 0px;
+        background: $background-color;
+        box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
+        min-width: 300px;
+        overflow: auto;
+        max-height: calc(100vh - 56px);
+        @include sm {
+            min-width: 420px;
+        }
+    }
+    .notif__list__header {
+        background: #fff;
+        border-bottom: 1px solid #e7e7e7;
+    }
+    .notif__list__header-headline {
+        font-size: 1rem;
+        color: $body-text;
+        font-weight: 700;
+    }
+    .notif__list__item {
+        background: #fff;
+        box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2);
+        border: 2px solid transparent;
+        &:hover {
+            border: 2px solid #f5f5f5;
+        }
+    }
+    .notif__list__headline {
+        font-size: 0.875rem; // 14px
+        color: $body-text;
+        font-weight: 700;
+    }
 
 }
 
@@ -2209,7 +2244,7 @@ article.list {
 }
 
 .simple-card__date {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-family: $font-family-sans-serif;
     font-size: 0.8125rem;
     margin-top: 10px;
     span {
@@ -2224,6 +2259,19 @@ article.list {
     cursor: pointer;
     &:focus {
         outline: none;
+    }
+}
+
+.button-pill {
+    font-family: $font-family-sans-serif;
+    font-size: 0.75rem; // 12px
+    background: #f3f3f3;
+    padding-right: 1em;
+    padding-left: 1em;
+    border-radius: 10rem;
+    border: none;
+    &:hover {
+        background: #e2e2e2;
     }
 }
 
