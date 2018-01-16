@@ -19,14 +19,13 @@ class NotificationList extends React.Component {
     }
 
     renderNotification(newItem) {
-        return (<div key={newItem._id} className='card mt-3'  style={{width: '30rem', margin: '10px'}}>
-            <div className="card-header">
+        return (<div key={newItem._id} className='notif__list__item m-2 p-3'>
+            <div className="notif__list__headline">
                 {newItem.headline}
                 <CloseButton onClick={() => this.props.clearNotification(newItem._id)}/>
             </div>
-            <div className='card-block p-1'>
-                <p>{newItem.description_text}</p>
-                <footer>{gettext('Created on')} {shortDate(newItem.versioncreated)}</footer>
+            <div className='wire-articles__item__meta-info'>
+                {gettext('Created on')} {shortDate(newItem.versioncreated)}
             </div>
         </div>);
     }
@@ -45,17 +44,11 @@ class NotificationList extends React.Component {
                 </span>
 
                 {this.state.displayItems && this.props.notifications && this.props.notifications.length > 0 &&
-                    <div style={{
-                        position:'absolute',
-                        right: '17px',
-                        top: '56px',
-                        backgroundColor: 'white',
-                        border: '1px solid #cecece'
-                    }}>
-                        <div className='p-1'>
-                            <span className='ml-2'>{gettext('Notifications')}</span>
+                    <div className="notif__list">
+                        <div className='notif__list__header d-flex py-3'>
+                            <span className='notif__list__header-headline ml-3'>{gettext('Notifications')}</span>
                             <button type="button"
-                                className="btn btn-secondary btn-xs float-right mr-1"
+                                className="button-pill ml-auto mr-3"
                                 onClick={this.props.clearAll}>{gettext('Clear All')}
                             </button>
                         </div>
