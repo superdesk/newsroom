@@ -16,10 +16,16 @@ class NotificationList extends React.Component {
     toggleDisplay() {
         if (!this.state.displayItems && (!this.props.notifications || this.props.notifications.length == 0)) return;
         this.setState({displayItems:!this.state.displayItems});
+        if (!this.state.displayItems) {
+            document.getElementById('header-notification').classList.add('notif--open');
+        } else {
+            document.getElementById('header-notification').classList.remove('notif--open');
+        }
     }
 
     renderNotification(newItem) {
         return (<div key={newItem._id} className='notif__list__item m-2 p-3'>
+            <p>{gettext('A story you downloaded has been updated')}</p>
             <div className="notif__list__headline">
                 {newItem.headline}
                 <CloseButton onClick={() => this.props.clearNotification(newItem._id)}/>

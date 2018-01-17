@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, wordCount, getProductQuery } from 'utils';
+import { gettext, shortDate, wordCount } from 'utils';
 import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
+import MoreNewsButton from './MoreNewsButton';
 
 const getPictureTextPanel = (item, picture) => {
     const rendition = getPreviewRendition(picture);
@@ -42,13 +43,7 @@ const getPictureTextPanel = (item, picture) => {
 function PictureTextCard({items, title, product}) {
     return (
         <div className='row'>
-            <div className='col-6 col-sm-8'>
-                <h3 className='home-section-heading'>{title}</h3>
-            </div>
-            <div className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-                {product &&
-                <button onClick={() => window.location.href = `/wire?q=${getProductQuery(product)}`} type='button' className='btn btn-outline-primary btn-sm mb-3'>{gettext('More news')}</button>}
-            </div>
+            <MoreNewsButton title={title} product={product}/>
             {items.map((item) => getPictureTextPanel(item, getPicture(item)))}
         </div>
     );

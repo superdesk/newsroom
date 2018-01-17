@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate, wordCount, getProductQuery } from 'utils';
+import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
+import MoreNewsButton from './MoreNewsButton';
 
 const getTopNewsLeftPanel = (item, picture) => {
 
@@ -95,13 +96,7 @@ const getTopNews = (items) => {
 function TopNewsTwoByTwoCard({items, title, product}) {
     return (
         <div className='row'>
-            <div className='col-6 col-sm-8'>
-                <h3 className='home-section-heading'>{title}</h3>
-            </div>
-            <div className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-                {product &&
-                <button onClick={() => window.location.href = `/wire?q=${getProductQuery(product)}`} type='button' className='btn btn-outline-primary btn-sm mb-3'>{gettext('More news')}</button>}
-            </div>
+            <MoreNewsButton title={title} product={product}/>
             {getTopNews(items)}
         </div>
     );

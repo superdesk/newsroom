@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate, wordCount, getProductQuery } from 'utils';
+import { gettext, shortDate, fullDate, wordCount } from 'utils';
+import MoreNewsButton from './MoreNewsButton';
 
 const getTextOnlyPanel = item => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-2 d-flex mb-4'>
@@ -24,13 +25,7 @@ const getTextOnlyPanel = item => (
 function TextOnlyCard({items, title, product}) {
     return (
         <div className='row'>
-            <div className='col-6 col-sm-8'>
-                <h3 className='home-section-heading'>{title}</h3>
-            </div>
-            <div className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-                {product &&
-                <button onClick={() => window.location.href = `/wire?q=${getProductQuery(product)}`} type='button' className='btn btn-outline-primary btn-sm mb-3'>{gettext('More news')}</button>}
-            </div>
+            <MoreNewsButton title={title} product={product}/>
             {items.map((item) => getTextOnlyPanel(item))}
         </div>
     );
