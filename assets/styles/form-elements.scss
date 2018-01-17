@@ -13,6 +13,7 @@
     &:checked + i {
         background: #{$selectedColor};
         border-color: #{$selectedColor};
+        opacity: 1;
 
         &:hover:after { opacity: 1; }
 
@@ -36,7 +37,8 @@
         height: #{$size};
         margin: 0;
         vertical-align: #{$valign};
-        border: 2px solid #dfdfdf;
+        border: 2px solid rgba(200, 200, 200, 0.4);
+        z-index: 100;
         transition: background 200ms ease;
 
         @if $rounded == "circle" {
@@ -49,11 +51,11 @@
             border-radius: 0; 
         }
     
-        background: #F9F9F9;
+        background-color: rgba(200, 200, 200, 0.1);
         font-size: #{$size};
         cursor: pointer;
 
-        &:hover:after { opacity: .2; }
+        &:hover:after { opacity: 1; }
 
         &:after {
             content: '';
@@ -65,7 +67,7 @@
             left: 16%;
             width: 1rem;
             height: .5rem;
-            border: .16rem solid #222;
+            border: .16rem solid rgba(200, 200, 200, 0.8);
             border-top: none;
             border-right: none;
             background: rgba(0, 0, 0, 0);

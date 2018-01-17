@@ -7,19 +7,41 @@ import 'whatwg-fetch';
 var filterOpen = false;
 var previewOpen = false;
 
-function responsiveWireItem() {
+function isGrid() {
+    if ( $('.wire-articles__item').hasClass('wire-articles__item--grid')) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+function responsiveWireItem() {    
+
     if (filterOpen && !previewOpen) {
         document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__one-side-pane');
         document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
+        if ( isGrid() ) {        
+            $('.wire-articles__item-wrap').removeClass().addClass('wire-articles__item-wrap col-sm-12 col-md-6 col-xl-4 col-xxl-3');
+        }
     } else if (filterOpen && previewOpen) {
         document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__one-side-pane');
         document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__two-side-panes');
+        if ( isGrid() ) {
+            $('.wire-articles__item-wrap').removeClass().addClass('wire-articles__item-wrap col-sm-12 col-md-12 col-xl-6 col-xxl-4');
+        }
     } else if (!filterOpen && previewOpen) {
         document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
         document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__one-side-pane');
+        if ( isGrid() ) {
+            $('.wire-articles__item-wrap').removeClass().addClass('wire-articles__item-wrap col-sm-12 col-md-6 col-xl-4 col-xxl-3');
+        }
     } else {
         document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__one-side-pane');
         document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
+        if ( isGrid() ) {
+            $('.wire-articles__item-wrap').removeClass().addClass('wire-articles__item-wrap col-sm-6 col-md-4 col-xl-3 col-xxl-2');
+        }
     }
 }
 
@@ -65,7 +87,7 @@ for(var i = 0; i < listItem.length; i++) {
 
 // Show and hide multi action bar
 
-$('.wire-articles__item--list__select input').click(function(){
+$('.wire-articles__item-select input').click(function(){
     $('.multi-action-bar').toggleClass('multi-action-bar--open');
 });
 
