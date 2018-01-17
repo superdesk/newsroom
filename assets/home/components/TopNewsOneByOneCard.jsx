@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate, wordCount } from 'utils';
+import { gettext, shortDate, fullDate, wordCount, getProductQuery } from 'utils';
 import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
 
 const getTopNewsPanel = (item, picture) => {
@@ -41,14 +41,15 @@ const getTopNewsPanel = (item, picture) => {
     </div>);
 };
 
-function TopNewsOneByOneCard({items, title}) {
+function TopNewsOneByOneCard({items, title, product}) {
     return (
         <div className='row'>
             <div className='col-6 col-sm-8'>
                 <h3 className='home-section-heading'>{title}</h3>
             </div>
             <div className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-                <button type='button' className='btn btn-outline-primary btn-sm mb-3'>{gettext('More news')}</button>
+                {product &&
+                <button onClick={() => window.location.href = `/wire?q=${getProductQuery(product)}`} type='button' className='btn btn-outline-primary btn-sm mb-3'>{gettext('More news')}</button>}
             </div>
             {items.map((item) => getTopNewsPanel(item, getPicture(item)))}
         </div>
@@ -58,6 +59,7 @@ function TopNewsOneByOneCard({items, title}) {
 TopNewsOneByOneCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
+    product: PropTypes.object,
 };
 
 export default TopNewsOneByOneCard;

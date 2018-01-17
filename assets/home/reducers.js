@@ -6,6 +6,7 @@ import {
 const initialState = {
     cards: [],
     itemsByCard: {},
+    products: [],
 };
 
 export default function homeReducer(state = initialState, action) {
@@ -15,7 +16,8 @@ export default function homeReducer(state = initialState, action) {
         return {
             ...state,
             cards: action.data.cards,
-            itemsByCard: action.data.itemsByCard
+            itemsByCard: action.data.itemsByCard,
+            products: action.data.products,
         };
 
     default:

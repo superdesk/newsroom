@@ -22,10 +22,14 @@ class HomeApp extends React.Component {
         this.getPanels = this.getPanels.bind(this);
     }
 
+    getProduct(card) {
+        return this.props.products.find(p => p._id === card.config.product);
+    }
+
     getPanels(card) {
         const items = this.props.itemsByCard[card.label];
         const Panel = panels[card.type];
-        return <Panel key={card.label} items={items} title={card.label}/>;
+        return <Panel key={card.label} items={items} title={card.label} product={this.getProduct(card)}/>;
     }
 
     render() {
@@ -47,11 +51,13 @@ class HomeApp extends React.Component {
 HomeApp.propTypes = {
     cards: PropTypes.arrayOf(PropTypes.object),
     itemsByCard: PropTypes.object,
+    products: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
     cards: state.cards,
     itemsByCard: state.itemsByCard,
+    products: state.products,
 });
 
 

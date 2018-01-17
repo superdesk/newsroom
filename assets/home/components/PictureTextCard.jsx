@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, wordCount } from 'utils';
+import { gettext, shortDate, wordCount, getProductQuery } from 'utils';
 import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
 
 const getPictureTextPanel = (item, picture) => {
@@ -39,14 +39,15 @@ const getPictureTextPanel = (item, picture) => {
     </div>);
 };
 
-function PictureTextCard({items, title}) {
+function PictureTextCard({items, title, product}) {
     return (
         <div className='row'>
             <div className='col-6 col-sm-8'>
                 <h3 className='home-section-heading'>{title}</h3>
             </div>
             <div className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-                <button type='button' className='btn btn-outline-primary btn-sm mb-3'>{gettext('More news')}</button>
+                {product &&
+                <button onClick={() => window.location.href = `/wire?q=${getProductQuery(product)}`} type='button' className='btn btn-outline-primary btn-sm mb-3'>{gettext('More news')}</button>}
             </div>
             {items.map((item) => getPictureTextPanel(item, getPicture(item)))}
         </div>
@@ -56,6 +57,7 @@ function PictureTextCard({items, title}) {
 PictureTextCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
+    product: PropTypes.object,
 };
 
 export default PictureTextCard;
