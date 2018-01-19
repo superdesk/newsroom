@@ -8,6 +8,48 @@
     <section class="content-main d-block py-4 px-2 p-md-3 p-lg-4">
         <div class="container-fluid">
 
+            <!-- Photo carousel -->
+            <div class="row">
+                <div class="col-12">
+                    <div id="carousel" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active" style="background-image: url('{{ url_for('static', filename = 'photos/carousel-01.jpeg') }}');">
+                                <div class="carousel-caption">
+                                    <h3>Anim minim consequat sunt ut anim duis.</h3>
+                                </div>
+                                <div class="carousel-overlay"></div>
+                            </div>
+                            <div class="carousel-item" style="background-image: url('{{ url_for('static', filename = 'photos/carousel-02.jpeg') }}');">
+                                <div class="carousel-caption">
+                                    <h3>Ad occaecat consectetur occaecat proident do ullamco</h3>
+                                </div>
+                                <div class="carousel-overlay"></div>
+                            </div>
+                            <div class="carousel-item" style="background-image: url('{{ url_for('static', filename = 'photos/carousel-03.jpeg') }}');">
+                                <div class="carousel-caption">
+                                    <h3>Laboris velit consectetur exercitation laborum ad eu non occaecat.</h3>
+                                </div>
+                                <div class="carousel-overlay"></div>
+                            </div>
+                            <div class="carousel-item" style="background-image: url('{{ url_for('static', filename = 'photos/carousel-04.jpeg') }}');">
+                                <div class="carousel-caption">
+                                    <h3>Incididunt enim irure commodo reprehenderit sit amet proident.</h3>
+                                </div>
+                                <div class="carousel-overlay"></div>
+                            </div>
+                        </div>
+                        <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+                          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                          <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                          <span class="sr-only">Next</span>
+                        </a>
+                      </div>
+                </div>
+            </div>
+
             <!-- Top News 2 + 2 -->
             <div class="row">
                 <div class="col-6 col-sm-8">
@@ -478,4 +520,23 @@
     </section>
 </div>
 
+{% endblock %}
+
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.18/jquery.touchSwipe.js" integrity="sha256-KKv6+21Uvs0xGccvranH3/RaUvz7N24khCbpW6leF5o=" crossorigin="anonymous"></script>
+<script>
+    // Carousel swipe
+    $('.carousel').swipe({
+
+        swipe: function(event, direction, distance, duration, fingerCount, fingerData) {
+
+        if (direction == 'left') $(this).carousel('next');
+        if (direction == 'right') $(this).carousel('prev');
+
+        },
+        allowPageScroll:'vertical'
+
+    });
+</script>
 {% endblock %}

@@ -2,6 +2,14 @@ import 'babel-polyfill';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
 
+// Carousel caption parallax
+$('.content-main').scroll(function() {    
+    var scrollTop = $('.content-main').scrollTop();
+    var imgPos = scrollTop / 2 + 'px';
+    $('.carousel-item').css('background-position', '50% ' + imgPos);
+    $('.carousel-caption').css('opacity', 1 - scrollTop / 400);
+});
+
 // Function for responsive wire item
 
 var filterOpen = false;

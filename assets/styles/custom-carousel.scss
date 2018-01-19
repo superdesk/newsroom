@@ -1,0 +1,83 @@
+// Custom carousel
+
+.carousel {
+    margin: -1.5rem -1.4375rem 1.5rem -1.4375rem;
+    @include md {
+        margin: -1.5rem -1.9375rem 1.5rem -1.9375rem;
+    }    
+    @include lg {
+        margin: -1.5rem -2.4375rem 1.5rem -2.4375rem;
+    }
+}
+
+.carousel-item {
+    height: 200px;
+    background-size: cover;
+    background-position: 50% 0;
+    @include md {
+        height: 500px;
+    }
+}
+
+.carousel-caption {
+    text-align: left;
+    left: 10%;
+    right: 10%;
+    bottom: 0;
+    @include md {
+        bottom: 20px;
+    }
+    @include xl {
+        left: 5%;
+        right: 5%;
+    }
+
+    h3 {
+        font-size: 24px;
+        text-align: left;
+        font-weight: 900;
+        @include md {
+            font-size: 48px;
+        }
+    }
+}
+
+.carousel-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: -moz-linear-gradient(bottom,  rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 50%);
+    background: -webkit-linear-gradient(bottom,  rgba(0,0,0,.6) 0%,rgba(0,0,0,0) 50%);
+    background: linear-gradient(to top,  rgba(0,0,0,.6) 0%,rgba(0,0,0,0) 50%);       
+}
+
+.carousel-control-next,
+.carousel-control-prev {
+    width: 50px;
+    height: 100px;
+    top: 50%;
+    margin-top: -50px;
+    background-color: rgba(0,0,0,0.5);
+}
+.carousel-control-next {
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 50px;
+    padding-left: 10px;
+}
+.carousel-control-prev {
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    padding-right: 10px;
+}
+
+.carousel-control-next-icon,
+.carousel-control-prev-icon {
+    width: 13px;
+    height: 21px;
+    background-image: url('/static/icon-arrow-white.svg');
+}
+.carousel-control-prev-icon {
+    transform:rotate(180deg);
+}
