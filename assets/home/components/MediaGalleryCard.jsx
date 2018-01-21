@@ -4,14 +4,14 @@ import { gettext, shortDate } from 'utils';
 import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
 import MoreNewsButton from './MoreNewsButton';
 
-const getMediaPanel = (item, picture) => {
+const getMediaPanel = (item, picture, openItem) => {
     
     const rendition = getPreviewRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className='col-sm-6 col-lg-3 d-flex mb-4'>
-        <div className='card card--home card--gallery'>
+        <div className='card card--home card--gallery' onClick={() => openItem(item)}>
             <img className='card-img-top' src={imageUrl} alt={caption} />
             <div className='card-body'>
                 <div className='wire-articles__item__meta'>                                
@@ -25,11 +25,11 @@ const getMediaPanel = (item, picture) => {
     </div>);
 };
 
-function MediaGalleryCard({items, title, product}) {
+function MediaGalleryCard({items, title, product, openItem}) {
     return (
         <div className='row'>
             <MoreNewsButton title={title} product={product}/>
-            {items.map((item) => getMediaPanel(item, getPicture(item)))}
+            {items.map((item) => getMediaPanel(item, getPicture(item), openItem))}
         </div>
     );
 }
@@ -38,6 +38,7 @@ MediaGalleryCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
     product: PropTypes.object,
+    openItem: PropTypes.func,
 };
 
 export default MediaGalleryCard;

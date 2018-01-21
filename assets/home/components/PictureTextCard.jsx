@@ -4,13 +4,13 @@ import { gettext, shortDate, wordCount } from 'utils';
 import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
 import MoreNewsButton from './MoreNewsButton';
 
-const getPictureTextPanel = (item, picture) => {
+const getPictureTextPanel = (item, picture, openItem) => {
     const rendition = getPreviewRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className="col-sm-6 col-lg-3 d-flex mb-4">
-        <div className="card card--home">
+        <div className="card card--home" onClick={() => openItem(item)}>
             <img className="card-img-top" src={imageUrl} alt={caption} />
             <div className="card-body">
                 <h4 className="card-title">{item.headline}</h4>
@@ -40,11 +40,11 @@ const getPictureTextPanel = (item, picture) => {
     </div>);
 };
 
-function PictureTextCard({items, title, product}) {
+function PictureTextCard({items, title, product, openItem}) {
     return (
         <div className='row'>
             <MoreNewsButton title={title} product={product}/>
-            {items.map((item) => getPictureTextPanel(item, getPicture(item)))}
+            {items.map((item) => getPictureTextPanel(item, getPicture(item), openItem))}
         </div>
     );
 }
@@ -53,6 +53,7 @@ PictureTextCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
     product: PropTypes.object,
+    openItem: PropTypes.func,
 };
 
 export default PictureTextCard;

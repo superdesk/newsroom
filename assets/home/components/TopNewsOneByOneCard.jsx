@@ -4,14 +4,14 @@ import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
 import MoreNewsButton from './MoreNewsButton';
 
-const getTopNewsPanel = (item, picture) => {
+const getTopNewsPanel = (item, picture, openItem) => {
     
     const rendition = getPreviewRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className='col-sm-12 col-md-6 d-flex mb-4'>
-        <div className='card card--home'>
+        <div className='card card--home' onClick={() => openItem(item)}>
             <img className='card-img-top' src={imageUrl} alt={caption} />
             <div className='card-body'>
                 <h4 className='card-title'>{item.headline}</h4>
@@ -42,11 +42,11 @@ const getTopNewsPanel = (item, picture) => {
     </div>);
 };
 
-function TopNewsOneByOneCard({items, title, product}) {
+function TopNewsOneByOneCard({items, title, product, openItem}) {
     return (
         <div className='row'>
             <MoreNewsButton title={title} product={product}/>
-            {items.map((item) => getTopNewsPanel(item, getPicture(item)))}
+            {items.map((item) => getTopNewsPanel(item, getPicture(item), openItem))}
         </div>
     );
 }
@@ -55,6 +55,7 @@ TopNewsOneByOneCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
     product: PropTypes.object,
+    openItem: PropTypes.func,
 };
 
 export default TopNewsOneByOneCard;

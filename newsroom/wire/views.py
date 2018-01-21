@@ -58,7 +58,10 @@ def get_home_data():
     return {
         'cards': cards,
         'itemsByCard': itemsByCard,
-        'products': get_products_by_company(company_id)
+        'products': get_products_by_company(company_id),
+        'user': str(user['_id']) if user else None,
+        'company': company_id,
+        'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()],
     }
 
 

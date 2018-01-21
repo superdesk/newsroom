@@ -4,14 +4,14 @@ import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
 import MoreNewsButton from './MoreNewsButton';
 
-const getTopNewsLeftPanel = (item, picture) => {
+const getTopNewsLeftPanel = (item, picture, openItem) => {
 
     const rendition = getPreviewRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className='col-sm-6 col-md-9 d-flex mb-4'>
-        <div className='card card--home card--horizontal'>
+        <div className='card card--home card--horizontal' onClick={() => openItem(item)}>
             {imageUrl && <div className='card-image-left'>
                 <img src={imageUrl} alt={caption} />
             </div>}
@@ -45,14 +45,14 @@ const getTopNewsLeftPanel = (item, picture) => {
     );
 };
   
-const getTopNewsRightPanel = (item, picture) => {
+const getTopNewsRightPanel = (item, picture, openItem) => {
 
     const rendition = getPreviewRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className='col-sm-6 col-md-3 d-flex mb-4'>
-        <div className='card card--home'>
+        <div className='card card--home' onClick={() => openItem(item)}>
             <img className='card-img-top' src={imageUrl} alt={caption} />
             <div className='card-body'>
                 <h4 className='card-title'>{item.headline}</h4>
@@ -82,22 +82,22 @@ const getTopNewsRightPanel = (item, picture) => {
     </div>);
 };
 
-const getTopNews = (items) => {
+const getTopNews = (items, openItem) => {
     const topNews = [];
     for(var i=0; i<items.length; i+=2) {
-        topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i])));
+        topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i]), openItem));
         if (i+1 < items.length) {
-            topNews.push(getTopNewsRightPanel(items[i+1], getPicture(items[i+1])));
+            topNews.push(getTopNewsRightPanel(items[i+1], getPicture(items[i+1]), openItem));
         }
     }
     return topNews;
 };
 
-function TopNewsTwoByTwoCard({items, title, product}) {
+function TopNewsTwoByTwoCard({items, title, product, openItem}) {
     return (
         <div className='row'>
             <MoreNewsButton title={title} product={product}/>
-            {getTopNews(items)}
+            {getTopNews(items, openItem)}
         </div>
     );
 }
@@ -106,6 +106,7 @@ TopNewsTwoByTwoCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
     product: PropTypes.object,
+    openItem: PropTypes.func,
 };
 
 export default TopNewsTwoByTwoCard;

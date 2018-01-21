@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import MoreNewsButton from './MoreNewsButton';
 
-const getTextOnlyPanel = item => (
+const getTextOnlyPanel = (item, openItem) => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-2 d-flex mb-4'>
-        <div className='card card--home'>
+        <div className='card card--home' onClick={() => openItem(item)}>
             <div className='card-body'>
                 <h5 className='card-title'>{item.headline}</h5>
                 <div className='wire-articles__item__meta'>
@@ -22,11 +22,11 @@ const getTextOnlyPanel = item => (
     </div>
 );
 
-function TextOnlyCard({items, title, product}) {
+function TextOnlyCard({items, title, product, openItem}) {
     return (
         <div className='row'>
             <MoreNewsButton title={title} product={product}/>
-            {items.map((item) => getTextOnlyPanel(item))}
+            {items.map((item) => getTextOnlyPanel(item, openItem))}
         </div>
     );
 }
@@ -35,6 +35,7 @@ TextOnlyCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
     product: PropTypes.object,
+    openItem: PropTypes.func,
 };
 
 export default TextOnlyCard;
