@@ -12,6 +12,7 @@ from flask_babel import gettext
 from bson import ObjectId
 
 from newsroom.navigations.navigations import get_navigations_by_company
+from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
@@ -46,6 +47,8 @@ def get_view_data():
 
 def get_home_data():
     cards = list(superdesk.get_resource_service('cards').get(None, None))
+    user = get_user()
+    company_id = str(user['company']) if user and user.get('company') else None
 
     itemsByCard = {}
     for card in cards:
@@ -54,7 +57,11 @@ def get_home_data():
 
     return {
         'cards': cards,
-        'itemsByCard': itemsByCard
+        'itemsByCard': itemsByCard,
+        'products': get_products_by_company(company_id),
+        'user': str(user['_id']) if user else None,
+        'company': company_id,
+        'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()],
     }
 
 

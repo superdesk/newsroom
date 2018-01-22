@@ -15,7 +15,7 @@ from newsroom.utils import query_resource
 @admin_only
 def settings():
     data = {
-        'products': list(query_resource('products', max_results=200)),
+        'products': list(query_resource('products', lookup={'is_enabled': True}, max_results=200)),
         "cards": list(query_resource('cards', max_results=200)),
     }
     return flask.render_template('settings.html', setting_type="cards", data=data)

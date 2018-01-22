@@ -2,26 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { gettext } from 'utils';
 import { get } from 'lodash';
 import { createPortal } from 'react-dom';
 
 import {
     followTopic,
     fetchItems,
-    copyPreviewContents,
-    shareItems,
     setQuery,
     selectAll,
     selectNone,
-    bookmarkItems,
-    removeBookmarks,
-    downloadItems,
-    openItem,
     fetchMoreItems,
     setView,
     refresh,
-    printItem,
     previewItem,
 } from 'wire/actions';
 
@@ -39,6 +31,7 @@ import ItemDetails from './ItemDetails';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
+import { getItemActions } from '../item-actions';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -274,59 +267,7 @@ const mapDispatchToProps = (dispatch) => ({
     },
     selectAll: () => dispatch(selectAll()),
     selectNone: () => dispatch(selectNone()),
-    actions: [
-        {
-            id: 'open',
-            name: gettext('Open'),
-            icon: 'text',
-            action: (item) => dispatch(openItem(item)),
-        },
-        {
-            name: gettext('Share'),
-            icon: 'share',
-            multi: true,
-            shortcut: true,
-            visited: (user, item) => user && item && item.shares &&  item.shares.includes(user),
-            when: (state) => state.user && state.company,
-            action: (items) => dispatch(shareItems(items)),
-        },
-        {
-            name: gettext('Print'),
-            icon: 'print',
-            visited: (user, item) => user && item && item.prints &&  item.prints.includes(user),
-            action: (item) => dispatch(printItem(item)),
-        },
-        {
-            name: gettext('Copy'),
-            icon: 'copy',
-            visited: (user, item) => user && item && item.copies &&  item.copies.includes(user),
-            action: (item) => dispatch(copyPreviewContents(item)),
-        },
-        {
-            name: gettext('Download'),
-            icon: 'download',
-            multi: true,
-            visited: (user, item) => user && item && item.downloads &&  item.downloads.includes(user),
-            when: (state) => state.user && state.company,
-            action: (items) => dispatch(downloadItems(items)),
-        },
-        {
-            name: gettext('Bookmark'),
-            icon: 'bookmark-add',
-            multi: true,
-            shortcut: true,
-            when: (state, item) => state.user && (!item || !item.bookmarks ||  !item.bookmarks.includes(state.user)),
-            action: (items) => dispatch(bookmarkItems(items)),
-        },
-        {
-            name: gettext('Remove from bookmarks'),
-            icon: 'bookmark-remove',
-            multi: true,
-            shortcut: true,
-            when: (state, item) => state.user && item && item.bookmarks && item.bookmarks.includes(state.user),
-            action: (items) => dispatch(removeBookmarks(items)),
-        },
-    ],
+    actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),

@@ -2,15 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
+import MoreNewsButton from './MoreNewsButton';
+import {getProductQuery} from '../../utils';
 
-const getTopNewsLeftPanel = (item, picture) => {
+const getTopNewsLeftPanel = (item, picture, product) => {
 
     const rendition = getPreviewRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className='col-sm-6 col-md-9 d-flex mb-4'>
-        <div className='card card--home card--horizontal'>
+        <div className='card card--home card--horizontal' onClick={() => window.location.href = `/wire?q=${getProductQuery(product)}&item=${item._id}`}>
             {imageUrl && <div className='card-image-left'>
                 <img src={imageUrl} alt={caption} />
             </div>}
@@ -44,14 +46,14 @@ const getTopNewsLeftPanel = (item, picture) => {
     );
 };
   
-const getTopNewsRightPanel = (item, picture) => {
+const getTopNewsRightPanel = (item, picture, product) => {
 
     const rendition = getPreviewRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className='col-sm-6 col-md-3 d-flex mb-4'>
-        <div className='card card--home'>
+        <div className='card card--home' onClick={() => window.location.href = `/wire?q=${getProductQuery(product)}&item=${item._id}`}>
             <img className='card-img-top' src={imageUrl} alt={caption} />
             <div className='card-body'>
                 <h4 className='card-title'>{item.headline}</h4>
@@ -81,27 +83,22 @@ const getTopNewsRightPanel = (item, picture) => {
     </div>);
 };
 
-const getTopNews = (items) => {
+const getTopNews = (items, product) => {
     const topNews = [];
     for(var i=0; i<items.length; i+=2) {
-        topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i])));
+        topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i]), product));
         if (i+1 < items.length) {
-            topNews.push(getTopNewsRightPanel(items[i+1], getPicture(items[i+1])));
+            topNews.push(getTopNewsRightPanel(items[i+1], getPicture(items[i+1]), product));
         }
     }
     return topNews;
 };
 
-function TopNewsTwoByTwoCard({items, title}) {
+function TopNewsTwoByTwoCard({items, title, product}) {
     return (
         <div className='row'>
-            <div className='col-6 col-sm-8'>
-                <h3 className='home-section-heading'>{title}</h3>
-            </div>
-            <div className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-                <button type='button' className='btn btn-outline-primary btn-sm mb-3'>{gettext('More news')}</button>
-            </div>
-            {getTopNews(items)}
+            <MoreNewsButton title={title} product={product}/>
+            {getTopNews(items, product)}
         </div>
     );
 }
@@ -109,6 +106,8 @@ function TopNewsTwoByTwoCard({items, title}) {
 TopNewsTwoByTwoCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
+    product: PropTypes.object,
+    openItem: PropTypes.func,
 };
 
 export default TopNewsTwoByTwoCard;

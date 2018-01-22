@@ -70,6 +70,18 @@ export function gettext(text, params) {
 }
 
 /**
+ * Returns query string query for a given product
+ *
+ * @param {Object} product
+ * @return {string}
+ */
+export function getProductQuery(product) {
+    let q = product.sd_product_id ? `products.code:${product.sd_product_id}` : '';
+    q += product.query ? product.sd_product_id ? ` OR (${product.query})` : product.query : '';
+    return q;
+}
+
+/**
  * Parse given date string and return Date instance
  *
  * @param {String} dateString

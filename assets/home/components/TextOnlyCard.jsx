@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
+import MoreNewsButton from './MoreNewsButton';
+import {getProductQuery} from '../../utils';
 
-const getTextOnlyPanel = item => (
+const getTextOnlyPanel = (item, product) => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-2 d-flex mb-4'>
-        <div className='card card--home'>
+        <div className='card card--home' onClick={() => window.location.href = `/wire?q=${getProductQuery(product)}&item=${item._id}`}>
             <div className='card-body'>
                 <h5 className='card-title'>{item.headline}</h5>
                 <div className='wire-articles__item__meta'>
@@ -21,16 +23,11 @@ const getTextOnlyPanel = item => (
     </div>
 );
 
-function TextOnlyCard({items, title}) {
+function TextOnlyCard({items, title, product}) {
     return (
         <div className='row'>
-            <div className='col-6 col-sm-8'>
-                <h3 className='home-section-heading'>{title}</h3>
-            </div>
-            <div className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-                <button type='button' className='btn btn-outline-primary btn-sm mb-3'>{gettext('More news')}</button>
-            </div>
-            {items.map((item) => getTextOnlyPanel(item))}
+            <MoreNewsButton title={title} product={product}/>
+            {items.map((item) => getTextOnlyPanel(item, product))}
         </div>
     );
 }
@@ -38,6 +35,8 @@ function TextOnlyCard({items, title}) {
 TextOnlyCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
+    product: PropTypes.object,
+    openItem: PropTypes.func,
 };
 
 export default TextOnlyCard;
