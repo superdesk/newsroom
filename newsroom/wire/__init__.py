@@ -31,8 +31,9 @@ def init_app(app):
 
     superdesk.register_resource('wire_search', WireSearchResource, WireSearchService, _app=app)
 
-    app.sidenav('Wire', 'wire.wire')
-    app.sidenav('Bookmarks', 'wire.bookmarks')
+    app.sidenav('Home', 'wire.index', 'dashboard')
+    app.sidenav('Wire', 'wire.wire', 'text')
+    app.sidenav('Bookmarks', 'wire.bookmarks', 'bookmark')
 
     from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter
     app.add_download_formatter('text', TextFormatter(), gettext('Plain Text'))
