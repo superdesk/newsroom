@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import MoreNewsButton from './MoreNewsButton';
+import {getProductQuery} from '../../utils';
 
-const getTextOnlyPanel = (item, openItem) => (
+const getTextOnlyPanel = (item, product) => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-2 d-flex mb-4'>
-        <div className='card card--home' onClick={() => openItem(item)}>
+        <div className='card card--home' onClick={() => window.location.href = `/wire?q=${getProductQuery(product)}&item=${item._id}`}>
             <div className='card-body'>
                 <h5 className='card-title'>{item.headline}</h5>
                 <div className='wire-articles__item__meta'>
@@ -22,11 +23,11 @@ const getTextOnlyPanel = (item, openItem) => (
     </div>
 );
 
-function TextOnlyCard({items, title, product, openItem}) {
+function TextOnlyCard({items, title, product}) {
     return (
         <div className='row'>
             <MoreNewsButton title={title} product={product}/>
-            {items.map((item) => getTextOnlyPanel(item, openItem))}
+            {items.map((item) => getTextOnlyPanel(item, product))}
         </div>
     );
 }
