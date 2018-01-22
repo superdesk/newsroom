@@ -140,7 +140,7 @@
         </div>
     </div>
 
-    <div class="wire-column__main container-fluid">
+    <div class="wire-column__main container-fluid px-4">
 
         <div class="d-flex mt-1 mt-sm-3 p-0 align-items-center flex-wrap flex-sm-nowrap">
             <div class="navbar-text search-results-info">
@@ -155,10 +155,126 @@
             </button>
         </div>
 
-        <div class="wire-articles wire-articles--list row">
+        <div class="wire-articles wire-articles--grid row">
 
-            <article class="wire-articles__item-wrap col-12">
-                <div class="wire-articles__item wire-articles__item--list">
+            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">
+                <div class="wire-articles__item wire-articles__item--grid">
+                    <div class="wire-articles__item-text">
+                        <h4 class="wire-articles__item-headline">
+                            Battling Kings go into NBL playoff mode
+                        </h4>
+                        <div class="wire-articles__item__meta">
+                            <div class="wire-articles__item__icons">
+                                <span class="wire-articles__item__icon">
+                                    <i class="icon--text icon--gray-light"></i>
+                                </span>
+                                <span class="wire-articles__item__icon">
+                                    <i class="icon--photo icon--gray-light"></i>
+                                </span>
+                                <span class="wire-articles__item__divider">
+                                </span>
+                            </div>
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
+                            </div>
+                        </div>                        
+                    </div>
+                    <div class="wire-articles__item-image">
+                        <div class="no-bindable-select wire-articles__item-select">
+                            <label class="circle-checkbox">
+                                <input type="checkbox" class="css-checkbox" />
+                                <i></i>
+                            </label>
+                        </div>
+                        <span class="wire-articles__item-image-icon">
+                            <i class="icon--resize icon--white"></i>
+                        </span>
+                        <figure>
+                            <img src="{{ url_for('static', filename = 'list_image_800x600.jpg') }}"/>
+                        </figure>
+                    </div>
+                    <div class="wire-articles__item-actions">
+
+                        <div class="btn-group">
+                            <span data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="icon--more icon--gray-light"></i>
+                            </span>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <button class="dropdown-item" type="button"><i class="icon--download"></i> Download</button>
+                                <button class="dropdown-item" type="button"><i class="icon--copy"></i> Copy</button>
+                                <button class="dropdown-item" type="button"><i class="icon--print"></i> Print</button>
+                                <button class="dropdown-item" type="button"><i class="icon--share"></i> Share</button>
+                                <button class="dropdown-item" type="button"><i class="icon--bookmark-add"></i> Add to Bookmarks</button>
+                            </div>
+                        </div>                     
+
+                        <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share"></i></button>
+                        <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
+                    </div>
+                </div>               
+                
+            </article>
+
+            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">
+                <div class="wire-articles__item wire-articles__item--grid wire-articles__item--visited">
+                    <div class="wire-articles__item-text">
+                        <h4 class="wire-articles__item-headline">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        </h4>
+                        <div class="wire-articles__item__meta">
+                            <div class="wire-articles__item__icons">
+                                <span class="wire-articles__item__icon">
+                                    <i class="icon--text icon--gray-light"></i>
+                                </span>
+                                <span class="wire-articles__item__icon">
+                                    <i class="icon--photo icon--gray-light"></i>
+                                </span>
+                                <span class="wire-articles__item__divider">
+                                </span>
+                            </div>
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
+                            </div>
+                        </div>                                            
+                    </div>
+                    <div class="wire-articles__item-image">
+                        <div class="no-bindable-select wire-articles__item-select">
+                            <label class="circle-checkbox">
+                                <input type="checkbox" class="css-checkbox" />
+                                <i></i>
+                            </label>
+                        </div>
+                        <span class="wire-articles__item-image-icon">
+                            <i class="icon--resize icon--white"></i>
+                        </span>
+                        <figure>
+                            <img src="{{ url_for('static', filename = 'list_image_800x600.jpg') }}"/>
+                        </figure>
+                    </div>
+                    <div class="wire-articles__item-actions">
+
+                        <div class="btn-group">
+                            <span data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="icon--more icon--gray-light"></i>
+                            </span>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <button class="dropdown-item" type="button"><i class="icon--download"></i> Download</button>
+                                <button class="dropdown-item" type="button"><i class="icon--copy"></i> Copy</button>
+                                <button class="dropdown-item" type="button"><i class="icon--print"></i> Print</button>
+                                <button class="dropdown-item" type="button"><i class="icon--share"></i> Share</button>
+                                <button class="dropdown-item" type="button"><i class="icon--bookmark-add"></i> Add to Bookmarks</button>
+                            </div>
+                        </div>
+
+                        <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share"></i></button>
+                        <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
+                    </div>
+                </div>
+            </article>
+            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">
+                <div class="wire-articles__item wire-articles__item--grid wire-articles__item--visited">
                     <div class="wire-articles__item-text">
                         <h4 class="wire-articles__item-headline">
                             <div class="no-bindable-select wire-articles__item-select">
@@ -166,7 +282,51 @@
                                     <input type="checkbox" class="css-checkbox" />
                                     <i></i>
                                 </label>
-                            </div>Battling Kings go into NBL playoff mode
+                            </div>Many to follow US on Jerusalem: Netanyahu
+                        </h4>
+                        <div class="wire-articles__item__meta">
+                            <div class="wire-articles__item__icons">
+                                <span class="wire-articles__item__icon">
+                                    <i class="icon--text icon--gray-light"></i>
+                                </span>
+                                <span class="wire-articles__item__icon">
+                                    <i class="icon--photo icon--gray-light"></i>
+                                </span>
+                                <span class="wire-articles__item__divider">
+                                </span>
+                            </div>
+                            <div class="wire-articles__item__meta-info">
+                                <span class="bold">London-Bridge-Atack</span>
+                                <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
+                            </div>
+                        </div>                                            
+                    </div>
+                    
+                    <div class="wire-articles__item-actions">
+
+                        <div class="btn-group">
+                            <span data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="icon--more icon--gray-light"></i>
+                            </span>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <button class="dropdown-item" type="button"><i class="icon--download"></i> Download</button>
+                                <button class="dropdown-item" type="button"><i class="icon--copy"></i> Copy</button>
+                                <button class="dropdown-item" type="button"><i class="icon--print"></i> Print</button>
+                                <button class="dropdown-item" type="button"><i class="icon--share"></i> Share</button>
+                                <button class="dropdown-item" type="button"><i class="icon--bookmark-add"></i> Add to Bookmarks</button>
+                            </div>
+                        </div>
+
+                        <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share"></i></button>
+                        <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
+                    </div>
+                </div>
+            </article>
+            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">
+                <div class="wire-articles__item wire-articles__item--grid">
+                    <div class="wire-articles__item-text">
+                        <h4 class="wire-articles__item-headline">
+                            Battling Kings go into NBL playoff mode
                         </h4>
                         <div class="wire-articles__item__meta">
                             <div class="wire-articles__item__icons">
@@ -184,14 +344,14 @@
                                 <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
                             </div>
                         </div>
-                        <div class="wire-articles__item__text">
-                            <p>MANDURAH GREYHOUND QLD TAB DIVS FOR $1.00 Race 1: 6 Chicago Nights $3.10 $2.00 3 Barrio Monelli $3.50 4 Sunset Candy NTD. Q: $4.70. E: $11.70. T: $18.80. Scr: 5. Race 2: 3 Dynamic Gold $4.20 $1.10 2 Dahlia Monelli...</p>
-                        </div>
-                        <div class="no-bindable wire-articles__item__versions-btn">
-                            Show previous versions (3)
-                        </div>
                     </div>
                     <div class="wire-articles__item-image">
+                            <div class="no-bindable-select wire-articles__item-select">
+                                    <label class="circle-checkbox">
+                                        <input type="checkbox" class="css-checkbox" />
+                                        <i></i>
+                                    </label>
+                                </div>
                         <span class="wire-articles__item-image-icon">
                             <i class="icon--resize icon--white"></i>
                         </span>
@@ -218,53 +378,14 @@
                         <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
                     </div>
                 </div>
-
-                <div class="wire-articles__versions">
-                    <div class="wire-articles__versions__item">
-                        <div class="wire-articles__versions__time">
-                            <span>14:15</span>
-                        </div>
-                        <div class="wire-articles__versions__meta">
-                            <div class="wire-articles__item__meta-info">
-                                <span class="bold">London-Bridge-Atack</span>
-                                <span>06.06.2017 // <span class="bold">345</span> words</span>
-                            </div>
-                        </div>
-                        <span class="wire-articles__item__divider"></span>
-                        <div class="wire-articles__versions__name">
-                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
-                        </div>
-                    </div>
-
-                    <div class="wire-articles__versions__item">
-                        <div class="wire-articles__versions__time">
-                            <span>14:02</span>
-                        </div>
-                        <div class="wire-articles__versions__meta">
-                            <div class="wire-articles__item__meta-info">
-                                <span class="bold">London-Bridge-Atack</span>
-                                <span>06.06.2017 // <span class="bold">345</span> words</span>
-                            </div>
-                        </div>
-                        <span class="wire-articles__item__divider"></span>
-                        <div class="wire-articles__versions__name">
-                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
-                        </div>
-                    </div>
-
-                </div>
+                
             </article>
 
-            <article class="wire-articles__item-wrap col-12">
-                <div class="wire-articles__item wire-articles__item--list wire-articles__item--visited">
+            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">
+                <div class="wire-articles__item wire-articles__item--grid wire-articles__item--visited">
                     <div class="wire-articles__item-text">
                         <h4 class="wire-articles__item-headline">
-                            <div class="no-bindable-select wire-articles__item-select">
-                                <label class="circle-checkbox">
-                                    <input type="checkbox" class="css-checkbox" />
-                                    <i></i>
-                                </label>
-                            </div>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         </h4>
                         <div class="wire-articles__item__meta">
                             <div class="wire-articles__item__icons">
@@ -281,15 +402,15 @@
                                 <span class="bold">London-Bridge-Atack</span>
                                 <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
                             </div>
-                        </div>
-                        <div class="wire-articles__item__text">
-                            <p>AAP Rolling News Bulletin for Nov 22 at 0000 Nigeria Mosque (YOLA) A suicide bomber has killed at least 50 people at a mosque in northeastern Nigeria in the biggest mass killing this year in a region facing an insurgency...</p>
-                        </div>
-                        <div class="no-bindable wire-articles__item__versions-btn">
-                            Show previous versions (3)
-                        </div>
+                        </div>                        
                     </div>
                     <div class="wire-articles__item-image">
+                        <div class="no-bindable-select wire-articles__item-select">
+                            <label class="circle-checkbox">
+                                <input type="checkbox" class="css-checkbox" />
+                                <i></i>
+                            </label>
+                        </div>
                         <span class="wire-articles__item-image-icon">
                             <i class="icon--resize icon--white"></i>
                         </span>
@@ -316,45 +437,10 @@
                         <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
                     </div>
                 </div>
-
-                <div class="wire-articles__versions">
-                    <div class="wire-articles__versions__item">
-                        <div class="wire-articles__versions__time">
-                            <span>14:15</span>
-                        </div>
-                        <div class="wire-articles__versions__meta">
-                            <div class="wire-articles__item__meta-info">
-                                <span class="bold">London-Bridge-Atack</span>
-                                <span>06.06.2017 // <span class="bold">345</span> words</span>
-                            </div>
-                        </div>
-                        <span class="wire-articles__item__divider"></span>
-                        <div class="wire-articles__versions__name">
-                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
-                        </div>
-                    </div>
-
-                    <div class="wire-articles__versions__item">
-                        <div class="wire-articles__versions__time">
-                            <span>14:02</span>
-                        </div>
-                        <div class="wire-articles__versions__meta">
-                            <div class="wire-articles__item__meta-info">
-                                <span class="bold">London-Bridge-Atack</span>
-                                <span>06.06.2017 // <span class="bold">345</span> words</span>
-                            </div>
-                        </div>
-                        <span class="wire-articles__item__divider"></span>
-                        <div class="wire-articles__versions__name">
-                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
-                        </div>
-                    </div>
-
-                </div>
+                
             </article>
-
-            <article class="wire-articles__item-wrap col-12">
-                <div class="wire-articles__item wire-articles__item--list wire-articles__item--visited">
+            <article class="wire-articles__item-wrap col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">
+                <div class="wire-articles__item wire-articles__item--grid wire-articles__item--visited">
                     <div class="wire-articles__item-text">
                         <h4 class="wire-articles__item-headline">
                             <div class="no-bindable-select wire-articles__item-select">
@@ -379,13 +465,7 @@
                                 <span class="bold">London-Bridge-Atack</span>
                                 <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
                             </div>
-                        </div>
-                        <div class="wire-articles__item__text">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vel dui metus. Sed tincidunt urna vitae imperdiet sollicitudin. Maecenas sit amet sem vitae arcu luctus vestibulum ut in dolor. Aliquam turpis ligula, ornare non justo vitae, consectetur iaculis leo. Mauris at sapien libero. Donec feugiat pellentesque mi vel dignissim. Morbi id nulla libero.</p>
-                        </div>
-                        <div class="no-bindable wire-articles__item__versions-btn">
-                            Show previous versions (3)
-                        </div>
+                        </div>                                                
                     </div>
                     
                     <div class="wire-articles__item-actions">
@@ -407,134 +487,9 @@
                         <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
                     </div>
                 </div>
-
-                <div class="wire-articles__versions">
-                    <div class="wire-articles__versions__item">
-                        <div class="wire-articles__versions__time">
-                            <span>14:15</span>
-                        </div>
-                        <div class="wire-articles__versions__meta">
-                            <div class="wire-articles__item__meta-info">
-                                <span class="bold">London-Bridge-Atack</span>
-                                <span>06.06.2017 // <span class="bold">345</span> words</span>
-                            </div>
-                        </div>
-                        <span class="wire-articles__item__divider"></span>
-                        <div class="wire-articles__versions__name">
-                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
-                        </div>
-                    </div>
-
-                    <div class="wire-articles__versions__item">
-                        <div class="wire-articles__versions__time">
-                            <span>14:02</span>
-                        </div>
-                        <div class="wire-articles__versions__meta">
-                            <div class="wire-articles__item__meta-info">
-                                <span class="bold">London-Bridge-Atack</span>
-                                <span>06.06.2017 // <span class="bold">345</span> words</span>
-                            </div>
-                        </div>
-                        <span class="wire-articles__item__divider"></span>
-                        <div class="wire-articles__versions__name">
-                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
-                        </div>
-                    </div>
-
-                </div>
+                
             </article>
-
-            <article class="wire-articles__item-wrap col-12">
-                <div class="wire-articles__item wire-articles__item--list">
-                    <div class="wire-articles__item-text">
-                        <h4 class="wire-articles__item-headline">
-                            <div class="no-bindable-select wire-articles__item-select">
-                                <label class="circle-checkbox">
-                                    <input type="checkbox" class="css-checkbox" />
-                                    <i></i>
-                                </label>
-                            </div>Bellissimo! Naples pizza listed by UNESCO
-                        </h4>
-                        <div class="wire-articles__item__meta">
-                            <div class="wire-articles__item__icons">
-                                <span class="wire-articles__item__icon">
-                                    <i class="icon--text icon--gray-light"></i>
-                                </span>
-                                <span class="wire-articles__item__icon">
-                                    <i class="icon--photo icon--gray-light"></i>
-                                </span>
-                                <span class="wire-articles__item__divider">
-                                </span>
-                            </div>
-                            <div class="wire-articles__item__meta-info">
-                                <span class="bold">London-Bridge-Atack</span>
-                                <span>Source: AAP // <span class="bold">345</span> words // 06.06.2017 14:25</span>
-                            </div>
-                        </div>
-                        <div class="wire-articles__item__text">
-                            <p>Agencies Rome Pizza-making as practised in Naples has been added to the UNESCO Intangible Cultural Heritage of Humanity list, the Italian government says. "The art of the Neapolitan pizza-maker is (part of) UNESCO world heritage. Victory!" Italy's Agriculture Minister Maurizio...</p>
-                        </div>
-                        <div class="no-bindable wire-articles__item__versions-btn">
-                            Show previous versions (3)
-                        </div>
-                    </div>
-                    
-                    <div class="wire-articles__item-actions">
-
-                        <div class="btn-group">
-                            <span data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="icon--more icon--gray-light"></i>
-                            </span>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <button class="dropdown-item" type="button"><i class="icon--download"></i> Download</button>
-                                <button class="dropdown-item" type="button"><i class="icon--copy"></i> Copy</button>
-                                <button class="dropdown-item" type="button"><i class="icon--print"></i> Print</button>
-                                <button class="dropdown-item" type="button"><i class="icon--share"></i> Share</button>
-                                <button class="dropdown-item" type="button"><i class="icon--bookmark-add"></i> Add to Bookmarks</button>
-                            </div>
-                        </div>
-
-                        <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Share"><i class="icon--share"></i></button>
-                        <button class="icon-button" type="button" data-toggle="tooltip" data-placement="left" title="Add to Bookmarks"><i class="icon--bookmark-add"></i></button>
-                    </div>
-                </div>
-
-                <div class="wire-articles__versions">
-                    <div class="wire-articles__versions__item">
-                        <div class="wire-articles__versions__time">
-                            <span>14:15</span>
-                        </div>
-                        <div class="wire-articles__versions__meta">
-                            <div class="wire-articles__item__meta-info">
-                                <span class="bold">London-Bridge-Atack</span>
-                                <span>06.06.2017 // <span class="bold">345</span> words</span>
-                            </div>
-                        </div>
-                        <span class="wire-articles__item__divider"></span>
-                        <div class="wire-articles__versions__name">
-                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
-                        </div>
-                    </div>
-
-                    <div class="wire-articles__versions__item">
-                        <div class="wire-articles__versions__time">
-                            <span>14:02</span>
-                        </div>
-                        <div class="wire-articles__versions__meta">
-                            <div class="wire-articles__item__meta-info">
-                                <span class="bold">London-Bridge-Atack</span>
-                                <span>06.06.2017 // <span class="bold">345</span> words</span>
-                            </div>
-                        </div>
-                        <span class="wire-articles__item__divider"></span>
-                        <div class="wire-articles__versions__name">
-                            <h5 class="wire-articles__versions__headline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h5>
-                        </div>
-                    </div>
-
-                </div>
-            </article>
-
+            
         </div>
     </div>
 

@@ -71,10 +71,10 @@ class WireListItem extends React.Component {
             >
 
                 <div className={wrapClassName}>
-                    <div className='wire-articles__item--list__text'>
+                    <div className='wire-articles__item-text'>
 
-                        <h4 className='wire-articles__item--list__headline'>
-                            <div className='no-bindable-select wire-articles__item--list__select' onClick={this.stopPropagation}>
+                        <h4 className='wire-articles__item-headline'>
+                            <div className='no-bindable-select wire-articles__item-select' onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
                                     <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
                                     <i></i>
@@ -121,14 +121,14 @@ class WireListItem extends React.Component {
                     </div>
 
                     {isExtended && getThumbnailRendition(picture) && (
-                        <div className="wire-articles__item--list__image">
+                        <div className="wire-articles__item-image">
                             <figure>
                                 <img src={getThumbnailRendition(picture).href} />
                             </figure>
                         </div>
                     )}
 
-                    <div className='wire-articles__item--list__actions' onClick={this.stopPropagation}>
+                    <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
                         <div className='btn-group'>
                             <span onClick={(event) => this.props.onActionList(event, this.props.item)}>
                                 <i className='icon--more icon--gray-light'></i>
