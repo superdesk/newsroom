@@ -27,12 +27,11 @@
                             <label for="password">{{ form.password.label.text }}</label>
                             {{ form.password(class="form-control", id="password", required="true") }}
                         </div>
-                        <div class="form-check mb-4">
-                            <label class="custom-control custom-checkbox">
+                        <div class="form-check mb-4 p-0">
+                            <div class="custom-control custom-checkbox">
                                 {{ form.remember_me(class="custom-control-input", id="remember_me") }}
-                                <span class="custom-control-indicator"></span>
-                                <span class="custom-control-description">{{ form.remember_me.label.text }}</span>
-                            </label>
+                                <label class="custom-control-label" for="remember_me">{{ form.remember_me.label.text }}</label>
+                            </div>                                                   
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">{{ gettext("Login") }}</button>
                     </form>
