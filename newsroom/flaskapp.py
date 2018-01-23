@@ -135,7 +135,7 @@ class Newsroom(eve.Eve):
 
     def sidenav(self, name, endpoint, icon=None):
         """Register an item in sidebar menu."""
-        self.sidenavs.append({'name': name, 'endpoint': endpoint, icon: icon})
+        self.sidenavs.append({'name': name, 'endpoint': endpoint, 'icon': icon})
 
     def add_download_formatter(self, _format, formatter, name):
         self.download_formatters[_format] = {
