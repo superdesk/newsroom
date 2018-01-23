@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 
-import { gettext } from 'utils';
+import { gettext, getProductQuery } from 'utils';
 import EditPanel from '../../components/EditPanel';
 
 
@@ -11,6 +11,7 @@ class EditProduct extends React.Component {
     constructor(props) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
+        this.getPoductTestButton = this.getPoductTestButton.bind(this);
         this.state = {
             activeTab: 'product-details',
             activeProduct: props.product._id,
@@ -30,6 +31,18 @@ class EditProduct extends React.Component {
         }
         if(event.target.name === 'navigations') {
             this.props.fetchNavigations();
+        }
+    }
+
+    getPoductTestButton(product) {
+        const q = getProductQuery(product);
+
+        if (q) {
+            return (
+                <a href={`/wire?q=${q}`} target="_blank"
+                    className='btn btn-secondary float-right mt-2'>{gettext('Test product')}
+                </a>
+            );
         }
     }
 
@@ -91,7 +104,7 @@ class EditProduct extends React.Component {
                                         />
                                         {this.props.product.sd_product_id &&
                                         <a href={`/wire?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
-                                            className='btn btn-secondary float-right mt-2'>{gettext('Test product')}
+                                            className='btn btn-secondary float-right mt-2'>{gettext('Test product id')}
                                         </a>}
                                     </div>
 
@@ -117,6 +130,7 @@ class EditProduct extends React.Component {
 
                                 </div>
                                 <div className='list-item__preview-footer'>
+                                    {this.getPoductTestButton(this.props.product)}
                                     <input
                                         type='button'
                                         className='btn btn-outline-primary'
