@@ -24,11 +24,11 @@ class NotificationList extends React.Component {
     }
 
     renderNotification(newItem) {
-        return (<div key={newItem._id} className='notif__list__item m-2 p-3'>
-            <p>{gettext('A story you downloaded has been updated')}</p>
+        return (<div key={newItem._id} className='notif__list__item'>
+            <CloseButton onClick={() => this.props.clearNotification(newItem._id)}/>
+            <div className="notif__list__info">{gettext('A story you downloaded has been updated')}</div>
             <div className="notif__list__headline">
                 {newItem.headline}
-                <CloseButton onClick={() => this.props.clearNotification(newItem._id)}/>
             </div>
             <div className='wire-articles__item__meta-info'>
                 {gettext('Created on')} {shortDate(newItem.versioncreated)}
@@ -51,7 +51,7 @@ class NotificationList extends React.Component {
 
                 {this.state.displayItems && this.props.notifications && this.props.notifications.length > 0 &&
                     <div className="notif__list">
-                        <div className='notif__list__header d-flex py-3'>
+                        <div className='notif__list__header d-flex'>
                             <span className='notif__list__header-headline ml-3'>{gettext('Notifications')}</span>
                             <button type="button"
                                 className="button-pill ml-auto mr-3"
