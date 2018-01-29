@@ -579,7 +579,7 @@ article.list {
     }
 }
 .list-item__preview-header {
-    padding: 20px;
+    padding: 20px 45px 20px 20px;
     display: flex;
     justify-content: space-between;
     position: relative;
@@ -587,6 +587,7 @@ article.list {
         font-size: 20px;
         font-weight: 700;
         margin-bottom: 0;
+        line-height: 1.4;
     }
     .icon-button {
         position: absolute;

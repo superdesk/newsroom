@@ -40,7 +40,7 @@ class EditProduct extends React.Component {
         if (q) {
             return (
                 <a href={`/wire?q=${q}`} target="_blank"
-                    className='btn btn-secondary float-right mt-2'>{gettext('Test product')}
+                    className='btn btn-outline-secondary float-right'>{gettext('Test product')}
                 </a>
             );
         }
@@ -104,7 +104,7 @@ class EditProduct extends React.Component {
                                         />
                                         {this.props.product.sd_product_id &&
                                         <a href={`/wire?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
-                                            className='btn btn-secondary float-right mt-2'>{gettext('Test product id')}
+                                            className='btn btn-outline-secondary float-right mt-2'>{gettext('Test product id')}
                                         </a>}
                                     </div>
 
@@ -118,7 +118,7 @@ class EditProduct extends React.Component {
                                         />
                                         {this.props.product.query &&
                                         <a href={`/wire?q=${this.props.product.query}`} target="_blank"
-                                            className='btn btn-secondary float-right mt-2'>{gettext('Test query')}
+                                            className='btn btn-outline-secondary float-right mt-3'>{gettext('Test query')}
                                         </a>}
                                     </div>
 

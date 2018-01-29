@@ -8,16 +8,16 @@ function CheckboxInput({name, label, onChange, value}) {
     }
 
     return (
-        <div className='form-check'>
-            <label className='custom-control custom-checkbox'>
+        <div className='form-check p-0'>                
+            <div className='custom-control custom-checkbox'>
                 <input type="checkbox"
                     name={name}
                     className="custom-control-input"
                     checked={value}
+                    id={name}
                     onChange={onChange} />
-                <span className="custom-control-indicator"></span>
-                <span className="custom-control-description">{' '}{label}</span>
-            </label>
+                <label className="custom-control-label" htmlFor={name}>{label}</label>                
+            </div>
         </div>
     );
 }

@@ -123,3 +123,6 @@ $('.wire-column__preview__mobile-bar button').click(function(){
     previewOpen = !previewOpen;
     responsiveWireItem();
 });
+
+// design view dropdown fix
+$('[data-toggle="dropdown"]').dropdown();

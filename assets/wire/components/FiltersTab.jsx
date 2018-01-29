@@ -59,13 +59,13 @@ class FiltersTab extends React.Component {
                     const isActive = groupFilter.indexOf(bucket.key) !== -1;
                     return (
                         <div key={bucket.key}>
-                            <label key={bucket.key} className="custom-control custom-checkbox ui-dark">
+                            <div key={bucket.key} className="custom-control custom-checkbox ui-dark">
                                 <input type="checkbox" className="custom-control-input"
                                     checked={isActive}
+                                    id={bucket.key}
                                     onChange={(event) => toggleFilter(event, group.field, bucket.key, group.single)} />
-                                <span className="custom-control-indicator" />
-                                <span className="custom-control-description">{bucket.label || '' + bucket.key}</span>
-                            </label>
+                                <label className="custom-control-label" htmlFor={bucket.key}>{bucket.label || '' + bucket.key}</label>
+                            </div>
                         </div>
                     );
                 });

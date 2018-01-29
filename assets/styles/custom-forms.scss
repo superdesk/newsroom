@@ -6,26 +6,43 @@ $enable-shadows:true;
   @include form-control-focus();
 }
 
+.input-group .form-control {
+  flex: 1 1 auto;
+}
+
 // Custom checkbox style
-.custom-control-indicator {
-  border-width: 1px;
-  border-style: solid;
-  border-color: $gray-600;
+.custom-control {
+  &.custom-checkbox {
+    margin-bottom: 0.3rem;
+  }
 }
-.custom-control-description {
-  line-height: 1.6rem;
+
+.custom-control-label {
+  color: $body-text;
+  
+  &:hover {
+    color: $gray-600;
+  }
+  
+  &::before {
+    border-width: 1px;
+    border-style: solid;
+    border-color: $gray-600;
+  }
 }
-.custom-control-input:checked ~ .custom-control-indicator {
+
+.custom-control-input:checked ~ .custom-control-label::before {
   border-color: $blue;
 }
+
 // UI dark
 .custom-control {
   &.ui-dark {
-    .custom-control-description {
+    .custom-control-label {
       color: $gray-500;
       font-weight: 300;
     }
-    .custom-control-input:checked ~ .custom-control-description {
+    .custom-control-input:checked ~ .custom-control-label {
       color: $gray-200;
     }
   }
