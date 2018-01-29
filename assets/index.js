@@ -10,6 +10,15 @@ $('.content-main').scroll(function() {
     $('.carousel-caption').css('opacity', 1 - scrollTop / 400);
 });
 
+const IS_TOUCH_DEVICE = () =>
+    'ontouchstart' in window        // works on most browsers
+    || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+
+if ( !IS_TOUCH_DEVICE() ) {
+    $('html').addClass('no-touch');
+    $('[data-toggle="tooltip"]').tooltip();
+}
+
 // Function for responsive wire item
 
 var filterOpen = false;
