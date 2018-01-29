@@ -61,8 +61,8 @@ CORE_APPS = [
     'newsroom.cards',
 ]
 
-SITE_NAME = 'AAP Newsroom'
-COPYRIGHT_HOLDER = 'AAP'
+SITE_NAME = 'ANSA Newsroom'
+COPYRIGHT_HOLDER = 'ANSA'
 COPYRIGHT_NOTICE = ''
 USAGE_TERMS = ''
 
