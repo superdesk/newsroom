@@ -17,7 +17,7 @@ function SearchResultsInfo({
 }) {
     const isFollowing = user && activeTopic;
     return (
-        <div className="d-flex mt-1 mt-sm-3 p-0 align-items-center flex-wrap flex-sm-nowrap">
+        <div className="d-flex mt-1 mt-sm-3 px-3 align-items-center flex-wrap flex-sm-nowrap">
             <div className="navbar-text search-results-info">
                 <span className="search-results-info__num">{totalItems}</span>
                 {query && (
