@@ -847,7 +847,6 @@ article.list {
     margin-right: 10px;
     margin-bottom: 6px;
     @include lg {
-        font-size: 2.375rem; // 38px
         margin-bottom: 0;
 }
 }
@@ -1049,7 +1048,7 @@ article.list {
 }
 
 .wire-articles {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .wire-articles__item {
@@ -1109,7 +1108,7 @@ article.list {
 .wire-articles__item-wrap {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     cursor: pointer;
     outline: none;
 }
@@ -1123,11 +1122,11 @@ article.list {
     flex-direction: column;
     padding: 12px;
     @include sm {
-        padding: 16px 10px 10px 15px;
+        padding: 12px 10px 6px 15px;
     }
     @include md {
         flex-direction: row;
-        padding: 16px 25px;
+        padding: 12px 20px;
     }
 }
 
@@ -1263,13 +1262,13 @@ article.list {
         flex-direction: column;
         padding: 12px;
         @include sm {
-            padding: 16px 15px 10px 15px;
+            padding: 12px 15px 6px 15px;
         }
         @include lg {
             flex-direction: row;
         }
         @include xl {
-            padding: 16px 25px;
+            padding: 12px 20px;
         }
     }
     .wire-articles__item-image {
@@ -1285,7 +1284,7 @@ article.list {
                 max-width: none;
                 width: 100%;
                 @include lg {
-                    max-width: 200px;
+                    max-width: 160px;
                     width: auto;
                 }
             }
@@ -1344,12 +1343,12 @@ article.list {
     }
     .wire-articles__item--list {
         flex-direction: column;
-        padding: 16px 10px 10px 15px;
+        padding: 12px 10px 6px 15px;
         @include xl {
             flex-direction: row;
         }
         @include xxl {
-            padding: 16px 25px;
+            padding: 12px 20px;
         }
     }
     .wire-articles__item-image {
@@ -1365,7 +1364,7 @@ article.list {
                 max-width: none;
                 width: 100%;
                 @include xl {
-                    max-width: 200px;
+                    max-width: 160px;
                     width: auto;
                 }
             }
@@ -1470,6 +1469,7 @@ article.list {
 .wire-articles__item-headline {
     font-size: 1rem;
     font-weight: 700;
+    margin-bottom: 4px;
 }
 
 .wire-articles__item-select {
@@ -1510,6 +1510,7 @@ article.list {
 .wire-articles__item__meta {
     display: flex;
     align-items: center;
+    margin-bottom: 4px;
 }
 
 .wire-articles__item__icons {
@@ -1542,14 +1543,15 @@ article.list {
         cursor: pointer;
     }
     @include lg {
-        line-height: 1.4;
+        line-height: 1.3;
     }
 }
 
 .wire-articles__item__text {
     font-size: 0.875rem;
     font-weight: 300;
-    margin: 5px 0px;
+    margin: 5px 0 0;
+    line-height: 1.3;
     p {
         margin: 0px;
     }
@@ -1559,6 +1561,7 @@ article.list {
     font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.8125rem;
     color: $main-blue;
+    margin-top: 4px;
 }
 
 .wire-articles__item__versions-btn--open {
@@ -1579,7 +1582,7 @@ article.list {
             max-width: none;
             width: 100%;
             @include md {
-                max-width: 200px;
+                max-width: 160px;
                 width: auto;
             }
         }
@@ -1609,7 +1612,7 @@ article.list {
         justify-content: flex-start;
     }
     > * {
-        margin-bottom: 5px;
+        margin-bottom: 3px;
     }
     .btn-group {
         &:hover {
