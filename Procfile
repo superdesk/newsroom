@@ -1,2 +1,2 @@
-web: PYTHONUNBUFFERED=true python app.py
+web: gunicorn -w 3 -b "0.0.0.0:$PORT" app
 websocket: python -m newsroom.websocket
