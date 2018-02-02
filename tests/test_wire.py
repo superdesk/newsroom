@@ -224,6 +224,18 @@ def test_search_filter_by_individual_navigation(client, app):
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
 
+    # test admin user filtering
+    with client.session_transaction() as session:
+        session['user_type'] = 'administrator'
+
+    resp = client.get('/search')
+    data = json.loads(resp.get_data())
+    assert 3 == len(data['_items'])  # gets all by default
+
+    resp = client.get('/search?navigation=51')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+
 
 def test_search_filtered_by_query_product(client, app):
     app.data.insert('navigations', [{
