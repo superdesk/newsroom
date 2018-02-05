@@ -1,5 +1,6 @@
 
 import io
+import os
 import hmac
 import bson
 from bson import ObjectId
@@ -89,6 +90,22 @@ def test_push_binary(client):
 
     resp = client.get('/assets/%s' % media_id)
     assert 200 == resp.status_code
+
+
+def test_push_binary_picture(client):
+    media_id = str(bson.ObjectId())
+
+    picture_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'picture.jpg')
+    with open(picture_path, mode='rb') as pic:
+        resp = client.post('/push_binary', data=dict(
+            media_id=media_id,
+            media=(pic, 'picture.jpg'),
+        ))
+
+        assert 201 == resp.status_code
+        resp = client.get('/assets/%s' % media_id)
+        assert resp.content_type == 'image/jpeg'
+        assert resp.content_length
 
 
 def test_push_binary_invalid_signature(client, app):

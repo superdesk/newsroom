@@ -1,10 +1,12 @@
 
+import io
 import hmac
 import flask
 import logging
 import superdesk
 
 from copy import copy
+from PIL import Image, ImageEnhance
 from flask import current_app as app
 from superdesk.utc import utcnow
 from superdesk.text_utils import get_word_count
@@ -171,7 +173,25 @@ def push_binary():
         flask.abort(500)
     media_id = flask.request.form['media_id']
     media = flask.request.files['media']
-    app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id)
+    binary = media  # what we store
+    content_type = media.content_type
+
+    MIN_WIDTH = 400
+    MAX_WIDTH = 2000
+    MIN_HEIGHT = 200
+    MAX_HEIGHT = 1000
+
+    try:
+        if 'image' in media.content_type:
+            image = Image.open(media)
+            width, height = image.size
+            if MIN_WIDTH < width < MAX_WIDTH and MIN_HEIGHT < height < MAX_HEIGHT:
+                binary = watermark(image)
+                content_type = 'image/jpeg'
+    except OSError:
+        pass
+
+    app.media.put(binary, resource=ASSETS_RESOURCE, _id=media_id, content_type=content_type)
     return flask.jsonify({'status': 'OK'}), 201
 
 
@@ -181,3 +201,29 @@ def push_binary_get(media_id):
         return flask.jsonify({})
     else:
         flask.abort(404)
+
+
+def watermark(image):
+    if image.mode != 'RGBA':
+        image = image.convert('RGBA')
+
+    with app.open_resource('static/watermark.png') as watermark_binary:
+        watermark_image = Image.open(watermark_binary)
+        set_opacity(watermark_image, 0.3)
+        watermark_layer = Image.new('RGBA', image.size)
+        watermark_layer.paste(watermark_image, (
+            image.size[0] - watermark_image.size[0],
+            int((image.size[1] - watermark_image.size[1]) * 0.66),
+        ))
+
+    final = Image.alpha_composite(image, watermark_layer)
+    output = io.BytesIO()
+    final.save(output, 'jpeg', quality=80)
+    output.seek(0)
+    return output
+
+
+def set_opacity(image, opacity=1):
+    alpha = image.split()[3]
+    alpha = ImageEnhance.Brightness(alpha).enhance(opacity)
+    image.putalpha(alpha)
