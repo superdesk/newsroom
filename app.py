@@ -2,7 +2,7 @@ import os
 
 from newsroom import Newsroom
 
-app = Newsroom(__name__)
+app = application = Newsroom(__name__)
 
 if __name__ == '__main__':
     host = '0.0.0.0'
