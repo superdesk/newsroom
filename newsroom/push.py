@@ -1,5 +1,6 @@
 
 import io
+import os
 import hmac
 import flask
 import logging
@@ -181,15 +182,12 @@ def push_binary():
     MIN_HEIGHT = 200
     MAX_HEIGHT = 1000
 
-    try:
-        if 'image' in media.content_type:
-            image = Image.open(media)
-            width, height = image.size
-            if MIN_WIDTH < width < MAX_WIDTH and MIN_HEIGHT < height < MAX_HEIGHT:
-                binary = watermark(image)
-                content_type = 'image/jpeg'
-    except OSError:
-        pass
+    if 'image' in media.content_type:
+        image = Image.open(media)
+        width, height = image.size
+        if MIN_WIDTH < width < MAX_WIDTH and MIN_HEIGHT < height < MAX_HEIGHT:
+            binary = watermark(image)
+            content_type = 'image/jpeg'
 
     app.media.put(binary, resource=ASSETS_RESOURCE, _id=media_id, content_type=content_type)
     return flask.jsonify({'status': 'OK'}), 201
@@ -207,7 +205,7 @@ def watermark(image):
     if image.mode != 'RGBA':
         image = image.convert('RGBA')
 
-    with app.open_resource('static/watermark.png') as watermark_binary:
+    with open(os.path.join(app.static_folder, 'watermark.png'), mode='rb') as watermark_binary:
         watermark_image = Image.open(watermark_binary)
         set_opacity(watermark_image, 0.3)
         watermark_layer = Image.new('RGBA', image.size)
