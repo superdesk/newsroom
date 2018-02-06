@@ -2369,4 +2369,45 @@ article.list {
     position: absolute;
 }
 
+// home event
+.date-round {
+    width: 100%;
+    min-width: 110px;
+    max-width: 140px;
+    margin: 0 auto;
+    border-radius: 100%;
+    background: #f1f1f1;
+    color: $gray-mid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:after {
+        content: "";
+        display: table;
+        padding-bottom: 100%;
+    }
+    @include sm {
+        max-width: 180px;
+    }
+}
+.date-round__wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.date-round__number {
+    font-size: 36px;
+    color: #7ed321;
+    line-height: 1.1;
+}
+.date-round__month {
+    font-size: 14px;
+    font-weight: 700;
+}
+.date-round__day {
+    font-family: $font-family-sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
 // End Wire BEM classes
