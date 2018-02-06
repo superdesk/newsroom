@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, shortDate, wordCount } from 'utils';
-import { getPicture, getPreviewRendition, getCaption } from 'wire/utils';
+import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import MoreNewsButton from './MoreNewsButton';
 
 const getPictureTextPanel = (item, picture, openItem) => {
-    const rendition = getPreviewRendition(picture);
+    const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 

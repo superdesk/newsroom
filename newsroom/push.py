@@ -177,7 +177,7 @@ def push_binary():
     binary = media  # what we store
     content_type = media.content_type
 
-    MIN_WIDTH = 400
+    MIN_WIDTH = 650
     MAX_WIDTH = 2000
     MIN_HEIGHT = 200
     MAX_HEIGHT = 1000
