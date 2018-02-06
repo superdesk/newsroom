@@ -21,6 +21,8 @@ class CardsResource(newsroom.Resource):
                 '4-media-gallery',
                 '1x1-top-news',
                 '2x2-top-news',
+                '3-text-only',
+                '3-picture-text',
             ],
         },
         'config': {

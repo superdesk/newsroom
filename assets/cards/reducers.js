@@ -28,6 +28,8 @@ const cardSizes = {
     '4-media-gallery': 4,
     '1x1-top-news': 2,
     '2x2-top-news': 4,
+    '3-text-only': 3,
+    '3-picture-text': 3,
 };
 
 export default function cardReducer(state = initialState, action) {
