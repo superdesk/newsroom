@@ -188,6 +188,8 @@ def push_binary():
         if MIN_WIDTH < width < MAX_WIDTH and MIN_HEIGHT < height < MAX_HEIGHT:
             binary = watermark(image)
             content_type = 'image/jpeg'
+        else:  # reset before storing it as is
+            media.seek(0)
 
     app.media.put(binary, resource=ASSETS_RESOURCE, _id=media_id, content_type=content_type)
     return flask.jsonify({'status': 'OK'}), 201
