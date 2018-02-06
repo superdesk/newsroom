@@ -92,20 +92,34 @@ def test_push_binary(client):
     assert 200 == resp.status_code
 
 
-def test_push_binary_picture(client):
-    media_id = str(bson.ObjectId())
+def get_fixture_path(fixture):
+    return os.path.join(os.path.dirname(__file__), 'fixtures', fixture)
 
-    picture_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'picture.jpg')
-    with open(picture_path, mode='rb') as pic:
+
+def upload_binary(fixture, client):
+    media_id = str(bson.ObjectId())
+    with open(get_fixture_path(fixture), mode='rb') as pic:
         resp = client.post('/push_binary', data=dict(
             media_id=media_id,
             media=(pic, 'picture.jpg'),
         ))
 
         assert 201 == resp.status_code
-        resp = client.get('/assets/%s' % media_id)
-        assert resp.content_type == 'image/jpeg'
-        assert resp.content_length
+    return client.get('/assets/%s' % media_id)
+
+
+def test_push_binary_picture_saves_updated(client):
+    resp = upload_binary('picture.jpg', client)
+    assert resp.content_type == 'image/jpeg'
+    with open(get_fixture_path('picture.jpg'), mode='rb') as picture:
+        assert resp.content_length != len(picture.read())
+
+
+def test_push_binary_thumbnail_saves_copy(client):
+    resp = upload_binary('thumbnail.jpg', client)
+    assert resp.content_type == 'image/jpeg'
+    with open(get_fixture_path('thumbnail.jpg'), mode='rb') as picture:
+        assert resp.content_length == len(picture.read())
 
 
 def test_push_binary_invalid_signature(client, app):
