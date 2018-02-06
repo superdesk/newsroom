@@ -73,7 +73,7 @@ export function getPicture(item) {
  * @return {Object}
  */
 export function getThumbnailRendition(picture) {
-    return get(picture, 'renditions.4-3', get(picture, 'renditions.thumbnail'));
+    return get(picture, 'renditions.viewImage', get(picture, 'renditions.thumbnail'));
 }
 
 /**
@@ -83,7 +83,7 @@ export function getThumbnailRendition(picture) {
  * @return {Object}
  */
 export function getPreviewRendition(picture) {
-    return get(picture, 'renditions.4-3', get(picture, 'renditions.viewImage'));
+    return get(picture, 'renditions.baseImage', get(picture, 'renditions.viewImage'));
 }
 
 /**
