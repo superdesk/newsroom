@@ -180,12 +180,11 @@ def push_binary():
     MIN_WIDTH = 650
     MAX_WIDTH = 2000
     MIN_HEIGHT = 200
-    MAX_HEIGHT = 1000
 
     if 'image' in media.content_type:
         image = Image.open(media)
         width, height = image.size
-        if MIN_WIDTH < width < MAX_WIDTH and MIN_HEIGHT < height < MAX_HEIGHT:
+        if MIN_WIDTH < width < MAX_WIDTH and MIN_HEIGHT < height:
             binary = watermark(image)
             content_type = 'image/jpeg'
         else:  # reset before storing it as is
