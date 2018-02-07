@@ -6,6 +6,8 @@ import PictureTextCard from './PictureTextCard';
 import MediaGalleryCard from './MediaGalleryCard';
 import TopNewsOneByOneCard from './TopNewsOneByOneCard';
 import TopNewsTwoByTwoCard from './TopNewsTwoByTwoCard';
+import LargeTextOnlyCard from './LargeTextOnlyCard';
+import LargePictureTextCard from './LargePictureTextCard';
 import {gettext} from 'utils';
 import {getItemActions} from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
@@ -20,6 +22,8 @@ const panels = {
     '4-media-gallery': MediaGalleryCard,
     '1x1-top-news': TopNewsOneByOneCard,
     '2x2-top-news': TopNewsTwoByTwoCard,
+    '3-text-only': LargeTextOnlyCard,
+    '3-picture-text': LargePictureTextCard,
 };
 
 const modals = {
