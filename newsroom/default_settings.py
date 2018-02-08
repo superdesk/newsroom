@@ -122,7 +122,7 @@ CACHE_DEFAULT_TIMEOUT = 3600
 CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
 
 # Recaptcha Settings
-RECAPTCHA_PUBLIC_KEY = '6LcEljMUAAAAANxcMEtMPjPTB6IRs1pe5oY5ubSp'
+RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
 # the lifetime of a permanent session in seconds
