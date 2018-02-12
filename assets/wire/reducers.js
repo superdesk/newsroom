@@ -70,7 +70,7 @@ const initialState = {
 };
 
 function recieveItems(state, data) {
-    const itemsById = {};
+    const itemsById = Object.assign({}, state.itemsById);
     const items = data._items.map((item) => {
         itemsById[item._id] = item;
         return item._id;
@@ -201,9 +201,15 @@ export default function wireReducer(state = initialState, action) {
     case OPEN_ITEM:{
         const readItems = getReadItems(state, action.item);
 
+        const itemsById = Object.assign({}, state.itemsById);
+        if (action.item) {
+            itemsById[action.item._id] = action.item;
+        }
+
         return {
             ...state,
             readItems,
+            itemsById,
             openItem: action.item || null,
         };
     }
