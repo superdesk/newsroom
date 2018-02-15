@@ -168,6 +168,7 @@ class WireApp extends React.Component {
                                 searchCriteria={searchCriteria}
                                 activeTopic={activeTopic}
                                 toggleNews={this.props.toggleNews}
+                                activeNavigation={this.props.activeNavigation}
                             />
 
                             <ItemsList

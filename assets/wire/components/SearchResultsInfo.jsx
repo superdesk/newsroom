@@ -17,6 +17,7 @@ function SearchResultsInfo({
     refresh,
     activeTopic,
     toggleNews,
+    activeNavigation,
 }) {
     const isFollowing = user && activeTopic;
     return (
@@ -41,13 +42,15 @@ function SearchResultsInfo({
             )}
 
             <div className="d-flex align-items-center ml-auto">
-                <label htmlFor='news-only' className="mr-2">{gettext('News only')}</label>
-                <Toggle
-                    id="news-only"
-                    defaultChecked={false}
-                    className='toggle-background'
-                    icons={false}
-                    onChange={toggleNews} />
+                {!activeNavigation && <div className={'d-flex align-items-center'}>
+                    <label htmlFor='news-only' className="mr-2">{gettext('News only')}</label>
+                    <Toggle
+                        id="news-only"
+                        defaultChecked={false}
+                        className='toggle-background'
+                        icons={false}
+                        onChange={toggleNews} />
+                </div>}
 
                 {!isEmpty(newItems) &&
                 <button type="button" className="button__reset-styles d-flex align-items-center ml-3" onClick={refresh}>
@@ -71,6 +74,7 @@ SearchResultsInfo.propTypes = {
     searchCriteria: PropTypes.object,
     activeTopic: PropTypes.object,
     toggleNews: PropTypes.func,
+    activeNavigation: PropTypes.string,
 };
 
 export default SearchResultsInfo;

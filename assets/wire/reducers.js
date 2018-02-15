@@ -408,6 +408,8 @@ export default function wireReducer(state = initialState, action) {
     }
 
     case TOGGLE_NAVIGATION:
+        return {...state, wire: _wireReducer(state.wire, action), newsOnly: false};
+
     case TOGGLE_FILTER:
     case SET_CREATED_FILTER:
     case RESET_FILTER:
