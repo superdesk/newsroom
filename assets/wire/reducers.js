@@ -30,6 +30,7 @@ import {
     COPY_ITEMS,
     PRINT_ITEMS,
     SET_TOPICS,
+    TOGGLE_NEWS,
 } from './actions';
 
 import { RENDER_MODAL, CLOSE_MODAL } from 'actions';
@@ -67,6 +68,7 @@ const initialState = {
         createdFilter: {},
         activeView: EXTENDED_VIEW,
     },
+    newsOnly: false,
 };
 
 function recieveItems(state, data) {
@@ -181,6 +183,14 @@ export default function wireReducer(state = initialState, action) {
             items,
         };
     }
+
+    case TOGGLE_NEWS: {
+        return {
+            ...state,
+            newsOnly: !state.newsOnly,
+        };
+    }
+
 
     case SET_ACTIVE:
         return {

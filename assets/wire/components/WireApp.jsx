@@ -15,6 +15,7 @@ import {
     setView,
     refresh,
     previewItem,
+    toggleNews,
 } from 'wire/actions';
 
 import { getActiveQuery, isTopicActive } from 'wire/utils';
@@ -166,6 +167,7 @@ class WireApp extends React.Component {
                                 refresh={this.props.refresh}
                                 searchCriteria={searchCriteria}
                                 activeTopic={activeTopic}
+                                toggleNews={this.props.toggleNews}
                             />
 
                             <ItemsList
@@ -235,6 +237,7 @@ WireApp.propTypes = {
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
+    toggleNews: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -261,6 +264,10 @@ const mapDispatchToProps = (dispatch) => ({
     followTopic: (query) => dispatch(followTopic(query)),
     followStory: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`})),
     fetchItems: () => dispatch(fetchItems()),
+    toggleNews: () => {
+        dispatch(toggleNews());
+        dispatch(fetchItems());
+    },
     setQuery: (query) => {
         dispatch(setQuery(query));
         dispatch(fetchItems());

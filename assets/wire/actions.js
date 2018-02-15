@@ -77,6 +77,11 @@ export function addTopic(topic) {
     return {type: ADD_TOPIC, topic};
 }
 
+export const TOGGLE_NEWS = 'TOGGLE_NEWS';
+export function toggleNews() {
+    return {type: TOGGLE_NEWS};
+}
+
 /**
  * Copy contents of item preview.
  *
@@ -124,6 +129,7 @@ function search(state, next) {
     const activeFilter = get(state, 'wire.activeFilter', {});
     const activeNavigation = get(state, 'wire.activeNavigation');
     const createdFilter = get(state, 'wire.createdFilter', {});
+    const newsOnly = !!state.newsOnly;
 
     const params = {
         q: state.query,
@@ -134,6 +140,7 @@ function search(state, next) {
         created_from: createdFilter.from,
         created_to: createdFilter.to,
         timezone_offset: getTimezoneOffset(),
+        newsOnly,
     };
 
     const queryString = Object.keys(params)

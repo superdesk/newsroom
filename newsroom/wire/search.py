@@ -185,6 +185,10 @@ class WireSearchService(newsroom.Service):
             query['bool']['must'].append(_query_string(req.args['q']))
             query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
 
+        if req.args.get('newsOnly'):
+            query['bool']['must_not'].append({'match': {'genre.code': 'Results (sport)'}})
+            query['bool']['must_not'].append({'match': {'genre.code': 'Broadcast Script'}})
+
         if req.args.get('bookmarks'):
             _set_bookmarks_query(query, req.args['bookmarks'])
 

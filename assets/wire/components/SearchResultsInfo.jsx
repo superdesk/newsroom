@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Toggle from 'react-toggle';
+import 'react-toggle/style.css';
 
 import { isEmpty } from 'lodash';
 import { gettext } from 'utils';
@@ -14,6 +16,7 @@ function SearchResultsInfo({
     newItems,
     refresh,
     activeTopic,
+    toggleNews,
 }) {
     const isFollowing = user && activeTopic;
     return (
@@ -28,6 +31,7 @@ function SearchResultsInfo({
                 )}
             </div>
 
+
             {user && !bookmarks && !isEmpty(searchCriteria) && (
                 <button
                     disabled={isFollowing}
@@ -36,12 +40,22 @@ function SearchResultsInfo({
                 >{gettext('Save as topic')}</button>
             )}
 
-            {!isEmpty(newItems) &&
-                <button type="button" className="button__reset-styles d-flex align-items-center ml-auto" onClick={refresh}>
+            <div className="d-flex align-items-center ml-auto">
+                <label htmlFor='news-only' className="mr-2">{gettext('News only')}</label>
+                <Toggle
+                    id="news-only"
+                    defaultChecked={false}
+                    className='toggle-background'
+                    icons={false}
+                    onChange={toggleNews} />
+
+                {!isEmpty(newItems) &&
+                <button type="button" className="button__reset-styles d-flex align-items-center ml-3" onClick={refresh}>
                     <i className="icon--refresh icon--pink" />
                     <span className="badge badge-pill badge-info badge-secondary ml-2">{newItems.length}</span>
                 </button>
-            }
+                }
+            </div>
         </div>
     );
 }
@@ -56,6 +70,7 @@ SearchResultsInfo.propTypes = {
     refresh: PropTypes.func,
     searchCriteria: PropTypes.object,
     activeTopic: PropTypes.object,
+    toggleNews: PropTypes.func,
 };
 
 export default SearchResultsInfo;
