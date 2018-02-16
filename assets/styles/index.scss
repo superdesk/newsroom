@@ -2410,4 +2410,13 @@ article.list {
     text-transform: uppercase;
 }
 
+.toggle-background.react-toggle--checked .react-toggle-track {
+  background-color: #00acec;
+}
+
+
+.toggle-background.react-toggle--checked:hover:not(.react-toggle--disabled) .react-toggle-track {
+  background-color: #0178a3;
+}
+
 // End Wire BEM classes
