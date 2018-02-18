@@ -44,7 +44,14 @@
             .wire-articles__item__meta {
                 margin: 10px 0;
             }
-
+            .wire-articles__item__text {
+                flex-grow: 1;
+            }
+            &.card-body--one-column {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
             &.card-body--two-columns {
                 display: flex;
                 flex-direction: column;
@@ -72,9 +79,15 @@
 
         .card-text {
             font-size: 1rem;
+            line-height: 1.5;
 
             &.small {
                 font-size: 0.875rem;
+                font-weight: 300;
+            }
+
+            &.tiny {
+                font-size: 0.8125rem;
                 font-weight: 300;
             }
         }

@@ -6,11 +6,13 @@ import MoreNewsButton from './MoreNewsButton';
 const getTextOnlyPanel = (item, openItem) => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-2 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item)}>
-            <div className='card-body'>
+            <div className='card-body card-body--one-column'>
                 <h5 className='card-title'>{item.headline}</h5>
+                <div className='wire-articles__item__text'>
+                    <p className='card-text tiny'>{item.description_text}</p>
+                </div>
                 <div className='wire-articles__item__meta'>
                     <div className='wire-articles__item__meta-info'>
-                        <span className='bold'>{item.slugline}</span>
                         <span>{gettext('Source: {{ source }}', {source: item.source})}
                             {' // '}<span className='bold'>{wordCount(item)}</span> {gettext('words')}
                             {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>

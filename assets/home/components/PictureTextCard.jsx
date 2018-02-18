@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, wordCount } from 'utils';
+import { gettext, shortDate, wordCount, fullDate } from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import MoreNewsButton from './MoreNewsButton';
 
@@ -14,11 +14,8 @@ const getPictureTextPanel = (item, picture, openItem) => {
             <img className="card-img-top" src={imageUrl} alt={caption} />
             <div className="card-body">
                 <h4 className="card-title">{item.headline}</h4>
-                <div className="wire-articles__item__meta">
-                    <div className="wire-articles__item__meta-info">
-                        <span className="bold">{item.slugline}</span>
-                        <span>{gettext('Source: {{ source }}', {source: item.source})} {'//'} {shortDate(item.versioncreated)}</span>
-                    </div>
+                <div className='wire-articles__item__text'>
+                    <p className='card-text small'>{item.description_text}</p>
                 </div>
             </div>
             <div className="card-footer">
@@ -32,7 +29,10 @@ const getPictureTextPanel = (item, picture, openItem) => {
                         </span>
                     </div>
                     <div className="wire-articles__item__meta-info">
-                        <span><span className="bold">{wordCount(item)}</span> {gettext('words')}</span>
+                        <span>{gettext('Source: {{ source }}', {source: item.source})}
+                            {' // '}<span className='bold'>{wordCount(item)}</span> {gettext('words')}
+                            {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                        </span>
                     </div>
                 </div>
             </div>
