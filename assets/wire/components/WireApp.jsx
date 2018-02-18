@@ -169,6 +169,7 @@ class WireApp extends React.Component {
                                 activeTopic={activeTopic}
                                 toggleNews={this.props.toggleNews}
                                 activeNavigation={this.props.activeNavigation}
+                                newsOnly={this.props.newsOnly}
                             />
 
                             <ItemsList
@@ -239,6 +240,7 @@ WireApp.propTypes = {
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
     toggleNews: PropTypes.func,
+    newsOnly: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -259,6 +261,7 @@ const mapStateToProps = (state) => ({
     newItems: state.newItems,
     navigations: get(state, 'wire.navigations', []),
     activeNavigation: get(state, 'wire.activeNavigation', null),
+    newsOnly: !!state.newsOnly,
 });
 
 const mapDispatchToProps = (dispatch) => ({
