@@ -45,6 +45,12 @@ class WireListItem extends React.Component {
         }
     }
 
+    componentDidMount() {
+        if (this.props.isActive) {
+            this.articleElem.focus();
+        }
+    }
+
     stopPropagation(event) {
         event.stopPropagation();
     }

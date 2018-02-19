@@ -18,6 +18,7 @@ function SearchResultsInfo({
     activeTopic,
     toggleNews,
     activeNavigation,
+    newsOnly,
 }) {
     const isFollowing = user && activeTopic;
     return (
@@ -46,7 +47,7 @@ function SearchResultsInfo({
                     <label htmlFor='news-only' className="mr-2">{gettext('News only')}</label>
                     <Toggle
                         id="news-only"
-                        defaultChecked={false}
+                        defaultChecked={newsOnly}
                         className='toggle-background'
                         icons={false}
                         onChange={toggleNews} />
@@ -75,6 +76,7 @@ SearchResultsInfo.propTypes = {
     activeTopic: PropTypes.object,
     toggleNews: PropTypes.func,
     activeNavigation: PropTypes.string,
+    newsOnly: PropTypes.bool,
 };
 
 export default SearchResultsInfo;
