@@ -24,6 +24,9 @@ blueprint = flask.Blueprint('push', __name__)
 ASSETS_RESOURCE = 'upload'
 KEY = 'PUSH_KEY'
 
+THUMBNAIL_SIZE = (640, 640)
+THUMBNAIL_QUALITY = 80
+
 
 def test_signature(request):
     """Test if request is signed using app PUSH_KEY."""
@@ -70,6 +73,8 @@ def publish_item(doc):
     for assoc in doc.get('associations', {}).values():
         if assoc:
             assoc.setdefault('subscribers', [])
+    if doc.get('associations', {}).get('featuremedia'):
+        generate_thumbnails(doc)
     _id = service.create([doc])[0]
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
@@ -172,25 +177,9 @@ def notify():
 def push_binary():
     if not test_signature(flask.request):
         flask.abort(500)
-    media_id = flask.request.form['media_id']
     media = flask.request.files['media']
-    binary = media  # what we store
-    content_type = media.content_type
-
-    MIN_WIDTH = 650
-    MAX_WIDTH = 2000
-    MIN_HEIGHT = 200
-
-    if 'image' in media.content_type:
-        image = Image.open(media)
-        width, height = image.size
-        if MIN_WIDTH < width < MAX_WIDTH and MIN_HEIGHT < height:
-            binary = watermark(image)
-            content_type = 'image/jpeg'
-        else:  # reset before storing it as is
-            media.seek(0)
-
-    app.media.put(binary, resource=ASSETS_RESOURCE, _id=media_id, content_type=content_type)
+    media_id = flask.request.form['media_id']
+    app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
     return flask.jsonify({'status': 'OK'}), 201
 
 
@@ -202,10 +191,63 @@ def push_binary_get(media_id):
         flask.abort(404)
 
 
-def watermark(image):
+def generate_thumbnails(item):
+    picture = item.get('associations', {}).get('featuremedia', {})
+    if not picture:
+        return
+
+    # use 4-3 rendition for generated thumbs
+    rendition = picture.get('renditions', {}).get('4-3', 'viewImage')
+    if not rendition:
+        return
+
+    # generate thumbnails
+    binary = app.media.get(rendition['media'], resource=ASSETS_RESOURCE)
+    im = Image.open(binary)
+    thumbnail = _get_thumbnail(im)  # 4-3 rendition resized
+    watermark = _get_watermark(im)  # 4-3 rendition with watermark
+    picture['renditions'].update({
+        '_newsroom_thumbnail': _store_image(thumbnail),
+        '_newsroom_thumbnail_large': _store_image(watermark),
+    })
+
+    # add watermark to base/view images
+    for key in ['base', 'view']:
+        rendition = picture.get('renditions', {}).get('%sImage' % key)
+        if rendition:
+            binary = app.media.get(rendition['media'], resource=ASSETS_RESOURCE)
+            im = Image.open(binary)
+            watermark = _get_watermark(im)
+            picture['renditions'].update({
+                '_newsroom_%s' % key: _store_image(watermark)
+            })
+
+
+def _store_image(image):
+    binary = io.BytesIO()
+    image.save(binary, 'jpeg', quality=THUMBNAIL_QUALITY)
+    binary.seek(0)
+    media_id = app.media.put(binary, resource=ASSETS_RESOURCE, content_type='image/jpeg')
+    binary.seek(0)
+    return {
+        'media': str(media_id),
+        'href': app.upload_url(media_id),
+        'width': image.width,
+        'height': image.height,
+        'mimetype': 'image/jpeg',
+    }
+
+
+def _get_thumbnail(image):
+    image = image.copy()
+    image.thumbnail(THUMBNAIL_SIZE)
+    return image
+
+
+def _get_watermark(image):
+    image = image.copy()
     if image.mode != 'RGBA':
         image = image.convert('RGBA')
-
     with open(os.path.join(app.static_folder, 'watermark.png'), mode='rb') as watermark_binary:
         watermark_image = Image.open(watermark_binary)
         set_opacity(watermark_image, 0.3)
@@ -215,11 +257,8 @@ def watermark(image):
             int((image.size[1] - watermark_image.size[1]) * 0.66),
         ))
 
-    final = Image.alpha_composite(image, watermark_layer)
-    output = io.BytesIO()
-    final.save(output, 'jpeg', quality=80)
-    output.seek(0)
-    return output
+    watermark = Image.alpha_composite(image, watermark_layer)
+    return watermark.convert('RGB')
 
 
 def set_opacity(image, opacity=1):

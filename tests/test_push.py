@@ -96,8 +96,9 @@ def get_fixture_path(fixture):
     return os.path.join(os.path.dirname(__file__), 'fixtures', fixture)
 
 
-def upload_binary(fixture, client):
-    media_id = str(bson.ObjectId())
+def upload_binary(fixture, client, media_id=None):
+    if not media_id:
+        media_id = str(bson.ObjectId())
     with open(get_fixture_path(fixture), mode='rb') as pic:
         resp = client.post('/push_binary', data=dict(
             media_id=media_id,
@@ -108,18 +109,50 @@ def upload_binary(fixture, client):
     return client.get('/assets/%s' % media_id)
 
 
-def test_push_binary_picture_saves_updated(client):
-    resp = upload_binary('picture.jpg', client)
-    assert resp.content_type == 'image/jpeg'
-    with open(get_fixture_path('picture.jpg'), mode='rb') as picture:
-        assert resp.content_length != len(picture.read())
-
-
 def test_push_binary_thumbnail_saves_copy(client):
     resp = upload_binary('thumbnail.jpg', client)
     assert resp.content_type == 'image/jpeg'
     with open(get_fixture_path('thumbnail.jpg'), mode='rb') as picture:
         assert resp.content_length == len(picture.read())
+
+
+def test_push_featuremedia_generates_renditions(client):
+    media_id = str(bson.ObjectId())
+    upload_binary('picture.jpg', client, media_id=media_id)
+    item = {
+        'guid': 'test',
+        'type': 'text',
+        'associations': {
+            'featuremedia': {
+                'type': 'picture',
+                'mimetype': 'image/jpeg',
+                'renditions': {
+                    '4-3': {
+                        'media': media_id,
+                    },
+                    'baseImage': {
+                        'media': media_id,
+                    },
+                    'viewImage': {
+                        'media': media_id,
+                    }
+                }
+            }
+        }
+    }
+
+    resp = client.post('/push', data=json.dumps(item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    resp = client.get('/wire/test?format=json')
+    data = json.loads(resp.get_data())
+    assert 200 == resp.status_code
+    picture = data['associations']['featuremedia']
+
+    for name in ['thumbnail', 'thumbnail_large', 'view', 'base']:
+        rendition = picture['renditions']['_newsroom_%s' % name]
+        resp = client.get(rendition['href'])
+        assert 200 == resp.status_code
 
 
 def test_push_binary_invalid_signature(client, app):
