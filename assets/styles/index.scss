@@ -834,6 +834,7 @@ article.list {
     display: flex;
     margin-right: 20px;
     width: 100%;
+    min-height: 48px;
     @include md {
         margin-right: 40px;
         width: auto;        
@@ -2413,12 +2414,22 @@ article.list {
 }
 
 .toggle-background.react-toggle--checked .react-toggle-track {
-  background-color: #00acec;
+  background-color: $main-blue !important;
 }
-
-
-.toggle-background.react-toggle--checked:hover:not(.react-toggle--disabled) .react-toggle-track {
-  background-color: #0178a3;
+.react-toggle-track {
+    width: 42px !important;
+    height: 22px !important;
+    background-color: #cccccc !important;
 }
-
+.react-toggle-thumb {
+    width: 18px !important;
+    height: 18px !important;
+    border: none !important;
+    top: 2px !important;
+    left: 2px !important;
+}
+.react-toggle--checked .react-toggle-thumb {
+    left: 22px !important;
+    border-color: none !important;
+}
 // End Wire BEM classes
