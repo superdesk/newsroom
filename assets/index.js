@@ -1,20 +1,18 @@
 import 'babel-polyfill';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
+import { isTouchDevice } from 'utils';
 
 // Carousel caption parallax
-$('.content-main').scroll(function() {    
+$('.content-main').scroll(function() {
     var scrollTop = $('.content-main').scrollTop();
     var imgPos = scrollTop / 2 + 'px';
     $('.carousel-item').css('background-position', '50% ' + imgPos);
     $('.carousel-caption').css('opacity', 1 - scrollTop / 400);
 });
 
-const IS_TOUCH_DEVICE = () =>
-    'ontouchstart' in window        // works on most browsers
-    || navigator.maxTouchPoints;       // works on IE10/11 and Surface
 
-if ( !IS_TOUCH_DEVICE() ) {
+if ( !isTouchDevice() ) {
     $('html').addClass('no-touch');
     $('[data-toggle="tooltip"]').tooltip();
 }

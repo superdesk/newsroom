@@ -15,6 +15,7 @@ import {openItemDetails} from '../actions';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
+import PhotoCarousel from './PhotoCarousel';
 
 const panels = {
     '6-text-only': TextOnlyCard,
@@ -81,6 +82,7 @@ class HomeApp extends React.Component {
             />, modal] :
                 <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4">
                     <div className="container-fluid">
+                        {this.props.photos.length > 0 && <PhotoCarousel photos={this.props.photos}/>}
                         {this.props.cards.length > 0 && this.props.cards.map((card) => this.getPanels(card))}
                         {this.props.cards.length === 0 &&
                         <div className="alert alert-warning" role="alert">
@@ -94,6 +96,7 @@ class HomeApp extends React.Component {
 }
 
 HomeApp.propTypes = {
+    photos: PropTypes.array,
     cards: PropTypes.arrayOf(PropTypes.object),
     itemsByCard: PropTypes.object,
     products: PropTypes.array,
@@ -110,6 +113,7 @@ HomeApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
+    photos: state.photos,
     cards: state.cards,
     itemsByCard: state.itemsByCard,
     products: state.products,
