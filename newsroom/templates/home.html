@@ -16,15 +16,4 @@
         homeData = {{ data | tojson | safe }};
     </script>
     {{ javascript_tag('home_js') | safe }}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.18/jquery.touchSwipe.js" integrity="sha256-KKv6+21Uvs0xGccvranH3/RaUvz7N24khCbpW6leF5o=" crossorigin="anonymous"></script>
-    <script>
-        // Carousel swipe
-        $('.carousel').swipe({
-            swipe: function(event, direction, distance, duration, fingerCount, fingerData) {
-                if (direction == 'left') $(this).carousel('next');
-                if (direction == 'right') $(this).carousel('prev');
-            },
-            allowPageScroll:'vertical'
-        });
-    </script>
 {% endblock %}

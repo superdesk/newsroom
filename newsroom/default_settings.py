@@ -134,7 +134,7 @@ HOMEPAGE_CAROUSEL = [{
     'count': 2
 }, {
     'source': 'https://photos-api.aap.com.au/api/v3/Galleries/Newsroom/AUSTRALIAN%20SPORT',
-    'count': 3
+    'count': 2
 }]
 
 # the lifetime of a permanent session in seconds

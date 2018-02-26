@@ -75,8 +75,9 @@ def get_home_data():
 
     itemsByCard = {}
     for card in cards:
-        itemsByCard[card['label']] = superdesk.get_resource_service('wire_search').\
-            get_product_items(ObjectId(card['config']['product']), card['config']['size'])
+        if card['config'].get('product'):
+            itemsByCard[card['label']] = superdesk.get_resource_service('wire_search').\
+                get_product_items(ObjectId(card['config']['product']), card['config']['size'])
 
     return {
         'photos': get_photos(),

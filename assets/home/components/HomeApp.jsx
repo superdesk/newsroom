@@ -15,12 +15,13 @@ import {openItemDetails} from '../actions';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
-import PhotoCarousel from './PhotoCarousel';
+import PhotoGalleryCard from './PhotoGalleryCard';
 
 const panels = {
     '6-text-only': TextOnlyCard,
     '4-picture-text': PictureTextCard,
     '4-media-gallery': MediaGalleryCard,
+    '4-photo-gallery': PhotoGalleryCard,
     '1x1-top-news': TopNewsOneByOneCard,
     '2x2-top-news': TopNewsTwoByTwoCard,
     '3-text-only': LargeTextOnlyCard,
@@ -57,6 +58,13 @@ class HomeApp extends React.Component {
     getPanels(card) {
         const items = this.props.itemsByCard[card.label];
         const Panel = panels[card.type];
+        if (card.type === '4-photo-gallery') {
+            return <Panel
+                key={card.label}
+                photos={this.props.photos}
+                title={card.label}
+            />;
+        }
         return <Panel
             key={card.label}
             items={items}
@@ -82,7 +90,6 @@ class HomeApp extends React.Component {
             />, modal] :
                 <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4">
                     <div className="container-fluid">
-                        {this.props.photos.length > 0 && <PhotoCarousel photos={this.props.photos}/>}
                         {this.props.cards.length > 0 && this.props.cards.map((card) => this.getPanels(card))}
                         {this.props.cards.length === 0 &&
                         <div className="alert alert-warning" role="alert">
