@@ -1,15 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { isTouchDevice } from 'utils';
 
-function is_touch_device() {
-    return 'ontouchstart' in window        // works on most browsers 
-    || navigator.maxTouchPoints;       // works on IE10/11 and Surface
-}
 
 class ActionButton extends React.Component {
-    componentDidMount() {        
-        if ( !is_touch_device() ) {
+    componentDidMount() {
+        if ( !isTouchDevice() ) {
             this.elem && $(this.elem).tooltip();
         }
     }

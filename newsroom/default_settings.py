@@ -125,6 +125,18 @@ CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
 RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
+# Base64 Encoded Token
+AAPPHOTOS_TOKEN = os.environ.get('AAPPHOTOS_TOKEN')
+
+# Home Page Carousel Sources
+HOMEPAGE_CAROUSEL = [{
+    'source': 'https://photos-api.aap.com.au/api/v3/Galleries/Newsroom/AUSTRALIAN%20NEWS',
+    'count': 2
+}, {
+    'source': 'https://photos-api.aap.com.au/api/v3/Galleries/Newsroom/AUSTRALIAN%20SPORT',
+    'count': 2
+}]
+
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 

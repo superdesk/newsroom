@@ -2,6 +2,8 @@ import io
 import flask
 import zipfile
 import superdesk
+import urllib.request
+import json
 
 from operator import itemgetter
 from flask import current_app as app
@@ -45,6 +47,27 @@ def get_view_data():
     }
 
 
+def _fetch_photos(url, count):
+    headers = {'Authorization': 'Basic {}'.format(app.config.get('AAPPHOTOS_TOKEN'))}
+    request = urllib.request.Request(url, headers=headers)
+
+    try:
+        with urllib.request.urlopen(request) as response:
+            data = response.read()
+            json_data = json.loads(data.decode("utf-8"))
+            return json_data['GalleryContainers'][:count]
+    except Exception:
+        return []
+
+
+def get_photos():
+    photos = []
+    for item in app.config.get('HOMEPAGE_CAROUSEL', []):
+        if item.get('source'):
+            photos.extend(_fetch_photos(item.get('source'), item.get('count', 2)))
+    return photos
+
+
 def get_home_data():
     cards = list(superdesk.get_resource_service('cards').get(None, None))
     user = get_user()
@@ -52,10 +75,12 @@ def get_home_data():
 
     itemsByCard = {}
     for card in cards:
-        itemsByCard[card['label']] = superdesk.get_resource_service('wire_search').\
-            get_product_items(ObjectId(card['config']['product']), card['config']['size'])
+        if card['config'].get('product'):
+            itemsByCard[card['label']] = superdesk.get_resource_service('wire_search').\
+                get_product_items(ObjectId(card['config']['product']), card['config']['size'])
 
     return {
+        'photos': get_photos(),
         'cards': cards,
         'itemsByCard': itemsByCard,
         'products': get_products_by_company(company_id),
