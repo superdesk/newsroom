@@ -188,6 +188,7 @@ class WireSearchService(newsroom.Service):
         if req.args.get('newsOnly'):
             query['bool']['must_not'].append({'match': {'genre.code': 'Results (sport)'}})
             query['bool']['must_not'].append({'match': {'genre.code': 'Broadcast Script'}})
+            query['bool']['must_not'].append({'match': {'source': 'PMF'}})
 
         if req.args.get('bookmarks'):
             _set_bookmarks_query(query, req.args['bookmarks'])
