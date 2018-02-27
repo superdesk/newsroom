@@ -10,6 +10,12 @@ from superdesk.default_settings import (   # noqa
     ELASTIC_DATE_FORMAT,
     CELERY_BROKER_URL,
     celery_queue,
+    AMAZON_SECRET_ACCESS_KEY,
+    AMAZON_ACCESS_KEY_ID,
+    AMAZON_CONTAINER_NAME,
+    AMAZON_OBJECT_ACL,
+    AMAZON_S3_SUBFOLDER,
+    AMAZON_REGION
 )
 
 XML = False
