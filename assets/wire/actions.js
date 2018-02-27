@@ -1,6 +1,7 @@
 
 import { get, isEmpty } from 'lodash';
 import server from 'server';
+import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset } from 'utils';
 import { markItemAsRead } from './utils';
 import { renderModal, closeModal } from 'actions';
@@ -29,6 +30,7 @@ export function previewItem(item) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
         dispatch(preview(item));
+        item && analytics.itemEvent('preview', item);
     };
 }
 
@@ -44,11 +46,14 @@ export function openItem(item) {
         updateRouteParams({
             item: item ? item._id : null
         }, getState());
+        item && analytics.itemEvent('open', item);
+        analytics.itemView(item);
     };
 }
 
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query) {
+    query && analytics.event('search', query);
     return {type: SET_QUERY, query};
 }
 
@@ -97,6 +102,7 @@ export function copyPreviewContents(item) {
         selection.addRange(range);
         if (document.execCommand('copy')) {
             notify.success(gettext('Item copied successfully.'));
+            item && analytics.itemEvent('copy', item);
         } else {
             notify.error(gettext('Sorry, Copy is not supported.'));
         }
@@ -112,6 +118,7 @@ export function copyPreviewContents(item) {
 export function printItem(item) {
     return (dispatch, getState) => {
         window.open(`/wire/${item._id}?print`, '_blank');
+        item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
         }
@@ -156,6 +163,7 @@ function search(state, next) {
  */
 export function fetchItems() {
     return (dispatch, getState) => {
+        const start = Date.now();
         dispatch(queryItems());
         return search(getState())
             .then((data) => dispatch(recieveItems(data)))
@@ -164,6 +172,7 @@ export function fetchItems() {
                 updateRouteParams({
                     q: state.query,
                 }, state);
+                analytics.timingComplete('search', Date.now() - start);
             })
             .catch(errorHandler);
     };
@@ -221,7 +230,7 @@ export function shareItems(items) {
  * @param {Object} data
  */
 export function submitShareItem(data) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         return server.post('/wire_share', data)
             .then(() => {
                 if (data.items.length > 1) {
@@ -231,6 +240,7 @@ export function submitShareItem(data) {
                 }
                 dispatch(closeModal());
             })
+            .then(() => multiItemEvent('share', data.items, getState()))
             .then(() => dispatch(setShareItems(data.items)))
             .catch(errorHandler);
     };
@@ -282,7 +292,7 @@ export function removeBookmarkItems(items) {
 }
 
 export function bookmarkItems(items) {
-    return (dispatch) =>
+    return (dispatch, getState) =>
         server.post('/wire_bookmark', {items})
             .then(() => {
                 if (items.length > 1) {
@@ -290,6 +300,9 @@ export function bookmarkItems(items) {
                 } else {
                     notify.success(gettext('Item was bookmarked successfully.'));
                 }
+            })
+            .then(() => {
+                multiItemEvent('bookmark', items, getState());
             })
             .then(() => dispatch(setBookmarkItems(items)))
             .catch(errorHandler);
@@ -343,10 +356,11 @@ export function downloadItems(items) {
  * @param {String} format
  */
 export function submitDownloadItems(items, format) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         window.open(`/download/${items.join(',')}?format=${format}`, '_blank');
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
+        multiItemEvent('download', items, getState());
     };
 }
 
@@ -535,4 +549,11 @@ export function setView(view) {
 
 export function refresh() {
     return (dispatch, getState) => dispatch(recieveItems(getState().newItemsData));
+}
+
+function multiItemEvent(event, items, state) {
+    items.forEach((itemId) => {
+        const item = state.itemsById[itemId];
+        item && analytics.itemEvent(event, item);
+    });
 }

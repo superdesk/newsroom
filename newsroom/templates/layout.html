@@ -102,5 +102,25 @@
 
 {% block script %}{% endblock %}
 
+{% if newsroom_config().analytics %}
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ newsroom_config().analytics | safe }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', {{ newsroom_config().analytics | tojson | safe }}, {
+      custom_map: {
+          dimension1: 'company',
+      }
+  });
+
+  {% if session.get('user') %}
+  gtag('set', {'user_id': {{ hash(session['user']) | tojson | safe }} });
+  {% endif %}
+</script>
+{% endif %}
+
 </body>
 </html>
