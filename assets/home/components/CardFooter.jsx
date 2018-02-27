@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
+import { gettext, shortDate, fullDate } from 'utils';
 
-function CardFooter({wordCount, pictureAvailable}) {
+function CardFooter({wordCount, pictureAvailable, source, versioncreated}) {
     return (<div className="card-footer">
         <div className="wire-articles__item__meta">
             <div className="wire-articles__item__icons">
@@ -14,7 +14,14 @@ function CardFooter({wordCount, pictureAvailable}) {
                 </span>}
             </div>
             <div className="wire-articles__item__meta-info">
-                <span><span className="bold">{wordCount}</span> {gettext('words')}</span>
+                <span>
+                    {source && gettext('Source: {{ source }}', {source}) + ' // '}
+                    <span className='bold'>{wordCount}</span> {gettext('words')}
+                    {versioncreated && ' // '}
+                    {versioncreated &&
+                        <time dateTime={fullDate(versioncreated)}>{shortDate(versioncreated)}</time>
+                    }
+                </span>
             </div>
         </div>
     </div>);
@@ -23,6 +30,8 @@ function CardFooter({wordCount, pictureAvailable}) {
 CardFooter.propTypes = {
     wordCount: PropTypes.number,
     pictureAvailable: PropTypes.bool,
+    source: PropTypes.string,
+    versioncreated: PropTypes.string,
 };
 
 export default CardFooter;

@@ -14,7 +14,7 @@ const getPictureTextPanel = (item, picture, openItem) => {
     return (<div key={item._id} className="col-sm-6 col-lg-4 d-flex mb-4">
         <div className="card card--home" onClick={() => openItem(item)}>
             <img className="card-img-top" src={imageUrl} alt={caption} />
-            <CardBody item={item}/>
+            <CardBody item={item} />
             <CardFooter wordCount={wordCount(item)} pictureAvailable={true}/>
         </div>
     </div>);
