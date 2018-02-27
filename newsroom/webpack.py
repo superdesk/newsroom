@@ -25,13 +25,12 @@ class NewsroomWebpack(Webpack):
             self.assets = {}
             return
 
-        if app.debug:
-            try:
-                self.assets = requests.get('{0}{1}'.format(app.config['WEBPACK_SERVER_URL'], 'manifest.json')).json()
-                self.assets_url = 'http://localhost:8080/'
-                return
-            except requests.exceptions.ConnectionError:
-                pass
+        try:
+            self.assets = requests.get('{0}{1}'.format(app.config['WEBPACK_SERVER_URL'], 'manifest.json')).json()
+            self.assets_url = 'http://localhost:8080/'
+            return
+        except requests.exceptions.ConnectionError:
+            pass
 
         try:
             with app.open_resource(webpack_stats, 'r') as stats_json:
