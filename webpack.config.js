@@ -17,7 +17,7 @@ module.exports = {
         wire_js: './assets/wire/index.js',
         home_js: './assets/home/index.js',
         notifications_js: './assets/notifications/index.js',
-        vendor: [
+        common: [
             'alertifyjs',
             'bootstrap',
             'classnames',
@@ -30,6 +30,10 @@ module.exports = {
             'redux',
             'redux-thunk',
             'redux-logger',
+
+            // internal
+            'utils',
+            'server',
         ],
     },
     output: {
@@ -77,11 +81,12 @@ module.exports = {
         new ManifestPlugin(),
         new webpack.ProvidePlugin({
             $: 'jquery',
-            jQuery: 'jquery',
-            Popper: ['popper.js', 'default'],
+            // bootstrap depenendecies
+            'window.jQuery': 'jquery',
+            'window.Popper': 'popper.js',
         }),
         new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendor',
+            name: 'common',
             minChunks: Infinity,
         }),
     ]
