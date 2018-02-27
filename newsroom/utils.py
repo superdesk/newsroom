@@ -5,6 +5,10 @@ from datetime import datetime
 from bson import ObjectId
 from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date
+import os
+from flask import url_for
+
+from werkzeug.utils import secure_filename
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None):
@@ -39,6 +43,14 @@ def get_entity_or_404(_id, resource):
     if not item:
         abort(404)
     return item
+
+
+def get_file(key):
+    file = request.files.get(key)
+    if file:
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return url_for('wire.uploaded_file', filename=filename)
 
 
 def get_json_or_400():

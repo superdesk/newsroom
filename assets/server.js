@@ -45,6 +45,20 @@ class Server {
     }
 
     /**
+     * Make POST request to url in keeps the format of the input
+     *
+     * @param {String} url
+     * @param {Object} data
+     * @return {Promise}
+     */
+    postFiles(url, data) {
+        return fetch(url, options({
+            method: 'POST',
+            body: data,
+        })).then(checkStatus);
+    }
+
+    /**
      * Make DELETE request to url
      *
      * @param {String} url

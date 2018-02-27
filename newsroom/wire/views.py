@@ -6,7 +6,7 @@ import urllib.request
 import json
 
 from operator import itemgetter
-from flask import current_app as app
+from flask import current_app as app, send_from_directory
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -121,6 +121,11 @@ def get_previous_versions(item):
 def index():
     return flask.render_template('home.html', data=get_home_data())
 
+
+@blueprint.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename)
 
 @blueprint.route('/wire')
 @login_required

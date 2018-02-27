@@ -32,6 +32,7 @@ const cardSizes = {
     '2x2-top-news': 4,
     '3-text-only': 3,
     '3-picture-text': 3,
+    '2x2-events': 4,
 };
 
 export default function cardReducer(state = initialState, action) {
@@ -57,8 +58,22 @@ export default function cardReducer(state = initialState, action) {
         const field = target.name;
         let card = state.cardToEdit;
 
-        if (field === 'product') {
+        if (field === 'type') {
+            if (target.value == '2x2-events') {
+                card['config'] = {events: [{}, {}, {}, {}]};
+            } else {
+                card['config'] = {};
+            }
+
+            card[field] = target.value;
+
+        } else if (field === 'product') {
             card['config']['product'] = target.value;
+        } else if (field.indexOf('event') >= 0) {
+            const eventData = field.split('_');
+            const events = card['config']['events'] || [{}, {}, {}, {}];
+            events[parseInt(eventData[1])][eventData[2]] = target.value;
+            card['config']['events'] = events;
         } else {
             card[field] = target.value;
         }

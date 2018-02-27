@@ -1,13 +1,13 @@
 import re
 import flask
 from bson import ObjectId
-from flask import jsonify
+from flask import jsonify, json
 from flask_babel import gettext
 from superdesk import get_resource_service
 
 from newsroom.auth.decorator import admin_only, login_required
 from newsroom.cards import blueprint
-from newsroom.utils import get_json_or_400, get_entity_or_404
+from newsroom.utils import get_json_or_400, get_entity_or_404, get_file
 from newsroom.utils import query_resource
 
 
@@ -42,15 +42,36 @@ def search():
 @blueprint.route('/cards/new', methods=['POST'])
 @admin_only
 def create():
-    data = get_json_or_400()
+    data = json.loads(flask.request.form['card'])
+    card_data = _get_card_data(data)
+    ids = get_resource_service('cards').post([card_data])
+    return jsonify({'success': True, '_id': ids[0]}), 201
+
+
+def _get_card_data(data):
+    if not data:
+        flask.abort(400)
+
     if not data.get('label'):
         return jsonify(gettext('Label not found')), 400
 
     if not data.get('type'):
         return jsonify(gettext('Type not found')), 400
 
-    ids = get_resource_service('cards').post([data])
-    return jsonify({'success': True, '_id': ids[0]}), 201
+    card_data = {
+        'label': data.get('label'),
+        'type': data.get('type'),
+        'config': data.get('config'),
+        'order': data.get('order'),
+    }
+
+    if data.get('type') == '2x2-events':
+        for index, event in enumerate(card_data['config']['events']):
+            file_url = get_file('file{}'.format(index))
+            if file_url:
+                event['file_url'] = file_url
+
+    return card_data
 
 
 @blueprint.route('/cards/<id>', methods=['POST'])
@@ -58,21 +79,10 @@ def create():
 def edit(id):
     card = get_entity_or_404(id, 'cards')
 
-    if not card.get('label'):
-        return jsonify(gettext('Label not found')), 400
+    data = json.loads(flask.request.form['card'])
+    card_data = _get_card_data(data)
 
-    if not card.get('type'):
-        return jsonify(gettext('Type not found')), 400
-
-    data = get_json_or_400()
-    updates = {
-        'label': data.get('label'),
-        'type': data.get('type'),
-        'config': data.get('config'),
-        'order': data.get('order'),
-    }
-
-    get_resource_service('cards').patch(id=ObjectId(id), updates=updates)
+    get_resource_service('cards').patch(id=ObjectId(id), updates=card_data)
     return jsonify({'success': True}), 200
 
 

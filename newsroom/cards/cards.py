@@ -25,6 +25,7 @@ class CardsResource(newsroom.Resource):
                 '2x2-top-news',
                 '3-text-only',
                 '3-picture-text',
+                '2x2-events,'
             ],
         },
         'config': {
