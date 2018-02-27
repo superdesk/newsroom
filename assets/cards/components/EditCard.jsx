@@ -11,6 +11,7 @@ const cardTypes = [
     {value: '4-picture-text', text: gettext('4-picture-text')},
     {value: '4-media-gallery', text: gettext('4-media-gallery')},
     {value: '4-photo-gallery', text: gettext('4-photo-gallery')},
+    {value: '4-text-only', text: gettext('4-text-only')},
     {value: '1x1-top-news', text: gettext('1x1-top-news')},
     {value: '2x2-top-news', text: gettext('2x2-top-news')},
     {value: '3-text-only', text: gettext('3-text-only')},

@@ -18,6 +18,7 @@ class CardsResource(newsroom.Resource):
             'allowed': [
                 '6-text-only',
                 '4-picture-text',
+                '4-text-only',
                 '4-media-gallery',
                 '4-photo-gallery',
                 '1x1-top-news',

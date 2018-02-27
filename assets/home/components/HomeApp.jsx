@@ -26,6 +26,7 @@ const panels = {
     '2x2-top-news': TopNewsTwoByTwoCard,
     '3-text-only': LargeTextOnlyCard,
     '3-picture-text': LargePictureTextCard,
+    '4-text-only': PictureTextCard,
 };
 
 const modals = {
@@ -67,6 +68,7 @@ class HomeApp extends React.Component {
         }
         return <Panel
             key={card.label}
+            type={card.type}
             items={items}
             title={card.label}
             product={this.getProduct(card)}
