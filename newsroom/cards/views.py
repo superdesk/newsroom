@@ -7,7 +7,7 @@ from superdesk import get_resource_service
 
 from newsroom.auth.decorator import admin_only, login_required
 from newsroom.cards import blueprint
-from newsroom.utils import get_json_or_400, get_entity_or_404, get_file
+from newsroom.utils import get_entity_or_404, get_file
 from newsroom.utils import query_resource
 
 
@@ -77,7 +77,7 @@ def _get_card_data(data):
 @blueprint.route('/cards/<id>', methods=['POST'])
 @admin_only
 def edit(id):
-    card = get_entity_or_404(id, 'cards')
+    get_entity_or_404(id, 'cards')
 
     data = json.loads(flask.request.form['card'])
     card_data = _get_card_data(data)

@@ -23,7 +23,7 @@ function EventDetails ({event, onChange, errors, index}) {
                     label={gettext('Headline')}
                     value={event.headline}
                     onChange={onChange}
-                    error={errors ? errors.event_0_headline : null}/>
+                    error={errors ? errors[`${prefix}headline`] : null}/>
 
                 <TextAreaInput
                     name={`${prefix}abstract`}
@@ -45,14 +45,21 @@ function EventDetails ({event, onChange, errors, index}) {
                     label={gettext('End Date')}
                     value={event.endDate}
                     onChange={onChange}
-                    error={errors ? errors[`${prefix}endDate`] : null}/>
+                    error={errors ? errors[`${prefix}endDate`] : null}
+                    required={false}/>
 
-                <FileInput
-                    name={`${prefix}file`}
-                    label={gettext('Image')}
-                    value={event.file}
+                <TextInput
+                    name={`${prefix}location`}
+                    label={gettext('Location')}
+                    value={event.location}
                     onChange={onChange}
-                    error={errors ? errors[`${prefix}file`] : null}/>
+                    error={errors ? errors[`${prefix}location`] : null}/>
+
+                {index < 2 && <FileInput
+                    name={`${prefix}file`}
+                    label={`${gettext('Image')} - ${event.file}`}
+                    onChange={onChange}
+                    error={errors ? errors[`${prefix}file`] : null} />}
             </div>
         </div>
     );

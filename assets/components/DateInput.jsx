@@ -17,7 +17,7 @@ function DateInput({name, label, onChange, value, error, required}) {
         <div className={wrapperClass}>
             <label htmlFor={name}>{label}</label>
             <div className="field">
-                <input type="datetime-local"
+                <input type="date"
                     id={name}
                     name={name}
                     className="form-control"

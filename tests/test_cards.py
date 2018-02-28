@@ -27,7 +27,7 @@ def test_card_list_fails_for_anonymous_user(client):
 def test_save_and_return_cards(client):
     test_login_succeeds_for_admin(client)
     # Save a new card
-    client.post('/cards/new', data=json.dumps({
+    client.post('/cards/new', data={'card': json.dumps({
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
         'label': 'Local News',
         'type': '4-picture-text',
@@ -35,7 +35,7 @@ def test_save_and_return_cards(client):
             'product': '5a23c1131d41c82b8dd4267d',
             'size': 4,
         }
-    }), content_type='application/json')
+    })})
 
     response = client.get('/cards')
     assert 'Local' in response.get_data(as_text=True)
@@ -45,9 +45,8 @@ def test_update_card(client):
     test_login_succeeds_for_admin(client)
 
     client.post('/cards/59b4c5c61d41c8d736852fbf/',
-                data=json.dumps({'label': 'Sport',
-                                 'type': '4-picture-text'}),
-                content_type='application/json')
+                data={'card': json.dumps({'label': 'Sport',
+                                          'type': '4-picture-text'})})
 
     response = client.get('/cards')
     assert '4-picture-text' in response.get_data(as_text=True)

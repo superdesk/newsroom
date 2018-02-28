@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
-function FileInput({name, label, onChange, value, error, accept, required}) {
+function FileInput({name, label, onChange, error, accept, required}) {
     let wrapperClass = 'form-group';
 
     if (error && error.length > 0) {
@@ -21,7 +21,6 @@ function FileInput({name, label, onChange, value, error, accept, required}) {
                     id={name}
                     name={name}
                     className="form-control"
-                    value={value}
                     onChange={onChange}
                     accept={accept}
                     required={required}
@@ -35,7 +34,6 @@ function FileInput({name, label, onChange, value, error, accept, required}) {
 FileInput.propTypes = {
     label: PropTypes.string.isRequired,
     name: PropTypes.string,
-    value: PropTypes.string,
     error: PropTypes.arrayOf(PropTypes.string),
     onChange: PropTypes.func,
     accept: PropTypes.string,
