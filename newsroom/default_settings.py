@@ -121,7 +121,7 @@ RATELIMIT_STRATEGY = 'fixed-window'
 RATELIMIT_ENABLED = True
 
 # Cache Settings
-CACHE_TYPE = 'simple'  # in-memory cache
+CACHE_TYPE = os.environ.get('CACHE_TYPE', 'simple')  # in-memory cache
 # The default timeout that is used if no timeout is specified in sec
 CACHE_DEFAULT_TIMEOUT = 3600
 # Redis host (used only if CACHE_TYPE is redis)

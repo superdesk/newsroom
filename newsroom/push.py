@@ -16,6 +16,7 @@ from newsroom.topics.topics import get_notification_topics
 from newsroom.utils import query_resource, parse_dates
 from newsroom.email import send_new_item_notification_email, send_history_match_notification_email
 from newsroom.history import get_history_users
+from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
 
 logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
@@ -91,6 +92,7 @@ def push():
     orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
     item['_id'] = publish_item(item)
     notify_new_item(item, check_topics=orig is None)
+    app.cache.delete(HOME_ITEMS_CACHE_KEY)
     return flask.jsonify({})
 
 
