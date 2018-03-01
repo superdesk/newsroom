@@ -109,12 +109,19 @@
   gtag('config', {{ newsroom_config().analytics | tojson | safe }}, {
       custom_map: {
           dimension1: 'company',
+          dimension2: 'user',
       }
   });
 
   {% if session.get('user') %}
   gtag('set', {'user_id': {{ hash(session['user']) | tojson | safe }} });
   {% endif %}
+
+  {% with messages = get_flashed_messages(category_filter=['analytics']) %}
+    {% if messages %}
+        analytics.sendEvents({{ messages | tojson | safe }});
+    {% endif %}
+  {% endwith %}
 </script>
 {% endif %}
 

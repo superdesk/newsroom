@@ -4,10 +4,14 @@ class Analytics {
     _event(name, params) {
         if (window.gtag) {
             const company = get(window, 'profileData.companyName', 'none');
-            window.gtag('event', name, Object.assign({
+            const user = get(window, 'profileData.user.first_name', 'unknown');
+            const userParams = {
                 event_category: company,
                 company: company,
-            }, params));
+                user: user,
+            };
+
+            window.gtag('event', name, Object.assign(userParams, params));
         }
     }
 
@@ -41,6 +45,14 @@ class Analytics {
             this.pageview();
         }
     }
+
+    sendEvents(events) {
+        events.forEach((event) => {
+            this._event(event);
+        });
+    }
 }
 
-export default new Analytics();
+// make it available
+window.analytics = new Analytics();
+export default window.analytics;
