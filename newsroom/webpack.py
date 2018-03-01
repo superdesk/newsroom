@@ -6,6 +6,10 @@ from flask import current_app, request
 from flask_webpack import Webpack
 
 
+def is_localhost():
+    return request and 'localhost' in request.url
+
+
 class NewsroomWebpack(Webpack):
 
     def init_app(self, app):
@@ -14,7 +18,7 @@ class NewsroomWebpack(Webpack):
             app.before_request(self._refresh_webpack_stats_if_debug)
 
     def _refresh_webpack_stats_if_debug(self):
-        if current_app.debug:
+        if current_app.debug or is_localhost():
             self._refresh_webpack_stats()
 
     def _set_asset_paths(self, app):

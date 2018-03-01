@@ -30,10 +30,6 @@ module.exports = {
             'redux',
             'redux-thunk',
             'redux-logger',
-
-            // internal
-            'utils',
-            'server',
         ],
     },
     output: {
