@@ -1,14 +1,15 @@
-import superdesk
-from flask import current_app as app, json, abort, request
-from uuid import uuid4
 from datetime import datetime
+from uuid import uuid4
+
+import superdesk
 from bson import ObjectId
 from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date
-import os
+from flask import current_app as app, json, abort, request
 from flask import url_for
-
 from werkzeug.utils import secure_filename
+
+from newsroom.upload import ASSETS_RESOURCE
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None):
@@ -49,8 +50,8 @@ def get_file(key):
     file = request.files.get(key)
     if file:
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return url_for('wire.uploaded_file', filename=filename)
+        app.media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
+        return url_for('upload.get_upload', media_id=filename)
 
 
 def get_json_or_400():

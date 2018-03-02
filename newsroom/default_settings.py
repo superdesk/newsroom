@@ -175,6 +175,3 @@ SERVICES = [
 
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'DD/MM/YYYY'
-
-# path for saving event images
-UPLOAD_FOLDER = '/tmp'
