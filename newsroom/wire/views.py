@@ -24,6 +24,8 @@ from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates
 from newsroom.notifications import push_user_notification
 from .search import get_bookmarks_count
 
+HOME_ITEMS_CACHE_KEY = 'home_items'
+
 
 def get_services(user):
     services = app.config['SERVICES']
@@ -61,28 +63,42 @@ def _fetch_photos(url, count):
 
 
 def get_photos():
+    if app.cache.get('home_photos'):
+        return app.cache.get('home_photos')
+
     photos = []
     for item in app.config.get('HOMEPAGE_CAROUSEL', []):
         if item.get('source'):
             photos.extend(_fetch_photos(item.get('source'), item.get('count', 2)))
+
+    app.cache.set('home_photos', photos, timeout=300)
     return photos
 
 
-def get_home_data():
-    cards = list(superdesk.get_resource_service('cards').get(None, None))
-    user = get_user()
-    company_id = str(user['company']) if user and user.get('company') else None
+def get_items_by_card(cards):
+    if app.cache.get(HOME_ITEMS_CACHE_KEY):
+        return app.cache.get(HOME_ITEMS_CACHE_KEY)
 
-    itemsByCard = {}
+    items_by_card = {}
     for card in cards:
         if card['config'].get('product'):
-            itemsByCard[card['label']] = superdesk.get_resource_service('wire_search').\
+            items_by_card[card['label']] = superdesk.get_resource_service('wire_search').\
                 get_product_items(ObjectId(card['config']['product']), card['config']['size'])
+
+    app.cache.set(HOME_ITEMS_CACHE_KEY, items_by_card, timeout=300)
+    return items_by_card
+
+
+def get_home_data():
+    user = get_user()
+    cards = list(superdesk.get_resource_service('cards').get(None, None))
+    company_id = str(user['company']) if user and user.get('company') else None
+    items_by_card = get_items_by_card(cards)
 
     return {
         'photos': get_photos(),
         'cards': cards,
-        'itemsByCard': itemsByCard,
+        'itemsByCard': items_by_card,
         'products': get_products_by_company(company_id),
         'user': str(user['_id']) if user else None,
         'company': company_id,
