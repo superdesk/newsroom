@@ -35,6 +35,7 @@ def login():
                 flask.session['name'] = '{} {}'.format(user.get('first_name'), user.get('last_name'))
                 flask.session['user_type'] = user['user_type']
                 flask.session.permanent = form.remember_me.data
+                flask.flash('login', 'analytics')
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
             else:
                 flask.flash(gettext('Account is disabled.'), 'danger')
