@@ -65,3 +65,7 @@ def parse_dates(item):
     for field in ['firstcreated', 'versioncreated']:
         if item.get(field) and type(item[field]) == str:
             item[field] = parse_date(item[field])
+
+
+def get_entity_dict(items):
+    return {item['_id']: item for item in items}
