@@ -4,6 +4,8 @@ import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 
 import { gettext } from 'utils';
+import CardDetails from './CardDetails';
+import EventDetails from './EventDetails';
 
 const cardTypes = [
     {value: '', text: ''},
@@ -16,26 +18,17 @@ const cardTypes = [
     {value: '2x2-top-news', text: gettext('2x2-top-news')},
     {value: '3-text-only', text: gettext('3-text-only')},
     {value: '3-picture-text', text: gettext('3-picture-text')},
+    {value: '2x2-events', text: gettext('2x2-events')},
 ];
-
 
 
 class EditCard extends React.Component {
     constructor(props) {
         super(props);
-
-        this.getProducts = this.getProducts.bind(this);
-    }
-
-    getProducts() {
-        const productList = [{ value: '', text: '' }];
-        this.props.products.map((product) => {
-            productList.push({ value: product._id, text: product.name });
-        });
-        return productList;
     }
 
     render() {
+        const events = this.props.card.config.events || [{}, {}, {}, {}];
         return (
             <div className='list-item__preview'>
                 <div className='list-item__preview-header'>
@@ -68,20 +61,27 @@ class EditCard extends React.Component {
                             onChange={this.props.onChange}
                             error={this.props.errors ? this.props.errors.type : null} />
 
-                        <SelectInput
-                            name='product'
-                            label={gettext('Product')}
-                            value={this.props.card.config.product}
-                            options={this.getProducts()}
-                            onChange={this.props.onChange}
-                            error={this.props.errors ? this.props.errors.product : null} />
-
                         <TextInput
                             name='order'
                             label={gettext('Order')}
                             value={this.props.card.order}
                             onChange={this.props.onChange}
                             error={this.props.errors ? this.props.errors.order : null}/>
+
+                        {this.props.card.type !== '2x2-events' && <CardDetails
+                            card={this.props.card}
+                            onChange={this.props.onChange}
+                            errors={this.props.errors}
+                            products={this.props.products} />}
+
+                        {this.props.card.type === '2x2-events' &&
+                         events.map((event, index) => <EventDetails
+                             key={`event${index}`}
+                             event={event}
+                             onChange={this.props.onChange}
+                             errors={this.props.errors}
+                             index={index} />)}
+
 
 
                     </div>
@@ -111,8 +111,6 @@ EditCard.propTypes = {
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
-    saveProducts: PropTypes.func.isRequired,
-    fetchProducts: PropTypes.func.isRequired,
 };
 
 export default EditCard;

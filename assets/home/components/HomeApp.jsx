@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import {gettext} from 'utils';
+import { get } from 'lodash';
 import TextOnlyCard from './TextOnlyCard';
 import PictureTextCard from './PictureTextCard';
 import MediaGalleryCard from './MediaGalleryCard';
@@ -8,7 +10,6 @@ import TopNewsOneByOneCard from './TopNewsOneByOneCard';
 import TopNewsTwoByTwoCard from './TopNewsTwoByTwoCard';
 import LargeTextOnlyCard from './LargeTextOnlyCard';
 import LargePictureTextCard from './LargePictureTextCard';
-import {gettext} from 'utils';
 import {getItemActions} from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
 import {openItemDetails} from '../actions';
@@ -16,6 +17,7 @@ import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import PhotoGalleryCard from './PhotoGalleryCard';
+import EventsTwoByTwoCard from './EventsTwoByTwoCard';
 
 const panels = {
     '6-text-only': TextOnlyCard,
@@ -27,6 +29,7 @@ const panels = {
     '3-text-only': LargeTextOnlyCard,
     '3-picture-text': LargePictureTextCard,
     '4-text-only': PictureTextCard,
+    '2x2-events': EventsTwoByTwoCard,
 };
 
 const modals = {
@@ -57,7 +60,6 @@ class HomeApp extends React.Component {
     }
 
     getPanels(card) {
-        const items = this.props.itemsByCard[card.label];
         const Panel = panels[card.type];
         if (card.type === '4-photo-gallery') {
             return <Panel
@@ -66,6 +68,15 @@ class HomeApp extends React.Component {
                 title={card.label}
             />;
         }
+        if (card.type === '2x2-events') {
+            return <Panel
+                key={card.label}
+                events={get(card, 'config.events')}
+                title={card.label}
+            />;
+        }
+
+        const items = this.props.itemsByCard[card.label] || [];
         return <Panel
             key={card.label}
             type={card.type}

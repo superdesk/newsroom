@@ -8,13 +8,14 @@ from superdesk.upload import upload_url as _upload_url
 
 
 cache_for = 3600 * 24 * 7  # 7 days cache
-blueprint = flask.Blueprint('upload', __name__)
+ASSETS_RESOURCE = 'upload'
+blueprint = flask.Blueprint(ASSETS_RESOURCE, __name__)
 
 
 @blueprint.route('/assets/<path:media_id>', methods=['GET'])
 def get_upload(media_id):
     try:
-        media_file = flask.current_app.media.get(media_id, 'upload')
+        media_file = flask.current_app.media.get(media_id, ASSETS_RESOURCE)
     except bson.errors.InvalidId:
         media_file = None
     if not media_file:

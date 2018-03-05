@@ -17,12 +17,11 @@ from newsroom.utils import query_resource, parse_dates
 from newsroom.email import send_new_item_notification_email, send_history_match_notification_email
 from newsroom.history import get_history_users
 from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
+from newsroom.upload import ASSETS_RESOURCE
 
 logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
 
-
-ASSETS_RESOURCE = 'upload'
 KEY = 'PUSH_KEY'
 
 THUMBNAIL_SIZE = (640, 640)
