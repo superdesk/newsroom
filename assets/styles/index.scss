@@ -184,6 +184,16 @@ body.print {
   }
 }
 
+.sidenav-icons__item--report {
+  position: absolute;
+  bottom: 40px;
+  left: auto;
+  right: 0;
+  @include sm {
+      left: 0;
+  }
+}
+
 .content-header {
     position: relative;
 }
