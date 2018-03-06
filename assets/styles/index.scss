@@ -301,15 +301,13 @@ body.print {
     justify-content: center;
     width: 56px;
     height: 56px;
-    background: #006f99;
-    img {
-        opacity: 0.8;
-    }
+    background: rgba(0, 0, 0, 0.7);
 }
 .navbar-brand {
     margin-left: 2rem;
-    opacity: .6;
+    opacity: .9;
     line-height: 1.2rem;
+    font-size: 1.125rem;
     @include sm {
         line-height: inherit;
     }
@@ -1769,7 +1767,7 @@ article.list {
 }
 
 .wire-column__preview__headline {
-    font-size: 1.125rem; // 18px
+    font-size: 1.5rem; // 24px
     font-weight: 700;
     line-height: 1.4;
 }
