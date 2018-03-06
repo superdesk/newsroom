@@ -91,17 +91,6 @@
                 font-weight: 300;
             }
         }
-
-        .card-img-top {
-            object-fit: cover;
-            max-height: 270px;
-            @include xl {
-                max-height: 370px;
-            }
-            @include xxl {
-                max-height: 470px;
-            }
-        }
         
     }
 
