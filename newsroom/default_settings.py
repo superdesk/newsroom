@@ -108,8 +108,8 @@ CORE_APPS = [
     'newsroom.media_utils',
 ]
 
-SITE_NAME = 'AAP Newsroom'
-COPYRIGHT_HOLDER = 'AAP'
+SITE_NAME = 'Newsroom'
+COPYRIGHT_HOLDER = 'STT'
 COPYRIGHT_NOTICE = ''
 USAGE_TERMS = ''
 CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
