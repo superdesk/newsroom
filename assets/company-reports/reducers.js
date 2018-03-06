@@ -27,7 +27,7 @@ export default function companyReportReducer(state = initialState, action) {
     case SET_ACTIVE_REPORT: {
         return {
             ...state,
-            activeReport: action.data.target.value,
+            activeReport: action.data,
             activeReportData: {},
         };
     }

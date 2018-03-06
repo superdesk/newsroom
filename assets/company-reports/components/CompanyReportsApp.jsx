@@ -45,7 +45,7 @@ class CompanyReportsApp extends React.Component {
                             id={'company-reports'}
                             name={'company-reports'}
                             value={this.props.activeReport || ''}
-                            onChange={this.props.setActiveReport}>
+                            onChange={(event) => this.props.setActiveReport(event.target.value)}>
                             {options.map((option) => <option key={option.value} value={option.value}>{option.text}</option>)}
                         </select>
                     </div>

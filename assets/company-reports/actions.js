@@ -2,6 +2,13 @@ import {errorHandler} from '../utils';
 import server from '../server';
 
 
+const REPORTS = {
+    'company-saved-searches': '/reports/company/saved_searches',
+    'user-saved-searches': '/reports/user/saved_searches',
+    'company-products': '/reports/company/products',
+};
+
+
 export const QUERY_REPORT = 'QUERY_REPORT';
 export function queryReport() {
     return {type: QUERY_REPORT};
@@ -25,55 +32,17 @@ export function setError(errors) {
 export function runReport() {
     return function (dispatch, getState) {
         dispatch(queryReport());
-        if (getState().activeReport == 'company-saved-searches') {
-            dispatch(fetchCompanySavedSearches());
-        }
-
-        if (getState().activeReport == 'user-saved-searches') {
-            dispatch(fetchUserSavedSearches());
-        }
-
-        if (getState().activeReport == 'company-products') {
-            dispatch(fetchCompanyProducts());
-        }
+        dispatch(fetchReport(REPORTS[getState().activeReport]));
     };
 }
 
 /**
- * Fetches number of saved searches by company
+ * Fetches the report data
  *
  */
-export function fetchCompanySavedSearches() {
+export function fetchReport(url) {
     return function (dispatch) {
-        return server.get('/reports/company/saved_searches')
-            .then((data) => {
-                dispatch(receivedData(data));
-            })
-            .catch((error) => errorHandler(error, dispatch, setError));
-    };
-}
-
-/**
- * Fetches number of saved searches by company
- *
- */
-export function fetchUserSavedSearches() {
-    return function (dispatch) {
-        return server.get('/reports/user/saved_searches')
-            .then((data) => {
-                dispatch(receivedData(data));
-            })
-            .catch((error) => errorHandler(error, dispatch, setError));
-    };
-}
-
-/**
- * Fetches company products
- *
- */
-export function fetchCompanyProducts() {
-    return function (dispatch) {
-        return server.get('/reports/company/products')
+        return server.get(url)
             .then((data) => {
                 dispatch(receivedData(data));
             })
