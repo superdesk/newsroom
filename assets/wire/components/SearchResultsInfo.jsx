@@ -21,10 +21,11 @@ function SearchResultsInfo({
     newsOnly,
 }) {
     const isFollowing = user && activeTopic;
+    const displayTotalItems = bookmarks || !isEmpty(searchCriteria)  || activeTopic;
     return (
         <div className="d-flex mt-1 mt-sm-3 px-3 align-items-center flex-wrap flex-sm-nowrap">
             <div className="navbar-text search-results-info">
-                <span className="search-results-info__num">{totalItems}</span>
+                {displayTotalItems && <span className="search-results-info__num">{totalItems}</span>}
                 {query && (
                     <span className="search-results-info__text">
                         {gettext('search results for:')}<br />

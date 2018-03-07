@@ -262,6 +262,7 @@ const mapStateToProps = (state) => ({
     navigations: get(state, 'wire.navigations', []),
     activeNavigation: get(state, 'wire.activeNavigation', null),
     newsOnly: !!state.newsOnly,
+    bookmarks: state.bookmarks,
 });
 
 const mapDispatchToProps = (dispatch) => ({
