@@ -310,12 +310,14 @@ body.print {
     font-size: 1.125rem;
     @include sm {
         line-height: inherit;
+        font-size: 1.5rem;
     }
     nav {
         display: flex;
         flex-direction: column;
         @include sm {
             flex-direction: row;
+            align-items: center;
         }
     }
 }
