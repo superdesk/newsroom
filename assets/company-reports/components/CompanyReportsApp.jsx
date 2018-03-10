@@ -5,10 +5,8 @@ import {
     setActiveReport,
     runReport,
 } from '../actions';
-import {gettext} from '../../utils';
-import CompanySavedSearches from './CompanySavedSearches';
-import UserSavedSearches from './UserSavedSearches';
-import CompanyProducts from './CompanyProducts';
+import { gettext } from '../../utils';
+import { panels } from '../utils';
 
 const options = [
     {value: '', text: ''},
@@ -17,11 +15,6 @@ const options = [
     {value: 'company-products', text: gettext('Products per company')},
 ];
 
-const panels = {
-    'company-saved-searches': CompanySavedSearches,
-    'user-saved-searches': UserSavedSearches,
-    'company-products': CompanyProducts,
-};
 
 class CompanyReportsApp extends React.Component {
     constructor(props, context) {
@@ -51,12 +44,19 @@ class CompanyReportsApp extends React.Component {
                     </div>
 
                     <div className="content-bar__right">
-                        <button
+                        {this.props.activeReport && <button
                             className='btn btn-outline-secondary'
                             type='button'
                             onClick={this.props.runReport}>
                             {gettext('Run report')}
-                        </button>
+                        </button>}
+                        {this.props.activeReport && <a
+                            className='btn btn-outline-secondary ml-2'
+                            type='button'
+                            href={`/reports/print/${this.props.activeReport}`}
+                            target="_blank">
+                            {gettext('Print report')}
+                        </a>}
                     </div>
                 </nav>
             </section>,

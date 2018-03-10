@@ -3,9 +3,9 @@ import server from '../server';
 
 
 const REPORTS = {
-    'company-saved-searches': '/reports/company/saved_searches',
-    'user-saved-searches': '/reports/user/saved_searches',
-    'company-products': '/reports/company/products',
+    'company-saved-searches': '/reports/company-saved-searches',
+    'user-saved-searches': '/reports/user-saved-searches',
+    'company-products': '/reports/company-products',
 };
 
 
