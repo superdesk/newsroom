@@ -24,7 +24,7 @@ def print_reports(report):
 @blueprint.route('/reports/company_reports', methods=['GET'])
 @admin_only
 def company_reports():
-    return render_template('company_reports.html', setting_type="company_reports", data=None)
+    return render_template('company_reports.html', setting_type="company_reports")
 
 
 @blueprint.route('/reports/<report>', methods=['GET'])

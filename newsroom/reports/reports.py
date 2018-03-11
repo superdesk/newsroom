@@ -27,7 +27,8 @@ def get_company_saved_searches():
             'topic_count': topic_count
         })
 
-    return {'results': results, 'name': gettext('Saved searches per company')}
+    sorted_results = sorted(results, key=lambda k: k['name'])
+    return {'results': sorted_results, 'name': gettext('Saved searches per company')}
 
 
 def get_user_saved_searches():
@@ -46,13 +47,14 @@ def get_user_saved_searches():
     for _id, topic_count in user_topics.items():
         results.append({
             '_id': _id,
-            'name': users.get(_id, {}).get('name'),
+            'name': '{} {}'.format(users.get(_id, {}).get('first_name'), users.get(_id, {}).get('last_name')),
             'is_enabled': users.get(_id, {}).get('is_enabled'),
             'company': companies.get(users.get(_id, {}).get('company', ''), {}).get('name'),
             'topic_count': topic_count
         })
 
-    return {'results': results, 'name': gettext('Saved searches per user')}
+    sorted_results = sorted(results, key=lambda k: k['name'])
+    return {'results': sorted_results, 'name': gettext('Saved searches per user')}
 
 
 def get_company_products():
@@ -79,4 +81,5 @@ def get_company_products():
                 'products': details.get('products', [])
             })
 
-    return {'results': results, 'name': gettext('Products per company')}
+    sorted_results = sorted(results, key=lambda k: k['name'])
+    return {'results': sorted_results, 'name': gettext('Products per company')}
