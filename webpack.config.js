@@ -18,6 +18,7 @@ module.exports = {
         home_js: './assets/home/index.js',
         notifications_js: './assets/notifications/index.js',
         company_reports_js: './assets/company-reports/index.js',
+        print_reports_js: './assets/company-reports/components/index.js',
         common: [
             'alertifyjs',
             'bootstrap',
