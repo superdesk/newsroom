@@ -12,7 +12,7 @@ body {
 
 h3.home-section-heading {
     font-size: 1.25rem;
-    font-weight: 900;
+    font-weight: 700;
     color: #006f99;
     margin-bottom: 1rem;
 }
@@ -72,8 +72,7 @@ label {
 
 // Tables
 .table {
-    font-size: 13px;
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size: 13px;    
     background-color: white;
     thead {
         th {
@@ -91,8 +90,7 @@ label {
         border-bottom: none;
         &.name {
             font-size: 14px;
-            font-weight: 700;
-            font-family: $font-family-serif;
+            font-weight: 700;            
             line-height: 120%;
         }
     }
@@ -269,8 +267,7 @@ body.print {
             background-color: #bbb;
             border-radius: 100%;
             color: white;
-            font-size: 1.1rem;  
-            font-family: $font-family-sans-serif;
+            font-size: 1.1rem;
             font-weight: 400;
             text-shadow: none;
             padding-left: 1px;
@@ -299,18 +296,16 @@ body.print {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
-    background: rgba(0, 0, 0, 0.7);
 }
 .navbar-brand {
     margin-left: 2rem;
-    opacity: .9;
+    opacity: 1;
     line-height: 1.2rem;
     font-size: 1.125rem;
+    font-weight: 400;
     @include sm {
         line-height: inherit;
-        font-size: 1.5rem;
+        font-size: 1.75rem;
     }
     nav {
         display: flex;
@@ -499,7 +494,6 @@ article.list {
 }
 .side-navigation__btn {
     display: block;
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 1px;
@@ -581,7 +575,6 @@ article.list {
     .nav-tabs {
         .nav-item {
             .nav-link {
-                font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
                 font-size: 12px;
                 color: #9b9b9b;
                 text-transform: uppercase;
@@ -621,7 +614,7 @@ article.list {
     position: relative;
     h3 {
         font-size: 20px;
-        font-weight: 700;
+        font-weight: 500;
         margin-bottom: 0;
         line-height: 1.4;
     }
@@ -709,7 +702,7 @@ article.list {
 
 .search__input {
     color: #d5d5d5;
-    font-weight: 700;
+    font-weight: 500;
     border: 0px;
     padding: 0;
     &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
@@ -763,7 +756,6 @@ article.list {
 }
 
 .content-bar__sort {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.89rem;
     align-items: center;
     padding-left: 10px;
@@ -1540,7 +1532,6 @@ article.list {
 }
 
 .wire-articles__item__meta-info {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.8125rem;
     color: #747474;
     line-height: 1.2;
@@ -1548,7 +1539,7 @@ article.list {
     flex-direction: column;
     .bold {
         color: $body-text;
-        font-weight: 700;
+        font-weight: 500;
     }
     .blue-text {
         color: #00acec;
@@ -1570,7 +1561,6 @@ article.list {
 }
 
 .wire-articles__item__versions-btn {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.8125rem;
     color: $main-blue;
     margin-top: 4px;
@@ -1672,7 +1662,6 @@ article.list {
 }
 
 .wire-articles__versions__time {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 1.4rem;
     color: #b6b6b6;
     font-weight: 400;
@@ -1719,7 +1708,6 @@ article.list {
 }
 
 .wire-column__preview__top-bar {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.8125rem; // 13px
     display: flex;
     align-items: center;
@@ -1736,7 +1724,6 @@ article.list {
     line-height: 1rem;
     padding: 0 10px 15px 20px;
     font-size: .8125rem;
-    font-family: $font-family-sans-serif;
     @include xl {
         padding: 0 10px 20px 20px;
         font-size: 1rem;
@@ -1760,7 +1747,6 @@ article.list {
 }
 
 .wire-column__preview__slug {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.875rem; // 14px
     font-weight: 500;
     color: #1d5b7d;
@@ -1801,14 +1787,12 @@ article.list {
 }
 
 .wire-column__preview__caption {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.8125rem; // 13px
     color: #7c7c7c;
     margin: 10px 20px;
 }
 
 .wire-column__preview-image-link {
-    font-family: $font-family-sans-serif;
     font-size: 0.8125rem;
     margin: 0px 20px;
     display: flex;
@@ -1871,7 +1855,6 @@ article.list {
 }
 
 .wire-column__preview__tags__headline {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.6875rem; // 11px
     color: #4D4D4D;
     text-transform: uppercase;
@@ -1923,7 +1906,6 @@ article.list {
 }
 
 .wire-column__preview__versions__time {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 2.25rem;
     color: #b6b6b6;
     font-weight: 300;
@@ -1932,7 +1914,6 @@ article.list {
 }
 
 .wire-column__preview__versions__meta {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 0.8125rem;
     color: #747474;
     line-height: 1.4;
@@ -2163,7 +2144,6 @@ article.list {
 }
 
 .profile__characters {
-    font-family: Roboto,"Helvetica Neue",Arial,sans-serif;
     font-size: 2.125rem; // 34px
 }
 
@@ -2347,7 +2327,6 @@ article.list {
 }
 
 .simple-card__date {
-    font-family: $font-family-sans-serif;
     font-size: 0.8125rem;
     margin-top: 10px;
     span {
@@ -2366,7 +2345,6 @@ article.list {
 }
 
 .button-pill {
-    font-family: $font-family-sans-serif;
     font-size: 0.75rem; // 12px
     background: #f3f3f3;
     padding-right: 1em;
@@ -2418,7 +2396,6 @@ article.list {
     font-weight: 700;
 }
 .date-round__day {
-    font-family: $font-family-sans-serif;
     font-size: 11px;
     text-transform: uppercase;
 }

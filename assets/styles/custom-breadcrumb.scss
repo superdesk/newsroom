@@ -5,6 +5,16 @@
     font-size: 1rem; // 16px
     line-height: 1.1;
   }
+  a.breadcrumb-item {
+    font-weight: 300;
+    &:hover {
+      text-decoration: none;
+      cursor: default;
+    }
+    @include sm {
+      letter-spacing: -.1rem;
+    }
+  }
   .breadcrumb-item + .breadcrumb-item::before {
     padding: 0;
     display: none;
