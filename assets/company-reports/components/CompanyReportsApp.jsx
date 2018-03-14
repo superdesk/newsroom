@@ -13,6 +13,7 @@ const options = [
     {value: 'company-saved-searches', text: gettext('Saved searches per company')},
     {value: 'user-saved-searches', text: gettext('Saved searches per user')},
     {value: 'company-products', text: gettext('Products per company')},
+    {value: 'product-stories', text: gettext('Stories per product')},
 ];
 
 

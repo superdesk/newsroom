@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+import superdesk
 from bson import ObjectId
 from flask_babel import gettext
 
@@ -83,3 +84,25 @@ def get_company_products():
 
     sorted_results = sorted(results, key=lambda k: k['name'])
     return {'results': sorted_results, 'name': gettext('Products per company')}
+
+
+def get_product_stories():
+    """ Returns the story count per product for today, this week, this month ..."""
+
+    results = []
+    products = query_resource('products')
+
+    for product in products:
+        product_stories = {
+            '_id': product['_id'],
+            'name': product.get('name'),
+            'is_enabled': product.get('is_enabled'),
+        }
+        counts = superdesk.get_resource_service('wire_search').get_product_item_report(product)
+        for key, value in counts.hits['aggregations'].items():
+            product_stories[key] = value['buckets'][0]['doc_count']
+
+        results.append(product_stories)
+
+    sorted_results = sorted(results, key=lambda k: k['name'])
+    return {'results': sorted_results, 'name': gettext('Stories per product')}

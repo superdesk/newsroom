@@ -1,4 +1,3 @@
-
 import pytz
 import logging
 import newsroom
@@ -382,3 +381,102 @@ class WireSearchService(newsroom.Service):
                     bookmark_users.append(bookmark)
 
         return bookmark_users
+
+    def get_product_item_report(self, product):
+        query = _items_query()
+
+        if not product:
+            return
+
+        query['bool']['should'] = []
+
+        if product.get('sd_product_id'):
+            query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
+
+        if product.get('query'):
+            query['bool']['should'].append(_query_string(product['query']))
+
+        query['bool']['minimum_should_match'] = 1
+        query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
+
+        now = datetime.utcnow()
+
+        source = {'query': query}
+        source['size'] = 0
+        source['aggs'] = {
+            "today": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": now.strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+            "last_24_hours": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": "now-1d/d"
+                        }
+                    ]
+                }
+            },
+            "this_week": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (now - timedelta(days=now.weekday())).strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+            "last_7_days": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (now - timedelta(days=7)).strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+            "this_month": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (now.replace(day=1)).strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+            "previous_month": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (((now.replace(day=1)) - timedelta(days=1)).replace(day=1)).strftime('%Y-%m-%d'),
+                            "to": (now.replace(day=1)).strftime('%Y-%m-%d'),
+                        }
+                    ]
+                }
+            },
+            "last_6_months": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (now - timedelta(days=180)).strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+        }
+
+        internal_req = ParsedRequest()
+        internal_req.args = {'source': json.dumps(source)}
+        return super().get(internal_req, None)

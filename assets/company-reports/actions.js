@@ -6,6 +6,7 @@ const REPORTS = {
     'company-saved-searches': '/reports/company-saved-searches',
     'user-saved-searches': '/reports/user-saved-searches',
     'company-products': '/reports/company-products',
+    'product-stories': '/reports/product-stories',
 };
 
 
