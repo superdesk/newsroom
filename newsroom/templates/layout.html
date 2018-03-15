@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/themes/bootstrap.min.css"/>
 
     <link rel="icon" type="image/x-icon"
-        href="{{ url_for('static', filename='favicon.ico') }}">
+        href="{{ url_for('theme', filename='favicon.ico') }}">
 
 {{ javascript_tag('common') | safe }}
 {{ javascript_tag('newsroom_css') | safe }}
@@ -21,11 +21,8 @@
 <body>
 
 <div class="newsroomWrap">
-
     <nav class="main navbar justify-content-start align-items-stretch">
-        <div class="navbar__logo px-1">
-            <img src="{{ url_for('static', filename = 'logo.svg') }}" width="90"/>
-        </div>
+        {% include 'logo.html' %}
         <div class="navbar-brand d-flex align-items-center ml-2 ml-sm-1 mr-0 mr-sm-4">
             <nav>
                 <a class="breadcrumb-item text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }}</a>

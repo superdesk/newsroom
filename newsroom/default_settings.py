@@ -177,3 +177,5 @@ SERVICES = [
 
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'DD/MM/YYYY'
+
+WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')

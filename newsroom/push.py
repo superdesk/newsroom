@@ -1,6 +1,5 @@
 
 import io
-import os
 import hmac
 import flask
 import logging
@@ -198,7 +197,8 @@ def generate_thumbnails(item):
         return
 
     # use 4-3 rendition for generated thumbs
-    rendition = picture.get('renditions', {}).get('4-3', 'viewImage')
+    renditions = picture.get('renditions', {})
+    rendition = renditions.get('4-3', renditions.get('viewImage'))
     if not rendition:
         return
 
@@ -247,9 +247,11 @@ def _get_thumbnail(image):
 
 def _get_watermark(image):
     image = image.copy()
+    if not app.config.get('WATERMARK_IMAGE'):
+        return image
     if image.mode != 'RGBA':
         image = image.convert('RGBA')
-    with open(os.path.join(app.static_folder, 'watermark.png'), mode='rb') as watermark_binary:
+    with open(app.config['WATERMARK_IMAGE'], mode='rb') as watermark_binary:
         watermark_image = Image.open(watermark_binary)
         set_opacity(watermark_image, 0.3)
         watermark_layer = Image.new('RGBA', image.size)
