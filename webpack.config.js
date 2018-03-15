@@ -17,7 +17,9 @@ module.exports = {
         wire_js: './assets/wire/index.js',
         home_js: './assets/home/index.js',
         notifications_js: './assets/notifications/index.js',
-        vendor: [
+        company_reports_js: './assets/company-reports/index.js',
+        print_reports_js: './assets/company-reports/components/index.js',
+        common: [
             'alertifyjs',
             'bootstrap',
             'classnames',
@@ -77,11 +79,12 @@ module.exports = {
         new ManifestPlugin(),
         new webpack.ProvidePlugin({
             $: 'jquery',
-            jQuery: 'jquery',
-            Popper: ['popper.js', 'default'],
+            // bootstrap depenendecies
+            'window.jQuery': 'jquery',
+            'window.Popper': 'popper.js',
         }),
         new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendor',
+            name: 'common',
             minChunks: Infinity,
         }),
     ]

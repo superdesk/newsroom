@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ config.SITE_NAME }} - Reports{% endblock %}
+
+{% block contentHeader %}
+
+{% endblock %}
+
+{% block content %}
+<div class="settingsWrap">
+    <div class="settings-inner">
+        <div class='side-navigation' id='reports-menu'>
+            <ul>
+                <li>
+                    <a class="side-navigation__btn {{ "active" if setting_type == "company_reports" }}"
+                        href="{{ url_for('reports.company_reports') }}">
+                        {{ gettext('Company Reports') }}</a>
+                </li>
+            </ul>
+        </div>
+        <div id="reports-app" class="content"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+    {{ javascript_tag('%s_js' % setting_type) | safe }}
+
+{% endblock %}

@@ -89,6 +89,7 @@ class ItemsList extends React.Component {
 
     onItemDoubleClick(item) {
         this.cancelClickTimeout();
+        this.props.dispatch(setActive(item._id));
         this.props.dispatch(openItem(item));
     }
 

@@ -116,7 +116,7 @@ def test_share_topics(client, app):
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
         assert outbox[0].sender == 'admin@bar.com'
-        assert outbox[0].subject == 'From ANSA Newsroom: %s' % topic['label']
+        assert outbox[0].subject == 'From newsroom: %s' % topic['label']
         assert 'Hi Foo Bar' in outbox[0].body
         assert 'System Admin shared ' in outbox[0].body
         assert topic['query'] in outbox[0].body

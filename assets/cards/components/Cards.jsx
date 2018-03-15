@@ -31,7 +31,13 @@ class Cards extends React.Component {
         let errors = {};
 
         if (!this.props.cardToEdit.label) {
-            errors.name = ['Please provide card label'];
+            errors.label = [gettext('Please provide card label')];
+            valid = false;
+        }
+
+        if (this.props.cardToEdit.type === '2x2-events' &&
+          !this.props.cardToEdit.config.events[0].startDate) {
+            errors.event_0_startDate = [gettext('Please provide start date')];
             valid = false;
         }
 
@@ -69,7 +75,7 @@ class Cards extends React.Component {
                         </div>
                     </div>
                     :
-                    <div className="flex-col">
+                    <div className="flex-col flex-column">
                         {this.props.activeQuery &&
                         <SearchResultsInfo
                             totalItems={this.props.totalCards}

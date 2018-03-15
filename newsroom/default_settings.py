@@ -10,6 +10,12 @@ from superdesk.default_settings import (   # noqa
     ELASTIC_DATE_FORMAT,
     CELERY_BROKER_URL,
     celery_queue,
+    AMAZON_SECRET_ACCESS_KEY,
+    AMAZON_ACCESS_KEY_ID,
+    AMAZON_CONTAINER_NAME,
+    AMAZON_OBJECT_ACL,
+    AMAZON_S3_SUBFOLDER,
+    AMAZON_REGION
 )
 
 XML = False
@@ -40,6 +46,7 @@ BLUEPRINTS = [
     'newsroom.products',
     'newsroom.navigations',
     'newsroom.cards',
+    'newsroom.reports',
 ]
 
 CORE_APPS = [
@@ -59,10 +66,11 @@ CORE_APPS = [
     'newsroom.products',
     'newsroom.navigations',
     'newsroom.cards',
+    'newsroom.reports',
 ]
 
-SITE_NAME = 'ANSA Newsroom'
-COPYRIGHT_HOLDER = 'ANSA'
+SITE_NAME = 'newsroom'
+COPYRIGHT_HOLDER = 'AAP'
 COPYRIGHT_NOTICE = ''
 USAGE_TERMS = ''
 
@@ -115,15 +123,27 @@ RATELIMIT_STRATEGY = 'fixed-window'
 RATELIMIT_ENABLED = True
 
 # Cache Settings
-CACHE_TYPE = 'simple'  # in-memory cache
+CACHE_TYPE = os.environ.get('CACHE_TYPE', 'simple')  # in-memory cache
 # The default timeout that is used if no timeout is specified in sec
 CACHE_DEFAULT_TIMEOUT = 3600
 # Redis host (used only if CACHE_TYPE is redis)
 CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
 
 # Recaptcha Settings
-RECAPTCHA_PUBLIC_KEY = '6LcEljMUAAAAANxcMEtMPjPTB6IRs1pe5oY5ubSp'
+RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
+
+# Base64 Encoded Token
+AAPPHOTOS_TOKEN = os.environ.get('AAPPHOTOS_TOKEN')
+
+# Home Page Carousel Sources
+HOMEPAGE_CAROUSEL = [{
+    'source': 'https://photos-api.aap.com.au/api/v3/Galleries/Newsroom/AUSTRALIAN%20NEWS',
+    'count': 2
+}, {
+    'source': 'https://photos-api.aap.com.au/api/v3/Galleries/Newsroom/AUSTRALIAN%20SPORT',
+    'count': 2
+}]
 
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
@@ -157,3 +177,5 @@ SERVICES = [
 
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'DD/MM/YYYY'
+
+WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')

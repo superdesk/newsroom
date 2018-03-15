@@ -28,7 +28,7 @@ class NotificationList extends React.Component {
             <CloseButton onClick={() => this.props.clearNotification(newItem._id)}/>
             <div className="notif__list__info">{gettext('A story you downloaded has been updated')}</div>
             <div className="notif__list__headline">
-                {newItem.headline}
+                <a href={`/wire?item=${newItem._id}`} >{newItem.headline}</a>
             </div>
             <div className='wire-articles__item__meta-info'>
                 {gettext('Created on')} {shortDate(newItem.versioncreated)}

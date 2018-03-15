@@ -41,5 +41,10 @@ def elastic_rebuild():
     rebuild_elastic_index()
 
 
+@manager.command
+def elastic_init():
+    app.data.init_elastic(app)
+
+
 if __name__ == "__main__":
     manager.run()

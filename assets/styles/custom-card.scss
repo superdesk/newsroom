@@ -44,25 +44,51 @@
             .wire-articles__item__meta {
                 margin: 10px 0;
             }
+            .wire-articles__item__text {
+                flex-grow: 1;
+            }
+            &.card-body--one-column {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+            &.card-body--two-columns {
+                display: flex;
+                flex-direction: column;
+                padding: 0;
+                @include sm {
+                    flex-direction: row;
+                }
+            }
+            &.card-body--green-border {
+                border-left: 4px solid #7ed321;
+            }
+            .card-body__sidebar {
+                flex: 0 0 20%;
+                padding: 1rem 1.25rem;
+                display: flex;                
+                align-items: center;
+                @include lg {
+                    flex: 0 0 35%;
+                }
+            }
+            .card-body__content {
+                padding: 1rem 1.25rem;
+            }
         }
 
         .card-text {
             font-size: 1rem;
+            line-height: 1.5;
 
             &.small {
                 font-size: 0.875rem;
                 font-weight: 300;
             }
-        }
 
-        .card-img-top {
-            object-fit: cover;
-            max-height: 270px;
-            @include xl {
-                max-height: 370px;
-            }
-            @include xxl {
-                max-height: 470px;
+            &.tiny {
+                font-size: 0.8125rem;
+                font-weight: 300;
             }
         }
         
@@ -82,6 +108,8 @@
             align-items: stretch;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            background-color: #2d2d2d;
 
             @include md {
                 max-width: 50%;
@@ -122,7 +150,9 @@
         }
 
         .card-img-top {
-            min-height: 370px;
+            min-height: 300px;
+            height: 100%;
+            object-fit: cover;
         }
 
     }

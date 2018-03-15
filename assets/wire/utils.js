@@ -70,10 +70,12 @@ export function getPicture(item) {
  * Get picture thumbnail rendition specs
  *
  * @param {Object} picture
+ * @param {Boolean} large
  * @return {Object}
  */
-export function getThumbnailRendition(picture) {
-    return get(picture, 'renditions.4-3', get(picture, 'renditions.thumbnail'));
+export function getThumbnailRendition(picture, large) {
+    const rendition = large ? 'renditions._newsroom_thumbnail_large' : 'renditions._newsroom_thumbnail';
+    return get(picture, rendition, get(picture, 'renditions.thumbnail'));
 }
 
 /**
@@ -83,7 +85,7 @@ export function getThumbnailRendition(picture) {
  * @return {Object}
  */
 export function getPreviewRendition(picture) {
-    return get(picture, 'renditions.4-3', get(picture, 'renditions.viewImage'));
+    return get(picture, 'renditions._newsroom_view', get(picture, 'renditions.viewImage'));
 }
 
 /**
@@ -93,7 +95,7 @@ export function getPreviewRendition(picture) {
  * @return {Object}
  */
 export function getDetailRendition(picture) {
-    return get(picture, 'renditions.baseImage');
+    return get(picture, 'renditions._newsroom_base', get(picture, 'renditions.baseImage'));
 }
 
 /**

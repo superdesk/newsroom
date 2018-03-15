@@ -36,7 +36,7 @@ def test_share_items(client, app):
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
         assert outbox[0].sender == 'admin@sourcefabric.org'
-        assert outbox[0].subject == 'From ANSA Newsroom: %s' % items[0]['headline']
+        assert outbox[0].subject == 'From newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
         assert 'admin admin shared ' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
@@ -223,6 +223,18 @@ def test_search_filter_by_individual_navigation(client, app):
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
+
+    # test admin user filtering
+    with client.session_transaction() as session:
+        session['user_type'] = 'administrator'
+
+    resp = client.get('/search')
+    data = json.loads(resp.get_data())
+    assert 3 == len(data['_items'])  # gets all by default
+
+    resp = client.get('/search?navigation=51')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
 
 
 def test_search_filtered_by_query_product(client, app):
