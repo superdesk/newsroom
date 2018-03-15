@@ -1,10 +1,13 @@
 
+import io
+import os
 import hmac
 import flask
 import logging
 import superdesk
 
 from copy import copy
+from PIL import Image, ImageEnhance
 from flask import current_app as app
 from superdesk.utc import utcnow
 from superdesk.text_utils import get_word_count
@@ -13,13 +16,16 @@ from newsroom.topics.topics import get_notification_topics
 from newsroom.utils import query_resource, parse_dates
 from newsroom.email import send_new_item_notification_email, send_history_match_notification_email
 from newsroom.history import get_history_users
+from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
+from newsroom.upload import ASSETS_RESOURCE
 
 logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
 
-
-ASSETS_RESOURCE = 'upload'
 KEY = 'PUSH_KEY'
+
+THUMBNAIL_SIZE = (640, 640)
+THUMBNAIL_QUALITY = 80
 
 
 def test_signature(request):
@@ -67,6 +73,8 @@ def publish_item(doc):
     for assoc in doc.get('associations', {}).values():
         if assoc:
             assoc.setdefault('subscribers', [])
+    if doc.get('associations', {}).get('featuremedia'):
+        generate_thumbnails(doc)
     _id = service.create([doc])[0]
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
@@ -83,6 +91,7 @@ def push():
     orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
     item['_id'] = publish_item(item)
     notify_new_item(item, check_topics=orig is None)
+    app.cache.delete(HOME_ITEMS_CACHE_KEY)
     return flask.jsonify({})
 
 
@@ -169,9 +178,9 @@ def notify():
 def push_binary():
     if not test_signature(flask.request):
         flask.abort(500)
-    media_id = flask.request.form['media_id']
     media = flask.request.files['media']
-    app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id)
+    media_id = flask.request.form['media_id']
+    app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
     return flask.jsonify({'status': 'OK'}), 201
 
 
@@ -181,3 +190,79 @@ def push_binary_get(media_id):
         return flask.jsonify({})
     else:
         flask.abort(404)
+
+
+def generate_thumbnails(item):
+    picture = item.get('associations', {}).get('featuremedia', {})
+    if not picture:
+        return
+
+    # use 4-3 rendition for generated thumbs
+    rendition = picture.get('renditions', {}).get('4-3', 'viewImage')
+    if not rendition:
+        return
+
+    # generate thumbnails
+    binary = app.media.get(rendition['media'], resource=ASSETS_RESOURCE)
+    im = Image.open(binary)
+    thumbnail = _get_thumbnail(im)  # 4-3 rendition resized
+    watermark = _get_watermark(im)  # 4-3 rendition with watermark
+    picture['renditions'].update({
+        '_newsroom_thumbnail': _store_image(thumbnail),
+        '_newsroom_thumbnail_large': _store_image(watermark),
+    })
+
+    # add watermark to base/view images
+    for key in ['base', 'view']:
+        rendition = picture.get('renditions', {}).get('%sImage' % key)
+        if rendition:
+            binary = app.media.get(rendition['media'], resource=ASSETS_RESOURCE)
+            im = Image.open(binary)
+            watermark = _get_watermark(im)
+            picture['renditions'].update({
+                '_newsroom_%s' % key: _store_image(watermark)
+            })
+
+
+def _store_image(image):
+    binary = io.BytesIO()
+    image.save(binary, 'jpeg', quality=THUMBNAIL_QUALITY)
+    binary.seek(0)
+    media_id = app.media.put(binary, resource=ASSETS_RESOURCE, content_type='image/jpeg')
+    binary.seek(0)
+    return {
+        'media': str(media_id),
+        'href': app.upload_url(media_id),
+        'width': image.width,
+        'height': image.height,
+        'mimetype': 'image/jpeg',
+    }
+
+
+def _get_thumbnail(image):
+    image = image.copy()
+    image.thumbnail(THUMBNAIL_SIZE)
+    return image
+
+
+def _get_watermark(image):
+    image = image.copy()
+    if image.mode != 'RGBA':
+        image = image.convert('RGBA')
+    with open(os.path.join(app.static_folder, 'watermark.png'), mode='rb') as watermark_binary:
+        watermark_image = Image.open(watermark_binary)
+        set_opacity(watermark_image, 0.3)
+        watermark_layer = Image.new('RGBA', image.size)
+        watermark_layer.paste(watermark_image, (
+            image.size[0] - watermark_image.size[0],
+            int((image.size[1] - watermark_image.size[1]) * 0.66),
+        ))
+
+    watermark = Image.alpha_composite(image, watermark_layer)
+    return watermark.convert('RGB')
+
+
+def set_opacity(image, opacity=1):
+    alpha = image.split()[3]
+    alpha = ImageEnhance.Brightness(alpha).enhance(opacity)
+    image.putalpha(alpha)

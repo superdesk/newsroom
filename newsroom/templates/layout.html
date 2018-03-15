@@ -14,8 +14,8 @@
     <link rel="icon" type="image/x-icon"
         href="{{ url_for('static', filename='favicon.ico') }}">
 
-    {{ javascript_tag('vendor') | safe }}
-    {{ javascript_tag('newsroom_css') | safe }}
+{{ javascript_tag('common') | safe }}
+{{ javascript_tag('newsroom_css') | safe }}
 
 </head>
 <body>
@@ -23,10 +23,10 @@
 <div class="newsroomWrap">
 
     <nav class="main navbar justify-content-start align-items-stretch">
-        <div class="navbar__logo">
-            <img src="{{ url_for('static', filename = 'logo.svg') }}" width="56" height="56"/>
+        <div class="navbar__logo px-1">
+            <img src="{{ url_for('static', filename = 'logo.svg') }}" width="90"/>
         </div>
-        <div class="navbar-brand d-flex align-items-center ml-2 ml-sm-4 mr-0 mr-sm-4">
+        <div class="navbar-brand d-flex align-items-center ml-2 ml-sm-1 mr-0 mr-sm-4">
             <nav>
                 <a class="breadcrumb-item text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }}</a>
                 {% block breadcrumb %}{% endblock %}
@@ -52,15 +52,20 @@
             <ul class="sidenav-icons">
                 {% if is_admin() %}
                 <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.endpoint == 'companies.settings' %}active{% endif %}">
-                  <a href="{{ url_for('companies.settings') }}" title="">
+                  <a href="{{ url_for('companies.settings') }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
                       <i class="icon--cog icon--mid-blue"></i>
+                  </a>
+                </li>
+                <li class="sidenav-icons__item sidenav-icons__item--report {% if request.endpoint == 'companies.settings' %}active{% endif %}">
+                  <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" data-toggle="tooltip" data-placement="right">
+                      <i class="icon--report icon--mid-blue"></i>
                   </a>
                 </li>
                 {% endif %}
 
                 {% for nav in sidenavs %}
                 <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %} badge--top-right">
-                  <a href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}">
+                  <a href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}" data-toggle="tooltip" data-placement="right">
                     {% if nav.name == 'Bookmarks' %}
                     <div id="bookmarks-count" class="badge badge-pill badge-info badge-secondary"></div>
                     {% endif %}
@@ -83,10 +88,6 @@
 
 <div id="modal-container"></div>
 
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
 <script>
     window.newsroom = {{ newsroom_config() | tojson | safe }};
     window.notificationData = {{ get_initial_notifications() | tojson | safe }};
@@ -102,15 +103,32 @@
 
 {% block script %}{% endblock %}
 
+{% if newsroom_config().analytics %}
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ newsroom_config().analytics | safe }}"></script>
 <script>
-    function is_touch_device() {
-        return 'ontouchstart' in window        // works on most browsers
-        || navigator.maxTouchPoints;       // works on IE10/11 and Surface
-    };
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-    if ( !is_touch_device() ) {
-        $('html').addClass('no-touch');
-    }
+  gtag('config', {{ newsroom_config().analytics | tojson | safe }}, {
+      custom_map: {
+          dimension1: 'company',
+          dimension2: 'user',
+      }
+  });
+
+  {% if session.get('user') %}
+  gtag('set', {'user_id': {{ hash(session['user']) | tojson | safe }} });
+  {% endif %}
+
+  {% with messages = get_flashed_messages(category_filter=['analytics']) %}
+    {% if messages %}
+        analytics.sendEvents({{ messages | tojson | safe }});
+    {% endif %}
+  {% endwith %}
 </script>
+{% endif %}
+
 </body>
 </html>

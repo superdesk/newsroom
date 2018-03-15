@@ -1,6 +1,7 @@
 import os
 import arrow
 import flask
+import hashlib
 
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
@@ -57,4 +58,10 @@ def newsroom_config():
         'websocket': os.environ.get('NEWSROOM_WEBSOCKET_URL', 'ws://localhost:%d' % (port + 100, )),
         'time_format': flask.current_app.config['CLIENT_TIME_FORMAT'],
         'date_format': flask.current_app.config['CLIENT_DATE_FORMAT'],
+        'analytics': os.environ.get('GOOGLE_ANALYTICS', 'UA-114768905-1'),
     }
+
+
+def hash_string(value):
+    """Return SHA256 hash for given string value."""
+    return hashlib.sha256(str(value).encode('utf-8')).hexdigest()

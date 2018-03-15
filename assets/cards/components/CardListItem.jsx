@@ -4,7 +4,7 @@ import { shortDate } from 'utils';
 
 
 function getProductName(products, id) {
-    return products.filter((product) => product._id == id)[0].name;
+    return products.find((product) => product._id == id).name;
 }
 
 function CardListItem({card, products, isActive, onClick}) {
@@ -14,7 +14,7 @@ function CardListItem({card, products, isActive, onClick}) {
             onClick={() => onClick(card._id)}>
             <td className="name">{card.label}</td>
             <td>{card.type}</td>
-            <td>{getProductName(products, card.config.product)}</td>
+            <td>{card.config.product && getProductName(products, card.config.product)}</td>
             <td>{card.order}</td>
             <td>{shortDate(card._created)}</td>
         </tr>

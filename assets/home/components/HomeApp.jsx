@@ -1,25 +1,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import {gettext} from 'utils';
+import { get } from 'lodash';
 import TextOnlyCard from './TextOnlyCard';
 import PictureTextCard from './PictureTextCard';
 import MediaGalleryCard from './MediaGalleryCard';
 import TopNewsOneByOneCard from './TopNewsOneByOneCard';
 import TopNewsTwoByTwoCard from './TopNewsTwoByTwoCard';
-import {gettext} from 'utils';
+import LargeTextOnlyCard from './LargeTextOnlyCard';
+import LargePictureTextCard from './LargePictureTextCard';
 import {getItemActions} from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
 import {openItemDetails} from '../actions';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
+import PhotoGalleryCard from './PhotoGalleryCard';
+import EventsTwoByTwoCard from './EventsTwoByTwoCard';
 
 const panels = {
     '6-text-only': TextOnlyCard,
     '4-picture-text': PictureTextCard,
     '4-media-gallery': MediaGalleryCard,
+    '4-photo-gallery': PhotoGalleryCard,
     '1x1-top-news': TopNewsOneByOneCard,
     '2x2-top-news': TopNewsTwoByTwoCard,
+    '3-text-only': LargeTextOnlyCard,
+    '3-picture-text': LargePictureTextCard,
+    '4-text-only': PictureTextCard,
+    '2x2-events': EventsTwoByTwoCard,
 };
 
 const modals = {
@@ -50,10 +60,26 @@ class HomeApp extends React.Component {
     }
 
     getPanels(card) {
-        const items = this.props.itemsByCard[card.label];
         const Panel = panels[card.type];
+        if (card.type === '4-photo-gallery') {
+            return <Panel
+                key={card.label}
+                photos={this.props.photos}
+                title={card.label}
+            />;
+        }
+        if (card.type === '2x2-events') {
+            return <Panel
+                key={card.label}
+                events={get(card, 'config.events')}
+                title={card.label}
+            />;
+        }
+
+        const items = this.props.itemsByCard[card.label] || [];
         return <Panel
             key={card.label}
+            type={card.type}
             items={items}
             title={card.label}
             product={this.getProduct(card)}
@@ -90,6 +116,7 @@ class HomeApp extends React.Component {
 }
 
 HomeApp.propTypes = {
+    photos: PropTypes.array,
     cards: PropTypes.arrayOf(PropTypes.object),
     itemsByCard: PropTypes.object,
     products: PropTypes.array,
@@ -106,6 +133,7 @@ HomeApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
+    photos: state.photos,
     cards: state.cards,
     itemsByCard: state.itemsByCard,
     products: state.products,

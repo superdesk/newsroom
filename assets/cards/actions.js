@@ -72,9 +72,21 @@ export function postCard() {
     return function (dispatch, getState) {
 
         const card = getState().cardToEdit;
+        let data = new FormData();
+        data.append('card', JSON.stringify(card));
+
+        if (card.type === '2x2-events') {
+            [...Array(4)].forEach((_, i) => {
+                const input = document.getElementById(`event_${i}_file`);
+                if (input && input.files.length > 0) {
+                    data.append(`file${i}`, input.files[0]);
+                }
+            });
+        }
+
         const url = `/cards/${card._id ? card._id : 'new'}`;
 
-        return server.post(url, card)
+        return server.postFiles(url, data)
             .then(function() {
                 if (card._id) {
                     notify.success(gettext('Card updated successfully'));

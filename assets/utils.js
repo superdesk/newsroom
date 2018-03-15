@@ -319,3 +319,8 @@ export function getConfig(key, defaultValue) {
 export function getTimezoneOffset() {
     return now.utcOffset() ? now.utcOffset() * -1 : 0; // it's oposite to Date.getTimezoneOffset
 }
+
+export function isTouchDevice() {
+    return 'ontouchstart' in window        // works on most browsers
+    || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+}

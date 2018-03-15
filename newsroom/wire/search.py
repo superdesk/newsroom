@@ -1,4 +1,3 @@
-
 import pytz
 import logging
 import newsroom
@@ -11,7 +10,7 @@ from eve.utils import ParsedRequest
 from flask_babel import gettext
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
-from newsroom.products.products import get_products_by_company
+from newsroom.products.products import get_products_by_company, get_products_by_navigation
 from newsroom.template_filters import is_admin
 
 logger = logging.getLogger(__name__)
@@ -89,28 +88,33 @@ def _set_product_query(query, company, user=None, navigation_id=None):
     :param navigation_id: navigation to filter products
     If not provided session user will be checked
     """
+    products = None
+
     if is_admin(user):
-        return
+        if navigation_id:
+            products = get_products_by_navigation(navigation_id)
+        else:
+            return  # admin will see everything by default
 
     if company:
-        query['bool']['should'] = []
         products = get_products_by_company(company['_id'], navigation_id)
-
-        product_ids = [p['sd_product_id'] for p in products if p.get('sd_product_id')]
-        if product_ids:
-            query['bool']['should'].append({'terms': {'products.code': product_ids}})
-
-        for product in products:
-            if product.get('query'):
-                query['bool']['should'].append(_query_string(product['query']))
-
-        query['bool']['minimum_should_match'] = 1
-
-        if not query['bool']['should']:
-            abort(403, gettext('Your company doesn\'t have any products defined.'))
     else:
         # user does not belong to a company so blocking all stories
         abort(403, gettext('User does not belong to a company.'))
+
+    query['bool']['should'] = []
+    product_ids = [p['sd_product_id'] for p in products if p.get('sd_product_id')]
+    if product_ids:
+        query['bool']['should'].append({'terms': {'products.code': product_ids}})
+
+    for product in products:
+        if product.get('query'):
+            query['bool']['should'].append(_query_string(product['query']))
+
+    query['bool']['minimum_should_match'] = 1
+
+    if not query['bool']['should']:
+        abort(403, gettext('Your company doesn\'t have any products defined.'))
 
 
 def _query_string(query):
@@ -179,6 +183,11 @@ class WireSearchService(newsroom.Service):
         if req.args.get('q'):
             query['bool']['must'].append(_query_string(req.args['q']))
             query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
+
+        if req.args.get('newsOnly'):
+            query['bool']['must_not'].append({'match': {'genre.code': 'Results (sport)'}})
+            query['bool']['must_not'].append({'match': {'genre.code': 'Broadcast Script'}})
+            query['bool']['must_not'].append({'match': {'source': 'PMF'}})
 
         if req.args.get('bookmarks'):
             _set_bookmarks_query(query, req.args['bookmarks'])
@@ -372,3 +381,102 @@ class WireSearchService(newsroom.Service):
                     bookmark_users.append(bookmark)
 
         return bookmark_users
+
+    def get_product_item_report(self, product):
+        query = _items_query()
+
+        if not product:
+            return
+
+        query['bool']['should'] = []
+
+        if product.get('sd_product_id'):
+            query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
+
+        if product.get('query'):
+            query['bool']['should'].append(_query_string(product['query']))
+
+        query['bool']['minimum_should_match'] = 1
+        query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
+
+        now = datetime.utcnow()
+
+        source = {'query': query}
+        source['size'] = 0
+        source['aggs'] = {
+            "today": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": now.strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+            "last_24_hours": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": "now-1d/d"
+                        }
+                    ]
+                }
+            },
+            "this_week": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (now - timedelta(days=now.weekday())).strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+            "last_7_days": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (now - timedelta(days=7)).strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+            "this_month": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (now.replace(day=1)).strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+            "previous_month": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (((now.replace(day=1)) - timedelta(days=1)).replace(day=1)).strftime('%Y-%m-%d'),
+                            "to": (now.replace(day=1)).strftime('%Y-%m-%d'),
+                        }
+                    ]
+                }
+            },
+            "last_6_months": {
+                "date_range": {
+                    "field": "versioncreated",
+                    "ranges": [
+                        {
+                            "from": (now - timedelta(days=180)).strftime('%Y-%m-%d')
+                        }
+                    ]
+                }
+            },
+        }
+
+        internal_req = ParsedRequest()
+        internal_req.args = {'source': json.dumps(source)}
+        return super().get(internal_req, None)

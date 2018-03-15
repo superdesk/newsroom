@@ -68,7 +68,7 @@ class Users extends React.Component {
                         </div>
                     </div>
                     :
-                    <div className="flex-col">
+                    <div className="flex-col flex-column">
                         {this.props.activeQuery &&
                         <SearchResultsInfo
                             totalItems={this.props.totalUsers}

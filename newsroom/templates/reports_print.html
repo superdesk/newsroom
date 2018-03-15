@@ -1,0 +1,19 @@
+{% extends "print_layout.html" %}
+
+{% block title %}{{ config.SITE_NAME }} - {{ data.get('name') }}{% endblock %}
+
+{% block content %}
+    <h2 class="text-center">{{ data.get('name') }}</h2>
+    <div id="print-reports" class="content"></div>
+{% endblock %}
+
+{% block script %}
+
+    <script>
+        reportData = {{ data | tojson | safe }};
+        report = {{ report | tojson | safe }};
+    </script>
+
+    {{ javascript_tag('%s_js' % setting_type) | safe }}
+    
+{% endblock %}

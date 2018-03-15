@@ -30,6 +30,7 @@ import {
     COPY_ITEMS,
     PRINT_ITEMS,
     SET_TOPICS,
+    TOGGLE_NEWS,
 } from './actions';
 
 import { RENDER_MODAL, CLOSE_MODAL } from 'actions';
@@ -52,6 +53,7 @@ const initialState = {
     activeQuery: null,
     user: null,
     company: null,
+    companyName: '',
     topics: [],
     selectedItems: [],
     bookmarks: false,
@@ -67,10 +69,11 @@ const initialState = {
         createdFilter: {},
         activeView: EXTENDED_VIEW,
     },
+    newsOnly: false,
 };
 
 function recieveItems(state, data) {
-    const itemsById = {};
+    const itemsById = Object.assign({}, state.itemsById);
     const items = data._items.map((item) => {
         itemsById[item._id] = item;
         return item._id;
@@ -182,6 +185,14 @@ export default function wireReducer(state = initialState, action) {
         };
     }
 
+    case TOGGLE_NEWS: {
+        return {
+            ...state,
+            newsOnly: !state.newsOnly,
+        };
+    }
+
+
     case SET_ACTIVE:
         return {
             ...state,
@@ -201,9 +212,15 @@ export default function wireReducer(state = initialState, action) {
     case OPEN_ITEM:{
         const readItems = getReadItems(state, action.item);
 
+        const itemsById = Object.assign({}, state.itemsById);
+        if (action.item) {
+            itemsById[action.item._id] = action.item;
+        }
+
         return {
             ...state,
             readItems,
+            itemsById,
             openItem: action.item || null,
         };
     }
@@ -252,6 +269,7 @@ export default function wireReducer(state = initialState, action) {
             user: action.wireData.user || null,
             topics: action.wireData.topics || [],
             company: action.wireData.company || null,
+            companyName: action.wireData.companyName || '',
             bookmarks: action.wireData.bookmarks || false,
             formats: action.wireData.formats || [],
             wire: Object.assign(state.wire, {navigations}),
@@ -392,6 +410,8 @@ export default function wireReducer(state = initialState, action) {
     }
 
     case TOGGLE_NAVIGATION:
+        return {...state, wire: _wireReducer(state.wire, action), newsOnly: false};
+
     case TOGGLE_FILTER:
     case SET_CREATED_FILTER:
     case RESET_FILTER:
