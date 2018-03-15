@@ -9,6 +9,7 @@ import os
 
 import eve
 import flask
+import jinja2
 import importlib
 
 from flask_babel import Babel
@@ -43,6 +44,7 @@ class Newsroom(eve.Eve):
         self.sidenavs = []
         self.download_formatters = {}
         self.extensions = {}
+        self.theme_folder = 'theme'
 
         app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
 
@@ -76,11 +78,16 @@ class Newsroom(eve.Eve):
         self._setup_email()
         self._setup_cache()
         self._setup_error_handlers()
+        self._setup_theme()
 
     def load_config(self):
         """Override Eve.load_config in order to get default_settings."""
         super(Newsroom, self).load_config()
         self.config.from_envvar('NEWSROOM_SETTINGS', silent=True)
+        try:
+            self.config.from_pyfile(os.path.join(os.getcwd(), 'settings.py'))
+        except FileNotFoundError:
+            pass
 
     def _setup_blueprints(self, modules):
         """Setup configured blueprints."""
@@ -115,6 +122,10 @@ class Newsroom(eve.Eve):
         self.add_template_global(is_admin)
         self.add_template_global(get_initial_notifications)
         self.add_template_global(hash_string, 'hash')
+        self.jinja_loader = jinja2.ChoiceLoader([
+            jinja2.FileSystemLoader('theme'),
+            jinja2.FileSystemLoader(self.template_folder),
+        ])
 
     def _setup_webpack(self):
         NewsroomWebpack(self)
@@ -135,6 +146,14 @@ class Newsroom(eve.Eve):
 
         self.register_error_handler(AssertionError, assertion_error)
 
+    def _setup_theme(self):
+        self.add_url_rule(
+            self.static_url_path.replace('static', 'theme') + '/<path:filename>',
+            endpoint='theme',
+            host=self.static_host,
+            view_func=self.send_theme_file
+        )
+
     def sidenav(self, name, endpoint, icon=None):
         """Register an item in sidebar menu."""
         self.sidenavs.append({'name': name, 'endpoint': endpoint, 'icon': icon})
@@ -145,3 +164,8 @@ class Newsroom(eve.Eve):
             'formatter': formatter,
             'name': name,
         }
+
+    def send_theme_file(self, filename):
+        if os.path.exists(os.path.join(self.theme_folder, filename)):
+            return flask.send_from_directory(self.theme_folder, filename)
+        return self.send_static_file(filename)
