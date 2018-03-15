@@ -36,7 +36,7 @@ def test_share_items(client, app):
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
         assert outbox[0].sender == 'admin@sourcefabric.org'
-        assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
+        assert outbox[0].subject == 'From newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
         assert 'admin admin shared ' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body

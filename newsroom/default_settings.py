@@ -69,7 +69,7 @@ CORE_APPS = [
     'newsroom.reports',
 ]
 
-SITE_NAME = 'AAP Newsroom'
+SITE_NAME = 'newsroom'
 COPYRIGHT_HOLDER = 'AAP'
 COPYRIGHT_NOTICE = ''
 USAGE_TERMS = ''
