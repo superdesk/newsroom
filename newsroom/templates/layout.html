@@ -25,7 +25,6 @@
         {% include 'logo.html' %}
         <div class="navbar-brand d-flex align-items-center ml-2 ml-sm-1 mr-0 mr-sm-4">
             <nav>
-                <a class="breadcrumb-item text-white"  href="{{ url_for('wire.index') }}">{{ config.SITE_NAME }}</a>
                 {% block breadcrumb %}{% endblock %}
             </nav>
         </div>

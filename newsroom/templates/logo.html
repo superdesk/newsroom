@@ -1,3 +1,5 @@
-<div class="navbar__logo px-1">
-    <img src="{{ url_for('theme', filename = 'logo.svg') }}" width="90"/>
+<div class="navbar__logo px-2">
+    <a href="{{ url_for('wire.index') }}">
+        <img src="{{ url_for('theme', filename = 'logo.svg') }}" width="220" alt="{{ config.SITE_NAME }}"/>
+    </a>
 </div>
