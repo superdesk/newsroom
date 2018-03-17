@@ -11,3 +11,8 @@ export function openItemDetails(item) {
     analytics.itemView(item);
     return {type: OPEN_ITEM, item};
 }
+
+export const SET_ACTIVE = 'SET_ACTIVE';
+export function setActive(cardId) {
+    return {type: SET_ACTIVE, cardId};
+}
