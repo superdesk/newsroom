@@ -63,6 +63,7 @@ class EditCard extends React.Component {
 
                         <TextInput
                             name='order'
+                            type='number'
                             label={gettext('Order')}
                             value={this.props.card.order}
                             onChange={this.props.onChange}

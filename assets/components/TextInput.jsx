@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
-function TextInput({name, label, onChange, value, error, required, readOnly, maxLength}) {
+function TextInput({type, name, label, onChange, value, error, required, readOnly, maxLength}) {
     let wrapperClass = 'form-group';
 
     if (error && error.length > 0) {
@@ -17,7 +17,8 @@ function TextInput({name, label, onChange, value, error, required, readOnly, max
         <div className={wrapperClass}>
             <label htmlFor={name}>{label}</label>
             <div className="field">
-                <input type="text"
+                <input 
+                    type={type || 'text'}
                     id={name}
                     name={name}
                     className="form-control"
@@ -34,6 +35,7 @@ function TextInput({name, label, onChange, value, error, required, readOnly, max
 }
 
 TextInput.propTypes = {
+    type: PropTypes.string,
     label: PropTypes.string.isRequired,
     name: PropTypes.string,
     value: PropTypes.string,
