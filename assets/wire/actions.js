@@ -3,7 +3,7 @@ import { get, isEmpty } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset } from 'utils';
-import { markItemAsRead } from './utils';
+import { markItemAsRead, toggleNewsOnlyParam } from './utils';
 import { renderModal, closeModal } from 'actions';
 
 export const SET_STATE = 'SET_STATE';
@@ -73,8 +73,8 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData, readData) {
-    return {type: INIT_DATA, wireData, readData};
+export function initData(wireData, readData, newsOnly) {
+    return {type: INIT_DATA, wireData, readData, newsOnly};
 }
 
 export const ADD_TOPIC = 'ADD_TOPIC';
@@ -84,6 +84,7 @@ export function addTopic(topic) {
 
 export const TOGGLE_NEWS = 'TOGGLE_NEWS';
 export function toggleNews() {
+    toggleNewsOnlyParam();
     return {type: TOGGLE_NEWS};
 }
 
