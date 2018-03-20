@@ -4,7 +4,8 @@ import { shortDate } from 'utils';
 
 
 function getProductName(products, id) {
-    return products.find((product) => product._id == id).name;
+    const product = products.find((product) => product._id == id);
+    return product && product.name;
 }
 
 function CardListItem({card, products, isActive, onClick}) {
