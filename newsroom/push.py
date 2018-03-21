@@ -208,8 +208,10 @@ def generate_thumbnails(item):
     thumbnail = _get_thumbnail(im)  # 4-3 rendition resized
     watermark = _get_watermark(im)  # 4-3 rendition with watermark
     picture['renditions'].update({
-        '_newsroom_thumbnail': _store_image(thumbnail),
-        '_newsroom_thumbnail_large': _store_image(watermark),
+        '_newsroom_thumbnail': _store_image(thumbnail,
+                                            _id='%s%s' % (rendition['media'], '_newsroom_thumbnail')),
+        '_newsroom_thumbnail_large': _store_image(watermark,
+                                                  _id='%s%s' % (rendition['media'], '_newsroom_thumbnail_large')),
     })
 
     # add watermark to base/view images
@@ -220,22 +222,23 @@ def generate_thumbnails(item):
             im = Image.open(binary)
             watermark = _get_watermark(im)
             picture['renditions'].update({
-                '_newsroom_%s' % key: _store_image(watermark)
+                '_newsroom_%s' % key: _store_image(watermark,
+                                                   _id='%s%s' % (rendition['media'], '_newsroom_%s' % key))
             })
 
 
-def _store_image(image):
+def _store_image(image, filename=None, _id=None):
     binary = io.BytesIO()
     image.save(binary, 'jpeg', quality=THUMBNAIL_QUALITY)
     binary.seek(0)
-    media_id = app.media.put(binary, resource=ASSETS_RESOURCE, content_type='image/jpeg')
+    media_id = app.media.put(binary, filename=filename, _id=_id, resource=ASSETS_RESOURCE, content_type='image/jpeg')
     binary.seek(0)
     return {
         'media': str(media_id),
         'href': app.upload_url(media_id),
         'width': image.width,
         'height': image.height,
-        'mimetype': 'image/jpeg',
+        'mimetype': 'image/jpeg'
     }
 
 
