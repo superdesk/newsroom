@@ -6,7 +6,7 @@ function CardBody({item, meta}) {
     return (<div className="card-body">
         <h4 className="card-title">{item.headline}</h4>
         <div className="wire-articles__item__text">
-            <p>{item.description_text}</p>
+            <p className='card-text small'>{item.description_text}</p>
         </div>
 
         {meta && (
