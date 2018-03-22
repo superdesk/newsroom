@@ -36,6 +36,12 @@ class ItemsList extends React.Component {
             diff = -1;
             break;
 
+        case 'Escape':
+            this.setState({actioningItem: null});
+            this.props.dispatch(setActive(null));
+            this.props.dispatch(previewItem(null));
+            return;
+
         default:
             return;
         }
@@ -73,6 +79,7 @@ class ItemsList extends React.Component {
 
     onItemClick(item) {
         const itemId = item._id;
+        this.setState({actioningItem: null});
         this.cancelPreviewTimeout();
         this.cancelClickTimeout();
 
