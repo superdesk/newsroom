@@ -46,7 +46,7 @@ function ItemDetails({item, user, actions, onClose}) {
                                         <b>{item.byline}</b>
                                     </span>
                                 )}
-                                {' on '}
+                                {' at '}
                                 {fullDate(item.versioncreated)}
                             </p>
 
