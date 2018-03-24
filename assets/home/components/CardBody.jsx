@@ -2,18 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, shortDate } from 'utils';
 
-function CardBody({item, meta}) {
+function CardBody({item, displayMeta, displayDescription, displaySource}) {
     return (<div className="card-body">
         <h4 className="card-title">{item.headline}</h4>
-        <div className="wire-articles__item__text">
-            <p className='card-text small'>{item.description_text}</p>
-        </div>
 
-        {meta && (
+        {displayDescription && <div className="wire-articles__item__text">
+            <p className='card-text small'>{item.description_text}</p>
+        </div>}
+
+        {displayMeta && (
             <div className="wire-articles__item__meta">
                 <div className="wire-articles__item__meta-info">
                     <span className="bold">{item.slugline}</span>
-                    <span>{gettext('Source: {{ source }}', {source: item.source})} {'//'} {shortDate(item.versioncreated)}</span>
+                    {displaySource &&
+                    <span>{gettext('Source: {{ source }}', {source: item.source})} {'//'} {shortDate(item.versioncreated)}</span>}
                 </div>
             </div>
         )}
@@ -22,11 +24,15 @@ function CardBody({item, meta}) {
 
 CardBody.propTypes = {
     item: PropTypes.object,
-    meta: PropTypes.bool,
+    displayMeta: PropTypes.bool,
+    displayDescription: PropTypes.bool,
+    displaySource: PropTypes.bool,
 };
 
 CardBody.defaultProps = {
-    meta: true,
+    displayMeta: true,
+    displayDescription: true,
+    displaySource: true,
 };
 
 export default CardBody;

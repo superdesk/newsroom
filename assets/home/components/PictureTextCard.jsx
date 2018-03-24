@@ -16,7 +16,7 @@ const getPictureTextPanel = (item, picture, openItem, withPictures, cardId) => {
             {rendition &&
                 <img className="card-img-top" src={imageUrl} alt={caption} />
             }
-            <CardBody item={item} meta={false} />
+            <CardBody item={item} displayMeta={false} />
             <CardFooter
                 wordCount={wordCount(item)}
                 pictureAvailable={!!rendition}
