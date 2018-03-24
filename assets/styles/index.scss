@@ -1516,6 +1516,13 @@ article.list {
     align-items: center;
     margin-bottom: 4px;
 }
+.wire-articles__item__meta--align-top {
+    align-items: flex-start;
+    
+    .wire-articles__item__icons {
+        margin-top: 3px;
+    }
+}
 
 .wire-articles__item__icons {
     display: flex;

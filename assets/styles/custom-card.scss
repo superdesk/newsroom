@@ -37,7 +37,7 @@
         .card-footer {
             background-color: white;
         }
-
+        
         .card-body {
             padding: 1rem 1.25rem;
 
@@ -74,6 +74,15 @@
             }
             .card-body__content {
                 padding: 1rem 1.25rem;
+            }
+        }
+
+        .card-footer {
+            .wire-articles__item__icon {
+                margin-right: 5px;
+                @include xxl {
+                    margin-right: 7px;
+                }
             }
         }
 
