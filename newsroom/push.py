@@ -232,6 +232,9 @@ def _store_image(image, filename=None, _id=None):
     image.save(binary, 'jpeg', quality=THUMBNAIL_QUALITY)
     binary.seek(0)
     media_id = app.media.put(binary, filename=filename, _id=_id, resource=ASSETS_RESOURCE, content_type='image/jpeg')
+    if not media_id:
+        # media with the same id exists
+        media_id = _id
     binary.seek(0)
     return {
         'media': str(media_id),

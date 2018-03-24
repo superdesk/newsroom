@@ -155,6 +155,51 @@ def test_push_featuremedia_generates_renditions(client):
         assert 200 == resp.status_code
 
 
+def test_push_featuremedia_has_renditions_for_existing_media(client):
+    media_id = str(bson.ObjectId())
+    upload_binary('picture.jpg', client, media_id=media_id)
+    item = {
+        'guid': 'test',
+        'type': 'text',
+        'associations': {
+            'featuremedia': {
+                'type': 'picture',
+                'mimetype': 'image/jpeg',
+                'renditions': {
+                    '4-3': {
+                        'media': media_id,
+                    },
+                    'baseImage': {
+                        'media': media_id,
+                    },
+                    'viewImage': {
+                        'media': media_id,
+                    }
+                }
+            }
+        }
+    }
+
+    # First post
+    resp = client.post('/push', data=json.dumps(item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    # Second post
+    resp = client.post('/push', data=json.dumps(item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    resp = client.get('/wire/test?format=json')
+    data = json.loads(resp.get_data())
+    assert 200 == resp.status_code
+    picture = data['associations']['featuremedia']
+
+    for name in ['thumbnail', 'thumbnail_large', 'view', 'base']:
+        rendition = picture['renditions']['_newsroom_%s' % name]
+        assert media_id in rendition['href']
+        resp = client.get(rendition['href'])
+        assert 200 == resp.status_code
+
+
 def test_push_binary_invalid_signature(client, app):
     app.config['PUSH_KEY'] = b'foo'
     resp = client.post('/push_binary', data=dict(
