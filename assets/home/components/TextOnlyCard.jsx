@@ -3,14 +3,17 @@ import PropTypes from 'prop-types';
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
 import CardRow from './CardRow';
 
+
 const getTextOnlyPanel = (item, openItem, cardId) => (
-    <div key={item._id} className='col-sm-6 col-md-4 col-lg-2 d-flex mb-4'>
+    <div key={item._id} className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
-            <div className='card-body card-body--one-column'>
-                <h5 className='card-title'>{item.headline}</h5>
+            <div className='card-body'>
+                <h4 className='card-title'>{item.headline}</h4>
                 <div className='wire-articles__item__text'>
-                    <p className='card-text tiny'>{item.description_text}</p>
+                    <p className='card-text small'>{item.description_text}</p>
                 </div>
+            </div>
+            <div className='card-footer'>
                 <div className='wire-articles__item__meta'>
                     <div className='wire-articles__item__meta-info'>
                         <span>{gettext('Source: {{ source }}', {source: item.source})}
