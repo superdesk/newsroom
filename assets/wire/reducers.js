@@ -266,6 +266,7 @@ export default function wireReducer(state = initialState, action) {
         return {
             ...state,
             readItems: action.readData || {},
+            newsOnly: action.newsOnly,
             user: action.wireData.user || null,
             topics: action.wireData.topics || [],
             company: action.wireData.company || null,
@@ -410,7 +411,7 @@ export default function wireReducer(state = initialState, action) {
     }
 
     case TOGGLE_NAVIGATION:
-        return {...state, wire: _wireReducer(state.wire, action), newsOnly: false};
+        return {...state, wire: _wireReducer(state.wire, action)};
 
     case TOGGLE_FILTER:
     case SET_CREATED_FILTER:

@@ -7,6 +7,7 @@ import { getTextFromHtml } from 'utils';
 
 const STATUS_KILLED = 'canceled';
 const READ_ITEMS_STORE = 'read_items';
+const NEWS_ONLY_STORE = 'news_only';
 
 const store = Store.createStore([localStorage], [operationsPlugin]);
 
@@ -29,6 +30,24 @@ export function markItemAsRead(item, state) {
     if (item && item._id && item.version) {
         store.assign(READ_ITEMS_STORE, {[item._id]: getMaxVersion(state.readItems[item._id], item.version)});
     }
+}
+
+/**
+ * Get news only value
+ *
+ * @returns {boolean}
+ */
+export function getNewsOnlyParam() {
+    return !!((store.get(NEWS_ONLY_STORE) || {}).value);
+}
+
+
+/**
+ * Toggles news only value
+ *
+ */
+export function toggleNewsOnlyParam() {
+    store.assign(NEWS_ONLY_STORE, {value: !getNewsOnlyParam()});
 }
 
 /**
