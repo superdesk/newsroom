@@ -62,7 +62,7 @@ def _get_card_data(data):
         'label': data.get('label'),
         'type': data.get('type'),
         'config': data.get('config'),
-        'order': data.get('order'),
+        'order': int(data.get('order', 0) or 0),
     }
 
     if data.get('type') == '2x2-events':
