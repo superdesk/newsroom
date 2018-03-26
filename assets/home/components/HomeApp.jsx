@@ -12,7 +12,7 @@ import LargeTextOnlyCard from './LargeTextOnlyCard';
 import LargePictureTextCard from './LargePictureTextCard';
 import {getItemActions} from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
-import {openItemDetails} from '../actions';
+import {openItemDetails, setActive} from '../actions';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
@@ -84,6 +84,8 @@ class HomeApp extends React.Component {
             title={card.label}
             product={this.getProduct(card)}
             openItem={this.props.openItemDetails}
+            isActive={this.props.activeCard === card._id}
+            cardId={card._id}
         />;
     }
 
@@ -126,6 +128,7 @@ HomeApp.propTypes = {
     itemToOpen: PropTypes.object,
     modal: PropTypes.object,
     openItemDetails: PropTypes.func,
+    activeCard: PropTypes.string,
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         action: PropTypes.func,
@@ -142,10 +145,14 @@ const mapStateToProps = (state) => ({
     format: PropTypes.format,
     itemToOpen: state.itemToOpen,
     modal: state.modal,
+    activeCard: state.activeCard,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    openItemDetails: (item) => dispatch(openItemDetails(item)),
+    openItemDetails: (item, cardId) => {
+        dispatch(openItemDetails(item));
+        dispatch(setActive(cardId));
+    },
     actions: getItemActions(dispatch),
 });
 

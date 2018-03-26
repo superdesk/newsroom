@@ -2,6 +2,7 @@
 import {
     INIT_DATA,
     OPEN_ITEM,
+    SET_ACTIVE,
 } from './actions';
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
 import {CLOSE_MODAL, RENDER_MODAL} from '../actions';
@@ -12,6 +13,7 @@ const initialState = {
     cards: [],
     itemsByCard: {},
     products: [],
+    activeCard: null,
 };
 
 export default function homeReducer(state = initialState, action) {
@@ -35,6 +37,12 @@ export default function homeReducer(state = initialState, action) {
             itemToOpen: action.item || null,
         };
     }
+
+    case SET_ACTIVE:
+        return {
+            ...state,
+            activeCard: action.cardId || null,
+        };
 
     case BOOKMARK_ITEMS: {
         const itemToOpen = Object.assign({}, state.itemToOpen);

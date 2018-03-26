@@ -2,16 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, shortDate } from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
-import MoreNewsButton from './MoreNewsButton';
+import CardRow from './CardRow';
 
-const getMediaPanel = (item, picture, openItem) => {
+const getMediaPanel = (item, picture, openItem, cardId) => {
 
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className='col-sm-6 col-lg-3 d-flex mb-4'>
-        <div className='card card--home card--gallery' onClick={() => openItem(item)}>
+        <div className='card card--home card--gallery' onClick={() => openItem(item, cardId)}>
             <img className='card-img-top' src={imageUrl} alt={caption} />
             <div className='card-body'>
                 <div className='wire-articles__item__meta'>
@@ -25,12 +25,11 @@ const getMediaPanel = (item, picture, openItem) => {
     </div>);
 };
 
-function MediaGalleryCard({items, title, product, openItem}) {
+function MediaGalleryCard ({items, title, product, openItem, isActive, cardId}) {
     return (
-        <div className='row'>
-            <MoreNewsButton title={title} product={product}/>
-            {items.map((item) => getMediaPanel(item, getPicture(item), openItem))}
-        </div>
+        <CardRow title={title} product={product} isActive={isActive}>
+            {items.map((item) => getMediaPanel(item, getPicture(item), openItem, cardId))}
+        </CardRow>
     );
 }
 
@@ -39,6 +38,8 @@ MediaGalleryCard.propTypes = {
     title: PropTypes.string,
     product: PropTypes.object,
     openItem: PropTypes.func,
+    isActive: PropTypes.bool,
+    cardId: PropTypes.string,
 };
 
 export default MediaGalleryCard;
