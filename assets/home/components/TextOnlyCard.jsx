@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate, wordCount } from 'utils';
+import { wordCount } from 'utils';
 import CardRow from './CardRow';
+import CardFooter from './CardFooter';
+import {getPicture} from 'wire/utils';
 
-
-const getTextOnlyPanel = (item, openItem, cardId) => (
+const getTextOnlyPanel = (item, openItem, picture, cardId) => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
             <div className='card-body'>
@@ -13,16 +14,12 @@ const getTextOnlyPanel = (item, openItem, cardId) => (
                     <p className='card-text small'>{item.description_text}</p>
                 </div>
             </div>
-            <div className='card-footer'>
-                <div className='wire-articles__item__meta'>
-                    <div className='wire-articles__item__meta-info'>
-                        <span>{gettext('Source: {{ source }}', {source: item.source})}
-                            {' // '}<span className='bold'>{wordCount(item)}</span> {gettext('words')}
-                            {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
-                        </span>
-                    </div>
-                </div>
-            </div>
+            <CardFooter
+                wordCount={wordCount(item)}
+                pictureAvailable={!!picture}
+                source={item.source}
+                versioncreated={item.versioncreated}
+            />
         </div>
     </div>
 );
@@ -31,7 +28,7 @@ const getTextOnlyPanel = (item, openItem, cardId) => (
 function TextOnlyCard ({items, title, product, openItem, isActive, cardId}) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getTextOnlyPanel(item, openItem, cardId))}
+            {items.map((item) => getTextOnlyPanel(item, openItem, getPicture(item), cardId))}
         </CardRow>
     );
 }

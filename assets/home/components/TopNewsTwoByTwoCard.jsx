@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate, wordCount } from 'utils';
+import { wordCount } from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import CardRow from './CardRow';
+import CardFooter from './CardFooter';
+import CardMeta from './CardMeta';
+import CardBody from './CardBody';
 
 const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
 
@@ -17,25 +20,14 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
             </div>}
             <div className='card-body'>
                 <h2 className='card-title'>{item.headline}</h2>
-                <div className='wire-articles__item__meta'>
-                    <div className='wire-articles__item__icons'>
-                        <span className='wire-articles__item__icon'>
-                            <i className='icon--text icon--gray-light'></i>
-                        </span>
-                        <span className='wire-articles__item__icon'>
-                            <i className='icon--photo icon--gray-light'></i>
-                        </span>
-                        <span className='wire-articles__item__divider'>
-                        </span>
-                    </div>
-                    <div className='wire-articles__item__meta-info'>
-                        <span className='bold'>{item.slugline}</span>
-                        <span>{gettext('Source: {{ source }}', {source: item.source})}
-                            {' // '}<span className='bold'>{wordCount(item)}</span> {gettext('words')}
-                            {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
-                        </span>
-                    </div>
-                </div>
+                <CardMeta
+                    pictureAvailable={!!picture}
+                    wordCount={wordCount(item)}
+                    source={item.source}
+                    versioncreated={item.versioncreated}
+                    displayDivider={true}
+                    slugline={item.slugline}
+                />
                 <div className='wire-articles__item__text'>
                     <p className='card-text'>{item.description_text}</p>
                 </div>
@@ -54,30 +46,13 @@ const getTopNewsRightPanel = (item, picture, openItem, cardId) => {
     return (<div key={item._id} className='col-sm-6 col-md-3 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
             <img className='card-img-top' src={imageUrl} alt={caption} />
-            <div className='card-body'>
-                <h4 className='card-title'>{item.headline}</h4>
-                <div className='wire-articles__item__meta'>
-                    <div className='wire-articles__item__meta-info'>
-                        <span className='bold'>{item.slugline}</span>
-                        <span>{gettext('Source: {{ source }}', {source: item.source})} {'//'} {shortDate(item.versioncreated)}</span>
-                    </div>
-                </div>
-            </div>
-            <div className='card-footer'>
-                <div className='wire-articles__item__meta'>
-                    <div className='wire-articles__item__icons'>
-                        <span className='wire-articles__item__icon'>
-                            <i className='icon--text icon--gray-light'></i>
-                        </span>
-                        <span className='wire-articles__item__icon'>
-                            <i className='icon--photo icon--gray-light'></i>
-                        </span>
-                    </div>
-                    <div className='wire-articles__item__meta-info'>
-                        <span><span className="bold">{wordCount(item)}</span> {gettext('words')}</span>
-                    </div>
-                </div>
-            </div>
+            <CardBody item={item} displayDescription={false} displaySource={false}/>
+            <CardFooter
+                wordCount={wordCount(item)}
+                pictureAvailable={!!picture}
+                source={item.source}
+                versioncreated={item.versioncreated}
+            />
         </div>
     </div>);
 };

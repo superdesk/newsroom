@@ -48,7 +48,7 @@ class Preview extends React.PureComponent {
                     <PreviewActionButtons item={item} user={user} actions={actions} />
                 </div>
 
-                <div className='wire-column__preview__date'>{gettext('Created')}{' '}{fullDate(item.versioncreated)}</div>
+                <div className='wire-column__preview__date'>{gettext('Published')}{' '}{fullDate(item.versioncreated)}</div>
 
                 <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
                     {item.slugline &&

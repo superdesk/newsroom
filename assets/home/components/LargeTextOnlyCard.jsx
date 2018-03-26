@@ -4,12 +4,18 @@ import {wordCount} from 'utils';
 import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
+import {getPicture} from 'wire/utils';
 
 const getTextOnlyPanel = (item, openItem, cardId) => (
     <div key={item._id} className='col-sm-6 col-lg-4 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
-            <CardBody item={item} />
-            <CardFooter wordCount={wordCount(item)} pictureAvailable={false}/>
+            <CardBody item={item} displaySource={false} />
+            <CardFooter
+                wordCount={wordCount(item)}
+                pictureAvailable={!!getPicture(item)}
+                source={item.source}
+                versioncreated={item.versioncreated}
+            />
         </div>
     </div>
 );

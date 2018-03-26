@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate, wordCount } from 'utils';
+import { wordCount } from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import CardRow from './CardRow';
+import CardMeta from './CardMeta';
 
 const getTopNewsPanel = (item, picture, openItem, cardId) => {
     
@@ -15,25 +16,14 @@ const getTopNewsPanel = (item, picture, openItem, cardId) => {
             <img className='card-img-top' src={imageUrl} alt={caption} />
             <div className='card-body'>
                 <h4 className='card-title'>{item.headline}</h4>
-                <div className='wire-articles__item__meta'>
-                    <div className='wire-articles__item__icons'>
-                        <span className='wire-articles__item__icon'>
-                            <i className='icon--text icon--gray-light'></i>
-                        </span>
-                        <span className='wire-articles__item__icon'>
-                            <i className='icon--photo icon--gray-light'></i>
-                        </span>
-                        <span className='wire-articles__item__divider'>
-                        </span>
-                    </div>
-                    <div className='wire-articles__item__meta-info'>
-                        <span className='bold'>{item.slugline}</span>
-                        <span>{gettext('Source: {{ source }}', {source: item.source})}
-                            {' // '}<span className='bold'>{wordCount(item)}</span> {gettext('words')}
-                            {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
-                        </span>
-                    </div>
-                </div>
+                <CardMeta
+                    pictureAvailable={!!picture}
+                    wordCount={wordCount(item)}
+                    source={item.source}
+                    versioncreated={item.versioncreated}
+                    displayDivider={true}
+                    slugline={item.slugline}
+                />
                 <div className='wire-articles__item__text'>
                     <p className='card-text small'>{item.description_text}</p>
                 </div>
