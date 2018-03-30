@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gettext } from 'utils';
 
 import {
     setTopicQuery,
@@ -13,7 +14,7 @@ function TopicsTab({topics, dispatch, newItemsByTopic, activeTopic}) {
         dispatch(setTopicQuery(topic));
     };
 
-    return topics.map((topic) => (
+    return topics && topics.length > 0 ? topics.map((topic) => (
         <a href='#' key={topic._id}
             className={`btn btn-block btn-outline-${topic === activeTopic ? 'primary' : 'secondary'}`}
             onClick={(e) => clickTopic(e, topic)}>
@@ -22,7 +23,7 @@ function TopicsTab({topics, dispatch, newItemsByTopic, activeTopic}) {
                 {newItemsByTopic[topic._id].length}
             </span>}
         </a>
-    ));
+    )) : <div className='wire-column__info'>{gettext('No topics created.')}</div>;
 }
 
 TopicsTab.propTypes = {

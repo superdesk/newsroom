@@ -972,7 +972,6 @@ article.list {
     .tab-content {
         display: flex;
         flex-direction: column;
-        flex: 1 1 auto;
         overflow: auto;
 
         .tab-pane {
@@ -1036,6 +1035,10 @@ article.list {
 .wire-column__nav__group {
     color: #fff;
     margin-bottom: 20px;
+}
+
+.wire-column__info {
+    color:#8b8f9a;
 }
 
 .wire-button__notif {
