@@ -6,13 +6,10 @@ function UserProfileMenu({links, onClick}) {
         <div className="profile-side-navigation__items">
             {links.map((link) => (
                 <a key={link.name}
-                    href=""
+                    href="#"
                     className={`btn btn-block btn-outline-${link.active ? 'primary' : 'secondary'}`}
                     name={link.name}
-                    onClick={(event) => {
-                        event.preventDefault();
-                        onClick(link.name);
-                    }}
+                    onClick={(event) => onClick(event, link.name)}
                 >{link.label}</a>
             ))}
         </div>

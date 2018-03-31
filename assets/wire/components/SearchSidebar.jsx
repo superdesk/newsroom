@@ -26,6 +26,7 @@ class SearchSidebar extends React.Component {
         this.toggleNavigation = this.toggleNavigation.bind(this);
         this.toggleFilter = this.toggleFilter.bind(this);
         this.resetFilter = this.resetFilter.bind(this);
+        this.manageTopics = this.manageTopics.bind(this);
     }
 
     toggleNavigation(event, navigation) {
@@ -41,6 +42,11 @@ class SearchSidebar extends React.Component {
     resetFilter(event) {
         event.preventDefault();
         this.props.dispatch(resetFilter());
+    }
+
+    manageTopics(e) {
+        e.preventDefault();
+        document.dispatchEvent(window.manageTopics);
     }
 
     render() {
@@ -75,6 +81,7 @@ class SearchSidebar extends React.Component {
                             topics={this.props.topics}
                             newItemsByTopic={this.props.newItemsByTopic}
                             activeTopic={this.props.activeTopic}
+                            manageTopics={this.manageTopics}
                         />
                     </div>
                 </div>
