@@ -2371,7 +2371,7 @@ article.list {
 .date-round {
     width: 100%;
     min-width: 110px;
-    max-width: 140px;
+    max-width: 180px;
     margin: 0 auto;
     border-radius: 100%;
     background: #f1f1f1;
@@ -2379,6 +2379,7 @@ article.list {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 6px;
     &:after {
         content: "";
         display: table;
@@ -2394,13 +2395,18 @@ article.list {
     align-items: center;
 }
 .date-round__number {
-    font-size: 36px;
+    font-size: 48px;
+    font-weight: 300;
     color: #7ed321;
     line-height: 1.1;
+    letter-spacing: -.1rem;
 }
 .date-round__month {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 500;
+}
+.date-round__month--big {
+    font-size: 18px;
 }
 .date-round__day {
     font-size: 11px;
