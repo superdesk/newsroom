@@ -18,13 +18,15 @@ class SearchSidebar extends React.Component {
     constructor(props) {
         super(props);
         this.tabs = [
-            {label: gettext('Navigation'), content: NavigationTab},
+            {label: gettext('Topics'), content: NavigationTab},
+            {label: gettext('My Topics'), content: TopicsTab},
             {label: gettext('Filters'), content: FiltersTab},
         ];
         this.state = {active: this.tabs[0]};
         this.toggleNavigation = this.toggleNavigation.bind(this);
         this.toggleFilter = this.toggleFilter.bind(this);
         this.resetFilter = this.resetFilter.bind(this);
+        this.manageTopics = this.manageTopics.bind(this);
     }
 
     toggleNavigation(event, navigation) {
@@ -40,6 +42,11 @@ class SearchSidebar extends React.Component {
     resetFilter(event) {
         event.preventDefault();
         this.props.dispatch(resetFilter());
+    }
+
+    manageTopics(e) {
+        e.preventDefault();
+        document.dispatchEvent(window.manageTopics);
     }
 
     render() {
@@ -58,24 +65,28 @@ class SearchSidebar extends React.Component {
                         </li>
                     ))}
                 </ul>
-                <div className='tab-content' key={gettext('Navigation')}>
+                <div className='tab-content' key={gettext('Topics')}>
                     <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[0]})} role='tabpanel'>
                         <NavigationTab
                             navigations={this.props.navigations}
                             activeNavigation={this.props.activeNavigation}
                             toggleNavigation={this.toggleNavigation}
                         />
-                        {this.props.topics.length && <span className='wire-column__nav__divider'></span>}
+                    </div>
+                </div>
+                <div className='tab-content' key={gettext('My Topics')}>
+                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[1]})} role='tabpanel'>
                         <TopicsTab
                             dispatch={this.props.dispatch}
                             topics={this.props.topics}
                             newItemsByTopic={this.props.newItemsByTopic}
                             activeTopic={this.props.activeTopic}
+                            manageTopics={this.manageTopics}
                         />
                     </div>
                 </div>
                 <div className='tab-content' key={gettext('Filters')}>
-                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[1]})} role='tabpanel'>
+                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[2]})} role='tabpanel'>
                         <FiltersTab
                             activeFilter={this.props.activeFilter}
                             aggregations={this.props.aggregations}

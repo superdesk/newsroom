@@ -1,7 +1,7 @@
 import { createStore, render } from 'utils';
 import userReducer from './reducers';
 import UserProfileApp from './components/UserProfileApp';
-import {initData} from './actions';
+import {initData, selectMenu} from './actions';
 
 
 const store = createStore(userReducer);
@@ -16,3 +16,8 @@ render(
     UserProfileApp,
     document.getElementById('header-profile-toggle')
 );
+
+
+document.addEventListener('manage_topics', function () {
+    store.dispatch(selectMenu('topics'));
+}, false);

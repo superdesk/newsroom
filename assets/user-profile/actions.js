@@ -27,16 +27,20 @@ export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
-export function updateMenu(event) {
-    return function (dispatch) {
-        event.preventDefault();
-        dispatch(selectMenu(event));
-    };
-}
 
 export const SELECT_MENU = 'SELECT_MENU';
 export function selectMenu(data) {
     return {type: SELECT_MENU, data};
+}
+
+export const TOGGLE_DROPDOWN = 'TOGGLE_DROPDOWN';
+export function toggleDropdown() {
+    return {type: TOGGLE_DROPDOWN};
+}
+
+export const HIDE_MODAL = 'HIDE_MODAL';
+export function hideModal() {
+    return {type: HIDE_MODAL};
 }
 
 

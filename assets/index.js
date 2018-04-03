@@ -22,6 +22,8 @@ if ( !isTouchDevice() ) {
 var filterOpen = false;
 var previewOpen = false;
 
+window.manageTopics = new Event('manage_topics');
+
 function isGrid() {
     if ( $('.wire-articles__item').hasClass('wire-articles__item--grid')) {
         return true;

@@ -128,7 +128,6 @@ class WireApp extends React.Component {
                         <span className={`content-bar__menu content-bar__menu--nav${this.state.withSidebar?'--open':''}`}
                             onClick={this.toggleSidebar}>
                             <i className={this.state.withSidebar ? 'icon--close-thin icon--white' : 'icon--hamburger'}></i>
-                            {/*<i className='icon--close-thin icon--white' onClick={this.toggleSidebar}></i>*/}
                         </span>
 
                         <SearchBar

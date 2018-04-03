@@ -5,6 +5,7 @@ import {
     SET_ERROR,
     GET_USER,
     EDIT_USER,
+    SELECT_MENU, HIDE_MODAL, TOGGLE_DROPDOWN,
 } from './actions';
 
 import {
@@ -22,6 +23,9 @@ const initialState = {
     topicsById: {},
     activeTopicId: null,
     isLoading: false,
+    selectedMenu: 'profile',
+    dropdown: false,
+    displayModal: false,
 };
 
 export default function itemReducer(state = initialState, action) {
@@ -67,6 +71,29 @@ export default function itemReducer(state = initialState, action) {
             editedUser: action.data.user || null,
             topics: action.data.topics || [],
             company: action.data.company || null,
+        };
+    }
+
+    case SELECT_MENU: {
+        return {
+            ...state,
+            selectedMenu: action.data,
+            dropdown: false,
+            displayModal: true,
+        };
+    }
+
+    case TOGGLE_DROPDOWN : {
+        return {
+            ...state,
+            dropdown: !state.dropdown,
+        };
+    }
+
+    case HIDE_MODAL: {
+        return {
+            ...state,
+            displayModal: false,
         };
     }
 
