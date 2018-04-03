@@ -133,6 +133,11 @@ CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
 RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
+# Filter tab behaviour
+# If true, aggregations will be against all content all the time
+# If false, aggregations will change by filters applied
+FILTER_BY_POST_FILTER = False
+
 # Base64 Encoded Token
 AAPPHOTOS_TOKEN = os.environ.get('AAPPHOTOS_TOKEN')
 
