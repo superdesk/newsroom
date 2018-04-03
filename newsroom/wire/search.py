@@ -198,7 +198,7 @@ class WireSearchService(newsroom.Service):
             filters = json.loads(req.args['filter'])
 
         if not app.config.get('FILTER_BY_POST_FILTER', False):
-            if filters and not app.config.get('FILTER_BY_POST_FILTER', False):
+            if filters:
                 query['bool']['must'] += _filter_terms(filters)
 
             if req.args.get('created_from') or req.args.get('created_to'):
