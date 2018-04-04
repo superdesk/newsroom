@@ -64,16 +64,25 @@
                 border-left: 4px solid #7ed321;
             }
             .card-body__sidebar {
-                flex: 0 0 20%;
-                padding: 1rem 1.25rem;
-                display: flex;                
+                flex: 0 0 45%;
+                padding: 1rem;
+                display: flex;        
                 align-items: center;
+                @include md {
+                    flex: 0 0 35%;
+                }
                 @include lg {
+                    flex: 0 0 50%;
+                }
+                @include xl {
+                    flex: 0 0 40%;
+                }
+                @include xxl {
                     flex: 0 0 35%;
                 }
             }
             .card-body__content {
-                padding: 1rem 1.25rem;
+                padding: 1rem;
             }
         }
 
