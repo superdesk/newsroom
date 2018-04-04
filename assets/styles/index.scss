@@ -1005,6 +1005,13 @@ article.list {
             color: #fff;
             border-bottom: 3px solid $main-blue;
         }
+
+        @include lg {
+            padding: .5rem .4rem;
+        }
+        @include xxl {
+            padding: .5rem 1rem;
+        }
     }
 }
 
