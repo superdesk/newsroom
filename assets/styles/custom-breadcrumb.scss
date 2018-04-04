@@ -2,8 +2,12 @@
 
 .navbar-brand {
   span.breadcrumb-item {
-    font-size: 1rem; // 16px
+    font-size: 0.8125rem; // 13px
     line-height: 1.1;
+
+    @include sm {
+      font-size: 1rem; // 16px
+    }
   }
   a.breadcrumb-item {
     font-weight: 300;
