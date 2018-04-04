@@ -296,7 +296,17 @@ body.print {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 0.5rem 0 1rem;
+    padding: 0 0.5rem;
+    max-width: 160px;
+
+    @include sm {
+        max-width: 224px;
+        padding: 0 0.5rem 0 1rem;
+    }
+
+    img {
+        max-width: 100%;
+    }
 }
 .navbar-brand {
     margin-left: 2rem;
@@ -326,7 +336,6 @@ nav.search {
     flex-direction: column;
     width: 56px;
     height: 56px;
-    margin-left: 4px;
     background: rgba(0, 0, 0, 0.7);
     padding: 9px;
     &:hover {
@@ -340,6 +349,10 @@ nav.search {
         position: relative;
         background: #F7F7F7;
         z-index: 1002;
+    }
+
+    @include sm {
+        margin-left: 4px;
     }
 }
 .header-profile__avatar {
