@@ -6,6 +6,7 @@ from superdesk.default_settings import (   # noqa
     CONTENTAPI_MONGO_URI,
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,
+    ELASTICSEARCH_URL,
     ELASTICSEARCH_SETTINGS,
     ELASTIC_DATE_FORMAT,
     CELERY_BROKER_URL,
@@ -84,8 +85,8 @@ if DEFAULT_TIMEZONE is None:
 
 BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
-WEBPACK_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static', 'manifest.json')
-WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL', '/static/')
+WEBPACK_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static', 'dist', 'manifest.json')
+WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL', '/static/dist/')
 WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL', 'http://localhost:8080/')
 
 # How many days a new account can stay active before it is approved by admin
