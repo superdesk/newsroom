@@ -1,1 +1,1 @@
-recursive-include newsroom *.js *.json *.css *.ico *.png *.jpg 
+recursive-include newsroom *.js *.json *.css *.ico *.png *.jpg *.svg *.eot *.ttf *.woff *.html *.txt

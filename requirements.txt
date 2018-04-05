@@ -1,8 +1,1 @@
-flask-babel==0.11.2
-flask-webpack==0.1.0
-Flask-WTF==0.14.2
-flask-limiter==0.9.5.1
-Flask-Cache==0.13.1
-honcho==1.0.1
-superdesk-core==1.13
-gunicorn==19.7.1
+-e .

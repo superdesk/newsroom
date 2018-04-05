@@ -108,5 +108,3 @@ node_modules
 .vscode/
 .vagrant
 
-newsroom/static/manifest.json
-newsroom/static/*.js

@@ -35,7 +35,7 @@ module.exports = {
         ],
     },
     output: {
-        path: path.resolve(__dirname, 'newsroom', 'static'),
+        path: path.resolve(__dirname, 'newsroom', 'static', 'dist'),
         publicPath: 'http://localhost:8080/',
         filename: '[name].[chunkhash].js',
         chunkFilename: '[id].[chunkhash].js'
