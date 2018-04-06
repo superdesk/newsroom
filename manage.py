@@ -1,6 +1,7 @@
+#!/usr/bin/env python
 
-from app import Newsroom
 from flask_script import Manager
+from newsroom import Newsroom
 from superdesk import get_resource_service
 from newsroom.elastic_utils import rebuild_elastic_index
 
@@ -44,6 +45,12 @@ def elastic_rebuild():
 @manager.command
 def elastic_init():
     app.data.init_elastic(app)
+
+
+@manager.command
+def content_reset():
+    app.data.remove('items')
+    app.data.remove('items_versions')
 
 
 if __name__ == "__main__":
