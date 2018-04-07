@@ -8,6 +8,7 @@ import { getTextFromHtml } from 'utils';
 const STATUS_KILLED = 'canceled';
 const READ_ITEMS_STORE = 'read_items';
 const NEWS_ONLY_STORE = 'news_only';
+const FILTER_TAB = 'filter_tab';
 
 const store = Store.createStore([localStorage], [operationsPlugin]);
 
@@ -49,6 +50,24 @@ export function getNewsOnlyParam() {
 export function toggleNewsOnlyParam() {
     store.assign(NEWS_ONLY_STORE, {value: !getNewsOnlyParam()});
 }
+
+/**
+ * Get active filter tab
+ *
+ * @returns {boolean}
+ */
+export function getActiveFilterTab() {
+    return (store.get(FILTER_TAB) || {}).value;
+}
+
+/**
+ * Set active filter tab
+ *
+ */
+export function setActiveFilterTab(tab) {
+    store.assign(FILTER_TAB, {value: tab});
+}
+
 
 /**
  * Returns the greater version
