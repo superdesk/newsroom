@@ -55,7 +55,11 @@ function SearchResultsInfo({
                 </div>}
 
                 {!isEmpty(newItems) &&
-                <button type="button" className="button__reset-styles d-flex align-items-center ml-3" onClick={refresh}>
+                <button
+                    type="button"
+                    title={gettext('New stories available to load')}
+                    className="button__reset-styles d-flex align-items-center ml-3"
+                    onClick={refresh}>
                     <i className="icon--refresh icon--pink" />
                     <span className="badge badge-pill badge-info badge-secondary ml-2">{newItems.length}</span>
                 </button>

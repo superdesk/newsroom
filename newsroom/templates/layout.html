@@ -63,8 +63,8 @@
 
                 {% for nav in sidenavs %}
                 <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %} badge--top-right">
-                  <a href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}" data-toggle="tooltip" data-placement="right">
-                    {% if nav.name == 'Bookmarks' %}
+                  <a href="{{ url_for(nav.endpoint) }}" title="{{  gettext(nav.name) }}" data-toggle="tooltip" data-placement="right">
+                    {% if nav.name == 'Saved Items' %}
                     <div id="bookmarks-count" class="badge badge-pill badge-info badge-secondary"></div>
                     {% endif %}
                     <i class="icon--{{ nav.icon }} icon--mid-blue"></i>

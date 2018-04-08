@@ -23,7 +23,7 @@ class FiltersTab extends React.Component {
             },
             {
                 field: 'genre',
-                label: gettext('Genre'),
+                label: gettext('Content Type'),
             },
             {
                 field: 'urgency',

@@ -31,7 +31,7 @@ class ListViewControls extends React.PureComponent {
         return(
             <div className='content-bar__right'>
                 <div className='btn-group'>
-                    <span className='content-bar__menu' onClick={this.toggleOpen}>
+                    <span className='content-bar__menu' onClick={this.toggleOpen} title={gettext('Change View')}>
                         <i className={`icon--${this.props.activeView}`}></i>
                     </span>
                     {this.state.isOpen && (

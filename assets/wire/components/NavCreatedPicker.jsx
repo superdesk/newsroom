@@ -26,7 +26,7 @@ function NavCreatedPicker({dispatch, createdFilter}) {
     const activeShortcut = shortcuts.find((shortcut) => shortcut.value === createdFilter.from);
 
     return (
-        <NavGroup label={gettext('Created')}>
+        <NavGroup label={gettext('Published')}>
             {shortcuts.map((shortcut) => (
                 <NavLink key={shortcut.value}
                     label={shortcut.label}
