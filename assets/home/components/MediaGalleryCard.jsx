@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate } from 'utils';
+import { shortDate } from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import CardRow from './CardRow';
 
@@ -16,7 +16,7 @@ const getMediaPanel = (item, picture, openItem, cardId) => {
             <div className='card-body'>
                 <div className='wire-articles__item__meta'>
                     <div className='wire-articles__item__meta-info'>
-                        <span>{gettext('Source: {{ source }}', {source: item.source})} {'//'} {shortDate(item.versioncreated)}</span>
+                        <span>{shortDate(item.versioncreated)}</span>
                     </div>
                 </div>
                 <h4 className='card-title'>{item.headline}</h4>

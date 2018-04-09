@@ -14,7 +14,7 @@ export default function ItemVersion({version, baseClass, showDivider, onClick}) 
                     <div className={`${baseClass}__item__meta-info`}>
                         <span className="bold">{version.slugline}</span>
                         <span>{formatDate(version.versioncreated)} {' // '}
-                            <span className="bold">{wordCount(version)}</span> {gettext('words')}
+                            <span>{wordCount(version)}</span> {gettext('words')}
                         </span>
                     </div>
                 </div>

@@ -48,7 +48,7 @@ export function getItemActions(dispatch) {
             action: (items) => dispatch(downloadItems(items)),
         },
         {
-            name: gettext('Bookmark'),
+            name: gettext('Save'),
             icon: 'bookmark-add',
             multi: true,
             shortcut: true,
@@ -56,7 +56,7 @@ export function getItemActions(dispatch) {
             action: (items) => dispatch(bookmarkItems(items)),
         },
         {
-            name: gettext('Remove from bookmarks'),
+            name: gettext('Unsave'),
             icon: 'bookmark-remove',
             multi: true,
             shortcut: true,
