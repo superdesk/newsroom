@@ -26,6 +26,14 @@ export function preview(item) {
     return {type: PREVIEW_ITEM, item};
 }
 
+
+export function previewAndCopy(item) {
+    return (dispatch) => {
+        dispatch(previewItem(item));
+        window.setTimeout(() => dispatch(copyPreviewContents(item)), 200);
+    };
+}
+
 export function previewItem(item) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());

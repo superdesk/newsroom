@@ -1,7 +1,7 @@
 import {gettext} from '../utils';
 import {
     bookmarkItems,
-    copyPreviewContents,
+    previewAndCopy,
     downloadItems,
     openItem,
     printItem,
@@ -37,7 +37,7 @@ export function getItemActions(dispatch) {
             name: gettext('Copy'),
             icon: 'copy',
             visited: (user, item) => user && item && item.copies &&  item.copies.includes(user),
-            action: (item) => dispatch(copyPreviewContents(item)),
+            action: (item) => dispatch(previewAndCopy(item)),
         },
         {
             name: gettext('Download'),
