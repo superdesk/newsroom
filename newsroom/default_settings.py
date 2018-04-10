@@ -151,6 +151,12 @@ HOMEPAGE_CAROUSEL = [{
     'count': 2
 }]
 
+# List of filters to remove matching stories when news only switch is turned on
+NEWS_ONLY_FILTERS = [
+    {'match': {'genre.code': 'Results (sport)'}},
+    {'match': {'source': 'PMF'}},
+]
+
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 
