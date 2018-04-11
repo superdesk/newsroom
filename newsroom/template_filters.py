@@ -6,6 +6,7 @@ import hashlib
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
 from superdesk.text_utils import get_text, get_word_count
+from superdesk.utc import utcnow
 
 
 def parse_date(datetime):
@@ -26,6 +27,10 @@ def datetime_short(datetime):
 def datetime_long(datetime):
     if datetime:
         return format_datetime(parse_date(datetime), "dd/MM/yyyy HH:mm")
+
+
+def date_header(datetime):
+    return format_datetime(parse_date(datetime if datetime else utcnow()), 'EEEE, MMMM d, yyyy')
 
 
 def time_short(datetime):

@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { createPortal } from 'react-dom';
+import { gettext } from 'utils';
 
 import {
     followTopic,
@@ -125,7 +126,11 @@ class WireApp extends React.Component {
                         />
                     }
                     <nav className='content-bar navbar justify-content-start flex-nowrap flex-sm-wrap'>
-                        <span className={`content-bar__menu content-bar__menu--nav${this.state.withSidebar?'--open':''}`}
+                        <span
+                            className={`content-bar__menu content-bar__menu--nav${this.state.withSidebar?'--open':''}`}
+                            data-toggle='tooltip'
+                            data-placement='left'
+                            title={this.state.withSidebar?gettext('Close filter panel'):gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className={this.state.withSidebar ? 'icon--close-thin icon--white' : 'icon--hamburger'}></i>
                         </span>

@@ -45,7 +45,11 @@ class NotificationList extends React.Component {
                     </div>
                 }
 
-                <span className="notif__circle" title={gettext('Notifications')}>
+                <span
+                    className="notif__circle"
+                    data-toggle='tooltip'
+                    data-placement='left'
+                    title={gettext('Notifications')}>
                     <i className='icon--alert icon--white' onClick={this.toggleDisplay} />
                 </span>
 

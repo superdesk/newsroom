@@ -28,7 +28,7 @@ from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, newsroom_config, is_admin,
-    hash_string,
+    hash_string, date_header
 )
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -113,6 +113,7 @@ class Newsroom(eve.Eve):
     def _setup_jinja(self):
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
+        self.add_template_filter(date_header)
         self.add_template_filter(plain_text)
         self.add_template_filter(time_short)
         self.add_template_filter(date_short)

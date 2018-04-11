@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, shortDate, fullDate } from 'utils';
-import settings from 'config';
 
 function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayDivider, slugline}) {
     return (<div className="wire-articles__item__meta">
@@ -17,7 +16,7 @@ function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayD
         <div className="wire-articles__item__meta-info">
             {slugline && <span className='bold'>{slugline}</span>}
             <span>
-                {source && settings.displaySourceOnHome && gettext('Source: {{ source }}', {source}) + ' // '}
+                {source && `${source} // `}
                 <span>{wordCount}</span> {gettext('words')}
                 {versioncreated && ' // '}
                 {versioncreated &&

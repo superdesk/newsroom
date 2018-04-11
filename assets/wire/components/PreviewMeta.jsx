@@ -27,8 +27,6 @@ function PreviewMeta({item, isItemDetail, inputRef}) {
                         <i className='icon--photo icon--gray-light'></i>
                     </span>
                 )}
-                {!isItemDetail && <span className='wire-articles__item__divider'>
-                </span>}
             </div>
             <div className='wire-articles__item__meta-info'>
                 <span>{gettext('News Value: {{ value }}', {value: item.urgency || DEFAULT_URGENCY})}</span>

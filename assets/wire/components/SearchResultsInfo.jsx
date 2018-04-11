@@ -57,6 +57,8 @@ function SearchResultsInfo({
                 {!isEmpty(newItems) &&
                 <button
                     type="button"
+                    data-toggle='tooltip'
+                    data-placement='left'
                     title={gettext('New stories available to load')}
                     className="button__reset-styles d-flex align-items-center ml-3"
                     onClick={refresh}>

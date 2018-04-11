@@ -10,7 +10,11 @@ function ProfileToggle({user, onClick}) {
             onClick();
         }}>
             <figure className="header-profile__avatar">
-                <span className="header-profile__characters">{initials}</span>
+                <span className="header-profile__characters"
+                    data-toggle='tooltip'
+                    data-placement='left'
+                    title={`${user.first_name} ${user.last_name}`}
+                >{initials}</span>
             </figure>
         </div>
     );
