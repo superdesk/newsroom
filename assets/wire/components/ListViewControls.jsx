@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { gettext } from 'utils';
 
 import { EXTENDED_VIEW, COMPACT_VIEW } from '../defaults';
+import {isTouchDevice} from '../../utils';
 
 class ListViewControls extends React.PureComponent {
     constructor(props) {
@@ -27,6 +28,16 @@ class ListViewControls extends React.PureComponent {
         this.props.setView(view.type);
     }
 
+    componentDidMount() {
+        if ( !isTouchDevice() ) {
+            this.elem && $(this.elem).tooltip();
+        }
+    }
+
+    componentWillUnmount() {
+        this.elem && $(this.elem).tooltip('dispose'); // make sure it's gone
+    }
+
     render() {
         return(
             <div className='content-bar__right'>
@@ -34,8 +45,7 @@ class ListViewControls extends React.PureComponent {
                     <span
                         className='content-bar__menu'
                         onClick={this.toggleOpen}
-                        data-toggle='tooltip'
-                        data-placement='left'
+                        ref={(elem) => this.elem = elem}
                         title={gettext('Change view')}>
                         <i className={`icon--${this.props.activeView}`}></i>
                     </span>

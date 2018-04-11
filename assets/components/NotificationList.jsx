@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import {gettext, shortDate} from 'utils';
 import CloseButton from './CloseButton';
+import {isTouchDevice} from '../utils';
 
 class NotificationList extends React.Component {
     constructor(props) {
@@ -11,6 +12,16 @@ class NotificationList extends React.Component {
 
         this.renderNotification = this.renderNotification.bind(this);
         this.toggleDisplay = this.toggleDisplay.bind(this);
+    }
+
+    componentDidMount() {
+        if ( !isTouchDevice() ) {
+            this.elem && $(this.elem).tooltip();
+        }
+    }
+
+    componentWillUnmount() {
+        this.elem && $(this.elem).tooltip('dispose'); // make sure it's gone
     }
 
     toggleDisplay() {
@@ -47,8 +58,7 @@ class NotificationList extends React.Component {
 
                 <span
                     className="notif__circle"
-                    data-toggle='tooltip'
-                    data-placement='left'
+                    ref={(elem) => this.elem = elem}
                     title={gettext('Notifications')}>
                     <i className='icon--alert icon--white' onClick={this.toggleDisplay} />
                 </span>

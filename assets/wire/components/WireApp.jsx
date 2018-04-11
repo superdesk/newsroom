@@ -34,6 +34,7 @@ import ItemDetails from './ItemDetails';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import { getItemActions } from '../item-actions';
+import {isTouchDevice} from '../../utils';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -93,6 +94,26 @@ class WireApp extends React.Component {
         return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
     }
 
+    componentDidMount() {
+        if ( !isTouchDevice() ) {
+            this.elemOpen && $(this.elemOpen).tooltip();
+            this.elemClose && $(this.elemClose).tooltip();
+        }
+    }
+
+    componentWillUnmount() {
+        this.componentWillUpdate();
+    }
+
+    componentWillUpdate() {
+        this.elemOpen && $(this.elemOpen).tooltip('dispose');
+        this.elemClose && $(this.elemClose).tooltip('dispose');
+    }
+
+    componentDidUpdate() {
+        this.componentDidMount();
+    }
+
     render() {
         const modal = this.renderModal(this.props.modal);
         const multiActionFilter = (action) => action.multi &&
@@ -126,14 +147,20 @@ class WireApp extends React.Component {
                         />
                     }
                     <nav className='content-bar navbar justify-content-start flex-nowrap flex-sm-wrap'>
-                        <span
-                            className={`content-bar__menu content-bar__menu--nav${this.state.withSidebar?'--open':''}`}
-                            data-toggle='tooltip'
-                            data-placement='left'
-                            title={this.state.withSidebar?gettext('Close filter panel'):gettext('Open filter panel')}
+                        {this.state.withSidebar && <span
+                            className='content-bar__menu content-bar__menu--nav--open'
+                            ref={(elem) => this.elemOpen = elem}
+                            title={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
-                            <i className={this.state.withSidebar ? 'icon--close-thin icon--white' : 'icon--hamburger'}></i>
-                        </span>
+                            <i className='icon--close-thin icon--white'></i>
+                        </span>}
+                        {!this.state.withSidebar && <span
+                            className='content-bar__menu content-bar__menu--nav'
+                            ref={(elem) => this.elemClose = elem}
+                            title={gettext('Open filter panel')}
+                            onClick={this.toggleSidebar}>
+                            <i className='icon--hamburger'></i>
+                        </span>}
 
                         <SearchBar
                             fetchItems={this.props.fetchItems}
