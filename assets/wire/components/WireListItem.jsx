@@ -39,12 +39,6 @@ class WireListItem extends React.Component {
         this.setState({previousVersions: !this.state.previousVersions});
     }
 
-    componentDidUpdate(nextProps) {
-        if (nextProps.isActive) {
-            this.articleElem.focus();
-        }
-    }
-
     componentDidMount() {
         if (this.props.isActive) {
             this.articleElem.focus();
