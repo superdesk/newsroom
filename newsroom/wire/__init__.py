@@ -31,7 +31,7 @@ def init_app(app):
 
     superdesk.register_resource('wire_search', WireSearchResource, WireSearchService, _app=app)
 
-    app.sidenav('Home', 'wire.index', 'dashboard')
+    app.sidenav('Home', 'wire.index', 'home')
     app.sidenav('Wire', 'wire.wire', 'text')
     app.sidenav('Saved Items', 'wire.bookmarks', 'bookmark')
 
