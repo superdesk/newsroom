@@ -80,7 +80,7 @@
                         {% endif %}
                         {% if item.genre %}
                         <div class="column__preview__tags__column">
-                            <span class="wire-column__preview__tags__headline">{{ _('Genre') }}</span>
+                            <span class="wire-column__preview__tags__headline">{{ _('Content Type') }}</span>
                             {% for genre in item.genre %}
                             <a class="wire-column__preview__tag"
                                 href='{{ url_for('wire.index') }}?q=genre.name:"{{ genre.name }}"'

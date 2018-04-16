@@ -22,7 +22,6 @@ const getTopNewsPanel = (item, picture, openItem, cardId) => {
                     source={item.source}
                     versioncreated={item.versioncreated}
                     displayDivider={false}
-                    slugline={item.slugline}
                 />
                 <div className='wire-articles__item__text'>
                     <p className='card-text small'>{item.description_text}</p>

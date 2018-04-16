@@ -29,7 +29,7 @@ function PreviewTags({item, isItemDetail}) {
             {genres &&
                 <div className='column__preview__tags__column'>
                     <span className='wire-column__preview__tags__headline'>
-                        {gettext('Genre')}</span>
+                        {gettext('Content Type')}</span>
                     {genres}
                 </div>
             }
