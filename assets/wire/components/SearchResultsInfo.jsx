@@ -18,6 +18,15 @@ class SearchResultsInfo extends React.Component {
         this.elem && $(this.elem).tooltip('dispose'); // make sure it's gone
     }
 
+    componentWillUpdate() {
+        this.componentWillUnmount();
+    }
+
+    componentDidUpdate() {
+        this.componentDidMount();
+    }
+
+
     render() {
         const isFollowing = this.props.user && this.props.activeTopic;
         const displayTotalItems = this.props.bookmarks || !isEmpty(this.props.searchCriteria) || this.props.activeTopic;
