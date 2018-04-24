@@ -379,6 +379,22 @@ article.list {
     cursor: pointer;
 }
 
+.footer {
+    z-index: 10;
+    height: 30px;
+    color: #333;
+    background-color: #e6e6e6;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
+    font-size: 11px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.footer a {
+    margin: 0 10px;
+}
+
 .contentWrap, .settingsWrap, .settings-inner, .flex-row, .flex-col {
     display: flex;
     flex-grow: 1;
