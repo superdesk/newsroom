@@ -142,11 +142,6 @@ def search():
     return send_response('wire_search', response)
 
 
-@blueprint.route('/copyright')
-def copyright():
-    return flask.render_template('copyright.html')
-
-
 @blueprint.route('/download/<_ids>')
 @login_required
 def download(_ids):
