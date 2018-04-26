@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {gettext} from 'utils';
@@ -46,7 +45,12 @@ class HomeApp extends React.Component {
         this.filterActions = this.filterActions.bind(this);
         this.renderModal = this.renderModal.bind(this);
         this.onHomeScroll = this.onHomeScroll.bind(this);
-        this.getFooter = this.getFooter.bind(this);
+        this.height = 0;
+    }
+
+    componentDidMount() {
+        document.getElementById('footer').style.display = 'none';
+        this.height = this.elem.offsetHeight;
     }
 
     renderModal(specs) {
@@ -59,22 +63,12 @@ class HomeApp extends React.Component {
     }
 
     onHomeScroll(event) {
-        const BUFFER = 100;
         const container = event.target;
-        if (container.scrollTop + container.offsetHeight + BUFFER >= container.scrollHeight) {
-            ReactDOM.render(this.getFooter(), document.getElementById('footer'));
+        if(container.scrollTop + this.height >= container.scrollHeight) {
+            document.getElementById('footer').style.display = 'flex';
         } else {
-            ReactDOM.render(null, document.getElementById('footer'));
+            document.getElementById('footer').style.display = 'none';
         }
-    }
-
-    getFooter() {
-        return (<div className="footer">
-            <a href="https://www.aap.com.au/legal/" target="_blank" rel="noopener noreferrer">{gettext('Privacy Policy')}</a>
-            <a href="https://www.aap.com.au/legal/" target="_blank" rel="noopener noreferrer">{gettext('Terms and Conditions')}</a>
-            <a href="https://www.aap.com.au/contact/sales-inquiries/" target="_blank" rel="noopener noreferrer">{gettext('Contact Us') }</a>
-            <a href='/copyright'>{gettext('Copyright')}</a>
-        </div>);
     }
 
     getProduct(card) {
@@ -125,7 +119,10 @@ class HomeApp extends React.Component {
                 actions={this.filterActions(this.props.itemToOpen)}
                 onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
             />, modal] :
-                <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4" onScroll={this.onHomeScroll}>
+                <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
+                    onScroll={this.onHomeScroll}
+                    ref={(elem) => this.elem = elem}
+                >
                     <div className="container-fluid">
                         {this.props.cards.length > 0 && this.props.cards.map((card) => this.getPanels(card))}
                         {this.props.cards.length === 0 &&

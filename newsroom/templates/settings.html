@@ -51,10 +51,6 @@
 </div>
 {% endblock %}
 
-{% block footer %}
-    {% include "footer.html" %}
-{% endblock %}
-
 {% block script %}
 <script>
 var viewData = {{ data | tojson | safe }};
