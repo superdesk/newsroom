@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="content">
-    <section class="content-main d-block py-4 px-2 p-md-3 p-lg-4">
+    <section class="content-main d-block py-4 px-2 p-md-3 p-lg-4" id="scrollable">
         <div class="container-fluid">
 
             <!-- Photo carousel - postponed, do not delete this code -->
@@ -949,6 +949,7 @@
 
 
 {% block script %}
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.18/jquery.touchSwipe.js" integrity="sha256-KKv6+21Uvs0xGccvranH3/RaUvz7N24khCbpW6leF5o=" crossorigin="anonymous"></script>
 <script>
     // Carousel swipe
@@ -963,5 +964,17 @@
         allowPageScroll:'vertical'
 
     });
+        
+    $(document).ready(function(){
+        $('#scrollable').bind('scroll', function() {
+            if($(this).scrollTop() + $(this).innerHeight()>=$(this)[0].scrollHeight) {
+                $('#footer').removeClass('footer--home');
+            }
+            else {
+                $('#footer').addClass('footer--home');
+            }
+        })
+    });
+
 </script>
 {% endblock %}
