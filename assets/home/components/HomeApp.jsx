@@ -49,7 +49,7 @@ class HomeApp extends React.Component {
     }
 
     componentDidMount() {
-        document.getElementById('footer').style.display = 'none';
+        document.getElementById('footer').className = 'footer footer--home';
         this.height = this.elem.offsetHeight;
     }
 
@@ -64,10 +64,11 @@ class HomeApp extends React.Component {
 
     onHomeScroll(event) {
         const container = event.target;
-        if(container.scrollTop + this.height >= container.scrollHeight) {
-            document.getElementById('footer').style.display = 'flex';
+        const BUFFER = 100;
+        if(container.scrollTop + this.height + BUFFER >= container.scrollHeight) {
+            document.getElementById('footer').className = 'footer';
         } else {
-            document.getElementById('footer').style.display = 'none';
+            document.getElementById('footer').className = 'footer footer--home';
         }
     }
 

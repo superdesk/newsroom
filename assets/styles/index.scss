@@ -390,9 +390,16 @@ article.list {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-.footer a {
-    margin: 0 10px;
+    margin: 0;
+    transition: margin 0.2s ease-in-out;
+
+    &--home {
+        margin-bottom: -30px;
+    }
+
+    a {
+        margin: 0 10px;
+    }
 }
 
 .contentWrap, .settingsWrap, .settings-inner, .flex-row, .flex-col {
