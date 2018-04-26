@@ -44,6 +44,13 @@ class HomeApp extends React.Component {
         this.getPanels = this.getPanels.bind(this);
         this.filterActions = this.filterActions.bind(this);
         this.renderModal = this.renderModal.bind(this);
+        this.onHomeScroll = this.onHomeScroll.bind(this);
+        this.height = 0;
+    }
+
+    componentDidMount() {
+        document.getElementById('footer').className = 'footer footer--home';
+        this.height = this.elem.offsetHeight;
     }
 
     renderModal(specs) {
@@ -52,6 +59,16 @@ class HomeApp extends React.Component {
             return (
                 <Modal key="modal" data={specs.data} />
             );
+        }
+    }
+
+    onHomeScroll(event) {
+        const container = event.target;
+        const BUFFER = 100;
+        if(container.scrollTop + this.height + BUFFER >= container.scrollHeight) {
+            document.getElementById('footer').className = 'footer';
+        } else {
+            document.getElementById('footer').className = 'footer footer--home';
         }
     }
 
@@ -103,7 +120,10 @@ class HomeApp extends React.Component {
                 actions={this.filterActions(this.props.itemToOpen)}
                 onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
             />, modal] :
-                <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4">
+                <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
+                    onScroll={this.onHomeScroll}
+                    ref={(elem) => this.elem = elem}
+                >
                     <div className="container-fluid">
                         {this.props.cards.length > 0 && this.props.cards.map((card) => this.getPanels(card))}
                         {this.props.cards.length === 0 &&
