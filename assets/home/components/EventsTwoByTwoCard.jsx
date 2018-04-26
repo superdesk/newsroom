@@ -29,7 +29,7 @@ const getEventPanel = (event, index) => {
             </div>,
         <div key='month' className='date-round__month date-round__month--big'><span>{d1.format('MMMM')}</span></div>,
         isDifferentMonth(d1, d2) ?
-            <div key='month' className='date-round__month'>
+            <div key='month2' className='date-round__month'>
                 {gettext('to')} <span className='date-round__number--small'>{d2.format('D')}</span>  <span>{d2.format('MMMM')}</span>
             </div> : null,
     ]);

@@ -81,7 +81,11 @@
         {% endblock %}
     </div>
 
-     {% include "footer.html" %}
+
+    <footer id="footer">
+        {% block footer %}
+        {% endblock %}
+    </footer>
 
     <div id="user-profile-app"></div>
 </div>
