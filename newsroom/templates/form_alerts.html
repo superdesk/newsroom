@@ -1,7 +1,7 @@
 {% if form.errors %}
   <div class="alert alert-danger" role="alert">
     <ul>
-      {% for field, errors in form.errors.items(): %}
+      {% for field, errors in form.errors.items() %}
         <li>{{ field }}: {{ gettext(errors[0]) }}</li>
       {% endfor %}
     </ul>

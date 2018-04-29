@@ -76,6 +76,7 @@ SITE_NAME = 'AAP Newsroom'
 COPYRIGHT_HOLDER = 'AAP'
 COPYRIGHT_NOTICE = ''
 USAGE_TERMS = ''
+CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
 
 TEMPLATES_AUTO_RELOAD = True
 
