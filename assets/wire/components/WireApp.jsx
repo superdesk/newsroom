@@ -223,7 +223,6 @@ class WireApp extends React.Component {
 
                         </div>
                     </div>
-                    {modal}
                 </section>
             ]).concat([
                 modal,
