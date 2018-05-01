@@ -42,3 +42,4 @@ def init_app(app):
 
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')
+    app.add_template_global(utils.get_date, 'get_date')

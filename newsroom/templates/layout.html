@@ -31,13 +31,13 @@
 
         {% if session.get('name') %}
         <div class="form-inline my-lg-0 ml-auto">
-            <div class="mr-2 d-none d-md-block">{{ None | date_header }}</div>
+            <div class="mr-2 d-none d-md-block">{{ get_date() | date_header }}</div>
             <div class="notif" id="header-notification"></div>
             <div id="header-profile-toggle"></div>
         </div>
         {% else %}
         <div class="form-inline my-lg-0 ml-auto pr-2 pr-sm-3">
-            <div class="mr-3 d-none d-md-block">{{ None | date_header }}</div>
+            <div class="mr-3 d-none d-md-block">{{ get_date() | date_header }}</div>
             <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             <a class="nav-link" href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
         </div>

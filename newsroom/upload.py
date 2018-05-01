@@ -5,6 +5,7 @@ import bson.errors
 
 from werkzeug.wsgi import wrap_file
 from superdesk.upload import upload_url as _upload_url
+from newsroom.auth import login_required
 
 
 cache_for = 3600 * 24 * 7  # 7 days cache
@@ -13,6 +14,7 @@ blueprint = flask.Blueprint(ASSETS_RESOURCE, __name__)
 
 
 @blueprint.route('/assets/<path:media_id>', methods=['GET'])
+@login_required
 def get_upload(media_id):
     try:
         media_file = flask.current_app.media.get(media_id, ASSETS_RESOURCE)
