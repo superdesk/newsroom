@@ -195,11 +195,19 @@ def reset_password(token):
 
 @blueprint.route('/token/<token_type>', methods=['GET', 'POST'])
 def token(token_type):
+    app_name = app.config['SITE_NAME']
+    contact_address = app.config['CONTACT_ADDRESS']
     form = TokenForm()
     if form.validate_on_submit():
         user = get_resource_service('users').find_one(req=None, email=form.email.data)
-        send_token(user, token_type)
-        flask.flash(gettext('A new reset password token has been sent. Please check your emails'), 'success')
+        token_sent = send_token(user, token_type)
+        if token_sent:
+            flask.flash(gettext('A new reset password token has been sent. Please check your emails'), 'success')
+        else:
+            message = '''Your email is not registered to {},
+            please <a href="{}" target="_blank"
+            rel="noopener noreferrer">contact us</a> for more details.'''.format(app_name, contact_address)
+            flask.flash(gettext(message), 'danger')
         return flask.redirect(flask.url_for('auth.login'))
     return flask.render_template('request_token.html', form=form, token_type=token_type)
 
