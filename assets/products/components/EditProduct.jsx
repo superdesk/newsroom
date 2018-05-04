@@ -20,7 +20,7 @@ class EditProduct extends React.Component {
         this.tabs = [
             {label: gettext('Product'), name: 'product-details'},
             {label: gettext('Companies'), name: 'companies'},
-            {label: gettext('Navigations'), name: 'navigations'}
+            {label: gettext('Navigation'), name: 'navigations'}
         ];
     }
 
