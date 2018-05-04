@@ -182,7 +182,7 @@ class WireSearchService(newsroom.Service):
 
         if req.args.get('q'):
             query['bool']['must'].append(_query_string(req.args['q']))
-            query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
+            # query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
 
         if req.args.get('newsOnly'):
             for f in app.config.get('NEWS_ONLY_FILTERS', []):
