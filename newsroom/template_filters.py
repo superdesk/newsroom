@@ -64,9 +64,16 @@ def newsroom_config():
         'time_format': flask.current_app.config['CLIENT_TIME_FORMAT'],
         'date_format': flask.current_app.config['CLIENT_DATE_FORMAT'],
         'analytics': os.environ.get('GOOGLE_ANALYTICS', 'UA-114768905-1'),
+        'privacy_policy': flask.current_app.config['PRIVACY_POLICY'],
+        'terms_and_conditions': flask.current_app.config['TERMS_AND_CONDITIONS'],
+        'contact_address': flask.current_app.config['CONTACT_ADDRESS'],
     }
 
 
 def hash_string(value):
     """Return SHA256 hash for given string value."""
     return hashlib.sha256(str(value).encode('utf-8')).hexdigest()
+
+
+def get_date():
+    return utcnow()
