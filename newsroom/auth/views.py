@@ -202,7 +202,7 @@ def token(token_type):
         user = get_resource_service('users').find_one(req=None, email=form.email.data)
         token_sent = send_token(user, token_type)
         if token_sent:
-            flask.flash(gettext('A new reset password token has been sent. Please check your emails'), 'success')
+            flask.flash(gettext('A reset password token has been sent to your email address.'), 'success')
         else:
             message = '''Your email is not registered to {},
             please <a href="{}" target="_blank"
