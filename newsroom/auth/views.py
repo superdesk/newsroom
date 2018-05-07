@@ -2,7 +2,7 @@ import flask
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from datetime import timedelta
-from flask import current_app as app
+from flask import current_app as app, abort
 import bcrypt
 from newsroom.auth import blueprint
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
@@ -11,6 +11,7 @@ from newsroom.email import send_validate_account_email, \
 from newsroom.utils import get_random_string
 from bson import ObjectId
 from flask_babel import gettext
+from .token import generate_auth_token, verify_auth_token
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
@@ -137,6 +138,46 @@ def is_current_user(user_id):
     """
     return flask.session['user'] == str(user_id)
 
+
+# this could be rate limited to a specific ip address
+@blueprint.route('/login/token/', methods=['POST'])
+def get_login_token():
+    email = flask.request.form.get('email')
+    password = flask.request.form.get('password')
+
+    if not is_valid_login_attempt(email):
+        abort(401, gettext('Exceeded number of allowed login attempts'))
+
+    user = get_resource_service('auth_user').find_one(req=None, email=email)
+
+    if user is not None and _is_password_valid(password.encode('UTF-8'), user):
+        user = get_resource_service('users').find_one(req=None, _id=user['_id'])
+
+        if not _is_company_enabled(user):
+            abort(401, gettext('Company account has been disabled.'))
+
+        if _is_account_enabled(user):
+            return generate_auth_token(
+                str(user['_id']),
+                '{} {}'.format(user.get('first_name'), user.get('last_name')),
+                user['user_type'])
+        else:
+            abort(401, gettext('Account is disabled.'))
+    else:
+        abort(401, gettext('Invalid username or password.'))
+
+
+@blueprint.route('/login/token/<token>', methods=['GET'])
+def login_with_token(token):
+    data = verify_auth_token(token)
+    if not data:
+        abort(401, gettext('invalid token'))
+
+    flask.session['user'] = data['id']
+    flask.session['name'] = data['name']
+    flask.session['user_type'] = data['user_type']
+    flask.flash('login', 'analytics')
+    return flask.redirect(flask.url_for('wire.index'))
 
 @blueprint.route('/logout')
 def logout():
