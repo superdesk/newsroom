@@ -26,7 +26,9 @@ DOMAIN = {}
 
 X_DOMAINS = '*'
 X_MAX_AGE = 24 * 3600
-X_HEADERS = ['Content-Type', 'Authorization', 'If-Match']
+X_HEADERS = ['Content-Type', 'Accept', 'If-Match', 'Access-Control-Allow-Origin', 'Authorization']
+X_EXPOSE_HEADERS = ['Access-Control-Allow-Origin']
+X_ALLOW_CREDENTIALS = True
 
 URL_PREFIX = 'api'
 

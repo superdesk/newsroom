@@ -6,6 +6,7 @@ install_requires = [
     'flask-webpack>=0.1.0,<0.2',
     'Flask-WTF>=0.14.2,<0.15',
     'flask-limiter>=0.9.5.1,<0.9.6',
+    'Flask-cors>=3.0.4,<3.1',
     'Flask-Cache>=0.13.1,<0.14',
     'honcho>=1.0.1',
     'gunicorn>=19.7.1',
