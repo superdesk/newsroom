@@ -1,6 +1,6 @@
 <footer class="footer" id="footer">
-    <a href="https://www.aap.com.au/legal/" target="_blank">{{ gettext('Privacy Policy') }}</a>
-    <a href="https://www.aap.com.au/legal/" target="_blank">{{ gettext('Terms and Conditions') }}</a>
-    <a href="https://www.aap.com.au/contact/sales-inquiries/" target="_blank">{{ gettext('Contact Us') }}</a>
+    <a href="{{ config.PRIVACY_POLICY }}" target="_blank">{{ gettext('Privacy Policy') }}</a>
+    <a href="{{ config.TERMS_AND_CONDITIONS }}" target="_blank">{{ gettext('Terms and Conditions') }}</a>
+    <a href="{{ config.CONTACT_ADDRESS }}" target="_blank">{{ gettext('Contact Us') }}</a>
     <a href="{{ url_for('public.copyright') }}" target="_blank">{{ gettext('Copyright') }}</a>
 </footer>

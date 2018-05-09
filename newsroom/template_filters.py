@@ -70,3 +70,7 @@ def newsroom_config():
 def hash_string(value):
     """Return SHA256 hash for given string value."""
     return hashlib.sha256(str(value).encode('utf-8')).hexdigest()
+
+
+def get_date():
+    return utcnow()
