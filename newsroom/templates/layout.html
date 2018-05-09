@@ -40,7 +40,7 @@
             <div class="mr-3 d-none d-md-block">{{ get_date() | date_header }}</div>
             <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             <a class="nav-link"
-               href="{{ newsroom_config().contact_address }}"
+               href="{{ config.CONTACT_ADDRESS }}"
                target="_blank">{{ gettext('Contact Us') }}</a>
         </div>
         {% endif %}
