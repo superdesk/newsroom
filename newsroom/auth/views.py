@@ -53,6 +53,9 @@ def is_valid_login_attempt(email):
     It increments the number of attempts and if it exceeds then it disables
     the user account
     """
+    if not email:
+        return False
+
     login_attempt = app.cache.get(email)
 
     if not login_attempt:
@@ -145,6 +148,9 @@ def get_login_token():
     email = flask.request.form.get('email')
     password = flask.request.form.get('password')
 
+    if not email or not password:
+        abort(400)
+
     if not is_valid_login_attempt(email):
         abort(401, gettext('Exceeded number of allowed login attempts'))
 
@@ -169,15 +175,19 @@ def get_login_token():
 
 @blueprint.route('/login/token/<token>', methods=['GET'])
 def login_with_token(token):
+    if not token:
+        abort(401, gettext('Invalid token'))
+
     data = verify_auth_token(token)
     if not data:
-        abort(401, gettext('invalid token'))
+        abort(401, gettext('Invalid token'))
 
     flask.session['user'] = data['id']
     flask.session['name'] = data['name']
     flask.session['user_type'] = data['user_type']
     flask.flash('login', 'analytics')
     return flask.redirect(flask.url_for('wire.index'))
+
 
 @blueprint.route('/logout')
 def logout():
