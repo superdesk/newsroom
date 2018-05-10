@@ -3,6 +3,8 @@ from flask import url_for
 from bson import ObjectId
 from pytest import fixture
 from superdesk import get_resource_service
+
+from newsroom.auth.token import verify_auth_token
 from tests.test_users import init as users_init
 
 
@@ -313,3 +315,38 @@ def test_login_with_remember_me_selected_creates_permanent_session(app, client):
 
     with client.session_transaction() as session:
         assert session.permanent is True
+
+
+def test_login_token_fails_for_wrong_username_or_password(client):
+    response = client.post(
+        url_for('auth.get_login_token'),
+        data={'email': 'xyz@abc.org', 'password': 'abc'}
+    )
+    assert 'Invalid username or password' in response.get_data(as_text=True)
+
+
+def test_login_token_succeeds_for_correct_username_or_password(client):
+    response = client.post(
+        url_for('auth.get_login_token'),
+        data={'email': 'admin@sourcefabric.org', 'password': 'admin'}
+    )
+    token = response.get_data(as_text=True)
+    data = verify_auth_token(token)
+    assert data['name'] == 'admin admin'
+
+
+def test_login_with_token_fails_for_wrong_token(client):
+    response = client.get('/login/token/1234')
+    assert 'Invalid token' in response.get_data(as_text=True)
+
+
+def test_login_with_token_succeeds_for_correct_token(client):
+    response = client.post(
+        url_for('auth.get_login_token'),
+        data={'email': 'admin@sourcefabric.org', 'password': 'admin'}
+    )
+    token = response.get_data(as_text=True)
+    client.get('/login/token/{}'.format(token), follow_redirects=True)
+
+    with client.session_transaction() as session:
+        assert session['user_type'] == 'administrator'
