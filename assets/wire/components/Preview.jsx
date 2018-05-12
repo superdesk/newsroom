@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { gettext, fullDate, formatHTML } from 'utils';
-import { getPicture, getPreviewRendition, showItemVersions, getCaption, isEqualItem } from 'wire/utils';
+import { getPicture, getPreviewRendition, showItemVersions, getCaption, isEqualItem, isKilled } from 'wire/utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from './PreviewActionButtons';
 import PreviewTags from './PreviewTags';
@@ -67,7 +67,7 @@ class Preview extends React.PureComponent {
                             )}
                         </p>
                     )}
-                    {getPreviewRendition(picture) && (
+                    {getPreviewRendition(picture) && !isKilled(item) && (
                         <figure className='wire-column__preview__image'>
                             <img src={getPreviewRendition(picture).href} />
                             <figcaption className='wire-column__preview__caption'>{getCaption(picture)}</figcaption>

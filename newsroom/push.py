@@ -13,7 +13,8 @@ from superdesk.text_utils import get_word_count
 from newsroom.notifications import push_notification
 from newsroom.topics.topics import get_notification_topics
 from newsroom.utils import query_resource, parse_dates
-from newsroom.email import send_new_item_notification_email, send_history_match_notification_email
+from newsroom.email import send_new_item_notification_email, \
+    send_history_match_notification_email, send_item_killed_notification_email
 from newsroom.history import get_history_users
 from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
 from newsroom.upload import ASSETS_RESOURCE
@@ -95,7 +96,7 @@ def push():
 
 
 def notify_new_item(item, check_topics=True):
-    if item.get('pubstatus') == 'canceled' or item.get('type') == 'composite':
+    if item.get('type') == 'composite':
         return
 
     lookup = {'is_enabled': True}
@@ -141,8 +142,11 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
 def send_user_notification_emails(item, user_matches, users):
     for user_id in user_matches:
         user = users.get(str(user_id))
-        if user.get('receive_email'):
-            send_history_match_notification_email(user, item=item)
+        if item.get('pubstatus') == 'canceled':
+            send_item_killed_notification_email(user, item=item)
+        else:
+            if user.get('receive_email'):
+                send_history_match_notification_email(user, item=item)
 
 
 def notify_topic_matches(item, users_dict, companies_dict):

@@ -109,3 +109,12 @@ def send_history_match_notification_email(user, item):
         url=url)
 
     send_email(to=recipients, subject=subject, text_body=text_body)
+
+
+def send_item_killed_notification_email(user, item):
+    formatter = current_app.download_formatters['text']['formatter']
+    recipients = [user['email']]
+    subject = gettext('Kill/Takedown notice')
+    text_body = formatter.format_item(item)
+
+    send_email(to=recipients, subject=subject, text_body=text_body)
