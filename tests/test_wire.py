@@ -112,11 +112,11 @@ def test_search_filters_items_with_updates(client, app):
     assert 'tag:weather' not in [item['_id'] for item in data['_items']]
 
 
-def test_search_filters_killed_items(client, app):
+def test_search_includes_killed_items(client, app):
     app.data.insert('items', [{'_id': 'foo', 'pubstatus': 'canceled', 'headline': 'killed'}])
     resp = client.get('/search?q=headline:killed')
     data = json.loads(resp.get_data())
-    assert 0 == len(data['_items'])
+    assert 1 == len(data['_items'])
 
 
 def test_search_by_products_id(client, app):

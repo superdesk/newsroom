@@ -273,6 +273,51 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     assert notification['item'] == 'bar'
 
 
+def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
+    company_ids = app.data.insert('companies', [{
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
+    user = {
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': False,  # should still get email
+        'company': company_ids[0],
+    }
+
+    user_ids = app.data.insert('users', [user])
+    user['_id'] = user_ids[0]
+
+    app.data.insert('history', docs=[{
+        'version': '1',
+        '_id': 'bar',
+    }], action='download', user=user)
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+    data = json.dumps({
+        'guid': 'bar',
+        'type': 'text',
+        'headline': 'Kill Notice',
+        'slugline': 'Court',
+        'description_html': 'This story is killed',
+        'body_html': 'Killed story',
+        'pubstatus': 'canceled'})
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+
+    with app.mail.record_messages() as outbox:
+        resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+        assert 200 == resp.status_code
+        assert push_mock.call_args[1]['item']['_id'] == 'bar'
+        assert len(push_mock.call_args[1]['users']) == 1
+    assert len(outbox) == 1
+    notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+    assert notification['item'] == 'bar'
+
+
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
