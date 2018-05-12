@@ -110,7 +110,10 @@ class WireApp extends React.Component {
         this.elemClose && $(this.elemClose).tooltip('dispose');
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(nextProps) {
+        if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery)) {
+            this.elemList.scrollTop = 0;
+        }
         this.componentDidMount();
     }
 
@@ -187,7 +190,7 @@ class WireApp extends React.Component {
                                 />
                             }
                         </div>
-                        <div className={mainClassName} onScroll={this.onListScroll}>
+                        <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
                             <SearchResultsInfo
                                 user={this.props.user}
                                 query={this.props.activeQuery}
