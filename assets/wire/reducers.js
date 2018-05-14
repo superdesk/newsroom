@@ -227,7 +227,7 @@ export default function wireReducer(state = initialState, action) {
 
 
     case SET_QUERY:
-        return {...state, query: action.query};
+        return {...state, query: action.query, activeItem: null};
 
     case QUERY_ITEMS:
         return {...state, isLoading: true, totalItems: null, activeQuery: state.query};
