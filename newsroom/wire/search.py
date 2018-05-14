@@ -183,7 +183,7 @@ class WireSearchService(newsroom.Service):
         if req.args.get('q'):
             query['bool']['must'].append(_query_string(req.args['q']))
 
-        if req.args.get('newsOnly'):
+        if req.args.get('newsOnly') and not req.args.get('navigation'):
             for f in app.config.get('NEWS_ONLY_FILTERS', []):
                 query['bool']['must_not'].append(f)
 
