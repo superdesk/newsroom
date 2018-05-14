@@ -182,7 +182,6 @@ class WireSearchService(newsroom.Service):
 
         if req.args.get('q'):
             query['bool']['must'].append(_query_string(req.args['q']))
-            query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
 
         if req.args.get('newsOnly'):
             for f in app.config.get('NEWS_ONLY_FILTERS', []):
@@ -243,7 +242,6 @@ class WireSearchService(newsroom.Service):
             query['bool']['should'].append(_query_string(product['query']))
 
         query['bool']['minimum_should_match'] = 1
-        query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
@@ -269,7 +267,6 @@ class WireSearchService(newsroom.Service):
                 'must_not': [
                     {'term': {'type': 'composite'}},
                     {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
-                    {'term': {'pubstatus': 'canceled'}}
                 ],
                 'must': [
                     {'term': {'_id': item_id}}
@@ -347,7 +344,6 @@ class WireSearchService(newsroom.Service):
                 'bool': {
                     'must_not': [
                         {'term': {'type': 'composite'}},
-                        {'term': {'pubstatus': 'canceled'}}
                     ],
                     'must': [
                         {'terms': {'_id': item_ids}}
@@ -364,7 +360,7 @@ class WireSearchService(newsroom.Service):
             return super().get(req, None)
 
         except Exception as exc:
-            logger.error('Error in get_matching_bookmarks for query: {}'.format(json.dumps(source)),
+            logger.error('Error in get_items for query: {}'.format(json.dumps(source)),
                          exc, exc_info=True)
 
     def get_matching_bookmarks(self, item_ids, active_users, active_companies):

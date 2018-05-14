@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { gettext, shortDate, fullDate, wordCount } from 'utils';
-import { getPicture, getThumbnailRendition, showItemVersions, shortText } from 'wire/utils';
+import { getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled } from 'wire/utils';
 
 import ActionList from 'components/ActionList';
 import ActionButton from 'components/ActionButton';
@@ -120,7 +120,7 @@ class WireListItem extends React.Component {
                         )}
                     </div>
 
-                    {isExtended && getThumbnailRendition(picture) && (
+                    {isExtended && !isKilled(item) && getThumbnailRendition(picture) && (
                         <div className="wire-articles__item-image">
                             <figure>
                                 <img src={getThumbnailRendition(picture).href} />
