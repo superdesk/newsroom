@@ -174,15 +174,15 @@ def test_create_new_user_succeeds(app, client):
 
     # change the password
     response = client.post(url_for('auth.reset_password', token=user['token']), data={
-        'new_password': 'abc',
-        'new_password2': 'abc',
+        'new_password': 'abc123def',
+        'new_password2': 'abc123def',
     })
     assert response.status_code == 302
 
     # Login with the new account succeeds
     response = client.post(
         url_for('auth.login'),
-        data={'email': 'newuser@abc.org', 'password': 'abc'},
+        data={'email': 'newuser@abc.org', 'password': 'abc123def'},
         follow_redirects=True
     )
     assert response.status_code == 200
