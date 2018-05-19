@@ -15,6 +15,11 @@ def init(app):
         '_id': 1,
         'name': 'Press co.',
         'is_enabled': False,
+    }, {
+        '_id': 2,
+        'name': 'Company co.',
+        'is_enabled': True,
+        'expiry_date': datetime.datetime.now() - datetime.timedelta(days=5),
     }])
 
 
@@ -103,6 +108,29 @@ def test_login_fails_for_user_with_disabled_company(app, client):
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',
         'company': 1,
+        'is_validated': True,
+        'is_enabled': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+
+    response = client.post(
+        url_for('auth.login'),
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+    assert 'Company account has been disabled' in response.get_data(as_text=True)
+
+
+def test_login_fails_for_user_with_expired_company(app, client):
+    # Register a new account
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'test',
+        'last_name': 'test',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'company': 2,
         'is_validated': True,
         'is_enabled': True,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),

@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 import flask
 from bson import ObjectId
@@ -9,7 +10,6 @@ from werkzeug.exceptions import NotFound
 
 from newsroom.auth.decorator import admin_only, login_required
 from newsroom.companies import blueprint
-from newsroom.companies.forms import CompanyForm
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400
 
 
@@ -38,12 +38,40 @@ def search():
 @blueprint.route('/companies/new', methods=['POST'])
 @admin_only
 def create():
-    form = CompanyForm()
-    if form.validate():
-        new_company = form.data
-        ids = get_resource_service('companies').post([new_company])
-        return jsonify({'success': True, '_id': ids[0]}), 201
-    return jsonify(form.errors), 400
+    company = get_json_or_400()
+    validate_company(company)
+    new_company = get_company_updates(company)
+    ids = get_resource_service('companies').post([new_company])
+    return jsonify({'success': True, '_id': ids[0]}), 201
+
+
+def validate_company(company):
+    if not company.get('name'):
+        return jsonify({'name': gettext('Name not found')}), 400
+
+    if company.get('expiry_date'):
+        try:
+            datetime.strptime(company.get('expiry_date'), '%Y-%m-%d')
+        except ValueError:
+            return jsonify({'expiry_date': gettext('Wrong date format')}), 400
+
+
+def get_company_updates(company):
+    updates = {
+        'name': company.get('name'),
+        'url': company.get('url'),
+        'sd_subscriber_id': company.get('sd_subscriber_id'),
+        'contact_name': company.get('contact_name'),
+        'contact_email': company.get('contact_email'),
+        'phone': company.get('phone'),
+        'country': company.get('country'),
+        'is_enabled': company.get('is_enabled'),
+    }
+
+    if company.get('expiry_date'):
+        updates['expiry_date'] = datetime.strptime(company.get('expiry_date'), '%Y-%m-%d')
+
+    return updates
 
 
 @blueprint.route('/companies/<id>', methods=['GET', 'POST'])
@@ -55,12 +83,13 @@ def edit(id):
         return NotFound(gettext('Company not found'))
 
     if flask.request.method == 'POST':
-        form = CompanyForm(company=company)
-        if form.validate():
-            get_resource_service('companies').patch(id=ObjectId(id),
-                                                    updates=form.data)
-            return jsonify({'success': True}), 200
-        return jsonify(form.errors), 400
+        company = get_json_or_400()
+        validate_company(company)
+        updates = get_company_updates(company)
+
+        get_resource_service('companies').patch(id=ObjectId(id), updates=updates)
+        return jsonify({'success': True}), 200
+    return jsonify(company), 200
 
 
 @blueprint.route('/companies/<id>', methods=['DELETE'])

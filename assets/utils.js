@@ -103,6 +103,17 @@ export function shortDate(dateString) {
 }
 
 /**
+ * Return date formatted for date inputs
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function getDateInputDate(dateString) {
+    const parsed = parseDate(dateString);
+    return parsed.format('YYYY-MM-DD');
+}
+
+/**
  * Return locale date
  *
  * @param {String} dateString

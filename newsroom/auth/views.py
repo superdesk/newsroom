@@ -1,4 +1,5 @@
 import flask
+from datetime import datetime
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from datetime import timedelta
@@ -110,7 +111,14 @@ def _is_company_enabled(user):
     if not company:
         return False
 
-    return company.get('is_enabled', False)
+    return company.get('is_enabled', False) and not _is_company_expired(company)
+
+
+def _is_company_expired(company):
+    expiry_date = company.get('expiry_date')
+    if not expiry_date:
+        return False
+    return expiry_date.replace(tzinfo=None) <= datetime.utcnow().replace(tzinfo=None)
 
 
 def _is_account_enabled(user):

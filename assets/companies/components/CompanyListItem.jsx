@@ -15,6 +15,7 @@ function CompanyListItem({company, isActive, onClick}) {
             <td>{company.phone}</td>
             <td>{company.country}</td>
             <td>{shortDate(company._created)}</td>
+            <td>{company.expiry_date && shortDate(company.expiry_date)}</td>
         </tr>
     );
 }

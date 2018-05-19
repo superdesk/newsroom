@@ -13,13 +13,13 @@ def init(app):
 def test_delete_company_deletes_company_and_users(client):
     test_login_succeeds_for_admin(client)
     # Register a new company
-    response = client.post('/companies/new', data={
+    response = client.post('/companies/new', data=json.dumps({
         'phone': '2132132134',
         'sd_subscriber_id': '12345',
         'name': 'Press Co.',
         'is_enabled': True,
         'contact_name': 'Tom'
-    })
+    }), content_type='application/json')
 
     assert response.status_code == 201
     company = get_resource_service('companies').find_one(req=None, name='Press Co.')
@@ -47,7 +47,7 @@ def test_delete_company_deletes_company_and_users(client):
 
 def test_get_company_users(client):
     test_login_succeeds_for_admin(client)
-    resp = client.post('companies/new', data={'name': 'Test'})
+    resp = client.post('companies/new', data=json.dumps({'name': 'Test'}), content_type='application/json')
     company_id = json.loads(resp.get_data()).get('_id')
     assert company_id
     resp = client.post('users/new', data={

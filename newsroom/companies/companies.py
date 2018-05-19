@@ -36,6 +36,11 @@ class CompaniesResource(newsroom.Resource):
         'country': {
             'type': 'string'
         },
+        'expiry_date': {
+            'type': 'datetime',
+            'nullable': True,
+            'required': False,
+        },
     }
     datasource = {
         'source': 'companies',
