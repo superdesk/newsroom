@@ -44,7 +44,7 @@ const getEventPanel = (event, index) => {
     };
 
     return (<div className='col-sm-12 col-lg-6 d-flex mb-4' key={index}>
-        <div className='card card--home'>
+        <div className='card card--home no-hover'>
             {event.file_url && <img className='card-img-top' src={event.file_url} alt={event.headline} />}
             <div className='card-body card-body--two-columns card-body--green-border'>
                 <div className='card-body__sidebar'>

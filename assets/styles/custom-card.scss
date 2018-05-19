@@ -24,6 +24,10 @@
             box-shadow: 0px 1px 9px rgba(0, 0, 0, 0.4);
             cursor: pointer;
         }
+
+        &.no-hover {
+            pointer-events: none;
+        }
         
         h1.card-title { font-size: 3.125rem; font-weight: 900; line-height: 1.4; }
         h2.card-title { font-size: 1.625rem; font-weight: 900; line-height: 1.4; }
