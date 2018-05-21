@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
+import DateInput from 'components/DateInput';
 
-import { gettext, shortDate } from 'utils';
+import { gettext, shortDate, getDateInputDate } from 'utils';
 import EditPanel from 'components/EditPanel';
 
 const countries = [
@@ -129,13 +130,21 @@ class EditCompany extends React.Component {
                                         value={this.props.company.contact_email}
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.contact_email : null}/>
+
                                     <SelectInput
                                         name='country'
                                         label={gettext('Country')}
                                         value={this.props.company.country}
                                         options={countries}
                                         onChange={this.props.onChange}
-                                        error={this.props.errors ? this.props.errors.user_type : null}/>
+                                        error={this.props.errors ? this.props.errors.country : null}/>
+
+                                    <DateInput
+                                        name={'expiry_date'}
+                                        label={gettext('Expiry Date')}
+                                        value={getDateInputDate(this.props.company.expiry_date)}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.expiry_date : null}/>
 
                                     <CheckboxInput
                                         name='is_enabled'

@@ -26,6 +26,7 @@ function CompanyList({companies, onClick, activeCompanyId}) {
                             <th>{ gettext('Telephone') }</th>
                             <th>{ gettext('Country') }</th>
                             <th>{ gettext('Created On') }</th>
+                            <th>{ gettext('Expires On') }</th>
                         </tr>
                     </thead>
                     <tbody>{list}</tbody>
