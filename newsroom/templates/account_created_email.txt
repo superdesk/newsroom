@@ -1,5 +1,6 @@
 {{name}},
 
+
 An {{app_name}} account has been created for you.
 In order to access your account, please visit {{url}} and complete your registration.
 
@@ -7,11 +8,5 @@ This link will expire after {{expires}} hours.
 
 If you believe the {{app_name}} account was created in error, please ignore this email.
 
-Regards,
-The {{app_name}} Team
 
-{{app_name}} is developed by Sourcefabric and the {{app_name}} community.
-
-http://sourcefabric.org
-
-
+{% include "email_footer.txt" %}
