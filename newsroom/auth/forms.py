@@ -35,7 +35,10 @@ class TokenForm(FlaskForm):
 
 
 class ResetPasswordForm(FlaskForm):
-    match_password2 = [DataRequired(), EqualTo('new_password2', message=gettext('Passwords must match.'))]
+    match_password2 = [
+        DataRequired(),
+        Length(min=8),
+        EqualTo('new_password2', message=gettext('Passwords must match.'))]
     old_password = PasswordField(gettext('Old password'), validators=[])
     new_password = PasswordField(gettext('New password'), validators=match_password2)
     new_password2 = PasswordField(gettext('Confirm new password'), validators=[DataRequired()])
