@@ -9,6 +9,18 @@ $('.content-main').scroll(function() {
     var imgPos = scrollTop / 2 + 'px';
     $('.carousel-item').css('background-position', '50% ' + imgPos);
     $('.carousel-caption').css('opacity', 1 - scrollTop / 400);
+
+});
+
+// Content navbar scroll
+$('.wire-articles--list').scroll(function() {
+    var articles_scrollTop = $('.wire-articles--list').scrollTop();
+    if( articles_scrollTop>10 ) {
+        $('.wire-column__main-header').addClass('wire-column__main-header--small');
+    }
+    else {
+        $('.wire-column__main-header').removeClass('wire-column__main-header--small');
+    }
 });
 
 
