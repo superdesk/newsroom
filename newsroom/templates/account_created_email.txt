@@ -1,15 +1,10 @@
-Hi {{name}},
+{% extends "email_layout.txt" %}
 
-Someone created for you a {{app_name}} user account.
-Please go to {{url}} and complete your registration.
+{% block content %}
+An {{app_name}} account has been created for you.
+In order to access your account, please visit {{url}} and complete your registration.
 
-This link expires after {{expires}} hour(s).
+This link will expire after {{expires}} hours.
 
-Please ignore this email if you think your {{app_name}} account was created in error.
-
-Thanks,
-The {{app_name}} Team
-
-{{app_name}} is developed by Sourcefabric and the {{app_name}} community.
-
-http://sourcefabric.org
+If you believe the {{app_name}} account was created in error, please ignore this email.
+{% endblock %}
