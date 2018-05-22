@@ -869,30 +869,35 @@ article.list {
 
 .search-results-info {
     font-size: 0.875rem; // 14px
-    line-height: 1.4;
+    line-height: 1.2;
     display: flex;
     margin-right: 20px;
     width: 100%;
-    min-height: 48px;
+    min-height: 28px;
+    padding-bottom: 0;
+    padding-top: 0;
     @include md {
         margin-right: 40px;
-        width: auto;        
+        width: auto;
+        padding-top: 0.3rem;
+        min-height: 48px;
     }
 }
 
 .search-results-info__num {
     font-size: 2rem; // 32px
     font-weight: 300;
-    line-height: 1em;
+    line-height: 1.4;
     margin-right: 10px;
-    margin-bottom: 6px;
+    transition: all 0.2s ease;
     @include lg {
         margin-bottom: 0;
-}
+    }
 }
 
 .search-results-info__text {
     color: #6e6e6e;
+    margin-top: 6px;
     b {
         color: $body-text;
     }
@@ -1052,6 +1057,8 @@ article.list {
 }
 
 .wire-column__main {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
     flex-shrink: 1;
     width: 50%;
@@ -1062,6 +1069,39 @@ article.list {
 
 .wire-column__main--left-margin {
     margin-left: 260px;
+}
+.wire-column__main-header {
+    flex-shrink: 0;
+    height: 76px;
+    transition: all .2s ease;
+    z-index: 10;
+    
+    &--small {
+        background: white;
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+        height: 66px;
+        padding-bottom: 6px;
+        
+        @include lg {
+            height: 46px;
+            padding-bottom: 0;
+        }
+
+        .btn-sm {
+            padding: 0.1875rem 0.75rem;
+            transition: padding .2s ease-out;
+        }
+        .search-results-info__num {
+            font-size: 1.625rem;
+            transition: all .2s ease;
+            margin-top: 3px;
+        }
+        .search-results-info {
+            line-height: 1;
+            transition: all .2s ease;
+        }
+    }
+
 }
 
 .flex-grid__item {
@@ -1164,7 +1204,7 @@ article.list {
 }
 
 .wire-articles--list {
-
+    overflow: auto;
 }
 
 .wire-articles__item--list {
@@ -1468,6 +1508,7 @@ article.list {
     }
     .search-results-info {
         margin-right: 10px;
+        transition: all .2s ease;
         @include xl {
             margin-right: 20px;
         }

@@ -139,22 +139,27 @@
         </div>
     </div>
 
-    <div class="wire-column__main container-fluid">
+    <div class="wire-column__main">
 
-        <div class="d-flex mt-1 mt-sm-2 px-2 align-items-center flex-wrap flex-sm-nowrap">
+        <div class="wire-column__main-header d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap">
             <div class="navbar-text search-results-info">
                 <span class="search-results-info__num">147</span>
                 <span class="search-results-info__text">search results for:<br><b>search</b></span>
             </div>
 
-            <button class="btn btn-outline-primary btn-sm">Save as topic</button>            
-            <button type="button" class="button__reset-styles d-flex align-items-center ml-auto">
-                <i class="icon--refresh icon--pink"></i>
-                <span class="badge badge-pill badge-info badge-secondary ml-2">21</span>
-            </button>
+            <button class="btn btn-outline-primary btn-sm">Save as topic</button>
+            <div class="d-flex align-items-center ml-auto">
+                    <button type="button" class="button__reset-styles d-flex align-items-center ml-auto">
+                            <i class="icon--refresh icon--pink"></i>
+                            <span class="badge badge-pill badge-info badge-secondary ml-2">21</span>
+                        </button>
+                <div class="d-flex align-items-center">
+                    <label for="news-only" class="mr-2">News only</label>
+                </div>
+            </div>
         </div>
 
-        <div class="wire-articles wire-articles--list row">
+        <div class="wire-articles wire-articles--list row m-0 pt-1">
 
             <article class="wire-articles__item-wrap col-12">
                 <div class="wire-articles__item wire-articles__item--list">
