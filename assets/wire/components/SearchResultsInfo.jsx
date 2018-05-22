@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Toggle from 'react-toggle';
+import classNames from 'classnames';
 import 'react-toggle/style.css';
 
 import { isEmpty } from 'lodash';
@@ -31,7 +32,10 @@ class SearchResultsInfo extends React.Component {
         const isFollowing = this.props.user && this.props.activeTopic;
         const displayTotalItems = this.props.bookmarks || !isEmpty(this.props.searchCriteria) || this.props.activeTopic;
         return (
-            <div className="d-flex mt-1 mt-sm-3 px-3 align-items-center flex-wrap flex-sm-nowrap">
+            <div className={classNames(
+                'wire-column__main-header d-flex mt-0 px-3 align-items-center flex-wrap flex-sm-nowrap',
+                this.props.scrollClass
+            )}>
                 <div className="navbar-text search-results-info">
                     {displayTotalItems && <span className="search-results-info__num">{this.props.totalItems}</span>}
                     {this.props.query && (
@@ -67,7 +71,7 @@ class SearchResultsInfo extends React.Component {
                 type="button"
                 ref={(elem) => this.elem = elem}
                 title={gettext('New stories available to load')}
-                className="button__reset-styles d-flex align-items-center ml-3"
+                className="button__reset-styles d-flex align-items-center ml-auto"
                 onClick={this.props.refresh}>
                 <i className="icon--refresh icon--pink"/>
                 <span className="badge badge-pill badge-info badge-secondary ml-2">{this.props.newItems.length}</span>
@@ -92,6 +96,7 @@ SearchResultsInfo.propTypes = {
     toggleNews: PropTypes.func,
     activeNavigation: PropTypes.string,
     newsOnly: PropTypes.bool,
+    scrollClass: PropTypes.string,
 };
 
 export default SearchResultsInfo;

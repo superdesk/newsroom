@@ -47,6 +47,7 @@ class WireApp extends React.Component {
         super(props);
         this.state = {
             withSidebar: false,
+            scrollClass: '',
         };
         this.toggleSidebar = this.toggleSidebar.bind(this);
         this.onListScroll = this.onListScroll.bind(this);
@@ -88,6 +89,13 @@ class WireApp extends React.Component {
             this.props.fetchMoreItems()
                 .catch(() => null); // ignore
         }
+
+        if(container.scrollTop > BUFFER) {
+            this.setState({ scrollClass: 'wire-column__main-header--small'});
+        }
+        else {
+            this.setState({ scrollClass: ''});
+        }
     }
 
     filterActions(item) {
@@ -125,7 +133,7 @@ class WireApp extends React.Component {
         const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
             this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
-        const mainClassName = classNames('wire-column__main container-fluid', {
+        const mainClassName = classNames('wire-column__main', {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,
         });
@@ -204,6 +212,7 @@ class WireApp extends React.Component {
                                 toggleNews={this.props.toggleNews}
                                 activeNavigation={this.props.activeNavigation}
                                 newsOnly={this.props.newsOnly}
+                                scrollClass={this.state.scrollClass}
                             />
 
                             <ItemsList
