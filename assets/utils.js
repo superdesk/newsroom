@@ -109,8 +109,12 @@ export function shortDate(dateString) {
  * @return {String}
  */
 export function getDateInputDate(dateString) {
-    const parsed = parseDate(dateString);
-    return parsed.format('YYYY-MM-DD');
+    if (dateString) {
+        const parsed = parseDate(dateString);
+        return parsed.format('YYYY-MM-DD');
+    }
+
+    return '';
 }
 
 /**
