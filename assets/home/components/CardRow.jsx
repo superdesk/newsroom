@@ -10,7 +10,7 @@ class CardRow extends React.Component {
 
     componentDidMount() {
         if (this.props.isActive) {
-            this.cardElem.scrollIntoView();
+            this.cardElem.scrollIntoView({behavior: 'instant', block: 'end', inline: 'nearest'});
         }
     }
 
