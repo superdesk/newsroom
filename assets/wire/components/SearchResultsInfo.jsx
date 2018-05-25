@@ -71,7 +71,7 @@ class SearchResultsInfo extends React.Component {
                 type="button"
                 ref={(elem) => this.elem = elem}
                 title={gettext('New stories available to load')}
-                className="button__reset-styles d-flex align-items-center ml-auto"
+                className="button__reset-styles d-flex align-items-center ml-3"
                 onClick={this.props.refresh}>
                 <i className="icon--refresh icon--pink"/>
                 <span className="badge badge-pill badge-info badge-secondary ml-2">{this.props.newItems.length}</span>
