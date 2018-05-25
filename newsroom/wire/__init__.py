@@ -13,10 +13,6 @@ from . import views  # noqa
 
 def init_app(app):
     app.config['DOMAIN']['items']['schema'].update({
-        'word_count': {'type': 'integer'},
-    })
-
-    app.config['DOMAIN']['items']['schema'].update({
         'products': {
             'type': 'list',
             'mapping': {

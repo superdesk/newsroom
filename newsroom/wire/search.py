@@ -64,7 +64,7 @@ class WireSearchResource(newsroom.Resource):
             'versioncreated': 1,
             'nextversion': 1,
             'ancestors': 1,
-            'word_count': 1,
+            'wordcount': 1,
         },
     }
 

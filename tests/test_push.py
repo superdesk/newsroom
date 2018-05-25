@@ -490,7 +490,7 @@ def test_push_parsed_item(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'wire_search')
     assert type(parsed['firstcreated']) == datetime
-    assert 2 == parsed['word_count']
+    assert 2 == parsed['wordcount']
 
 
 def test_push_parsed_dates(client, app):
