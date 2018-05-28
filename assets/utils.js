@@ -223,8 +223,8 @@ export function getTextFromHtml(html) {
  * @return {number}
  */
 export function wordCount(item) {
-    if (isInteger(item.word_count)) {
-        return item.word_count;
+    if (isInteger(item.wordcount)) {
+        return item.wordcount;
     }
 
     if (!item.body_html) {

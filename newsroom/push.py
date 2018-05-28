@@ -58,7 +58,7 @@ def publish_item(doc):
     doc.setdefault('firstcreated', now)
     doc.setdefault('versioncreated', now)
     doc.setdefault(app.config['VERSION'], 1)
-    doc.setdefault('word_count', get_word_count(doc.get('body_html', '')))
+    doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
     service = superdesk.get_resource_service('content_api')
     if 'evolvedfrom' in doc:
         parent_item = service.find_one(req=None, _id=doc['evolvedfrom'])
