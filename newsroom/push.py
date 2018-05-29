@@ -93,11 +93,27 @@ def push():
     item = flask.json.loads(flask.request.get_data())
     assert 'guid' in item, {'guid': 1}
     assert 'type' in item, {'type': 1}
+
+    if item.get('type') == 'event':
+        push_event(item)
+
     orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
     item['_id'] = publish_item(item)
     notify_new_item(item, check_topics=orig is None)
     app.cache.delete(HOME_ITEMS_CACHE_KEY)
     return flask.jsonify({})
+
+
+def push_event(event):
+    orig = app.data.find_one('wire_search', req=None, _id=event['guid'])
+    now = utcnow()
+    parse_dates(event)
+    event.setdefault('firstcreated', now)
+    event.setdefault('versioncreated', now)
+    event.setdefault(app.config['VERSION'], 1)
+    service = superdesk.get_resource_service('events')
+    _id = service.create([event])[0]
+    return _id
 
 
 def notify_new_item(item, check_topics=True):

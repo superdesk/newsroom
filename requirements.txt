@@ -1,1 +1,2 @@
 -e .
+git+git://github.com/superdesk/superdesk-planning.git@master#egg=superdesk-planning
