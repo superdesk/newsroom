@@ -88,10 +88,10 @@ class WireListItem extends React.Component {
 
                         {isExtended && (
                             <div className='wire-articles__item__meta'>
-                                <WireListItemIcons item={item} picture={picture} divider={true} />
+                                <WireListItemIcons item={item} picture={picture} />
                                 <div className='wire-articles__item__meta-info'>
                                     <span className='bold'>{this.slugline}</span>
-                                    <span>{gettext('Source: {{ source }}', {source: item.source})}
+                                    <span>{gettext('{{ source }}', {source: item.source})}
                                         {' // '}<span>{this.wordCount}</span> {gettext('words')}
                                         {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
                                     </span>
