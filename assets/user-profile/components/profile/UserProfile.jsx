@@ -73,6 +73,15 @@ class UserProfile extends React.Component {
                                     error={errors ? errors.last_name : null} />
                             </div>
 
+                            <div className="col-lg-6">
+                                <TextInput
+                                    name='email'
+                                    label={gettext('Email')}
+                                    value={user.email}
+                                    readOnly
+                                />
+                            </div>
+
                             <div className="col-lg-12">
                                 <TextInput
                                     name='phone'
