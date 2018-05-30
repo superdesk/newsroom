@@ -1,5 +1,5 @@
 from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
-from flask import current_app, render_template
+from flask import current_app, render_template, url_for
 from flask_babel import gettext
 
 
@@ -26,7 +26,7 @@ def send_email(to, subject, text_body, html_body=None, sender=None, connection=N
 
 def send_new_signup_email(user):
     app_name = current_app.config['SITE_NAME']
-    url = '{}/settings'.format(current_app.config['CLIENT_URL'])
+    url = url_for('users.settings', _external=True)
     recipients = current_app.config['SIGNUP_EMAIL_RECIPIENTS'].split(',')
     subject = gettext('A new newsroom signup request')
     text_body = render_template(
@@ -47,7 +47,7 @@ def send_validate_account_email(user_name, user_email, token):
     :return:
     """
     app_name = current_app.config['SITE_NAME']
-    url = '{}/validate/{}'.format(current_app.config['CLIENT_URL'], token)
+    url = url_for('auth.validate_account', token=token, _external=True)
     hours = current_app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'] * 24
 
     subject = gettext('{} account created'.format(app_name))
@@ -66,7 +66,7 @@ def send_reset_password_email(user_name, user_email, token):
     :return:
     """
     app_name = current_app.config['SITE_NAME']
-    url = '{}/reset_password/{}'.format(current_app.config['CLIENT_URL'], token)
+    url = url_for('auth.reset_password', token=token, _external=True)
     hours = current_app.config['RESET_PASSWORD_TOKEN_TIME_TO_LIVE'] * 24
 
     subject = gettext('{} password reset'.format(app_name))
@@ -80,7 +80,7 @@ def send_reset_password_email(user_name, user_email, token):
 
 def send_new_item_notification_email(user, topic_name, item):
     app_name = current_app.config['SITE_NAME']
-    url = '{}/item/{}'.format(current_app.config['CLIENT_URL'], item['guid'])
+    url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
     subject = gettext('New story for followed topic: {}'.format(topic_name))
     text_body = render_template(
@@ -97,7 +97,7 @@ def send_new_item_notification_email(user, topic_name, item):
 
 def send_history_match_notification_email(user, item):
     app_name = current_app.config['SITE_NAME']
-    url = '{}/item/{}'.format(current_app.config['CLIENT_URL'], item['guid'])
+    url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
     subject = gettext('New update for your previously accessed story: {}'.format(item['headline']))
     text_body = render_template(
