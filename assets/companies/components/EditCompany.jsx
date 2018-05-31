@@ -5,7 +5,7 @@ import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 import DateInput from 'components/DateInput';
 
-import { gettext, shortDate, getDateInputDate } from 'utils';
+import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
 import EditPanel from 'components/EditPanel';
 
 const countries = [
@@ -147,6 +147,7 @@ class EditCompany extends React.Component {
                                         error={this.props.errors ? this.props.errors.expiry_date : null}/>
 
                                     <CheckboxInput
+                                        labelClass={isInPast(this.props.company.expiry_date) ? 'text-danger' : ''}
                                         name='is_enabled'
                                         label={gettext('Enabled')}
                                         value={this.props.company.is_enabled}

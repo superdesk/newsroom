@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate } from 'utils';
+import { gettext, shortDate, isInPast } from 'utils';
 
 
 function CompanyListItem({company, isActive, onClick}) {
@@ -10,7 +10,9 @@ function CompanyListItem({company, isActive, onClick}) {
             onClick={() => onClick(company._id)}>
             <td className="name">{company.name}</td>
             <td>{company.sd_subscriber_id}</td>
-            <td>{(company.is_enabled ? gettext('Enabled') : gettext('Disabled'))}</td>
+            <td className={isInPast(company.expiry_date) && 'text-danger'}>
+                {(company.is_enabled ? gettext('Enabled') : gettext('Disabled'))}
+            </td>
             <td>{company.contact_name}</td>
             <td>{company.phone}</td>
             <td>{company.country}</td>

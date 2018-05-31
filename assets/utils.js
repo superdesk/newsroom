@@ -137,6 +137,22 @@ function isToday(date) {
     return date.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
 }
 
+
+/**
+ * Test if given day is in the past
+ *
+ * @param {Date} date
+ * @return {Boolean}
+ */
+export function isInPast(dateString) {
+    if(!dateString) {
+        return false;
+    }
+
+    const parsed = parseDate(dateString);
+    return parsed.format('YYYY-MM-DD') < now.format('YYYY-MM-DD');
+}
+
 /**
  * Return full date representation
  *
