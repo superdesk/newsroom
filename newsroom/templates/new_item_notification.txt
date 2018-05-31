@@ -1,5 +1,6 @@
-Hi {{user.first_name}},
+{% extends "email_layout.txt" %}
 
+{% block content %}
 {% if is_topic %}
 There is a new story for your followed topic: {{topic_name}}
 {% else %}
@@ -16,11 +17,5 @@ There is a new update for your previously accessed story
 {{ item.description_text }}
 {% endif %}
 
-
-
 You can navigate to {{url}} to view that story.
-
-
-Regards,
-{{app_name}}
-
+{% endblock %}

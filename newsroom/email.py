@@ -88,7 +88,7 @@ def send_new_item_notification_email(user, topic_name, item):
         app_name=app_name,
         is_topic=True,
         topic_name=topic_name,
-        user=user,
+        name=user.get('first_name'),
         item=item,
         url=url)
 
@@ -104,7 +104,7 @@ def send_history_match_notification_email(user, item):
         'new_item_notification.txt',
         app_name=app_name,
         is_topic=False,
-        user=user,
+        name=user.get('first_name'),
         item=item,
         url=url)
 

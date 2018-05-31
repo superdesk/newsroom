@@ -1,8 +1,9 @@
 import React from 'react';
+import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 
-function CheckboxInput({name, label, onChange, value}) {
+function CheckboxInput({name, label, onChange, value, labelClass}) {
     if (!name) {
         name = `input-${label}`;
     }
@@ -16,7 +17,7 @@ function CheckboxInput({name, label, onChange, value}) {
                     checked={value}
                     id={name}
                     onChange={onChange} />
-                <label className="custom-control-label" htmlFor={name}>{label}</label>                
+                <label className={classNames('custom-control-label', labelClass)} htmlFor={name}>{label}</label>
             </div>
         </div>
     );
@@ -27,6 +28,7 @@ CheckboxInput.propTypes = {
     label: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
     value: PropTypes.bool.isRequired,
+    labelClass: PropTypes.string,
 };
 
 export default CheckboxInput;
