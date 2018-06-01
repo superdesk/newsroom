@@ -10,7 +10,7 @@ function CompanyListItem({company, isActive, onClick}) {
             onClick={() => onClick(company._id)}>
             <td className="name">{company.name}</td>
             <td>{company.sd_subscriber_id}</td>
-            <td className={isInPast(company.expiry_date) && 'text-danger'}>
+            <td className={isInPast(company.expiry_date) ? 'text-danger' : null}>
                 {(company.is_enabled ? gettext('Enabled') : gettext('Disabled'))}
             </td>
             <td>{company.contact_name}</td>

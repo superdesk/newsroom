@@ -69,7 +69,7 @@ def get_company_updates(company):
     }
 
     if company.get('expiry_date'):
-        updates['expiry_date'] = datetime.strptime(company.get('expiry_date'), '%Y-%m-%d')
+        updates['expiry_date'] = datetime.strptime(str(company.get('expiry_date'))[:10], '%Y-%m-%d')
     else:
         updates['expiry_date'] = None
 
