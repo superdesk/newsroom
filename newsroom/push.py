@@ -8,6 +8,8 @@ import superdesk
 from copy import copy
 from PIL import Image, ImageEnhance
 from flask import current_app as app
+from flask_babel import gettext
+
 from superdesk.utc import utcnow
 from superdesk.text_utils import get_word_count
 from newsroom.notifications import push_notification
@@ -57,13 +59,41 @@ def fix_hrefs(doc):
         fix_hrefs(assoc)
 
 
-def publish_item(doc):
-    """Duplicating the logic from content_api.publish service."""
+@blueprint.route('/push', methods=['POST'])
+def push():
+    if not test_signature(flask.request):
+        flask.abort(500)
+    item = flask.json.loads(flask.request.get_data())
+    assert 'guid' in item, {'guid': 1}
+    assert 'type' in item, {'type': 1}
+
+    orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
+
+    if item.get('type') == 'event':
+        item['_id'] = publish_event(item, orig)
+    elif item.get('type') == 'planning':
+        publish_planning(item, orig)
+    elif item.get('type') == 'text':
+        item['_id'] = publish_item(item)
+    else:
+        flask.abort(400, gettext('Unknown type {}'.format(item.get('type'))))
+
+    notify_new_item(item, check_topics=orig is None)
+    app.cache.delete(HOME_ITEMS_CACHE_KEY)
+    return flask.jsonify({})
+
+
+def set_dates(doc):
     now = utcnow()
     parse_dates(doc)
     doc.setdefault('firstcreated', now)
     doc.setdefault('versioncreated', now)
     doc.setdefault(app.config['VERSION'], 1)
+
+
+def publish_item(doc):
+    """Duplicating the logic from content_api.publish service."""
+    set_dates(doc)
     doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
     service = superdesk.get_resource_service('content_api')
     if 'evolvedfrom' in doc:
@@ -112,8 +142,13 @@ def push_event(event):
     event.setdefault('versioncreated', now)
     event.setdefault(app.config['VERSION'], 1)
     service = superdesk.get_resource_service('events')
+    event.setdefault('_id', event['guid'])
     _id = service.create([event])[0]
     return _id
+
+
+def publish_planning(planning):
+    pass
 
 
 def notify_new_item(item, check_topics=True):

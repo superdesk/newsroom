@@ -51,11 +51,12 @@ BLUEPRINTS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.events'
+    'newsroom.planning'
 ]
 
 CORE_APPS = [
     'superdesk.notification',
+    'planning.events',
     'content_api.items',
     'content_api.items_versions',
     'content_api.search',
@@ -73,7 +74,7 @@ CORE_APPS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.events',
+    'newsroom.planning',
 ]
 
 SITE_NAME = 'AAP Newsroom'
