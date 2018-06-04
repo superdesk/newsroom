@@ -29,9 +29,11 @@ class SearchResultsInfo extends React.Component {
 
     render() {
         const isFollowing = this.props.user && this.props.activeTopic;
+        const displayFollowTopic = this.props.user && !this.props.bookmarks && !isEmpty(this.props.searchCriteria);
         const displayTotalItems = this.props.bookmarks || !isEmpty(this.props.searchCriteria) || this.props.activeTopic;
+        const displayHeader = !isEmpty(this.props.newItems) || displayTotalItems || displayFollowTopic || this.props.query;
         return (
-            <div className={classNames(
+            displayHeader ? <div className={classNames(
                 'wire-column__main-header d-flex mt-0 px-3 align-items-center flex-wrap flex-sm-nowrap',
                 this.props.scrollClass
             )}>
@@ -46,7 +48,7 @@ class SearchResultsInfo extends React.Component {
                 </div>
 
 
-                {this.props.user && !this.props.bookmarks && !isEmpty(this.props.searchCriteria) && (
+                {displayFollowTopic && (
                     <button
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-none d-sm-block"
@@ -54,7 +56,7 @@ class SearchResultsInfo extends React.Component {
                     >{gettext('Save as topic')}</button>
                 )}
 
-                {this.props.user && !this.props.bookmarks && !isEmpty(this.props.searchCriteria) && (
+                {displayFollowTopic && (
                     <button
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-block d-sm-none"
@@ -75,7 +77,7 @@ class SearchResultsInfo extends React.Component {
                       </button>
                     }
                 </div>
-            </div>
+            </div> : null
         );
     }
 }

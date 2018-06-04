@@ -35,7 +35,6 @@ import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import { getItemActions } from '../item-actions';
 import {isTouchDevice} from '../../utils';
-import NewsOnlyControl from './NewsOnlyControl';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -179,15 +178,12 @@ class WireApp extends React.Component {
                             setQuery={this.props.setQuery}
                         />
 
-                        <NewsOnlyControl
-                            activeNavigation={this.props.activeNavigation}
-                            newsOnly={this.props.newsOnly}
-                            toggleNews={this.props.toggleNews}
-                        />
-
                         <ListViewControls
                             activeView={this.props.activeView}
                             setView={this.props.setView}
+                            activeNavigation={this.props.activeNavigation}
+                            newsOnly={this.props.newsOnly}
+                            toggleNews={this.props.toggleNews}
                         />
                     </nav>
                 </section>,

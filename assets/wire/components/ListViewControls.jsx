@@ -5,6 +5,7 @@ import { gettext } from 'utils';
 
 import { EXTENDED_VIEW, COMPACT_VIEW } from '../defaults';
 import {isTouchDevice} from '../../utils';
+import NewsOnlyControl from './NewsOnlyControl';
 
 class ListViewControls extends React.PureComponent {
     constructor(props) {
@@ -41,6 +42,11 @@ class ListViewControls extends React.PureComponent {
     render() {
         return(
             <div className='content-bar__right'>
+                <NewsOnlyControl
+                    activeNavigation={this.props.activeNavigation}
+                    newsOnly={this.props.newsOnly}
+                    toggleNews={this.props.toggleNews}
+                />
                 <div className='btn-group'>
                     <span
                         className='content-bar__menu'
@@ -72,6 +78,9 @@ class ListViewControls extends React.PureComponent {
 ListViewControls.propTypes = {
     activeView: PropTypes.string,
     setView: PropTypes.func.isRequired,
+    newsOnly: PropTypes.bool,
+    toggleNews: PropTypes.func,
+    activeNavigation: PropTypes.string,
 };
 
 export default ListViewControls;
