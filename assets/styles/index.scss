@@ -468,6 +468,7 @@ article.list {
     background-color: #fff;
     cursor: pointer;
     z-index: 1002;
+    border-left: 1px solid #ebebeb;
 }
 
 .show .content-bar__menu {
@@ -478,6 +479,7 @@ article.list {
 .content-bar__menu--nav {
     background: #ededed;
     flex-shrink: 0;
+    border: none;
     .icon--close-thin {
         display: none;
     }
@@ -485,6 +487,7 @@ article.list {
 
 .content-bar__menu--nav--open {
     background: #717b96;
+    border: none;
     .icon--hamburger {
         display: none;
     }
@@ -872,13 +875,12 @@ article.list {
     line-height: 1.2;
     display: flex;
     margin-right: 20px;
-    width: 100%;
+    width: auto;
     min-height: 28px;
     padding-bottom: 0;
     padding-top: 0;
     @include md {
-        margin-right: 40px;
-        width: auto;
+        margin-right: 40px;    
         padding-top: 0.3rem;
         min-height: 48px;
     }
@@ -954,12 +956,13 @@ article.list {
     right: 0;
     top: 56px;
     left: 100%;
-    z-index: 101;
+    z-index: 1001;
     width: 320px;
     @include lg {
         position: static;
         top: auto;       
         width: 0;
+        z-index: 101;
     }
 }
 .wire-column__preview--open {
@@ -1072,36 +1075,43 @@ article.list {
 }
 .wire-column__main-header {
     flex-shrink: 0;
-    height: 76px;
+    height: 46px;
     transition: all .2s ease;
     z-index: 10;
+    
+    @include lg {
+        height: 56px;
+    }
     
     &--small {
         background: white;
         box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
-        height: 66px;
-        padding-bottom: 6px;
-        
-        @include lg {
-            height: 46px;
-            padding-bottom: 0;
-        }
+        height: 46px;
 
         .btn-sm {
-            padding: 0.1875rem 0.75rem;
-            transition: padding .2s ease-out;
+            @include sm {
+                padding: 0.1875rem 0.75rem;
+                transition: padding .2s ease-out;
+            }
         }
         .search-results-info__num {
-            font-size: 1.625rem;
-            transition: all .2s ease;
-            margin-top: 3px;
+            @include sm {
+                font-size: 1.625rem;
+                transition: all .2s ease;
+                margin-top: 3px;
+            }
         }
         .search-results-info {
-            line-height: 1;
-            transition: all .2s ease;
+            @include sm {
+                line-height: 1;
+                transition: all .2s ease;
+            }
         }
     }
 
+    + .wire-articles--list {
+        padding-top: 4px;
+    }
 }
 
 .flex-grid__item {
@@ -1205,6 +1215,8 @@ article.list {
 
 .wire-articles--list {
     overflow: auto;
+    padding-top: 20px;
+    margin-top: 0;
 }
 
 .wire-articles__item--list {
