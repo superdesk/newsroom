@@ -135,7 +135,7 @@ class ItemsList extends React.Component {
             />
         );
 
-        const listClassName = classNames('wire-articles wire-articles--list row m-0 pt-1', {
+        const listClassName = classNames('wire-articles wire-articles--list', {
             'wire-articles--list-compact': !isExtended,
         });
 
