@@ -181,6 +181,9 @@ class WireApp extends React.Component {
                         <ListViewControls
                             activeView={this.props.activeView}
                             setView={this.props.setView}
+                            activeNavigation={this.props.activeNavigation}
+                            newsOnly={this.props.newsOnly}
+                            toggleNews={this.props.toggleNews}
                         />
                     </nav>
                 </section>,
