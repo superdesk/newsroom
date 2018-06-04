@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Toggle from 'react-toggle';
 import classNames from 'classnames';
 import 'react-toggle/style.css';
 
@@ -50,32 +49,30 @@ class SearchResultsInfo extends React.Component {
                 {this.props.user && !this.props.bookmarks && !isEmpty(this.props.searchCriteria) && (
                     <button
                         disabled={isFollowing}
-                        className="btn btn-outline-primary btn-sm"
+                        className="btn btn-outline-primary btn-sm d-none d-sm-block"
                         onClick={() => this.props.followTopic(this.props.searchCriteria)}
                     >{gettext('Save as topic')}</button>
                 )}
 
-                <div className="d-flex align-items-center ml-auto">
-                    {!this.props.activeNavigation && <div className={'d-flex align-items-center'}>
-                        <label htmlFor='news-only' className="mr-2">{gettext('News only')}</label>
-                        <Toggle
-                            id="news-only"
-                            defaultChecked={this.props.newsOnly}
-                            className='toggle-background'
-                            icons={false}
-                            onChange={this.props.toggleNews}/>
-                    </div>}
+                {this.props.user && !this.props.bookmarks && !isEmpty(this.props.searchCriteria) && (
+                    <button
+                        disabled={isFollowing}
+                        className="btn btn-outline-primary btn-sm d-block d-sm-none"
+                        onClick={() => this.props.followTopic(this.props.searchCriteria)}
+                    >{gettext('S')}</button>
+                )}
 
+                <div className="d-flex align-items-center ml-auto">
                     {!isEmpty(this.props.newItems) &&
-            <button
-                type="button"
-                ref={(elem) => this.elem = elem}
-                title={gettext('New stories available to load')}
-                className="button__reset-styles d-flex align-items-center ml-3"
-                onClick={this.props.refresh}>
-                <i className="icon--refresh icon--pink"/>
-                <span className="badge badge-pill badge-info badge-secondary ml-2">{this.props.newItems.length}</span>
-            </button>
+                      <button
+                          type="button"
+                          ref={(elem) => this.elem = elem}
+                          title={gettext('New stories available to load')}
+                          className="button__reset-styles d-flex align-items-center ml-3"
+                          onClick={this.props.refresh}>
+                          <i className="icon--refresh icon--pink"/>
+                          <span className="badge badge-pill badge-info badge-secondary ml-2">{this.props.newItems.length}</span>
+                      </button>
                     }
                 </div>
             </div>

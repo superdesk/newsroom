@@ -35,6 +35,7 @@ import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import { getItemActions } from '../item-actions';
 import {isTouchDevice} from '../../utils';
+import NewsOnlyControl from './NewsOnlyControl';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -176,6 +177,12 @@ class WireApp extends React.Component {
                         <SearchBar
                             fetchItems={this.props.fetchItems}
                             setQuery={this.props.setQuery}
+                        />
+
+                        <NewsOnlyControl
+                            activeNavigation={this.props.activeNavigation}
+                            newsOnly={this.props.newsOnly}
+                            toggleNews={this.props.toggleNews}
                         />
 
                         <ListViewControls
