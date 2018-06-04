@@ -70,7 +70,7 @@ def test_notify_invalid_signature(client, app):
     data = json.dumps({})
     headers = get_signature_headers(data, b'bar')
     resp = client.post('/push', data=data, content_type='application/json', headers=headers)
-    assert 500 == resp.status_code
+    assert 403 == resp.status_code
 
 
 def test_push_binary(client):
@@ -206,7 +206,7 @@ def test_push_binary_invalid_signature(client, app):
         media_id=str(bson.ObjectId()),
         media=(io.BytesIO(b'foo'), 'foo'),
     ))
-    assert 500 == resp.status_code
+    assert 403 == resp.status_code
 
 
 def test_notify_topic_matches_for_new_item(client, app, mocker):
