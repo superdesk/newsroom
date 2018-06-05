@@ -42,6 +42,12 @@ def test_signature(request):
     )
 
 
+def assert_test_signature(request):
+    if not test_signature(request):
+        logger.warning('signature invalid on push from %s', request.referrer or request.remote_addr)
+        flask.abort(403)
+
+
 def fix_hrefs(doc):
     if doc.get('renditions'):
         for key, rendition in doc['renditions'].items():
@@ -83,8 +89,7 @@ def publish_item(doc):
 
 @blueprint.route('/push', methods=['POST'])
 def push():
-    if not test_signature(flask.request):
-        flask.abort(500)
+    assert_test_signature(flask.request)
     item = flask.json.loads(flask.request.get_data())
     assert 'guid' in item, {'guid': 1}
     assert 'type' in item, {'type': 1}
@@ -179,8 +184,7 @@ def notify():
 
 @blueprint.route('/push_binary', methods=['POST'])
 def push_binary():
-    if not test_signature(flask.request):
-        flask.abort(500)
+    assert_test_signature(flask.request)
     media = flask.request.files['media']
     media_id = flask.request.form['media_id']
     app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
@@ -217,7 +221,6 @@ def generate_thumbnails(item):
         '_newsroom_thumbnail_large': _store_image(watermark,
                                                   _id='%s%s' % (rendition['media'], '_newsroom_thumbnail_large')),
     })
-
     # add watermark to base/view images
     for key in ['base', 'view']:
         rendition = picture.get('renditions', {}).get('%sImage' % key)
