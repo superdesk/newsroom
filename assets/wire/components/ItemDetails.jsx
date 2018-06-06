@@ -50,9 +50,6 @@ function ItemDetails({item, user, actions, onClose}) {
                                 {fullDate(item.versioncreated)}
                             </p>
 
-                            {item.description_text &&
-                                <p className="wire-column__preview__lead">{item.description_text}</p>}
-
                             {item.body_html &&
                           <div className="wire-column__preview__text"
                               dangerouslySetInnerHTML={({__html: formatHTML(item.body_html)})}/>
