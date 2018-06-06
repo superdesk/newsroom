@@ -31,6 +31,14 @@ class UsersResource(newsroom.Resource):
             'type': 'string',
             'nullable': True
         },
+        'mobile': {
+            'type': 'string',
+            'nullable': True
+        },
+        'role': {
+            'type': 'string',
+            'nullable': True
+        },
         'signup_details': {
             'type': 'dict'
         },

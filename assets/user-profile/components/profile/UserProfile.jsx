@@ -73,7 +73,7 @@ class UserProfile extends React.Component {
                                     error={errors ? errors.last_name : null} />
                             </div>
 
-                            <div className="col-lg-6">
+                            <div className="col-lg-12">
                                 <TextInput
                                     name='email'
                                     label={gettext('Email')}
@@ -82,13 +82,31 @@ class UserProfile extends React.Component {
                                 />
                             </div>
 
-                            <div className="col-lg-12">
+                            <div className="col-lg-6">
                                 <TextInput
                                     name='phone'
-                                    label={gettext('Telephone')}
+                                    label={gettext('Phone')}
                                     value={user.phone}
                                     onChange={onChange}
                                     error={errors ? errors.phone : null} />
+                            </div>
+
+                            <div className="col-lg-6">
+                                <TextInput
+                                    name='mobile'
+                                    label={gettext('Mobile')}
+                                    value={user.mobile}
+                                    onChange={onChange}
+                                    error={errors ? errors.mobile : null} />
+                            </div>
+
+                            <div className="col-lg-6">
+                                <TextInput
+                                    name='role'
+                                    label={gettext('Role')}
+                                    value={user.role}
+                                    onChange={onChange}
+                                    error={errors ? errors.role : null} />
                             </div>
 
                             <div className="col-lg-12">
