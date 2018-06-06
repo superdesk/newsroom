@@ -75,9 +75,7 @@ class Preview extends React.PureComponent {
                     )}
 
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions}/>
-                    {item.description_text &&
-                            <p className='wire-column__preview__lead'>{item.description_text}</p>
-                    }
+                    
                     {item.body_html &&
                             <div className='wire-column__preview__text' id='preview-body' dangerouslySetInnerHTML={({__html: formatHTML(item.body_html)})} />
                     }
