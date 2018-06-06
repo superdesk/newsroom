@@ -55,10 +55,24 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
 
                     <TextInput
                         name='phone'
-                        label={gettext('Telephone')}
+                        label={gettext('Phone')}
                         value={user.phone}
                         onChange={onChange}
                         error={errors ? errors.phone : null} />
+
+                    <TextInput
+                        name='mobile'
+                        label={gettext('Mobile')}
+                        value={user.mobile}
+                        onChange={onChange}
+                        error={errors ? errors.mobile : null} />
+
+                    <TextInput
+                        name='role'
+                        label={gettext('Role')}
+                        value={user.role}
+                        onChange={onChange}
+                        error={errors ? errors.role : null} />
 
                     <SelectInput
                         name='user_type'

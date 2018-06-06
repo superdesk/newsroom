@@ -22,7 +22,9 @@ function UsersList({users, onClick, activeUserId, companiesById}) {
                         <tr>
                             <th>{ gettext('Name') }</th>
                             <th>{ gettext('Email') }</th>
-                            <th>{ gettext('Telephone') }</th>
+                            <th>{ gettext('Phone') }</th>
+                            <th>{ gettext('Mobile') }</th>
+                            <th>{ gettext('Role') }</th>
                             <th>{ gettext('User Type') }</th>
                             <th>{ gettext('Company') }</th>
                             <th>{ gettext('Status') }</th>

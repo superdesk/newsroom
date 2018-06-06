@@ -20,6 +20,8 @@ class UserForm(FlaskForm):
     last_name = StringField(gettext('Last Name'), validators=[DataRequired()])
     email = StringField(gettext('Email'), validators=[DataRequired(), Email()])
     phone = StringField(gettext('Telephone'), validators=[DataRequired()])
+    mobile = StringField(gettext('Mobile'), validators=[])
+    role = StringField(gettext('Role'), validators=[])
     user_type = SelectField(gettext('User Type'), choices=user_types)
     company = StringField(gettext('Company'), validators=[])
     signup_details = TextAreaField(gettext('Sign Up Details'), validators=[])

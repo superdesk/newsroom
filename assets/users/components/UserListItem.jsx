@@ -11,6 +11,8 @@ function UserListItem({user, isActive, onClick, companiesById}) {
             <td className="name">{user.first_name} {user.last_name}</td>
             <td>{user.email}</td>
             <td>{user.phone}</td>
+            <td>{user.mobile}</td>
+            <td>{user.role}</td>
             <td>{user.user_type}</td>
             <td>{(user.company && companiesById ? companiesById[user.company].name : null)}</td>
             <td>{(user.is_approved ? gettext('Approved') : gettext('Needs Approval'))} -

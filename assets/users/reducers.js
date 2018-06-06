@@ -34,6 +34,8 @@ export default function userReducer(state = initialState, action) {
             name: '',
             email: '',
             phone: '',
+            mobile: '',
+            role: '',
             company: '',
         };
 
