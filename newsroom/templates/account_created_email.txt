@@ -1,5 +1,4 @@
 {% extends "email_layout.txt" %}
-
 {% block content %}
 An {{app_name}} account has been created for you.
 In order to access your account, please visit {{url}} and complete your registration.
