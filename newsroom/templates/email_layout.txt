@@ -1,10 +1,7 @@
 {{name}},
-
 {% block content %}{% endblock %}
-
 Regards,
 The {{app_name}} Team
 
 {{app_name}} is developed by Sourcefabric and the {{app_name}} community.
-
 http://sourcefabric.org

@@ -437,7 +437,14 @@ def test_send_notification_emails(client, app):
     with app.mail.record_messages() as outbox:
         key = b'something random'
         app.config['PUSH_KEY'] = key
-        data = json.dumps({'guid': 'foo', 'type': 'text', 'headline': 'this is a test'})
+        data = json.dumps({
+            'guid': 'foo',
+            'type': 'text',
+            'headline': 'this is a test headline',
+            'byline': 'John Smith',
+            'slugline': 'This is the main slugline',
+            'description_text': 'This is the main description text'
+        })
         headers = get_signature_headers(data, key)
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
