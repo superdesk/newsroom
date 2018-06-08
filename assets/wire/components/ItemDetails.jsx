@@ -6,7 +6,7 @@ import PreviewTags from './PreviewTags';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import { gettext, fullDate, formatHTML } from 'utils';
-import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled } from 'wire/utils';
+import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT } from 'wire/utils';
 
 function ItemDetails({item, user, actions, onClose}) {
     const picture = getPicture(item);
@@ -49,6 +49,9 @@ function ItemDetails({item, user, actions, onClose}) {
                                 {` ${gettext('at')} `}
                                 {fullDate(item.versioncreated)}
                             </p>
+
+                            {item.description_text && DISPLAY_ABSTRACT &&
+                                <p className="wire-column__preview__lead">{item.description_text}</p>}
 
                             {item.body_html &&
                           <div className="wire-column__preview__text"

@@ -198,4 +198,7 @@ SERVICES = [
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'DD/MM/YYYY'
 
+# Hides or displays abstract on preview panel and details modal
+DISPLAY_ABSTRACT = False
+
 WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')

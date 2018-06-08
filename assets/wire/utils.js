@@ -3,12 +3,14 @@ import localStorage from 'store/storages/localStorage';
 import operationsPlugin from 'store/plugins/operations';
 
 import { get, isEmpty, isEqual, pickBy } from 'lodash';
-import { getTextFromHtml } from 'utils';
+import { getTextFromHtml, getConfig } from 'utils';
 
 const STATUS_KILLED = 'canceled';
 const READ_ITEMS_STORE = 'read_items';
 const NEWS_ONLY_STORE = 'news_only';
 const FILTER_TAB = 'filter_tab';
+
+export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
 const store = Store.createStore([localStorage], [operationsPlugin]);
 
