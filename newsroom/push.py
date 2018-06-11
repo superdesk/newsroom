@@ -4,6 +4,7 @@ import hmac
 import flask
 import logging
 import superdesk
+from datetime import datetime
 
 from copy import copy
 from PIL import Image, ImageEnhance
@@ -20,6 +21,11 @@ from newsroom.email import send_new_item_notification_email, \
 from newsroom.history import get_history_users
 from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
 from newsroom.upload import ASSETS_RESOURCE
+
+
+from planning.events.events import generate_recurring_events
+from planning.common import WORKFLOW_STATE
+
 
 logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
@@ -61,24 +67,22 @@ def fix_hrefs(doc):
 
 @blueprint.route('/push', methods=['POST'])
 def push():
-    if not test_signature(flask.request):
-        flask.abort(500)
+    assert_test_signature(flask.request)
     item = flask.json.loads(flask.request.get_data())
     assert 'guid' in item, {'guid': 1}
     assert 'type' in item, {'type': 1}
 
-    orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
-
     if item.get('type') == 'event':
-        item['_id'] = publish_event(item, orig)
+        item['_id'] = publish_event(item)
     elif item.get('type') == 'planning':
-        publish_planning(item, orig)
+        publish_planning(item)
     elif item.get('type') == 'text':
+        orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
         item['_id'] = publish_item(item)
+        notify_new_item(item, check_topics=orig is None)
     else:
         flask.abort(400, gettext('Unknown type {}'.format(item.get('type'))))
 
-    notify_new_item(item, check_topics=orig is None)
     app.cache.delete(HOME_ITEMS_CACHE_KEY)
     return flask.jsonify({})
 
@@ -117,38 +121,136 @@ def publish_item(doc):
     return _id
 
 
-@blueprint.route('/push', methods=['POST'])
-def push():
-    assert_test_signature(flask.request)
-    item = flask.json.loads(flask.request.get_data())
-    assert 'guid' in item, {'guid': 1}
-    assert 'type' in item, {'type': 1}
+def publish_event(event):
+    orig = app.data.find_one('agenda', req=None, _id=event['guid'])
+    service = superdesk.get_resource_service('agenda')
 
-    if item.get('type') == 'event':
-        push_event(item)
+    if not orig:
+        # new event
+        agenda = {}
+        agenda.setdefault('_id', event['guid'])
+        agenda['event_id'] = event['guid']
+        agenda['name'] = event.get('name')
+        agenda['slugline'] = event.get('slugline')
+        agenda['definition_long'] = event.get('definition_long')
+        agenda['calendars'] = event.get('calendars')
+        agenda['location'] = event.get('location')
+        agenda['event'] = event
+        now = utcnow()
+        parse_dates(event)
+        agenda.setdefault('firstcreated', now)
+        agenda.setdefault('versioncreated', now)
+        agenda.setdefault(app.config['VERSION'], 1)
 
-    orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
-    item['_id'] = publish_item(item)
-    notify_new_item(item, check_topics=orig is None)
-    app.cache.delete(HOME_ITEMS_CACHE_KEY)
-    return flask.jsonify({})
+        agenda['dates'] = get_event_dates(event)
 
+        _id = service.create([agenda])[0]
 
-def push_event(event):
-    orig = app.data.find_one('wire_search', req=None, _id=event['guid'])
-    now = utcnow()
-    parse_dates(event)
-    event.setdefault('firstcreated', now)
-    event.setdefault('versioncreated', now)
-    event.setdefault(app.config['VERSION'], 1)
-    service = superdesk.get_resource_service('events')
-    event.setdefault('_id', event['guid'])
-    _id = service.create([event])[0]
+    else:
+        # replace the original document
+        if event.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
+                event.get('pubstatus') == 'cancelled':
+            # it has been cancelled so don't need to change the dates
+            updates = {'event': event}
+            _id = service.patch(event['guid'], updates)
+        elif event.get('state') in [WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED]:
+            # schedule is changed, recalculate the dates, planning id and coverages from dates will be removed
+            updates = {'event': event}
+            updates['dates'] = get_event_dates(event)
+            _id = service.patch(event['guid'], updates)
+
     return _id
 
 
+def get_event_dates(event):
+    dates = []
+
+    event['dates']['start'] = datetime.strptime(event['dates']['start'], '%Y-%m-%dT%H:%M:%S+0000')
+    event['dates']['end'] = datetime.strptime(event['dates']['end'], '%Y-%m-%dT%H:%M:%S+0000')
+
+    if event['dates'].get('recurring_rule', None):
+        # recurring event
+        recurring_events = generate_recurring_events(event)
+        for recurring_event in recurring_events:
+            dates.append({
+                'start': recurring_event['dates']['start'],
+                'end': recurring_event['dates']['end'],
+                'state': recurring_event['state'],
+            })
+    else:
+        # non recurring event
+        dates.append({
+            'start': event['dates']['start'],
+            'end': event['dates']['end'],
+            'state': event['state'],
+        })
+    return dates
+
+
 def publish_planning(planning):
-    pass
+    service = superdesk.get_resource_service('agenda')
+
+    # update dates
+    planning['planning_date'] = datetime.strptime(planning['planning_date'], '%Y-%m-%dT%H:%M:%S+0000')
+
+    if planning.get('event_item'):
+        # this is a planning for an event item
+        agenda = app.data.find_one('agenda', req=None, _id=planning['event_item'])
+
+        if planning.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
+                planning.get('pubstatus') == 'cancelled':
+
+            # it has been cancelled so remove the planning item from the list
+            agenda['planning_items'] = [p for p in agenda.get('planning_items', []) if p['guid'] != planning['guid']]
+
+            # remove references from dates
+            for date in agenda['dates']:
+                if date['start'].date() == planning['planning_date'].date():
+                    date['planning_id'] = None
+                    date['coverages'] = []
+
+            return service.patch(agenda['_id'], agenda)
+
+        for date in agenda['dates']:
+            if date['start'].date() == planning['planning_date'].date():
+                date['planning_id'] = planning['guid']
+                date['coverages'] = [c['planning']['g2_content_type'] for c in planning.get('coverages', [])]
+
+    else:
+        # there's no event item (ad-hoc planning item)
+        agenda = {}
+        agenda['dates'].append({
+            'start': planning['planning_date'],
+            'planing_id': planning['guid'],
+            'coverages': [c['planning']['g2_content_type'] for c in planning.get('coverages', [])]
+        })
+        pass
+
+    now = utcnow()
+    parse_dates(agenda)
+    agenda.setdefault('firstcreated', now)
+    agenda.setdefault('versioncreated', now)
+    agenda.setdefault(app.config['VERSION'], 1)
+
+    agenda['headline'] = planning.get('headline')
+    agenda['slugline'] = planning.get('slugline')
+    agenda['abstract'] = planning.get('abstract')
+    agenda['name'] = planning.get('name')
+    agenda['planning_id'] = planning.get('guid')
+
+    # add to the list of planning items. If it existed, replace with the new one
+    existing_planning_items = agenda.get('planning_items', [])
+    agenda['planning_items'] = [p for p in existing_planning_items if p['guid'] != planning['guid']] or []
+    agenda['planning_items'].append(planning)
+
+    if not agenda.get('_id'):
+        # new item
+        planning.setdefault('_id', planning['guid'])
+        _id = service.create([agenda])[0]
+    else:
+        # replace the original document
+        _id = service.patch(agenda['_id'], agenda)
+    return _id
 
 
 def notify_new_item(item, check_topics=True):

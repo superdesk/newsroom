@@ -51,7 +51,7 @@ BLUEPRINTS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.planning'
+    'newsroom.agenda',
 ]
 
 CORE_APPS = [
@@ -74,7 +74,7 @@ CORE_APPS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.planning',
+    'newsroom.agenda',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -99,6 +99,8 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 WEBPACK_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static', 'dist', 'manifest.json')
 WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL', '/static/dist/')
 WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL', 'http://localhost:8080/')
+
+SERVER_DOMAIN = 'localhost'
 
 # How many days a new account can stay active before it is approved by admin
 NEW_ACCOUNT_ACTIVE_DAYS = 14
