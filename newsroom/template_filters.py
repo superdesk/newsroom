@@ -64,6 +64,7 @@ def newsroom_config():
         'time_format': flask.current_app.config['CLIENT_TIME_FORMAT'],
         'date_format': flask.current_app.config['CLIENT_DATE_FORMAT'],
         'analytics': os.environ.get('GOOGLE_ANALYTICS', 'UA-114768905-1'),
+        'display_abstract': flask.current_app.config['DISPLAY_ABSTRACT'],
     }
 
 

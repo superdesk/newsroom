@@ -2,7 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { gettext, fullDate, formatHTML } from 'utils';
-import { getPicture, getPreviewRendition, showItemVersions, getCaption, isEqualItem, isKilled } from 'wire/utils';
+import {
+    getPicture,
+    getPreviewRendition,
+    showItemVersions,
+    getCaption,
+    isEqualItem, isKilled, DISPLAY_ABSTRACT } from 'wire/utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from './PreviewActionButtons';
 import PreviewTags from './PreviewTags';
@@ -75,6 +80,10 @@ class Preview extends React.PureComponent {
                     )}
 
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions}/>
+
+                    {item.description_text && DISPLAY_ABSTRACT &&
+                        <p className='wire-column__preview__lead'>{item.description_text}</p>
+                    }
                     
                     {item.body_html &&
                             <div className='wire-column__preview__text' id='preview-body' dangerouslySetInnerHTML={({__html: formatHTML(item.body_html)})} />
