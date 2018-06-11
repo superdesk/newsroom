@@ -26,7 +26,6 @@ event = {
     },
     'guid': 'foo',
     'item_id': 'foo',
-    '_id': 'foo',
     'type': 'event',
     'location': [
         {
@@ -93,3 +92,21 @@ def test_push_parsed_event(client, app):
     assert type(parsed['firstcreated']) == datetime
     assert 1 == len(parsed['event_contact_info'])
     assert 1 == len(parsed['location'])
+
+
+def test_push_updated_event(client, app):
+    # first push
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    # update comes in
+    event['dates'] = {
+        "start": "2018-05-27T08:00:00+0000",
+        "end": "2018-06-30T09:00:00+0000",
+        "tz": "Australia/Sydney"
+    }
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+    parsed = get_entity_or_404(event['guid'], 'planning_search')
+    assert type(parsed['firstcreated']) == datetime
+    assert 1 == len(parsed['event_contact_info'])
+    assert 1 == len(parsed['location'])
+    assert parsed['dates']['end'] == "2018-06-30T09:00:00+0000"

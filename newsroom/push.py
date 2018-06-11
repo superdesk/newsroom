@@ -61,8 +61,7 @@ def fix_hrefs(doc):
 
 @blueprint.route('/push', methods=['POST'])
 def push():
-    if not test_signature(flask.request):
-        flask.abort(500)
+    assert_test_signature(flask.request)
     item = flask.json.loads(flask.request.get_data())
     assert 'guid' in item, {'guid': 1}
     assert 'type' in item, {'type': 1}
@@ -70,9 +69,9 @@ def push():
     orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
 
     if item.get('type') == 'event':
-        item['_id'] = publish_event(item, orig)
+        item['_id'] = publish_event(item)
     elif item.get('type') == 'planning':
-        publish_planning(item, orig)
+        publish_planning(item)
     elif item.get('type') == 'text':
         item['_id'] = publish_item(item)
     else:
@@ -117,38 +116,40 @@ def publish_item(doc):
     return _id
 
 
-@blueprint.route('/push', methods=['POST'])
-def push():
-    assert_test_signature(flask.request)
-    item = flask.json.loads(flask.request.get_data())
-    assert 'guid' in item, {'guid': 1}
-    assert 'type' in item, {'type': 1}
-
-    if item.get('type') == 'event':
-        push_event(item)
-
-    orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
-    item['_id'] = publish_item(item)
-    notify_new_item(item, check_topics=orig is None)
-    app.cache.delete(HOME_ITEMS_CACHE_KEY)
-    return flask.jsonify({})
-
-
-def push_event(event):
-    orig = app.data.find_one('wire_search', req=None, _id=event['guid'])
+def publish_event(event):
+    orig = app.data.find_one('planning_search', req=None, _id=event['guid'])
     now = utcnow()
     parse_dates(event)
     event.setdefault('firstcreated', now)
     event.setdefault('versioncreated', now)
     event.setdefault(app.config['VERSION'], 1)
     service = superdesk.get_resource_service('events')
-    event.setdefault('_id', event['guid'])
-    _id = service.create([event])[0]
+
+    if not orig:
+        event.setdefault('_id', event['guid'])
+        _id = service.create([event])[0]
+    else:
+        # replace t original document
+        _id = service.replace(event['guid'], event, orig)
     return _id
 
 
 def publish_planning(planning):
-    pass
+    orig = app.data.find_one('planning_search', req=None, _id=planning['guid'])
+    now = utcnow()
+    parse_dates(planning)
+    planning.setdefault('firstcreated', now)
+    planning.setdefault('versioncreated', now)
+    planning.setdefault(app.config['VERSION'], 1)
+    service = superdesk.get_resource_service('planning')
+
+    if not orig:
+        planning.setdefault('_id', planning['guid'])
+        _id = service.create([planning])[0]
+    else:
+        # replace t original document
+        _id = service.replace(planning['guid'], planning, orig)
+    return _id
 
 
 def notify_new_item(item, check_topics=True):

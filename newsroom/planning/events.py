@@ -16,4 +16,3 @@ class EventsResource(newsroom.Resource):
 
 class EventsService(newsroom.Service):
     pass
-

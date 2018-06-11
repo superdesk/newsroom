@@ -2,6 +2,7 @@ import superdesk
 
 from flask import Blueprint
 from newsroom.planning.events import EventsResource, EventsService
+from newsroom.planning.planning import PlanningResource, PlanningService
 from newsroom.planning.search import PlanningSearchResource, PlanningSearchService
 from superdesk.metadata.item import not_analyzed
 
@@ -26,4 +27,5 @@ def init_app(app):
         },
     })
     superdesk.register_resource('events', EventsResource, EventsService, _app=app)
+    superdesk.register_resource('planning', PlanningResource, PlanningService, _app=app)
     superdesk.register_resource('planning_search', PlanningSearchResource, PlanningSearchService, _app=app)

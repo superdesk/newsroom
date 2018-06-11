@@ -29,6 +29,9 @@ class PlanningSearchService(newsroom.Service):
     def find_one(self, req, **lookup):
         hits = self.elastic.es.mget({'ids': [lookup[app.config['ID_FIELD']]]},
                                     app.config['CONTENTAPI_ELASTICSEARCH_INDEX'])
+        if len(hits.get('docs', [])) == 1 and not hits['docs'][0].get('found'):
+            return
+
         hits['hits'] = {'hits': hits.pop('docs', [])}
         docs = self.elastic._parse_hits(hits, 'events')
         return docs.first()
