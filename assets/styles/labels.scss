@@ -1,0 +1,43 @@
+// Labels
+
+$labels-palette: (
+  blue: $main-blue,
+  green: $green,
+  green-dark: $green-dark,
+  orange: $orange,
+  red: $red,
+);
+
+/// Generates base styles for a label.
+@mixin label {
+    display: inline-block;
+    padding: 0 6px;
+    vertical-align: middle;
+    border-radius: 2px;
+    text-transform: uppercase;
+    line-height: 1rem;
+    letter-spacing: 0.125em;
+    font-size: 9px;
+    white-space: nowrap;
+    cursor: default;
+    border: 1px solid transparent;
+    font-weight: 500;
+}
+
+.label {
+    @include label;
+
+    background-color: transparent;
+    border-style: solid;
+    border-width: 1px;
+    border-color: $gray-mid;
+    color: $gray-mid;
+
+    @each $name, $color in $labels-palette {
+        &.label--#{$name} {
+            border-color: $color;
+            color: $color;
+            text-decoration-color: $color;
+        }
+    }
+}
