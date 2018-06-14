@@ -1075,18 +1075,18 @@ article.list {
 }
 .wire-column__main-header {
     flex-shrink: 0;
-    height: 46px;
+    height: 36px;
     transition: all .2s ease;
     z-index: 10;
     
     @include lg {
-        height: 56px;
+        height: 42px;
     }
     
     &--small {
         background: white;
         box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
-        height: 46px;
+        height: 36px;
 
         .btn-sm {
             @include sm {
