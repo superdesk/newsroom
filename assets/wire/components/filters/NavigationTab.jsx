@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import { gettext } from 'utils';
-
 import NavLink from './NavLink';
 
 function NavigationTab({navigations, activeNavigation, toggleNavigation}) {

@@ -208,8 +208,9 @@ class WireSearchService(newsroom.Service):
         source['from'] = int(req.args.get('from', 0))
 
         if app.config.get('FILTER_BY_POST_FILTER', False):
-            if filters:
+            if filters or req.args.get('created_from') or req.args.get('created_to'):
                 source['post_filter'] = {'bool': {'must': []}}
+            if filters:
                 source['post_filter']['bool']['must'] += _filter_terms(filters)
             if req.args.get('created_from') or req.args.get('created_to'):
                 source['post_filter']['bool']['must'].append(_versioncreated_range(req.args))

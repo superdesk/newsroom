@@ -4,8 +4,7 @@ import { gettext } from 'utils';
 
 import NavLink from './NavLink';
 import NavGroup from './NavGroup';
-
-import { setCreatedFilter } from '../actions';
+import { setCreatedFilter } from 'wire/actions';
 
 const shortcuts = [
     {label: gettext('Today'), value: 'now/d'},
