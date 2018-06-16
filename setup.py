@@ -10,6 +10,7 @@ install_requires = [
     'honcho>=1.0.1',
     'gunicorn>=19.7.1',
     'superdesk-core>=1.15.1,<1.16',
+    'git+git://github.com/superdesk/superdesk-planning.git@master#egg=superdesk-planning',
 ]
 
 setup(

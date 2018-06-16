@@ -66,6 +66,7 @@ class WireSearchResource(newsroom.Resource):
             'ancestors': 1,
             'wordcount': 1,
         },
+        'elastic_filter': {'bool': {'must': [{'term': {'_type': 'items'}}]}},
     }
 
     item_methods = ['GET']
@@ -154,7 +155,7 @@ def _items_query():
                 {'term': {'type': 'composite'}},
                 {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
             ],
-            'must': [],
+            'must': [{'term': {'_type': 'items'}}],
         }
     }
 
