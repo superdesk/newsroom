@@ -36,7 +36,7 @@ import {
 import { RENDER_MODAL, CLOSE_MODAL } from 'actions';
 import { modalReducer } from 'reducers';
 
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { toggleValue } from 'utils';
 import { EXTENDED_VIEW } from './defaults';
 import { getMaxVersion } from './utils';
@@ -70,6 +70,7 @@ const initialState = {
         activeView: EXTENDED_VIEW,
     },
     newsOnly: false,
+    resultsFiltered: false,
 };
 
 function recieveItems(state, data) {
@@ -88,6 +89,7 @@ function recieveItems(state, data) {
         aggregations: data._aggregations || null,
         newItems: [],
         newItemsData: null,
+        resultsFiltered: !isEmpty(state.wire.activeFilter) || !isEmpty(state.wire.createdFilter)
     };
 }
 
@@ -129,6 +131,9 @@ function _wireReducer(state, action) {
     case TOGGLE_FILTER: {
         const activeFilter = Object.assign({}, state.activeFilter);
         activeFilter[action.key] = toggleValue(activeFilter[action.key], action.val);
+        if (!activeFilter[action.key] || activeFilter[action.key].length === 0) {
+            delete activeFilter[action.key];
+        }
         if (action.single) {
             activeFilter[action.key] = activeFilter[action.key].filter((val) => val === action.val);
         }

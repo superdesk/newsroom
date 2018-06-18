@@ -138,7 +138,11 @@ class WireApp extends React.Component {
             'wire-articles__two-side-panes': panesCount === 2,
         });
 
-        const searchCriteria = getActiveQuery(this.props.activeQuery, this.props.activeFilter, this.props.createdFilter);
+        const searchCriteria = getActiveQuery(
+            this.props.activeQuery,
+            this.props.resultsFiltered ? this.props.activeFilter : {},
+            this.props.resultsFiltered ? this.props.createdFilter : {}
+        );
         const activeTopic = this.props.topics.find((topic) => isTopicActive(topic, searchCriteria));
 
         return (
@@ -216,6 +220,7 @@ class WireApp extends React.Component {
                                 activeNavigation={this.props.activeNavigation}
                                 newsOnly={this.props.newsOnly}
                                 scrollClass={this.state.scrollClass}
+                                resultsFiltered = {this.props.resultsFiltered}
                             />
 
                             <ItemsList
@@ -286,6 +291,7 @@ WireApp.propTypes = {
     activeNavigation: PropTypes.string,
     toggleNews: PropTypes.func,
     newsOnly: PropTypes.bool,
+    resultsFiltered: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -308,6 +314,7 @@ const mapStateToProps = (state) => ({
     activeNavigation: get(state, 'wire.activeNavigation', null),
     newsOnly: !!state.newsOnly,
     bookmarks: state.bookmarks,
+    resultsFiltered: state.resultsFiltered,
 });
 
 const mapDispatchToProps = (dispatch) => ({

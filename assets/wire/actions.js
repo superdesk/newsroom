@@ -458,8 +458,7 @@ export function toggleNavigation(navigation) {
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
 export function toggleFilter(key, val, single) {
     return (dispatch) => {
-        dispatch({type: TOGGLE_FILTER, key, val, single});
-        dispatch(fetchItems());
+        setTimeout(() => dispatch({type: TOGGLE_FILTER, key, val, single}));
     };
 }
 
@@ -518,7 +517,6 @@ export const SET_CREATED_FILTER = 'SET_CREATED_FILTER';
 export function setCreatedFilter(filter) {
     return (dispatch) => {
         dispatch(_setCreatedFilter(filter));
-        dispatch(fetchItems());
     };
 }
 

@@ -1019,21 +1019,28 @@ article.list {
         overflow: auto;
 
         .tab-pane {
-            padding: 20px 20px 0 20px;
+            padding: 20px;
 
             #reset-filter-buffer {
                 height: 80px;
             }
 
-            #reset-filter {
+            .filter-button {
                 position: absolute;
-                bottom: 0;
                 left: 0;
                 right: 15px;
-                padding: 20px 20px 0 20px;
+                padding: 10px 20px 0 20px;
                 background: $nav-sidebar-bg;
-                border-top: 1px solid $nav-sidebar-border;
                 opacity: 0.8;
+
+                &.reset {
+                    bottom: 0;
+                }
+
+                &.search {
+                    bottom: 50px;
+                    border-top: 1px solid $nav-sidebar-border;
+                }
             }
         }
     }

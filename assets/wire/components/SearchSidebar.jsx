@@ -12,8 +12,8 @@ import {
 } from 'wire/actions';
 
 import TopicsTab from './TopicsTab';
-import FiltersTab from './FiltersTab';
-import NavigationTab from './NavigationTab';
+import FiltersTab from './filters/FiltersTab';
+import NavigationTab from './filters/NavigationTab';
 
 class SearchSidebar extends React.Component {
     constructor(props) {
@@ -96,6 +96,7 @@ class SearchSidebar extends React.Component {
                             resetFilter={this.resetFilter}
                             dispatch={this.props.dispatch}
                             createdFilter={this.props.createdFilter}
+                            resultsFiltered={this.props.resultsFiltered}
                         />
                     </div>
                 </div>
@@ -117,6 +118,7 @@ SearchSidebar.propTypes = {
     newItemsByTopic: PropTypes.object,
     createdFilter: PropTypes.object.isRequired,
     activeTopic: PropTypes.object,
+    resultsFiltered: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -126,6 +128,7 @@ const mapStateToProps = (state) => ({
     aggregations: state.aggregations,
     newItemsByTopic: state.newItemsByTopic,
     createdFilter: state.wire.createdFilter,
+    resultsFiltered: state.resultsFiltered,
 });
 
 export default connect(mapStateToProps)(SearchSidebar);

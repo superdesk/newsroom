@@ -30,7 +30,12 @@ class SearchResultsInfo extends React.Component {
     render() {
         const isFollowing = this.props.user && this.props.activeTopic;
         const displayFollowTopic = this.props.user && !this.props.bookmarks && !isEmpty(this.props.searchCriteria);
-        const displayTotalItems = this.props.bookmarks || !isEmpty(this.props.searchCriteria) || this.props.activeTopic;
+
+        const displayTotalItems = this.props.bookmarks ||
+          !isEmpty(this.props.searchCriteria) ||
+          this.props.activeTopic ||
+          this.props.resultsFiltered;
+
         const displayHeader = !isEmpty(this.props.newItems) || displayTotalItems || displayFollowTopic || this.props.query;
         return (
             displayHeader ? <div className={classNames(
@@ -96,6 +101,7 @@ SearchResultsInfo.propTypes = {
     activeNavigation: PropTypes.string,
     newsOnly: PropTypes.bool,
     scrollClass: PropTypes.string,
+    resultsFiltered: PropTypes.bool,
 };
 
 export default SearchResultsInfo;
