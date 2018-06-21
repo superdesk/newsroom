@@ -1,8 +1,10 @@
+import pytz
 from flask import json
 from datetime import datetime
+from copy import deepcopy
 from newsroom.utils import get_entity_or_404
 
-event = {
+test_event = {
     'state': 'scheduled',
     'slugline': 'New Press conference',
     'calendars': [
@@ -85,7 +87,7 @@ event = {
     }
 }
 
-planning = {
+test_planning = {
     "description_text": "description here",
     "_current_version": 1,
     "agendas": [],
@@ -96,7 +98,7 @@ planning = {
             "qcode": "e"
         }
     ],
-    "item_id": "urn:newsml:localhost:5000:2018-05-28T20:54:59.868362:4bdb1f38-4f2b-469a-8a2f-a774d2d38462",
+    "item_id": "bar",
     "ednote": "ed note here",
     "slugline": "Vivid planning item",
     "headline": "Planning headline",
@@ -145,9 +147,9 @@ planning = {
             "coverage_id": "urn:newsml:localhost:5000:2018-05-28T20:55:00.526019:88f5bc77-f0ce-4775-acc1-e728f10f79f7"
         }
     ],
-    "_id": "urn:newsml:localhost:5000:2018-05-28T20:54:59.868362:4bdb1f38-4f2b-469a-8a2f-a774d2d38462",
+    "_id": "bar",
     "urgency": 3,
-    "guid": "urn:newsml:localhost:5000:2018-05-28T20:54:59.868362:4bdb1f38-4f2b-469a-8a2f-a774d2d38462",
+    "guid": "bar",
     "name": "This is the name of the vivid planning item",
     "subject": [
         {
@@ -163,10 +165,13 @@ planning = {
 
 
 def test_push_parsed_event(client, app):
+    event = deepcopy(test_event)
     client.post('/push', data=json.dumps(event), content_type='application/json')
     parsed = get_entity_or_404(event['guid'], 'agenda')
     assert type(parsed['firstcreated']) == datetime
-    assert 1 == len(parsed['dates'])
+    assert parsed['dates']['tz'] == 'Australia/Sydney'
+    assert parsed['dates']['end'] == datetime.\
+        strptime('2018-05-28T05:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC)
     assert 1 == len(parsed['event']['event_contact_info'])
     assert 1 == len(parsed['location'])
 
@@ -176,6 +181,8 @@ def test_push_parsed_event(client, app):
 
 
 def test_push_cancelled_event(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo2'
     # first push
     client.post('/push', data=json.dumps(event), content_type='application/json')
 
@@ -192,6 +199,8 @@ def test_push_cancelled_event(client, app):
 
 
 def test_push_updated_event(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo3'
     # first push
     client.post('/push', data=json.dumps(event), content_type='application/json')
 
@@ -207,94 +216,43 @@ def test_push_updated_event(client, app):
     assert type(parsed['firstcreated']) == datetime
     assert 1 == len(parsed['event']['event_contact_info'])
     assert 1 == len(parsed['location'])
-    assert parsed['dates'][0]['end'] == '2018-06-30T09:00:00+0000'
-
-
-def test_push_recurring_event(client, app):
-    # update event to recurring
-    event['state'] = 'scheduled'
-    event['dates'] = {
-        'start': '2029-11-27T01:00:00+0000',
-        'end': '2029-11-27T04:00:00+0000',
-        'tz': 'Australia/Sydney',
-        'recurring_rule': {
-            'frequency': 'DAILY',
-            'interval': 1,
-            'count': 6,
-            'endRepeatMode': 'count',
-            'until': '__none__'
-        }
-    }
-    client.post('/push', data=json.dumps(event), content_type='application/json')
-    parsed = get_entity_or_404(event['guid'], 'agenda')
-    assert type(parsed['firstcreated']) == datetime
-    assert 6 == len(parsed['dates'])
-
-
-def test_push_repush_recurring_event(client, app):
-    # update event to recurring
-    event['state'] = 'scheduled'
-    event['dates'] = {
-        'start': '2029-11-27T01:00:00+0000',
-        'end': '2029-11-27T04:00:00+0000',
-        'tz': 'Australia/Sydney',
-        'recurring_rule': {
-            'frequency': 'DAILY',
-            'interval': 1,
-            'count': 6,
-            'endRepeatMode': 'count',
-            'until': '__none__'
-        }
-    }
-
-    # first push
-    client.post('/push', data=json.dumps(event), content_type='application/json')
-
-    event['state'] = 'rescheduled'
-    event['dates'] = {
-        'start': '2029-12-27T01:00:00+0000',
-        'end': '2029-12-27T04:00:00+0000',
-        'tz': 'Australia/Sydney',
-        'recurring_rule': {
-            'frequency': 'DAILY',
-            'interval': 1,
-            'count': 8,
-            'endRepeatMode': 'count',
-            'until': '__none__'
-        }
-    }
-
-    client.post('/push', data=json.dumps(event), content_type='application/json')
-    parsed = get_entity_or_404(event['guid'], 'agenda')
-    assert type(parsed['firstcreated']) == datetime
-    assert 8 == len(parsed['dates'])
+    assert parsed['dates']['end'].day == 30
 
 
 def test_push_parsed_planning_for_an_existing_event(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo4'
     client.post('/push', data=json.dumps(event), content_type='application/json')
     parsed = get_entity_or_404(event['guid'], 'agenda')
     assert type(parsed['firstcreated']) == datetime
-    assert 1 == len(parsed['dates'])
     assert 1 == len(parsed['event']['event_contact_info'])
     assert 1 == len(parsed['location'])
 
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar1'
+    planning['event_item'] = 'foo4'
     client.post('/push', data=json.dumps(planning), content_type='application/json')
-    parsed = get_entity_or_404('foo', 'agenda')
+    parsed = get_entity_or_404('foo4', 'agenda')
     assert parsed['headline'] == 'Planning headline'
+    assert 2 == len(parsed['coverages'])
 
 
 def test_push_cancelled_planning_for_an_existing_event(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo5'
     client.post('/push', data=json.dumps(event), content_type='application/json')
     parsed = get_entity_or_404(event['guid'], 'agenda')
     assert type(parsed['firstcreated']) == datetime
-    assert 1 == len(parsed['dates'])
     assert 1 == len(parsed['event']['event_contact_info'])
     assert 1 == len(parsed['location'])
 
     # first push
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar2'
+    planning['event_item'] = 'foo5'
     client.post('/push', data=json.dumps(planning), content_type='application/json')
-    parsed = get_entity_or_404('foo', 'agenda')
-    assert len(parsed['dates'][0]['coverages']) == 2
+    parsed = get_entity_or_404('foo5', 'agenda')
+    assert len(parsed['coverages']) == 2
     assert len(parsed['planning_items']) == 1
 
     # update the planning for cancel
@@ -303,6 +261,25 @@ def test_push_cancelled_planning_for_an_existing_event(client, app):
 
     # second push
     client.post('/push', data=json.dumps(planning), content_type='application/json')
-    parsed = get_entity_or_404('foo', 'agenda')
-    assert len(parsed['dates'][0]['coverages']) == 0
+    parsed = get_entity_or_404('foo5', 'agenda')
+    assert len(parsed['coverages']) == 0
     assert len(parsed['planning_items']) == 0
+
+
+def test_push_parsed_adhoc_planning_for_an_non_existing_event(client, app):
+    # pushing an event to create the index
+    event = deepcopy(test_event)
+    event['guid'] = 'foo6'
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    # remove event link from planning item
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar3'
+    planning['event_item'] = None
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('bar3', 'agenda')
+    assert type(parsed['firstcreated']) == datetime
+    assert 2 == len(parsed['coverages'])
+    assert 1 == len(parsed['planning_items'])
+    assert parsed['headline'] == 'Planning headline'
