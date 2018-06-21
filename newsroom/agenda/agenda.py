@@ -17,33 +17,44 @@ class AgendaResource(newsroom.Resource):
 
     # identifiers
     schema['event_id'] = events_schema['guid']
-    schema['planning_id'] = planning_schema['guid']
+    schema['recurrence_id'] = {
+        'type': 'string',
+        'mapping': not_analyzed,
+        'nullable': True,
+    }
 
     # content metadata
     schema['name'] = events_schema['name']
-    schema['slugline'] = events_schema['slugline']
+    schema['slugline'] = {'type': 'string'}
     schema['definition_long'] = events_schema['definition_long']
     schema['abstract'] = planning_schema['abstract']
     schema['headline'] = planning_schema['headline']
     schema['firstcreated'] = events_schema['firstcreated']
     schema['versioncreated'] = events_schema['versioncreated']
 
-    # normalized dates
+    # dates
     schema['dates'] = {
-        'type': 'list',
-        'nullable': True,
+        'type': 'dict',
         'schema': {
-            'type': 'dict',
-            'schema': {
-                'start': {'type': 'datetime'},
-                'end': {'type': 'datetime'},
-                'state': WORKFLOW_STATE_SCHEMA,
-                'planning_id': planning_schema['guid'],
-                'coverages': {'type': 'list', 'nullable': True},
-            }
-        },
-        'mapping': not_analyzed,
+            'start': {'type': 'datetime'},
+            'end': {'type': 'datetime'},
+            'tz': {'type': 'string'},
+        }
     }
+
+    # coverages
+    schema['coverages'] = {
+        'type': 'nested',
+        'properties': {
+            'planning_id': not_analyzed,
+            'coverage_id': not_analyzed,
+            'scheduled': {'type': 'datetime'},
+            'coverage_type': {'type': 'string'}
+        }
+    }
+
+    # state
+    schema['state'] = WORKFLOW_STATE_SCHEMA
 
     # other searchable fields needed in UI
     schema['calendars'] = events_schema['calendars']
@@ -62,7 +73,7 @@ class AgendaResource(newsroom.Resource):
     datasource = {
         'source': 'agenda',
         'search_backend': 'elastic',
-        'default_sort': [('dates.start', 1)],
+        'default_sort': [('versioncreated', 1)],
     }
     item_methods = ['GET']
 
