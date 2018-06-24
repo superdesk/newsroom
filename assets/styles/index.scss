@@ -1829,18 +1829,16 @@ article.list {
     padding: 10px 10px 5px 20px;
     flex-shrink: 0;
     @include xl {
-        padding: 20px 10px 20px 20px;
+        padding: 15px 10px 20px 20px;
     }
 }
 
 .wire-column__preview__date {
     color: #747474;
     line-height: 1rem;
-    padding: 0 10px 15px 20px;
     font-size: .8125rem;
     @include xl {
-        padding: 0 10px 20px 20px;
-        font-size: 1rem;
+        font-size: .8125rem;
     }
 }
 
@@ -1876,6 +1874,7 @@ article.list {
 
 .wire-column__preview__author {
     color: #626262;
+    font-size: 0.9375rem;
     font-weight: 300;
     .bold {
         color: #222222;
