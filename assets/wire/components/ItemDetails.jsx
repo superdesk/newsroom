@@ -10,7 +10,7 @@ import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled,
 
 function ItemDetails({item, user, actions, onClose}) {
     const picture = getPicture(item);
-    const itemType = isPreformatted(item)?'preformatted':'text';
+    const itemType = isPreformatted(item) ? 'preformatted' : 'text';
     const itemDetailClassName = `wire-column__preview__content--item-detail-item-${itemType}`;
     const itemWrapperClassName = `wire-column__preview__content--item-detail-${itemType}-wrap`;
     return (
