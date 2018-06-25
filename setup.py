@@ -9,7 +9,7 @@ install_requires = [
     'Flask-Cache>=0.13.1,<0.14',
     'honcho>=1.0.1',
     'gunicorn>=19.7.1',
-    'superdesk-core>=1.15.1,<1.16'
+    'superdesk-core==1.21'
 ]
 
 setup(
