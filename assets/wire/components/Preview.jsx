@@ -35,7 +35,7 @@ class Preview extends React.PureComponent {
                 <div className="wire-column__preview__top-bar pt-2 pb-0">
                     <div className='wire-column__preview__date'>{gettext('Published')}{' '}{fullDate(item.versioncreated)}</div>
                     <button className="icon-button" onClick={this.props.closePreview}>
-                        <i className="icon--close-large"></i>
+                        <i className="icon--close-thin icon--gray"></i>
                     </button>
                 </div>
 
