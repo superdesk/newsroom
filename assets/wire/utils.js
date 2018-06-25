@@ -149,6 +149,16 @@ export function isKilled(item) {
 }
 
 /**
+ * Checks if item is preformatted
+ *
+ * @param {Object} item
+ * @return {Boolean}
+ */
+export function isPreformatted(item) {
+    return item.body_html.includes('<pre>');
+}
+
+/**
  * Test if other item versions should be visible
  *
  * @param {Object} item

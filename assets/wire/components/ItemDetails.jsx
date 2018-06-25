@@ -6,10 +6,13 @@ import PreviewTags from './PreviewTags';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import { gettext, fullDate, formatHTML } from 'utils';
-import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT } from 'wire/utils';
+import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT, isPreformatted } from 'wire/utils';
 
 function ItemDetails({item, user, actions, onClose}) {
     const picture = getPicture(item);
+    const itemType = isPreformatted(item) ? 'preformatted' : 'text';
+    const itemDetailClassName = `wire-column__preview__content--item-detail-item-${itemType}`;
+    const itemWrapperClassName = `wire-column__preview__content--item-detail-${itemType}-wrap`;
     return (
         <div className='content--item-detail'>
             <section className='content-header'>
@@ -35,8 +38,8 @@ function ItemDetails({item, user, actions, onClose}) {
                         </figure>
                     )}
 
-                    <div className="wire-column__preview__content--item-detail-text-wrap">
-                        <div className="wire-column__preview__content--item-detail-item-text">
+                    <div className={itemWrapperClassName}>
+                        <div className={itemDetailClassName}>
                             <span className="wire-column__preview__slug">{item.slugline}</span>
                             <h2 className="wire-column__preview__headline">{item.headline}</h2>
 
