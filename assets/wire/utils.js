@@ -103,7 +103,13 @@ export function getIntVersion(item) {
  * @return {Object}
  */
 export function getPicture(item) {
-    return item.type === 'picture' ? item : get(item, 'associations.featuremedia');
+    return item.type === 'picture' ? item : get(item, 'associations.featuremedia', getBodyPicture(item));
+}
+
+function getBodyPicture(item) {
+    const pictures = Object.values(get(item, 'associations', {})).filter((assoc) => get(assoc, 'type') === 'picture');
+
+    return pictures.length ? pictures[0] : null;
 }
 
 /**
