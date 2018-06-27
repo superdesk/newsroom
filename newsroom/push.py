@@ -144,6 +144,7 @@ def publish_event(event):
             }
 
             _id = service.patch(event['guid'], updates)
+
         elif event.get('state') in [WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED]:
             # schedule is changed, recalculate the dates, planning id and coverages from dates will be removed
             updates = {}
@@ -151,6 +152,17 @@ def publish_event(event):
             updates['dates'] = get_event_dates(event)
             updates['coverages'] = None
             updates['planning_items'] = None
+            _id = service.patch(event['guid'], updates)
+
+        elif event.get('state') == WORKFLOW_STATE.SCHEDULED:
+            # event is reposted (possibly after a cancel)
+            updates = {
+                'event': event,
+                app.config['VERSION']: event[app.config['VERSION']],
+                'state': event['state'],
+                'dates': get_event_dates(event),
+            }
+            set_agenda_metadata_from_event(updates, event)
             _id = service.patch(event['guid'], updates)
 
     return _id
@@ -282,6 +294,7 @@ def get_coverages(planning_items):
                 'coverage_id': coverage['coverage_id'],
                 'scheduled': coverage['planning']['scheduled'],
                 'coverage_type': coverage['planning']['g2_content_type'],
+                'workflow_status': coverage['workflow_status'],
             })
 
     return coverages
