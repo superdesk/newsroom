@@ -5,11 +5,23 @@
     width: 18px;
     height: 18px;
     line-height: 18px;
+
+    .btn-outline-primary & {
+        fill: $main-blue;
+    }
 }
 
-.svg-icon--arrow-right {
+.svg-icon--arrow-right,
+.svg-icon--arrow-down {
     background-image: url('/static/arrow-right-black.svg');
 }
 .svg-icon--external-link-blue {
     background-image: url('/static/icon-external-link-blue.svg');
+}
+.svg-icon--arrow-down {
+    transform: rotate(90deg);
+}
+.svg-icon--arrow-down-white {
+    background-image: url('/static/icon-arrow-white.svg');
+    transform: rotate(90deg);    
 }
