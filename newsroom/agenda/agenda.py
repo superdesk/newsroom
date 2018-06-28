@@ -25,7 +25,7 @@ class AgendaResource(newsroom.Resource):
 
     # content metadata
     schema['name'] = events_schema['name']
-    schema['slugline'] = {'type': 'string'}
+    schema['slugline'] = not_analyzed
     schema['definition_long'] = events_schema['definition_long']
     schema['abstract'] = planning_schema['abstract']
     schema['headline'] = planning_schema['headline']
