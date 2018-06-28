@@ -9,7 +9,7 @@ install_requires = [
     'Flask-Cache>=0.13.1,<0.14',
     'honcho>=1.0.1',
     'gunicorn>=19.7.1',
-    'superdesk-core>=1.15.1,<1.16',
+    'superdesk-core==1.21'
 ]
 
 setup(
@@ -23,6 +23,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=install_requires,
+    dependency_links=['http://github.com/superdesk/superdesk-planning/tarball/master#egg=superdesk-planning'],
     scripts=['manage.py'],
     classifiers=[
         'Development Status :: 4 - Beta',
