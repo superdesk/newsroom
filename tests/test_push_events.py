@@ -175,7 +175,7 @@ def test_push_parsed_event(client, app):
     assert 1 == len(parsed['event']['event_contact_info'])
     assert 1 == len(parsed['location'])
 
-    resp = client.get('/agenda?date_to=now/d')
+    resp = client.get('/agenda/search?date_to=now/d')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 

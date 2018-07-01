@@ -26,3 +26,5 @@ def init_app(app):
     # })
 
     superdesk.register_resource('agenda', AgendaResource, AgendaService, _app=app)
+
+    app.sidenav('Agenda', 'agenda.agenda', 'bookmark')

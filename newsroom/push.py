@@ -254,10 +254,11 @@ def set_agenda_metadata_from_event(agenda, event):
     agenda['event_id'] = event['guid']
     agenda['recurrence_id'] = event.get('recurrence_id')
     agenda['name'] = event.get('name')
-    agenda['slugline'] = event.get('slugline')
+    agenda['slugline'] = event.get('slugline', agenda.get('slugline'))
     agenda['definition_long'] = event.get('definition_long')
     agenda['calendars'] = event.get('calendars')
     agenda['location'] = event.get('location')
+    agenda['ednote'] = event.get('ednote', agenda.get('ednote'))
     agenda['state'] = event.get('state')
     agenda['event'] = event
 
@@ -272,8 +273,9 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
     set_dates(agenda)
 
     agenda['headline'] = planning_item.get('headline')
-    agenda['slugline'] = planning_item.get('slugline')
+    agenda['slugline'] = planning_item.get('slugline', agenda.get('slugline'))
     agenda['abstract'] = planning_item.get('abstract')
+    agenda['ednote'] = planning_item.get('ednote', agenda.get('ednote'))
     agenda['name'] = planning_item.get('name')
 
 
@@ -304,6 +306,8 @@ def get_coverages(planning_items):
                 'scheduled': coverage['planning']['scheduled'],
                 'coverage_type': coverage['planning']['g2_content_type'],
                 'workflow_status': coverage['workflow_status'],
+                'news_coverage_status': coverage.get('news_coverage_status', {}).get('label'),
+                'coverage_provider': coverage['planning'].get('coverage_provider'),
             })
 
     return coverages

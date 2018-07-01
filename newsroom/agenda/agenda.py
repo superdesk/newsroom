@@ -31,6 +31,7 @@ class AgendaResource(newsroom.Resource):
     schema['headline'] = planning_schema['headline']
     schema['firstcreated'] = events_schema['firstcreated']
     schema['versioncreated'] = events_schema['versioncreated']
+    schema['ednote'] = events_schema['ednote']
 
     # dates
     schema['dates'] = {
@@ -49,7 +50,10 @@ class AgendaResource(newsroom.Resource):
             'planning_id': not_analyzed,
             'coverage_id': not_analyzed,
             'scheduled': {'type': 'datetime'},
-            'coverage_type': {'type': 'string'}
+            'coverage_type': not_analyzed,
+            'workflow_status': not_analyzed,
+            'news_coverage_status': not_analyzed,
+            'coverage_provider': not_analyzed,
         }
     }
 
