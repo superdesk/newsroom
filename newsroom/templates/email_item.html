@@ -1,0 +1,11 @@
+<h1>{{ item.headline }}</h1>
+
+{% if item.body_html %}{{ item.body_html | safe }}{% elif item.body_txt %}<pre>{{ item.body_txt }}</pre>{% endif %}
+
+<dl>
+{% if item.slugline %}<dt>Slugline:</dt><dd>{{ item.slugline }}</dd>{% endif %}
+{% if item.headline %}<dt>Headline:</dt><dd>{{ item.headline }}</dd>{% endif %}
+{% if item.service %}<dt>Category:</dt><dd>{{ item.service.0.name }}</dd>{% endif %}
+<dt>Published:</dt><dd>{{ item.versioncreated | datetime_long }}</dd>
+<dt>Link:</dt><dd><a href="{{ url }}">{{ url }}</a></dd>
+</dl>

@@ -79,20 +79,20 @@ def send_reset_password_email(user_name, user_email, token):
 
 
 def send_new_item_notification_email(user, topic_name, item):
-    app_name = current_app.config['SITE_NAME']
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
     subject = gettext('New story for followed topic: {}'.format(topic_name))
-    text_body = render_template(
-        'new_item_notification.txt',
-        app_name=app_name,
+    kwargs = dict(
+        app_name=current_app.config['SITE_NAME'],
         is_topic=True,
         topic_name=topic_name,
         name=user.get('first_name'),
         item=item,
-        url=url)
-
-    send_email(to=recipients, subject=subject, text_body=text_body)
+        url=url,
+    )
+    text_body = render_template('new_item_notification.txt', **kwargs)
+    html_body = render_template('new_item_notification.html', **kwargs)
+    send_email(to=recipients, subject=subject, text_body=text_body, html_body=html_body)
 
 
 def send_history_match_notification_email(user, item):

@@ -7,6 +7,7 @@ install_requires = [
     'Flask-WTF>=0.14.2,<0.15',
     'flask-limiter>=0.9.5.1,<0.9.6',
     'Flask-Cache>=0.13.1,<0.14',
+    'flask_pymongo>=0.5.2,<1.0',
     'honcho>=1.0.1',
     'gunicorn>=19.7.1',
     'superdesk-core>=1.15.1,<1.16',
