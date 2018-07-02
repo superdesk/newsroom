@@ -6,7 +6,7 @@ from superdesk.metadata.item import not_analyzed
 from planning.common import WORKFLOW_STATE_SCHEMA
 from newsroom.wire.search import get_local_date
 from eve.utils import ParsedRequest
-from flask import json
+from flask import json, abort
 
 
 class AgendaResource(newsroom.Resource):
@@ -79,6 +79,7 @@ class AgendaResource(newsroom.Resource):
         'search_backend': 'elastic',
         'default_sort': [('versioncreated', 1)],
     }
+
     item_methods = ['GET']
 
 
@@ -100,17 +101,48 @@ def _event_date_range(args):
     return {'range': {'dates.start': _range}}
 
 
+aggregations = {
+    'calendar': {'terms': {'field': 'calendars.name', 'size': 20}},
+    'location': {'terms': {'field': 'location.name', 'size': 20}},
+    'coverage': {'terms': {'field': 'coverages.coverage_type', 'size': 10}},
+}
+
+
+def get_aggregation_field(key):
+    return aggregations[key]['terms']['field']
+
+
+def _filter_terms(filters):
+    return [{'terms': {get_aggregation_field(key): val}} for key, val in filters.items() if val]
+
+
 class AgendaService(newsroom.Service):
     def get(self, req, lookup):
         query = _agenda_query()
-
-        if req.args.get('date_from') or req.args.get('date_to'):
-            query['bool']['must'].append(_event_date_range(req.args))
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
         source['size'] = 25
         source['from'] = int(req.args.get('from', 0))
+
+        filters = None
+
+        if req.args.get('filter'):
+            filters = json.loads(req.args['filter'])
+
+        if filters or req.args.get('date_from') or req.args.get('date_to'):
+            source['post_filter'] = {'bool': {'must': []}}
+        if filters:
+            source['post_filter']['bool']['must'] += _filter_terms(filters)
+        if req.args.get('date_from') or req.args.get('date_to'):
+            source['post_filter']['bool']['must'].append(_event_date_range(req.args))
+
+        if source['from'] >= 1000:
+            # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
+            return abort(400)
+
+        if not source['from']:  # avoid aggregations when handling pagination
+            source['aggs'] = aggregations
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}

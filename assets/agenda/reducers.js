@@ -112,7 +112,7 @@ function updateItemActions(state, items, action) {
     return itemsById;
 }
 
-function _wireReducer(state, action) {
+function _agendaReducer(state, action) {
     switch (action.type) {
 
     case TOGGLE_NAVIGATION: {
@@ -129,7 +129,7 @@ function _wireReducer(state, action) {
     case TOGGLE_FILTER: {
         const activeFilter = Object.assign({}, state.activeFilter);
         activeFilter[action.key] = toggleValue(activeFilter[action.key], action.val);
-        if (!activeFilter[action.key] || activeFilter[action.key].length === 0) {
+        if (!action.val || !activeFilter[action.key] || activeFilter[action.key].length === 0) {
             delete activeFilter[action.key];
         }
         if (action.single) {
@@ -405,13 +405,13 @@ export default function wireReducer(state = initialState, action) {
     }
 
     case TOGGLE_NAVIGATION:
-        return {...state, agenda: _wireReducer(state.agenda, action)};
+        return {...state, agenda: _agendaReducer(state.agenda, action)};
 
     case TOGGLE_FILTER:
     case SET_CREATED_FILTER:
     case RESET_FILTER:
     case SET_VIEW:
-        return {...state, agenda: _wireReducer(state.agenda, action)};
+        return {...state, agenda: _agendaReducer(state.agenda, action)};
 
     case START_LOADING:
         return {...state, isLoading: true};

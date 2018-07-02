@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 const STATUS_CANCELED = 'canceled';
 const STATUS_POSTPONED = 'postponed';
@@ -42,7 +42,7 @@ export function isRescheduled(item) {
  * @return {Boolean}
  */
 export function hasCoverages(item) {
-    return item && item.coverages && item.coverages.length;
+    return !isEmpty(get(item, 'coverages'));
 }
 
 /**
@@ -62,7 +62,7 @@ export function isRecurring(item) {
  * @return {String}
  */
 export function getGeoLocation(item) {
-    get(item, 'location.location', null);
+    return get(item, 'location.location', null);
 }
 
 /**
@@ -85,7 +85,7 @@ export function getLocationString(item) {
  * @return {String}
  */
 export function hasLocation(item) {
-    return item && item.location && item.location.length;
+    return !isEmpty(get(item, 'location'));
 }
 
 
@@ -96,7 +96,7 @@ export function hasLocation(item) {
  * @return {String}
  */
 export function hasContact(item) {
-    return item && item.event && item.event.event_contact_info && item.event.event_contact_info.length;
+    return !isEmpty(get(item, 'event.event_contact_info'));
 }
 
 /**
@@ -147,7 +147,7 @@ export function getContactEmail(item) {
  * @return {String}
  */
 export function hasEventLink(item) {
-    return item && item.event && item.event.links && item.event.links.length;
+    return !isEmpty(get(item, 'event.links'));
 }
 
 

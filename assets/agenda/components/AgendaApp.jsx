@@ -16,6 +16,7 @@ import {
     setView,
     refresh,
     previewItem,
+    toggleDropdownFilter,
 } from 'agenda/actions';
 
 import { getActiveQuery, isTopicActive } from 'wire/utils';
@@ -35,6 +36,7 @@ import ShareItemModal from 'components/ShareItemModal';
 import { getItemActions } from 'wire/item-actions';
 import {isTouchDevice} from 'utils';
 import {hasCoverages, isCanceled, isPostponed, isRescheduled} from '../utils';
+import AgendaFilters from './AgendaFilters';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -232,6 +234,12 @@ class AgendaApp extends React.Component {
                                 resultsFiltered = {this.props.resultsFiltered}
                             />
 
+                            <AgendaFilters
+                                aggregations={this.props.aggregations}
+                                toggleFilter={this.props.toggleDropdownFilter}
+                                activeFilter={this.props.activeFilter}
+                            />
+
                             <AgendaList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
@@ -299,6 +307,8 @@ AgendaApp.propTypes = {
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
     resultsFiltered: PropTypes.bool,
+    aggregations: PropTypes.object,
+    toggleDropdownFilter: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -321,6 +331,7 @@ const mapStateToProps = (state) => ({
     activeNavigation: get(state, 'agenda.activeNavigation', null),
     bookmarks: state.bookmarks,
     resultsFiltered: state.resultsFiltered,
+    aggregations: state.aggregations,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -338,6 +349,7 @@ const mapDispatchToProps = (dispatch) => ({
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
+    toggleDropdownFilter: (field, value) => dispatch(toggleDropdownFilter(field, value)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

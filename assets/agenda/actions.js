@@ -434,6 +434,14 @@ export function toggleFilter(key, val, single) {
     };
 }
 
+export const TOGGLE_DROPDOWN_FILTER = 'TOGGLE_DROPDOWN_FILTER';
+export function toggleDropdownFilter(key, val, single) {
+    return (dispatch) => {
+        dispatch({type: TOGGLE_FILTER, key, val, single});
+        dispatch(fetchItems());
+    };
+}
+
 export const START_LOADING = 'START_LOADING';
 export function startLoading() {
     return {type: START_LOADING};
