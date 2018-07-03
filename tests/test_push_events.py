@@ -120,7 +120,7 @@ test_planning = {
                 "ednote": "ed note here",
                 "scheduled": "2018-05-28T10:51:52+0000"
             },
-            "news_coverage_status": {
+            "coverage_status": {
                 "name": "coverage intended",
                 "label": "Planned",
                 "qcode": "ncostat:int"
@@ -137,7 +137,7 @@ test_planning = {
                 "ednote": "ed note here",
                 "scheduled": "2018-05-28T10:51:52+0000"
             },
-            "news_coverage_status": {
+            "coverage_status": {
                 "name": "coverage intended",
                 "label": "Planned",
                 "qcode": "ncostat:int"

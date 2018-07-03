@@ -52,7 +52,7 @@ class AgendaResource(newsroom.Resource):
             'scheduled': {'type': 'datetime'},
             'coverage_type': not_analyzed,
             'workflow_status': not_analyzed,
-            'news_coverage_status': not_analyzed,
+            'coverage_status': not_analyzed,
             'coverage_provider': not_analyzed,
         }
     }

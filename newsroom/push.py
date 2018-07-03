@@ -23,7 +23,6 @@ from newsroom.upload import ASSETS_RESOURCE
 
 from planning.common import WORKFLOW_STATE
 
-
 logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
 
@@ -174,7 +173,6 @@ def publish_event(event):
 
 
 def get_event_dates(event):
-
     event['dates']['start'] = datetime.strptime(event['dates']['start'], '%Y-%m-%dT%H:%M:%S+0000')
     event['dates']['end'] = datetime.strptime(event['dates']['end'], '%Y-%m-%dT%H:%M:%S+0000')
 
@@ -200,29 +198,22 @@ def publish_planning(planning):
             # if there's an event then _id field will have the same value as event_id
             agenda = app.data.find_one('agenda', req=None, _id=planning['event_item'])
 
-            if planning.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
-                    planning.get('pubstatus') == 'cancelled':
+            if not agenda:
+                # event id exists in planning item but event is not in the system
+                logger.warning('Event {} for planning {} couldn\'t be found'.format(planning['event_item'], planning))
+                # create new agenda
+                agenda = init_adhoc_agenda(planning)
+            else:
+                if planning.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
+                        planning.get('pubstatus') == 'cancelled':
+                    # remove the planning item from the list
+                    set_agenda_planning_items(agenda, planning, action='remove')
 
-                # remove the planning item from the list
-                set_agenda_planning_items(agenda, planning, action='remove')
-
-                return service.patch(agenda['_id'], agenda)
+                    return service.patch(agenda['_id'], agenda)
 
         else:
             # there's no event item (ad-hoc planning item)
-            agenda = {}
-
-            # check if there's an existing ad-hoc
-            existing_planning_items = list(query_resource('agenda', lookup={'planning_id': planning['guid']}))
-
-            if len(existing_planning_items) > 0:
-                agenda = existing_planning_items[0]
-
-            # planning dates is saved as the dates of the new agenda
-            agenda['dates'] = {
-                'start': planning['planning_date'],
-                'end': planning['planning_date'],
-            }
+            agenda = init_adhoc_agenda(planning)
 
         # update agenda metadata
         set_agenda_metadata_from_planning(agenda, planning)
@@ -231,8 +222,8 @@ def publish_planning(planning):
         set_agenda_planning_items(agenda, planning, action='add')
 
         if not agenda.get('_id'):
-            # setting _id of agenda to be equal to planning if there's no event
-            agenda.setdefault('_id', planning['guid'])
+            # setting _id of agenda to be equal to planning if there's no event id
+            agenda.setdefault('_id', planning.get('event_item', planning['guid']) or planning['guid'])
             _id = service.create([agenda])[0]
         else:
             # replace the original document
@@ -240,6 +231,27 @@ def publish_planning(planning):
         return _id
     except Exception as exc:
         logger.error('Error in publishing planning: {}'.format(planning), exc, exc_info=True)
+
+
+def init_adhoc_agenda(planning):
+    """
+    Inits an adhoc agenda item
+    """
+    agenda = {}
+
+    # check if there's an existing ad-hoc
+    existing_planning_items = list(query_resource('agenda', lookup={'planning_id': planning['guid']}))
+
+    if len(existing_planning_items) > 0:
+        agenda = existing_planning_items[0]
+
+    # planning dates is saved as the dates of the new agenda
+    agenda['dates'] = {
+        'start': planning['planning_date'],
+        'end': planning['planning_date'],
+    }
+
+    return agenda
 
 
 def set_agenda_metadata_from_event(agenda, event):
@@ -334,7 +346,6 @@ def notify_new_item(item, check_topics=True):
 
 
 def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids):
-
     related_items = item.get('ancestors', [])
     related_items.append(item['_id'])
 

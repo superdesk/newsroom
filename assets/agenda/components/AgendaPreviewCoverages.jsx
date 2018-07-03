@@ -26,8 +26,8 @@ function AgendaPreviewCoverages({coverages}) {
                 <div className='coverage-item__row'>
                     {coverage.coverage_provider && <span className='coverage-item__text-label mr-1'>{gettext('Source')}:</span>}
                     {coverage.coverage_provider && <span className='mr-2'>{coverage.coverage_provider}</span>}
-                    {coverage.news_coverage_status && <span className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>}
-                    {coverage.news_coverage_status && <span>{coverage.news_coverage_status}</span>}
+                    {coverage.coverage_status && <span className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>}
+                    {coverage.coverage_status && <span>{coverage.news_coverage_status}</span>}
                 </div>
 
             </div>)}
