@@ -17,6 +17,7 @@ def update_config(conf):
     conf['DEBUG'] = True
     conf['TESTING'] = True
     conf['WEBPACK_ASSETS_URL'] = None
+    conf['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Prague'
     return conf
 
 

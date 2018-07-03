@@ -1,7 +1,10 @@
-{{name}},
+{% block name %}{{ name }},{% endblock %}
 {% block content %}{% endblock %}
+
+{% block footer %}
 Regards,
 The {{app_name}} Team
 
 {{app_name}} is developed by Sourcefabric and the {{app_name}} community.
 http://sourcefabric.org
+{% endblock %}
