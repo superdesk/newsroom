@@ -12,6 +12,7 @@ import {
     setQuery,
     selectAll,
     selectNone,
+    selectDate,
     fetchMoreItems,
     setView,
     refresh,
@@ -37,6 +38,7 @@ import { getItemActions } from 'wire/item-actions';
 import {isTouchDevice} from 'utils';
 import {hasCoverages, isCanceled, isPostponed, isRescheduled} from '../utils';
 import AgendaFilters from './AgendaFilters';
+import AgendaDateNavigation from './AgendaDateNavigation';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -197,6 +199,12 @@ class AgendaApp extends React.Component {
                             setQuery={this.props.setQuery}
                         />
 
+                        <AgendaDateNavigation
+                            selectDate={this.props.selectDate}
+                            activeDate={this.props.activeDate}
+                            activeGrouping={this.props.activeGrouping}
+                        />
+
                         <AgendaListViewControls
                             activeView={this.props.activeView}
                             setView={this.props.setView}
@@ -309,6 +317,9 @@ AgendaApp.propTypes = {
     resultsFiltered: PropTypes.bool,
     aggregations: PropTypes.object,
     toggleDropdownFilter: PropTypes.func,
+    selectDate: PropTypes.func,
+    activeDate: PropTypes.number,
+    activeGrouping: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -332,6 +343,8 @@ const mapStateToProps = (state) => ({
     bookmarks: state.bookmarks,
     resultsFiltered: state.resultsFiltered,
     aggregations: state.aggregations,
+    activeDate: state.activeDate,
+    activeGrouping: state.activeGrouping,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -350,6 +363,10 @@ const mapDispatchToProps = (dispatch) => ({
     refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
     toggleDropdownFilter: (field, value) => dispatch(toggleDropdownFilter(field, value)),
+    selectDate: (dateString, grouping) => {
+        dispatch(selectDate(dateString, grouping));
+        dispatch(fetchItems());
+    }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

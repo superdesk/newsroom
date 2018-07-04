@@ -29,7 +29,7 @@ import {
     DOWNLOAD_ITEMS,
     COPY_ITEMS,
     PRINT_ITEMS,
-    SET_TOPICS,
+    SET_TOPICS, SELECT_DATE,
 } from './actions';
 
 import { RENDER_MODAL, CLOSE_MODAL } from 'actions';
@@ -69,6 +69,8 @@ const initialState = {
         activeView: EXTENDED_VIEW,
     },
     resultsFiltered: false,
+    activeDate: Date.now(),
+    activeGrouping: 'day',
 };
 
 function recieveItems(state, data) {
@@ -167,7 +169,7 @@ function _agendaReducer(state, action) {
     }
 }
 
-export default function wireReducer(state = initialState, action) {
+export default function agendaReducer(state = initialState, action) {
     switch (action.type) {
 
     case SET_ITEMS: {
@@ -293,6 +295,14 @@ export default function wireReducer(state = initialState, action) {
         return {
             ...state,
             selectedItems: [],
+        };
+
+    case SELECT_DATE:
+        return {
+            ...state,
+            selectedItems: [],
+            activeDate: action.dateString,
+            activeGrouping: action.grouping || 'day',
         };
 
     case SHARE_ITEMS: {

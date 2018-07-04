@@ -1,11 +1,11 @@
 import { createStore, render, initWebSocket } from 'utils';
 
-import wireReducer from './reducers';
+import agendaReducer from './reducers';
 import {getReadItems} from 'wire/utils';
 import AgendaApp from './components/AgendaApp';
 import { fetchItems, setState, initData, initParams, pushNotification, setView } from './actions';
 
-const store = createStore(wireReducer);
+const store = createStore(agendaReducer);
 
 // init data
 store.dispatch(initData(window.agendaData || {}, getReadItems()));

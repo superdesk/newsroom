@@ -7,6 +7,7 @@ from planning.common import WORKFLOW_STATE_SCHEMA
 from newsroom.wire.search import get_local_date
 from eve.utils import ParsedRequest
 from flask import json, abort
+from newsroom.wire.search import _query_string
 
 
 class AgendaResource(newsroom.Resource):
@@ -120,6 +121,12 @@ class AgendaService(newsroom.Service):
     def get(self, req, lookup):
         query = _agenda_query()
 
+        if req.args.get('q'):
+            query['bool']['must'].append(_query_string(req.args['q']))
+
+        if req.args.get('date_from') or req.args.get('date_to'):
+            query['bool']['must'].append(_event_date_range(req.args))
+
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
         source['size'] = 25
@@ -130,12 +137,8 @@ class AgendaService(newsroom.Service):
         if req.args.get('filter'):
             filters = json.loads(req.args['filter'])
 
-        if filters or req.args.get('date_from') or req.args.get('date_to'):
-            source['post_filter'] = {'bool': {'must': []}}
         if filters:
-            source['post_filter']['bool']['must'] += _filter_terms(filters)
-        if req.args.get('date_from') or req.args.get('date_to'):
-            source['post_filter']['bool']['must'].append(_event_date_range(req.args))
+            source['post_filter'] = {'bool': {'must': [_filter_terms(filters)]}}
 
         if source['from'] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination

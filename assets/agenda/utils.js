@@ -1,8 +1,28 @@
 import { get, isEmpty } from 'lodash';
+import moment from 'moment/moment';
 
 const STATUS_CANCELED = 'canceled';
 const STATUS_POSTPONED = 'postponed';
 const STATUS_RESCHEDULED = 'rescheduled';
+
+const navigationFunctions = {
+    'day': {
+        'next': getNextDay,
+        'previous': getPreviousDay,
+        'format': (dateString) => moment(dateString).format('dddd, D MMMM'),
+    },
+    'week': {
+        'next': getNextWeek,
+        'previous': getPreviousWeek,
+        'format': (dateString) => `${moment(dateString).format('D MMMM')} - 
+        ${moment(dateString).add(6, 'days').format('D MMMM')}`,
+    },
+    'month': {
+        'next': getNextMonth,
+        'previous': getPreviousMonth,
+        'format': (dateString) => moment(dateString).format('MMMM, YYYY'),
+    }
+};
 
 
 /**
@@ -164,6 +184,120 @@ export function getEventLink(item) {
     }
     return null;
 }
+
+
+/**
+ * Format date of a date (without time)
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatNavigationDate(dateString, grouping) {
+    return navigationFunctions[grouping].format(dateString);
+}
+
+
+/**
+ * Return date formatted for query
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function getDateInputDate(dateString) {
+    if (dateString) {
+        const parsed = moment(parseInt(dateString));
+        return parsed.format('YYYY-MM-DD');
+    }
+
+    return '';
+}
+
+/**
+ * Gets the next day
+ *
+ * @param {String} dateString
+ * @return {String} number of milliseconds since the Unix Epoch
+ */
+function getNextDay(dateString) {
+    return moment(dateString).add(1, 'days').valueOf();
+}
+
+
+/**
+ * Gets the next day
+ *
+ * @param {String} dateString
+ * @return {String} number of milliseconds since the Unix Epoch
+ */
+function getPreviousDay(dateString) {
+    return moment(dateString).add(-1, 'days').valueOf();
+}
+
+/**
+ * Gets the next week
+ *
+ * @param {String} dateString
+ * @return {String} number of milliseconds since the Unix Epoch
+ */
+function getNextWeek(dateString) {
+    return moment(dateString).add(7, 'days').isoWeekday(1).valueOf();
+}
+
+
+/**
+ * Gets the previous week
+ *
+ * @param {String} dateString
+ * @return {String} number of milliseconds since the Unix Epoch
+ */
+function getPreviousWeek(dateString) {
+    return moment(dateString).add(-7, 'days').isoWeekday(1).valueOf();
+}
+
+/**
+ * Gets the next month
+ *
+ * @param {String} dateString
+ * @return {String} number of milliseconds since the Unix Epoch
+ */
+function getNextMonth(dateString) {
+    return moment(dateString).add(1, 'months').startOf('month').valueOf();
+}
+
+
+/**
+ * Gets the previous month
+ *
+ * @param {String} dateString
+ * @return {String} number of milliseconds since the Unix Epoch
+ */
+function getPreviousMonth(dateString) {
+    return moment(dateString).add(-1, 'months').startOf('month').valueOf();
+}
+
+/**
+ * Calls the next function of a given grouping
+ *
+ * @param {String} dateString
+ * @param {String} grouping: day, week or month
+ * @return {String} number of milliseconds since the Unix Epoch
+ */
+export function getNext(dateString, grouping) {
+    return navigationFunctions[grouping].next(dateString);
+}
+
+
+/**
+ * Calls the previous function of a given grouping
+ *
+ * @param {String} dateString
+ * @param {String} grouping: day, week or month
+ * @return {String} number of milliseconds since the Unix Epoch
+ */
+export function getPrevious(dateString, grouping) {
+    return navigationFunctions[grouping].previous(dateString);
+}
+
 
 
 

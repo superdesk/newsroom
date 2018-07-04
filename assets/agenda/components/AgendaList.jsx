@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 
-import { gettext, formatDate } from 'utils';
+import { gettext, formatDate, formatWeek, formatMonth } from 'utils';
 import AgendaListItem from './AgendaListItem';
 import { setActive, previewItem, toggleSelected, openItem } from '../actions';
 import { EXTENDED_VIEW } from 'wire/defaults';
@@ -11,6 +11,12 @@ import { getIntVersion } from 'wire/utils';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
+
+const Groupers = {
+    'day': formatDate,
+    'week': formatWeek,
+    'month': formatMonth,
+};
 
 class AgendaList extends React.Component {
     constructor(props) {
@@ -116,8 +122,9 @@ class AgendaList extends React.Component {
 
     getGroupedItems(items) {
         const groupedItems = {};
+        const grouper = Groupers[this.props.activeGrouping];
         items.map((item) => {
-            const key = formatDate(this.props.itemsById[item].dates.start);
+            const key = grouper(this.props.itemsById[item].dates.start);
             let groupList = groupedItems[key] || [];
             groupList.push(item);
             groupedItems[key] = groupList;
@@ -192,6 +199,7 @@ AgendaList.propTypes = {
     user: PropTypes.string,
     company: PropTypes.string,
     activeView: PropTypes.string,
+    activeGrouping: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -204,6 +212,7 @@ const mapStateToProps = (state) => ({
     bookmarks: state.bookmarks,
     user: state.user,
     company: state.company,
+    activeGrouping: state.activeGrouping,
 });
 
 export default connect(mapStateToProps)(AgendaList);

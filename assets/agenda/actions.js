@@ -5,6 +5,7 @@ import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset } from 'utils';
 import { markItemAsRead } from 'wire/utils';
 import { renderModal, closeModal } from 'actions';
+import {getDateInputDate} from './utils';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -90,6 +91,11 @@ export function addTopic(topic) {
     return {type: ADD_TOPIC, topic};
 }
 
+export const SELECT_DATE = 'SELECT_DATE';
+export function selectDate(dateString, grouping) {
+    return {type: SELECT_DATE, dateString, grouping};
+}
+
 
 /**
  * Copy contents of item preview.
@@ -140,6 +146,7 @@ function search(state, next) {
     const activeFilter = get(state, 'agenda.activeFilter', {});
     const activeNavigation = get(state, 'agenda.activeNavigation');
     const createdFilter = get(state, 'agenda.createdFilter', {});
+    const agendaDate = getDateInputDate(state.activeDate);
 
     const params = {
         q: state.query,
@@ -149,6 +156,7 @@ function search(state, next) {
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to: createdFilter.to,
+        date_from: agendaDate,
         timezone_offset: getTimezoneOffset(),
     };
 

@@ -184,6 +184,28 @@ export function formatDate(dateString) {
 }
 
 /**
+ * Format week of a date (without time)
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatWeek(dateString) {
+    const startDate = parseDate(dateString).isoWeekday(1);
+    const endDate = parseDate(dateString).isoWeekday(7);
+    return `${startDate.format(DATE_FORMAT)} - ${endDate.format(DATE_FORMAT)}`;
+}
+
+/**
+ * Format month of a date (without time)
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatMonth(dateString) {
+    return parseDate(dateString).format('MMMM');
+}
+
+/**
  * Wrapper for alertifyjs
  */
 export const notify = {
