@@ -1223,6 +1223,8 @@ article.list {
 .wire-articles--list {
     padding-top: 20px;
     margin-top: 0;
+    overflow: auto;
+    flex-grow: 1;
 }
 
 .wire-articles__item--list {
