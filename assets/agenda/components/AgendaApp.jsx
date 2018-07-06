@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 import { gettext } from 'utils';
 
 import {
-    followTopic,
+    followEvent,
     fetchItems,
     setQuery,
     selectAll,
@@ -20,7 +20,7 @@ import {
     toggleDropdownFilter,
 } from 'agenda/actions';
 
-import { getActiveQuery, isTopicActive } from 'wire/utils';
+import { getActiveQuery } from 'wire/utils';
 
 import AgendaPreview from './AgendaPreview';
 import AgendaList from './AgendaList';
@@ -134,8 +134,8 @@ class AgendaApp extends React.Component {
         const multiActionFilter = (action) => action.multi &&
             this.props.selectedItems.every((item) => !action.when || action.when(this.props, this.props.itemsById[item]));
 
-        const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
-            this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
+        const isFollowing = get(this.props, 'itemToPreview._id') && this.props.topics &&
+            this.props.topics.find((topic) => topic.query === this.props.itemToPreview._id);
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
         const mainClassName = classNames('wire-column__main', {
             'wire-articles__one-side-pane': panesCount === 1,
@@ -160,7 +160,7 @@ class AgendaApp extends React.Component {
             this.props.resultsFiltered ? this.props.activeFilter : {},
             this.props.resultsFiltered ? this.props.createdFilter : {}
         );
-        const activeTopic = this.props.topics.find((topic) => isTopicActive(topic, searchCriteria));
+        const activeTopic = this.props.topics.find((topic) => topic._id === this.props.activeTopic);
 
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
@@ -232,7 +232,6 @@ class AgendaApp extends React.Component {
                                 query={this.props.activeQuery}
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
-                                followTopic={this.props.followTopic}
                                 newItems={this.props.newItems}
                                 refresh={this.props.refresh}
                                 searchCriteria={searchCriteria}
@@ -290,7 +289,7 @@ AgendaApp.propTypes = {
     itemToPreview: PropTypes.object,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
-    followTopic: PropTypes.func,
+    followEvent: PropTypes.func,
     modal: PropTypes.object,
     user: PropTypes.string,
     company: PropTypes.string,
@@ -308,7 +307,6 @@ AgendaApp.propTypes = {
     fetchMoreItems: PropTypes.func,
     activeView: PropTypes.string,
     setView: PropTypes.func,
-    followEvent: PropTypes.func,
     newItems: PropTypes.array,
     refresh: PropTypes.func,
     closePreview: PropTypes.func,
@@ -320,6 +318,7 @@ AgendaApp.propTypes = {
     selectDate: PropTypes.func,
     activeDate: PropTypes.number,
     activeGrouping: PropTypes.string,
+    activeTopic: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -339,6 +338,7 @@ const mapStateToProps = (state) => ({
     activeView: get(state, 'agenda.activeView'),
     newItems: state.newItems,
     navigations: get(state, 'agenda.navigations', []),
+    activeTopic: get(state, 'agenda.activeTopic'),
     activeNavigation: get(state, 'agenda.activeNavigation', null),
     bookmarks: state.bookmarks,
     resultsFiltered: state.resultsFiltered,
@@ -348,8 +348,10 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    followTopic: (query) => dispatch(followTopic(query)),
-    followEvent: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`})),
+    followEvent: (item) => dispatch(followEvent({
+        label: item.name,
+        query: `${item._id}`
+    })),
     fetchItems: () => dispatch(fetchItems()),
     setQuery: (query) => {
         dispatch(setQuery(query));

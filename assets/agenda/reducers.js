@@ -3,6 +3,7 @@ import {
     OPEN_ITEM,
     SET_ITEMS,
     SET_QUERY,
+    SET_EVENT_QUERY,
     QUERY_ITEMS,
     RECIEVE_ITEMS,
     RECIEVE_ITEM,
@@ -19,6 +20,7 @@ import {
     REMOVE_BOOKMARK,
     SET_NEW_ITEMS_BY_TOPIC,
     TOGGLE_NAVIGATION,
+    TOGGLE_TOPIC,
     TOGGLE_FILTER,
     START_LOADING,
     RECIEVE_NEXT_ITEMS,
@@ -67,6 +69,7 @@ const initialState = {
         activeFilter: {},
         createdFilter: {},
         activeView: EXTENDED_VIEW,
+        activeTopic: null,
     },
     resultsFiltered: false,
     activeDate: Date.now(),
@@ -125,6 +128,17 @@ function _agendaReducer(state, action) {
             activeFilter: {},
             createdFilter: {},
             activeNavigation,
+        };
+    }
+
+    case TOGGLE_TOPIC: {
+        const activeTopic = action.topic ? action.topic._id : null;
+
+        return {
+            ...state,
+            activeFilter: {},
+            createdFilter: {},
+            activeTopic,
         };
     }
 
@@ -225,6 +239,9 @@ export default function agendaReducer(state = initialState, action) {
 
     case SET_QUERY:
         return {...state, query: action.query, activeItem: null};
+
+    case SET_EVENT_QUERY:
+        return {...state, queryId: action.query, activeItem: null};
 
     case QUERY_ITEMS:
         return {...state, isLoading: true, totalItems: null, activeQuery: state.query};
@@ -414,9 +431,8 @@ export default function agendaReducer(state = initialState, action) {
         };
     }
 
+    case TOGGLE_TOPIC:
     case TOGGLE_NAVIGATION:
-        return {...state, agenda: _agendaReducer(state.agenda, action)};
-
     case TOGGLE_FILTER:
     case SET_CREATED_FILTER:
     case RESET_FILTER:

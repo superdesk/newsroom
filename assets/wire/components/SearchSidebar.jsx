@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { gettext } from 'utils';
+import { gettext, isWireContext } from 'utils';
 import { setActiveFilterTab, getActiveFilterTab } from '../utils';
 
 import {
@@ -18,9 +18,11 @@ import NavigationTab from './filters/NavigationTab';
 class SearchSidebar extends React.Component {
     constructor(props) {
         super(props);
+
+        const tabName = isWireContext() ? 'Topics' : 'Events';
         this.tabs = [
-            {label: gettext('Topics'), content: NavigationTab},
-            {label: gettext('My Topics'), content: TopicsTab},
+            {label: gettext(tabName), content: NavigationTab},
+            {label: gettext('My {{name}}', {name: tabName}), content: TopicsTab},
             {label: gettext('Filters'), content: FiltersTab},
         ];
         this.state = {active: getActiveFilterTab() || this.tabs[0].label};
@@ -124,10 +126,10 @@ SearchSidebar.propTypes = {
 const mapStateToProps = (state) => ({
     bookmarkedItems: state.bookmarkedItems || [],
     itemsById: state.itemsById,
-    activeFilter: state.wire.activeFilter,
+    activeFilter: (state.wire || state.agenda).activeFilter,
     aggregations: state.aggregations,
     newItemsByTopic: state.newItemsByTopic,
-    createdFilter: state.wire.createdFilter,
+    createdFilter: (state.wire || state.agenda).createdFilter,
     resultsFiltered: state.resultsFiltered,
 });
 

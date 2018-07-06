@@ -1,17 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
+import { gettext, isWireContext } from 'utils';
 
 import {
     setTopicQuery,
     removeNewItems,
 } from 'wire/actions';
 
+import {
+    setEventQuery,
+} from 'agenda/actions';
+
+const tabName = isWireContext() ? 'topics' : 'events';
+
 function TopicsTab({topics, dispatch, newItemsByTopic, activeTopic, manageTopics}) {
     const clickTopic = (e, topic) => {
         e.preventDefault();
         dispatch(removeNewItems(topic._id));
-        dispatch(setTopicQuery(topic));
+        dispatch(topic.topic_type === 'agenda' ? setEventQuery(topic) : setTopicQuery(topic));
     };
 
     return topics && topics.length > 0 ? [topics.map((topic) => (
@@ -23,9 +29,9 @@ function TopicsTab({topics, dispatch, newItemsByTopic, activeTopic, manageTopics
                 {newItemsByTopic[topic._id].length}
             </span>}
         </a>
-    )),   <a key='manage_topics' href='#' onClick={manageTopics}>{gettext('Manage my topics')}</a>]
+    )),   <a key='manage_topics' href='#' onClick={manageTopics}>{gettext('Manage my {{name}}', {name: tabName})}</a>]
 
-        : <div className='wire-column__info'>{gettext('No topics created.')}</div>;
+        : <div className='wire-column__info'>{gettext('No {{name}} created.', {name: tabName})}</div>;
 }
 
 TopicsTab.propTypes = {
@@ -34,6 +40,7 @@ TopicsTab.propTypes = {
     newItemsByTopic: PropTypes.object,
     activeTopic: PropTypes.object,
     manageTopics: PropTypes.func,
+
 };
 
 export default TopicsTab;

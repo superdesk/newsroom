@@ -202,6 +202,7 @@ export function fetchItem(id) {
  * @param {String} topic
  */
 export function followTopic(topic) {
+    topic.topic_type = 'wire';
     return renderModal('followTopic', {topic});
 }
 
@@ -411,7 +412,8 @@ function reloadTopics(user) {
     return function (dispatch) {
         return server.get(`/users/${user}/topics`)
             .then((data) => {
-                return dispatch(setTopics(data._items));
+                const wireTopics = data._items.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
+                return dispatch(setTopics(wireTopics));
             })
             .catch(errorHandler);
     };

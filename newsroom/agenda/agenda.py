@@ -34,6 +34,14 @@ class AgendaResource(newsroom.Resource):
     schema['versioncreated'] = events_schema['versioncreated']
     schema['ednote'] = events_schema['ednote']
 
+    # aggregated fields
+    schema['genre'] = planning_schema['genre']
+    schema['subject'] = planning_schema['subject']
+    schema['anpa_category'] = planning_schema['anpa_category']
+    schema['priority'] = planning_schema['priority']
+    schema['urgency'] = planning_schema['urgency']
+    schema['place'] = planning_schema['place']
+
     # dates
     schema['dates'] = {
         'type': 'dict',
@@ -106,6 +114,11 @@ aggregations = {
     'calendar': {'terms': {'field': 'calendars.name', 'size': 20}},
     'location': {'terms': {'field': 'location.name', 'size': 20}},
     'coverage': {'terms': {'field': 'coverages.coverage_type', 'size': 10}},
+    'genre': {'terms': {'field': 'genre.name', 'size': 50}},
+    'service': {'terms': {'field': 'service.name', 'size': 50}},
+    'subject': {'terms': {'field': 'subject.name', 'size': 20}},
+    'urgency': {'terms': {'field': 'urgency'}},
+    'place': {'terms': {'field': 'place.name', 'size': 50}},
 }
 
 
@@ -123,6 +136,9 @@ class AgendaService(newsroom.Service):
 
         if req.args.get('q'):
             query['bool']['must'].append(_query_string(req.args['q']))
+
+        if req.args.get('id'):
+            query['bool']['must'].append({'term': {'_id': req.args['id']}})
 
         if req.args.get('date_from') or req.args.get('date_to'):
             query['bool']['must'].append(_event_date_range(req.args))

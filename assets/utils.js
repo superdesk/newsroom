@@ -377,3 +377,11 @@ export function isTouchDevice() {
     return 'ontouchstart' in window        // works on most browsers
     || navigator.maxTouchPoints;       // works on IE10/11 and Surface
 }
+
+/**
+ * Checks if wire context
+ * @returns {boolean}
+ */
+export function isWireContext() {
+    return window.location.pathname.includes('/wire');
+}

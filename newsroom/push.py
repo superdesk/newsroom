@@ -272,6 +272,10 @@ def set_agenda_metadata_from_event(agenda, event):
     agenda['location'] = event.get('location')
     agenda['ednote'] = event.get('ednote', agenda.get('ednote'))
     agenda['state'] = event.get('state')
+    agenda['place'] = event.get('place')
+    agenda['subject'] = event.get('subject')
+    agenda['anpa_category'] = event.get('anpa_category')
+
     agenda['event'] = event
 
     set_dates(agenda)
@@ -289,6 +293,12 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
     agenda['abstract'] = planning_item.get('abstract')
     agenda['ednote'] = planning_item.get('ednote', agenda.get('ednote'))
     agenda['name'] = planning_item.get('name')
+    agenda['place'] = planning_item.get('place', agenda.get('place'))
+    agenda['subject'] = planning_item.get('subject', agenda.get('subject'))
+    agenda['anpa_category'] = planning_item.get('anpa_category', agenda.get('anpa_category'))
+    agenda['genre'] = planning_item.get('genre')
+    agenda['priority'] = planning_item.get('priority')
+    agenda['urgency'] = planning_item.get('urgency')
 
 
 def set_agenda_planning_items(agenda, planning_item, action='add'):

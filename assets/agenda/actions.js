@@ -66,6 +66,12 @@ export function setQuery(query) {
     return {type: SET_QUERY, query};
 }
 
+export const SET_EVENT_QUERY = 'SET_EVENT_QUERY';
+export function setQueryById(query) {
+    query && analytics.event('search', query);
+    return {type: SET_EVENT_QUERY, query};
+}
+
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {
     return {type: QUERY_ITEMS};
@@ -150,6 +156,7 @@ function search(state, next) {
 
     const params = {
         q: state.query,
+        id: state.queryId,
         bookmarks: state.bookmarks && state.user,
         navigation: activeNavigation,
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
@@ -202,7 +209,8 @@ export function fetchItem(id) {
  *
  * @param {String} topic
  */
-export function followTopic(topic) {
+export function followEvent(topic) {
+    topic.topic_type = 'agenda';
     return renderModal('followTopic', {topic});
 }
 
@@ -401,7 +409,8 @@ function reloadTopics(user) {
     return function (dispatch) {
         return server.get(`/users/${user}/topics`)
             .then((data) => {
-                return dispatch(setTopics(data._items));
+                const agendaTopics = data._items.filter((topic) => topic.topic_type === 'agenda');
+                return dispatch(setTopics(agendaTopics));
             })
             .catch(errorHandler);
     };
@@ -425,6 +434,11 @@ export function fetchNewItems() {
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
 function _toggleNavigation(navigation) {
     return {type: TOGGLE_NAVIGATION, navigation};
+}
+
+export const TOGGLE_TOPIC = 'TOGGLE_TOPIC';
+function _toggleTopic(topic) {
+    return {type: TOGGLE_TOPIC, topic};
 }
 
 export function toggleNavigation(navigation) {
@@ -526,10 +540,11 @@ export function resetFilter(filter) {
  * @param {Object} topic
  * @return {Promise}
  */
-export function setTopicQuery(topic) {
+export function setEventQuery(topic) {
     return (dispatch) => {
         dispatch(_toggleNavigation());
-        dispatch(setQuery(topic.query || ''));
+        dispatch(_toggleTopic(topic));
+        dispatch(setQueryById(topic.query || ''));
         dispatch(_resetFilter(topic.filter));
         dispatch(_setCreatedFilter(topic.created));
         return dispatch(fetchItems());
