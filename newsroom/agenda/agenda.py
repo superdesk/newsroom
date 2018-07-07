@@ -86,7 +86,7 @@ class AgendaResource(newsroom.Resource):
     datasource = {
         'source': 'agenda',
         'search_backend': 'elastic',
-        'default_sort': [('versioncreated', 1)],
+        'default_sort': [('dates.start', 1)],
     }
 
     item_methods = ['GET']
@@ -144,7 +144,7 @@ class AgendaService(newsroom.Service):
             query['bool']['must'].append(_event_date_range(req.args))
 
         source = {'query': query}
-        source['sort'] = [{'versioncreated': 'desc'}]
+        source['sort'] = [{'dates.start': 'asc'}]
         source['size'] = 25
         source['from'] = int(req.args.get('from', 0))
 

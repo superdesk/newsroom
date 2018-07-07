@@ -110,64 +110,22 @@ export function hasLocation(item) {
 
 
 /**
- * Returns item has contact info
+ * Returns public contacts
  *
  * @param {Object} item
  * @return {String}
  */
-export function hasContact(item) {
-    return !isEmpty(get(item, 'event.event_contact_info'));
-}
+export function getPublicContacts(item) {
+    const publicContacts = [];
+    const contacts = get(item, 'event.event_contact_info', []);
+    contacts.filter(c => c.public).map(c => publicContacts.push({
+        name: `${c.first_name} ${c.last_name}`,
+        email: c.contact_email,
+        mobiles: (c.mobile || []).filter(m => m.public).map(m => m.number),
+        phones: (c.phone || []).filter(m => m.public).map(m => m.number),
+    }));
 
-/**
- * Returns item has contact name
- *
- * @param {Object} item
- * @return {String}
- */
-export function getContactName(item) {
-    if (hasContact(item)) {
-        const contact = get(item, 'event.event_contact_info');
-        return `${contact[0].first_name} ${contact[0].last_name}`;
-    }
-}
-
-/**
- * Returns item has contact number
- *
- * @param {Object} item
- * @return {String}
- */
-export function getContactNumber(item) {
-    if (hasContact(item)) {
-        const contact = get(item, 'event.event_contact_info');
-        const mobile = contact[0].mobile;
-        const telephone = contact[0].contact_phone;
-        return mobile.length > 0 ? mobile[0].number : telephone.length > 0 ? telephone[0].number : '';
-    }
-}
-
-/**
- * Returns item has contact email
- *
- * @param {Object} item
- * @return {String}
- */
-export function getContactEmail(item) {
-    if (hasContact(item)) {
-        const contact = get(item, 'event.event_contact_info');
-        return contact[0].contact_email;
-    }
-}
-
-/**
- * Returns item has event link
- *
- * @param {Object} item
- * @return {String}
- */
-export function hasEventLink(item) {
-    return !isEmpty(get(item, 'event.links'));
+    return publicContacts;
 }
 
 
@@ -177,12 +135,8 @@ export function hasEventLink(item) {
  * @param {Object} item
  * @return {String}
  */
-export function getEventLink(item) {
-    const links = get(item, 'event.links', []);
-    if (links.length) {
-        return links[0];
-    }
-    return null;
+export function getEventLinks(item) {
+    return get(item, 'event.links', []);
 }
 
 

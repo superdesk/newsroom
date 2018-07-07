@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getContactName,
-    hasContact, hasLocation, getEventLink,
-    hasEventLink, getContactEmail, getContactNumber, getLocationString} from 'agenda/utils';
+import {hasLocation, getEventLinks, getLocationString, getPublicContacts} from 'agenda/utils';
 import {formatTime} from 'utils';
 
 
@@ -18,16 +16,18 @@ function AgendaPreviewMeta({item}) {
                     <span><i className='icon-small--clock icon--gray'></i>
                         {`${formatTime(item.dates.start)} - ${formatTime(item.dates.end)}`}</span>
                 </div>
-                {hasContact(item) && <div className='wire-articles__item__meta-row'>
+                {getPublicContacts(item).map((contact) => <div
+                    className='wire-articles__item__meta-row'
+                    key={contact.name}>
                     <i className='icon-small--user icon--gray'></i>
-                    <span>{`${getContactName(item)} ${getContactNumber(item)}`}
-                        <a href={`mailto:${getContactEmail(item)}`}>{getContactEmail(item)}</a>
+                    <span>{`${contact.name} ${contact.phones || contact.mobiles}`}
+                        <a href={`mailto:${contact.email}`}>{contact.email}</a>
                     </span>
-                </div>}
-                {hasEventLink(item) && <div className='wire-articles__item__meta-row'>
+                </div>)}
+                {getEventLinks(item).map((link) => <div className='wire-articles__item__meta-row' key={link}>
                     <i className='icon-small--globe icon--gray'></i>
-                    <span><a href={getEventLink(item)}>{getEventLink(item)}</a></span>
-                </div>}
+                    <span><a href={link}>{link}</a></span>
+                </div>)}
             </div>
         </div>
     );
