@@ -4,10 +4,11 @@ from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk.metadata.item import not_analyzed
 from planning.common import WORKFLOW_STATE_SCHEMA
-from newsroom.wire.search import get_local_date
+from newsroom.wire.search import get_local_date, set_bookmarks_query
 from eve.utils import ParsedRequest
 from flask import json, abort
 from newsroom.wire.search import _query_string
+from superdesk.resource import Resource
 
 
 class AgendaResource(newsroom.Resource):
@@ -82,6 +83,12 @@ class AgendaResource(newsroom.Resource):
         'schema': planning_schema,
     }
 
+    schema['bookmarks'] = Resource.not_analyzed_field('list')  # list of user ids who bookmarked this item
+    schema['downloads'] = Resource.not_analyzed_field('list')  # list of user ids who downloaded this item
+    schema['shares'] = Resource.not_analyzed_field('list')  # list of user ids who shared this item
+    schema['prints'] = Resource.not_analyzed_field('list')  # list of user ids who printed this item
+    schema['copies'] = Resource.not_analyzed_field('list')  # list of user ids who copied this item
+
     resource_methods = ['GET']
     datasource = {
         'source': 'agenda',
@@ -139,6 +146,9 @@ class AgendaService(newsroom.Service):
 
         if req.args.get('id'):
             query['bool']['must'].append({'term': {'_id': req.args['id']}})
+
+        if req.args.get('bookmarks'):
+            set_bookmarks_query(query, req.args['bookmarks'])
 
         if req.args.get('date_from') or req.args.get('date_to'):
             query['bool']['must'].append(_event_date_range(req.args))

@@ -58,6 +58,7 @@ const initialState = {
     topics: [],
     selectedItems: [],
     bookmarks: false,
+    context: null,
     formats: [],
     newItems: [],
     newItemsData: null,
@@ -222,6 +223,7 @@ export default function agendaReducer(state = initialState, action) {
             bookmarks: action.agendaData.bookmarks || false,
             formats: action.agendaData.formats || [],
             agenda: Object.assign(state.agenda, {navigations}),
+            context: 'agenda',
         };
     }
 

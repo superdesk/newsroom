@@ -28,13 +28,6 @@ export function preview(item) {
 }
 
 
-export function previewAndCopy(item) {
-    return (dispatch) => {
-        dispatch(previewItem(item));
-        window.setTimeout(() => dispatch(copyPreviewContents(item)), 200);
-    };
-}
-
 export function previewItem(item) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
@@ -102,34 +95,6 @@ export function selectDate(dateString, grouping) {
     return {type: SELECT_DATE, dateString, grouping};
 }
 
-
-/**
- * Copy contents of item preview.
- *
- * This is an initial version, should be updated with preview markup changes.
- */
-export function copyPreviewContents(item) {
-    return (dispatch, getState) => {
-        const preview = document.getElementById('preview-article');
-        const selection = window.getSelection();
-        const range = document.createRange();
-        selection.removeAllRanges();
-        range.selectNode(preview);
-        selection.addRange(range);
-        if (document.execCommand('copy')) {
-            notify.success(gettext('Item copied successfully.'));
-            item && analytics.itemEvent('copy', item);
-        } else {
-            notify.error(gettext('Sorry, Copy is not supported.'));
-        }
-        selection.removeAllRanges();
-        if (getState().user) {
-            server.post(`/agenda/${item._id}/copy`)
-                .then(dispatch(setCopyItem(item._id)))
-                .catch(errorHandler);
-        }
-    };
-}
 
 export function printItem(item) {
     return (dispatch, getState) => {
@@ -299,47 +264,6 @@ export function setPrintItem(item) {
     return {type: PRINT_ITEMS, items: [item]};
 }
 
-export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
-export function setBookmarkItems(items) {
-    return {type: BOOKMARK_ITEMS, items};
-}
-
-export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
-export function removeBookmarkItems(items) {
-    return {type: REMOVE_BOOKMARK, items};
-}
-
-export function bookmarkItems(items) {
-    return (dispatch, getState) =>
-        server.post('/agenda_bookmark', {items})
-            .then(() => {
-                if (items.length > 1) {
-                    notify.success(gettext('Items were bookmarked successfully.'));
-                } else {
-                    notify.success(gettext('Item was bookmarked successfully.'));
-                }
-            })
-            .then(() => {
-                multiItemEvent('bookmark', items, getState());
-            })
-            .then(() => dispatch(setBookmarkItems(items)))
-            .catch(errorHandler);
-}
-
-export function removeBookmarks(items) {
-    return (dispatch, getState) =>
-        server.del('/agenda_bookmark', {items})
-            .then(() => {
-                if (items.length > 1) {
-                    notify.success(gettext('Items were removed from bookmarks successfully.'));
-                } else {
-                    notify.success(gettext('Item was removed from bookmarks successfully.'));
-                }
-            })
-            .then(() => dispatch(removeBookmarkItems(items)))
-            .then(() => getState().bookmarks && dispatch(fetchItems()))
-            .catch(errorHandler);
-}
 
 function errorHandler(reason) {
     console.error('error', reason);
@@ -364,7 +288,7 @@ export function downloadItems(items) {
  */
 export function submitDownloadItems(items, format) {
     return (dispatch, getState) => {
-        window.open(`/download/${items.join(',')}?format=${format}`, '_blank');
+        window.open(`/download/${items.join(',')}?format=${format}&type=${getState().context}`, '_blank');
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
         multiItemEvent('download', items, getState());

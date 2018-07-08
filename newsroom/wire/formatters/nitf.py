@@ -11,7 +11,7 @@ class NITFFormatter():
     def format_filename(self, item):
         return '{}.xml'.format(item['_id'])
 
-    def format_item(self, item):
+    def format_item(self, item, item_type='items'):
         dest = {}
         nitf = self.formatter.get_nitf(item, dest, '')
         return etree.tostring(nitf, xml_declaration=True, pretty_print=True, encoding=self.encoding)

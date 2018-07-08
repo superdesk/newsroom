@@ -20,7 +20,7 @@ from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
-from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates
+from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type
 from newsroom.notifications import push_user_notification
 from .search import get_bookmarks_count
 
@@ -147,16 +147,17 @@ def search():
 @login_required
 def download(_ids):
     user = get_user(required=True)
-    items = [get_entity_or_404(_id, 'items') for _id in _ids.split(',')]
-    _file = io.BytesIO()
     _format = flask.request.args.get('format', 'text')
+    item_type = get_type()
+    items = [get_entity_or_404(_id, item_type) for _id in _ids.split(',')]
+    _file = io.BytesIO()
     formatter = app.download_formatters[_format]['formatter']
     with zipfile.ZipFile(_file, mode='w') as zf:
         for item in items:
             parse_dates(item)  # fix for old items
             zf.writestr(
                 secure_filename(formatter.format_filename(item)),
-                formatter.format_item(item)
+                formatter.format_item(item, item_type=item_type)
             )
     _file.seek(0)
 
@@ -169,13 +170,15 @@ def download(_ids):
 @login_required
 def share():
     current_user = get_user(required=True)
+    item_type = get_type()
     data = get_json_or_400()
     assert data.get('users')
     assert data.get('items')
-    items = [get_entity_or_404(_id, 'items') for _id in data.get('items')]
+    items = [get_entity_or_404(_id, item_type) for _id in data.get('items')]
     with app.mail.connect() as connection:
         for user_id in data['users']:
             user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
+            subject = items[0]['headline'] if item_type == 'items' else items[0].get('name')
             if not user or not user.get('email'):
                 continue
             template_kwargs = {
@@ -186,16 +189,16 @@ def share():
             }
             send_email(
                 [user['email']],
-                gettext('From %s: %s' % (app.config['SITE_NAME'], items[0]['headline'])),
-                flask.render_template('share_item.txt', **template_kwargs),
+                gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
+                flask.render_template('share_{}.txt'.format(item_type), **template_kwargs),
                 sender=current_user['email'],
                 connection=connection
             )
-    update_action_list(data.get('items'), 'shares')
+    update_action_list(data.get('items'), 'shares', item_type=item_type)
     return flask.jsonify(), 201
 
 
-@blueprint.route('/wire_bookmark', methods=['POST', 'DELETE'])
+@blueprint.route('/bookmark', methods=['POST', 'DELETE'])
 @login_required
 def bookmark():
     """Bookmark an item.
@@ -205,24 +208,26 @@ def bookmark():
     """
     data = get_json_or_400()
     assert data.get('items')
-    update_action_list(data.get('items'), 'bookmarks')
+    item_type = get_type()
+    update_action_list(data.get('items'), 'bookmarks', item_type=item_type)
     user_id = get_user_id()
     push_user_notification('bookmarks', count=get_bookmarks_count(user_id))
     return flask.jsonify(), 200
 
 
-def update_action_list(items, action_list, force_insert=False):
+def update_action_list(items, action_list, force_insert=False, item_type='items'):
     """
     Stores user id into array of action_list of an item
     :param items: items to be updated
     :param action_list: field name of the list
     :param force_insert: inserts into list regardless of the http method
+    :param item_type: either items or agenda as the collection
     :return:
     """
     user_id = get_user_id()
     if user_id:
-        db = app.data.get_mongo_collection('items')
-        elastic = app.data._search_backend('items')
+        db = app.data.get_mongo_collection(item_type)
+        elastic = app.data._search_backend(item_type)
         if flask.request.method == 'POST' or force_insert:
             updates = {'$addToSet': {action_list: user_id}}
         else:
@@ -231,14 +236,15 @@ def update_action_list(items, action_list, force_insert=False):
             result = db.update_one({'_id': item_id}, updates)
             if result.modified_count:
                 modified = db.find_one({'_id': item_id})
-                elastic.update('items', item_id, {action_list: modified[action_list]})
+                elastic.update(item_type, item_id, {action_list: modified[action_list]})
 
 
 @blueprint.route('/wire/<_id>/copy', methods=['POST'])
 @login_required
 def copy(_id):
-    get_entity_or_404(_id, 'items')
-    update_action_list([_id], 'copies')
+    item_type = get_type()
+    get_entity_or_404(_id, item_type)
+    update_action_list([_id], 'copies', item_type=item_type)
     return flask.jsonify(), 200
 
 

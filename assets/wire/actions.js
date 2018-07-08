@@ -117,7 +117,7 @@ export function copyPreviewContents(item) {
         }
         selection.removeAllRanges();
         if (getState().user) {
-            server.post(`/wire/${item._id}/copy`)
+            server.post(`/wire/${item._id}/copy?type=${getState().context}`)
                 .then(dispatch(setCopyItem(item._id)))
                 .catch(errorHandler);
         }
@@ -126,7 +126,7 @@ export function copyPreviewContents(item) {
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        window.open(`/wire/${item._id}?print`, '_blank');
+        window.open(`/${getState().context}/${item._id}?print`, '_blank');
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
@@ -241,7 +241,7 @@ export function shareItems(items) {
  */
 export function submitShareItem(data) {
     return (dispatch, getState) => {
-        return server.post('/wire_share', data)
+        return server.post(`/wire_share?type=${getState().context}`, data)
             .then(() => {
                 if (data.items.length > 1) {
                     notify.success(gettext('Items were shared successfully.'));
@@ -303,7 +303,7 @@ export function removeBookmarkItems(items) {
 
 export function bookmarkItems(items) {
     return (dispatch, getState) =>
-        server.post('/wire_bookmark', {items})
+        server.post(`/bookmark?type=${getState().context}`, {items})
             .then(() => {
                 if (items.length > 1) {
                     notify.success(gettext('Items were bookmarked successfully.'));
@@ -320,7 +320,7 @@ export function bookmarkItems(items) {
 
 export function removeBookmarks(items) {
     return (dispatch, getState) =>
-        server.del('/wire_bookmark', {items})
+        server.del(`/bookmark?type=${getState().context}`, {items})
             .then(() => {
                 if (items.length > 1) {
                     notify.success(gettext('Items were removed from bookmarks successfully.'));
@@ -367,7 +367,7 @@ export function downloadItems(items) {
  */
 export function submitDownloadItems(items, format) {
     return (dispatch, getState) => {
-        window.open(`/download/${items.join(',')}?format=${format}`, '_blank');
+        window.open(`/download/${items.join(',')}?format=${format}&type=${getState().context}`, '_blank');
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
         multiItemEvent('download', items, getState());

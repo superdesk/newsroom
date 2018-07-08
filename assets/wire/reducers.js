@@ -204,6 +204,7 @@ export default function wireReducer(state = initialState, action) {
             bookmarks: action.wireData.bookmarks || false,
             formats: action.wireData.formats || [],
             wire: Object.assign(state.wire, {navigations, newsOnly: action.newsOnly}),
+            context: 'wire',
         };
     }
 

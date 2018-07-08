@@ -1,0 +1,5 @@
+{{ item.name }}
+{{ item.slugline }}
+
+
+{{ item.definition_long | plain_text }}

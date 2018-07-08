@@ -31,7 +31,7 @@ class NewsMLG2Formatter():
     def format_filename(self, item):
         return '{}.xml'.format(item['_id'])
 
-    def format_item(self, item):
+    def format_item(self, item, item_type='items'):
         item = item.copy()
         item.setdefault('guid', item['_id'])
         item.setdefault('_current_version', item['version'])

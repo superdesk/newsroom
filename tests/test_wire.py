@@ -66,14 +66,14 @@ def test_bookmarks(client, app):
 
     assert 0 == get_bookmarks_count(client, user_id)
 
-    resp = client.post('/wire_bookmark', data=json.dumps({
+    resp = client.post('/bookmark?type=wire', data=json.dumps({
         'items': [items[0]['_id']],
     }), content_type='application/json')
     assert resp.status_code == 200
 
     assert 1 == get_bookmarks_count(client, user_id)
 
-    client.delete('/wire_bookmark', data=json.dumps({
+    client.delete('/bookmark?type=wire', data=json.dumps({
         'items': [items[0]['_id']],
     }), content_type='application/json')
     assert resp.status_code == 200
