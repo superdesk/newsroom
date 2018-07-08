@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 import classNames from 'classnames';
 
 import { gettext, formatDate, formatWeek, formatMonth } from 'utils';
@@ -212,7 +213,7 @@ const mapStateToProps = (state) => ({
     bookmarks: state.bookmarks,
     user: state.user,
     company: state.company,
-    activeGrouping: state.activeGrouping,
+    activeGrouping: get(state, 'agenda.activeGrouping'),
 });
 
 export default connect(mapStateToProps)(AgendaList);

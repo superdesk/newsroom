@@ -152,7 +152,7 @@ function search(state, next) {
     const activeFilter = get(state, 'agenda.activeFilter', {});
     const activeNavigation = get(state, 'agenda.activeNavigation');
     const createdFilter = get(state, 'agenda.createdFilter', {});
-    const agendaDate = getDateInputDate(state.activeDate);
+    const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
 
     const params = {
         q: state.query,

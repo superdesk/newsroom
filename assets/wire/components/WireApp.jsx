@@ -312,7 +312,7 @@ const mapStateToProps = (state) => ({
     newItems: state.newItems,
     navigations: get(state, 'wire.navigations', []),
     activeNavigation: get(state, 'wire.activeNavigation', null),
-    newsOnly: !!state.newsOnly,
+    newsOnly: !!get(state, 'wire.newsOnly'),
     bookmarks: state.bookmarks,
     resultsFiltered: state.resultsFiltered,
 });

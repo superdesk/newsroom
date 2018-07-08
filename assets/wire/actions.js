@@ -145,7 +145,7 @@ function search(state, next) {
     const activeFilter = get(state, 'wire.activeFilter', {});
     const activeNavigation = get(state, 'wire.activeNavigation');
     const createdFilter = get(state, 'wire.createdFilter', {});
-    const newsOnly = !!state.newsOnly;
+    const newsOnly = !!get(state, 'wire.newsOnly');
 
     const params = {
         q: state.query,

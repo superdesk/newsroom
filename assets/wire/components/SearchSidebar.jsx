@@ -21,11 +21,11 @@ class SearchSidebar extends React.Component {
 
         const tabName = isWireContext() ? 'Topics' : 'Events';
         this.tabs = [
-            {label: gettext(tabName), content: NavigationTab},
-            {label: gettext('My {{name}}', {name: tabName}), content: TopicsTab},
-            {label: gettext('Filters'), content: FiltersTab},
+            {id: 'tab-1', label: gettext(tabName), content: NavigationTab},
+            {id: 'tab-2', label: gettext('My {{name}}', {name: tabName}), content: TopicsTab},
+            {id: 'tab-3', label: gettext('Filters'), content: FiltersTab},
         ];
-        this.state = {active: getActiveFilterTab() || this.tabs[0].label};
+        this.state = {active: getActiveFilterTab() || this.tabs[0].id};
         this.toggleNavigation = this.toggleNavigation.bind(this);
         this.toggleFilter = this.toggleFilter.bind(this);
         this.resetFilter = this.resetFilter.bind(this);
@@ -58,19 +58,19 @@ class SearchSidebar extends React.Component {
                 <ul className='nav justify-content-center' id='pills-tab' role='tablist'>
                     {this.tabs.map((tab) => (
                         <li className='wire-column__nav__tab nav-item' key={tab.label}>
-                            <a className={`nav-link ${this.state.active === tab.label && 'active'}`}
+                            <a className={`nav-link ${this.state.active === tab.id && 'active'}`}
                                 role='tab'
                                 href=''
                                 onClick={(event) => {
                                     event.preventDefault();
-                                    setActiveFilterTab(tab.label);
-                                    this.setState({active: tab.label});
+                                    setActiveFilterTab(tab.id);
+                                    this.setState({active: tab.id});
                                 }}>{tab.label}</a>
                         </li>
                     ))}
                 </ul>
                 <div className='tab-content' key={gettext('Topics')}>
-                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[0].label})} role='tabpanel'>
+                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[0].id})} role='tabpanel'>
                         <NavigationTab
                             navigations={this.props.navigations}
                             activeNavigation={this.props.activeNavigation}
@@ -79,7 +79,7 @@ class SearchSidebar extends React.Component {
                     </div>
                 </div>
                 <div className='tab-content' key={gettext('My Topics')}>
-                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[1].label})} role='tabpanel'>
+                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[1].id})} role='tabpanel'>
                         <TopicsTab
                             dispatch={this.props.dispatch}
                             topics={this.props.topics}
@@ -90,7 +90,7 @@ class SearchSidebar extends React.Component {
                     </div>
                 </div>
                 <div className='tab-content' key={gettext('Filters')}>
-                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[2].label})} role='tabpanel'>
+                    <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === this.tabs[2].id})} role='tabpanel'>
                         <FiltersTab
                             activeFilter={this.props.activeFilter}
                             aggregations={this.props.aggregations}

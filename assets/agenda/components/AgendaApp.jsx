@@ -343,8 +343,8 @@ const mapStateToProps = (state) => ({
     bookmarks: state.bookmarks,
     resultsFiltered: state.resultsFiltered,
     aggregations: state.aggregations,
-    activeDate: state.activeDate,
-    activeGrouping: state.activeGrouping,
+    activeDate: get(state, 'agenda.activeDate'),
+    activeGrouping: get(state, 'agenda.activeGrouping'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
