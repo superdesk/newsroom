@@ -7,6 +7,7 @@ import PreviewActionButtons from 'wire/components/PreviewActionButtons';
 import {hasCoverages, isRecurring} from '../utils';
 import AgendaListItemLabels from './AgendaListItemLabels';
 import AgendaPreviewMeta from './AgendaPreviewMeta';
+import AgendaPreviewImage from './AgendaPreviewImage';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 
 
@@ -60,8 +61,7 @@ class AgendaPreview extends React.PureComponent {
                         <AgendaListItemLabels item={item} />
                     </div>
 
-
-
+                    <AgendaPreviewImage item={item} />
                     <AgendaPreviewMeta item={item} />
 
                     {item.abstract && DISPLAY_ABSTRACT &&
