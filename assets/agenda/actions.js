@@ -3,8 +3,9 @@ import { get, isEmpty } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset } from 'utils';
-import { markItemAsRead, toggleNewsOnlyParam } from './utils';
+import { markItemAsRead } from 'wire/utils';
 import { renderModal, closeModal } from 'actions';
+import {getDateInputDate} from './utils';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -26,13 +27,6 @@ export function preview(item) {
     return {type: PREVIEW_ITEM, item};
 }
 
-
-export function previewAndCopy(item) {
-    return (dispatch) => {
-        dispatch(previewItem(item));
-        window.setTimeout(() => dispatch(copyPreviewContents(item)), 200);
-    };
-}
 
 export function previewItem(item) {
     return (dispatch, getState) => {
@@ -65,6 +59,12 @@ export function setQuery(query) {
     return {type: SET_QUERY, query};
 }
 
+export const SET_EVENT_QUERY = 'SET_EVENT_QUERY';
+export function setQueryById(query) {
+    query && analytics.event('search', query);
+    return {type: SET_EVENT_QUERY, query};
+}
+
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {
     return {type: QUERY_ITEMS};
@@ -81,8 +81,8 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData, readData, newsOnly) {
-    return {type: INIT_DATA, wireData, readData, newsOnly};
+export function initData(agendaData, readData) {
+    return {type: INIT_DATA, agendaData, readData};
 }
 
 export const ADD_TOPIC = 'ADD_TOPIC';
@@ -90,43 +90,15 @@ export function addTopic(topic) {
     return {type: ADD_TOPIC, topic};
 }
 
-export const TOGGLE_NEWS = 'TOGGLE_NEWS';
-export function toggleNews() {
-    toggleNewsOnlyParam();
-    return {type: TOGGLE_NEWS};
+export const SELECT_DATE = 'SELECT_DATE';
+export function selectDate(dateString, grouping) {
+    return {type: SELECT_DATE, dateString, grouping};
 }
 
-/**
- * Copy contents of item preview.
- *
- * This is an initial version, should be updated with preview markup changes.
- */
-export function copyPreviewContents(item) {
-    return (dispatch, getState) => {
-        const preview = document.getElementById('preview-article');
-        const selection = window.getSelection();
-        const range = document.createRange();
-        selection.removeAllRanges();
-        range.selectNode(preview);
-        selection.addRange(range);
-        if (document.execCommand('copy')) {
-            notify.success(gettext('Item copied successfully.'));
-            item && analytics.itemEvent('copy', item);
-        } else {
-            notify.error(gettext('Sorry, Copy is not supported.'));
-        }
-        selection.removeAllRanges();
-        if (getState().user) {
-            server.post(`/wire/${item._id}/copy?type=${getState().context}`)
-                .then(dispatch(setCopyItem(item._id)))
-                .catch(errorHandler);
-        }
-    };
-}
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        window.open(`/${getState().context}/${item._id}?print`, '_blank');
+        window.open(`/agenda/${item._id}?print`, '_blank');
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
@@ -142,21 +114,22 @@ export function printItem(item) {
  * @return {Promise}
  */
 function search(state, next) {
-    const activeFilter = get(state, 'wire.activeFilter', {});
-    const activeNavigation = get(state, 'wire.activeNavigation');
-    const createdFilter = get(state, 'wire.createdFilter', {});
-    const newsOnly = !!get(state, 'wire.newsOnly');
+    const activeFilter = get(state, 'agenda.activeFilter', {});
+    const activeNavigation = get(state, 'agenda.activeNavigation');
+    const createdFilter = get(state, 'agenda.createdFilter', {});
+    const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
 
     const params = {
         q: state.query,
+        id: state.queryId,
         bookmarks: state.bookmarks && state.user,
         navigation: activeNavigation,
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to: createdFilter.to,
+        date_from: agendaDate,
         timezone_offset: getTimezoneOffset(),
-        newsOnly,
     };
 
     const queryString = Object.keys(params)
@@ -164,7 +137,7 @@ function search(state, next) {
         .map((key) => [key, params[key]].join('='))
         .join('&');
 
-    return server.get(`/search?${queryString}`);
+    return server.get(`/agenda/search?${queryString}`);
 }
 
 /**
@@ -190,7 +163,7 @@ export function fetchItems() {
 
 export function fetchItem(id) {
     return (dispatch) => {
-        return server.get(`/wire/${id}?format=json`)
+        return server.get(`/agenda/${id}?format=json`)
             .then((data) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
@@ -201,8 +174,8 @@ export function fetchItem(id) {
  *
  * @param {String} topic
  */
-export function followTopic(topic) {
-    topic.topic_type = 'wire';
+export function followEvent(topic) {
+    topic.topic_type = 'agenda';
     return renderModal('followTopic', {topic});
 }
 
@@ -241,7 +214,7 @@ export function shareItems(items) {
  */
 export function submitShareItem(data) {
     return (dispatch, getState) => {
-        return server.post(`/wire_share?type=${getState().context}`, data)
+        return server.post('/agenda_share', data)
             .then(() => {
                 if (data.items.length > 1) {
                     notify.success(gettext('Items were shared successfully.'));
@@ -291,64 +264,12 @@ export function setPrintItem(item) {
     return {type: PRINT_ITEMS, items: [item]};
 }
 
-export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
-export function setBookmarkItems(items) {
-    return {type: BOOKMARK_ITEMS, items};
-}
-
-export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
-export function removeBookmarkItems(items) {
-    return {type: REMOVE_BOOKMARK, items};
-}
-
-export function bookmarkItems(items) {
-    return (dispatch, getState) =>
-        server.post(`/bookmark?type=${getState().context}`, {items})
-            .then(() => {
-                if (items.length > 1) {
-                    notify.success(gettext('Items were bookmarked successfully.'));
-                } else {
-                    notify.success(gettext('Item was bookmarked successfully.'));
-                }
-            })
-            .then(() => {
-                multiItemEvent('bookmark', items, getState());
-            })
-            .then(() => dispatch(setBookmarkItems(items)))
-            .catch(errorHandler);
-}
-
-export function removeBookmarks(items) {
-    return (dispatch, getState) =>
-        server.del(`/bookmark?type=${getState().context}`, {items})
-            .then(() => {
-                if (items.length > 1) {
-                    notify.success(gettext('Items were removed from bookmarks successfully.'));
-                } else {
-                    notify.success(gettext('Item was removed from bookmarks successfully.'));
-                }
-            })
-            .then(() => dispatch(removeBookmarkItems(items)))
-            .then(() => getState().bookmarks && dispatch(fetchItems()))
-            .catch(errorHandler);
-}
 
 function errorHandler(reason) {
     console.error('error', reason);
 }
 
-/**
- * Fetch item versions.
- *
- * @param {Object} item
- * @return {Promise}
- */
-export function fetchVersions(item) {
-    return () => server.get(`/wire/${item._id}/versions`)
-        .then((data) => {
-            return data._items;
-        });
-}
+
 
 /**
  * Download items - display modal to pick a format
@@ -412,8 +333,8 @@ function reloadTopics(user) {
     return function (dispatch) {
         return server.get(`/users/${user}/topics`)
             .then((data) => {
-                const wireTopics = data._items.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
-                return dispatch(setTopics(wireTopics));
+                const agendaTopics = data._items.filter((topic) => topic.topic_type === 'agenda');
+                return dispatch(setTopics(agendaTopics));
             })
             .catch(errorHandler);
     };
@@ -434,19 +355,14 @@ export function fetchNewItems() {
         .then((response) => dispatch(setNewItems(response)));
 }
 
-export function fetchNext(item) {
-    return () => {
-        if (!item.nextversion) {
-            return Promise.reject();
-        }
-
-        return server.get(`/wire/${item.nextversion}?format=json`);
-    };
-}
-
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
 function _toggleNavigation(navigation) {
     return {type: TOGGLE_NAVIGATION, navigation};
+}
+
+export const TOGGLE_TOPIC = 'TOGGLE_TOPIC';
+function _toggleTopic(topic) {
+    return {type: TOGGLE_TOPIC, topic};
 }
 
 export function toggleNavigation(navigation) {
@@ -461,6 +377,14 @@ export const TOGGLE_FILTER = 'TOGGLE_FILTER';
 export function toggleFilter(key, val, single) {
     return (dispatch) => {
         setTimeout(() => dispatch({type: TOGGLE_FILTER, key, val, single}));
+    };
+}
+
+export const TOGGLE_DROPDOWN_FILTER = 'TOGGLE_DROPDOWN_FILTER';
+export function toggleDropdownFilter(key, val, single) {
+    return (dispatch) => {
+        dispatch({type: TOGGLE_FILTER, key, val, single});
+        dispatch(fetchItems());
     };
 }
 
@@ -540,10 +464,11 @@ export function resetFilter(filter) {
  * @param {Object} topic
  * @return {Promise}
  */
-export function setTopicQuery(topic) {
+export function setEventQuery(topic) {
     return (dispatch) => {
         dispatch(_toggleNavigation());
-        dispatch(setQuery(topic.query || ''));
+        dispatch(_toggleTopic(topic));
+        dispatch(setQueryById(topic.query || ''));
         dispatch(_resetFilter(topic.filter));
         dispatch(_setCreatedFilter(topic.created));
         return dispatch(fetchItems());

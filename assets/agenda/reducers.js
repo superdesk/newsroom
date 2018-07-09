@@ -3,6 +3,7 @@ import {
     OPEN_ITEM,
     SET_ITEMS,
     SET_QUERY,
+    SET_EVENT_QUERY,
     QUERY_ITEMS,
     RECIEVE_ITEMS,
     RECIEVE_ITEM,
@@ -19,6 +20,7 @@ import {
     REMOVE_BOOKMARK,
     SET_NEW_ITEMS_BY_TOPIC,
     TOGGLE_NAVIGATION,
+    TOGGLE_TOPIC,
     TOGGLE_FILTER,
     START_LOADING,
     RECIEVE_NEXT_ITEMS,
@@ -29,15 +31,14 @@ import {
     DOWNLOAD_ITEMS,
     COPY_ITEMS,
     PRINT_ITEMS,
-    SET_TOPICS,
-    TOGGLE_NEWS,
+    SET_TOPICS, SELECT_DATE,
 } from './actions';
 
 import { RENDER_MODAL, CLOSE_MODAL } from 'actions';
 
 import { get, isEmpty } from 'lodash';
 import { toggleValue } from 'utils';
-import { EXTENDED_VIEW } from './defaults';
+import { EXTENDED_VIEW } from 'wire/defaults';
 
 import { defaultReducer } from '../reducers';
 
@@ -57,19 +58,22 @@ const initialState = {
     topics: [],
     selectedItems: [],
     bookmarks: false,
+    context: null,
     formats: [],
     newItems: [],
     newItemsData: null,
     newItemsByTopic: {},
     readItems: {},
     resultsFiltered: false,
-    wire: {
+    agenda: {
         navigations: [],
         activeNavigation: null,
         activeFilter: {},
         createdFilter: {},
         activeView: EXTENDED_VIEW,
-        newsOnly: false,
+        activeTopic: null,
+        activeDate: Date.now(),
+        activeGrouping: 'day',
     },
 };
 
@@ -89,12 +93,12 @@ function recieveItems(state, data) {
         aggregations: data._aggregations || null,
         newItems: [],
         newItemsData: null,
-        resultsFiltered: !isEmpty(state.wire.activeFilter) || !isEmpty(state.wire.createdFilter)
+        resultsFiltered: !isEmpty(state.agenda.activeFilter) || !isEmpty(state.agenda.createdFilter)
     };
 }
 
 
-function _wireReducer(state, action) {
+function _agendaReducer(state, action) {
     switch (action.type) {
 
     case TOGGLE_NAVIGATION: {
@@ -108,10 +112,21 @@ function _wireReducer(state, action) {
         };
     }
 
+    case TOGGLE_TOPIC: {
+        const activeTopic = action.topic ? action.topic._id : null;
+
+        return {
+            ...state,
+            activeFilter: {},
+            createdFilter: {},
+            activeTopic,
+        };
+    }
+
     case TOGGLE_FILTER: {
         const activeFilter = Object.assign({}, state.activeFilter);
         activeFilter[action.key] = toggleValue(activeFilter[action.key], action.val);
-        if (!activeFilter[action.key] || activeFilter[action.key].length === 0) {
+        if (!action.val || !activeFilter[action.key] || activeFilter[action.key].length === 0) {
             delete activeFilter[action.key];
         }
         if (action.single) {
@@ -144,19 +159,20 @@ function _wireReducer(state, action) {
             activeView: action.view,
         };
 
-    case TOGGLE_NEWS: {
+    case SELECT_DATE:
         return {
             ...state,
-            newsOnly: !state.newsOnly,
+            selectedItems: [],
+            activeDate: action.dateString,
+            activeGrouping: action.grouping || 'day',
         };
-    }
 
     default:
         return state;
     }
 }
 
-export default function wireReducer(state = initialState, action) {
+export default function agendaReducer(state = initialState, action) {
     switch (action.type) {
 
     case SET_ITEMS:
@@ -191,30 +207,35 @@ export default function wireReducer(state = initialState, action) {
     case RECIEVE_ITEMS:
         return recieveItems(state, action.data);
 
+    case SET_EVENT_QUERY:
+        return {...state, queryId: action.query, activeItem: null};
+
 
     case INIT_DATA: {
-        const navigations = get(action, 'wireData.navigations', []);
+        const navigations = get(action, 'agendaData.navigations', []);
         return {
             ...state,
             readItems: action.readData || {},
-            user: action.wireData.user || null,
-            topics: action.wireData.topics || [],
-            company: action.wireData.company || null,
-            companyName: action.wireData.companyName || '',
-            bookmarks: action.wireData.bookmarks || false,
-            formats: action.wireData.formats || [],
-            wire: Object.assign(state.wire, {navigations, newsOnly: action.newsOnly}),
-            context: 'wire',
+            user: action.agendaData.user || null,
+            topics: action.agendaData.topics || [],
+            company: action.agendaData.company || null,
+            companyName: action.agendaData.companyName || '',
+            bookmarks: action.agendaData.bookmarks || false,
+            formats: action.agendaData.formats || [],
+            agenda: Object.assign(state.agenda, {navigations}),
+            context: 'agenda',
         };
     }
 
+
+    case SELECT_DATE:
+    case TOGGLE_TOPIC:
     case TOGGLE_NAVIGATION:
-    case TOGGLE_NEWS:
     case TOGGLE_FILTER:
     case SET_CREATED_FILTER:
     case RESET_FILTER:
     case SET_VIEW:
-        return {...state, wire: _wireReducer(state.wire, action)};
+        return {...state, agenda: _agendaReducer(state.agenda, action)};
 
 
     default:

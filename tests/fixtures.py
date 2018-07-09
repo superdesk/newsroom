@@ -59,10 +59,56 @@ items = [
     }
 ]
 
+agenda_items = [{
+    'type': 'agenda',
+    '_id': 'urn:conference',
+    'versioncreated': '2018-06-27T11:12:04+0000',
+    'name': 'Conference Planning',
+    'slugline': 'Prime Conference',
+    'planning_items': [
+        {
+            'versioncreated': '2018-06-27T11:07:17+0000',
+            'planning_date': '2018-07-20T04:00:00+0000',
+            'expired': False,
+            'flags': {
+                'marked_for_not_publication': False
+            },
+            'slugline': 'Prime Conference',
+            'item_class': 'plinat:newscoverage',
+            'pubstatus': 'usable',
+            'item_id': 'urn:planning',
+            'name': 'Conference Planning',
+            '_id': 'urn:planning',
+            'firstcreated': '2018-06-27T11:07:17+0000',
+            'state': 'draft',
+            'guid': 'urn:planning',
+            'agendas': [],
+            '_current_version': 1,
+            'coverages': [],
+            'type': 'planning'
+        }
+    ],
+    '_created': '2018-06-27T11:12:07+0000',
+    'coverages': [],
+    'dates': {
+        'end': '2018-07-20T04:00:00+0000',
+        'start': '2018-07-20T04:00:00+0000'
+    },
+    'firstcreated': '2018-06-27T11:12:04+0000',
+    '_current_version': 1,
+    'headline': 'test headline',
+}
+]
+
 
 @fixture(autouse=True)
 def init_items(app):
     app.data.insert('items', items)
+
+
+@fixture(autouse=True)
+def init_agenda_items(app):
+    app.data.insert('agenda', agenda_items)
 
 
 @fixture(autouse=True)

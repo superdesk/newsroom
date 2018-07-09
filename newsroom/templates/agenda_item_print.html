@@ -1,0 +1,32 @@
+{% extends "print_layout.html" %}
+
+{% block title %}{{ item.name }}{% endblock %}
+
+{% block content %}
+<article>
+    <pre>{{ item.slugline }}</pre>
+
+    <h1>{{ item.headline }}</h1>
+
+    <div class="row">
+        <div class="col-9">
+            <div class="lead">
+                {{ item.definition_long }}
+            </div>
+        </div>
+        <div class="col">
+            <h5>{{ _('Metadata') }}</h3>
+            <dl>
+                {% if item.subject %}
+                <dt>{{ _('Category') }}</dt>
+                <dd>{{ item.subject|join(', ', attribute='name')}}</dd>
+                {% endif %}
+                {% if item.genre %}
+                <dt>{{ _('Content Type') }}</dt>
+                <dd>{{ item.genre|join(', ', attribute='name')}}</dd>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+</article>
+{% endblock %}

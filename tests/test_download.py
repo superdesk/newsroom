@@ -12,7 +12,7 @@ items_ids = [item['_id'] for item in items[:2]]
 
 
 def download_file(client, _format):
-    resp = client.get('/download/%s?format=%s' % (','.join(items_ids), _format))
+    resp = client.get('/download/%s?format=%s&type=wire' % (','.join(items_ids), _format))
     assert resp.status_code == 200
     assert resp.mimetype == 'application/zip'
     _file = io.BytesIO(resp.get_data())

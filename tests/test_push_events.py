@@ -3,6 +3,8 @@ from flask import json
 from datetime import datetime
 from copy import deepcopy
 from newsroom.utils import get_entity_or_404
+from .fixtures import init_auth
+
 
 test_event = {
     'state': 'scheduled',
@@ -120,7 +122,7 @@ test_planning = {
                 "ednote": "ed note here",
                 "scheduled": "2018-05-28T10:51:52+0000"
             },
-            "news_coverage_status": {
+            "coverage_status": {
                 "name": "coverage intended",
                 "label": "Planned",
                 "qcode": "ncostat:int"
@@ -137,7 +139,7 @@ test_planning = {
                 "ednote": "ed note here",
                 "scheduled": "2018-05-28T10:51:52+0000"
             },
-            "news_coverage_status": {
+            "coverage_status": {
                 "name": "coverage intended",
                 "label": "Planned",
                 "qcode": "ncostat:int"
@@ -175,7 +177,8 @@ def test_push_parsed_event(client, app):
     assert 1 == len(parsed['event']['event_contact_info'])
     assert 1 == len(parsed['location'])
 
-    resp = client.get('/agenda?date_to=now/d')
+    init_auth(app, client)
+    resp = client.get('/agenda/search?date_to=now/d')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 

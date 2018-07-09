@@ -142,7 +142,7 @@ def _filter_terms(filters):
     return [{'terms': {get_aggregation_field(key): val}} for key, val in filters.items() if val]
 
 
-def _set_bookmarks_query(query, user_id):
+def set_bookmarks_query(query, user_id):
     query['bool']['must'].append({
         'term': {'bookmarks': str(user_id)},
     })
@@ -169,7 +169,7 @@ class WireSearchService(newsroom.Service):
             _set_product_query(query, company)
         except Forbidden:
             return 0
-        _set_bookmarks_query(query, user_id)
+        set_bookmarks_query(query, user_id)
         source = {'query': query, 'size': 0}
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
@@ -189,7 +189,7 @@ class WireSearchService(newsroom.Service):
                 query['bool']['must_not'].append(f)
 
         if req.args.get('bookmarks'):
-            _set_bookmarks_query(query, req.args['bookmarks'])
+            set_bookmarks_query(query, req.args['bookmarks'])
 
         filters = None
 

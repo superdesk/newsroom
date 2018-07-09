@@ -61,6 +61,11 @@ def get_json_or_400():
     return data
 
 
+def get_type():
+    item_type = request.args.get('type', 'wire')
+    return 'items' if item_type == 'wire' else 'agenda'
+
+
 def parse_dates(item):
     for field in ['firstcreated', 'versioncreated']:
         if item.get(field) and type(item[field]) == str:

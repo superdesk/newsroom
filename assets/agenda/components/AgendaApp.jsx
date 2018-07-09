@@ -7,34 +7,38 @@ import { createPortal } from 'react-dom';
 import { gettext } from 'utils';
 
 import {
-    followTopic,
+    followEvent,
     fetchItems,
     setQuery,
     selectAll,
     selectNone,
+    selectDate,
     fetchMoreItems,
     setView,
     refresh,
     previewItem,
-    toggleNews,
-} from 'wire/actions';
+    toggleDropdownFilter,
+} from 'agenda/actions';
 
-import { getActiveQuery, isTopicActive } from 'wire/utils';
+import { getActiveQuery } from 'wire/utils';
 
-import Preview from './Preview';
-import ItemsList from './ItemsList';
+import AgendaPreview from './AgendaPreview';
+import AgendaList from './AgendaList';
 import SearchBar from '../../components/SearchBar';
-import SearchResultsInfo from './SearchResultsInfo';
-import SearchSidebar from './SearchSidebar';
-import SelectedItemsBar from './SelectedItemsBar';
-import ListViewControls from './ListViewControls';
-import DownloadItemsModal from './DownloadItemsModal';
-import ItemDetails from './ItemDetails';
+import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import SearchSidebar from 'wire/components/SearchSidebar';
+import SelectedItemsBar from 'wire/components/SelectedItemsBar';
+import AgendaListViewControls from './AgendaListViewControls';
+import DownloadItemsModal from 'wire/components/DownloadItemsModal';
+import ItemDetails from 'wire/components/ItemDetails';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
-import { getItemActions } from '../item-actions';
-import {isTouchDevice} from '../../utils';
+import { getItemActions } from 'wire/item-actions';
+import {isTouchDevice} from 'utils';
+import {hasCoverages, isCanceled, isPostponed, isRescheduled} from '../utils';
+import AgendaFilters from './AgendaFilters';
+import AgendaDateNavigation from './AgendaDateNavigation';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -42,7 +46,7 @@ const modals = {
     downloadItems: DownloadItemsModal,
 };
 
-class WireApp extends React.Component {
+class AgendaApp extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -130,12 +134,25 @@ class WireApp extends React.Component {
         const multiActionFilter = (action) => action.multi &&
             this.props.selectedItems.every((item) => !action.when || action.when(this.props, this.props.itemsById[item]));
 
-        const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
-            this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
+        const isFollowing = get(this.props, 'itemToPreview._id') && this.props.topics &&
+            this.props.topics.find((topic) => topic.query === this.props.itemToPreview._id);
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
         const mainClassName = classNames('wire-column__main', {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,
+        });
+
+        /*
+        className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}
+         */
+
+        const previewClassName = classNames('wire-column__preview', {
+            'wire-column__preview--covering': hasCoverages(this.props.itemToPreview),
+            'wire-column__preview--not-covering': !hasCoverages(this.props.itemToPreview),
+            'wire-column__preview--postponed': isPostponed(this.props.itemToPreview),
+            'wire-column__preview--cancelled': isCanceled(this.props.itemToPreview),
+            'wire-column__preview--rescheduled': isRescheduled(this.props.itemToPreview),
+            'wire-column__preview--open': this.props.itemToPreview,
         });
 
         const searchCriteria = getActiveQuery(
@@ -143,7 +160,7 @@ class WireApp extends React.Component {
             this.props.resultsFiltered ? this.props.activeFilter : {},
             this.props.resultsFiltered ? this.props.createdFilter : {}
         );
-        const activeTopic = this.props.topics.find((topic) => isTopicActive(topic, searchCriteria));
+        const activeTopic = this.props.topics.find((topic) => topic._id === this.props.activeTopic);
 
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
@@ -182,12 +199,16 @@ class WireApp extends React.Component {
                             setQuery={this.props.setQuery}
                         />
 
-                        <ListViewControls
+                        <AgendaDateNavigation
+                            selectDate={this.props.selectDate}
+                            activeDate={this.props.activeDate}
+                            activeGrouping={this.props.activeGrouping}
+                        />
+
+                        <AgendaListViewControls
                             activeView={this.props.activeView}
                             setView={this.props.setView}
                             activeNavigation={this.props.activeNavigation}
-                            newsOnly={this.props.newsOnly}
-                            toggleNews={this.props.toggleNews}
                         />
                     </nav>
                 </section>,
@@ -211,31 +232,34 @@ class WireApp extends React.Component {
                                 query={this.props.activeQuery}
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
-                                followTopic={this.props.followTopic}
                                 newItems={this.props.newItems}
                                 refresh={this.props.refresh}
                                 searchCriteria={searchCriteria}
                                 activeTopic={activeTopic}
-                                toggleNews={this.props.toggleNews}
                                 activeNavigation={this.props.activeNavigation}
-                                newsOnly={this.props.newsOnly}
                                 scrollClass={this.state.scrollClass}
                                 resultsFiltered = {this.props.resultsFiltered}
                             />
 
-                            <ItemsList
+                            <AgendaFilters
+                                aggregations={this.props.aggregations}
+                                toggleFilter={this.props.toggleDropdownFilter}
+                                activeFilter={this.props.activeFilter}
+                            />
+
+                            <AgendaList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
                             />
                         </div>
 
-                        <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
+                        <div className={previewClassName}>
                             {this.props.itemToPreview &&
-                            <Preview
+                            <AgendaPreview
                                 item={this.props.itemToPreview}
                                 user={this.props.user}
                                 actions={this.filterActions(this.props.itemToPreview)}
-                                followStory={this.props.followStory}
+                                followEvent={this.props.followEvent}
                                 isFollowing={!!isFollowing}
                                 closePreview={this.props.closePreview}
                             />
@@ -256,7 +280,7 @@ class WireApp extends React.Component {
     }
 }
 
-WireApp.propTypes = {
+AgendaApp.propTypes = {
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
     activeQuery: PropTypes.string,
@@ -265,7 +289,7 @@ WireApp.propTypes = {
     itemToPreview: PropTypes.object,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
-    followTopic: PropTypes.func,
+    followEvent: PropTypes.func,
     modal: PropTypes.object,
     user: PropTypes.string,
     company: PropTypes.string,
@@ -283,23 +307,26 @@ WireApp.propTypes = {
     fetchMoreItems: PropTypes.func,
     activeView: PropTypes.string,
     setView: PropTypes.func,
-    followStory: PropTypes.func,
     newItems: PropTypes.array,
     refresh: PropTypes.func,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
-    toggleNews: PropTypes.func,
-    newsOnly: PropTypes.bool,
     resultsFiltered: PropTypes.bool,
+    aggregations: PropTypes.object,
+    toggleDropdownFilter: PropTypes.func,
+    selectDate: PropTypes.func,
+    activeDate: PropTypes.number,
+    activeGrouping: PropTypes.string,
+    activeTopic: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
     isLoading: state.isLoading,
     totalItems: state.totalItems,
     activeQuery: state.activeQuery,
-    activeFilter: get(state, 'wire.activeFilter'),
-    createdFilter: get(state, 'wire.createdFilter'),
+    activeFilter: get(state, 'agenda.activeFilter'),
+    createdFilter: get(state, 'agenda.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -308,23 +335,24 @@ const mapStateToProps = (state) => ({
     company: state.company,
     topics: state.topics || [],
     selectedItems: state.selectedItems,
-    activeView: get(state, 'wire.activeView'),
+    activeView: get(state, 'agenda.activeView'),
     newItems: state.newItems,
-    navigations: get(state, 'wire.navigations', []),
-    activeNavigation: get(state, 'wire.activeNavigation', null),
-    newsOnly: !!get(state, 'wire.newsOnly'),
+    navigations: get(state, 'agenda.navigations', []),
+    activeTopic: get(state, 'agenda.activeTopic'),
+    activeNavigation: get(state, 'agenda.activeNavigation', null),
     bookmarks: state.bookmarks,
     resultsFiltered: state.resultsFiltered,
+    aggregations: state.aggregations,
+    activeDate: get(state, 'agenda.activeDate'),
+    activeGrouping: get(state, 'agenda.activeGrouping'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    followTopic: (query) => dispatch(followTopic(query)),
-    followStory: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`})),
+    followEvent: (item) => dispatch(followEvent({
+        label: item.name,
+        query: `${item._id}`
+    })),
     fetchItems: () => dispatch(fetchItems()),
-    toggleNews: () => {
-        dispatch(toggleNews());
-        dispatch(fetchItems());
-    },
     setQuery: (query) => {
         dispatch(setQuery(query));
         dispatch(fetchItems());
@@ -336,6 +364,11 @@ const mapDispatchToProps = (dispatch) => ({
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
+    toggleDropdownFilter: (field, value) => dispatch(toggleDropdownFilter(field, value)),
+    selectDate: (dateString, grouping) => {
+        dispatch(selectDate(dateString, grouping));
+        dispatch(fetchItems());
+    }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
+export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

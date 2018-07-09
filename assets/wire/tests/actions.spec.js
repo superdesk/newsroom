@@ -63,15 +63,16 @@ describe('wire actions', () => {
     });
 
     it('can bookmark items', () => {
-        fetchMock.post('/wire_bookmark', {});
-        fetchMock.delete('/wire_bookmark', {});
+        store.dispatch(actions.initData({context: 'wire'}));
+        fetchMock.post('/bookmark?type=wire', {});
+        fetchMock.delete('/bookmark?type=wire', {});
 
         store.dispatch(actions.bookmarkItems(['foo', 'bar']));
-        expect(fetchMock.called('/wire_bookmark')).toBeTruthy();
+        expect(fetchMock.called('/bookmark?type=wire')).toBeTruthy();
         fetchMock.reset();
 
         store.dispatch(actions.removeBookmarks('foo'));
-        expect(fetchMock.called('/wire_bookmark')).toBeTruthy();
+        expect(fetchMock.called('/bookmark?type=wire')).toBeTruthy();
     });
 
     it('can populate new items on update notification by topic', () => {

@@ -15,6 +15,7 @@ class TopicsResource(newsroom.Resource):
         'notifications': {'type': 'boolean', 'default': False},
         'user': {'type': 'objectid'},
         'timezone_offset': {'type': 'integer', 'nullable': True},
+        'topic_type': {'type': 'string', 'nullable': True},
     }
 
 
