@@ -11,6 +11,10 @@ import {
     resetFilter,
 } from 'wire/actions';
 
+import {
+    toggleNavigation as toggleAgendaNavigation
+} from 'agenda/actions';
+
 import TopicsTab from './TopicsTab';
 import FiltersTab from './filters/FiltersTab';
 import NavigationTab from './filters/NavigationTab';
@@ -34,7 +38,8 @@ class SearchSidebar extends React.Component {
 
     toggleNavigation(event, navigation) {
         event.preventDefault();
-        this.props.dispatch(toggleNavigation(navigation));
+        const fn = isWireContext() ? toggleNavigation : toggleAgendaNavigation;
+        this.props.dispatch(fn(navigation));
     }
 
     toggleFilter(event, field, value, single) {

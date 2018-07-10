@@ -49,5 +49,6 @@ def get_view_data():
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': [t for t in topics if t.get('topic_type') == 'agenda'],
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()],
-        'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None),
+        'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
+                                                  product_type='agenda'),
     }

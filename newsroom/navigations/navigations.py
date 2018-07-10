@@ -36,12 +36,12 @@ class NavigationsService(newsroom.Service):
     pass
 
 
-def get_navigations_by_company(company_id):
+def get_navigations_by_company(company_id, product_type='wire'):
     """
     Returns list of navigations for given company id
     Navigations will contain the list of product ids
     """
-    product_lookup = {'is_enabled': True, 'companies': str(company_id)}
+    product_lookup = {'is_enabled': True, 'companies': str(company_id), 'product_type': product_type}
     products = list(superdesk.get_resource_service('products').get(req=None, lookup=product_lookup))
 
     # Get the navigation ids used across products

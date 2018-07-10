@@ -2,9 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
+import SelectInput from 'components/SelectInput';
 
 import { gettext, getProductQuery } from 'utils';
 import EditPanel from '../../components/EditPanel';
+
+const productTypes = [
+    {value: 'wire', text: gettext('Wire')},
+    {value: 'agenda', text: gettext('Agenda')},
+];
 
 
 class EditProduct extends React.Component {
@@ -103,7 +109,7 @@ class EditProduct extends React.Component {
                                             onChange={this.props.onChange}
                                         />
                                         {this.props.product.sd_product_id &&
-                                        <a href={`/wire?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
+                                        <a href={`/${this.props.product.product_type || 'wire'}?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
                                             className='btn btn-outline-secondary float-right mt-2'>{gettext('Test product id')}
                                         </a>}
                                     </div>
@@ -117,10 +123,18 @@ class EditProduct extends React.Component {
                                             onChange={this.props.onChange}
                                         />
                                         {this.props.product.query &&
-                                        <a href={`/wire?q=${this.props.product.query}`} target="_blank"
+                                        <a href={`/${this.props.product.product_type || 'wire'}?q=${this.props.product.query}`} target="_blank"
                                             className='btn btn-outline-secondary float-right mt-3'>{gettext('Test query')}
                                         </a>}
                                     </div>
+
+                                    <SelectInput
+                                        name='product_type'
+                                        label={gettext('Product Type')}
+                                        value={this.props.product.product_type}
+                                        options={productTypes}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.product_type : null} />
 
                                     <CheckboxInput
                                         name='is_enabled'
