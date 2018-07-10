@@ -1,4 +1,4 @@
-# Superdesk Newsroom
+# Superdesk Newshub a.k.a. Newsroom
 
 Newshub is a secure self-service content store, fed by outputs from a Superdesk content management system.
 
@@ -16,11 +16,9 @@ Users may also share items with their colleagues and comment on them.
 
 Superdesk Newshub was developed in partnership with the Australian Associated Press news agency. Its Newshub instance, which it brands “AAP Newsroom”, is fed by the agency’s Superdesk production CMS. 
 
-Newshub is fully responsive from desktop, to tablet, to mobile. 
-
+Newshub is fully responsive from desktop, to tablet, to mobile.
 
 Sourcefabric is happy to provide demonstrations of Newshub and other newsroom tools from the Superdesk stable.
-
 
 ## Install
 
