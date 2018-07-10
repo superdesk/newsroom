@@ -2558,3 +2558,9 @@ article.list {
     border-color: none !important;
 }
 // End Wire BEM classes
+
+#copy-area {
+    position: absolute;
+    top: 0;
+    left: -1000px;
+}
