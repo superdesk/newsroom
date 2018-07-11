@@ -31,10 +31,11 @@ def init_app(app):
     app.sidenav('Wire', 'wire.wire', 'text')
     app.sidenav('Saved Items', 'wire.bookmarks', 'bookmark')
 
-    from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter
-    app.add_download_formatter('text', TextFormatter(), gettext('Plain Text'))
-    app.add_download_formatter('nitf', NITFFormatter(), 'NITF')
-    app.add_download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2')
+    from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter
+    app.add_download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'])
+    app.add_download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'])
+    app.add_download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'])
+    app.add_download_formatter('json', JsonFormatter(), 'Json', ['agenda'])
 
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')
