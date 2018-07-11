@@ -33,6 +33,11 @@ class ProductsResource(newsroom.Resource):
             'type': 'list',
             'nullable': True,
         },
+        'product_type': {
+            'type': 'string',
+            'allowed': ['agenda', 'wire'],
+            'default': 'wire'
+        },
     }
     datasource = {
         'source': 'products',

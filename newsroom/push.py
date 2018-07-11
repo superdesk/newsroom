@@ -275,6 +275,7 @@ def set_agenda_metadata_from_event(agenda, event):
     agenda['place'] = event.get('place')
     agenda['subject'] = event.get('subject')
     agenda['anpa_category'] = event.get('anpa_category')
+    agenda['products'] = event.get('products')
 
     agenda['event'] = event
 
@@ -299,6 +300,7 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
     agenda['genre'] = planning_item.get('genre')
     agenda['priority'] = planning_item.get('priority')
     agenda['urgency'] = planning_item.get('urgency')
+    agenda['products'] = planning_item.get('products')
 
 
 def set_agenda_planning_items(agenda, planning_item, action='add'):

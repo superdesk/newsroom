@@ -77,6 +77,7 @@ def edit(id):
         'sd_product_id': data.get('sd_product_id'),
         'query': data.get('query'),
         'is_enabled': data.get('is_enabled'),
+        'product_type': data.get('product_type', 'wire')
     }
 
     validation = validate_product(updates)

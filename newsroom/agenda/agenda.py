@@ -89,6 +89,18 @@ class AgendaResource(newsroom.Resource):
     schema['prints'] = Resource.not_analyzed_field('list')  # list of user ids who printed this item
     schema['copies'] = Resource.not_analyzed_field('list')  # list of user ids who copied this item
 
+    # matching products from superdesk
+    schema['products'] = {
+        'type': 'list',
+        'mapping': {
+            'type': 'object',
+            'properties': {
+                'code': not_analyzed,
+                'name': not_analyzed
+            }
+        }
+    }
+
     resource_methods = ['GET']
     datasource = {
         'source': 'agenda',
