@@ -18,6 +18,7 @@ import {
     refresh,
     previewItem,
     toggleDropdownFilter,
+    openItemDetails,
 } from 'agenda/actions';
 
 import { getActiveQuery } from 'wire/utils';
@@ -262,6 +263,7 @@ class AgendaApp extends React.Component {
                                 followEvent={this.props.followEvent}
                                 isFollowing={!!isFollowing}
                                 closePreview={this.props.closePreview}
+                                openItemDetails={this.props.openItemDetails}
                             />
                             }
 
@@ -319,6 +321,7 @@ AgendaApp.propTypes = {
     activeDate: PropTypes.number,
     activeGrouping: PropTypes.string,
     activeTopic: PropTypes.string,
+    openItemDetails: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -368,7 +371,8 @@ const mapDispatchToProps = (dispatch) => ({
     selectDate: (dateString, grouping) => {
         dispatch(selectDate(dateString, grouping));
         dispatch(fetchItems());
-    }
+    },
+    openItemDetails: (item) => dispatch(openItemDetails(item)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

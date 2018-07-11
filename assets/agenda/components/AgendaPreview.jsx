@@ -23,7 +23,7 @@ class AgendaPreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, followEvent, isFollowing} = this.props;
+        const {item, user, actions, followEvent, isFollowing, openItemDetails} = this.props;
         return (
             <div className='wire-column__preview__items'>
 
@@ -61,7 +61,7 @@ class AgendaPreview extends React.PureComponent {
                         <AgendaListItemLabels item={item} />
                     </div>
 
-                    <AgendaPreviewImage item={item} />
+                    <AgendaPreviewImage item={item} onClick={openItemDetails} />
                     <AgendaPreviewMeta item={item} />
 
                     {item.abstract && DISPLAY_ABSTRACT &&
@@ -96,6 +96,7 @@ AgendaPreview.propTypes = {
     followEvent: PropTypes.func,
     isFollowing: PropTypes.bool,
     closePreview: PropTypes.func,
+    openItemDetails: PropTypes.func,
 };
 
 export default AgendaPreview;
