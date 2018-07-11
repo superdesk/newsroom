@@ -6,7 +6,7 @@ import {get} from 'lodash';
  * @return {Array}
  */
 export function getLocations(item) {
-    return get(item, 'location', []).filter((loc) => get(loc, 'location.lat'));
+    return (get(item, 'location') || []).filter((loc) => get(loc, 'location.lat'));
 }
 
 /**
