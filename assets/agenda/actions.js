@@ -36,6 +36,9 @@ export function previewItem(item) {
     };
 }
 
+export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
+export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
+
 export const OPEN_ITEM = 'OPEN_ITEM';
 export function openItemDetails(item) {
     return {type: OPEN_ITEM, item};
@@ -137,7 +140,7 @@ function search(state, next) {
         .map((key) => [key, params[key]].join('='))
         .join('&');
 
-    return server.get(`/agenda/search?${queryString}`);
+    return server.get(`/agenda/search?${queryString}&tick=${Date.now().toString()}`);
 }
 
 /**
