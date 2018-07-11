@@ -137,7 +137,12 @@
 <script>
     window.mapsProvider = 'google';
     window.googleMapsKey = {{ config.GOOGLE_MAPS_KEY | tojson }};
+    function setMapsLoaded() {
+        window.mapsLoaded = true;
+    }
 </script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_MAPS_KEY }}&callback=setMapsLoaded" async defer></script> 
+<div id="google-map"></div>
 {% endif %}
 
 </body>

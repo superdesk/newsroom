@@ -39,5 +39,11 @@ module.exports = {
             "error",
             {"allow": ["warn", "error"]}
         ],
+        "react/no-deprecated": [
+            1,
+        ],
+        "react/jsx-no-target-blank": [
+            0,
+        ],
     }
 };

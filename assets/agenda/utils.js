@@ -240,7 +240,6 @@ export function getNext(dateString, grouping) {
     return navigationFunctions[grouping].next(dateString);
 }
 
-
 /**
  * Calls the previous function of a given grouping
  *
@@ -251,10 +250,3 @@ export function getNext(dateString, grouping) {
 export function getPrevious(dateString, grouping) {
     return navigationFunctions[grouping].previous(dateString);
 }
-
-
-
-
-
-
-

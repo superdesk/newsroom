@@ -25,7 +25,7 @@ cache:
 
 before_install:
     - sudo apt-get purge elasticsearch
-    - sudo apt-get install -t stable elasticsearch
+    - sudo apt-get install -y -t stable --allow-unauthenticated elasticsearch
     - sudo service elasticsearch restart
 
 install:
