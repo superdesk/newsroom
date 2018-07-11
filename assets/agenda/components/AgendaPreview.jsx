@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { gettext, formatHTML, formatDate, formatTime } from 'utils';
+import { gettext, formatDate, formatTime } from 'utils';
 import { isEqualItem, DISPLAY_ABSTRACT } from 'wire/utils';
-import PreviewActionButtons from 'wire/components/PreviewActionButtons';
+import PreviewActionButtons from 'components/PreviewActionButtons';
 import {hasCoverages, isRecurring} from '../utils';
 import AgendaListItemLabels from './AgendaListItemLabels';
 import AgendaPreviewMeta from './AgendaPreviewMeta';
@@ -69,7 +69,7 @@ class AgendaPreview extends React.PureComponent {
                     }
 
                     {item.definition_long &&
-                        <div className='wire-column__preview__text' id='preview-body' dangerouslySetInnerHTML={({__html: formatHTML(item.definition_long)})} />
+                        <pre className='wire-column__preview__text' id='preview-body'>{item.definition_long}</pre>
                     }
 
                     {hasCoverages(item) && <AgendaPreviewCoverages coverages={item.coverages} />}

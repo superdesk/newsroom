@@ -9,7 +9,7 @@ import {
     getCaption,
     isEqualItem, isKilled, DISPLAY_ABSTRACT } from 'wire/utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
-import PreviewActionButtons from './PreviewActionButtons';
+import PreviewActionButtons from 'components/PreviewActionButtons';
 import PreviewTags from './PreviewTags';
 import PreviewMeta from './PreviewMeta';
 

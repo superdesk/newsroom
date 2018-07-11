@@ -1,19 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {isEmpty} from 'lodash';
-import PreviewActionButtons from './PreviewActionButtons';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
+import PreviewActionButtons from 'components/PreviewActionButtons';
 import { gettext, fullDate, formatHTML } from 'utils';
 import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT } from 'wire/utils';
-import { getLocations } from 'maps/utils';
-import Map from 'maps/components/map';
+
 
 function ItemDetails({item, user, actions, onClose}) {
     const picture = getPicture(item);
-    const locations = getLocations(item);
 
     return (
         <div className='content--item-detail'>
@@ -37,12 +34,6 @@ function ItemDetails({item, user, actions, onClose}) {
                                 <img src={getDetailRendition(picture).href} />
                             </span>
                             <figcaption className="wire-column__preview__caption">{getCaption(picture)}</figcaption>
-                        </figure>
-                    )}
-
-                    {!getDetailRendition(picture) && !isEmpty(locations) && window.mapsLoaded && (
-                        <figure className="wire-column__preview__image">
-                            <Map locations={locations} />
                         </figure>
                     )}
 
