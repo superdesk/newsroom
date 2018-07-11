@@ -133,5 +133,12 @@
 </script>
 {% endif %}
 
+{% if config.GOOGLE_MAPS_KEY %}
+<script>
+    window.mapsProvider = 'google';
+    window.googleMapsKey = {{ config.GOOGLE_MAPS_KEY | tojson }};
+</script>
+{% endif %}
+
 </body>
 </html>
