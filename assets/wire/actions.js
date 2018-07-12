@@ -2,7 +2,7 @@
 import { get, isEmpty } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import { gettext, notify, updateRouteParams, getTimezoneOffset } from 'utils';
+import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml } from 'utils';
 import { markItemAsRead, toggleNewsOnlyParam } from './utils';
 import { renderModal, closeModal } from 'actions';
 
@@ -26,11 +26,10 @@ export function preview(item) {
     return {type: PREVIEW_ITEM, item};
 }
 
-
 export function previewAndCopy(item) {
     return (dispatch) => {
         dispatch(previewItem(item));
-        window.setTimeout(() => dispatch(copyPreviewContents(item)), 200);
+        dispatch(copyPreviewContents(item));
     };
 }
 
@@ -103,19 +102,22 @@ export function toggleNews() {
  */
 export function copyPreviewContents(item) {
     return (dispatch, getState) => {
-        const preview = document.getElementById('preview-article');
-        const selection = window.getSelection();
-        const range = document.createRange();
-        selection.removeAllRanges();
-        range.selectNode(preview);
-        selection.addRange(range);
+        const textarea = document.getElementById('copy-area');
+
+        textarea.value = [
+            get(item, 'headline', get(item, 'slugline')),
+            '',
+            get(item, 'body_text') || getTextFromHtml(get(item, 'body_html'))
+        ].join('\n');
+        textarea.select();
+
         if (document.execCommand('copy')) {
             notify.success(gettext('Item copied successfully.'));
             item && analytics.itemEvent('copy', item);
         } else {
             notify.error(gettext('Sorry, Copy is not supported.'));
         }
-        selection.removeAllRanges();
+
         if (getState().user) {
             server.post(`/wire/${item._id}/copy?type=${getState().context}`)
                 .then(dispatch(setCopyItem(item._id)))

@@ -1,14 +1,5 @@
 {% extends "email_layout.txt" %}
-{% block content %}{% if is_topic %}
-There is a new story for your followed topic: {{topic_name}}
-{% else %}
-There is a new update for your previously accessed story
-{% endif %}
-{{ item.slugline }}
-{{ item.headline }}
-{% if item.byline %}By: {{ item.byline }}{% endif %}
-{% if item.description_html %}{{ item.description_html | plain_text }}
-{% else %}{{ item.description_text }}
-{% endif %}
-You can navigate to {{url}} to view that story.
+{% block name %}{% endblock %}
+{% block content %}
+{% include 'email_item.txt' %}
 {% endblock %}

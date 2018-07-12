@@ -1260,9 +1260,10 @@ article.list {
 }
 
 .wire-articles--list {
-    overflow: auto;
     padding-top: 20px;
     margin-top: 0;
+    overflow: auto;
+    flex-grow: 1;
 }
 
 .wire-articles__item--list {
@@ -2121,14 +2122,13 @@ article.list {
     padding: 10px 10px 5px 20px;
     flex-shrink: 0;
     @include xl {
-        padding: 20px 10px 20px 20px;
+        padding: 15px 10px 20px 20px;
     }
 }
 
 .wire-column__preview__date {
     color: #747474;
     line-height: 1rem;
-    padding: 0 10px 15px 20px;
     font-size: .8125rem;
     @include xl {
         padding: 0 10px 20px 20px;
@@ -2138,8 +2138,8 @@ article.list {
 
     .wire-column__preview--canceled & {
         text-decoration: line-through;
+        font-size: .8125rem;
     }
-
 }
 
 .wire-column__preview__buttons {
@@ -2184,6 +2184,7 @@ article.list {
 
 .wire-column__preview__author {
     color: #626262;
+    font-size: 0.9375rem;
     font-weight: 300;
     .bold {
         color: #222222;
@@ -2507,6 +2508,20 @@ article.list {
     order: 2;
     flex: 1 1 100%;
     overflow: auto;
+    @include lg {
+        margin: 0px 40px 0px 10px;
+    }
+}
+
+.wire-column__preview__content--item-detail-preformatted-wrap {
+    display: flex;
+    flex-direction: column;
+    margin: 30px 0 20px 0;
+}
+
+.wire-column__preview__content--item-detail-item-preformatted {
+    order: 2;
+    flex: 1 1 100%;
     @include lg {
         margin: 0px 40px 0px 10px;
     }
@@ -2928,4 +2943,10 @@ article.list {
 
 #google-map {
     display: none;
+}
+
+#copy-area {
+    position: absolute;
+    top: 0;
+    left: -1000px;
 }
