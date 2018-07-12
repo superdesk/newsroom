@@ -77,12 +77,12 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
-def _set_product_query(query, company, user=None, navigation_id=None):
+def set_product_query(query, company, user=None, navigation_id=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
     If user is not administrator then products apply if user has a company
-    If user is not administrator and has no company then everthing will be filtered
+    If user is not administrator and has no company then everything will be filtered
     :param query: search query
     :param company: company
     :param user: user to check against (used for notification checking)
@@ -110,7 +110,7 @@ def _set_product_query(query, company, user=None, navigation_id=None):
 
     for product in products:
         if product.get('query'):
-            query['bool']['should'].append(_query_string(product['query']))
+            query['bool']['should'].append(query_string(product['query']))
 
     query['bool']['minimum_should_match'] = 1
 
@@ -118,7 +118,7 @@ def _set_product_query(query, company, user=None, navigation_id=None):
         abort(403, gettext('Your company doesn\'t have any products defined.'))
 
 
-def _query_string(query):
+def query_string(query):
     return {
         'query_string': {
             'query': query,
@@ -166,7 +166,7 @@ class WireSearchService(newsroom.Service):
         user = get_user()
         company = get_user_company(user)
         try:
-            _set_product_query(query, company)
+            set_product_query(query, company)
         except Forbidden:
             return 0
         set_bookmarks_query(query, user_id)
@@ -179,10 +179,10 @@ class WireSearchService(newsroom.Service):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        _set_product_query(query, company, navigation_id=req.args.get('navigation'))
+        set_product_query(query, company, navigation_id=req.args.get('navigation'))
 
         if req.args.get('q'):
-            query['bool']['must'].append(_query_string(req.args['q']))
+            query['bool']['must'].append(query_string(req.args['q']))
 
         if req.args.get('newsOnly') and not req.args.get('navigation'):
             for f in app.config.get('NEWS_ONLY_FILTERS', []):
@@ -241,7 +241,7 @@ class WireSearchService(newsroom.Service):
             query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
 
         if product.get('query'):
-            query['bool']['should'].append(_query_string(product['query']))
+            query['bool']['should'].append(query_string(product['query']))
 
         query['bool']['minimum_should_match'] = 1
 
@@ -295,7 +295,7 @@ class WireSearchService(newsroom.Service):
             topic_filter = {'bool': {'must': []}}
 
             if topic.get('query'):
-                topic_filter['bool']['must'].append(_query_string(topic['query']))
+                topic_filter['bool']['must'].append(query_string(topic['query']))
 
             if topic.get('created'):
                 topic_filter['bool']['must'].append(_versioncreated_range(dict(
@@ -312,7 +312,7 @@ class WireSearchService(newsroom.Service):
             # for now even if there's no active company matching for the user
             # continuing with the search
             try:
-                _set_product_query(query, company, user)
+                set_product_query(query, company, user)
             except Forbidden:
                 return []
 
@@ -401,7 +401,7 @@ class WireSearchService(newsroom.Service):
             query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
 
         if product.get('query'):
-            query['bool']['should'].append(_query_string(product['query']))
+            query['bool']['should'].append(query_string(product['query']))
 
         query['bool']['minimum_should_match'] = 1
         query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
