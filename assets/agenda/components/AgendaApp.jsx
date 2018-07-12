@@ -31,7 +31,7 @@ import SearchSidebar from 'wire/components/SearchSidebar';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import AgendaListViewControls from './AgendaListViewControls';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
-import ItemDetails from 'wire/components/ItemDetails';
+import AgendaItemDetails from 'agenda/components/AgendaItemDetails';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
@@ -164,7 +164,7 @@ class AgendaApp extends React.Component {
         const activeTopic = this.props.topics.find((topic) => topic._id === this.props.activeTopic);
 
         return (
-            (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
+            (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}

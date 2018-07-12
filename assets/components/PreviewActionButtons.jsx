@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ActionButton from '../../components/ActionButton';
+import ActionButton from './ActionButton';
 
 
 function PreviewActionButtons({item, user, actions}) {
