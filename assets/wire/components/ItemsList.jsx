@@ -29,10 +29,12 @@ class ItemsList extends React.Component {
         let diff = 0;
         switch (event.key) {
         case 'ArrowDown':
+        case 'ArrowRight':
             diff = 1;
             break;
 
         case 'ArrowUp':
+        case 'ArrowLeft':
             diff = -1;
             break;
 
@@ -61,6 +63,12 @@ class ItemsList extends React.Component {
         }
 
         this.previewTimeout = setTimeout(() => this.props.dispatch(previewItem(nextItem)), PREVIEW_TIMEOUT);
+
+        const activeElements = document.getElementsByClassName('wire-articles__item--open');
+
+        if (activeElements && activeElements.length) {
+            activeElements[0].scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
+        }
     }
 
     cancelPreviewTimeout() {
