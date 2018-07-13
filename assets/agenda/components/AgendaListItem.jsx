@@ -83,10 +83,10 @@ class AgendaListItem extends React.Component {
 
                         <AgendaListItemIcons item={item} />
 
-                        {isExtended && (
-                            <div className="wire-articles__item__text">
-                                <p>{item.definition_long || item.abstract}</p>
-                            </div>
+                        {isExtended && item.definition_short && (
+                            <p className="wire-articles__item__text">
+                                {item.definition_short || item.abstract}
+                            </p>
                         )}
 
                     </div>
