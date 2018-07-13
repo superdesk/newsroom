@@ -267,6 +267,7 @@ def set_agenda_metadata_from_event(agenda, event):
     agenda['recurrence_id'] = event.get('recurrence_id')
     agenda['name'] = event.get('name')
     agenda['slugline'] = event.get('slugline', agenda.get('slugline'))
+    agenda['definition_short'] = event.get('definition_short')
     agenda['definition_long'] = event.get('definition_long')
     agenda['calendars'] = event.get('calendars')
     agenda['location'] = event.get('location')
