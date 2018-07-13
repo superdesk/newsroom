@@ -35,7 +35,13 @@ def get_upload(media_id):
     response.cache_control.s_max_age = cache_for
     response.cache_control.public = True
     response.make_conditional(flask.request)
-    response.headers['Content-Disposition'] = 'inline'
+
+    if flask.request.args.get('filename'):
+        response.headers['Content-Type'] = media_file.content_type
+        response.headers['Content-Disposition'] = 'attachment; filename="%s"' % flask.request.args['filename']
+    else:
+        response.headers['Content-Disposition'] = 'inline'
+
     return response
 
 

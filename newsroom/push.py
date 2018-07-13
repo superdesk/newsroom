@@ -122,6 +122,12 @@ def publish_event(event):
     # if there's an event then _id field will have the same value as event_id
     logger.info('publishing event %s', event)
 
+    # populate attachments href
+    if event.get('files'):
+        for file_ref in event['files']:
+            if file_ref.get('media'):
+                file_ref.setdefault('href', app.upload_url(file_ref['media']))
+
     try:
         orig = app.data.find_one('agenda', req=None, _id=event['guid'])
         service = superdesk.get_resource_service('agenda')
