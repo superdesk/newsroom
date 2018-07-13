@@ -28,7 +28,7 @@ function ItemDetails({item, user, actions, onClose}) {
 
             </section>
 
-            <article id='preview-article' className="wire-column__preview__content--item-detal-wrap">
+            <article id='preview-article' className="wire-column__preview__content--item-detail-wrap">
                 <div className="wire-column__preview__content">
                     {getDetailRendition(picture) && !isKilled(item) && (
                         <figure className="wire-column__preview__image">

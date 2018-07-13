@@ -1,59 +1,54 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {isEmpty} from 'lodash';
-import { formatDate, formatTime } from 'utils';
-import PreviewActionButtons from 'components/PreviewActionButtons';
 
 import { getLocations } from 'maps/utils';
 import Map from 'maps/components/map';
 
+import PreviewActionButtons from 'components/PreviewActionButtons';
+
+import Content from 'ui/components/Content';
+import ContentBar from 'ui/components/ContentBar';
+import ContentHeader from 'ui/components/ContentHeader';
+
+import Article from 'ui/components/Article';
+import ArticleBody from 'ui/components/ArticleBody';
+import ArticleSidebar from 'ui/components/ArticleSidebar';
+
+import {hasCoverages} from '../utils';
+
+import AgendaTime from './AgendaTime';
+import AgendaName from './AgendaName';
+import AgendaLongDescription from './AgendaLongDescription';
+import AgendaMeta from './AgendaMeta';
+import AgendaEdNote from './AgendaEdNote';
+import AgendaDetailCoverages from './AgendaDetailCoverages';
+
 export default function AgendaItemDetails({item, user, actions, onClose}) {
     const locations = getLocations(item);
+    const map = !isEmpty(locations) && window.mapsLoaded && <Map locations={locations} />;
 
     return (
-        <div className='content--item-detail'>
-            <section className='content-header'>
-                <div className='content-bar navbar justify-content-between'>
-
-                    <span className='content-bar__menu' onClick={onClose}>
-                        <i className='icon--close-thin'></i>
-                    </span>
-
+        <Content type="item-detail">
+            <ContentHeader>
+                <ContentBar onClose={onClose}>
                     <PreviewActionButtons item={item} user={user} actions={actions}/>
-                </div>
+                </ContentBar>
+            </ContentHeader>
 
-            </section>
-
-            <article id='preview-article' className="wire-column__preview__content--item-detal-wrap">
-                <div className="wire-column__preview__content">
-                    {!isEmpty(locations) && window.mapsLoaded && (
-                        <figure className="wire-column__preview__image">
-                            <Map locations={locations} />
-                        </figure>
-                    )}
-
-                    <div className="wire-column__preview__content--item-detail-text-wrap">
-                        <div className="wire-column__preview__content--item-detail-item-text">
-                            <span className="wire-column__preview__slug">{item.slugline}</span>
-                            <h2 className="wire-column__preview__headline">{item.name || item.headline}</h2>
-
-                            <p className="wire-column__preview__author">
-                                <span className="time-label">{formatTime(item.dates.start)}</span>
-                                <div className="wire-column__preview__date">{formatDate(item.dates.start)}</div>
-                            </p>
-
-                            {item.definition_short &&
-                                <p className="wire-column__preview__lead">{item.definition_short}</p>
-                            }
-
-                            {item.definition_long &&
-                                <pre className="wire-column__preview__text">{item.definition_long}</pre>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </article>
-        </div>
+            <Article image={map} covering={hasCoverages(item)}>
+                <ArticleBody>
+                    <AgendaTime item={item} />
+                    <AgendaName item={item} />
+                    <AgendaMeta item={item} />
+                    <AgendaLongDescription item={item} />
+                </ArticleBody>
+                <ArticleSidebar>
+                    <AgendaDetailCoverages item={item} />
+                    <AgendaEdNote item={item} />
+                </ArticleSidebar>
+            </Article>
+        </Content>
     );
 }
 

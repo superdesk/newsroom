@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { gettext, formatDate, formatTime } from 'utils';
-import { isEqualItem, DISPLAY_ABSTRACT } from 'wire/utils';
+import { gettext } from 'utils';
+import { isEqualItem } from 'wire/utils';
 import PreviewActionButtons from 'components/PreviewActionButtons';
-import {hasCoverages, isRecurring} from '../utils';
-import AgendaListItemLabels from './AgendaListItemLabels';
-import AgendaPreviewMeta from './AgendaPreviewMeta';
-import AgendaPreviewImage from './AgendaPreviewImage';
-import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 
+import AgendaName from './AgendaName';
+import AgendaTime from './AgendaTime';
+import AgendaMeta from './AgendaMeta';
+import AgendaEdNote from './AgendaEdNote';
+import AgendaPreviewCoverages from './AgendaPreviewCoverages';
+import AgendaPreviewImage from './AgendaPreviewImage';
+import AgendaLongDescription from './AgendaLongDescription';
 
 class AgendaPreview extends React.PureComponent {
     constructor(props) {
@@ -49,36 +51,13 @@ class AgendaPreview extends React.PureComponent {
                 </div>
 
                 <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
-
-                    <h2 className='wire-column__preview__headline'>{item.name}</h2>
-
-                    <div className="wire-column__preview__content-header">
-                        <div className="wire-articles__item__meta-time">
-                            <span className="time-label">{formatTime(item.dates.start)}</span>
-                            {isRecurring(item) && <span className="time-icon"><i className="icon-small--repeat"></i></span>}
-                        </div>
-                        <div className="wire-column__preview__date">{formatDate(item.dates.start)}</div>
-                        <AgendaListItemLabels item={item} />
-                    </div>
-
+                    <AgendaName item={item} />
+                    <AgendaTime item={item} />
                     <AgendaPreviewImage item={item} onClick={openItemDetails} />
-                    <AgendaPreviewMeta item={item} />
-
-                    {item.abstract && DISPLAY_ABSTRACT &&
-                        <p className='wire-column__preview__lead'>{item.abstract}</p>
-                    }
-
-                    {item.definition_long &&
-                        <pre className='wire-column__preview__text' id='preview-body'>{item.definition_long}</pre>
-                    }
-
-                    {hasCoverages(item) && <AgendaPreviewCoverages coverages={item.coverages} />}
-
-                    {item.ednote && <div className="wire-column__preview__editorial-note">
-                        <i className="icon-small--info icon--gray"></i>
-                        <span>{item.ednote}</span>
-                    </div>}
-
+                    <AgendaMeta item={item} />
+                    <AgendaLongDescription item={item} />
+                    <AgendaPreviewCoverages item={item} />
+                    <AgendaEdNote item={item} />
                 </div>
             </div>
         );

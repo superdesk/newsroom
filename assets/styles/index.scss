@@ -2270,6 +2270,10 @@ article.list {
     }
 }
 
+.wire-column__preview__text--pre {
+    white-space: pre-wrap;
+}
+
 .wire-column__preview__tags {
     display: flex;
     flex-wrap: wrap;
