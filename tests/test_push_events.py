@@ -1,8 +1,11 @@
 import io
 import pytz
 from flask import json
+from .test_push import get_signature_headers
 from datetime import datetime
 from copy import deepcopy
+
+from superdesk import get_resource_service
 from newsroom.utils import get_entity_or_404
 from .fixtures import init_auth
 
@@ -287,6 +290,278 @@ def test_push_parsed_adhoc_planning_for_an_non_existing_event(client, app):
     assert 2 == len(parsed['coverages'])
     assert 1 == len(parsed['planning_items'])
     assert parsed['headline'] == 'Planning headline'
+
+
+def test_notify_topic_matches_for_new_event_item(client, app, mocker):
+    event = deepcopy(test_event)
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'user_type': 'administrator'
+    }])
+
+    with client as cli:
+        with client.session_transaction() as session:
+            user = str(user_ids[0])
+            session['user'] = user
+
+        topic = {'label': 'bar', 'query': 'foo', 'notifications': True, 'topic_type': 'agenda'}
+        resp = cli.post('api/users/%s/topics' % user, data=topic)
+        assert 201 == resp.status_code
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+    event['dates']['start'] = '2018-05-29T04:00:00+0000'
+    data = json.dumps(event)
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args[1]['item']['_id'] == 'foo'
+    assert len(push_mock.call_args[1]['topics']) == 1
+
+
+def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
+    event = deepcopy(test_event)
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'user_type': 'administrator'
+    }])
+
+    with client as cli:
+        with client.session_transaction() as session:
+            user = str(user_ids[0])
+            session['user'] = user
+
+        topic = {'label': 'bar', 'query': 'foo', 'notifications': True, 'topic_type': 'agenda'}
+        resp = cli.post('api/users/%s/topics' % user, data=topic)
+        assert 201 == resp.status_code
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar2'
+    planning['event_item'] = 'foo'
+    data = json.dumps(planning)
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args[1]['item']['_id'] == 'foo'
+    assert len(push_mock.call_args[1]['topics']) == 1
+
+
+def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
+    # remove event link from planning item
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar3'
+    planning['event_item'] = None
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'user_type': 'administrator'
+    }])
+
+    with client as cli:
+        with client.session_transaction() as session:
+            user = str(user_ids[0])
+            session['user'] = user
+
+        topic = {'label': 'bar', 'query': 'bar3', 'notifications': True, 'topic_type': 'agenda'}
+        resp = cli.post('api/users/%s/topics' % user, data=topic)
+        assert 201 == resp.status_code
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+
+    # resend the planning item
+    data = json.dumps(planning)
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args[1]['item']['_id'] == 'bar3'
+    assert len(push_mock.call_args[1]['topics']) == 1
+
+
+def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, mocker):
+    company_ids = app.data.insert('companies', [{
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
+    user = {
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'company': company_ids[0],
+    }
+
+    user_ids = app.data.insert('users', [user])
+    user['_id'] = user_ids[0]
+
+    app.data.insert('history', docs=[{
+        'version': '1',
+        '_id': 'bar3',
+    }], action='download', user=user)
+
+    # remove event link from planning item
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar3'
+    planning['event_item'] = None
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+
+    data = json.dumps(planning)
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args[1]['item']['_id'] == 'bar3'
+    assert len(push_mock.call_args[1]['users']) == 1
+
+    notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+    assert notification['item'] == 'bar3'
+
+
+def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker):
+    company_ids = app.data.insert('companies', [{
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
+    user = {
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'company': company_ids[0],
+    }
+
+    user_ids = app.data.insert('users', [user])
+    user['_id'] = user_ids[0]
+
+    app.data.insert('history', docs=[{
+        'version': '1',
+        '_id': 'foo',
+    }], action='download', user=user)
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+    event = deepcopy(test_event)
+    data = json.dumps(event)
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args[1]['item']['_id'] == 'foo'
+    assert len(push_mock.call_args[1]['users']) == 1
+
+    notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+    assert notification['item'] == 'foo'
+
+
+def test_notify_user_matches_for_new_planning_in_history(client, app, mocker):
+    event = deepcopy(test_event)
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    company_ids = app.data.insert('companies', [{
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
+    user = {
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'company': company_ids[0],
+    }
+
+    user_ids = app.data.insert('users', [user])
+    user['_id'] = user_ids[0]
+
+    app.data.insert('history', docs=[{
+        'version': '1',
+        '_id': 'foo',
+    }], action='download', user=user)
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar2'
+    planning['event_item'] = 'foo'
+    data = json.dumps(planning)
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    assert 200 == resp.status_code
+
+    assert push_mock.call_args[1]['item']['_id'] == 'foo'
+    assert len(push_mock.call_args[1]['users']) == 1
+
+    notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+    assert notification['item'] == 'foo'
+
+
+def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
+    event = deepcopy(test_event)
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    company_ids = app.data.insert('companies', [{
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
+    user = {
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': False,  # should still get email
+        'company': company_ids[0],
+    }
+
+    user_ids = app.data.insert('users', [user])
+    user['_id'] = user_ids[0]
+
+    app.data.insert('history', docs=[{
+        'version': '1',
+        '_id': 'foo',
+    }], action='download', user=user)
+
+    key = b'something random'
+    app.config['PUSH_KEY'] = key
+    event['pubstatus'] = 'cancelled'
+    event['state'] = 'cancelled'
+    data = json.dumps(event)
+    push_mock = mocker.patch('newsroom.push.push_notification')
+    headers = get_signature_headers(data, key)
+
+    with app.mail.record_messages() as outbox:
+        resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+        assert 200 == resp.status_code
+        assert push_mock.call_args[1]['item']['_id'] == 'foo'
+        assert len(push_mock.call_args[1]['users']) == 1
+    assert len(outbox) == 1
+    notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+    assert notification['item'] == 'foo'
 
 
 def test_push_event_with_files(client, app):

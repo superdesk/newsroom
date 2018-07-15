@@ -1,5 +1,6 @@
 {% extends "email_layout.html" %}
 {% block name %}{% endblock %}
 {% block content %}
-{% include 'email_item.html' %}
+{% if type == 'wire' %}{% include "email_item.html" %}{% endif %}
+{% if type == 'agenda' %}{% include "email_agenda.html" %}{% endif %}
 {% endblock %}

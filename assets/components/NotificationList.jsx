@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {gettext, shortDate} from 'utils';
-import CloseButton from './CloseButton';
+import {gettext} from 'utils';
 import {isTouchDevice} from '../utils';
+import NotificationListItem from './NotificationListItem';
 
 class NotificationList extends React.Component {
     constructor(props) {
@@ -35,16 +35,7 @@ class NotificationList extends React.Component {
     }
 
     renderNotification(newItem) {
-        return (<div key={newItem._id} className='notif__list__item'>
-            <CloseButton onClick={() => this.props.clearNotification(newItem._id)}/>
-            <div className="notif__list__info">{gettext('A story you downloaded has been updated')}</div>
-            <div className="notif__list__headline">
-                <a href={`/wire?item=${newItem._id}`} >{newItem.headline}</a>
-            </div>
-            <div className='wire-articles__item__meta-info'>
-                {gettext('Created on')} {shortDate(newItem.versioncreated)}
-            </div>
-        </div>);
+        return (<NotificationListItem key={newItem._id} item={newItem} clearNotification={this.props.clearNotification}/>);
     }
 
     render() {

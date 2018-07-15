@@ -13,7 +13,7 @@ from flask_babel import gettext
 from superdesk.utc import utcnow
 from superdesk.text_utils import get_word_count
 from newsroom.notifications import push_notification
-from newsroom.topics.topics import get_notification_topics
+from newsroom.topics.topics import get_wire_notification_topics, get_agenda_notification_topics
 from newsroom.utils import query_resource, parse_dates
 from newsroom.email import send_new_item_notification_email, \
     send_history_match_notification_email, send_item_killed_notification_email
@@ -69,9 +69,12 @@ def push():
     assert 'type' in item, {'type': 1}
 
     if item.get('type') == 'event':
-        item['_id'] = publish_event(item)
+        orig = app.data.find_one('agenda', req=None, _id=item['guid'])
+        item['_id'] = publish_event(item, orig)
+        notify_new_item(item, check_topics=True)
     elif item.get('type') == 'planning':
-        publish_planning(item)
+        agenda = publish_planning(item)
+        notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
         orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
         item['_id'] = publish_item(item)
@@ -117,9 +120,7 @@ def publish_item(doc):
     return _id
 
 
-def publish_event(event):
-    # check if there's an earlier version of event exists
-    # if there's an event then _id field will have the same value as event_id
+def publish_event(event, orig):
     logger.info('publishing event %s', event)
 
     # populate attachments href
@@ -129,7 +130,7 @@ def publish_event(event):
                 file_ref.setdefault('href', app.upload_url(file_ref['media']))
 
     try:
-        orig = app.data.find_one('agenda', req=None, _id=event['guid'])
+        _id = event['guid']
         service = superdesk.get_resource_service('agenda')
 
         if not orig:
@@ -151,7 +152,7 @@ def publish_event(event):
                     'state': event['state']
                 }
 
-                _id = service.patch(event['guid'], updates)
+                service.patch(event['guid'], updates)
 
             elif event.get('state') in [WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED]:
                 # schedule is changed, recalculate the dates, planning id and coverages from dates will be removed
@@ -160,7 +161,7 @@ def publish_event(event):
                 updates['dates'] = get_event_dates(event)
                 updates['coverages'] = None
                 updates['planning_items'] = None
-                _id = service.patch(event['guid'], updates)
+                service.patch(event['guid'], updates)
 
             elif event.get('state') == WORKFLOW_STATE.SCHEDULED:
                 # event is reposted (possibly after a cancel)
@@ -171,7 +172,7 @@ def publish_event(event):
                     'dates': get_event_dates(event),
                 }
                 set_agenda_metadata_from_event(updates, event)
-                _id = service.patch(event['guid'], updates)
+                service.patch(event['guid'], updates)
 
         return _id
     except Exception as exc:
@@ -194,6 +195,7 @@ def get_event_dates(event):
 def publish_planning(planning):
     logger.info('publishing planning %s', planning)
     service = superdesk.get_resource_service('agenda')
+    agenda = None
 
     try:
         # update dates
@@ -215,7 +217,8 @@ def publish_planning(planning):
                     # remove the planning item from the list
                     set_agenda_planning_items(agenda, planning, action='remove')
 
-                    return service.patch(agenda['_id'], agenda)
+                    service.patch(agenda['_id'], agenda)
+                    return agenda
 
         else:
             # there's no event item (ad-hoc planning item)
@@ -230,11 +233,12 @@ def publish_planning(planning):
         if not agenda.get('_id'):
             # setting _id of agenda to be equal to planning if there's no event id
             agenda.setdefault('_id', planning.get('event_item', planning['guid']) or planning['guid'])
-            _id = service.create([agenda])[0]
+            agenda.setdefault('guid', planning.get('event_item', planning['guid']) or planning['guid'])
+            service.create([agenda])[0]
         else:
             # replace the original document
-            _id = service.patch(agenda['_id'], agenda)
-        return _id
+            service.patch(agenda['_id'], agenda)
+        return agenda
     except Exception as exc:
         logger.error('Error in publishing planning: {}'.format(planning), exc, exc_info=True)
 
@@ -246,7 +250,7 @@ def init_adhoc_agenda(planning):
     agenda = {}
 
     # check if there's an existing ad-hoc
-    existing_planning_items = list(query_resource('agenda', lookup={'planning_id': planning['guid']}))
+    existing_planning_items = list(query_resource('agenda', lookup={'planning_items.guid': planning['guid']}))
 
     if len(existing_planning_items) > 0:
         agenda = existing_planning_items[0]
@@ -269,6 +273,7 @@ def set_agenda_metadata_from_event(agenda, event):
     # setting _id of agenda to be equal to event
     agenda.setdefault('_id', event['guid'])
 
+    agenda['guid'] = event['guid']
     agenda['event_id'] = event['guid']
     agenda['recurrence_id'] = event.get('recurrence_id')
     agenda['name'] = event.get('name')
@@ -360,7 +365,11 @@ def notify_new_item(item, check_topics=True):
     push_notification('new_item', item=item['_id'])
 
     if check_topics:
-        notify_topic_matches(item, users_dict, companies_dict)
+        if item.get('type') == 'text':
+            notify_wire_topic_matches(item, users_dict, companies_dict)
+        else:
+            notify_agenda_topic_matches(item, users_dict)
+
     notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
 
 
@@ -369,8 +378,14 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
     related_items.append(item['_id'])
 
     history_users = get_history_users(related_items, user_ids, company_ids)
-    bookmark_users = superdesk.get_resource_service('wire_search'). \
-        get_matching_bookmarks(related_items, users_dict, companies_dict)
+
+    bookmark_users = []
+    if item.get('type') == 'text':
+        bookmark_users = superdesk.get_resource_service('wire_search'). \
+            get_matching_bookmarks(related_items, users_dict, companies_dict)
+    else:
+        bookmark_users = superdesk.get_resource_service('agenda').\
+            get_matching_bookmarks(related_items, users_dict, companies_dict)
 
     history_users.extend(bookmark_users)
     history_users = list(set(history_users))
@@ -390,18 +405,30 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
 def send_user_notification_emails(item, user_matches, users):
     for user_id in user_matches:
         user = users.get(str(user_id))
-        if item.get('pubstatus') == 'canceled':
+        if item.get('pubstatus') in ['canceled', 'cancelled']:
             send_item_killed_notification_email(user, item=item)
         else:
             if user.get('receive_email'):
                 send_history_match_notification_email(user, item=item)
 
 
-def notify_topic_matches(item, users_dict, companies_dict):
-    topics = get_notification_topics()
+def notify_wire_topic_matches(item, users_dict, companies_dict):
+    topics = get_wire_notification_topics()
 
     topic_matches = superdesk.get_resource_service('wire_search'). \
         get_matching_topics(item['_id'], topics, users_dict, companies_dict)
+
+    if topic_matches:
+        push_notification('topic_matches',
+                          item=item,
+                          topics=topic_matches)
+        send_topic_notification_emails(item, topics, topic_matches, users_dict)
+
+
+def notify_agenda_topic_matches(item, users_dict):
+    topics = get_agenda_notification_topics(item, users_dict)
+
+    topic_matches = [t['_id'] for t in topics]
 
     if topic_matches:
         push_notification('topic_matches',

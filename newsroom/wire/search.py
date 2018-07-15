@@ -128,7 +128,7 @@ def query_string(query):
     }
 
 
-def _versioncreated_range(created):
+def versioncreated_range(created):
     _range = {}
     offset = int(created.get('timezone_offset', '0'))
     if created.get('created_from'):
@@ -201,7 +201,7 @@ class WireSearchService(newsroom.Service):
                 query['bool']['must'] += _filter_terms(filters)
 
             if req.args.get('created_from') or req.args.get('created_to'):
-                query['bool']['must'].append(_versioncreated_range(req.args))
+                query['bool']['must'].append(versioncreated_range(req.args))
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
@@ -214,7 +214,7 @@ class WireSearchService(newsroom.Service):
             if filters:
                 source['post_filter']['bool']['must'] += _filter_terms(filters)
             if req.args.get('created_from') or req.args.get('created_to'):
-                source['post_filter']['bool']['must'].append(_versioncreated_range(req.args))
+                source['post_filter']['bool']['must'].append(versioncreated_range(req.args))
 
         if source['from'] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
@@ -298,7 +298,7 @@ class WireSearchService(newsroom.Service):
                 topic_filter['bool']['must'].append(query_string(topic['query']))
 
             if topic.get('created'):
-                topic_filter['bool']['must'].append(_versioncreated_range(dict(
+                topic_filter['bool']['must'].append(versioncreated_range(dict(
                     created_from=topic['created'].get('from'),
                     created_to=topic['created'].get('to'),
                     timezone_offset=topic.get('timezone_offset', '0')
@@ -368,9 +368,9 @@ class WireSearchService(newsroom.Service):
     def get_matching_bookmarks(self, item_ids, active_users, active_companies):
         """
         Returns a list of user ids bookmarked any of the given items
-        :param item_id: list of ids of items to be searched
-        :param users: user_id, user dictionary
-        :param companies: company_id, company dictionary
+        :param item_ids: list of ids of items to be searched
+        :param active_users: user_id, user dictionary
+        :param active_companies: company_id, company dictionary
         :return:
         """
         bookmark_users = []

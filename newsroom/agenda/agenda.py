@@ -1,5 +1,7 @@
 
 import newsroom
+import logging
+
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk.metadata.item import not_analyzed
@@ -12,6 +14,8 @@ from superdesk.resource import Resource
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 
+logger = logging.getLogger(__name__)
+
 
 class AgendaResource(newsroom.Resource):
     """
@@ -20,6 +24,7 @@ class AgendaResource(newsroom.Resource):
     schema = {}
 
     # identifiers
+    schema['guid'] = events_schema['guid']
     schema['event_id'] = events_schema['guid']
     schema['recurrence_id'] = {
         'type': 'string',
@@ -194,3 +199,49 @@ class AgendaService(newsroom.Service):
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
+
+    def get_items(self, item_ids):
+        try:
+            query = {
+                'bool': {
+                    'must': [
+                        {'terms': {'_id': item_ids}}
+                    ],
+                }
+            }
+
+            source = {'query': query}
+            source['size'] = len(item_ids)
+
+            req = ParsedRequest()
+            req.args = {'source': json.dumps(source)}
+
+            return super().get(req, None)
+
+        except Exception as exc:
+            logger.error('Error in get_items for agenda query: {}'.format(json.dumps(source)),
+                         exc, exc_info=True)
+
+    def get_matching_bookmarks(self, item_ids, active_users, active_companies):
+        """
+        Returns a list of user ids bookmarked any of the given items
+        :param item_ids: list of ids of items to be searched
+        :param active_users: user_id, user dictionary
+        :param active_companies: company_id, company dictionary
+        :return:
+        """
+        bookmark_users = []
+
+        search_results = self.get_items(item_ids)
+
+        if not search_results:
+            return bookmark_users
+
+        for result in search_results.hits['hits']['hits']:
+            bookmarks = result['_source'].get('bookmarks', [])
+            for bookmark in bookmarks:
+                user = active_users.get(bookmark)
+                if user and str(user.get('company', '')) in active_companies:
+                    bookmark_users.append(bookmark)
+
+        return bookmark_users
