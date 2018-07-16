@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {isEmpty} from 'lodash';
 
+import { gettext } from 'utils';
+
 import { getLocations } from 'maps/utils';
 import Map from 'maps/components/map';
 
@@ -14,15 +16,17 @@ import ContentHeader from 'ui/components/ContentHeader';
 import Article from 'ui/components/Article';
 import ArticleBody from 'ui/components/ArticleBody';
 import ArticleSidebar from 'ui/components/ArticleSidebar';
+import ArticleSidebarBox from 'ui/components/ArticleSidebarBox';
 
-import {hasCoverages} from '../utils';
+import { hasCoverages, hasAttachments } from '../utils';
 
 import AgendaTime from './AgendaTime';
 import AgendaName from './AgendaName';
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
-import AgendaDetailCoverages from './AgendaDetailCoverages';
+import AgendaCoverages from './AgendaCoverages';
+import AgendaAttachments from './AgendaAttachments';
 
 export default function AgendaItemDetails({item, user, actions, onClose}) {
     const locations = getLocations(item);
@@ -44,7 +48,16 @@ export default function AgendaItemDetails({item, user, actions, onClose}) {
                     <AgendaLongDescription item={item} />
                 </ArticleBody>
                 <ArticleSidebar>
-                    <AgendaDetailCoverages item={item} />
+                    {hasCoverages(item) && (
+                        <ArticleSidebarBox label={gettext('Coverages')}>
+                            <AgendaCoverages coverages={item.coverages} />
+                        </ArticleSidebarBox>
+                    )}
+                    {hasAttachments(item) && (
+                        <ArticleSidebarBox label={gettext('Attachments')}>
+                            <AgendaAttachments item={item} />
+                        </ArticleSidebarBox>
+                    )}
                     <AgendaEdNote item={item} />
                 </ArticleSidebar>
             </Article>

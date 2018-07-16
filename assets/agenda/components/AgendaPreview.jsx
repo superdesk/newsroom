@@ -5,6 +5,8 @@ import { gettext } from 'utils';
 import { isEqualItem } from 'wire/utils';
 import PreviewActionButtons from 'components/PreviewActionButtons';
 
+import Preview from 'ui/components/Preview';
+
 import AgendaName from './AgendaName';
 import AgendaTime from './AgendaTime';
 import AgendaMeta from './AgendaMeta';
@@ -12,6 +14,7 @@ import AgendaEdNote from './AgendaEdNote';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import AgendaPreviewImage from './AgendaPreviewImage';
 import AgendaLongDescription from './AgendaLongDescription';
+import AgendaPreviewAttachments from './AgendaPreviewAttachments';
 
 class AgendaPreview extends React.PureComponent {
     constructor(props) {
@@ -27,14 +30,7 @@ class AgendaPreview extends React.PureComponent {
     render() {
         const {item, user, actions, followEvent, isFollowing, openItemDetails} = this.props;
         return (
-            <div className='wire-column__preview__items'>
-
-                <div className="wire-column__preview__mobile-bar">
-                    <button className="icon-button" onClick={this.props.closePreview}>
-                        <i className="icon--close-large"></i>
-                    </button>
-                </div>
-
+            <Preview onCloseClick={this.props.closePreview}>
                 <div className='wire-column__preview__top-bar'>
                     <div>
                         {user && item.slugline && item.slugline.trim() &&
@@ -57,9 +53,10 @@ class AgendaPreview extends React.PureComponent {
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} />
                     <AgendaPreviewCoverages item={item} />
+                    <AgendaPreviewAttachments item={item} />
                     <AgendaEdNote item={item} />
                 </div>
-            </div>
+            </Preview>
         );
     }
 }

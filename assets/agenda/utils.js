@@ -250,3 +250,23 @@ export function getNext(dateString, grouping) {
 export function getPrevious(dateString, grouping) {
     return navigationFunctions[grouping].previous(dateString);
 }
+
+/**
+ * Get agenda item attachments
+ * 
+ * @param {Object} item
+ * @return {Array}
+ */
+export function getAttachments(item) {
+    return get(item, 'event.files', []);
+}
+
+/**
+ * Test if item has any attachments
+ * 
+ * @param {Object} item
+ * @return {Boolean}
+ */
+export function hasAttachments(item) {
+    return !isEmpty(getAttachments(item));
+}

@@ -1,11 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, formatDate} from 'utils';
+import { isEmpty } from 'lodash';
+import { gettext, formatDate } from 'utils';
 
 const getCoverageStatusClass = (coverage) =>
     coverage.workflow_status === 'active' ? 'icon--green' : 'icon--gray-light';
 
 export default function AgendaCoverages({coverages}) {
+    if (isEmpty(coverages)) {
+        return null;
+    }
+
     return coverages.map((coverage) => (
         <div className='coverage-item' key={coverage.coverage_id}>
             <div className='coverage-item__row'>
