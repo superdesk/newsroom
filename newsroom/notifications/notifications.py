@@ -68,7 +68,10 @@ def get_initial_notifications():
         return None
 
     saved_notifications = get_user_notifications(session['user'])
-    items = superdesk.get_resource_service('wire_search').get_items([n['item'] for n in saved_notifications])
+    item_ids = [n['item'] for n in saved_notifications]
+    items = []
+    items.extend(superdesk.get_resource_service('wire_search').get_items(item_ids))
+    items.extend(superdesk.get_resource_service('agenda').get_items(item_ids))
     return {
         'user': str(session['user']) if session['user'] else None,
         'notifications': list(items),

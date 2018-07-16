@@ -79,6 +79,13 @@ def send_reset_password_email(user_name, user_email, token):
 
 
 def send_new_item_notification_email(user, topic_name, item):
+    if item.get('type') == 'text':
+        _send_new_wire_notification_email(user, topic_name, item)
+    else:
+        _send_new_agenda_notification_email(user, topic_name, item)
+
+
+def _send_new_wire_notification_email(user, topic_name, item):
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
     subject = gettext('New story for followed topic: {}'.format(topic_name))
@@ -89,6 +96,25 @@ def send_new_item_notification_email(user, topic_name, item):
         name=user.get('first_name'),
         item=item,
         url=url,
+        type='wire'
+    )
+    text_body = render_template('new_item_notification.txt', **kwargs)
+    html_body = render_template('new_item_notification.html', **kwargs)
+    send_email(to=recipients, subject=subject, text_body=text_body, html_body=html_body)
+
+
+def _send_new_agenda_notification_email(user, topic_name, item):
+    url = url_for('agenda.item', _id=item['guid'], _external=True)
+    recipients = [user['email']]
+    subject = gettext('New update for followed agenda: {}'.format(topic_name))
+    kwargs = dict(
+        app_name=current_app.config['SITE_NAME'],
+        is_topic=True,
+        topic_name=topic_name,
+        name=user.get('first_name'),
+        item=item,
+        url=url,
+        type='agenda'
     )
     text_body = render_template('new_item_notification.txt', **kwargs)
     html_body = render_template('new_item_notification.html', **kwargs)
@@ -96,6 +122,13 @@ def send_new_item_notification_email(user, topic_name, item):
 
 
 def send_history_match_notification_email(user, item):
+    if item.get('type') == 'text':
+        _send_history_match_wire_notification_email(user, item)
+    else:
+        _send_history_match_agenda_notification_email(user, item)
+
+
+def _send_history_match_wire_notification_email(user, item):
     app_name = current_app.config['SITE_NAME']
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
@@ -106,15 +139,51 @@ def send_history_match_notification_email(user, item):
         is_topic=False,
         name=user.get('first_name'),
         item=item,
-        url=url)
+        url=url,
+        type='wire'
+    )
+
+    send_email(to=recipients, subject=subject, text_body=text_body)
+
+
+def _send_history_match_agenda_notification_email(user, item):
+    app_name = current_app.config['SITE_NAME']
+    url = url_for('agenda.item', _id=item['guid'], _external=True)
+    recipients = [user['email']]
+    subject = gettext('New update for your previously accessed agenda: {}'.format(item['name']))
+    text_body = render_template(
+        'new_item_notification.txt',
+        app_name=app_name,
+        is_topic=False,
+        name=user.get('first_name'),
+        item=item,
+        url=url,
+        type='agenda'
+    )
 
     send_email(to=recipients, subject=subject, text_body=text_body)
 
 
 def send_item_killed_notification_email(user, item):
+    if item.get('type') == 'text':
+        _send_wire_killed_notification_email(user, item)
+    else:
+        _send_agenda_killed_notification_email(user, item)
+
+
+def _send_wire_killed_notification_email(user, item):
     formatter = current_app.download_formatters['text']['formatter']
     recipients = [user['email']]
     subject = gettext('Kill/Takedown notice')
     text_body = formatter.format_item(item)
+
+    send_email(to=recipients, subject=subject, text_body=text_body)
+
+
+def _send_agenda_killed_notification_email(user, item):
+    formatter = current_app.download_formatters['text']['formatter']
+    recipients = [user['email']]
+    subject = gettext('Agenda cancelled notice')
+    text_body = formatter.format_item(item, item_type='agenda')
 
     send_email(to=recipients, subject=subject, text_body=text_body)

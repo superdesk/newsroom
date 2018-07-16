@@ -1,5 +1,6 @@
 {% extends "email_layout.txt" %}
 {% block name %}{% endblock %}
 {% block content %}
-{% include 'email_item.txt' %}
+{% if type=="wire" %}{% include "email_item.txt" %}{% endif %}
+{% if type=="agenda" %}{% include "email_agenda.txt" %}{% endif %}
 {% endblock %}

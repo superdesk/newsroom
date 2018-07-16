@@ -1,0 +1,9 @@
+{{ item.name }}
+
+{% if item.definition_short %}{{ item.definition_short }}{% elif item.definition_long %}{{ item.definition_long }}{% endif %}
+
+{% if item.slugline %}Slugline: {{ item.slugline }}{% endif %}
+{% if item.headline %}Headline: {{ item.headline }}{% endif %}
+
+Published: {{ item.versioncreated | datetime_long }}
+Link: {{ url }}

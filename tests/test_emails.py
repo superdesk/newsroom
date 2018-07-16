@@ -13,6 +13,7 @@ def test_item_notification_template(client, app, mocker):
             {'name': 'Racing'},
         ],
         'body_html': '<p>HTML Body</p>',
+        'type': 'text',
     }
 
     item_url = 'http://localhost:5050/wire/tag:localhost:2018:bcc9fd45'
@@ -37,6 +38,7 @@ Headline: Albion Park Greyhound VIC TAB DIVS 1-2 Monday
 Category: Racing
 Published: 02/07/2018 11:15
 Link: {{ item_url }}
+
 {% endblock %}
 """, app_name=app.config['SITE_NAME'], item_url=item_url),
         html_body=render_template_string("""
@@ -52,5 +54,6 @@ Link: {{ item_url }}
 <dt>Published:</dt><dd>02/07/2018 11:15</dd>
 <dt>Link:</dt><dd><a href="{{ item_url }}">{{ item_url }}</a></dd>
 </dl>
+
 {% endblock %}
 """, app_name=app.config['SITE_NAME'], item_url=item_url))
