@@ -2286,6 +2286,10 @@ article.list {
     border-top: 1px dotted #cacaca;
     margin-top: 20px;
     padding-top: 20px;
+
+    & + .wire-column__preview__coverage {
+        margin-top: 30px;
+    }
 }
 
 .wire-column__preview__coverage__headline {
@@ -2321,6 +2325,14 @@ article.list {
 
     & + .coverage-item__row {
         margin-top: 4px;
+    }
+}
+.coverage-item__column {
+    display: flex;
+    flex-direction: column;
+
+    &--grow {
+        flex-grow: 1;
     }
 }
 .coverage-item__text-label {
