@@ -85,13 +85,19 @@ def _is_password_valid(password, user):
     Checks the password of the user
     """
     # user is found so save the id in login attempts
-    previous_login_attempt = app.cache.get(user.get('email'))
+    previous_login_attempt = app.cache.get(user.get('email')) or {}
     previous_login_attempt['user_id'] = user.get('_id')
     app.cache.set(user.get('email'), previous_login_attempt)
 
-    hashed = user.get('password').encode('UTF-8')
+    try:
+        hashed = user['password'].encode('UTF-8')
+    except (AttributeError, KeyError):
+        return False
 
-    if not bcrypt.checkpw(password, hashed):
+    try:
+        if not bcrypt.checkpw(password, hashed):
+            return False
+    except (TypeError, ValueError):
         return False
 
     # login successful so remove the login attempt check record

@@ -3,8 +3,10 @@ from flask import url_for
 from bson import ObjectId
 from pytest import fixture
 from superdesk import get_resource_service
+from superdesk.utils import get_hash
 
 from newsroom.auth.token import verify_auth_token
+from newsroom.auth.views import _is_password_valid
 from tests.test_users import init as users_init
 
 
@@ -378,3 +380,11 @@ def test_login_with_token_succeeds_for_correct_token(client):
 
     with client.session_transaction() as session:
         assert session['user_type'] == 'administrator'
+
+
+def test_is_user_valid_empty_password(client):
+    password = 'foo'.encode('utf-8')
+    assert not _is_password_valid(password, {'_id': 'foo', 'email': 'foo@example.com'})
+    assert not _is_password_valid(password, {'_id': 'foo', 'email': 'foo@example.com', 'password': None})
+    assert not _is_password_valid(password, {'_id': 'foo', 'email': 'foo@example.com', 'password': ''})
+    assert _is_password_valid(password, {'_id': 'foo', 'email': 'foo@example.com', 'password': get_hash('foo', 10)})
