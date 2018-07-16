@@ -1,3 +1,4 @@
+import io
 import pytz
 from flask import json
 from datetime import datetime
@@ -286,3 +287,30 @@ def test_push_parsed_adhoc_planning_for_an_non_existing_event(client, app):
     assert 2 == len(parsed['coverages'])
     assert 1 == len(parsed['planning_items'])
     assert parsed['headline'] == 'Planning headline'
+
+
+def test_push_event_with_files(client, app):
+    event = deepcopy(test_event)
+    media_id = 'media-id'
+    resp = client.post('/push_binary', data=dict(
+        media_id=media_id,
+        media=(io.BytesIO('foo'.encode('utf-8')), media_id, 'text/plain'),
+    ))
+    assert resp.status_code == 201
+
+    event['files'] = [
+        {'media': media_id, 'name': 'test.txt', 'mimetype': 'text/plain'},
+    ]
+
+    resp = client.post('/push', data=json.dumps(event), content_type='application/json')
+    assert resp.status_code == 200
+
+    resp = client.get('/agenda/foo?format=json')
+    item = json.loads(resp.get_data())
+
+    assert 1 == len(item['event']['files'])
+    file_ref = item['event']['files'][0]
+    assert 'href' in file_ref
+    resp = client.get(file_ref['href'])
+    assert 200 == resp.status_code
+    assert 'foo' == resp.get_data().decode('utf-8')
