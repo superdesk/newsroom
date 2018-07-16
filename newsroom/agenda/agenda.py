@@ -7,8 +7,10 @@ from planning.common import WORKFLOW_STATE_SCHEMA
 from newsroom.wire.search import get_local_date, set_bookmarks_query
 from eve.utils import ParsedRequest
 from flask import json, abort
-from newsroom.wire.search import _query_string
+from newsroom.wire.search import query_string, set_product_query
 from superdesk.resource import Resource
+from newsroom.auth import get_user
+from newsroom.companies import get_user_company
 
 
 class AgendaResource(newsroom.Resource):
@@ -153,9 +155,12 @@ def _filter_terms(filters):
 class AgendaService(newsroom.Service):
     def get(self, req, lookup):
         query = _agenda_query()
+        user = get_user()
+        company = get_user_company(user)
+        set_product_query(query, company, navigation_id=req.args.get('navigation'))
 
         if req.args.get('q'):
-            query['bool']['must'].append(_query_string(req.args['q']))
+            query['bool']['must'].append(query_string(req.args['q']))
 
         if req.args.get('id'):
             query['bool']['must'].append({'term': {'_id': req.args['id']}})

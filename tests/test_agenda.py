@@ -86,3 +86,46 @@ def test_share_items(client, app):
 
     user_id = app.data.find_all('users')[0]['_id']
     assert str(user_id) in data['shares']
+
+
+def test_agenda_search_filtered_by_query_product(client, app):
+    app.data.insert('navigations', [{
+        '_id': 51,
+        'name': 'navigation-1',
+        'is_enabled': True,
+    }, {
+        '_id': 52,
+        'name': 'navigation-2',
+        'is_enabled': True,
+    }])
+
+    app.data.insert('products', [{
+        '_id': 12,
+        'name': 'product test',
+        'query': 'headline:test',
+        'companies': ['1'],
+        'navigations': ['51'],
+        'is_enabled': True,
+        'product_type': 'agenda',
+    }, {
+        '_id': 13,
+        'name': 'product test 2',
+        'query': 'slugline:prime',
+        'companies': ['1'],
+        'navigations': ['52'],
+        'is_enabled': True,
+        'product_type': 'agenda',
+    }])
+
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
+
+    resp = client.get('/agenda/search')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+    assert '_aggregations' in data
+    resp = client.get('/agenda/search?navigation=51')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+    assert '_aggregations' in data
