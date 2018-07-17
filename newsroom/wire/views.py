@@ -186,7 +186,8 @@ def share():
             send_email(
                 [user['email']],
                 gettext('From %s: %s' % (app.config['SITE_NAME'], items[0]['headline'])),
-                flask.render_template('share_item.txt', **template_kwargs),
+                text_body=flask.render_template('share_item.txt', **template_kwargs),
+                html_body=flask.render_template('share_item.html', **template_kwargs),
                 sender=current_user['email'],
                 connection=connection
             )
