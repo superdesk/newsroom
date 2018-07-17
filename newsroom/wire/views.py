@@ -54,7 +54,7 @@ def _fetch_photos(url, count):
     request = urllib.request.Request(url, headers=headers)
 
     try:
-        with urllib.request.urlopen(request) as response:
+        with urllib.request.urlopen(request, timeout=10) as response:
             data = response.read()
             json_data = json.loads(data.decode("utf-8"))
             return json_data['GalleryContainers'][:count]
