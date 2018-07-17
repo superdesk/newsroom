@@ -91,6 +91,7 @@ def set_dates(doc):
     parse_dates(doc)
     doc.setdefault('firstcreated', now)
     doc.setdefault('versioncreated', now)
+    doc.setdefault('version', 1)
     doc.setdefault(app.config['VERSION'], 1)
 
 
@@ -148,7 +149,7 @@ def publish_event(event, orig):
                 # update the event, the version and the state
                 updates = {
                     'event': event,
-                    app.config['VERSION']: event[app.config['VERSION']],
+                    'version': event.get('version', [app.config['VERSION']]),
                     'state': event['state']
                 }
 
@@ -167,7 +168,7 @@ def publish_event(event, orig):
                 # event is reposted (possibly after a cancel)
                 updates = {
                     'event': event,
-                    app.config['VERSION']: event[app.config['VERSION']],
+                    'version': event.get('version', [app.config['VERSION']]),
                     'state': event['state'],
                     'dates': get_event_dates(event),
                 }
@@ -247,13 +248,9 @@ def init_adhoc_agenda(planning):
     """
     Inits an adhoc agenda item
     """
-    agenda = {}
 
     # check if there's an existing ad-hoc
-    existing_planning_items = list(query_resource('agenda', lookup={'planning_items.guid': planning['guid']}))
-
-    if len(existing_planning_items) > 0:
-        agenda = existing_planning_items[0]
+    agenda = app.data.find_one('agenda', req=None, _id=planning['guid']) or {}
 
     # planning dates is saved as the dates of the new agenda
     agenda['dates'] = {
@@ -280,6 +277,7 @@ def set_agenda_metadata_from_event(agenda, event):
     agenda['slugline'] = event.get('slugline', agenda.get('slugline'))
     agenda['definition_short'] = event.get('definition_short')
     agenda['definition_long'] = event.get('definition_long')
+    agenda['version'] = event.get('version')
     agenda['calendars'] = event.get('calendars')
     agenda['location'] = event.get('location')
     agenda['ednote'] = event.get('ednote', agenda.get('ednote'))
@@ -350,7 +348,7 @@ def get_coverages(planning_items):
 
 
 def notify_new_item(item, check_topics=True):
-    if item.get('type') == 'composite':
+    if not item or item.get('type') == 'composite':
         return
 
     lookup = {'is_enabled': True}
