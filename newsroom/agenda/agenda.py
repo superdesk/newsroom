@@ -10,7 +10,7 @@ from newsroom.wire.search import get_local_date, set_bookmarks_query
 from eve.utils import ParsedRequest
 from flask import json, abort
 from newsroom.wire.search import query_string, set_product_query
-from superdesk.resource import Resource
+from superdesk.resource import Resource, not_enabled
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 
@@ -40,6 +40,7 @@ class AgendaResource(newsroom.Resource):
     schema['abstract'] = planning_schema['abstract']
     schema['headline'] = planning_schema['headline']
     schema['firstcreated'] = events_schema['firstcreated']
+    schema['version'] = events_schema['version']
     schema['versioncreated'] = events_schema['versioncreated']
     schema['ednote'] = events_schema['ednote']
 
@@ -83,12 +84,15 @@ class AgendaResource(newsroom.Resource):
     schema['location'] = events_schema['location']
 
     # event details
-    schema['event'] = events_schema
+    schema['event'] = {
+        'type': 'object',
+        'mapping': not_enabled,
+    }
 
     # planning details which can be more than one per event
     schema['planning_items'] = {
         'type': 'list',
-        'schema': planning_schema,
+        'mapping': not_enabled,
     }
 
     schema['bookmarks'] = Resource.not_analyzed_field('list')  # list of user ids who bookmarked this item
