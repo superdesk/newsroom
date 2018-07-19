@@ -21,12 +21,9 @@ import {
     openItemDetails,
 } from 'agenda/actions';
 
-import { getActiveQuery } from 'wire/utils';
-
 import AgendaPreview from './AgendaPreview';
 import AgendaList from './AgendaList';
 import SearchBar from '../../components/SearchBar';
-import SearchResultsInfo from 'wire/components/SearchResultsInfo';
 import SearchSidebar from 'wire/components/SearchSidebar';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import AgendaListViewControls from './AgendaListViewControls';
@@ -156,11 +153,6 @@ class AgendaApp extends React.Component {
             'wire-column__preview--open': this.props.itemToPreview,
         });
 
-        const searchCriteria = getActiveQuery(
-            this.props.activeQuery,
-            this.props.resultsFiltered ? this.props.activeFilter : {},
-            this.props.resultsFiltered ? this.props.createdFilter : {}
-        );
         const activeTopic = this.props.topics.find((topic) => topic._id === this.props.activeTopic);
 
         return (
@@ -228,20 +220,6 @@ class AgendaApp extends React.Component {
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
-                            <SearchResultsInfo
-                                user={this.props.user}
-                                query={this.props.activeQuery}
-                                bookmarks={this.props.bookmarks}
-                                totalItems={this.props.totalItems}
-                                newItems={this.props.newItems}
-                                refresh={this.props.refresh}
-                                searchCriteria={searchCriteria}
-                                activeTopic={activeTopic}
-                                activeNavigation={this.props.activeNavigation}
-                                scrollClass={this.state.scrollClass}
-                                resultsFiltered = {this.props.resultsFiltered}
-                            />
-
                             <AgendaFilters
                                 aggregations={this.props.aggregations}
                                 toggleFilter={this.props.toggleDropdownFilter}
