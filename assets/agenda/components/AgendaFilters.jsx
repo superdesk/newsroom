@@ -9,6 +9,9 @@ const filters = [{
     label: 'Any location',
     field: 'location'
 }, {
+    label: 'Any region',
+    field: 'place'
+}, {
     label: 'Any coverage',
     field: 'coverage'
 }];
