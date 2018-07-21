@@ -21,8 +21,8 @@ import re
 @admin_only
 def settings():
     data = {
-        'users': list(query_resource('users', max_results=200)),
-        "companies": list(query_resource('companies', max_results=200)),
+        'users': list(query_resource('users')),
+        "companies": list(query_resource('companies')),
     }
     return flask.render_template('settings.html', setting_type="users", data=data)
 
@@ -50,7 +50,7 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'$or': [{'first_name': regex}, {'last_name': regex}]}
-    users = list(query_resource('users', lookup=lookup, max_results=50))
+    users = list(query_resource('users', lookup=lookup))
     return jsonify(users), 200
 
 

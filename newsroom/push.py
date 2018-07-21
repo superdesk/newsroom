@@ -105,11 +105,11 @@ def notify_new_item(item, check_topics=True):
         return
 
     lookup = {'is_enabled': True}
-    all_users = list(query_resource('users', lookup=lookup, max_results=200))
+    all_users = list(query_resource('users', lookup=lookup))
     user_ids = [u['_id'] for u in all_users]
     users_dict = {str(user['_id']): user for user in all_users}
 
-    all_companies = list(query_resource('companies', lookup=lookup, max_results=200))
+    all_companies = list(query_resource('companies', lookup=lookup))
     company_ids = [c['_id'] for c in all_companies]
     companies_dict = {str(company['_id']): company for company in all_companies}
 

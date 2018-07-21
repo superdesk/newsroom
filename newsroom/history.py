@@ -57,7 +57,7 @@ def get_history_users(item_ids, active_user_ids, active_company_ids):
         'company': {'$in': active_company_ids}
     }
 
-    histories = query_resource('history', lookup=lookup, max_results=200)
+    histories = query_resource('history', lookup=lookup)
     user_matches = [str(h['user']) for h in histories]
 
     return user_matches
