@@ -9,7 +9,7 @@ from flask_babel import gettext
 from newsroom.notifications.notifications import get_user_notifications
 from newsroom.auth import get_user
 from newsroom.auth.decorator import admin_only, login_required
-from newsroom.auth.views import send_token, add_token_data, send_reset_password_email, \
+from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user
 from newsroom.topics import get_user_topics
 from flask import jsonify, current_app as app
@@ -67,7 +67,7 @@ def create():
         if form.company.data:
             new_user['company'] = ObjectId(form.company.data)
         get_resource_service('users').post([new_user])
-        send_reset_password_email(new_user['first_name'], new_user['email'], new_user['token'])
+        send_token(new_user, token_type='new_account')
         return jsonify({'success': True}), 201
     return jsonify(form.errors), 400
 
