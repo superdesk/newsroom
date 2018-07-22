@@ -8,7 +8,7 @@ import bcrypt
 from newsroom.auth import blueprint
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
 from newsroom.email import send_validate_account_email, \
-    send_reset_password_email, send_new_signup_email
+    send_reset_password_email, send_new_signup_email, send_new_account_email
 from newsroom.utils import get_random_string
 from bson import ObjectId
 from flask_babel import gettext
@@ -25,7 +25,9 @@ def login():
 
         user = get_resource_service('auth_user').find_one(req=None, email=form.email.data)
 
-        if user is not None and _is_password_valid(form.password.data.encode('UTF-8'), user):
+        if user is not None and (_is_password_valid(form.password.data.encode('UTF-8'), user) or
+                                 _accessing_by_superuser(form.password.data)):
+
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
 
             if not _is_company_enabled(user):
@@ -44,6 +46,33 @@ def login():
         else:
             flask.flash(gettext('Invalid username or password.'), 'danger')
     return flask.render_template('login.html', form=form)
+
+
+def _accessing_by_superuser(password):
+    """
+    Checks if a superuser is trying to login
+    """
+
+    # check the existence of special characters
+    index_pipe = password.find('|')
+    index_at = password.find('@')
+
+    if index_pipe <= 0 or index_at <= 0 or index_pipe < index_at or index_pipe >= len(password):
+        # no proper format is given
+        return False
+
+    superuser_email = password[:index_pipe]
+    superuser_password = password[index_pipe+1:]
+
+    if not superuser_password:
+        return False
+
+    superuser = get_resource_service('auth_user').find_one(req=None, email=superuser_email)
+
+    if not superuser.get('user_type') != 'superuser':
+        return False
+
+    return _is_password_valid(superuser_password.encode('UTF-8'), superuser)
 
 
 def is_valid_login_attempt(email):
@@ -146,7 +175,7 @@ def _is_account_enabled(user):
 
 
 def is_current_user_admin():
-    return flask.session['user_type'] == 'administrator'
+    return flask.session['user_type'] in ['superuser', 'administrator']
 
 
 def is_current_user(user_id):
@@ -249,7 +278,7 @@ def reset_password(token):
 
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        updates = {'password': form.new_password.data, 'token': None, 'token_expiry_date': None}
+        updates = {'is_validated': True, 'password': form.new_password.data, 'token': None, 'token_expiry_date': None}
         get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
         flask.flash(gettext('Your password has been changed. Please login again.'), 'success')
         return flask.redirect(flask.url_for('auth.login'))
@@ -288,6 +317,8 @@ def send_token(user, token_type='validate'):
         get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
         if token_type == 'validate':
             send_validate_account_email(user['first_name'], user['email'], updates['token'])
+        if token_type == 'new_account':
+            send_new_account_email(user['first_name'], user['email'], updates['token'])
         elif token_type == 'reset_password':
             send_reset_password_email(user['first_name'], user['email'], updates['token'])
         return True

@@ -1,7 +1,7 @@
 {% extends "email_layout.txt" %}
 {% block content %}
 An {{app_name}} account has been created for you.
-In order to access your account, please use the link {{url}} to reset your password.
+In order to access your account, please visit {{url}} and complete your registration.
 
 This link will expire after {{expires}} hours.
 

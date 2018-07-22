@@ -14,7 +14,7 @@ def login_required(f):
 def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('user_type') is None or session.get('user_type') != 'administrator':
+        if session.get('user_type') is None or session.get('user_type') not in ['superuser', 'administrator']:
             return abort(403)
         return f(*args, **kwargs)
     return decorated_function
