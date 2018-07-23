@@ -154,19 +154,23 @@ def test_create_new_user_succeeds(app, client):
         'is_enabled': True,
         'contact_name': 'Tom'
     }])
-    # Insert a new user
-    response = client.post('/users/new', data={
-        'email': 'newuser@abc.org',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'password': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': company_ids[0],
-        'user_type': 'public',
-        'is_enabled': True
-    })
-    assert response.status_code == 201
+    with app.mail.record_messages() as outbox:
+        # Insert a new user
+        response = client.post('/users/new', data={
+            'email': 'newuser@abc.org',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'password': 'abc',
+            'country': 'Australia',
+            'phone': '1234567',
+            'company': company_ids[0],
+            'user_type': 'public',
+            'is_enabled': True
+        })
+        assert response.status_code == 201
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['newuser@abc.org']
+        assert 'account created' in outbox[0].subject
 
     # get reset password token
     user = list(app.data.find('users', req=None, lookup={'email': 'newuser@abc.org'}))[0]
