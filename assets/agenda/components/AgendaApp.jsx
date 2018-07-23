@@ -196,6 +196,7 @@ class AgendaApp extends React.Component {
                             selectDate={this.props.selectDate}
                             activeDate={this.props.activeDate}
                             activeGrouping={this.props.activeGrouping}
+                            displayCalendar={true}
                         />
 
                         <AgendaListViewControls
