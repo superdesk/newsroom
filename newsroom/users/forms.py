@@ -11,7 +11,8 @@ class UserForm(FlaskForm):
 
     BooleanField.false_values = {False, 'false', ''}
 
-    user_types = [('administrator', gettext('Administrator')),
+    user_types = [('superuser', gettext('Super User')),
+                  ('administrator', gettext('Administrator')),
                   ('public', gettext('Public')),
                   ('internal', gettext('Internal'))]
 

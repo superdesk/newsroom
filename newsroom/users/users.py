@@ -48,7 +48,7 @@ class UsersResource(newsroom.Resource):
         'company': newsroom.Resource.rel('companies', embeddable=True, required=False),
         'user_type': {
             'type': 'string',
-            'allowed': ['administrator', 'internal', 'public'],
+            'allowed': ['superuser', 'administrator', 'internal', 'public'],
             'default': 'public'
         },
         'is_validated': {

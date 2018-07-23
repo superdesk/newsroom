@@ -53,8 +53,8 @@ def word_count(html):
 
 def is_admin(user=None):
     if user:
-        return user.get('user_type') == 'administrator'
-    return flask.session.get('user_type') == 'administrator'
+        return user.get('user_type') in ['superuser', 'administrator']
+    return flask.session.get('user_type') in ['superuser', 'administrator']
 
 
 def newsroom_config():
