@@ -340,7 +340,7 @@ def get_coverages(planning_items):
                 'scheduled': coverage['planning']['scheduled'],
                 'coverage_type': coverage['planning']['g2_content_type'],
                 'workflow_status': coverage['workflow_status'],
-                'news_coverage_status': coverage.get('news_coverage_status', {}).get('label'),
+                'coverage_status': coverage.get('news_coverage_status', {}).get('label'),
                 'coverage_provider': coverage['planning'].get('coverage_provider'),
             })
 
