@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
 const filters = [{
-    label: 'Any calendar',
+    label: gettext('Any calendar'),
     field: 'calendar'
 }, {
-    label: 'Any location',
+    label: gettext('Any location'),
     field: 'location'
 }, {
-    label: 'Any region',
+    label: gettext('Any region'),
     field: 'place'
 }, {
-    label: 'Any coverage',
+    label: gettext('Any coverage'),
     field: 'coverage'
 }];
 
