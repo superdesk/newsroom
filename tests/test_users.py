@@ -1,6 +1,8 @@
 from flask import url_for
 from pytest import fixture
 from bson import ObjectId
+from flask import json
+
 from superdesk import get_resource_service
 
 
@@ -234,3 +236,20 @@ def test_new_user_can_be_deleted(client):
 
     user = get_resource_service('users').find_one(req=None, email='newuser@abc.org')
     assert user is None
+
+
+def test_return_search_for_all_users(client, app):
+    test_login_succeeds_for_admin(client)
+
+    for i in range(250):
+        app.data.insert('users', [{
+            'email': 'foo%s@bar.com' % i,
+            'first_name': 'Foo%s' % i,
+            'is_enabled': True,
+            'receive_email': True,
+            'company': '',
+        }])
+
+    resp = client.get('/users/search?q=fo')
+    data = json.loads(resp.get_data())
+    assert 250 == len(data)

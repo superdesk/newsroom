@@ -80,3 +80,18 @@ def test_delete_product(client):
     data = json.loads(response.get_data())
     assert 1 == len(data)
     assert data[0]['name'] == 'Breaking'
+
+
+def test_gets_all_products(client, app):
+    test_login_succeeds_for_admin(client)
+
+    for i in range(250):
+        app.data.insert('products', [{
+            'name': 'Sport-%s' % i,
+            'description': 'Top level sport product',
+            'is_enabled': True,
+        }])
+
+    resp = client.get('/products')
+    data = json.loads(resp.get_data())
+    assert 251 == len(data)
