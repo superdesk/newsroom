@@ -79,7 +79,6 @@ def send_reset_password_email(user_name, user_email, token):
 
 
 def send_new_item_notification_email(user, topic_name, item):
-    url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
     subject = gettext('New story for followed topic: {}'.format(topic_name))
     kwargs = dict(
@@ -88,7 +87,6 @@ def send_new_item_notification_email(user, topic_name, item):
         topic_name=topic_name,
         name=user.get('first_name'),
         item=item,
-        url=url,
     )
     text_body = render_template('new_item_notification.txt', **kwargs)
     html_body = render_template('new_item_notification.html', **kwargs)
