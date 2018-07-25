@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext } from 'utils';
+import InfoBox from './InfoBox';
+import PreviewTagsBlock from './PreviewTagsBlock';
+import PreviewTagsLink from './PreviewTagsLink';
 
 function formatCV(items, field) {
     return items && items.map((item) => (
-        <a key={item.code}
-            className='wire-column__preview__tag'
+        <PreviewTagsLink key={item.code}
             href={`/wire?q=${field}:"${item.name}"`}
-        >{item.name}</a>
+            text={item.name}
+        />
     ));
 }
 
@@ -16,24 +19,19 @@ function PreviewTags({item, isItemDetail}) {
     const subjects = item.subject && formatCV(item.subject, 'subject.name');
 
     return (
-        <div className='wire-column__preview__tags'>
-            {isItemDetail ? <span className="column__preview__tags__box-headline">{gettext('Metadata')}</span> : null}
+        <InfoBox label={isItemDetail ? gettext('Metadata') : null} top={!isItemDetail}>
             {subjects &&
-                <div className='column__preview__tags__column'>
-                    <span className='wire-column__preview__tags__headline'>
-                        {gettext('Category')}</span>
+                <PreviewTagsBlock label={gettext('Category')}>
                     {subjects}
-                </div>
+                </PreviewTagsBlock>
             }
 
             {genres &&
-                <div className='column__preview__tags__column'>
-                    <span className='wire-column__preview__tags__headline'>
-                        {gettext('Content Type')}</span>
+                <PreviewTagsBlock label={gettext('Content Type')}>
                     {genres}
-                </div>
+                </PreviewTagsBlock>
             }
-        </div>
+        </InfoBox>
     );
 }
 

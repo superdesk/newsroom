@@ -8,7 +8,7 @@ from superdesk.metadata.item import not_analyzed
 from planning.common import WORKFLOW_STATE_SCHEMA
 from newsroom.wire.search import get_local_date, set_bookmarks_query
 from eve.utils import ParsedRequest
-from flask import json, abort
+from flask import json, abort, url_for
 from newsroom.wire.search import query_string, set_product_query
 from superdesk.resource import Resource, not_enabled
 from newsroom.auth import get_user
@@ -64,16 +64,21 @@ class AgendaResource(newsroom.Resource):
 
     # coverages
     schema['coverages'] = {
-        'type': 'nested',
-        'properties': {
-            'planning_id': not_analyzed,
-            'coverage_id': not_analyzed,
-            'scheduled': {'type': 'datetime'},
-            'coverage_type': not_analyzed,
-            'workflow_status': not_analyzed,
-            'coverage_status': not_analyzed,
-            'coverage_provider': not_analyzed,
-        }
+        'type': 'object',
+        'mapping': {
+            'type': 'nested',
+            'properties': {
+                'planning_id': not_analyzed,
+                'coverage_id': not_analyzed,
+                'scheduled': {'type': 'date'},
+                'coverage_type': not_analyzed,
+                'workflow_status': not_analyzed,
+                'coverage_status': not_analyzed,
+                'coverage_provider': not_analyzed,
+                'delivery_id': not_analyzed,
+                'delivery_href': not_analyzed,
+            },
+        },
     }
 
     # state
@@ -205,23 +210,27 @@ class AgendaService(newsroom.Service):
         return super().get(internal_req, lookup)
 
     def get_items(self, item_ids):
-        try:
-            query = {
-                'bool': {
-                    'must': [
-                        {'terms': {'_id': item_ids}}
-                    ],
-                }
+        query = {
+            'bool': {
+                'must': [
+                    {'terms': {'_id': item_ids}}
+                ],
             }
+        }
 
+        return self.get_items_by_query(query, size=len(item_ids))
+
+    def get_items_by_query(self, query, size=50):
+        try:
             source = {'query': query}
-            source['size'] = len(item_ids)
+
+            if size:
+                source['size'] = size
 
             req = ParsedRequest()
             req.args = {'source': json.dumps(source)}
 
             return super().get(req, None)
-
         except Exception as exc:
             logger.error('Error in get_items for agenda query: {}'.format(json.dumps(source)),
                          exc, exc_info=True)
@@ -249,3 +258,36 @@ class AgendaService(newsroom.Service):
                     bookmark_users.append(bookmark)
 
         return bookmark_users
+
+    def set_delivery(self, wire_item):
+        if not wire_item.get('coverage_id'):
+            return
+
+        query = {
+            'bool': {
+                'must': [
+                    {'nested': {
+                        'path': 'coverages',
+                        'query': {
+                            'bool': {
+                                'must': [
+                                    {'term': {'coverages.coverage_id': wire_item['coverage_id']}}
+                                ]
+                            }
+                        },
+                    }}
+                ],
+            }
+        }
+
+        agenda_items = self.get_items_by_query(query)
+        for item in agenda_items:
+            wire_item.setdefault('agenda_id', item['_id'])
+            wire_item.setdefault('agenda_href', url_for('agenda.item', _id=item['_id']))
+            coverages = item['coverages']
+            for coverage in coverages:
+                if coverage['coverage_id'] == wire_item['coverage_id'] and not coverage.get('delivery'):
+                    coverage['delivery_id'] = wire_item['guid']
+                    coverage['delivery_href'] = url_for('wire.item', _id=wire_item['guid'])
+                    self.system_update(item['_id'], {'coverages': coverages}, item)
+                    break

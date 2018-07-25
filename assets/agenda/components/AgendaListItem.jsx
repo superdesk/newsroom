@@ -91,28 +91,30 @@ class AgendaListItem extends React.Component {
 
                     </div>
 
-                    <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
-                        <div className='btn-group'>
-                            <span onClick={(event) => this.props.onActionList(event, this.props.item)}>
-                                <i className='icon--more icon--gray-light'></i>
-                            </span>
-                            { this.props.showActions ? <ActionList
-                                item={this.props.item}
-                                user={this.props.user}
-                                actions={this.props.actions}
-                            /> : null }
-                        </div>
+                    {this.props.actions.length && (
+                        <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
+                            <div className='btn-group'>
+                                <span onClick={(event) => this.props.onActionList(event, this.props.item)}>
+                                    <i className='icon--more icon--gray-light'></i>
+                                </span>
+                                { this.props.showActions ? <ActionList
+                                    item={this.props.item}
+                                    user={this.props.user}
+                                    actions={this.props.actions}
+                                /> : null }
+                            </div>
 
-                        {this.props.actions.map((action) =>
-                            action.shortcut &&
-                          <ActionButton
-                              key={action.name}
-                              className="icon-button"
-                              action={action}
-                              isVisited={action.visited && action.visited(this.props.user, this.props.item)}
-                              item={this.props.item} />
-                        )}
-                    </div>
+                            {this.props.actions.map((action) =>
+                                action.shortcut &&
+                            <ActionButton
+                                key={action.name}
+                                className="icon-button"
+                                action={action}
+                                isVisited={action.visited && action.visited(this.props.user, this.props.item)}
+                                item={this.props.item} />
+                            )}
+                        </div>
+                    )}
                 </div>
 
             </article>

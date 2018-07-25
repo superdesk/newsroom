@@ -54,8 +54,10 @@ class ListItemPreviousVersions extends React.Component {
 
         return (
             this.props.item.ancestors ?
-                <div className={`${this.baseClass}__versions`} id={this.props.inputId}>
-                    {this.props.isPreview ? <span className="wire-column__preview__versions__box-headline">{gettext('Previous versions')}</span> : null }
+                <div className={this.baseClass + '__versions'} id={this.props.inputId}>
+                    {this.props.isPreview && (
+                        <span className="wire-column__preview__versions__box-headline">{gettext('Previous versions')}</span>
+                    )}
                     {versions}
                 </div> : null
         );

@@ -8,7 +8,7 @@ from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
 from flask import current_app as app, abort
 from newsroom.auth import get_user, login_required
-from newsroom.utils import get_entity_or_404
+from newsroom.utils import get_entity_or_404, is_json_request
 from newsroom.wire.views import update_action_list
 from flask_babel import gettext
 
@@ -23,7 +23,7 @@ def agenda():
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'agenda')
-    if flask.request.args.get('format') == 'json':
+    if is_json_request(flask.request):
         return flask.jsonify(item)
 
     if 'print' in flask.request.args:

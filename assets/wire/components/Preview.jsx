@@ -12,6 +12,7 @@ import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from 'components/PreviewActionButtons';
 import PreviewTags from './PreviewTags';
 import PreviewMeta from './PreviewMeta';
+import AgendaLinks from './AgendaLinks';
 
 
 class Preview extends React.PureComponent {
@@ -98,6 +99,7 @@ class Preview extends React.PureComponent {
                         />
                     }
 
+                    <AgendaLinks item={item} preview={true} />
                 </div>
             </div>
         );

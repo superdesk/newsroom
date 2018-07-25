@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 install_requires = [
     'eve==0.7.8',
+    'flask>=0.12,<1.0',
     'flask-babel>=0.11.2,<0.12',
     'flask-webpack>=0.1.0,<0.2',
     'Flask-WTF>=0.14.2,<0.15',

@@ -39,7 +39,9 @@ item = {
                 }
             }
         }
-    }
+    },
+    'event_id': 'urn:event/1',
+    'coverage_id': 'urn:coverage/1',
 }
 
 
@@ -504,3 +506,10 @@ def test_push_parsed_dates(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'items')
     assert type(parsed['firstcreated']) == datetime
+
+
+def test_push_event_coverage_info(client, app):
+    client.post('/push', data=json.dumps(item), content_type='application/json')
+    parsed = get_entity_or_404(item['guid'], 'items')
+    assert parsed['event_id'] == 'urn:event/1'
+    assert parsed['coverage_id'] == 'urn:coverage/1'
