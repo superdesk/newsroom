@@ -1,18 +1,21 @@
 
-import newsroom
 import logging
+import newsroom
+
+from flask import json, abort, url_for
+from eve.utils import ParsedRequest
 
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk.metadata.item import not_analyzed
 from planning.common import WORKFLOW_STATE_SCHEMA
 from newsroom.wire.search import get_local_date, set_bookmarks_query
-from eve.utils import ParsedRequest
-from flask import json, abort, url_for
 from newsroom.wire.search import query_string, set_product_query
 from superdesk.resource import Resource, not_enabled
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
+from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
+from newsroom.email import send_coverage_notification_email
 
 logger = logging.getLogger(__name__)
 
@@ -290,4 +293,13 @@ class AgendaService(newsroom.Service):
                     coverage['delivery_id'] = wire_item['guid']
                     coverage['delivery_href'] = url_for('wire.item', _id=wire_item['guid'])
                     self.system_update(item['_id'], {'coverages': coverages}, item)
+                    self.notify_new_coverage(item, wire_item)
                     break
+
+    def notify_new_coverage(self, agenda, wire_item):
+        user_dict = get_user_dict()
+        company_dict = get_company_dict()
+        notify_user_ids = filter_active_users(agenda.get('bookmarks', []), user_dict, company_dict)
+        for user_id in notify_user_ids:
+            user = user_dict[str(user_id)]
+            send_coverage_notification_email(user, agenda, wire_item)

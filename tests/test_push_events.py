@@ -1,7 +1,8 @@
 import io
 import pytz
-from flask import json
+from flask import json, render_template_string
 from .test_push import get_signature_headers
+from .utils import post_json, get_json
 from datetime import datetime
 from copy import deepcopy
 
@@ -591,28 +592,52 @@ def test_push_event_with_files(client, app):
     assert 'foo' == resp.get_data().decode('utf-8')
 
 
-def test_push_item_with_coverage(client, app):
+def test_push_item_with_coverage(client, app, mocker):
     test_item = {
         'type': 'text',
         'guid': 'item',
         'planning_id': test_planning['_id'],
         'coverage_id': test_planning['coverages'][0]['coverage_id'],
     }
-    client.post('/push', data=json.dumps(test_event), content_type='application/json')
-    client.post('/push', data=json.dumps(test_planning), content_type='application/json')
+    post_json(client, '/push', test_event)
+    post_json(client, '/push', test_planning)
+    post_json(client, '/bookmark?type=agenda', {'items': [test_event['guid']]})
 
-    resp = client.post('/push', data=json.dumps(test_item), content_type='application/json')
-    assert 200 == resp.status_code
+    mail = mocker.patch('newsroom.email.send_email')
+    post_json(client, '/push', test_item)
 
-    resp = client.get('/agenda/foo?format=json')
-    item = json.loads(resp.get_data())
+    item = get_json(client, '/agenda/foo')
     coverages = item.get('coverages')
 
     assert coverages[0]['coverage_id'] == test_item['coverage_id']
     assert coverages[0]['delivery_id'] == test_item['guid']
     assert coverages[0]['delivery_href'] == '/wire/%s' % test_item['guid']
 
-    resp = client.get('/wire/item?format=json')
-    wire_item = json.loads(resp.get_data())
+    wire_item = get_json(client, '/wire/item')
     assert wire_item['agenda_id'] == 'foo'
     assert wire_item['agenda_href'] == '/agenda/foo'
+
+    mail.assert_called_with(
+        to=['admin@sourcefabric.org'],
+        subject='New coverage',
+        text_body=render_template_string("""
+{% extends "email_layout.txt" %}
+
+{% block content %}
+New coverage received for agenda item {{ agenda.name }}:
+
+{% include "email_item.txt" %}
+
+{% endblock %}
+        """.strip(), agenda=item, item=wire_item),
+        html_body=render_template_string("""
+{% extends "email_layout.txt" %}
+
+{% block content %}
+<p>New coverage received for agenda item {{ agenda.name }}:</p>
+
+{% include "email_item.html" %}
+
+{% endblock %}
+        """.strip(), agenda=item, item=wire_item)
+    )
