@@ -589,3 +589,30 @@ def test_push_event_with_files(client, app):
     resp = client.get(file_ref['href'])
     assert 200 == resp.status_code
     assert 'foo' == resp.get_data().decode('utf-8')
+
+
+def test_push_item_with_coverage(client, app):
+    test_item = {
+        'type': 'text',
+        'guid': 'item',
+        'planning_id': test_planning['_id'],
+        'coverage_id': test_planning['coverages'][0]['coverage_id'],
+    }
+    client.post('/push', data=json.dumps(test_event), content_type='application/json')
+    client.post('/push', data=json.dumps(test_planning), content_type='application/json')
+
+    resp = client.post('/push', data=json.dumps(test_item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    resp = client.get('/agenda/foo?format=json')
+    item = json.loads(resp.get_data())
+    coverages = item.get('coverages')
+
+    assert coverages[0]['coverage_id'] == test_item['coverage_id']
+    assert coverages[0]['delivery_id'] == test_item['guid']
+    assert coverages[0]['delivery_href'] == '/wire/%s' % test_item['guid']
+
+    resp = client.get('/wire/item?format=json')
+    wire_item = json.loads(resp.get_data())
+    assert wire_item['agenda_id'] == 'foo'
+    assert wire_item['agenda_href'] == '/agenda/foo'

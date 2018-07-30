@@ -20,7 +20,7 @@ from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
-from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type
+from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request
 from newsroom.notifications import push_user_notification
 from .search import get_bookmarks_count
 
@@ -262,7 +262,7 @@ def versions(_id):
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
-    if flask.request.args.get('format') == 'json':
+    if is_json_request(flask.request):
         return flask.jsonify(item)
     previous_versions = get_previous_versions(item)
     if 'print' in flask.request.args:

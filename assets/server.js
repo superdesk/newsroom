@@ -30,6 +30,20 @@ class Server {
     }
 
     /**
+     * Make GET request accepting application/json
+     *
+     * @param {String} url
+     * @return {Promise}
+     */
+    getJson(url) {
+        return fetch(url, options({
+            headers: {
+                Accept: 'application/json',
+            },
+        })).then(checkStatus);
+    }
+
+    /**
      * Make POST request to url
      *
      * @param {String} url

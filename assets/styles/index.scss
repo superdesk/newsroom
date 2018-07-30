@@ -1225,7 +1225,7 @@ article.list {
     .wire-articles__item__meta-info .bold {
         color: $gray-mid;
     }
-    .wire-articles__item__meta-info .bold {
+    .wire-articles__wire-articles__item__metaitem__meta-info .bold {
         font-weight: 500;
     }
     .wire-articles__item-image figure img {
@@ -1890,7 +1890,11 @@ article.list {
     font-weight: 500;
     padding: 2px 8px;
     border-radius: 2px;
-    
+
+    &--covering {
+        background-color: $green;
+    }
+
     .wire-articles__item--covering &,
     .wire-column__preview--covering &,
     .wire-column__preview__content--covering & {
@@ -2052,6 +2056,15 @@ article.list {
     z-index: 0;
 }
 
+a.wire-articles__versions {
+    display: block;
+    color: inherit;
+
+    &:hover {
+        text-decoration: none;
+        box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.4);
+    }
+}
 
 .wire-articles__versions__item {
     display: flex;
@@ -2264,6 +2277,7 @@ article.list {
 .wire-column__preview__text {
     color: #444444;
     font-weight: 300;
+    margin-bottom: 20px;
 
     .wire-column__preview--canceled & {
         text-decoration: line-through;
@@ -2274,10 +2288,9 @@ article.list {
     white-space: pre-wrap;
 }
 
-.wire-column__preview__tags {
+.wire-column__preview__tags, .info-box--top {
     display: flex;
     flex-wrap: wrap;
-    border-top: 1px dotted #cacaca;
     margin-top: 0;
     padding-top: 3px;
 }
@@ -2348,7 +2361,7 @@ article.list {
 
 }
 
-.column__preview__tags__box-headline {
+.column__preview__tags__box-headline, .info-box__label {
     font-size: 0.875rem;
     color: #222222;
     font-weight: 700;
@@ -2385,10 +2398,10 @@ article.list {
     }
 }
 
-.wire-column__preview__versions {
+.wire-column__preview__versions, .info-box {
     display: flex;
     flex-direction: column;
-    margin: 20px 0px;
+    margin: 0 0 20px;
 }
 
 .wire-column__preview__versions__box-headline {
@@ -2587,8 +2600,17 @@ article.list {
         padding-top: 6px;
     }
 }
+
 .content--item-detail .wire-articles__item__meta-info {
     margin-top: 10px;
+}
+
+.wire-articles__item__meta.wire-articles__item__meta--row {
+    flex-direction: row;
+
+    .wire-articles__item__meta-info {
+        margin-top: 0;
+    }
 }
 
 .wire-column__preview__content--item-detail-info-wrap, 
@@ -2613,9 +2635,15 @@ article.list {
     flex-direction: column;
 }
 
-.content--item-detail .column__preview__tags__column {
+.content--item-detail .column__preview__tags__column, .info-box__content {
     border-top: 1px dotted #cacaca;
     padding: 10px 0px;
+}
+
+.info-box__content .column__preview__tags__column,
+.info-box__content .wire-column__preview__versions__item {
+    border-top: none;
+    padding: 0;
 }
 
 .profileWrap {

@@ -74,3 +74,9 @@ def parse_dates(item):
 
 def get_entity_dict(items):
     return {item['_id']: item for item in items}
+
+
+def is_json_request(request):
+    """Test if request is for json content."""
+    return request.args.get('format') == 'json' or \
+        request.accept_mimetypes.best_match(['application/json', 'text/html']) == 'application/json'

@@ -21,7 +21,9 @@ if (localStorage.getItem('view')) {
 
 // handle history
 window.onpopstate = function(event) {
-    store.dispatch(setState(event.state));
+    if (event.state) {
+        store.dispatch(setState(event.state));
+    }
 };
 
 // fetch items & render

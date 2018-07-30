@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
+import AgendaLinks from './AgendaLinks';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import PreviewActionButtons from 'components/PreviewActionButtons';
@@ -75,6 +76,8 @@ function ItemDetails({item, user, actions, onClose}) {
                             {showItemVersions(item) &&
                                 <ListItemPreviousVersions item={item} isPreview={true}/>
                             }
+
+                            <AgendaLinks item={item} />
                         </div>
 
                     </div>

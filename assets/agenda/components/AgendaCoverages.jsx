@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import { gettext, formatDate } from 'utils';
+import CoverageItemStatus from './CoverageItemStatus';
 
 const getCoverageStatusClass = (coverage) =>
     coverage.workflow_status === 'active' ? 'icon--green' : 'icon--gray-light';
@@ -28,8 +29,7 @@ export default function AgendaCoverages({coverages}) {
             <div className='coverage-item__row'>
                 {coverage.coverage_provider && <span className='coverage-item__text-label mr-1'>{gettext('Source')}:</span>}
                 {coverage.coverage_provider && <span className='mr-2'>{coverage.coverage_provider}</span>}
-                {coverage.coverage_status && <span className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>}
-                {coverage.coverage_status && <span>{coverage.coverage_status}</span>}
+                <CoverageItemStatus coverage={coverage} />
             </div>
         </div>
     ));
