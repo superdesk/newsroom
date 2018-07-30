@@ -2,7 +2,7 @@ import superdesk
 
 from flask import Blueprint
 from newsroom.agenda.agenda import AgendaResource, AgendaService
-# from superdesk.metadata.item import not_analyzed
+from . import formatters
 
 blueprint = Blueprint('agenda', __name__)
 
@@ -28,3 +28,4 @@ def init_app(app):
     superdesk.register_resource('agenda', AgendaResource, AgendaService, _app=app)
 
     app.sidenav('Agenda', 'agenda.agenda', 'calendar')
+    app.add_download_formatter('ical', formatters.iCalFormatter(), 'iCalendar', ['agenda'])

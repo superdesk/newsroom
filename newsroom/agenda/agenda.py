@@ -81,6 +81,12 @@ class AgendaResource(newsroom.Resource):
         },
     }
 
+    # attachments
+    schema['files'] = {
+        'type': 'list',
+        'mapping': not_enabled,
+    }
+
     # state
     schema['state'] = WORKFLOW_STATE_SCHEMA
 
