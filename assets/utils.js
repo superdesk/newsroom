@@ -297,10 +297,10 @@ export function updateRouteParams(updates, state) {
 
     Object.keys(updates).forEach((key) => {
         if (updates[key]) {
-            dirty = dirty || updates[key] !== params.get(key);
+            dirty = dirty || updates[key] != params.get(key);
             params.set(key, updates[key]);
         } else {
-            dirty = dirty || params.has(key) || params.entries.length == 0;
+            dirty = dirty || params.has(key);
             params.delete(key);
         }
     });

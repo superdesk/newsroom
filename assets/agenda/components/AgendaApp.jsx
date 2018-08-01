@@ -37,6 +37,7 @@ import {isTouchDevice} from 'utils';
 import {hasCoverages, isCanceled, isPostponed, isRescheduled} from '../utils';
 import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
+import BookmarkTabs from 'components/BookmarkTabs';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -179,13 +180,17 @@ class AgendaApp extends React.Component {
                             onClick={this.toggleSidebar}>
                             <i className='icon--close-thin icon--white'></i>
                         </span>}
-                        {!this.state.withSidebar && <span
+                        {!this.state.withSidebar && !this.props.bookmarks && <span
                             className='content-bar__menu content-bar__menu--nav'
                             ref={(elem) => this.elemClose = elem}
                             title={gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className='icon--hamburger'></i>
                         </span>}
+
+                        {this.props.bookmarks &&
+                            <BookmarkTabs active="agenda" />
+                        }
 
                         <SearchBar
                             fetchItems={this.props.fetchItems}
@@ -221,11 +226,13 @@ class AgendaApp extends React.Component {
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
-                            <AgendaFilters
-                                aggregations={this.props.aggregations}
-                                toggleFilter={this.props.toggleDropdownFilter}
-                                activeFilter={this.props.activeFilter}
-                            />
+                            {!this.props.bookmarks &&
+                                <AgendaFilters
+                                    aggregations={this.props.aggregations}
+                                    toggleFilter={this.props.toggleDropdownFilter}
+                                    activeFilter={this.props.activeFilter}
+                                />
+                            }
 
                             <AgendaList
                                 actions={this.props.actions}

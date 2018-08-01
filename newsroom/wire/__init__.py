@@ -33,7 +33,7 @@ def init_app(app):
 
     app.sidenav('Home', 'wire.index', 'home')
     app.sidenav('Wire', 'wire.wire', 'text')
-    app.sidenav('Saved Items', 'wire.bookmarks', 'bookmark')
+    app.sidenav('Saved Items', 'wire.bookmarks', 'bookmark', group=1, active=['wire.bookmarks', 'agenda.bookmarks'])
 
     from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter
     app.add_download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'])

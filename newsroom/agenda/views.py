@@ -19,6 +19,14 @@ def agenda():
     return flask.render_template('agenda_index.html', data=get_view_data())
 
 
+@blueprint.route('/bookmarks_agenda')
+@login_required
+def bookmarks():
+    data = get_view_data()
+    data['bookmarks'] = True
+    return flask.render_template('agenda_index.html', data=data)
+
+
 @blueprint.route('/agenda/<_id>')
 @login_required
 def item(_id):
