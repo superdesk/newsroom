@@ -1,14 +1,13 @@
 from datetime import datetime
 from uuid import uuid4
 
-import superdesk
 from bson import ObjectId
+from flask import current_app as app, json, abort, request, g, url_for
+from werkzeug.utils import secure_filename
 from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date
-from flask import current_app as app, json, abort, request
-from flask import url_for
-from werkzeug.utils import secure_filename
 
+import superdesk
 from newsroom.upload import ASSETS_RESOURCE
 
 
@@ -80,3 +79,33 @@ def is_json_request(request):
     """Test if request is for json content."""
     return request.args.get('format') == 'json' or \
         request.accept_mimetypes.best_match(['application/json', 'text/html']) == 'application/json'
+
+
+def get_user_dict():
+    """Get all active users indexed by _id."""
+    if 'user_dict' not in g or app.testing:
+        lookup = {'is_enabled': True}
+        all_users = list(query_resource('users', lookup=lookup, max_results=200))
+        g.user_dict = {str(user['_id']): user for user in all_users}
+    return g.user_dict
+
+
+def get_company_dict():
+    """Get all active companies indexed by _id.
+
+    Must reload when testing because there it's using single context.
+    """
+    if 'company_dict' not in g or app.testing:
+        lookup = {'is_enabled': True}
+        all_companies = list(query_resource('companies', lookup=lookup, max_results=200))
+        g.company_dict = {str(company['_id']): company for company in all_companies}
+    return g.company_dict
+
+
+def filter_active_users(user_ids, user_dict, company_dict):
+    active = []
+    for _id in user_ids:
+        user = user_dict.get(_id)
+        if user and (not user.get('company') or str(user.get('company', '')) in company_dict):
+            active.append(_id)
+    return active

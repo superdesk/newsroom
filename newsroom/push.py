@@ -14,7 +14,7 @@ from superdesk.utc import utcnow
 from superdesk.text_utils import get_word_count
 from newsroom.notifications import push_notification
 from newsroom.topics.topics import get_wire_notification_topics, get_agenda_notification_topics
-from newsroom.utils import query_resource, parse_dates
+from newsroom.utils import parse_dates, get_user_dict, get_company_dict
 from newsroom.email import send_new_item_notification_email, \
     send_history_match_notification_email, send_item_killed_notification_email
 from newsroom.history import get_history_users
@@ -109,7 +109,7 @@ def publish_item(doc):
         else:
             logger.warning("Failed to find evolvedfrom item %s for %s", doc['evolvedfrom'], doc['guid'])
     fix_hrefs(doc)
-    logger.info('publishing %s', doc['guid'])
+    logger.debug('publishing %s', doc['guid'])
     for assoc in doc.get('associations', {}).values():
         if assoc:
             assoc.setdefault('subscribers', [])
@@ -124,7 +124,7 @@ def publish_item(doc):
 
 
 def publish_event(event, orig):
-    logger.info('publishing event %s', event)
+    logger.debug('publishing event %s', event)
 
     # populate attachments href
     if event.get('files'):
@@ -196,7 +196,7 @@ def get_event_dates(event):
 
 
 def publish_planning(planning):
-    logger.info('publishing planning %s', planning)
+    logger.debug('publishing planning %s', planning)
     service = superdesk.get_resource_service('agenda')
     agenda = None
 
@@ -353,24 +353,21 @@ def notify_new_item(item, check_topics=True):
     if not item or item.get('type') == 'composite':
         return
 
-    lookup = {'is_enabled': True}
-    all_users = list(query_resource('users', lookup=lookup, max_results=200))
-    user_ids = [u['_id'] for u in all_users]
-    users_dict = {str(user['_id']): user for user in all_users}
+    user_dict = get_user_dict()
+    user_ids = [u['_id'] for u in user_dict.values()]
 
-    all_companies = list(query_resource('companies', lookup=lookup, max_results=200))
-    company_ids = [c['_id'] for c in all_companies]
-    companies_dict = {str(company['_id']): company for company in all_companies}
+    company_dict = get_company_dict()
+    company_ids = [c['_id'] for c in company_dict.values()]
 
     push_notification('new_item', item=item['_id'])
 
     if check_topics:
         if item.get('type') == 'text':
-            notify_wire_topic_matches(item, users_dict, companies_dict)
+            notify_wire_topic_matches(item, user_dict, company_dict)
         else:
-            notify_agenda_topic_matches(item, users_dict)
+            notify_agenda_topic_matches(item, user_dict)
 
-    notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
+    notify_user_matches(item, user_dict, company_dict, user_ids, company_ids)
 
 
 def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids):

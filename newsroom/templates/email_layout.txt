@@ -1,4 +1,4 @@
-{% block name %}{{ name }},{% endblock %}
+{% block name %}{% if name %}{{ name }},{% endif %}{% endblock %}
 {% block content %}{% endblock %}
 
 {% block footer %}

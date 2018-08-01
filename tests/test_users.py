@@ -15,7 +15,8 @@ def init(app):
         'user_type': 'administrator',
         'is_validated': True,
         'is_enabled': True,
-        'is_approved': True
+        'is_approved': True,
+        'receive_email': True,
     }])
 
 
