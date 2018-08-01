@@ -11,7 +11,8 @@ install_requires = [
     'flask_pymongo>=0.5.2,<1.0',
     'honcho>=1.0.1',
     'gunicorn>=19.7.1',
-    'superdesk-core==1.21'
+    'superdesk-core==1.21',
+    'icalendar>=4.0.2,<4.1',
 ]
 
 setup(
