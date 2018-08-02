@@ -5,9 +5,8 @@ import classNames from 'classnames';
 import ActionList from 'components/ActionList';
 import ActionButton from 'components/ActionButton';
 
-
 import AgendaListItemIcons from './AgendaListItemIcons';
-import {hasCoverages, isCanceled, isPostponed, isRescheduled} from '../utils';
+import {hasCoverages, isCanceled, isPostponed, isRescheduled, getName} from '../utils';
 
 class AgendaListItem extends React.Component {
     constructor(props) {
@@ -78,14 +77,14 @@ class AgendaListItem extends React.Component {
                                 </label>
                             </div>
 
-                            {item.name}
+                            {getName(item)}
                         </h4>
 
                         <AgendaListItemIcons item={item} />
 
                         {isExtended && item.definition_short && (
                             <p className="wire-articles__item__text">
-                                {item.definition_short || item.abstract}
+                                {item.definition_short}
                             </p>
                         )}
 

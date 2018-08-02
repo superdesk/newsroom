@@ -270,3 +270,13 @@ export function getAttachments(item) {
 export function hasAttachments(item) {
     return !isEmpty(getAttachments(item));
 }
+
+/**
+ * Get agenda item name
+ *
+ * @param {Object} item
+ * @return {String}
+ */
+export function getName(item) {
+    return item.name || item.headline;
+}
