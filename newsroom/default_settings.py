@@ -56,7 +56,6 @@ BLUEPRINTS = [
 
 CORE_APPS = [
     'superdesk.notification',
-    'planning.events',
     'content_api.items',
     'content_api.items_versions',
     'content_api.search',
