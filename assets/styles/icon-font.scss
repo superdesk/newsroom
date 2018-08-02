@@ -68,6 +68,11 @@
         color: $orange;
     }
 }
+
+.icon--rotate-90 {
+    transform: rotate(90deg);
+}
+
 .icon--rotate-180 {
     transform: rotate(180deg);
 }

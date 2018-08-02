@@ -8,7 +8,6 @@ import werkzeug.exceptions
 from bson import ObjectId
 from superdesk.utc import utcnow
 from flask import current_app as app, session
-from newsroom.wire.search import get_bookmarks_count
 
 
 class NotificationsResource(newsroom.Resource):
@@ -75,5 +74,4 @@ def get_initial_notifications():
     return {
         'user': str(session['user']) if session['user'] else None,
         'notifications': list(items),
-        'bookmarksCount': get_bookmarks_count(session['user']),
     }

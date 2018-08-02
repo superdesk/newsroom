@@ -34,7 +34,8 @@ import ItemDetails from './ItemDetails';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import { getItemActions } from '../item-actions';
-import {isTouchDevice} from '../../utils';
+import {isTouchDevice} from 'utils';
+import BookmarkTabs from 'components/BookmarkTabs';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -169,7 +170,12 @@ class WireApp extends React.Component {
                             onClick={this.toggleSidebar}>
                             <i className='icon--close-thin icon--white'></i>
                         </span>}
-                        {!this.state.withSidebar && <span
+
+                        {this.props.bookmarks && 
+                            <BookmarkTabs active="wire" />
+                        }
+
+                        {!this.state.withSidebar && !this.props.bookmarks && <span
                             className='content-bar__menu content-bar__menu--nav'
                             ref={(elem) => this.elemClose = elem}
                             title={gettext('Open filter panel')}
