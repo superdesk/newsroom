@@ -6,4 +6,4 @@
 {% if item.headline %}Headline: {{ item.headline }}{% endif %}
 
 Published: {{ item.versioncreated | datetime_long }}
-Link: {{ url }}
+Link: {{ url_for_agenda(item) }}

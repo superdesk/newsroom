@@ -6,16 +6,15 @@ from eve.methods.get import get_internal
 from eve.render import send_response
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
-from flask import current_app as app, abort
+from flask import current_app as app
 from newsroom.auth import get_user, login_required
 from newsroom.utils import get_entity_or_404, is_json_request
 from newsroom.wire.views import update_action_list
-from flask_babel import gettext
 
 
 @blueprint.route('/agenda')
 @login_required
-def agenda():
+def index():
     return flask.render_template('agenda_index.html', data=get_view_data())
 
 
@@ -39,7 +38,9 @@ def item(_id):
         update_action_list([_id], 'prints', force_insert=True)
         return flask.render_template(template, item=item)
 
-    return abort(400, gettext('No format provided'))
+    data = get_view_data()
+    data['item'] = item
+    return flask.render_template('agenda_index.html', data=data, title=item.get('name', item.get('headline')))
 
 
 @blueprint.route('/agenda/search')

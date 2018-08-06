@@ -5,7 +5,9 @@ export default function ContentBar(props) {
     return (
         <div className='content-bar navbar justify-content-between'>
             <span className='content-bar__menu' onClick={props.onClose}>
-                <i className='icon--close-thin'></i>
+                {props.onClose &&
+                    <i className='icon--close-thin'></i>
+                }
             </span>
             {props.children}
         </div>
