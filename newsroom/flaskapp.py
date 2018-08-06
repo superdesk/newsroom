@@ -148,6 +148,11 @@ class Newsroom(eve.Eve):
 
         self.register_error_handler(AssertionError, assertion_error)
 
+        def render_404(err):
+            return flask.render_template('404.html'), 404
+
+        self.register_error_handler(404, render_404)
+
     def _setup_theme(self):
         self.add_url_rule(
             self.static_url_path.replace('static', 'theme') + '/<path:filename>',

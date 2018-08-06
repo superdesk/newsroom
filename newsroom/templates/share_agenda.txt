@@ -1,8 +1,13 @@
+{% extends "email_layout.txt" %}
+{% block content %}
 Hi {{ recipient.first_name }} {{ recipient.last_name }},
 {{ sender.first_name }} {{ sender.last_name }} shared the following agenda with you:
 {% for item in items %}
-{{ item.name }}
-{{ url_for('agenda.item', _id=item['_id'], _external=True)}}
+{% include "email_agenda.txt" %}
+
 {% endfor %}
 
 {{ message }}
+
+{% endblock %}
+{% block name %}{% endblock %}

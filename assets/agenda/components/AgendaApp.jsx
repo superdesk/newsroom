@@ -155,13 +155,14 @@ class AgendaApp extends React.Component {
         });
 
         const activeTopic = this.props.topics.find((topic) => topic._id === this.props.activeTopic);
+        const onDetailClose = this.props.detail ? null : () => this.props.actions.filter(a => a.id == 'open')[0].action(null);
 
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
-                onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
+                onClose={onDetailClose}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     {this.props.selectedItems && this.props.selectedItems.length > 0 &&
@@ -308,6 +309,7 @@ AgendaApp.propTypes = {
     activeGrouping: PropTypes.string,
     activeTopic: PropTypes.string,
     openItemDetails: PropTypes.func,
+    detail: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -334,6 +336,7 @@ const mapStateToProps = (state) => ({
     aggregations: state.aggregations,
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
+    detail: get(state, 'detail', false),
 });
 
 const mapDispatchToProps = (dispatch) => ({

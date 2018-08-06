@@ -5,8 +5,9 @@ from .fixtures import items, init_items, agenda_items, init_agenda_items, init_a
 
 def test_item_detail(client):
     resp = client.get('/agenda/urn:conference')
-    assert resp.status_code == 400
-    assert 'format' in resp.get_data(as_text=True)
+    assert resp.status_code == 200
+    assert 'urn:conference' in resp.get_data().decode()
+    assert 'Conference Planning' in resp.get_data().decode()
 
 
 def test_item_json(client):

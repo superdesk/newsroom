@@ -7,5 +7,5 @@
 {% if item.headline %}<dt>Headline:</dt><dd>{{ item.headline }}</dd>{% endif %}
 
 <dt>Published:</dt><dd>{{ item.versioncreated | datetime_long }}</dd>
-<dt>Link:</dt><dd><a href="{{ url }}">{{ url }}</a></dd>
+<dt>Link:</dt><dd><a href="url_for_agenda(item)">{{ url_for_agenda(item) }}</a></dd>
 </dl>

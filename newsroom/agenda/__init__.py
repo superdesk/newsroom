@@ -1,6 +1,6 @@
 import superdesk
 
-from flask import Blueprint
+from flask import Blueprint, url_for
 from newsroom.agenda.agenda import AgendaResource, AgendaService
 from . import formatters
 
@@ -9,23 +9,13 @@ blueprint = Blueprint('agenda', __name__)
 from . import views  # noqa
 
 
+def url_for_agenda(item, _external=True):
+    """Get url for agenda item."""
+    return url_for('agenda.item', _id=item['_id'], _external=_external)
+
+
 def init_app(app):
-    # app.config['DOMAIN']['events']['schema'].update({
-    #     'slugline': {
-    #         'type': 'string',
-    #         'index': not_analyzed
-    #     },
-    # })
-
-    # app.config['DOMAIN']['events']['schema'].update({
-    #     'event_contact_info': {
-    #         'type': 'dict',
-    #         'nullable': 'true',
-    #         'index': not_analyzed
-    #     },
-    # })
-
     superdesk.register_resource('agenda', AgendaResource, AgendaService, _app=app)
-
-    app.sidenav('Agenda', 'agenda.agenda', 'calendar')
+    app.sidenav('Agenda', 'agenda.index', 'calendar')
     app.add_download_formatter('ical', formatters.iCalFormatter(), 'iCalendar', ['agenda'])
+    app.add_template_global(url_for_agenda)

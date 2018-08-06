@@ -75,6 +75,7 @@ const initialState = {
         activeDate: Date.now(),
         activeGrouping: 'day',
     },
+    detail: false,
 };
 
 function recieveItems(state, data) {
@@ -213,6 +214,7 @@ export default function agendaReducer(state = initialState, action) {
 
     case INIT_DATA: {
         const navigations = get(action, 'agendaData.navigations', []);
+        const openItem = get(action, 'agendaData.item', null);
         return {
             ...state,
             readItems: action.readData || {},
@@ -224,6 +226,8 @@ export default function agendaReducer(state = initialState, action) {
             formats: action.agendaData.formats || [],
             agenda: Object.assign(state.agenda, {navigations}),
             context: 'agenda',
+            openItem: openItem,
+            detail: !!openItem,
         };
     }
 
