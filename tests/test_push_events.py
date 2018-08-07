@@ -181,6 +181,8 @@ def test_push_parsed_event(client, app):
         strptime('2018-05-28T05:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC)
     assert 1 == len(parsed['event']['event_contact_info'])
     assert 1 == len(parsed['location'])
+    assert 1 == len(parsed['service'])
+    assert 'a' == parsed['service'][0]['code']
 
     init_auth(app, client)
     resp = client.get('/agenda/search?date_to=now/d')
@@ -243,6 +245,8 @@ def test_push_parsed_planning_for_an_existing_event(client, app):
     parsed = get_entity_or_404('foo4', 'agenda')
     assert parsed['headline'] == 'Planning headline'
     assert 2 == len(parsed['coverages'])
+    assert 1 == len(parsed['service'])
+    assert 'e' == parsed['service'][0]['code']
 
 
 def test_push_cancelled_planning_for_an_existing_event(client, app):
