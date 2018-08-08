@@ -12,6 +12,7 @@ from planning.common import WORKFLOW_STATE_SCHEMA
 from newsroom.wire.search import get_local_date, set_bookmarks_query
 from newsroom.wire.search import query_string, set_product_query
 from superdesk.resource import Resource, not_enabled
+from content_api.items.resource import code_mapping
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
@@ -50,10 +51,10 @@ class AgendaResource(newsroom.Resource):
     # aggregated fields
     schema['genre'] = planning_schema['genre']
     schema['subject'] = planning_schema['subject']
-    schema['anpa_category'] = planning_schema['anpa_category']
     schema['priority'] = planning_schema['priority']
     schema['urgency'] = planning_schema['urgency']
     schema['place'] = planning_schema['place']
+    schema['service'] = code_mapping
 
     # dates
     schema['dates'] = {

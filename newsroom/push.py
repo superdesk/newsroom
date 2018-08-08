@@ -286,12 +286,20 @@ def set_agenda_metadata_from_event(agenda, event):
     agenda['state'] = event.get('state')
     agenda['place'] = event.get('place')
     agenda['subject'] = event.get('subject')
-    agenda['anpa_category'] = event.get('anpa_category')
     agenda['products'] = event.get('products')
+
+    # only set service if available
+    service = format_qcode_items(event.get('anpa_category'))
+    if service:
+        agenda['service'] = service
 
     agenda['event'] = event
 
     set_dates(agenda)
+
+
+def format_qcode_items(items=None):
+    return [{'code': item.get('qcode'), 'name': item.get('name')} for item in items]
 
 
 def set_agenda_metadata_from_planning(agenda, planning_item):
@@ -308,11 +316,14 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
     agenda['name'] = planning_item.get('name')
     agenda['place'] = planning_item.get('place', agenda.get('place'))
     agenda['subject'] = planning_item.get('subject', agenda.get('subject'))
-    agenda['anpa_category'] = planning_item.get('anpa_category', agenda.get('anpa_category'))
     agenda['genre'] = planning_item.get('genre')
     agenda['priority'] = planning_item.get('priority')
     agenda['urgency'] = planning_item.get('urgency')
     agenda['products'] = planning_item.get('products')
+
+    service = format_qcode_items(planning_item.get('anpa_category'))
+    if service:
+        agenda['service'] = service
 
 
 def set_agenda_planning_items(agenda, planning_item, action='add'):
