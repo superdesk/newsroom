@@ -3,7 +3,8 @@ import { createStore, render, initWebSocket } from 'utils';
 import wireReducer from './reducers';
 import {getNewsOnlyParam, getReadItems} from './utils';
 import WireApp from './components/WireApp';
-import { fetchItems, setState, initData, initParams, pushNotification, setView } from './actions';
+import { fetchItems, setState, initData, initParams, pushNotification, } from './actions';
+import { setView } from 'search/actions';
 
 const store = createStore(wireReducer);
 

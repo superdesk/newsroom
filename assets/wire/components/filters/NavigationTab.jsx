@@ -1,13 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext } from 'utils';
+import { connect } from 'react-redux';
 import NavLink from './NavLink';
 
-function NavigationTab({navigations, activeNavigation, toggleNavigation}) {
+import { toggleNavigation } from 'search/actions';
+
+function NavigationTab({navigations, activeNavigation, toggleNavigation, fetchItems}) {
     const navLinks = navigations.map((navigation) => (
         <NavLink key={navigation.name}
             isActive={activeNavigation === navigation._id || navigations.length === 1}
-            onClick={(event) => toggleNavigation(event, navigation)}
+            onClick={(event) => {
+                event.preventDefault();
+                toggleNavigation(navigation);
+                fetchItems();
+            }}
             label={navigation.name}
         />
     ));
@@ -15,7 +22,11 @@ function NavigationTab({navigations, activeNavigation, toggleNavigation}) {
     const all = (
         <NavLink key="all"
             isActive={!activeNavigation}
-            onClick={(event) => toggleNavigation(event)}
+            onClick={(event) => {
+                event.preventDefault();
+                toggleNavigation();
+                fetchItems();
+            }}
             label={gettext('All')}
         />
     );
@@ -27,6 +38,11 @@ NavigationTab.propTypes = {
     navigations: PropTypes.arrayOf(PropTypes.object),
     activeNavigation: PropTypes.string,
     toggleNavigation: PropTypes.func.isRequired,
+    fetchItems: PropTypes.func.isRequired,
 };
 
-export default NavigationTab;
+const mapDispatchToProps = {
+    toggleNavigation,
+};
+
+export default connect(null, mapDispatchToProps)(NavigationTab);

@@ -108,3 +108,5 @@ node_modules
 .vscode/
 .vagrant
 
+# newsroom
+newsroom/static/

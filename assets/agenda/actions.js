@@ -7,6 +7,15 @@ import { markItemAsRead } from 'wire/utils';
 import { renderModal, closeModal } from 'actions';
 import {getDateInputDate} from './utils';
 
+import {
+    setQuery,
+    toggleTopic,
+    resetFilter,
+    toggleFilter,
+    toggleNavigation,
+    setCreatedFilter,
+} from 'search/actions';
+
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
     return {type: SET_STATE, state};
@@ -54,12 +63,6 @@ export function openItem(item) {
         item && analytics.itemEvent('open', item);
         analytics.itemView(item);
     };
-}
-
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    query && analytics.event('search', query);
-    return {type: SET_QUERY, query};
 }
 
 export const SET_EVENT_QUERY = 'SET_EVENT_QUERY';
@@ -117,9 +120,9 @@ export function printItem(item) {
  * @return {Promise}
  */
 function search(state, next) {
-    const activeFilter = get(state, 'agenda.activeFilter', {});
-    const activeNavigation = get(state, 'agenda.activeNavigation');
-    const createdFilter = get(state, 'agenda.createdFilter', {});
+    const activeFilter = get(state, 'search.activeFilter', {});
+    const activeNavigation = get(state, 'search.activeNavigation');
+    const createdFilter = get(state, 'search.createdFilter', {});
     const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
 
     const params = {
@@ -358,35 +361,9 @@ export function fetchNewItems() {
         .then((response) => dispatch(setNewItems(response)));
 }
 
-export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
-function _toggleNavigation(navigation) {
-    return {type: TOGGLE_NAVIGATION, navigation};
-}
-
-export const TOGGLE_TOPIC = 'TOGGLE_TOPIC';
-function _toggleTopic(topic) {
-    return {type: TOGGLE_TOPIC, topic};
-}
-
-export function toggleNavigation(navigation) {
-    return (dispatch) => {
-        dispatch(setQuery(''));
-        dispatch(_toggleNavigation(navigation));
-        return dispatch(fetchItems());
-    };
-}
-
-export const TOGGLE_FILTER = 'TOGGLE_FILTER';
-export function toggleFilter(key, val, single) {
-    return (dispatch) => {
-        setTimeout(() => dispatch({type: TOGGLE_FILTER, key, val, single}));
-    };
-}
-
-export const TOGGLE_DROPDOWN_FILTER = 'TOGGLE_DROPDOWN_FILTER';
 export function toggleDropdownFilter(key, val, single) {
     return (dispatch) => {
-        dispatch({type: TOGGLE_FILTER, key, val, single});
+        dispatch(toggleFilter(key, val, single));
         dispatch(fetchItems());
     };
 }
@@ -438,29 +415,6 @@ export function initParams(params) {
     };
 }
 
-function _setCreatedFilter(filter) {
-    return {type: SET_CREATED_FILTER, filter};
-}
-
-export const SET_CREATED_FILTER = 'SET_CREATED_FILTER';
-export function setCreatedFilter(filter) {
-    return (dispatch) => {
-        dispatch(_setCreatedFilter(filter));
-    };
-}
-
-function _resetFilter(filter) {
-    return {type: RESET_FILTER, filter};
-}
-
-export const RESET_FILTER = 'RESET_FILTER';
-export function resetFilter(filter) {
-    return (dispatch) => {
-        dispatch(_resetFilter(filter));
-        dispatch(fetchItems());
-    };
-}
-
 /**
  * Set query for given topic
  *
@@ -469,19 +423,13 @@ export function resetFilter(filter) {
  */
 export function setEventQuery(topic) {
     return (dispatch) => {
-        dispatch(_toggleNavigation());
-        dispatch(_toggleTopic(topic));
+        dispatch(toggleNavigation());
+        dispatch(toggleTopic(topic));
         dispatch(setQueryById(topic.query || ''));
-        dispatch(_resetFilter(topic.filter));
-        dispatch(_setCreatedFilter(topic.created));
+        dispatch(resetFilter(topic.filter));
+        dispatch(setCreatedFilter(topic.created));
         return dispatch(fetchItems());
     };
-}
-
-export const SET_VIEW = 'SET_VIEW';
-export function setView(view) {
-    localStorage.setItem('view', view);
-    return {type: SET_VIEW, view};
 }
 
 export function refresh() {

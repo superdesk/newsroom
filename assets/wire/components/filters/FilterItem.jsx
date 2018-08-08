@@ -11,7 +11,10 @@ export default function FilterItem({bucket, group, toggleFilter, groupFilter}) {
                 className="custom-control-input"
                 checked={isActive}
                 id={bucket.key}
-                onChange={(event) => toggleFilter(event, group.field, bucket.key, group.single)} />
+                onChange={(event) => {
+                    event.preventDefault();
+                    toggleFilter(group.field, bucket.key, group.single);
+                }} />
             <label
                 className="custom-control-label"
                 htmlFor={bucket.key}

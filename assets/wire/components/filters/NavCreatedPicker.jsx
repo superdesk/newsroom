@@ -4,7 +4,6 @@ import { gettext } from 'utils';
 
 import NavLink from './NavLink';
 import NavGroup from './NavGroup';
-import { setCreatedFilter } from 'wire/actions';
 
 const shortcuts = [
     {label: gettext('Today'), value: 'now/d'},
@@ -12,14 +11,14 @@ const shortcuts = [
     {label: gettext('This month'), value: 'now/M'},
 ];
 
-function NavCreatedPicker({dispatch, createdFilter}) {
+function NavCreatedPicker({setCreatedFilter, createdFilter}) {
     const onClickFactory = (value) => (event) => {
         event.preventDefault();
-        dispatch(setCreatedFilter({from: createdFilter.from === value ? null : value, to: null}));
+        setCreatedFilter({from: createdFilter.from === value ? null : value, to: null});
     };
 
     const onInputChange = (event) => {
-        dispatch(setCreatedFilter({[event.target.name]: event.target.value}));
+        setCreatedFilter({[event.target.name]: event.target.value});
     };
 
     const activeShortcut = shortcuts.find((shortcut) => shortcut.value === createdFilter.from);
@@ -54,8 +53,8 @@ function NavCreatedPicker({dispatch, createdFilter}) {
 }
 
 NavCreatedPicker.propTypes = {
-    dispatch: PropTypes.func.isRequired,
     createdFilter: PropTypes.object.isRequired,
+    setCreatedFilter: PropTypes.func.isRequired,
 };
 
 export default NavCreatedPicker;

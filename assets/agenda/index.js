@@ -3,7 +3,8 @@ import { createStore, render, initWebSocket } from 'utils';
 import agendaReducer from './reducers';
 import {getReadItems} from 'wire/utils';
 import AgendaApp from './components/AgendaApp';
-import { fetchItems, setState, initData, initParams, pushNotification, setView } from './actions';
+import { fetchItems, setState, initData, initParams, pushNotification } from './actions';
+import { setView } from 'search/actions';
 
 const store = createStore(agendaReducer);
 

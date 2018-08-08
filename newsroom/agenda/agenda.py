@@ -9,7 +9,7 @@ from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk.metadata.item import not_analyzed
 from planning.common import WORKFLOW_STATE_SCHEMA
-from newsroom.wire.search import get_local_date, set_bookmarks_query
+from newsroom.wire.search import get_local_date, set_bookmarks_query, versioncreated_range
 from newsroom.wire.search import query_string, set_product_query
 from superdesk.resource import Resource, not_enabled
 from content_api.items.resource import code_mapping
@@ -194,6 +194,9 @@ class AgendaService(newsroom.Service):
 
         if req.args.get('date_from') or req.args.get('date_to'):
             query['bool']['must'].append(_event_date_range(req.args))
+
+        if req.args.get('created_from') or req.args.get('created_to'):
+            query['bool']['must'].append(versioncreated_range(req.args))
 
         source = {'query': query}
         source['sort'] = [{'dates.start': 'asc'}]

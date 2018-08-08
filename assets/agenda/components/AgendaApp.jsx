@@ -3,27 +3,29 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
-import { createPortal } from 'react-dom';
 import { gettext } from 'utils';
 
 import {
     followEvent,
     fetchItems,
-    setQuery,
     selectAll,
     selectNone,
     selectDate,
     fetchMoreItems,
-    setView,
     refresh,
     previewItem,
     toggleDropdownFilter,
     openItemDetails,
 } from 'agenda/actions';
 
+import {
+    setView,
+} from 'search/actions';
+
+import BaseApp from 'layout/components/BaseApp';
 import AgendaPreview from './AgendaPreview';
 import AgendaList from './AgendaList';
-import SearchBar from '../../components/SearchBar';
+import SearchBar from 'components/SearchBar';
 import SearchSidebar from 'wire/components/SearchSidebar';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import AgendaListViewControls from './AgendaListViewControls';
@@ -33,8 +35,6 @@ import AgendaItemDetails from 'agenda/components/AgendaItemDetails';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import { getItemActions } from 'wire/item-actions';
-import {isTouchDevice} from 'utils';
-import {hasCoverages, isCanceled, isPostponed, isRescheduled} from '../utils';
 import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
@@ -45,87 +45,12 @@ const modals = {
     downloadItems: DownloadItemsModal,
 };
 
-class AgendaApp extends React.Component {
+class AgendaApp extends BaseApp {
     constructor(props) {
         super(props);
-        this.state = {
-            withSidebar: false,
-            scrollClass: '',
-        };
-        this.toggleSidebar = this.toggleSidebar.bind(this);
-        this.onListScroll = this.onListScroll.bind(this);
-        this.filterActions = this.filterActions.bind(this);
-    }
-
-    renderModal(specs) {
-        if (specs) {
-            const Modal = modals[specs.modal];
-            return (
-                <Modal key="modal" data={specs.data} />
-            );
-        }
-    }
-
-    renderNavBreadcrumb(navigations, activeNavigation, activeTopic) {
-        const dest = document.getElementById('nav-breadcrumb');
-        if (!dest) {
-            return null;
-        }
-
-        let name = get(navigations.find((nav) => nav._id === activeNavigation), 'name', '');
-        if (!name && activeTopic) {
-            name = activeTopic.label;
-        }
-
-        return createPortal(name , dest);
-    }
-
-    toggleSidebar(event) {
-        event.preventDefault();
-        this.setState({withSidebar: !this.state.withSidebar});
-    }
-
-    onListScroll(event) {
-        const BUFFER = 10;
-        const container = event.target;
-        if (container.scrollTop + container.offsetHeight + BUFFER >= container.scrollHeight) {
-            this.props.fetchMoreItems()
-                .catch(() => null); // ignore
-        }
-
-        if(container.scrollTop > BUFFER) {
-            this.setState({ scrollClass: 'wire-column__main-header--small'});
-        }
-        else {
-            this.setState({ scrollClass: ''});
-        }
-    }
-
-    filterActions(item) {
-        return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
-    }
-
-    componentDidMount() {
-        if ( !isTouchDevice() ) {
-            this.elemOpen && $(this.elemOpen).tooltip();
-            this.elemClose && $(this.elemClose).tooltip();
-        }
-    }
-
-    componentWillUnmount() {
-        this.componentWillUpdate();
-    }
-
-    componentWillUpdate() {
-        this.elemOpen && $(this.elemOpen).tooltip('dispose');
-        this.elemClose && $(this.elemClose).tooltip('dispose');
-    }
-
-    componentDidUpdate(nextProps) {
-        if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery)) {
-            this.elemList.scrollTop = 0;
-        }
-        this.componentDidMount();
+        this.modals = modals;
+        this.tabs[0].label = gettext('Events');
+        this.tabs[1].label = gettext('My Events');
     }
 
     render() {
@@ -139,19 +64,6 @@ class AgendaApp extends React.Component {
         const mainClassName = classNames('wire-column__main', {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,
-        });
-
-        /*
-        className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}
-         */
-
-        const previewClassName = classNames('wire-column__preview', {
-            'wire-column__preview--covering': hasCoverages(this.props.itemToPreview),
-            'wire-column__preview--not-covering': !hasCoverages(this.props.itemToPreview),
-            'wire-column__preview--postponed': isPostponed(this.props.itemToPreview),
-            'wire-column__preview--cancelled': isCanceled(this.props.itemToPreview),
-            'wire-column__preview--rescheduled': isRescheduled(this.props.itemToPreview),
-            'wire-column__preview--open': this.props.itemToPreview,
         });
 
         const activeTopic = this.props.topics.find((topic) => topic._id === this.props.activeTopic);
@@ -195,7 +107,6 @@ class AgendaApp extends React.Component {
 
                         <SearchBar
                             fetchItems={this.props.fetchItems}
-                            setQuery={this.props.setQuery}
                         />
 
                         <AgendaDateNavigation
@@ -216,14 +127,7 @@ class AgendaApp extends React.Component {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar
-                                    topics={this.props.topics}
-                                    activeTopic={activeTopic}
-                                    setQuery={this.props.setQuery}
-                                    activeQuery={this.props.activeQuery}
-                                    navigations={this.props.navigations}
-                                    activeNavigation={this.props.activeNavigation}
-                                />
+                                <SearchSidebar tabs={this.tabs} props={this.props} />
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
@@ -241,20 +145,15 @@ class AgendaApp extends React.Component {
                             />
                         </div>
 
-                        <div className={previewClassName}>
-                            {this.props.itemToPreview &&
-                            <AgendaPreview
-                                item={this.props.itemToPreview}
-                                user={this.props.user}
-                                actions={this.filterActions(this.props.itemToPreview)}
-                                followEvent={this.props.followEvent}
-                                isFollowing={!!isFollowing}
-                                closePreview={this.props.closePreview}
-                                openItemDetails={this.props.openItemDetails}
-                            />
-                            }
-
-                        </div>
+                        <AgendaPreview
+                            item={this.props.itemToPreview}
+                            user={this.props.user}
+                            actions={this.filterActions(this.props.itemToPreview)}
+                            followEvent={this.props.followEvent}
+                            isFollowing={!!isFollowing}
+                            closePreview={this.props.closePreview}
+                            openItemDetails={this.props.openItemDetails}
+                        />
                     </div>
                 </section>
             ]).concat([
@@ -288,7 +187,6 @@ AgendaApp.propTypes = {
         name: PropTypes.string,
         action: PropTypes.func,
     })),
-    setQuery: PropTypes.func.isRequired,
     selectedItems: PropTypes.array,
     selectAll: PropTypes.func,
     selectNone: PropTypes.func,
@@ -316,8 +214,8 @@ const mapStateToProps = (state) => ({
     isLoading: state.isLoading,
     totalItems: state.totalItems,
     activeQuery: state.activeQuery,
-    activeFilter: get(state, 'agenda.activeFilter'),
-    createdFilter: get(state, 'agenda.createdFilter'),
+    activeFilter: get(state, 'search.activeFilter'),
+    createdFilter: get(state, 'search.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -326,11 +224,11 @@ const mapStateToProps = (state) => ({
     company: state.company,
     topics: state.topics || [],
     selectedItems: state.selectedItems,
-    activeView: get(state, 'agenda.activeView'),
+    activeView: get(state, 'search.activeView'),
     newItems: state.newItems,
-    navigations: get(state, 'agenda.navigations', []),
-    activeTopic: get(state, 'agenda.activeTopic'),
-    activeNavigation: get(state, 'agenda.activeNavigation', null),
+    navigations: get(state, 'search.navigations', []),
+    activeTopic: get(state, 'search.activeTopic'),
+    activeNavigation: get(state, 'search.activeNavigation', null),
     bookmarks: state.bookmarks,
     resultsFiltered: state.resultsFiltered,
     aggregations: state.aggregations,
@@ -345,10 +243,6 @@ const mapDispatchToProps = (dispatch) => ({
         query: `${item._id}`
     })),
     fetchItems: () => dispatch(fetchItems()),
-    setQuery: (query) => {
-        dispatch(setQuery(query));
-        dispatch(fetchItems());
-    },
     selectAll: () => dispatch(selectAll()),
     selectNone: () => dispatch(selectNone()),
     actions: getItemActions(dispatch),

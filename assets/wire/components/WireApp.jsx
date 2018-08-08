@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
-import { createPortal } from 'react-dom';
 import { gettext } from 'utils';
 
 import {
@@ -13,14 +12,18 @@ import {
     selectAll,
     selectNone,
     fetchMoreItems,
-    setView,
     refresh,
     previewItem,
     toggleNews,
 } from 'wire/actions';
 
+import {
+    setView,
+} from 'search/actions';
+
 import { getActiveQuery, isTopicActive } from 'wire/utils';
 
+import BaseApp from 'layout/components/BaseApp';
 import Preview from './Preview';
 import ItemsList from './ItemsList';
 import SearchBar from '../../components/SearchBar';
@@ -34,7 +37,6 @@ import ItemDetails from './ItemDetails';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import { getItemActions } from '../item-actions';
-import {isTouchDevice} from 'utils';
 import BookmarkTabs from 'components/BookmarkTabs';
 
 const modals = {
@@ -43,87 +45,10 @@ const modals = {
     downloadItems: DownloadItemsModal,
 };
 
-class WireApp extends React.Component {
+class WireApp extends BaseApp {
     constructor(props) {
         super(props);
-        this.state = {
-            withSidebar: false,
-            scrollClass: '',
-        };
-        this.toggleSidebar = this.toggleSidebar.bind(this);
-        this.onListScroll = this.onListScroll.bind(this);
-        this.filterActions = this.filterActions.bind(this);
-    }
-
-    renderModal(specs) {
-        if (specs) {
-            const Modal = modals[specs.modal];
-            return (
-                <Modal key="modal" data={specs.data} />
-            );
-        }
-    }
-
-    renderNavBreadcrumb(navigations, activeNavigation, activeTopic) {
-        const dest = document.getElementById('nav-breadcrumb');
-        if (!dest) {
-            return null;
-        }
-
-        let name = get(navigations.find((nav) => nav._id === activeNavigation), 'name', '');
-        if (!name && activeTopic) {
-            name = activeTopic.label;
-        }
-
-        return createPortal(name , dest);
-    }
-
-    toggleSidebar(event) {
-        event.preventDefault();
-        this.setState({withSidebar: !this.state.withSidebar});
-    }
-
-    onListScroll(event) {
-        const BUFFER = 10;
-        const container = event.target;
-        if (container.scrollTop + container.offsetHeight + BUFFER >= container.scrollHeight) {
-            this.props.fetchMoreItems()
-                .catch(() => null); // ignore
-        }
-
-        if(container.scrollTop > BUFFER) {
-            this.setState({ scrollClass: 'wire-column__main-header--small'});
-        }
-        else {
-            this.setState({ scrollClass: ''});
-        }
-    }
-
-    filterActions(item) {
-        return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
-    }
-
-    componentDidMount() {
-        if ( !isTouchDevice() ) {
-            this.elemOpen && $(this.elemOpen).tooltip();
-            this.elemClose && $(this.elemClose).tooltip();
-        }
-    }
-
-    componentWillUnmount() {
-        this.componentWillUpdate();
-    }
-
-    componentWillUpdate() {
-        this.elemOpen && $(this.elemOpen).tooltip('dispose');
-        this.elemClose && $(this.elemClose).tooltip('dispose');
-    }
-
-    componentDidUpdate(nextProps) {
-        if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery)) {
-            this.elemList.scrollTop = 0;
-        }
-        this.componentDidMount();
+        this.modals = modals;
     }
 
     render() {
@@ -201,14 +126,7 @@ class WireApp extends React.Component {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar
-                                    topics={this.props.topics}
-                                    activeTopic={activeTopic}
-                                    setQuery={this.props.setQuery}
-                                    activeQuery={this.props.activeQuery}
-                                    navigations={this.props.navigations}
-                                    activeNavigation={this.props.activeNavigation}
-                                />
+                                <SearchSidebar tabs={this.tabs} props={this.props} />
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
@@ -304,8 +222,8 @@ const mapStateToProps = (state) => ({
     isLoading: state.isLoading,
     totalItems: state.totalItems,
     activeQuery: state.activeQuery,
-    activeFilter: get(state, 'wire.activeFilter'),
-    createdFilter: get(state, 'wire.createdFilter'),
+    activeFilter: get(state, 'search.activeFilter'),
+    createdFilter: get(state, 'search.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -314,10 +232,10 @@ const mapStateToProps = (state) => ({
     company: state.company,
     topics: state.topics || [],
     selectedItems: state.selectedItems,
-    activeView: get(state, 'wire.activeView'),
+    activeView: get(state, 'search.activeView'),
     newItems: state.newItems,
-    navigations: get(state, 'wire.navigations', []),
-    activeNavigation: get(state, 'wire.activeNavigation', null),
+    navigations: get(state, 'search.navigations', []),
+    activeNavigation: get(state, 'search.activeNavigation', null),
     newsOnly: !!get(state, 'wire.newsOnly'),
     bookmarks: state.bookmarks,
     resultsFiltered: state.resultsFiltered,
@@ -331,10 +249,7 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(toggleNews());
         dispatch(fetchItems());
     },
-    setQuery: (query) => {
-        dispatch(setQuery(query));
-        dispatch(fetchItems());
-    },
+    setQuery: (query) => dispatch(setQuery(query)),
     selectAll: () => dispatch(selectAll()),
     selectNone: () => dispatch(selectNone()),
     actions: getItemActions(dispatch),
