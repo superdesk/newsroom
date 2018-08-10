@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 
 import { gettext } from 'utils';
-import { setQuery } from 'wire/actions';
+import { setQuery } from 'search/actions';
 
 class SearchBar extends React.Component {
     constructor(props) {
@@ -48,8 +48,8 @@ class SearchBar extends React.Component {
                         <input type='text'
                             name='q'
                             className='search__input form-control'
-                            placeholder='Search for...'
-                            aria-label='Search for...'
+                            placeholder={gettext('Search for...')}
+                            aria-label={gettext('Search for...')}
                             value={this.state.query || ''}
                             onChange={this.onChange}
                         />

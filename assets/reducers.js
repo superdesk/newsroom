@@ -1,4 +1,5 @@
 import {CLOSE_MODAL, RENDER_MODAL,} from 'actions';
+import {searchReducer} from 'search/reducers';
 
 import {
     ADD_TOPIC,
@@ -17,13 +18,16 @@ import {
     SET_ACTIVE,
     SET_ITEMS,
     SET_NEW_ITEMS,
-    SET_QUERY,
     SET_STATE,
     SET_TOPICS,
     SHARE_ITEMS,
     START_LOADING,
     TOGGLE_SELECTED,
 } from './wire/actions';
+
+import {
+    SET_QUERY,
+} from 'search/actions';
 
 import {getMaxVersion} from './wire/utils';
 import {REMOVE_NEW_ITEMS, SET_NEW_ITEMS_BY_TOPIC} from './agenda/actions';
@@ -121,13 +125,11 @@ export function defaultReducer(state, action) {
         };
     }
 
-
     case SET_QUERY:
         return {...state, query: action.query, activeItem: null};
 
     case QUERY_ITEMS:
         return {...state, isLoading: true, totalItems: null, activeQuery: state.query};
-
 
     case RECIEVE_ITEM: {
         const itemsById = Object.assign({}, state.itemsById);
@@ -294,7 +296,15 @@ export function defaultReducer(state, action) {
     case SET_TOPICS:
         return {...state, topics: action.topics};
 
-    default:
+    default: {
+        const search = searchReducer(state.search, action);
+
+        if (search !== state.search) {
+            return {...state, search};
+        }
+
         return state;
+    }
+
     }
 }

@@ -6,6 +6,7 @@ import { createStore, applyMiddleware } from 'redux';
 import wireApp from '../reducers';
 import * as actions from '../actions';
 import { getTimezoneOffset, now } from 'utils';
+import {setQuery, toggleNavigation} from 'search/actions';
 
 describe('wire actions', () => {
     let store;
@@ -41,7 +42,7 @@ describe('wire actions', () => {
     });
 
     it('can fetch items using query', () => {
-        store.dispatch(actions.setQuery('foo'));
+        store.dispatch(setQuery('foo'));
         return store.dispatch(actions.fetchItems())
             .then(() => {
                 const state = store.getState();
@@ -157,19 +158,11 @@ describe('wire actions', () => {
     });
 
     it('can set and reset service filter', () => {
-        fetchMock.get('/search?navigation=foo', {_items: [{_id: 'foo'}]});
-        fetchMock.get('/search?navigation=bar', {_items: [{_id: 'bar'}]});
-        return store.dispatch(actions.toggleNavigation({_id: 'foo'}))
-            .then(() => {
-                expect(store.getState().wire.activeNavigation).toEqual('foo');
-                return store.dispatch(actions.toggleNavigation({_id: 'bar'}));
-            })
-            .then(() => {
-                expect(store.getState().wire.activeNavigation).toEqual('bar');
-                return store.dispatch(actions.toggleNavigation());
-            })
-            .then(() => {
-                expect(store.getState().wire.activeNavigation).toBeUndefined();
-            });
+        store.dispatch(toggleNavigation({_id: 'foo'}));
+        expect(store.getState().search.activeNavigation).toEqual('foo');
+        store.dispatch(toggleNavigation({_id: 'bar'}));
+        expect(store.getState().search.activeNavigation).toEqual('bar');
+        store.dispatch(toggleNavigation());
+        expect(store.getState().search.activeNavigation).toBeUndefined();
     });
 });

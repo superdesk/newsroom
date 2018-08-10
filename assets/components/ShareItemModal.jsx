@@ -102,7 +102,7 @@ class ShareItemModal extends React.Component {
 ShareItemModal.propTypes = {
     submit: PropTypes.func.isRequired,
     data: PropTypes.shape({
-        items: PropTypes.arrayOf(PropTypes.object).isRequired,
+        items: PropTypes.arrayOf(PropTypes.string).isRequired,
         users: PropTypes.arrayOf(PropTypes.shape({
             _id: PropTypes.string.isRequired,
             first_name: PropTypes.string.isRequired,

@@ -6,6 +6,11 @@ import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml 
 import { markItemAsRead, toggleNewsOnlyParam } from './utils';
 import { renderModal, closeModal } from 'actions';
 
+import {
+    setQuery,
+    toggleNavigation,
+} from 'search/actions';
+
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
     return {type: SET_STATE, state};
@@ -58,11 +63,7 @@ export function openItem(item) {
     };
 }
 
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    query && analytics.event('search', query);
-    return {type: SET_QUERY, query};
-}
+
 
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {
@@ -446,19 +447,6 @@ export function fetchNext(item) {
     };
 }
 
-export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
-function _toggleNavigation(navigation) {
-    return {type: TOGGLE_NAVIGATION, navigation};
-}
-
-export function toggleNavigation(navigation) {
-    return (dispatch) => {
-        dispatch(setQuery(''));
-        dispatch(_toggleNavigation(navigation));
-        return dispatch(fetchItems());
-    };
-}
-
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
 export function toggleFilter(key, val, single) {
     return (dispatch) => {
@@ -524,16 +512,9 @@ export function setCreatedFilter(filter) {
     };
 }
 
-function _resetFilter(filter) {
-    return {type: RESET_FILTER, filter};
-}
-
 export const RESET_FILTER = 'RESET_FILTER';
 export function resetFilter(filter) {
-    return (dispatch) => {
-        dispatch(_resetFilter(filter));
-        dispatch(fetchItems());
-    };
+    return {type: RESET_FILTER, filter};
 }
 
 /**
@@ -544,18 +525,12 @@ export function resetFilter(filter) {
  */
 export function setTopicQuery(topic) {
     return (dispatch) => {
-        dispatch(_toggleNavigation());
+        dispatch(toggleNavigation());
         dispatch(setQuery(topic.query || ''));
-        dispatch(_resetFilter(topic.filter));
+        dispatch(resetFilter(topic.filter));
         dispatch(_setCreatedFilter(topic.created));
         return dispatch(fetchItems());
     };
-}
-
-export const SET_VIEW = 'SET_VIEW';
-export function setView(view) {
-    localStorage.setItem('view', view);
-    return {type: SET_VIEW, view};
 }
 
 export function refresh() {

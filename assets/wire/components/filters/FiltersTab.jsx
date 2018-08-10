@@ -1,13 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import { isEmpty } from 'lodash';
 import { gettext } from 'utils';
 
 import NavCreatedPicker from './NavCreatedPicker';
-import {fetchItems, resetFilter} from 'wire/actions';
 import FilterGroup from './FilterGroup';
 import FilterButton from './FilterButton';
+
+import {
+    resetFilter,
+    toggleFilter,
+    setCreatedFilter,
+} from 'search/actions';
 
 class FiltersTab extends React.Component {
     constructor(props) {
@@ -59,23 +65,30 @@ class FiltersTab extends React.Component {
     }
 
     render() {
-        const {activeFilter, createdFilter, dispatch} = this.props;
+        const {activeFilter, createdFilter} = this.props;
         const isResetActive = Object.keys(activeFilter).find((key) => !isEmpty(activeFilter[key]))
             || Object.keys(createdFilter).find((key) => !isEmpty(createdFilter[key]));
 
         return this.getFilterGroups().filter((group) => !!group).concat([
-            <NavCreatedPicker key="created" dispatch={dispatch} createdFilter={createdFilter} />,
+            <NavCreatedPicker key="created" createdFilter={createdFilter} setCreatedFilter={this.props.setCreatedFilter} />,
             isResetActive || this.props.resultsFiltered ? (
                 [<div key="reset-buffer" id="reset-filter-buffer"></div>,
                     <FilterButton
                         key='search'
                         label={gettext('Search')}
-                        onClick={(e) => {e.preventDefault(); dispatch(fetchItems());}}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            this.props.fetchItems();
+                        }}
                         className='search'/>,
                     <FilterButton
                         key='reset'
                         label={gettext('Clear filters')}
-                        onClick={(e) => {e.preventDefault(); dispatch(resetFilter());}}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            this.props.resetFilter();
+                            this.props.fetchItems();
+                        }}
                         className='reset'/>,
                 ]
             ) : null,
@@ -86,11 +99,26 @@ class FiltersTab extends React.Component {
 FiltersTab.propTypes = {
     aggregations: PropTypes.object,
     activeFilter: PropTypes.object,
-    toggleFilter: PropTypes.func.isRequired,
-    resetFilter: PropTypes.func.isRequired,
-    dispatch: PropTypes.func.isRequired,
     createdFilter: PropTypes.object.isRequired,
     resultsFiltered: PropTypes.bool.isRequired,
+
+    resetFilter: PropTypes.func.isRequired,
+    toggleFilter: PropTypes.func.isRequired,
+    setCreatedFilter: PropTypes.func.isRequired,
+    fetchItems: PropTypes.func.isRequired,
 };
 
-export default FiltersTab;
+const mapStateToProps = (state) => ({
+    aggregations: state.aggregations,
+    activeFilter: state.search.activeFilter,
+    createdFilter: state.search.createdFilter,
+    resultsFiltered: state.resultsFiltered,
+});
+
+const mapDispatchToProps = {
+    resetFilter,
+    toggleFilter,
+    setCreatedFilter,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FiltersTab);
