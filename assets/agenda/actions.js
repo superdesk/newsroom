@@ -361,9 +361,9 @@ export function fetchNewItems() {
         .then((response) => dispatch(setNewItems(response)));
 }
 
-export function toggleDropdownFilter(key, val, single) {
+export function toggleDropdownFilter(key, val) {
     return (dispatch) => {
-        dispatch(toggleFilter(key, val, single));
+        dispatch(toggleFilter(key, val, true));
         dispatch(fetchItems());
     };
 }

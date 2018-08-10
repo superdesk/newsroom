@@ -13,7 +13,8 @@ const filters = [{
     field: 'place'
 }, {
     label: gettext('Any coverage'),
-    field: 'coverage'
+    field: 'coverage',
+    nestedField: 'coverage',
 }];
 
 const getActiveFilterLabel = (filter, activeFilter) => activeFilter[filter.field] ?
@@ -41,7 +42,13 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter}) {
                     onClick={() => toggleFilter(filter.field, null)}
                 >{gettext(filter.label)}</button>
                 <div className='dropdown-divider'></div>
-                {aggregations[filter.field] && aggregations[filter.field].buckets.map((bucket) =>
+                {!filter.nestedField && aggregations[filter.field] && aggregations[filter.field].buckets.map((bucket) =>
+                    <button
+                        key={bucket.key}
+                        className='dropdown-item'
+                        onClick={() => toggleFilter(filter.field, bucket.key)}
+                    >{bucket.key}</button>)}
+                {filter.nestedField && aggregations[filter.field] && aggregations[filter.field][filter.nestedField] && aggregations[filter.field][filter.nestedField].buckets.map((bucket) =>
                     <button
                         key={bucket.key}
                         className='dropdown-item'
