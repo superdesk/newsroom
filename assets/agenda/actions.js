@@ -240,16 +240,6 @@ export function toggleSelected(item) {
     return {type: TOGGLE_SELECTED, item};
 }
 
-export const SELECT_ALL = 'SELECT_ALL';
-export function selectAll() {
-    return {type: SELECT_ALL};
-}
-
-export const SELECT_NONE = 'SELECT_NONE';
-export function selectNone() {
-    return {type: SELECT_NONE};
-}
-
 export const SHARE_ITEMS = 'SHARE_ITEMS';
 export function setShareItems(items) {
     return {type: SHARE_ITEMS, items};

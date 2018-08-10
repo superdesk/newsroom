@@ -9,8 +9,6 @@ import {
     followTopic,
     fetchItems,
     setQuery,
-    selectAll,
-    selectNone,
     fetchMoreItems,
     refresh,
     previewItem,
@@ -53,8 +51,6 @@ class WireApp extends BaseApp {
 
     render() {
         const modal = this.renderModal(this.props.modal);
-        const multiActionFilter = (action) => action.multi &&
-            this.props.selectedItems.every((item) => !action.when || action.when(this.props, this.props.itemsById[item]));
 
         const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
             this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
@@ -79,14 +75,9 @@ class WireApp extends BaseApp {
                 onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
             />] : [
                 <section key="contentHeader" className='content-header'>
-                    {this.props.selectedItems && this.props.selectedItems.length > 0 &&
-                        <SelectedItemsBar
-                            selectedItems={this.props.selectedItems}
-                            selectAll={this.props.selectAll}
-                            selectNone={this.props.selectNone}
-                            actions={this.props.actions.filter(multiActionFilter)}
-                        />
-                    }
+                    <SelectedItemsBar
+                        actions={this.props.actions}
+                    />
                     <nav className='content-bar navbar justify-content-start flex-nowrap flex-sm-wrap'>
                         {this.state.withSidebar && <span
                             className='content-bar__menu content-bar__menu--nav--open'
@@ -181,6 +172,7 @@ class WireApp extends BaseApp {
 }
 
 WireApp.propTypes = {
+    state: PropTypes.object,
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
     activeQuery: PropTypes.string,
@@ -200,9 +192,6 @@ WireApp.propTypes = {
         action: PropTypes.func,
     })),
     setQuery: PropTypes.func.isRequired,
-    selectedItems: PropTypes.array,
-    selectAll: PropTypes.func,
-    selectNone: PropTypes.func,
     bookmarks: PropTypes.bool,
     fetchMoreItems: PropTypes.func,
     activeView: PropTypes.string,
@@ -219,6 +208,7 @@ WireApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
+    state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
     activeQuery: state.activeQuery,
@@ -231,7 +221,6 @@ const mapStateToProps = (state) => ({
     user: state.user,
     company: state.company,
     topics: state.topics || [],
-    selectedItems: state.selectedItems,
     activeView: get(state, 'search.activeView'),
     newItems: state.newItems,
     navigations: get(state, 'search.navigations', []),
@@ -250,8 +239,6 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(fetchItems());
     },
     setQuery: (query) => dispatch(setQuery(query)),
-    selectAll: () => dispatch(selectAll()),
-    selectNone: () => dispatch(selectNone()),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
