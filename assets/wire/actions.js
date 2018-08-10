@@ -103,12 +103,17 @@ export function toggleNews() {
 export function copyPreviewContents(item) {
     return (dispatch, getState) => {
         const textarea = document.getElementById('copy-area');
+        const contents = [];
 
-        textarea.value = [
-            get(item, 'headline', get(item, 'slugline')),
-            '',
-            get(item, 'body_text') || getTextFromHtml(get(item, 'body_html'))
-        ].join('\n');
+        item.slugline && contents.push(item.slugline);
+        item.headline && contents.push(item.headline);
+        item.byline && contents.push(gettext('By: {{ byline }}', {byline: get(item, 'byline')}));
+        contents.push('');
+        contents.push(get(item, 'description_text') || getTextFromHtml(get(item, 'description_html')));
+        contents.push('');
+        contents.push(get(item, 'body_text') || getTextFromHtml(get(item, 'body_html')));
+
+        textarea.value = contents.join('\n');
         textarea.select();
 
         if (document.execCommand('copy')) {
