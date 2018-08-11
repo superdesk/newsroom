@@ -14,12 +14,30 @@ const filters = [{
 }, {
     label: gettext('Any coverage'),
     field: 'coverage',
-    nestedField: 'coverage',
+    nestedField: 'coverage_type',
 }];
 
 const getActiveFilterLabel = (filter, activeFilter) => activeFilter[filter.field] ?
     activeFilter[filter.field][0] : gettext(filter.label);
 
+const getDropdownItems = (filter, aggregations, toggleFilter) => {
+    if (!filter.nestedField && aggregations[filter.field]) {
+        return processBuckets(aggregations[filter.field].buckets, filter, toggleFilter);
+    }
+
+    if (filter.nestedField && aggregations[filter.field] && aggregations[filter.field][filter.nestedField]) {
+        return processBuckets(aggregations[filter.field][filter.nestedField].buckets, filter, toggleFilter);
+    }
+
+    return null;
+};
+
+const processBuckets = (buckets, filter, toggleFilter) => buckets.map((bucket) =>
+    <button
+        key={bucket.key}
+        className='dropdown-item'
+        onClick={() => toggleFilter(filter.field, bucket.key)}
+    >{bucket.key}</button>);
 
 function AgendaFilters({aggregations, toggleFilter, activeFilter}) {
     return (<div className='wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap'>
@@ -42,18 +60,7 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter}) {
                     onClick={() => toggleFilter(filter.field, null)}
                 >{gettext(filter.label)}</button>
                 <div className='dropdown-divider'></div>
-                {!filter.nestedField && aggregations[filter.field] && aggregations[filter.field].buckets.map((bucket) =>
-                    <button
-                        key={bucket.key}
-                        className='dropdown-item'
-                        onClick={() => toggleFilter(filter.field, bucket.key)}
-                    >{bucket.key}</button>)}
-                {filter.nestedField && aggregations[filter.field] && aggregations[filter.field][filter.nestedField] && aggregations[filter.field][filter.nestedField].buckets.map((bucket) =>
-                    <button
-                        key={bucket.key}
-                        className='dropdown-item'
-                        onClick={() => toggleFilter(filter.field, bucket.key)}
-                    >{bucket.key}</button>)}
+                {getDropdownItems(filter, aggregations, toggleFilter)}
             </div>
         </div>)}
     </div>);

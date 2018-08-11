@@ -174,11 +174,24 @@ aggregations = {
 
 
 def get_aggregation_field(key):
+    if key == 'coverage':
+        return aggregations[key]['aggs']['coverage_type']['terms']['field']
     return aggregations[key]['terms']['field']
 
 
 def _filter_terms(filters):
-    return [{'terms': {get_aggregation_field(key): val}} for key, val in filters.items() if val]
+    term_filters = []
+    for key, val in filters.items():
+        if val and key != 'coverage':
+            term_filters.append({'terms': {get_aggregation_field(key): val}})
+        if val and key == 'coverage':
+            term_filters.append(
+                {"nested": {
+                    "path": "coverages",
+                    "query": {"bool": {"must": [{'terms': {get_aggregation_field(key): val}}]}}
+                }})
+
+    return term_filters
 
 
 class AgendaService(newsroom.Service):

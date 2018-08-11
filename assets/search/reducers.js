@@ -55,7 +55,7 @@ export function searchReducer(state=INITIAL_STATE, action) {
         if (!action.val || !activeFilter[action.key] || activeFilter[action.key].length === 0) {
             delete activeFilter[action.key];
         }
-        if (action.single) {
+        else if (action.single) {
             activeFilter[action.key] = activeFilter[action.key].filter((val) => val === action.val);
         }
         return {
