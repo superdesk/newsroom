@@ -3014,6 +3014,19 @@ a.wire-articles__versions {
     left: 22px !important;
     border-color: none !important;
 }
+
+.collapsible {
+    margin: 20px 0 10px 0;
+    &__link {
+        display: block;
+        margin-bottom: 20px;
+        font-size: 0.875rem;        
+    }
+    &__form {
+        display: none;
+    }
+}
+
 // End Wire BEM classes
 
 
