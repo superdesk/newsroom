@@ -98,6 +98,9 @@ class AgendaResource(newsroom.Resource):
     schema['calendars'] = events_schema['calendars']
     schema['location'] = events_schema['location']
 
+    # update location name to be not_analyzed
+    schema['location']['mapping']['properties']['name'] = not_analyzed
+
     # event details
     schema['event'] = {
         'type': 'object',
@@ -159,21 +162,36 @@ def _event_date_range(args):
 aggregations = {
     'calendar': {'terms': {'field': 'calendars.name', 'size': 20}},
     'location': {'terms': {'field': 'location.name', 'size': 20}},
-    'coverage': {'terms': {'field': 'coverages.coverage_type', 'size': 10}},
     'genre': {'terms': {'field': 'genre.name', 'size': 50}},
     'service': {'terms': {'field': 'service.name', 'size': 50}},
     'subject': {'terms': {'field': 'subject.name', 'size': 20}},
     'urgency': {'terms': {'field': 'urgency'}},
     'place': {'terms': {'field': 'place.name', 'size': 50}},
+    'coverage': {
+        'nested': {'path': 'coverages'},
+        'aggs': {'coverage_type': {'terms': {'field': 'coverages.coverage_type', 'size': 10}}}},
 }
 
 
 def get_aggregation_field(key):
+    if key == 'coverage':
+        return aggregations[key]['aggs']['coverage_type']['terms']['field']
     return aggregations[key]['terms']['field']
 
 
 def _filter_terms(filters):
-    return [{'terms': {get_aggregation_field(key): val}} for key, val in filters.items() if val]
+    term_filters = []
+    for key, val in filters.items():
+        if val and key != 'coverage':
+            term_filters.append({'terms': {get_aggregation_field(key): val}})
+        if val and key == 'coverage':
+            term_filters.append(
+                {"nested": {
+                    "path": "coverages",
+                    "query": {"bool": {"must": [{'terms': {get_aggregation_field(key): val}}]}}
+                }})
+
+    return term_filters
 
 
 class AgendaService(newsroom.Service):
