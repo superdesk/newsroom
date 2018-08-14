@@ -74,7 +74,7 @@ export default class BaseApp extends React.Component {
     }
 
     filterActions(item) {
-        return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
+        return this.props.actions.filter((action) => !action.when || action.when(this.props.state, item));
     }
 
     componentDidMount() {
@@ -111,6 +111,7 @@ export default class BaseApp extends React.Component {
 }
 
 BaseApp.propTypes = {
+    state: PropTypes.object.isRequired,
     actions: PropTypes.arrayOf(PropTypes.object).isRequired,
     activeQuery: PropTypes.string,
     fetchMoreItems: PropTypes.func.isRequired,
