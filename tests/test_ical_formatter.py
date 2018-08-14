@@ -25,11 +25,10 @@ def test_ical_formatter_item(client, app, mocker):
     parsed = get_entity_or_404(event['guid'], 'agenda')
     formatter = iCalFormatter()
 
-    assert 'foo.ical' == formatter.format_filename(parsed)
+    assert formatter.format_filename(parsed).endswith('new-press-conference.ical')
 
     mocker.patch('newsroom.agenda.formatters.ical_formatter.utcnow', return_value=datetime(2018, 7, 30, 11, 9, 0))
     ical = formatter.format_item(parsed, item_type='agenda')
-    print('ical', ical.decode('utf-8'))
 
     cal = icalendar.cal.Calendar.from_ical(ical)
     assert cal['version'] == '2.0'

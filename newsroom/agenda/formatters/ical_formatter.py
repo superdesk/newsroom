@@ -6,6 +6,8 @@ from superdesk.utc import utcnow
 
 from newsroom.agenda.contacts import get_contact_name, get_contact_email
 
+from newsroom.wire.formatters.base import BaseFormatter
+
 
 def get_rrule_kwargs(rrule):
     kwargs = {'freq': rrule['frequency']}
@@ -23,13 +25,12 @@ def guid(item):
     return item.get('guid', item.get('event', {}).get('guid', item.get('_id')))
 
 
-class iCalFormatter():
+class iCalFormatter(BaseFormatter):
 
     VERSION = '2.0'
     PRODID = 'Newshub'
-
-    def format_filename(self, event):
-        return '%s.ical' % guid(event)
+    FILE_EXTENSION = 'ical'
+    MIMETYPE = 'text/calendar'
 
     def format_item(self, item, item_type=None):
         cal = icalendar.Calendar()
@@ -89,7 +90,11 @@ class iCalFormatter():
             event.add('url', link)
 
         # contacts
-        for contact in item.get('event', {}).get('event_contact_info'):
+        try:
+            contact_info = item['event']['event_contact_info']
+        except KeyError:
+            contact_info = []
+        for contact in contact_info:
             if contact.get('public'):
                 event.add('contact', ', '.join(filter(None, [
                     get_contact_name(contact),

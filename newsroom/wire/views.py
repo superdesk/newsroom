@@ -5,13 +5,14 @@ import superdesk
 import urllib.request
 import json
 
+from bson import ObjectId
 from operator import itemgetter
 from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
 from flask_babel import gettext
-from bson import ObjectId
+from superdesk.utc import utcnow
 
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
@@ -154,18 +155,29 @@ def download(_ids):
     items = [get_entity_or_404(_id, item_type) for _id in _ids.split(',')]
     _file = io.BytesIO()
     formatter = app.download_formatters[_format]['formatter']
-    with zipfile.ZipFile(_file, mode='w') as zf:
-        for item in items:
-            parse_dates(item)  # fix for old items
-            zf.writestr(
-                secure_filename(formatter.format_filename(item)),
-                formatter.format_item(item, item_type=item_type)
-            )
-    _file.seek(0)
+
+    mimetype = None
+    attachment_filename = '%s-newsroom.zip' % utcnow().strftime('%Y%m%d%H%M')
+    if len(items) == 1:
+        item = items[0]
+        parse_dates(item)  # fix for old items
+        _file.write(formatter.format_item(item, item_type=item_type))
+        _file.seek(0)
+        mimetype = formatter.get_mimetype(item)
+        attachment_filename = secure_filename(formatter.format_filename(item))
+    else:
+        with zipfile.ZipFile(_file, mode='w') as zf:
+            for item in items:
+                parse_dates(item)  # fix for old items
+                zf.writestr(
+                    secure_filename(formatter.format_filename(item)),
+                    formatter.format_item(item, item_type=item_type)
+                )
+        _file.seek(0)
 
     update_action_list(_ids.split(','), 'downloads', force_insert=True)
     app.data.insert('history', items, action='download', user=user)
-    return flask.send_file(_file, attachment_filename='newsroom.zip', as_attachment=True)
+    return flask.send_file(_file, mimetype=mimetype, attachment_filename=attachment_filename, as_attachment=True)
 
 
 @blueprint.route('/wire_share', methods=['POST'])

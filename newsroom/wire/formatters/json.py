@@ -2,17 +2,17 @@
 from planning.output_formatters.json_event import JsonEventFormatter
 from copy import deepcopy
 from flask import json
+from .base import BaseFormatter
 
 agenda_remove_fields = {'bookmarks', 'copies', 'shares'}
 
 
-class JsonFormatter():
+class JsonFormatter(BaseFormatter):
 
-    encoding = 'utf-8'
+    MIMETYPE = 'application/json'
+    FILE_EXTENSION = 'json'
+
     formatter = JsonEventFormatter()
-
-    def format_filename(self, item):
-        return '{}.xml'.format(item['_id'])
 
     def format_item(self, item, item_type='items'):
         if (item_type == 'wire'):
@@ -23,4 +23,4 @@ class JsonFormatter():
         for f in self.formatter.remove_fields.union(agenda_remove_fields):
             output_item.pop(f, None)
 
-        return json.dumps(output_item)
+        return json.dumps(output_item, indent=2).encode()
