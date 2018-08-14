@@ -108,6 +108,7 @@ export function copyPreviewContents(item) {
         item.slugline && contents.push(item.slugline);
         item.headline && contents.push(item.headline);
         item.byline && contents.push(gettext('By: {{ byline }}', {byline: get(item, 'byline')}));
+        item.source && contents.push(gettext('Source: {{ source }}', {source: item.source}));
         contents.push('');
         contents.push(get(item, 'description_text') || getTextFromHtml(get(item, 'description_html')));
         contents.push('');
