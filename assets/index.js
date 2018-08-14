@@ -29,6 +29,12 @@ if ( !isTouchDevice() ) {
     $('[data-toggle="tooltip"]').tooltip();
 }
 
+// collapsible group
+$('.collapsible__link').click(function() {
+    $('.collapsible__link i').toggleClass('rotate-90-ccw');
+    $('.collapsible__form').toggle();
+});
+
 // Function for responsive wire item
 
 var filterOpen = false;
