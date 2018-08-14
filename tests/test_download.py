@@ -1,4 +1,3 @@
-
 import io
 import lxml
 import zipfile
@@ -9,12 +8,15 @@ from superdesk.utc import utcnow
 from .fixtures import items, init_items, init_auth  # noqa
 
 items_ids = [item['_id'] for item in items[:2]]
+item = items[:2][0]
 
 
 def download_file(client, _format):
     resp = client.get('/download/%s?format=%s' % (','.join(items_ids), _format))
     assert resp.status_code == 200
     assert resp.mimetype == 'application/zip'
+    assert resp.headers.get('Content-Disposition') == 'attachment; filename={}-newsroom.zip'.format(
+        utcnow().strftime('%Y%m%d%H%M'))
     _file = io.BytesIO(resp.get_data())
     return _file
 
@@ -41,23 +43,38 @@ def newsmlg2_content_test(content):
     assert 'newsMessage' in root.tag
 
 
+def filename(filename, item):
+    return '%s-%s' % (item['versioncreated'].strftime('%Y%m%d%H%M'), filename)
+
+
 formats = [
     {
         'format': 'text',
-        'filename': 'tagfoo.txt',
+        'mimetype': 'text/plain',
+        'filename': filename('amazon-bookstore-opening.txt', item),
         'test_content': text_content_test,
     },
     {
         'format': 'nitf',
-        'filename': 'tagfoo.xml',
+        'mimetype': 'application/vnd.nitf',
+        'filename': filename('amazon-bookstore-opening.xml', item),
         'test_content': nitf_content_test,
     },
     {
         'format': 'newsmlg2',
-        'filename': 'tagfoo.xml',
+        'mimetype': 'application/vnd.iptc.g2.newsitem+xml',
+        'filename': filename('amazon-bookstore-opening.xml', item),
         'test_content': newsmlg2_content_test,
     }
 ]
+
+
+def test_download_single(client, app):
+    for _format in formats:
+        resp = client.get('/download/%s?format=%s' % (item['_id'], _format['format']))
+        assert resp.status_code == 200
+        assert resp.mimetype == _format['mimetype']
+        assert resp.headers.get('Content-Disposition') == 'attachment; filename=%s' % _format['filename']
 
 
 def test_item_download(client, app):
