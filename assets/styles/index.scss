@@ -1084,7 +1084,7 @@ article.list {
     flex-shrink: 0;
     height: 36px;
     transition: all .2s ease;
-    z-index: 10;
+    z-index: 9;
     
     @include lg {
         height: 42px;
