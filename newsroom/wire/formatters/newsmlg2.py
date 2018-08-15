@@ -5,6 +5,8 @@ from flask import current_app as app
 from superdesk.publish.formatters.nitf_formatter import NITFFormatter
 from superdesk.publish.formatters.newsml_g2_formatter import NewsMLG2Formatter as SuperdeskFormatter
 
+from .base import BaseFormatter
+
 
 class NewsroomFormatter(SuperdeskFormatter):
 
@@ -22,14 +24,14 @@ class NewsroomFormatter(SuperdeskFormatter):
         etree.SubElement(rightsinfo, 'usageTerms').text = rights['usageterms']
 
 
-class NewsMLG2Formatter():
+class NewsMLG2Formatter(BaseFormatter):
+
+    MIMETYPE = 'application/vnd.iptc.g2.newsitem+xml'
+    FILE_EXTENSION = 'xml'
 
     encoding = 'utf-8'
     formatter = NewsroomFormatter()
     nitf_formatter = NITFFormatter()
-
-    def format_filename(self, item):
-        return '{}.xml'.format(item['_id'])
 
     def format_item(self, item):
         item = item.copy()
