@@ -89,7 +89,10 @@ def _is_password_valid(password, user):
     previous_login_attempt['user_id'] = user.get('_id')
     app.cache.set(user.get('email'), previous_login_attempt)
 
-    hashed = user.get('password').encode('UTF-8')
+    try:
+        hashed = user.get('password').encode('UTF-8')
+    except AttributeError:
+        return False
 
     if not bcrypt.checkpw(password, hashed):
         return False

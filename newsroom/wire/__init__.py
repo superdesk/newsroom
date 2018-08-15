@@ -31,8 +31,10 @@ def init_app(app):
 
     superdesk.register_resource('wire_search', WireSearchResource, WireSearchService, _app=app)
 
+    app.section('wire', 'Wire')
+
     app.sidenav('Home', 'wire.index', 'home')
-    app.sidenav('Wire', 'wire.wire', 'text')
+    app.sidenav('Wire', 'wire.wire', 'text', section='wire')
     app.sidenav('Saved Items', 'wire.bookmarks', 'bookmark', group=1, active=['wire.bookmarks', 'agenda.bookmarks'])
 
     from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter

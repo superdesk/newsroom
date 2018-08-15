@@ -41,6 +41,9 @@ class CompaniesResource(newsroom.Resource):
             'nullable': True,
             'required': False,
         },
+        'sections': {
+            'type': 'object',
+        },
     }
     datasource = {
         'source': 'companies',

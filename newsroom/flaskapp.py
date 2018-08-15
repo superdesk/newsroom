@@ -45,6 +45,7 @@ class Newsroom(eve.Eve):
         self.download_formatters = {}
         self.extensions = {}
         self.theme_folder = 'theme'
+        self.sections = []
 
         app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
 
@@ -69,11 +70,11 @@ class Newsroom(eve.Eve):
             self.media = AmazonMediaStorage(self)
         else:
             self.media = SuperdeskGridFSMediaStorage(self)
+        self._setup_jinja()
         self._setup_limiter()
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
         self._setup_babel()
-        self._setup_jinja()
         self._setup_webpack()
         self._setup_email()
         self._setup_cache()
@@ -118,7 +119,7 @@ class Newsroom(eve.Eve):
         self.add_template_filter(time_short)
         self.add_template_filter(date_short)
         self.add_template_filter(word_count)
-        self.add_template_global(self.sidenavs, 'sidenavs')
+        self.add_template_global(lambda: self.sidenavs, 'sidenavs')
         self.add_template_global(newsroom_config)
         self.add_template_global(is_admin)
         self.add_template_global(get_initial_notifications)
@@ -161,7 +162,7 @@ class Newsroom(eve.Eve):
             view_func=self.send_theme_file
         )
 
-    def sidenav(self, name, endpoint, icon=None, group=0, active=None):
+    def sidenav(self, name, endpoint, icon=None, group=0, active=None, section=None):
         """Register an item in sidebar menu."""
         self.sidenavs.append({
             'name': name,
@@ -169,6 +170,7 @@ class Newsroom(eve.Eve):
             'icon': icon,
             'group': group,
             'active': active,
+            'section': section,
         })
 
     def add_download_formatter(self, _format, formatter, name, types):
@@ -183,3 +185,9 @@ class Newsroom(eve.Eve):
         if os.path.exists(os.path.join(self.theme_folder, filename)):
             return flask.send_from_directory(self.theme_folder, filename)
         return self.send_static_file(filename)
+
+    def section(self, _id, name):
+        self.sections.append({
+            '_id': _id,
+            'name': name,
+        })

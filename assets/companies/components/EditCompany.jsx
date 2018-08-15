@@ -5,8 +5,9 @@ import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 import DateInput from 'components/DateInput';
 
+import { isEmpty } from 'lodash';
 import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
-import EditPanel from 'components/EditPanel';
+import CompanyPermissions from './CompanyPermissions';
 
 const countries = [
     {value: 'au', text: gettext('Australia')},
@@ -18,41 +19,44 @@ class EditCompany extends React.Component {
     constructor(props) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
-        this.getCompanyProducts = this.getCompanyProducts.bind(this);
         this.getUsers = this.getUsers.bind(this);
         this.state = {activeTab: 'company-details'};
         this.tabs = [
             {label: gettext('Company'), name: 'company-details'},
             {label: gettext('Users'), name: 'users'},
-            {label: gettext('Products'), name: 'products'},
+            {label: gettext('Permissions'), name: 'permissions'},
         ];
     }
 
     handleTabClick(event) {
         this.setState({activeTab: event.target.name});
-        if(event.target.name === 'users' && this.props.company._id) {
+        if (event.target.name === 'users' && this.props.company._id) {
             this.props.fetchCompanyUsers(this.props.company._id);
-        }
-        if(event.target.name === 'products' && this.props.company._id) {
-            this.props.fetchProducts();
         }
     }
 
     getUsers() {
-        if (this.props.users) {
-            return this.props.users.map((user) => (<tr key={user._id}>
+        if (isEmpty(this.props.users)) {
+            return (
+                <tr>
+                    <td colSpan="2">{gettext('There are no users in the company.')}</td>
+                </tr>
+            );
+        }
+
+        return this.props.users.map((user) => (
+            <tr key={user._id}>
                 <td>{user.first_name} {user.last_name}</td>
                 <td>{shortDate(user._created)}</td>
-            </tr>));
-        }
+            </tr>
+        ));
     }
 
-    getCompanyProducts() {
-        const products = this.props.products.filter((product) =>
-            product.companies && product.companies.includes(this.props.company._id)
-        ).map(p => p._id);
-
-        return {_id: this.props.company._id, products};
+    componentDidUpdate(prevProps) {
+        // reset tabs when new company is created
+        if (!this.props.company._id && prevProps.company._id) {
+            this.setState({activeTab: 'company-details'});
+        }
     }
 
     render() {
@@ -72,7 +76,7 @@ class EditCompany extends React.Component {
                 </div>
 
                 <ul className='nav nav-tabs'>
-                    {this.tabs.map((tab) => (
+                    {this.tabs.filter((tab, index) => index === 0 || this.props.company._id).map((tab) => (
                         <li key={tab.name} className='nav-item'>
                             <a
                                 name={tab.name}
@@ -176,12 +180,9 @@ class EditCompany extends React.Component {
                             </table>
                         </div>
                     }
-                    {this.state.activeTab === 'products' &&
-                        <EditPanel
-                            parent={this.getCompanyProducts()}
-                            items={this.props.products}
-                            field="products"
-                            onSave={this.props.saveProducts}
+                    {this.state.activeTab === 'permissions' && this.props.company._id &&
+                        <CompanyPermissions
+                            company={this.props.company}
                         />
                     }
                 </div>
@@ -199,9 +200,6 @@ EditCompany.propTypes = {
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     fetchCompanyUsers: PropTypes.func.isRequired,
-    products: PropTypes.array.isRequired,
-    saveProducts: PropTypes.func.isRequired,
-    fetchProducts: PropTypes.func.isRequired,
 };
 
 export default EditCompany;

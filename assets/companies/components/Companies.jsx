@@ -12,8 +12,6 @@ import {
     postCompany,
     selectCompany,
     setError,
-    saveProducts,
-    fetchProducts,
 } from '../actions';
 import {gettext} from 'utils';
 
@@ -92,8 +90,6 @@ class Companies extends React.Component {
                         users={this.props.companyUsers}
                         fetchCompanyUsers={this.props.fetchCompanyUsers}
                         products={this.props.products}
-                        saveProducts={this.props.saveProducts}
-                        fetchProducts={this.props.fetchProducts}
                     />
                 }
             </div>
@@ -119,8 +115,6 @@ Companies.propTypes = {
     errors: PropTypes.object,
     dispatch: PropTypes.func,
     products: PropTypes.array,
-    saveProducts: PropTypes.func.isRequired,
-    fetchProducts: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -145,8 +139,6 @@ const mapDispatchToProps = (dispatch) => ({
     deleteCompany: () => dispatch(deleteCompany()),
     cancelEdit: (event) => dispatch(cancelEdit(event)),
     fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
-    saveProducts: (products) => dispatch(saveProducts(products)),
-    fetchProducts: () => dispatch(fetchProducts()),
     dispatch: dispatch,
 });
 
