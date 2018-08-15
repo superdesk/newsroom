@@ -1,11 +1,12 @@
 
 import flask
+from .base import BaseFormatter
 
 
-class TextFormatter():
+class TextFormatter(BaseFormatter):
 
-    def format_filename(self, item):
-        return '{}.txt'.format(item['_id'])
+    FILE_EXTENSION = 'txt'
+    MIMETYPE = 'text/plain'
 
     def format_item(self, item, item_type='items'):
         if item_type == 'items':

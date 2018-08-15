@@ -1,3 +1,4 @@
+from pytz import utc
 from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
@@ -62,7 +63,7 @@ items = [
 agenda_items = [{
     'type': 'agenda',
     '_id': 'urn:conference',
-    'versioncreated': '2018-06-27T11:12:04+0000',
+    'versioncreated': datetime(2018, 6, 27, 11, 12, 4, tzinfo=utc),
     'name': 'Conference Planning',
     'slugline': 'Prime Conference',
     'planning_items': [
@@ -91,8 +92,8 @@ agenda_items = [{
     '_created': '2018-06-27T11:12:07+0000',
     'coverages': [],
     'dates': {
-        'end': '2018-07-20T04:00:00+0000',
-        'start': '2018-07-20T04:00:00+0000'
+        'end': datetime(2018, 7, 20, 4, 0, 0, tzinfo=utc),
+        'start': datetime(2018, 7, 20, 4, 0, 0, tzinfo=utc),
     },
     'firstcreated': '2018-06-27T11:12:04+0000',
     '_current_version': 1,
