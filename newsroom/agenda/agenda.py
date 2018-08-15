@@ -16,7 +16,7 @@ from content_api.items.resource import code_mapping
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
-from newsroom.email import send_coverage_notification_email
+from newsroom.agenda.email import send_coverage_notification_email
 
 logger = logging.getLogger(__name__)
 

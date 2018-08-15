@@ -10,7 +10,7 @@ from flask import current_app as app
 from newsroom.auth import get_user, login_required
 from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400
 from newsroom.wire.views import update_action_list
-from newsroom.email import send_coverage_request_email
+from newsroom.agenda.email import send_coverage_request_email
 
 
 @blueprint.route('/agenda')
