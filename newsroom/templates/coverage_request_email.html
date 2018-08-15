@@ -1,0 +1,9 @@
+{% extends "email_layout.html" %}
+
+{% block content %}
+<p>A new coverage has been requested with the following details:</p>
+<p>User name: {{ name }}</p>
+<p>Email: {{ email }}</p>
+<p>Agenda item: <a href="{{url}}">{{ url }}</a></p>
+<p>Message: {{ message }}</p>
+{% endblock %}

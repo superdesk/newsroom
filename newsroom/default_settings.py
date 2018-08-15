@@ -84,6 +84,8 @@ CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
 PRIVACY_POLICY = 'https://www.aap.com.au/legal/'
 TERMS_AND_CONDITIONS = 'https://www.aap.com.au/legal/'
 
+# List of email addresses that will receive the coverage request emails
+COVERAGE_REQUEST_RECIPIENTS = []
 
 TEMPLATES_AUTO_RELOAD = True
 

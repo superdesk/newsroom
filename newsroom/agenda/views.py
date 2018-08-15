@@ -8,8 +8,9 @@ from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
 from flask import current_app as app
 from newsroom.auth import get_user, login_required
-from newsroom.utils import get_entity_or_404, is_json_request
+from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400
 from newsroom.wire.views import update_action_list
+from newsroom.agenda.email import send_coverage_request_email
 
 
 @blueprint.route('/agenda')
@@ -62,3 +63,15 @@ def get_view_data():
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='agenda'),
     }
+
+
+@blueprint.route('/agenda/request_coverage', methods=['POST'])
+@login_required
+def request_coverage():
+    user = get_user(required=True)
+    data = get_json_or_400()
+    assert data.get('item')
+    assert data.get('message')
+    item = get_entity_or_404(data.get('item'), 'agenda')
+    send_coverage_request_email(user, data.get('message'), item['_id'])
+    return flask.jsonify(), 201

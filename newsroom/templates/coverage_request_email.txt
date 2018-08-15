@@ -1,0 +1,10 @@
+{% extends "email_layout.txt" %}
+{% block content %}
+A new coverage has been requested with the following details:
+
+User Name: {{name}}
+Email: {{email}}
+Agenda item: {{url}}
+Message: {{message}}
+
+{% endblock %}

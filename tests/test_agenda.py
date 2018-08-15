@@ -130,3 +130,21 @@ def test_agenda_search_filtered_by_query_product(client, app):
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
+
+
+def test_coverage_request(client, app):
+    app.config['COVERAGE_REQUEST_RECIPIENTS'] = ['admin@bar.com']
+    with app.mail.record_messages() as outbox:
+        resp = client.post('/agenda/request_coverage', data=json.dumps({
+            'item': ['urn:conference'],
+            'message': 'Some info message',
+        }), content_type='application/json')
+
+        assert resp.status_code == 201, resp.get_data().decode('utf-8')
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['admin@bar.com']
+        assert outbox[0].subject == 'A new coverage request'
+        assert 'admin admin' in outbox[0].body
+        assert 'admin@sourcefabric.org' in outbox[0].body
+        assert 'http://localhost:5050/agenda/urn:conference' in outbox[0].body
+        assert 'Some info message' in outbox[0].body

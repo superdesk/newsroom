@@ -187,13 +187,3 @@ def _send_agenda_killed_notification_email(user, item):
     text_body = formatter.format_item(item, item_type='agenda')
 
     send_email(to=recipients, subject=subject, text_body=text_body)
-
-
-def send_coverage_notification_email(user, agenda, wire_item):
-    if user.get('receive_email'):
-        send_email(
-            to=[user['email']],
-            subject=gettext('New coverage'),
-            text_body=render_template('agenda_new_coverage_email.txt', agenda=agenda, item=wire_item),
-            html_body=render_template('agenda_new_coverage_email.html', agenda=agenda, item=wire_item)
-        )
