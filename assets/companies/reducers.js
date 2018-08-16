@@ -22,7 +22,20 @@ const initialState = {
     totalCompanies: null,
     activeQuery: null,
     services: [],
+    sections: [],
 };
+
+function setupCompanies(companyList, state) {
+    const companiesById = {};
+    const companyOptions = [];
+    const companies = companyList.map((company) => {
+        companiesById[company._id] = company;
+        companyOptions.push({value: company._id, text: company.name});
+        return company._id;
+    });
+
+    return {...state, companiesById, companyOptions, companies, isLoading: false};
+}
 
 export default function companyReducer(state = initialState, action) {
     switch (action.type) {
@@ -99,27 +112,25 @@ export default function companyReducer(state = initialState, action) {
             companyToEdit: null,
             activeQuery: state.query};
 
-    case GET_COMPANIES: {
-        const companiesById = {};
-        const companyOptions = [];
-        const companies = action.data.map((company) => {
-            companiesById[company._id] = company;
-            companyOptions.push({value: company._id, text: company.name});
-            return company._id;
-        });
+    case GET_COMPANIES:
+        return setupCompanies(action.data, state);
 
-        return {...state, companies, companiesById, companyOptions, isLoading: false};
-    }
-
-    case GET_COMPANY_USERS: {
+    case GET_COMPANY_USERS:
         return {...state, companyUsers: action.data};
-    }
 
     case GET_PRODUCTS:
         return {...state, products: action.data};
 
-    case INIT_VIEW_DATA:
-        return {...state, services: action.data.services, products: action.data.products};
+    case INIT_VIEW_DATA: {
+        const nextState = {
+            ...state,
+            services: action.data.services,
+            products: action.data.products,
+            sections: action.data.sections,
+        };
+
+        return setupCompanies(action.data.companies, nextState);
+    }
 
     default:
         return state;

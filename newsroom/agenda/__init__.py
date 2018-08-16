@@ -16,6 +16,7 @@ def url_for_agenda(item, _external=True):
 
 def init_app(app):
     superdesk.register_resource('agenda', AgendaResource, AgendaService, _app=app)
-    app.sidenav('Agenda', 'agenda.index', 'calendar')
+    app.section('agenda', 'Agenda')
+    app.sidenav('Agenda', 'agenda.index', 'calendar', section='agenda')
     app.add_download_formatter('ical', formatters.iCalFormatter(), 'iCalendar', ['agenda'])
     app.add_template_global(url_for_agenda)

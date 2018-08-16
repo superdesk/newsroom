@@ -78,7 +78,7 @@
                 </li>
                 {% endif %}
 
-                {% for nav in sidenavs %}
+                {% for nav in sidenavs() %}
                 <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %} badge--top-right">
                   <a href="{{ url_for(nav.endpoint) }}" title="{{ nav.name }}">
                     {% if nav.name == 'Bookmarks' %}
