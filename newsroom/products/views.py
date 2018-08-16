@@ -2,7 +2,7 @@ import re
 
 import flask
 from bson import ObjectId
-from flask import jsonify
+from flask import jsonify, current_app
 from flask_babel import gettext
 from superdesk import get_resource_service
 
@@ -19,6 +19,7 @@ def settings():
         'products': list(query_resource('products', max_results=200)),
         "navigations": list(query_resource('navigations', max_results=200)),
         "companies": list(query_resource('companies', max_results=200)),
+        "sections": current_app.sections,
     }
     return flask.render_template('settings.html', setting_type="products", data=data)
 

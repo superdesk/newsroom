@@ -18,6 +18,8 @@ import {
     cancelEdit
 } from '../actions';
 import {gettext} from 'utils';
+import { get } from 'lodash';
+import { sectionsPropType } from '../types';
 
 class Products extends React.Component {
     constructor(props, context) {
@@ -61,6 +63,7 @@ class Products extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
+        const sectionFilter = (product) => !this.props.activeSection || get(product, 'product_type', 'wire') === this.props.activeSection;
 
         return (
             <div className="flex-row">
@@ -78,7 +81,7 @@ class Products extends React.Component {
                             query={this.props.activeQuery} />
                         }
                         <ProductList
-                            products={this.props.products}
+                            products={this.props.products.filter(sectionFilter)}
                             onClick={this.props.selectProduct}
                             activeProductId={this.props.activeProductId} />
                     </div>
@@ -105,6 +108,9 @@ class Products extends React.Component {
 }
 
 Products.propTypes = {
+    sections: sectionsPropType,
+    activeSection: PropTypes.string.isRequired,
+
     products: PropTypes.arrayOf(PropTypes.object),
     productToEdit: PropTypes.object,
     activeProductId: PropTypes.string,
