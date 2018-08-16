@@ -11,10 +11,12 @@ from newsroom.auth import get_user, login_required
 from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400
 from newsroom.wire.views import update_action_list
 from newsroom.agenda.email import send_coverage_request_email
+from newsroom.companies import section
 
 
 @blueprint.route('/agenda')
 @login_required
+@section('agenda')
 def index():
     return flask.render_template('agenda_index.html', data=get_view_data())
 

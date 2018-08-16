@@ -1,6 +1,7 @@
 import superdesk
+from functools import wraps
 
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, abort
 from newsroom.auth import get_user
 
 from .companies import CompaniesResource, CompaniesService
@@ -30,9 +31,21 @@ def get_company_sidenavs():
     user = get_user()
     company = get_user_company(user)
     if company and company.get('sections'):
-        print('c', company['sections'])
         return [nav for nav in current_app.sidenavs if section_allowed(nav, company['sections'])]
     return current_app.sidenavs
+
+
+def section(_id):
+    def section_decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user = get_user()
+            company = get_user_company(user)
+            if company and company.get('sections') and not company['sections'].get(_id):
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated_function
+    return section_decorator
 
 
 def init_app(app):

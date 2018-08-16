@@ -147,12 +147,15 @@ class Newsroom(eve.Eve):
         def assertion_error(err):
             return flask.jsonify({'error': err.args[0] if err.args else 1}), 400
 
-        self.register_error_handler(AssertionError, assertion_error)
-
         def render_404(err):
             return flask.render_template('404.html'), 404
 
+        def render_403(err):
+            return flask.render_template('403.html'), 403
+
+        self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
+        self.register_error_handler(403, render_403)
 
     def _setup_theme(self):
         self.add_url_rule(
