@@ -28,9 +28,8 @@ class AgendaCoverageRequest extends React.Component {
     }
 
     requestCoverage() {
-        this.props.requestCoverage(this.props.item, this.state.message)
-            .then(() => this.setState({'status': gettext('Your request has been sent successfully')}))
-            .catch(() => this.setState({'status': gettext('Failed to send the request')}));
+        this.props.requestCoverage(this.props.item, this.state.message);
+        this.reset();
     }
 
     render() {
@@ -64,7 +63,6 @@ class AgendaCoverageRequest extends React.Component {
                         disabled={!this.state.message}
                         onClick={this.requestCoverage}
                     ></input>
-                    {this.state.status && <i className='ml-2'>{this.state.status}</i>}
                 </div>
             </div>
         </div>);
