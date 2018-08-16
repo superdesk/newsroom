@@ -17,6 +17,7 @@ import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import AgendaPreviewImage from './AgendaPreviewImage';
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaPreviewAttachments from './AgendaPreviewAttachments';
+import AgendaCoverageRequest from './AgendaCoverageRequest';
 
 class AgendaPreview extends React.PureComponent {
     constructor(props) {
@@ -30,7 +31,7 @@ class AgendaPreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, followEvent, isFollowing, openItemDetails} = this.props;
+        const {item, user, actions, followEvent, isFollowing, openItemDetails, requestCoverage} = this.props;
 
         const previewClassName = classNames('wire-column__preview', {
             'wire-column__preview--covering': hasCoverages(item),
@@ -67,6 +68,7 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaMeta item={item} />
                             <AgendaLongDescription item={item} />
                             <AgendaPreviewCoverages item={item} />
+                            <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                             <AgendaPreviewAttachments item={item} />
                             <AgendaEdNote item={item} />
                         </div>
@@ -89,6 +91,7 @@ AgendaPreview.propTypes = {
     isFollowing: PropTypes.bool,
     closePreview: PropTypes.func,
     openItemDetails: PropTypes.func,
+    requestCoverage: PropTypes.func,
 };
 
 export default AgendaPreview;

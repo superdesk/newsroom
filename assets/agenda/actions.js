@@ -53,6 +53,14 @@ export function openItemDetails(item) {
     return {type: OPEN_ITEM, item};
 }
 
+export function requestCoverage(item, message) {
+    return () => {
+        const url = '/agenda/request_coverage';
+        const data = { item: item._id, message };
+        return server.post(url, data);
+    };
+}
+
 export function openItem(item) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
