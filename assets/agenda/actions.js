@@ -2,7 +2,7 @@
 import { get, isEmpty } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import { gettext, notify, updateRouteParams, getTimezoneOffset } from 'utils';
+import { gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler } from 'utils';
 import { markItemAsRead } from 'wire/utils';
 import { renderModal, closeModal } from 'actions';
 import {getDateInputDate} from './utils';
@@ -51,6 +51,16 @@ export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
 export const OPEN_ITEM = 'OPEN_ITEM';
 export function openItemDetails(item) {
     return {type: OPEN_ITEM, item};
+}
+
+export function requestCoverage(item, message) {
+    return () => {
+        const url = '/agenda/request_coverage';
+        const data = { item: item._id, message };
+        return server.post(url, data)
+            .then(() => notify.success(gettext('Your request has been sent successfully')))
+            .catch(errorHandler);
+    };
 }
 
 export function openItem(item) {
@@ -259,12 +269,6 @@ export const PRINT_ITEMS = 'PRINT_ITEMS';
 export function setPrintItem(item) {
     return {type: PRINT_ITEMS, items: [item]};
 }
-
-
-function errorHandler(reason) {
-    console.error('error', reason);
-}
-
 
 
 /**

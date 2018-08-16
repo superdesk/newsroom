@@ -14,6 +14,7 @@ import {
     previewItem,
     toggleDropdownFilter,
     openItemDetails,
+    requestCoverage,
 } from 'agenda/actions';
 
 import {
@@ -144,6 +145,7 @@ class AgendaApp extends BaseApp {
                             isFollowing={!!isFollowing}
                             closePreview={this.props.closePreview}
                             openItemDetails={this.props.openItemDetails}
+                            requestCoverage={this.props.requestCoverage}
                         />
                     </div>
                 </section>
@@ -196,6 +198,7 @@ AgendaApp.propTypes = {
     activeGrouping: PropTypes.string,
     activeTopic: PropTypes.string,
     openItemDetails: PropTypes.func,
+    requestCoverage: PropTypes.func,
     detail: PropTypes.bool,
 };
 
@@ -243,6 +246,7 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(fetchItems());
     },
     openItemDetails: (item) => dispatch(openItemDetails(item)),
+    requestCoverage: (item, message) => dispatch(requestCoverage(item, message)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);
