@@ -1,4 +1,4 @@
-from flask import json
+from flask import json, url_for
 from pytest import fixture
 from bson import ObjectId
 from .test_users import test_login_succeeds_for_admin, init as user_init
@@ -100,3 +100,17 @@ def test_save_company_permissions(client, app):
 
     updated = app.data.find_one('companies', req=None, _id='c-1')
     assert updated['sections']['wire']
+    assert not updated['sections'].get('agenda')
+
+    # available by default
+    resp = client.get(url_for('agenda.index'))
+    assert resp.status_code == 200
+
+    # set company with wire only
+    user = app.data.find_one('users', req=None, first_name='admin')
+    assert user
+    app.data.update('users', user['_id'], {'company': 'c-1'}, user)
+
+    # test section protection
+    resp = client.get(url_for('agenda.index'))
+    assert resp.status_code == 403

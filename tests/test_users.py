@@ -23,7 +23,7 @@ def init(app):
 def test_user_list_fails_for_anonymous_user(client):
     response = client.get('/users/search')
     assert response.status_code == 403
-    assert b'403 Forbidden' in response.data
+    assert b'Forbidden' in response.data
 
 
 def test_return_search_for_users(client):

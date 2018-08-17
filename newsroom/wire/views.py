@@ -23,6 +23,7 @@ from newsroom.email import send_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request
 from newsroom.notifications import push_user_notification
+from newsroom.companies import section
 from .search import get_bookmarks_count
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
@@ -128,6 +129,7 @@ def index():
 
 @blueprint.route('/wire')
 @login_required
+@section('wire')
 def wire():
     return flask.render_template('wire_index.html', data=get_view_data())
 
