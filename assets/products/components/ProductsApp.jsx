@@ -5,14 +5,13 @@ import {
     newProduct,
     setQuery,
     fetchProducts,
-    selectSection,
 } from '../actions';
 import Products from './Products';
 import ListBar from 'components/ListBar';
-import SectionSwitch from './SectionSwitch';
 import { gettext } from 'utils';
 
-import { sectionsPropType } from '../types';
+import SectionSwitch from 'features/sections/SectionSwitch';
+import { sectionsPropType } from 'features/sections/types';
 
 class ProductsApp extends React.Component {
     constructor(props, context) {
@@ -31,7 +30,6 @@ class ProductsApp extends React.Component {
                     <SectionSwitch
                         sections={this.props.sections}
                         activeSection={this.props.activeSection}
-                        selectSection={this.props.selectSection}
                     />
                 </ListBar>
                 <Products activeSection={this.props.activeSection} sections={this.props.sections} />
@@ -47,7 +45,6 @@ ProductsApp.propTypes = {
     fetchProducts: PropTypes.func,
     setQuery: PropTypes.func,
     newProduct: PropTypes.func,
-    selectSection: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -59,7 +56,6 @@ const mapDispatchToProps = {
     fetchProducts,
     setQuery,
     newProduct,
-    selectSection,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductsApp);

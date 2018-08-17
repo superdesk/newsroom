@@ -23,7 +23,6 @@ function ProductList({products, onClick, activeProductId}) {
                             <th>{ gettext('Status') }</th>
                             <th>{ gettext('Superdesk Product Id') }</th>
                             <th>{ gettext('Query') }</th>
-                            <th>{ gettext('Product Type') }</th>
                             <th>{ gettext('Created On') }</th>
                         </tr>
                     </thead>
