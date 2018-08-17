@@ -16,6 +16,7 @@ import {
     saveProducts,
 } from '../actions';
 import {gettext} from 'utils';
+import { sectionsPropType } from 'features/sections/types';
 
 class Navigations extends React.Component {
     constructor(props, context) {
@@ -92,6 +93,7 @@ class Navigations extends React.Component {
                         products={this.props.products}
                         saveProducts={this.props.saveProducts}
                         fetchProducts={this.props.fetchProducts}
+                        sections={this.props.sections}
                     />
                 }
             </div>
@@ -115,6 +117,7 @@ Navigations.propTypes = {
     errors: PropTypes.object,
     dispatch: PropTypes.func,
     products: PropTypes.arrayOf(PropTypes.object),
+    sections: sectionsPropType,
     saveProducts: PropTypes.func.isRequired,
     fetchProducts: PropTypes.func.isRequired,
 };
@@ -128,6 +131,7 @@ const mapStateToProps = (state) => ({
     totalNavigations: state.totalNavigations,
     errors: state.errors,
     products: state.products,
+    sections: state.sections.list,
 });
 
 const mapDispatchToProps = (dispatch) => ({

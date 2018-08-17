@@ -18,6 +18,7 @@ def settings():
     data = {
         'products': list(query_resource('products', max_results=200)),
         "navigations": list(query_resource('navigations', max_results=200)),
+        'sections': app.sections,
     }
     return flask.render_template('settings.html', setting_type="navigations", data=data)
 

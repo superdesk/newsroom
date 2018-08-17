@@ -1,5 +1,6 @@
 import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
+import { initSections } from 'features/sections/actions';
 
 
 export const SELECT_PRODUCT = 'SELECT_PRODUCT';
@@ -184,17 +185,11 @@ export function saveNavigations(navigations) {
     };
 }
 
-export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data) {
     return function (dispatch) {
         dispatch(getProducts(data.products));
         dispatch(getCompanies(data.companies));
         dispatch(getNavigations(data.navigations));
-        dispatch({type: INIT_VIEW_DATA, data: data});
+        dispatch(initSections(data.sections));
     };
-}
-
-export const SELECT_SECTION = 'SELECT_SECTION';
-export function selectSection(sectionId) {
-    return {type: SELECT_SECTION, section: sectionId};
 }

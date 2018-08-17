@@ -19,7 +19,6 @@ import {
 } from '../actions';
 import {gettext} from 'utils';
 import { get } from 'lodash';
-import { sectionsPropType } from '../types';
 
 class Products extends React.Component {
     constructor(props, context) {
@@ -108,7 +107,6 @@ class Products extends React.Component {
 }
 
 Products.propTypes = {
-    sections: sectionsPropType,
     activeSection: PropTypes.string.isRequired,
 
     products: PropTypes.arrayOf(PropTypes.object),

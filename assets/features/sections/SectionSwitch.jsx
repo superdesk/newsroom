@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-import { sectionsPropType } from '../types';
+import { selectSection } from './actions';
+import { sectionsPropType } from './types';
 
-export default function SectionSwitch({sections, activeSection, selectSection}) {
+function SectionSwitch({sections, activeSection, selectSection}) {
     return (
         <div className="btn-group btn-group--navbar ml-0 mr-3">
             {sections.map((section) => (
@@ -22,3 +24,9 @@ SectionSwitch.propTypes = {
 
     selectSection: PropTypes.func.isRequired,
 };
+
+const mapDispatchToProps = {
+    selectSection,
+};
+
+export default connect(null, mapDispatchToProps)(SectionSwitch);

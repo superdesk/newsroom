@@ -5,6 +5,7 @@ import CheckboxInput from 'components/CheckboxInput';
 import EditPanel from 'components/EditPanel';
 
 import { gettext } from 'utils';
+import { sectionsPropType } from 'features/sections/types';
 
 
 class EditNavigation extends React.Component {
@@ -110,6 +111,9 @@ class EditNavigation extends React.Component {
                             items={this.props.products}
                             field="products"
                             onSave={this.props.saveProducts}
+                            groups={this.props.sections}
+                            groupField={'product_type'}
+                            groupDefaultValue={'wire'}
                         />
                     }
                 </div>
@@ -128,6 +132,7 @@ EditNavigation.propTypes = {
     onDelete: PropTypes.func.isRequired,
     saveProducts: PropTypes.func.isRequired,
     fetchProducts: PropTypes.func.isRequired,
+    sections: sectionsPropType,
 };
 
 export default EditNavigation;
