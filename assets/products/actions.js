@@ -184,11 +184,17 @@ export function saveNavigations(navigations) {
     };
 }
 
+export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data) {
     return function (dispatch) {
         dispatch(getProducts(data.products));
         dispatch(getCompanies(data.companies));
         dispatch(getNavigations(data.navigations));
+        dispatch({type: INIT_VIEW_DATA, data: data});
     };
 }
 
+export const SELECT_SECTION = 'SELECT_SECTION';
+export function selectSection(sectionId) {
+    return {type: SELECT_SECTION, section: sectionId};
+}

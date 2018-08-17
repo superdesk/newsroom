@@ -8,6 +8,7 @@ class ListBar extends React.Component {
         return (
             <section className="content-header">
                 <nav className="content-bar navbar content-bar--side-padding">
+                    {this.props.children}
                     <SearchBar setQuery={this.props.setQuery} fetchItems={()=>this.props.fetch()}/>
                     <div className="content-bar__right">
                         <button
@@ -27,6 +28,7 @@ ListBar.propTypes = {
     fetch: PropTypes.func,
     buttonName: PropTypes.string,
     onNewItem: PropTypes.func,
+    children: PropTypes.node,
 };
 
 
