@@ -125,8 +125,10 @@ export function defaultReducer(state, action) {
         };
     }
 
-    case SET_QUERY:
-        return {...state, query: action.query, activeItem: null};
+    case SET_QUERY: {
+        const search = Object.assign({}, state.search, {activeTopic: null});
+        return {...state, query: action.query, activeItem: null, search: search};
+    }
 
     case QUERY_ITEMS:
         return {...state, isLoading: true, totalItems: null, activeQuery: state.query};

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
+import { get } from 'lodash';
 
 import CheckboxInput from 'components/CheckboxInput';
 
@@ -24,7 +25,7 @@ class CompanyPermissions extends React.Component {
         const products = {};
 
         this.props.products.forEach((product) => {
-            products[product._id] = product.companies.includes(this.props.company._id);
+            products[product._id] = get(product, 'companies', []).includes(this.props.company._id);
         });
 
         const sections = {};

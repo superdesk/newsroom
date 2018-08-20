@@ -5,7 +5,7 @@ import {
     SELECT_DATE,
 } from './actions';
 
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 import { EXTENDED_VIEW } from 'wire/defaults';
 
 import { searchReducer } from 'search/reducers';
@@ -24,7 +24,6 @@ const initialState = {
     activeQuery: null,
     user: null,
     company: null,
-    companyName: '',
     topics: [],
     selectedItems: [],
     bookmarks: false,
@@ -34,7 +33,6 @@ const initialState = {
     newItemsData: null,
     newItemsByTopic: {},
     readItems: {},
-    resultsFiltered: false,
     agenda: {
         activeView: EXTENDED_VIEW,
         activeDate: Date.now(),
@@ -60,7 +58,6 @@ function recieveItems(state, data) {
         aggregations: data._aggregations || null,
         newItems: [],
         newItemsData: null,
-        resultsFiltered: !isEmpty(state.agenda.activeFilter) || !isEmpty(state.agenda.createdFilter)
     };
 }
 
@@ -88,7 +85,7 @@ export default function agendaReducer(state = initialState, action) {
         return recieveItems(state, action.data);
 
     case SET_EVENT_QUERY:
-        return {...state, queryId: action.query, activeItem: null};
+        return {...state, query: action.query, activeItem: null};
 
     case INIT_DATA: {
         const navigations = get(action, 'agendaData.navigations', []);
@@ -99,7 +96,6 @@ export default function agendaReducer(state = initialState, action) {
             user: action.agendaData.user || null,
             topics: action.agendaData.topics || [],
             company: action.agendaData.company || null,
-            companyName: action.agendaData.companyName || '',
             bookmarks: action.agendaData.bookmarks || false,
             formats: action.agendaData.formats || [],
             search: Object.assign({}, state.search, {navigations}),

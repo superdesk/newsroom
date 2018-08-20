@@ -15,6 +15,8 @@ import {
     setCreatedFilter,
 } from 'search/actions';
 
+import { resultsFilteredSelector } from 'search/selectors';
+
 class FiltersTab extends React.Component {
     constructor(props) {
         super(props);
@@ -112,7 +114,7 @@ const mapStateToProps = (state) => ({
     aggregations: state.aggregations,
     activeFilter: state.search.activeFilter,
     createdFilter: state.search.createdFilter,
-    resultsFiltered: state.resultsFiltered,
+    resultsFiltered: resultsFilteredSelector(state),
 });
 
 const mapDispatchToProps = {

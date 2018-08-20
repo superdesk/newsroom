@@ -65,7 +65,7 @@ class EditPanel extends React.Component {
             <div className='tab-pane active' id='navigations'>
                 <form onSubmit={this.saveItems}>
                     <div className="list-item__preview-form">
-                        {this.props.groups.map((group) => (
+                        {!isEmpty(this.props.groups) && this.props.groups.map((group) => (
                             <div className="form-group" key={group._id}>
                                 <label>{group.name}</label>
                                 {this.renderList(this.props.items.filter((item) => get(item, this.props.groupField, this.props.groupDefaultValue) === group._id))}

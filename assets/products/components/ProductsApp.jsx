@@ -19,22 +19,20 @@ class ProductsApp extends React.Component {
     }
 
     render() {
-        return (
-            <div>
-                <ListBar
-                    onNewItem={this.props.newProduct}
-                    setQuery={this.props.setQuery}
-                    fetch={this.props.fetchProducts}
-                    buttonName={gettext('Product')}
-                >
-                    <SectionSwitch
-                        sections={this.props.sections}
-                        activeSection={this.props.activeSection}
-                    />
-                </ListBar>
-                <Products activeSection={this.props.activeSection} sections={this.props.sections} />
-            </div>
-        );
+        return [
+            <ListBar key="bar"
+                onNewItem={this.props.newProduct}
+                setQuery={this.props.setQuery}
+                fetch={this.props.fetchProducts}
+                buttonName={gettext('Product')}
+            >
+                <SectionSwitch
+                    sections={this.props.sections}
+                    activeSection={this.props.activeSection}
+                />
+            </ListBar>,
+            <Products key="products" activeSection={this.props.activeSection} sections={this.props.sections} />
+        ];
     }
 }
 

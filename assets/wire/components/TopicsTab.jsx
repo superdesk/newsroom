@@ -22,9 +22,11 @@ function TopicsTab({topics, setTopicQuery, newItemsByTopic, activeTopic, removeN
         setTopicQuery(topic);
     };
 
+    const activeTopicId = activeTopic ? activeTopic._id : null;
+
     return topics && topics.length > 0 ? [topics.map((topic) => (
         <a href='#' key={topic._id}
-            className={`btn btn-block btn-outline-${topic._id === activeTopic ? 'primary' : 'secondary'}`}
+            className={`btn btn-block btn-outline-${topic._id === activeTopicId ? 'primary' : 'secondary'}`}
             onClick={(e) => clickTopic(e, topic)}>
             {topic.label}
             {newItemsByTopic && newItemsByTopic[topic._id] && <span className='wire-button__notif'>
@@ -43,7 +45,7 @@ function TopicsTab({topics, setTopicQuery, newItemsByTopic, activeTopic, removeN
 TopicsTab.propTypes = {
     topics: PropTypes.array.isRequired,
     newItemsByTopic: PropTypes.object,
-    activeTopic: PropTypes.string,
+    activeTopic: PropTypes.object,
 
     removeNewItems: PropTypes.func.isRequired,
     setTopicQuery: PropTypes.func.isRequired,

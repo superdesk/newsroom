@@ -1,4 +1,5 @@
 import analytics from 'analytics';
+import { renderModal } from 'actions';
 
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query) {
@@ -38,4 +39,15 @@ export const SET_VIEW = 'SET_VIEW';
 export function setView(view) {
     localStorage.setItem('view', view);
     return {type: SET_VIEW, view};
+}
+
+/**
+ * Start a follow topic action
+ *
+ * @param {String} topic
+ * @param {String} type
+ */
+export function followTopic(topic, type) {
+    topic.topic_type = type;
+    return renderModal('followTopic', {topic});
 }
