@@ -199,16 +199,6 @@ export function fetchItem(id) {
     };
 }
 
-/**
- * Start a follow topic action
- *
- * @param {String} topic
- */
-export function followTopic(topic) {
-    topic.topic_type = 'wire';
-    return renderModal('followTopic', {topic});
-}
-
 export function submitFollowTopic(data) {
     return (dispatch, getState) => {
         const user = getState().user;

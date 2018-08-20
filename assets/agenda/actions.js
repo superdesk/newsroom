@@ -75,12 +75,6 @@ export function openItem(item) {
     };
 }
 
-export const SET_EVENT_QUERY = 'SET_EVENT_QUERY';
-export function setQueryById(query) {
-    query && analytics.event('search', query);
-    return {type: SET_EVENT_QUERY, query};
-}
-
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {
     return {type: QUERY_ITEMS};
@@ -419,7 +413,7 @@ export function setEventQuery(topic) {
     return (dispatch) => {
         dispatch(toggleNavigation());
         dispatch(toggleTopic(topic));
-        dispatch(setQueryById(topic.query || ''));
+        dispatch(setQuery(topic.query));
         dispatch(resetFilter(topic.filter));
         dispatch(setCreatedFilter(topic.created));
         return dispatch(fetchItems());

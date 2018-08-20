@@ -21,6 +21,10 @@ import {
     setView,
 } from 'search/actions';
 
+import {
+    activeTopicSelector,
+} from 'search/selectors';
+
 import BaseApp from 'layout/components/BaseApp';
 import AgendaPreview from './AgendaPreview';
 import AgendaList from './AgendaList';
@@ -30,6 +34,7 @@ import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import AgendaListViewControls from './AgendaListViewControls';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import AgendaItemDetails from 'agenda/components/AgendaItemDetails';
+import SearchResultsInfo from 'wire/components/SearchResultsInfo';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
@@ -63,7 +68,6 @@ class AgendaApp extends BaseApp {
             'wire-articles__two-side-panes': panesCount === 2,
         });
 
-        const activeTopic = this.props.topics.find((topic) => topic._id === this.props.activeTopic);
         const onDetailClose = this.props.detail ? null : () => this.props.actions.filter(a => a.id == 'open')[0].action(null);
 
         return (
@@ -131,6 +135,21 @@ class AgendaApp extends BaseApp {
                                 />
                             }
 
+                            <SearchResultsInfo
+                                user={this.props.user}
+                                query={this.props.activeQuery}
+                                bookmarks={this.props.bookmarks}
+                                totalItems={this.props.totalItems}
+                                topicType='agenda'
+                                newItems={this.props.newItems}
+                                refresh={this.props.refresh}
+                                activeTopic={this.props.activeTopic}
+                                toggleNews={this.props.toggleNews}
+                                activeNavigation={this.props.activeNavigation}
+                                newsOnly={this.props.newsOnly}
+                                scrollClass={this.state.scrollClass}
+                            />
+
                             <AgendaList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
@@ -154,7 +173,7 @@ class AgendaApp extends BaseApp {
                 this.renderNavBreadcrumb(
                     this.props.navigations,
                     this.props.activeNavigation,
-                    activeTopic
+                    this.props.activeTopic
                 )
             ])
         );
@@ -190,13 +209,12 @@ AgendaApp.propTypes = {
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
-    resultsFiltered: PropTypes.bool,
     aggregations: PropTypes.object,
     toggleDropdownFilter: PropTypes.func,
     selectDate: PropTypes.func,
     activeDate: PropTypes.number,
     activeGrouping: PropTypes.string,
-    activeTopic: PropTypes.string,
+    activeTopic: PropTypes.object,
     openItemDetails: PropTypes.func,
     requestCoverage: PropTypes.func,
     detail: PropTypes.bool,
@@ -219,10 +237,9 @@ const mapStateToProps = (state) => ({
     activeView: get(state, 'search.activeView'),
     newItems: state.newItems,
     navigations: get(state, 'search.navigations', []),
-    activeTopic: get(state, 'search.activeTopic'),
+    activeTopic: activeTopicSelector(state),
     activeNavigation: get(state, 'search.activeNavigation', null),
     bookmarks: state.bookmarks,
-    resultsFiltered: state.resultsFiltered,
     aggregations: state.aggregations,
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),

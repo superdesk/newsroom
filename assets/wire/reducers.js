@@ -4,7 +4,7 @@ import {
     TOGGLE_NEWS,
 } from './actions';
 
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 
 import { defaultReducer } from '../reducers';
 import { searchReducer } from 'search/reducers';
@@ -21,7 +21,6 @@ const initialState = {
     activeQuery: null,
     user: null,
     company: null,
-    companyName: '',
     topics: [],
     selectedItems: [],
     bookmarks: false,
@@ -30,7 +29,6 @@ const initialState = {
     newItemsData: null,
     newItemsByTopic: {},
     readItems: {},
-    resultsFiltered: false,
     wire: {
         newsOnly: false,
     },
@@ -53,7 +51,6 @@ function recieveItems(state, data) {
         aggregations: data._aggregations || null,
         newItems: [],
         newItemsData: null,
-        resultsFiltered: !isEmpty(state.wire.activeFilter) || !isEmpty(state.wire.createdFilter)
     };
 }
 
@@ -87,7 +84,6 @@ export default function wireReducer(state = initialState, action) {
             user: action.wireData.user || null,
             topics: action.wireData.topics || [],
             company: action.wireData.company || null,
-            companyName: action.wireData.companyName || '',
             bookmarks: action.wireData.bookmarks || false,
             formats: action.wireData.formats || [],
             wire: Object.assign({}, state.wire, {newsOnly: action.newsOnly}),

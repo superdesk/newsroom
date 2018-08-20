@@ -6,7 +6,6 @@ import { get } from 'lodash';
 import { gettext } from 'utils';
 
 import {
-    followTopic,
     fetchItems,
     setQuery,
     fetchMoreItems,
@@ -17,9 +16,10 @@ import {
 
 import {
     setView,
+    followTopic,
 } from 'search/actions';
 
-import { getActiveQuery, isTopicActive } from 'wire/utils';
+import { activeTopicSelector } from 'search/selectors';
 
 import BaseApp from 'layout/components/BaseApp';
 import Preview from './Preview';
@@ -59,14 +59,7 @@ class WireApp extends BaseApp {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,
         });
-
-        const searchCriteria = getActiveQuery(
-            this.props.activeQuery,
-            this.props.resultsFiltered ? this.props.activeFilter : {},
-            this.props.resultsFiltered ? this.props.createdFilter : {}
-        );
-        const activeTopic = this.props.topics.find((topic) => isTopicActive(topic, searchCriteria));
-
+        
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
@@ -126,16 +119,14 @@ class WireApp extends BaseApp {
                                 query={this.props.activeQuery}
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
-                                followTopic={this.props.followTopic}
+                                topicType='wire'
                                 newItems={this.props.newItems}
                                 refresh={this.props.refresh}
-                                searchCriteria={searchCriteria}
-                                activeTopic={activeTopic}
+                                activeTopic={this.props.activeTopic}
                                 toggleNews={this.props.toggleNews}
                                 activeNavigation={this.props.activeNavigation}
                                 newsOnly={this.props.newsOnly}
                                 scrollClass={this.state.scrollClass}
-                                resultsFiltered = {this.props.resultsFiltered}
                             />
 
                             <ItemsList
@@ -164,7 +155,7 @@ class WireApp extends BaseApp {
                 this.renderNavBreadcrumb(
                     this.props.navigations,
                     this.props.activeNavigation,
-                    activeTopic
+                    this.props.activeTopic
                 )
             ])
         );
@@ -176,12 +167,9 @@ WireApp.propTypes = {
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
     activeQuery: PropTypes.string,
-    activeFilter: PropTypes.object,
-    createdFilter: PropTypes.object,
     itemToPreview: PropTypes.object,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
-    followTopic: PropTypes.func,
     modal: PropTypes.object,
     user: PropTypes.string,
     company: PropTypes.string,
@@ -204,7 +192,7 @@ WireApp.propTypes = {
     activeNavigation: PropTypes.string,
     toggleNews: PropTypes.func,
     newsOnly: PropTypes.bool,
-    resultsFiltered: PropTypes.bool,
+    activeTopic: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -212,8 +200,6 @@ const mapStateToProps = (state) => ({
     isLoading: state.isLoading,
     totalItems: state.totalItems,
     activeQuery: state.activeQuery,
-    activeFilter: get(state, 'search.activeFilter'),
-    createdFilter: get(state, 'search.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -227,12 +213,12 @@ const mapStateToProps = (state) => ({
     activeNavigation: get(state, 'search.activeNavigation', null),
     newsOnly: !!get(state, 'wire.newsOnly'),
     bookmarks: state.bookmarks,
-    resultsFiltered: state.resultsFiltered,
+
+    activeTopic: activeTopicSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    followTopic: (query) => dispatch(followTopic(query)),
-    followStory: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`})),
+    followStory: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`}, 'wire')),
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {
         dispatch(toggleNews());

@@ -2,10 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import 'react-toggle/style.css';
+import { connect } from 'react-redux';
 
 import { isEmpty } from 'lodash';
 import { gettext } from 'utils';
 import {isTouchDevice} from '../../utils';
+
+import {
+    followTopic,
+} from 'search/actions';
+
+import {
+    searchCriteriaSelector,
+    resultsFilteredSelector,
+} from 'search/selectors';
 
 class SearchResultsInfo extends React.Component {
     componentDidMount() {
@@ -33,7 +43,7 @@ class SearchResultsInfo extends React.Component {
 
         const displayTotalItems = this.props.bookmarks ||
           !isEmpty(this.props.searchCriteria) ||
-          this.props.activeTopic ||
+          !isEmpty(this.props.activeTopic) ||
           this.props.resultsFiltered;
 
         const displayHeader = !isEmpty(this.props.newItems) || displayTotalItems || displayFollowTopic || this.props.query;
@@ -57,7 +67,7 @@ class SearchResultsInfo extends React.Component {
                     <button
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-none d-sm-block"
-                        onClick={() => this.props.followTopic(this.props.searchCriteria)}
+                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType)}
                     >{gettext('Save as topic')}</button>
                 )}
 
@@ -65,7 +75,7 @@ class SearchResultsInfo extends React.Component {
                     <button
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-block d-sm-none"
-                        onClick={() => this.props.followTopic(this.props.searchCriteria)}
+                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType)}
                     >{gettext('S')}</button>
                 )}
 
@@ -91,17 +101,29 @@ SearchResultsInfo.propTypes = {
     user: PropTypes.string,
     query: PropTypes.string,
     totalItems: PropTypes.number,
-    followTopic: PropTypes.func,
     bookmarks: PropTypes.bool,
     newItems: PropTypes.array,
     refresh: PropTypes.func,
-    searchCriteria: PropTypes.object,
     activeTopic: PropTypes.object,
     toggleNews: PropTypes.func,
     activeNavigation: PropTypes.string,
     newsOnly: PropTypes.bool,
     scrollClass: PropTypes.string,
+    topicType: PropTypes.string,
+
+    searchCriteria: PropTypes.object,
     resultsFiltered: PropTypes.bool,
+
+    followTopic: PropTypes.func.isRequired,
 };
 
-export default SearchResultsInfo;
+const mapStateToProps = (state) => ({
+    searchCriteria: searchCriteriaSelector(state),
+    resultsFiltered: resultsFilteredSelector(state),
+});
+
+const mapDispatchToProps = {
+    followTopic,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchResultsInfo);
