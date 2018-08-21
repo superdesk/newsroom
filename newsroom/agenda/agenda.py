@@ -118,6 +118,7 @@ class AgendaResource(newsroom.Resource):
     schema['shares'] = Resource.not_analyzed_field('list')  # list of user ids who shared this item
     schema['prints'] = Resource.not_analyzed_field('list')  # list of user ids who printed this item
     schema['copies'] = Resource.not_analyzed_field('list')  # list of user ids who copied this item
+    schema['watches'] = Resource.not_analyzed_field('list')  # list of users following the event
 
     # matching products from superdesk
     schema['products'] = {
@@ -208,7 +209,14 @@ class AgendaService(newsroom.Service):
             query['bool']['must'].append({'term': {'_id': req.args['id']}})
 
         if req.args.get('bookmarks'):
-            set_bookmarks_query(query, req.args['bookmarks'])
+            query['bool']['must'].append({
+                'bool': {
+                    'should': [
+                        {'term': {'bookmarks': str(req.args['bookmarks'])}},
+                        {'term': {'watches': str(req.args['bookmarks'])}},
+                    ],
+                },
+            })
 
         if req.args.get('date_from') or req.args.get('date_to'):
             query['bool']['must'].append(_event_date_range(req.args))

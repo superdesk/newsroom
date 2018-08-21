@@ -1,6 +1,7 @@
 from flask import json
 
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company  # noqa
+from .utils import post_json, delete_json
 
 
 def test_item_detail(client):
@@ -148,3 +149,14 @@ def test_coverage_request(client, app):
         assert 'admin@sourcefabric.org' in outbox[0].body
         assert 'http://localhost:5050/agenda/urn:conference' in outbox[0].body
         assert 'Some info message' in outbox[0].body
+
+
+def test_watch_event(client, app):
+    user_id = app.data.find_all('users')[0]['_id']
+    assert 0 == get_bookmarks_count(client, user_id)
+
+    post_json(client, '/agenda_watch', {'items': ['urn:conference']})
+    assert 1 == get_bookmarks_count(client, user_id)
+
+    delete_json(client, '/agenda_watch', {'items': ['urn:conference']})
+    assert 0 == get_bookmarks_count(client, user_id)

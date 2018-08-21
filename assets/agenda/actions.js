@@ -16,6 +16,8 @@ import {
     setCreatedFilter,
 } from 'search/actions';
 
+const WATCH_URL = '/agenda_watch';
+
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
     return {type: SET_STATE, state};
@@ -179,14 +181,30 @@ export function fetchItem(id) {
     };
 }
 
-/**
- * Start a follow topic action
- *
- * @param {String} topic
- */
-export function followEvent(topic) {
-    topic.topic_type = 'agenda';
-    return renderModal('followTopic', {topic});
+export const WATCH_EVENTS = 'WATCH_EVENTS';
+export function watchEvents(ids) {
+    return (dispatch) => {
+        server.post(WATCH_URL, {items: ids})
+            .then(() => dispatch({type: WATCH_EVENTS, items: ids}));
+    };
+}
+
+export const STOP_WATCHING_EVENT = 'STOP_WATCHING_EVENT';
+export function stopWatchingEvent(item) {
+    return (dispatch, getState) => {
+        server.del(WATCH_URL, {items: [item._id]})
+            .then(() => {
+                if (getState().bookmarks) {
+                    if (getState().previewItem === item._id) { // close preview if it's opened
+                        dispatch(previewItem()); 
+                    }
+
+                    dispatch(fetchItems()); // item should get removed from the list in bookmarks view
+                } else { // in agenda toggle item watched state
+                    dispatch({type: STOP_WATCHING_EVENT, item: item});
+                }
+            });
+    };
 }
 
 export function submitFollowTopic(data) {

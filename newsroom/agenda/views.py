@@ -77,3 +77,13 @@ def request_coverage():
     item = get_entity_or_404(data.get('item'), 'agenda')
     send_coverage_request_email(user, data.get('message'), item['_id'])
     return flask.jsonify(), 201
+
+
+@blueprint.route('/agenda_watch', methods=['POST', 'DELETE'])
+@login_required
+def follow():
+    user = get_user(required=True)
+    data = get_json_or_400()
+    assert data.get('items')
+    update_action_list(data.get('items'), 'watches', item_type='agenda')
+    return flask.jsonify(), 200
