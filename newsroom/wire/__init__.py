@@ -35,7 +35,8 @@ def init_app(app):
 
     app.sidenav('Home', 'wire.index', 'home')
     app.sidenav('Wire', 'wire.wire', 'text', section='wire')
-    app.sidenav('Saved Items', 'wire.bookmarks', 'bookmark', group=1, active=['wire.bookmarks', 'agenda.bookmarks'])
+
+    app.sidenav('Saved Items', 'wire.bookmarks', 'bookmark', group=1, blueprint='wire')
 
     from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter
     app.add_download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'])

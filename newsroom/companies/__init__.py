@@ -1,8 +1,9 @@
 import superdesk
 from functools import wraps
 
-from flask import Blueprint, current_app, abort
+from flask import Blueprint, abort
 from newsroom.auth import get_user
+from newsroom.template_filters import sidenavs
 
 from .companies import CompaniesResource, CompaniesService
 
@@ -27,12 +28,13 @@ def section_allowed(nav, sections):
     return not nav.get('section') or sections.get(nav['section'])
 
 
-def get_company_sidenavs():
+def get_company_sidenavs(blueprint=None):
     user = get_user()
     company = get_user_company(user)
+    navs = sidenavs(blueprint)
     if company and company.get('sections'):
-        return [nav for nav in current_app.sidenavs if section_allowed(nav, company['sections'])]
-    return current_app.sidenavs
+        return [nav for nav in navs if section_allowed(nav, company['sections'])]
+    return navs
 
 
 def section(_id):

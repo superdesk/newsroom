@@ -64,8 +64,8 @@
                 {% endif %}
 
                 {% for group in range(0, 2) %}
-                    {% for nav in sidenavs()|selectattr("group", "equalto", group) %}
-                    <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %} {% if nav.active and request.endpoint in nav.active %}active {% endif %}">
+                    {% for nav in sidenavs(request.blueprint)|selectattr("group", "equalto", group) %}
+                    <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %}">
                     <a href="{{ url_for(nav.endpoint) }}" title="{{  gettext(nav.name) }}" data-toggle="tooltip" data-placement="right">
                         <i class="icon--{{ nav.icon }} icon--mid-blue"></i>
                     </a>
