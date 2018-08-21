@@ -28,7 +28,7 @@ from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, newsroom_config, is_admin,
-    hash_string, date_header, get_date
+    hash_string, date_header, get_date, sidenavs,
 )
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -119,7 +119,7 @@ class Newsroom(eve.Eve):
         self.add_template_filter(time_short)
         self.add_template_filter(date_short)
         self.add_template_filter(word_count)
-        self.add_template_global(lambda: self.sidenavs, 'sidenavs')
+        self.add_template_global(sidenavs)
         self.add_template_global(newsroom_config)
         self.add_template_global(is_admin)
         self.add_template_global(get_initial_notifications)
@@ -165,7 +165,7 @@ class Newsroom(eve.Eve):
             view_func=self.send_theme_file
         )
 
-    def sidenav(self, name, endpoint, icon=None, group=0, active=None, section=None):
+    def sidenav(self, name, endpoint, icon=None, group=0, active=None, section=None, blueprint=None):
         """Register an item in sidebar menu."""
         self.sidenavs.append({
             'name': name,
@@ -174,6 +174,7 @@ class Newsroom(eve.Eve):
             'group': group,
             'active': active,
             'section': section,
+            'blueprint': blueprint,
         })
 
     def add_download_formatter(self, _format, formatter, name, types):

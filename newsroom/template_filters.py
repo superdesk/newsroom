@@ -3,6 +3,7 @@ import arrow
 import flask
 import hashlib
 
+from flask import current_app as app
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
 from superdesk.text_utils import get_text, get_word_count
@@ -75,3 +76,10 @@ def hash_string(value):
 
 def get_date():
     return utcnow()
+
+
+def sidenavs(blueprint=None):
+    def blueprint_matches(nav, blueprint):
+        return not nav.get('blueprint') or not blueprint or nav['blueprint'] == blueprint
+
+    return [nav for nav in app.sidenavs if blueprint_matches(nav, blueprint)]
