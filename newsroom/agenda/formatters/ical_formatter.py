@@ -1,4 +1,5 @@
 
+import arrow
 import icalendar
 
 from flask import url_for
@@ -9,6 +10,11 @@ from newsroom.agenda.contacts import get_contact_name, get_contact_email
 from newsroom.wire.formatters.base import BaseFormatter
 
 
+def datetime(value):
+    """Make sure dates are datetime instances."""
+    return arrow.get(value).datetime
+
+
 def get_rrule_kwargs(rrule):
     kwargs = {'freq': rrule['frequency']}
     if rrule.get('count'):
@@ -16,7 +22,7 @@ def get_rrule_kwargs(rrule):
     if rrule.get('interval'):
         kwargs['interval'] = rrule['interval']
     if rrule.get('until'):
-        kwargs['until'] = rrule['until']
+        kwargs['until'] = datetime(rrule['until'])
     return kwargs
 
 
@@ -60,9 +66,9 @@ class iCalFormatter(BaseFormatter):
 
         # dates
         dates = item.get('dates', {})
-        event.add('dtstart', dates['start'])
+        event.add('dtstart', datetime(dates['start']))
         if dates.get('end'):
-            event.add('dtend', dates['end'])
+            event.add('dtend', datetime(dates['end']))
         try:
             rrule = item['event']['dates']['recurring_rule']
             event.add('rrule', get_rrule_kwargs(rrule))
