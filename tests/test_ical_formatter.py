@@ -1,4 +1,5 @@
 
+import os
 import copy
 import icalendar
 
@@ -49,3 +50,10 @@ def test_ical_formatter_item(client, app, mocker):
     assert vevent['url'] == event['links'][0]
     assert vevent['contact'] == 'Professor Tom Jones, AAP, jones@foo.com'
     assert vevent['rrule'].to_ical() == b'FREQ=DAILY;COUNT=3;INTERVAL=1'
+
+
+def test_ical_formatter_failing(client, app):
+    with open(os.path.join(os.path.dirname(__file__), 'agenda_fixture.json'), 'r') as fixture:
+        item = json.load(fixture)
+    formatter = iCalFormatter()
+    formatter.format_item(item, item_type='agenda')
