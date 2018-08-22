@@ -171,7 +171,8 @@ class AgendaApp extends BaseApp {
                     this.props.navigations,
                     this.props.activeNavigation,
                     this.props.activeTopic
-                )
+                ),
+                this.renderSavedItemsCount()
             ])
         );
     }
@@ -214,6 +215,7 @@ AgendaApp.propTypes = {
     openItemDetails: PropTypes.func,
     requestCoverage: PropTypes.func,
     detail: PropTypes.bool,
+    savedItemsCount: PropTypes.number,
 };
 
 const mapStateToProps = (state) => ({
@@ -240,6 +242,7 @@ const mapStateToProps = (state) => ({
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
     detail: get(state, 'detail', false),
+    savedItemsCount: state.savedItemsCount,
 });
 
 const mapDispatchToProps = (dispatch) => ({

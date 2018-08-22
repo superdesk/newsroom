@@ -18,7 +18,7 @@ def init_app(app):
     superdesk.register_resource('agenda', AgendaResource, AgendaService, _app=app)
     app.section('agenda', 'Agenda')
     app.sidenav('Agenda', 'agenda.index', 'calendar', section='agenda')
-    app.sidenav('Saved Items', 'agenda.bookmarks', 'bookmark', group=1, blueprint='agenda')
+    app.sidenav('Saved Items', 'agenda.bookmarks', 'bookmark', group=1, blueprint='agenda', badge='saved-items-count')
 
     app.add_download_formatter('ical', formatters.iCalFormatter(), 'iCalendar', ['agenda'])
     app.add_template_global(url_for_agenda)

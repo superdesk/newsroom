@@ -4,7 +4,7 @@ import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml } from 'utils';
 import { markItemAsRead, toggleNewsOnlyParam } from './utils';
-import { renderModal, closeModal } from 'actions';
+import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 
 import {
     setQuery,
@@ -296,7 +296,7 @@ export function removeBookmarkItems(items) {
 
 export function bookmarkItems(items) {
     return (dispatch, getState) =>
-        server.post(`/bookmark?type=${getState().context}`, {items})
+        server.post(`/${getState().context}_bookmark`, {items})
             .then(() => {
                 if (items.length > 1) {
                     notify.success(gettext('Items were bookmarked successfully.'));
@@ -313,7 +313,7 @@ export function bookmarkItems(items) {
 
 export function removeBookmarks(items) {
     return (dispatch, getState) =>
-        server.del(`/bookmark?type=${getState().context}`, {items})
+        server.del(`/${getState().context}_bookmark`, {items})
             .then(() => {
                 if (items.length > 1) {
                     notify.success(gettext('Items were removed from bookmarks successfully.'));
@@ -397,6 +397,9 @@ export function pushNotification(push) {
 
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
+
+        case `saved_items:${user}`:
+            return dispatch(setSavedItemsCount(push.extra.count));
         }
     };
 }

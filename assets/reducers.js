@@ -1,4 +1,7 @@
-import {CLOSE_MODAL, RENDER_MODAL,} from 'actions';
+import {
+    CLOSE_MODAL, RENDER_MODAL,
+    SAVED_ITEMS_COUNT,
+} from 'actions';
 import {searchReducer} from 'search/reducers';
 
 import {
@@ -297,6 +300,9 @@ export function defaultReducer(state, action) {
 
     case SET_TOPICS:
         return {...state, topics: action.topics};
+    
+    case SAVED_ITEMS_COUNT:
+        return {...state, savedItemsCount: action.count};
 
     default: {
         const search = searchReducer(state.search, action);

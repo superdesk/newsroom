@@ -124,6 +124,7 @@ export default function agendaReducer(state = initialState, action) {
             context: 'agenda',
             openItem: openItem,
             detail: !!openItem,
+            savedItemsCount: action.agendaData.saved_items || null,
         };
     }
 

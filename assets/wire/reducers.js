@@ -89,6 +89,7 @@ export default function wireReducer(state = initialState, action) {
             wire: Object.assign({}, state.wire, {newsOnly: action.newsOnly}),
             search: Object.assign({}, state.search, {navigations}),
             context: 'wire',
+            savedItemsCount: action.wireData.saved_items || null,
         };
     }
 

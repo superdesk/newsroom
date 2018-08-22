@@ -51,6 +51,7 @@ def get_view_data():
                     if 'wire' in f['types']],
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='wire'),
+        'saved_items': get_bookmarks_count(user['_id']),
     }
 
 
@@ -214,7 +215,7 @@ def share():
     return flask.jsonify(), 201
 
 
-@blueprint.route('/bookmark', methods=['POST', 'DELETE'])
+@blueprint.route('/wire_bookmark', methods=['POST', 'DELETE'])
 @login_required
 def bookmark():
     """Bookmark an item.
@@ -224,10 +225,9 @@ def bookmark():
     """
     data = get_json_or_400()
     assert data.get('items')
-    item_type = get_type()
-    update_action_list(data.get('items'), 'bookmarks', item_type=item_type)
+    update_action_list(data.get('items'), 'bookmarks', item_type='items')
     user_id = get_user_id()
-    push_user_notification('bookmarks', count=get_bookmarks_count(user_id))
+    push_user_notification('saved_items', count=get_bookmarks_count(user_id))
     return flask.jsonify(), 200
 
 

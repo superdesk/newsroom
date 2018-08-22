@@ -4,7 +4,7 @@ import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler } from 'utils';
 import { markItemAsRead } from 'wire/utils';
-import { renderModal, closeModal } from 'actions';
+import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 import {getDateInputDate} from './utils';
 
 import {
@@ -46,9 +46,6 @@ export function previewItem(item) {
         item && analytics.itemEvent('preview', item);
     };
 }
-
-export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
-export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
 
 export const OPEN_ITEM = 'OPEN_ITEM';
 export function openItemDetails(item) {
@@ -183,9 +180,15 @@ export function fetchItem(id) {
 
 export const WATCH_EVENTS = 'WATCH_EVENTS';
 export function watchEvents(ids) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         server.post(WATCH_URL, {items: ids})
-            .then(() => dispatch({type: WATCH_EVENTS, items: ids}));
+            .then(() => {
+                dispatch({type: WATCH_EVENTS, items: ids});
+                ids.forEach((_id) => {
+                    const item = getState().itemsById[_id];
+                    item && analytics.itemEvent('watch', item);
+                });
+            });
     };
 }
 
@@ -337,6 +340,9 @@ export function pushNotification(push) {
 
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
+
+        case `saved_items:${user}`:
+            return dispatch(setSavedItemsCount(push.extra.count));
         }
     };
 }

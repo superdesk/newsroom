@@ -22,7 +22,7 @@ class Analytics {
     }
 
     itemEvent(name, item, params) {
-        this.event(name, item.headline || item.slugline, params);
+        this.event(name, item.headline || item.name || item.slugline, params);
     }
 
     timingComplete(name, value) {

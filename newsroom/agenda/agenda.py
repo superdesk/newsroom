@@ -21,6 +21,17 @@ from newsroom.agenda.email import send_coverage_notification_email
 logger = logging.getLogger(__name__)
 
 
+def set_saved_items_query(query, user_id):
+    query['bool']['must'].append({
+        'bool': {
+            'should': [
+                {'term': {'bookmarks': str(user_id)}},
+                {'term': {'watches': str(user_id)}},
+            ],
+        },
+    })
+
+
 class AgendaResource(newsroom.Resource):
     """
     Agenda schema
@@ -209,14 +220,7 @@ class AgendaService(newsroom.Service):
             query['bool']['must'].append({'term': {'_id': req.args['id']}})
 
         if req.args.get('bookmarks'):
-            query['bool']['must'].append({
-                'bool': {
-                    'should': [
-                        {'term': {'bookmarks': str(req.args['bookmarks'])}},
-                        {'term': {'watches': str(req.args['bookmarks'])}},
-                    ],
-                },
-            })
+            set_saved_items_query(query, req.args['bookmarks'])
 
         if req.args.get('date_from') or req.args.get('date_to'):
             query['bool']['must'].append(_event_date_range(req.args))
@@ -339,3 +343,12 @@ class AgendaService(newsroom.Service):
         for user_id in notify_user_ids:
             user = user_dict[str(user_id)]
             send_coverage_notification_email(user, agenda, wire_item)
+
+    def get_saved_items_count(self):
+        query = _agenda_query()
+        user = get_user()
+        company = get_user_company(user)
+        set_product_query(query, company)
+        set_saved_items_query(query, str(user['_id']))
+        cursor = self.get_items_by_query(query, size=0)
+        return cursor.count()

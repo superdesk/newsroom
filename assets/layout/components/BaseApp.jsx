@@ -52,6 +52,15 @@ export default class BaseApp extends React.Component {
         return createPortal(name , dest);
     }
 
+    renderSavedItemsCount() {
+        const dest = document.getElementById('saved-items-count');
+        if (!dest) {
+            return null;
+        }
+
+        return createPortal(this.props.savedItemsCount, dest);
+    }
+
     toggleSidebar(event) {
         event.preventDefault();
         this.setState({withSidebar: !this.state.withSidebar});
@@ -115,4 +124,5 @@ BaseApp.propTypes = {
     actions: PropTypes.arrayOf(PropTypes.object).isRequired,
     activeQuery: PropTypes.string,
     fetchMoreItems: PropTypes.func.isRequired,
+    savedItemsCount: PropTypes.number,
 };

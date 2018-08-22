@@ -156,7 +156,8 @@ class WireApp extends BaseApp {
                     this.props.navigations,
                     this.props.activeNavigation,
                     this.props.activeTopic
-                )
+                ),
+                this.renderSavedItemsCount(),
             ])
         );
     }
@@ -193,6 +194,7 @@ WireApp.propTypes = {
     toggleNews: PropTypes.func,
     newsOnly: PropTypes.bool,
     activeTopic: PropTypes.object,
+    savedItemsCount: PropTypes.number,
 };
 
 const mapStateToProps = (state) => ({
@@ -213,6 +215,7 @@ const mapStateToProps = (state) => ({
     activeNavigation: get(state, 'search.activeNavigation', null),
     newsOnly: !!get(state, 'wire.newsOnly'),
     bookmarks: state.bookmarks,
+    savedItemsCount: state.savedItemsCount,
 
     activeTopic: activeTopicSelector(state),
 });
