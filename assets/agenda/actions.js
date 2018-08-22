@@ -1,5 +1,5 @@
 
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler } from 'utils';
@@ -189,19 +189,19 @@ export function watchEvents(ids) {
     };
 }
 
-export const STOP_WATCHING_EVENT = 'STOP_WATCHING_EVENT';
-export function stopWatchingEvent(item) {
+export const STOP_WATCHING_EVENTS = 'STOP_WATCHING_EVENTS';
+export function stopWatchingEvents(items) {
     return (dispatch, getState) => {
-        server.del(WATCH_URL, {items: [item._id]})
+        server.del(WATCH_URL, {items})
             .then(() => {
                 if (getState().bookmarks) {
-                    if (getState().previewItem === item._id) { // close preview if it's opened
+                    if (includes(items, getState().previewItem)) { // close preview if it's opened
                         dispatch(previewItem()); 
                     }
 
                     dispatch(fetchItems()); // item should get removed from the list in bookmarks view
                 } else { // in agenda toggle item watched state
-                    dispatch({type: STOP_WATCHING_EVENT, item: item});
+                    dispatch({type: STOP_WATCHING_EVENTS, items: items});
                 }
             });
     };

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { get } from 'lodash';
 
-import { gettext } from 'utils';
 import { isEqualItem } from 'wire/utils';
 import PreviewActionButtons from 'components/PreviewActionButtons';
 
@@ -32,7 +31,7 @@ class AgendaPreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, watchEvents, stopWatchingEvent, openItemDetails, requestCoverage} = this.props;
+        const {item, user, actions, openItemDetails, requestCoverage} = this.props;
 
         const isWatching = get(item, 'watches', []).includes(user);
 
@@ -43,6 +42,7 @@ class AgendaPreview extends React.PureComponent {
             'wire-column__preview--cancelled': isCanceled(item),
             'wire-column__preview--rescheduled': isRescheduled(item),
             'wire-column__preview--open': !!item,
+            'wire-column__preview--watched': isWatching,
         });
 
         return (
@@ -50,23 +50,6 @@ class AgendaPreview extends React.PureComponent {
                 {item &&
                     <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
                         <div className='wire-column__preview__top-bar'>
-                            <div>
-                                {user && !isWatching &&
-                                    <button type="button"
-                                        className="btn btn-outline-primary btn-responsive"
-                                        onClick={() => watchEvents([item._id])}>
-                                        {gettext('Watch event')}
-                                    </button>
-                                }
-                                {user && isWatching &&
-                                    <button type="button"
-                                        className="btn btn-outline-primary btn-responsive"
-                                        onClick={() => stopWatchingEvent(item)}>
-                                        {gettext('Stop watching')}
-                                    </button>
-                                }
-                            </div>
-
                             <PreviewActionButtons item={item} user={user} actions={actions} />
                         </div>
 
@@ -97,12 +80,9 @@ AgendaPreview.propTypes = {
         url: PropTypes.func,
     })),
     followEvent: PropTypes.func,
-    isFollowing: PropTypes.bool,
     closePreview: PropTypes.func,
     openItemDetails: PropTypes.func,
     requestCoverage: PropTypes.func,
-    watchEvents: PropTypes.func.isRequired,
-    stopWatchingEvent: PropTypes.func.isRequired,
 };
 
 export default AgendaPreview;

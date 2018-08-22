@@ -7,7 +7,7 @@ import { gettext } from 'utils';
 
 import {
     watchEvents,
-    stopWatchingEvent,
+    stopWatchingEvents,
     fetchItems,
     selectDate,
     fetchMoreItems,
@@ -159,8 +159,6 @@ class AgendaApp extends BaseApp {
                             item={this.props.itemToPreview}
                             user={this.props.user}
                             actions={this.filterActions(this.props.itemToPreview)}
-                            watchEvents={this.props.watchEvents}
-                            stopWatchingEvent={this.props.stopWatchingEvent}
                             closePreview={this.props.closePreview}
                             openItemDetails={this.props.openItemDetails}
                             requestCoverage={this.props.requestCoverage}
@@ -216,9 +214,6 @@ AgendaApp.propTypes = {
     openItemDetails: PropTypes.func,
     requestCoverage: PropTypes.func,
     detail: PropTypes.bool,
-
-    watchEvents: PropTypes.func.isRequired,
-    stopWatchingEvent: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -248,16 +243,21 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    watchEvents: (items) => dispatch(watchEvents(items)),
-    stopWatchingEvent: (item) => dispatch(stopWatchingEvent(item)),
     fetchItems: () => dispatch(fetchItems()),
     actions: getItemActions(dispatch).concat([
         {
             name: gettext('Watch'),
             icon: 'calendar',
             multi: true,
-            when: (state, item) => state.user && !state.bookmarks && !includes(get(item, 'watches', []), state.user),
+            when: (state, item) => state.user && !includes(get(item, 'watches', []), state.user),
             action: (items) => dispatch(watchEvents(items)),
+        },
+        {
+            name: gettext('Stop watching'),
+            icon: 'calendar',
+            multi: true,
+            when: (state, item) => state.user && includes(get(item, 'watches', []), state.user),
+            action: (items) => dispatch(stopWatchingEvents(items)),
         },
     ]),
     fetchMoreItems: () => dispatch(fetchMoreItems()),

@@ -4,7 +4,7 @@ import {
     INIT_DATA,
     SELECT_DATE,
     WATCH_EVENTS,
-    STOP_WATCHING_EVENT,
+    STOP_WATCHING_EVENTS,
 } from './actions';
 
 import { get } from 'lodash';
@@ -80,12 +80,6 @@ function _agendaReducer(state, action) {
     }
 }
 
-function updateItem(state, item, updates) {
-    const itemsById = Object.assign({}, state.itemsById);
-    itemsById[item._id] = Object.assign({}, itemsById[item._id], updates);
-    return {...state, itemsById};
-}
-
 export default function agendaReducer(state = initialState, action) {
     switch (action.type) {
 
@@ -105,8 +99,15 @@ export default function agendaReducer(state = initialState, action) {
         return {...state, itemsById};
     }
 
-    case STOP_WATCHING_EVENT:
-        return updateItem(state, action.item, {watches: get(action.item, 'watches', []).filter((uid) => uid !== state.user)});
+    case STOP_WATCHING_EVENTS: {
+        const itemsById = Object.assign({}, state.itemsById);
+        action.items.forEach((_id) => {
+            const watches = get(itemsById[_id], 'watches', []).filter((userId) => userId !== state.user);
+            itemsById[_id] = Object.assign({}, itemsById[_id], {watches});
+        });
+
+        return {...state, itemsById};
+    }
 
     case INIT_DATA: {
         const navigations = get(action, 'agendaData.navigations', []);
