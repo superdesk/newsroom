@@ -82,7 +82,6 @@ def request_coverage():
 @blueprint.route('/agenda_watch', methods=['POST', 'DELETE'])
 @login_required
 def follow():
-    user = get_user(required=True)
     data = get_json_or_400()
     assert data.get('items')
     update_action_list(data.get('items'), 'watches', item_type='agenda')

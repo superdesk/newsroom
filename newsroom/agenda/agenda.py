@@ -9,7 +9,7 @@ from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk.metadata.item import not_analyzed
 from planning.common import WORKFLOW_STATE_SCHEMA
-from newsroom.wire.search import get_local_date, set_bookmarks_query, versioncreated_range
+from newsroom.wire.search import get_local_date, versioncreated_range
 from newsroom.wire.search import query_string, set_product_query
 from superdesk.resource import Resource, not_enabled
 from content_api.items.resource import code_mapping
@@ -290,7 +290,7 @@ class AgendaService(newsroom.Service):
             return bookmark_users
 
         for result in search_results.hits['hits']['hits']:
-            bookmarks = result['_source'].get('bookmarks', [])
+            bookmarks = result['_source'].get('watches', [])
             for bookmark in bookmarks:
                 user = active_users.get(bookmark)
                 if user and str(user.get('company', '')) in active_companies:
@@ -335,7 +335,7 @@ class AgendaService(newsroom.Service):
     def notify_new_coverage(self, agenda, wire_item):
         user_dict = get_user_dict()
         company_dict = get_company_dict()
-        notify_user_ids = filter_active_users(agenda.get('bookmarks', []), user_dict, company_dict)
+        notify_user_ids = filter_active_users(agenda.get('watches', []), user_dict, company_dict)
         for user_id in notify_user_ids:
             user = user_dict[str(user_id)]
             send_coverage_notification_email(user, agenda, wire_item)

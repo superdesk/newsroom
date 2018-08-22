@@ -605,7 +605,8 @@ def test_push_item_with_coverage(client, app, mocker):
     }
     post_json(client, '/push', test_event)
     post_json(client, '/push', test_planning)
-    post_json(client, '/bookmark?type=agenda', {'items': [test_event['guid']]})
+
+    post_json(client, '/agenda_watch', {'items': [test_event['guid']]})
 
     mail = mocker.patch('newsroom.agenda.email.send_email')
     post_json(client, '/push', test_item)

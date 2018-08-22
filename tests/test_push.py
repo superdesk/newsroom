@@ -346,8 +346,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     headers = get_signature_headers(data, key)
     resp = client.post('/push', data=data, content_type='application/json', headers=headers)
     assert 200 == resp.status_code
-    assert push_mock.call_args[1]['item']['_id'] == 'bar'
-    assert len(push_mock.call_args[1]['users']) == 1
+    push_mock.assert_called_once_with('new_item', item='bar')
 
 
 def test_do_not_notify_inactive_user(client, app, mocker):
