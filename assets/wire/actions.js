@@ -9,6 +9,7 @@ import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 import {
     setQuery,
     toggleNavigation,
+    setCreatedFilter,
 } from 'search/actions';
 
 export const SET_STATE = 'SET_STATE';
@@ -145,9 +146,9 @@ export function printItem(item) {
  * @return {Promise}
  */
 function search(state, next) {
-    const activeFilter = get(state, 'wire.activeFilter', {});
-    const activeNavigation = get(state, 'wire.activeNavigation');
-    const createdFilter = get(state, 'wire.createdFilter', {});
+    const activeFilter = get(state, 'search.activeFilter', {});
+    const activeNavigation = get(state, 'search.activeNavigation');
+    const createdFilter = get(state, 'search.createdFilter', {});
     const newsOnly = !!get(state, 'wire.newsOnly');
 
     const params = {
@@ -494,17 +495,6 @@ export function initParams(params) {
     };
 }
 
-function _setCreatedFilter(filter) {
-    return {type: SET_CREATED_FILTER, filter};
-}
-
-export const SET_CREATED_FILTER = 'SET_CREATED_FILTER';
-export function setCreatedFilter(filter) {
-    return (dispatch) => {
-        dispatch(_setCreatedFilter(filter));
-    };
-}
-
 export const RESET_FILTER = 'RESET_FILTER';
 export function resetFilter(filter) {
     return {type: RESET_FILTER, filter};
@@ -521,7 +511,7 @@ export function setTopicQuery(topic) {
         dispatch(toggleNavigation());
         dispatch(setQuery(topic.query || ''));
         dispatch(resetFilter(topic.filter));
-        dispatch(_setCreatedFilter(topic.created));
+        dispatch(setCreatedFilter(topic.created));
         return dispatch(fetchItems());
     };
 }

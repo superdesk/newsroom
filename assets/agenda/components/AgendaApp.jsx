@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { get, includes } from 'lodash';
+import { get, includes, isEmpty } from 'lodash';
 import { gettext } from 'utils';
 
 import {
@@ -60,6 +60,7 @@ class AgendaApp extends BaseApp {
 
     render() {
         const modal = this.renderModal(this.props.modal);
+        const showDatePicker = isEmpty(this.props.createdFilter.from) && isEmpty(this.props.createdFilter.to);
 
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
         const mainClassName = classNames('wire-column__main', {
@@ -104,12 +105,13 @@ class AgendaApp extends BaseApp {
                             fetchItems={this.props.fetchItems}
                         />
 
-                        <AgendaDateNavigation
+                        {showDatePicker && <AgendaDateNavigation
                             selectDate={this.props.selectDate}
                             activeDate={this.props.activeDate}
+                            createdFilter={this.props.createdFilter}
                             activeGrouping={this.props.activeGrouping}
                             displayCalendar={true}
-                        />
+                        />}
 
                         <AgendaListViewControls
                             activeView={this.props.activeView}
