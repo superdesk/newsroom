@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import { get, includes } from 'lodash';
 import { gettext } from 'utils';
 
 import {
-    followEvent,
+    watchEvents,
+    stopWatchingEvents,
     fetchItems,
     selectDate,
     fetchMoreItems,
@@ -60,8 +61,6 @@ class AgendaApp extends BaseApp {
     render() {
         const modal = this.renderModal(this.props.modal);
 
-        const isFollowing = get(this.props, 'itemToPreview._id') && this.props.topics &&
-            this.props.topics.find((topic) => topic.query === this.props.itemToPreview._id);
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
         const mainClassName = classNames('wire-column__main', {
             'wire-articles__one-side-pane': panesCount === 1,
@@ -160,8 +159,6 @@ class AgendaApp extends BaseApp {
                             item={this.props.itemToPreview}
                             user={this.props.user}
                             actions={this.filterActions(this.props.itemToPreview)}
-                            followEvent={this.props.followEvent}
-                            isFollowing={!!isFollowing}
                             closePreview={this.props.closePreview}
                             openItemDetails={this.props.openItemDetails}
                             requestCoverage={this.props.requestCoverage}
@@ -174,7 +171,8 @@ class AgendaApp extends BaseApp {
                     this.props.navigations,
                     this.props.activeNavigation,
                     this.props.activeTopic
-                )
+                ),
+                this.renderSavedItemsCount()
             ])
         );
     }
@@ -190,7 +188,6 @@ AgendaApp.propTypes = {
     itemToPreview: PropTypes.object,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
-    followEvent: PropTypes.func,
     modal: PropTypes.object,
     user: PropTypes.string,
     company: PropTypes.string,
@@ -218,6 +215,7 @@ AgendaApp.propTypes = {
     openItemDetails: PropTypes.func,
     requestCoverage: PropTypes.func,
     detail: PropTypes.bool,
+    savedItemsCount: PropTypes.number,
 };
 
 const mapStateToProps = (state) => ({
@@ -244,15 +242,27 @@ const mapStateToProps = (state) => ({
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
     detail: get(state, 'detail', false),
+    savedItemsCount: state.savedItemsCount,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    followEvent: (item) => dispatch(followEvent({
-        label: item.name,
-        query: `${item._id}`
-    })),
     fetchItems: () => dispatch(fetchItems()),
-    actions: getItemActions(dispatch),
+    actions: getItemActions(dispatch).concat([
+        {
+            name: gettext('Watch'),
+            icon: 'calendar',
+            multi: true,
+            when: (state, item) => state.user && !includes(get(item, 'watches', []), state.user),
+            action: (items) => dispatch(watchEvents(items)),
+        },
+        {
+            name: gettext('Stop watching'),
+            icon: 'calendar',
+            multi: true,
+            when: (state, item) => state.user && includes(get(item, 'watches', []), state.user),
+            action: (items) => dispatch(stopWatchingEvents(items)),
+        },
+    ]),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),

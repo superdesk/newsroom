@@ -165,7 +165,7 @@ class Newsroom(eve.Eve):
             view_func=self.send_theme_file
         )
 
-    def sidenav(self, name, endpoint, icon=None, group=0, active=None, section=None, blueprint=None):
+    def sidenav(self, name, endpoint, icon=None, group=0, active=None, section=None, blueprint=None, badge=None):
         """Register an item in sidebar menu."""
         self.sidenavs.append({
             'name': name,
@@ -175,6 +175,7 @@ class Newsroom(eve.Eve):
             'active': active,
             'section': section,
             'blueprint': blueprint,
+            'badge': badge,
         })
 
     def add_download_formatter(self, _format, formatter, name, types):

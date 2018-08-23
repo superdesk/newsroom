@@ -1,10 +1,10 @@
 
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler } from 'utils';
 import { markItemAsRead } from 'wire/utils';
-import { renderModal, closeModal } from 'actions';
+import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 import {getDateInputDate} from './utils';
 
 import {
@@ -15,6 +15,8 @@ import {
     toggleNavigation,
     setCreatedFilter,
 } from 'search/actions';
+
+const WATCH_URL = '/agenda_watch';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -44,9 +46,6 @@ export function previewItem(item) {
         item && analytics.itemEvent('preview', item);
     };
 }
-
-export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
-export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
 
 export const OPEN_ITEM = 'OPEN_ITEM';
 export function openItemDetails(item) {
@@ -179,14 +178,35 @@ export function fetchItem(id) {
     };
 }
 
-/**
- * Start a follow topic action
- *
- * @param {String} topic
- */
-export function followEvent(topic) {
-    topic.topic_type = 'agenda';
-    return renderModal('followTopic', {topic});
+export const WATCH_EVENTS = 'WATCH_EVENTS';
+export function watchEvents(ids) {
+    return (dispatch, getState) => {
+        server.post(WATCH_URL, {items: ids})
+            .then(() => {
+                dispatch({type: WATCH_EVENTS, items: ids});
+                notify.success(gettext('Started watching items successfully.'));
+                analytics.multiItemEvent('watch', ids.map((_id) => getState().itemsById[_id]));
+            });
+    };
+}
+
+export const STOP_WATCHING_EVENTS = 'STOP_WATCHING_EVENTS';
+export function stopWatchingEvents(items) {
+    return (dispatch, getState) => {
+        server.del(WATCH_URL, {items})
+            .then(() => {
+                notify.success(gettext('Stopped watching items successfully.'));
+                if (getState().bookmarks) {
+                    if (includes(items, getState().previewItem)) { // close preview if it's opened
+                        dispatch(previewItem()); 
+                    }
+
+                    dispatch(fetchItems()); // item should get removed from the list in bookmarks view
+                } else { // in agenda toggle item watched state
+                    dispatch({type: STOP_WATCHING_EVENTS, items: items});
+                }
+            });
+    };
 }
 
 export function submitFollowTopic(data) {
@@ -319,6 +339,9 @@ export function pushNotification(push) {
 
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
+
+        case `saved_items:${user}`:
+            return dispatch(setSavedItemsCount(push.extra.count));
         }
     };
 }

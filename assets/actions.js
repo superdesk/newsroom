@@ -8,3 +8,8 @@ export const CLOSE_MODAL = 'CLOSE_MODAL';
 export function closeModal() {
     return {type: CLOSE_MODAL};
 }
+
+export const SAVED_ITEMS_COUNT = 'SAVED_ITEMS_COUNT';
+export function setSavedItemsCount(count) {
+    return {type: SAVED_ITEMS_COUNT, count: count};
+}

@@ -9,7 +9,7 @@ from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk.metadata.item import not_analyzed
 from planning.common import WORKFLOW_STATE_SCHEMA
-from newsroom.wire.search import get_local_date, set_bookmarks_query, versioncreated_range
+from newsroom.wire.search import get_local_date, versioncreated_range
 from newsroom.wire.search import query_string, set_product_query
 from superdesk.resource import Resource, not_enabled
 from content_api.items.resource import code_mapping
@@ -19,6 +19,17 @@ from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
 from newsroom.agenda.email import send_coverage_notification_email
 
 logger = logging.getLogger(__name__)
+
+
+def set_saved_items_query(query, user_id):
+    query['bool']['must'].append({
+        'bool': {
+            'should': [
+                {'term': {'bookmarks': str(user_id)}},
+                {'term': {'watches': str(user_id)}},
+            ],
+        },
+    })
 
 
 class AgendaResource(newsroom.Resource):
@@ -118,6 +129,7 @@ class AgendaResource(newsroom.Resource):
     schema['shares'] = Resource.not_analyzed_field('list')  # list of user ids who shared this item
     schema['prints'] = Resource.not_analyzed_field('list')  # list of user ids who printed this item
     schema['copies'] = Resource.not_analyzed_field('list')  # list of user ids who copied this item
+    schema['watches'] = Resource.not_analyzed_field('list')  # list of users following the event
 
     # matching products from superdesk
     schema['products'] = {
@@ -208,7 +220,7 @@ class AgendaService(newsroom.Service):
             query['bool']['must'].append({'term': {'_id': req.args['id']}})
 
         if req.args.get('bookmarks'):
-            set_bookmarks_query(query, req.args['bookmarks'])
+            set_saved_items_query(query, req.args['bookmarks'])
 
         if req.args.get('date_from') or req.args.get('date_to'):
             query['bool']['must'].append(_event_date_range(req.args))
@@ -282,7 +294,7 @@ class AgendaService(newsroom.Service):
             return bookmark_users
 
         for result in search_results.hits['hits']['hits']:
-            bookmarks = result['_source'].get('bookmarks', [])
+            bookmarks = result['_source'].get('watches', [])
             for bookmark in bookmarks:
                 user = active_users.get(bookmark)
                 if user and str(user.get('company', '')) in active_companies:
@@ -327,7 +339,16 @@ class AgendaService(newsroom.Service):
     def notify_new_coverage(self, agenda, wire_item):
         user_dict = get_user_dict()
         company_dict = get_company_dict()
-        notify_user_ids = filter_active_users(agenda.get('bookmarks', []), user_dict, company_dict)
+        notify_user_ids = filter_active_users(agenda.get('watches', []), user_dict, company_dict)
         for user_id in notify_user_ids:
             user = user_dict[str(user_id)]
             send_coverage_notification_email(user, agenda, wire_item)
+
+    def get_saved_items_count(self):
+        query = _agenda_query()
+        user = get_user()
+        company = get_user_company(user)
+        set_product_query(query, company)
+        set_saved_items_query(query, str(user['_id']))
+        cursor = self.get_items_by_query(query, size=0)
+        return cursor.count()

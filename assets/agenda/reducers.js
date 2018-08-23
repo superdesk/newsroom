@@ -3,6 +3,8 @@ import {
     RECIEVE_ITEMS,
     INIT_DATA,
     SELECT_DATE,
+    WATCH_EVENTS,
+    STOP_WATCHING_EVENTS,
 } from './actions';
 
 import { get } from 'lodash';
@@ -87,6 +89,26 @@ export default function agendaReducer(state = initialState, action) {
     case SET_EVENT_QUERY:
         return {...state, query: action.query, activeItem: null};
 
+    case WATCH_EVENTS: {
+        const itemsById = Object.assign({}, state.itemsById);
+        action.items.forEach((_id) => {
+            const watches = get(itemsById[_id], 'watches', []).concat(state.user);
+            itemsById[_id] = Object.assign({}, itemsById[_id], {watches});
+        });
+
+        return {...state, itemsById};
+    }
+
+    case STOP_WATCHING_EVENTS: {
+        const itemsById = Object.assign({}, state.itemsById);
+        action.items.forEach((_id) => {
+            const watches = get(itemsById[_id], 'watches', []).filter((userId) => userId !== state.user);
+            itemsById[_id] = Object.assign({}, itemsById[_id], {watches});
+        });
+
+        return {...state, itemsById};
+    }
+
     case INIT_DATA: {
         const navigations = get(action, 'agendaData.navigations', []);
         const openItem = get(action, 'agendaData.item', null);
@@ -102,6 +124,7 @@ export default function agendaReducer(state = initialState, action) {
             context: 'agenda',
             openItem: openItem,
             detail: !!openItem,
+            savedItemsCount: action.agendaData.saved_items || null,
         };
     }
 
