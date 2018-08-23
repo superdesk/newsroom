@@ -10,6 +10,16 @@ export function getLocations(item) {
 }
 
 /**
+ * Get location address for item
+ *
+ * @param {Object} item 
+ * @return {Object}
+ */
+export function getAddress(item) {
+    return get(item, 'location.0.address');
+}
+
+/**
  * Get location bounding box
  * @param {Object} location 
  * @return {Array}
@@ -25,6 +35,24 @@ export function getBoundingBox(location) {
  */
 export function getAddressLine(location) {
     return get(location, 'address.line.0');
+}
+
+/**
+ * Get address state
+ *
+ * @param {Object} location
+ */
+export function getAddressState(location) {
+    return get(location, 'address.locality');
+}
+
+/**
+ * Get address country
+ *
+ * @param {Object} location
+ */
+export function getAddressCountry(location) {
+    return get(location, 'address.country');
 }
 
 /**
@@ -55,4 +83,12 @@ export function getLatLng(location) {
         lat: get(location, 'location.lat'),
         lng: get(location, 'location.lon'),
     };
+}
+
+export function mapsLoaded() {
+    return window.mapsLoaded;
+}
+
+export function mapsKey() {
+    return window.googleMapsKey;
 }
