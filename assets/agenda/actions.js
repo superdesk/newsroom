@@ -184,10 +184,8 @@ export function watchEvents(ids) {
         server.post(WATCH_URL, {items: ids})
             .then(() => {
                 dispatch({type: WATCH_EVENTS, items: ids});
-                ids.forEach((_id) => {
-                    const item = getState().itemsById[_id];
-                    item && analytics.itemEvent('watch', item);
-                });
+                notify.success(gettext('Started watching items successfully.'));
+                analytics.multiItemEvent('watch', ids.map((_id) => getState().itemsById[_id]));
             });
     };
 }
@@ -197,6 +195,7 @@ export function stopWatchingEvents(items) {
     return (dispatch, getState) => {
         server.del(WATCH_URL, {items})
             .then(() => {
+                notify.success(gettext('Stopped watching items successfully.'));
                 if (getState().bookmarks) {
                     if (includes(items, getState().previewItem)) { // close preview if it's opened
                         dispatch(previewItem()); 

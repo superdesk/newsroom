@@ -51,6 +51,10 @@ class Analytics {
             this._event(event);
         });
     }
+
+    multiItemEvent(event, items) {
+        items.forEach((item) => item && this.itemEvent(event, item));
+    }
 }
 
 // make it available

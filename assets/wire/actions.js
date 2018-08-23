@@ -236,15 +236,15 @@ export function submitShareItem(data) {
     return (dispatch, getState) => {
         return server.post(`/wire_share?type=${getState().context}`, data)
             .then(() => {
+                dispatch(closeModal());
+                dispatch(setShareItems(data.items));
                 if (data.items.length > 1) {
                     notify.success(gettext('Items were shared successfully.'));
                 } else {
                     notify.success(gettext('Item was shared successfully.'));
                 }
-                dispatch(closeModal());
             })
-            .then(() => multiItemEvent('share', data.items, getState()))
-            .then(() => dispatch(setShareItems(data.items)))
+            .then(() => analytics.multiItemEvent('share', data.items.map((_id) => getState().itemsById[_id])))
             .catch(errorHandler);
     };
 }
@@ -305,7 +305,7 @@ export function bookmarkItems(items) {
                 }
             })
             .then(() => {
-                multiItemEvent('bookmark', items, getState());
+                analytics.multiItemEvent('bookmark', items.map((_id) => getState().itemsById[_id]));
             })
             .then(() => dispatch(setBookmarkItems(items)))
             .catch(errorHandler);
@@ -363,7 +363,7 @@ export function submitDownloadItems(items, format) {
         window.open(`/download/${items.join(',')}?format=${format}&type=${getState().context}`, '_blank');
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
-        multiItemEvent('download', items, getState());
+        analytics.multiItemEvent('download', items.map((_id) => getState().itemsById[_id]));
     };
 }
 
@@ -528,11 +528,4 @@ export function setTopicQuery(topic) {
 
 export function refresh() {
     return (dispatch, getState) => dispatch(recieveItems(getState().newItemsData));
-}
-
-function multiItemEvent(event, items, state) {
-    items.forEach((itemId) => {
-        const item = state.itemsById[itemId];
-        item && analytics.itemEvent(event, item);
-    });
 }
