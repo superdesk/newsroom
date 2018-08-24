@@ -250,14 +250,14 @@ const mapDispatchToProps = (dispatch) => ({
     actions: getItemActions(dispatch).concat([
         {
             name: gettext('Watch'),
-            icon: 'calendar',
+            icon: 'watch',
             multi: true,
             when: (state, item) => state.user && !includes(get(item, 'watches', []), state.user),
             action: (items) => dispatch(watchEvents(items)),
         },
         {
             name: gettext('Stop watching'),
-            icon: 'calendar',
+            icon: 'unwatch',
             multi: true,
             when: (state, item) => state.user && includes(get(item, 'watches', []), state.user),
             action: (items) => dispatch(stopWatchingEvents(items)),
