@@ -46,7 +46,7 @@ class AgendaListItem extends React.Component {
             'wire-articles__item--covering': hasCoverages(this.props.item),
             'wire-articles__item--not-covering': !hasCoverages(this.props.item),
             'wire-articles__item--postponed': isPostponed(this.props.item),
-            'wire-articles__item--cancelled': isCanceled(this.props.item),
+            'wire-articles__item--canceled': isCanceled(this.props.item),
             'wire-articles__item--rescheduled': isRescheduled(this.props.item),
             'wire-articles__item--selected': this.props.isSelected,
         });
