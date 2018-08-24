@@ -110,3 +110,6 @@ node_modules
 
 # newsroom
 newsroom/static/
+
+# pytest
+.pytest_cache

@@ -132,54 +132,51 @@ def publish_event(event, orig):
             if file_ref.get('media'):
                 file_ref.setdefault('href', app.upload_url(file_ref['media']))
 
-    try:
-        _id = event['guid']
-        service = superdesk.get_resource_service('agenda')
+    _id = event['guid']
+    service = superdesk.get_resource_service('agenda')
 
-        if not orig:
-            # new event
-            agenda = {}
-            set_agenda_metadata_from_event(agenda, event)
-            agenda['dates'] = get_event_dates(event)
-            _id = service.create([agenda])[0]
-        else:
-            # replace the original document
-            if event.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
-                    event.get('pubstatus') == 'cancelled':
+    if not orig:
+        # new event
+        agenda = {}
+        set_agenda_metadata_from_event(agenda, event)
+        agenda['dates'] = get_event_dates(event)
+        _id = service.create([agenda])[0]
+    else:
+        # replace the original document
+        if event.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
+                event.get('pubstatus') == 'cancelled':
 
-                # it has been cancelled so don't need to change the dates
-                # update the event, the version and the state
-                updates = {
-                    'event': event,
-                    'version': event.get('version', [app.config['VERSION']]),
-                    'state': event['state']
-                }
+            # it has been cancelled so don't need to change the dates
+            # update the event, the version and the state
+            updates = {
+                'event': event,
+                'version': event.get('version', event.get(app.config['VERSION'])),
+                'state': event['state']
+            }
 
-                service.patch(event['guid'], updates)
+            service.patch(event['guid'], updates)
 
-            elif event.get('state') in [WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED]:
-                # schedule is changed, recalculate the dates, planning id and coverages from dates will be removed
-                updates = {}
-                set_agenda_metadata_from_event(updates, event)
-                updates['dates'] = get_event_dates(event)
-                updates['coverages'] = None
-                updates['planning_items'] = None
-                service.patch(event['guid'], updates)
+        elif event.get('state') in [WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED]:
+            # schedule is changed, recalculate the dates, planning id and coverages from dates will be removed
+            updates = {}
+            set_agenda_metadata_from_event(updates, event)
+            updates['dates'] = get_event_dates(event)
+            updates['coverages'] = None
+            updates['planning_items'] = None
+            service.patch(event['guid'], updates)
 
-            elif event.get('state') == WORKFLOW_STATE.SCHEDULED:
-                # event is reposted (possibly after a cancel)
-                updates = {
-                    'event': event,
-                    'version': event.get('version', [app.config['VERSION']]),
-                    'state': event['state'],
-                    'dates': get_event_dates(event),
-                }
-                set_agenda_metadata_from_event(updates, event)
-                service.patch(event['guid'], updates)
+        elif event.get('state') == WORKFLOW_STATE.SCHEDULED:
+            # event is reposted (possibly after a cancel)
+            updates = {
+                'event': event,
+                'version': event.get('version', event.get(app.config['VERSION'])),
+                'state': event['state'],
+                'dates': get_event_dates(event),
+            }
+            set_agenda_metadata_from_event(updates, event)
+            service.patch(event['guid'], updates)
 
-        return _id
-    except Exception as exc:
-        logger.error('Error in publishing event: {}'.format(event), exc, exc_info=True)
+    return _id
 
 
 def get_event_dates(event):
@@ -200,50 +197,47 @@ def publish_planning(planning):
     service = superdesk.get_resource_service('agenda')
     agenda = None
 
-    try:
-        # update dates
-        planning['planning_date'] = datetime.strptime(planning['planning_date'], '%Y-%m-%dT%H:%M:%S+0000')
+    # update dates
+    planning['planning_date'] = datetime.strptime(planning['planning_date'], '%Y-%m-%dT%H:%M:%S+0000')
 
-        if planning.get('event_item'):
-            # this is a planning for an event item
-            # if there's an event then _id field will have the same value as event_id
-            agenda = app.data.find_one('agenda', req=None, _id=planning['event_item'])
+    if planning.get('event_item'):
+        # this is a planning for an event item
+        # if there's an event then _id field will have the same value as event_id
+        agenda = app.data.find_one('agenda', req=None, _id=planning['event_item'])
 
-            if not agenda:
-                # event id exists in planning item but event is not in the system
-                logger.warning('Event {} for planning {} couldn\'t be found'.format(planning['event_item'], planning))
-                # create new agenda
-                agenda = init_adhoc_agenda(planning)
-            else:
-                if planning.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
-                        planning.get('pubstatus') == 'cancelled':
-                    # remove the planning item from the list
-                    set_agenda_planning_items(agenda, planning, action='remove')
-
-                    service.patch(agenda['_id'], agenda)
-                    return agenda
-
-        else:
-            # there's no event item (ad-hoc planning item)
+        if not agenda:
+            # event id exists in planning item but event is not in the system
+            logger.warning('Event {} for planning {} couldn\'t be found'.format(planning['event_item'], planning))
+            # create new agenda
             agenda = init_adhoc_agenda(planning)
-
-        # update agenda metadata
-        set_agenda_metadata_from_planning(agenda, planning)
-
-        # add the planning item to the list
-        set_agenda_planning_items(agenda, planning, action='add')
-
-        if not agenda.get('_id'):
-            # setting _id of agenda to be equal to planning if there's no event id
-            agenda.setdefault('_id', planning.get('event_item', planning['guid']) or planning['guid'])
-            agenda.setdefault('guid', planning.get('event_item', planning['guid']) or planning['guid'])
-            service.create([agenda])[0]
         else:
-            # replace the original document
-            service.patch(agenda['_id'], agenda)
-        return agenda
-    except Exception as exc:
-        logger.error('Error in publishing planning: {}'.format(planning), exc, exc_info=True)
+            if planning.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
+                    planning.get('pubstatus') == 'cancelled':
+                # remove the planning item from the list
+                set_agenda_planning_items(agenda, planning, action='remove')
+
+                service.patch(agenda['_id'], agenda)
+                return agenda
+
+    else:
+        # there's no event item (ad-hoc planning item)
+        agenda = init_adhoc_agenda(planning)
+
+    # update agenda metadata
+    set_agenda_metadata_from_planning(agenda, planning)
+
+    # add the planning item to the list
+    set_agenda_planning_items(agenda, planning, action='add')
+
+    if not agenda.get('_id'):
+        # setting _id of agenda to be equal to planning if there's no event id
+        agenda.setdefault('_id', planning.get('event_item', planning['guid']) or planning['guid'])
+        agenda.setdefault('guid', planning.get('event_item', planning['guid']) or planning['guid'])
+        service.create([agenda])[0]
+    else:
+        # replace the original document
+        service.patch(agenda['_id'], agenda)
+    return agenda
 
 
 def init_adhoc_agenda(planning):
