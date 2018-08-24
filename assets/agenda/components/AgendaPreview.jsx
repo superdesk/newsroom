@@ -39,7 +39,7 @@ class AgendaPreview extends React.PureComponent {
             'wire-column__preview--covering': hasCoverages(item),
             'wire-column__preview--not-covering': !hasCoverages(item),
             'wire-column__preview--postponed': isPostponed(item),
-            'wire-column__preview--cancelled': isCanceled(item),
+            'wire-column__preview--canceled': isCanceled(item),
             'wire-column__preview--rescheduled': isRescheduled(item),
             'wire-column__preview--open': !!item,
             'wire-column__preview--watched': isWatching,

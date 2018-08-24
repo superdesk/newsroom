@@ -1,6 +1,7 @@
 import { get, isEmpty } from 'lodash';
 import moment from 'moment/moment';
 
+const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'canceled';
 const STATUS_POSTPONED = 'postponed';
 const STATUS_RESCHEDULED = 'rescheduled';
@@ -24,7 +25,6 @@ const navigationFunctions = {
     }
 };
 
-
 /**
  * Test if an item is canceled
  *
@@ -32,7 +32,7 @@ const navigationFunctions = {
  * @return {Boolean}
  */
 export function isCanceled(item) {
-    return item && item.state === STATUS_CANCELED;
+    return item && (item.state === STATUS_CANCELED || item.state === STATUS_KILLED);
 }
 
 /**
