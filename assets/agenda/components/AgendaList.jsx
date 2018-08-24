@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import classNames from 'classnames';
+import moment from 'moment/moment';
 
 import { gettext, formatDate, formatWeek, formatMonth } from 'utils';
 import AgendaListItem from './AgendaListItem';
@@ -124,11 +125,21 @@ class AgendaList extends React.Component {
     getGroupedItems(items) {
         const groupedItems = {};
         const grouper = Groupers[this.props.activeGrouping];
-        items.map((item) => {
-            const key = grouper(this.props.itemsById[item].dates.start);
-            let groupList = groupedItems[key] || [];
-            groupList.push(item);
-            groupedItems[key] = groupList;
+
+        items.forEach((_id) => {
+            const item = this.props.itemsById[_id];
+            const start = moment(item.dates.start);
+            const end = moment(get(item, 'dates.end', start));
+            let key = null;
+
+            for (let day = start; day.isBefore(end); day = day.add(1, 'd')) {
+                if (grouper(day) !== key) {
+                    key = grouper(day);
+                    const groupList = groupedItems[key] || [];
+                    groupList.push(_id);
+                    groupedItems[key] = groupList;
+                }
+            }
         });
 
         return groupedItems;
