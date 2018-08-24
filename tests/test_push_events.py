@@ -193,14 +193,18 @@ def test_push_parsed_event(client, app):
 def test_push_cancelled_event(client, app):
     event = deepcopy(test_event)
     event['guid'] = 'foo2'
+    event['version'] = 1
+
     # first push
     client.post('/push', data=json.dumps(event), content_type='application/json')
 
     # update comes in
     event['pubstatus'] = 'cancelled'
     event['state'] = 'cancelled'
+    event.pop('version', None)
 
-    client.post('/push', data=json.dumps(event), content_type='application/json')
+    resp = client.post('/push', data=json.dumps(event), content_type='application/json')
+    assert resp.status_code == 200
     parsed = get_entity_or_404(event['guid'], 'agenda')
     assert type(parsed['firstcreated']) == datetime
     assert 1 == len(parsed['event']['event_contact_info'])
