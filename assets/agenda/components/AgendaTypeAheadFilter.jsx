@@ -4,42 +4,21 @@ import {gettext} from 'utils';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import 'react-bootstrap-typeahead/css/Typeahead-bs4.css';
+import AgendaFilterButton from './AgendaFilterButton';
 
-const getActiveFilterLabel = (filter, activeFilter) => {
-    return activeFilter[filter.field] ? activeFilter[filter.field][0] : gettext(filter.label);
-};
 
 const getActiveTypeahead = (filter, activeFilter) => {
     return activeFilter[filter.field] ? activeFilter[filter.field][0] : [];
 };
 
-const getDropdownItems = (filter, aggregations, toggleFilter) => {
-    if (!filter.nestedField && aggregations && aggregations[filter.field]) {
-        return processBuckets(aggregations[filter.field].buckets, filter, toggleFilter);
-    }
-
-    if (filter.nestedField && aggregations && aggregations[filter.field] && aggregations[filter.field][filter.nestedField]) {
-        return processBuckets(aggregations[filter.field][filter.nestedField].buckets, filter, toggleFilter);
-    }
-
-    return null;
-};
-
 const processBuckets = (buckets) => buckets.map((bucket) => bucket.key);
 
-function AgendaTypeAheadFilter({aggregations, filter, toggleFilter, activeFilter}) {
+function AgendaTypeAheadFilter({aggregations, filter, toggleFilter, activeFilter, getDropdownItems}) {
     return (<div className="btn-group" key={filter.field}>
-        <button
-            id={filter.field}
-            type='button'
-            className='btn btn-outline-primary btn-sm d-flex align-items-center px-2 ml-2'
-            data-toggle='dropdown'
-            aria-haspopup='true'
-            aria-expanded='false'>
-            <i className='icon-small--calendar d-sm-none'></i>
-            <span className='d-none d-sm-block'>{getActiveFilterLabel(filter, activeFilter)}</span>
-            <i className='icon-small--arrow-down ml-1'></i>
-        </button>
+        <AgendaFilterButton
+            filter={filter}
+            activeFilter={activeFilter}
+        />
         <div className='dropdown-menu' aria-labelledby={filter.field}>
             <button
                 type='button'
@@ -50,7 +29,7 @@ function AgendaTypeAheadFilter({aggregations, filter, toggleFilter, activeFilter
             <Typeahead
                 labelKey={filter.label}
                 onChange={(selected) => toggleFilter(filter.field, selected.length ? selected : null)}
-                options={getDropdownItems(filter, aggregations, toggleFilter)}
+                options={getDropdownItems(filter, aggregations, toggleFilter, processBuckets)}
                 placeholder={gettext('Choose a location...')}
                 selected={getActiveTypeahead(filter, activeFilter)}
                 className='p-2'
@@ -64,6 +43,7 @@ AgendaTypeAheadFilter.propTypes = {
     filter: PropTypes.object,
     toggleFilter: PropTypes.func,
     activeFilter: PropTypes.object,
+    getDropdownItems: PropTypes.func,
 };
 
 export default AgendaTypeAheadFilter;
