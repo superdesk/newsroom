@@ -162,13 +162,12 @@ def _agenda_query():
 
 
 def _event_date_range(args):
-    _range = {}
     offset = int(args.get('timezone_offset', '0'))
     if args.get('date_from'):
-        _range['gte'] = get_local_date(args['date_from'], '00:00:00', offset)
-    if args.get('date_to'):
-        _range['lte'] = get_local_date(args['date_to'], '23:59:59', offset)
-    return {'range': {'dates.start': _range}}
+        return [  # Each range query must be on its own, otherwise elastic doesn't return what it should.
+            {'range': {'dates.start': {'lte': get_local_date(args['date_from'], '23:59:59', offset)}}},
+            {'range': {'dates.end': {'gt': get_local_date(args['date_from'], '00:00:00', offset)}}},
+        ]
 
 
 aggregations = {
@@ -222,8 +221,8 @@ class AgendaService(newsroom.Service):
         if req.args.get('bookmarks'):
             set_saved_items_query(query, req.args['bookmarks'])
 
-        if req.args.get('date_from') or req.args.get('date_to'):
-            query['bool']['must'].append(_event_date_range(req.args))
+        if req.args.get('date_from'):
+            query['bool']['must'].extend(_event_date_range(req.args))
 
         if req.args.get('created_from') or req.args.get('created_to'):
             query['bool']['must'].append(versioncreated_range(req.args))

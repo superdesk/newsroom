@@ -178,7 +178,7 @@ function getNextDay(dateString) {
 
 
 /**
- * Gets the next day
+ * Gets the previous day
  *
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
