@@ -162,12 +162,13 @@ def _agenda_query():
 
 
 def _event_date_range(args):
+    """Get events for selected date.
+
+    ATM it should display everything not finished by that date, even starting later.
+    """
     offset = int(args.get('timezone_offset', '0'))
     if args.get('date_from'):
-        return [  # Each range query must be on its own, otherwise elastic doesn't return what it should.
-            {'range': {'dates.start': {'lte': get_local_date(args['date_from'], '23:59:59', offset)}}},
-            {'range': {'dates.end': {'gt': get_local_date(args['date_from'], '00:00:00', offset)}}},
-        ]
+        return {'range': {'dates.end': {'gt': get_local_date(args['date_from'], '00:00:00', offset)}}},
 
 
 aggregations = {
@@ -222,7 +223,7 @@ class AgendaService(newsroom.Service):
             set_saved_items_query(query, req.args['bookmarks'])
 
         if req.args.get('date_from'):
-            query['bool']['must'].extend(_event_date_range(req.args))
+            query['bool']['must'].append(_event_date_range(req.args))
 
         if req.args.get('created_from') or req.args.get('created_to'):
             query['bool']['must'].append(versioncreated_range(req.args))
