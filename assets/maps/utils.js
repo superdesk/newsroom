@@ -1,12 +1,20 @@
 import {get} from 'lodash';
 
 /**
+ * Get item locations
+ * @param {Object} item
+ */
+export function getLocations(item) {
+    return (get(item, 'location')) || [];
+}
+
+/**
  * Get locations with geo coordinates
  * @param {Object} item 
  * @return {Array}
  */
-export function getLocations(item) {
-    return (get(item, 'location') || []).filter((loc) => get(loc, 'location.lat'));
+export function getGeoLocations(locations) {
+    return locations.filter((loc) => get(loc, 'location.lat'));
 }
 
 /**

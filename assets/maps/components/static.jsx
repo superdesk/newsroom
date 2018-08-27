@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {isEmpty} from 'lodash';
 import {
+    getGeoLocations,
     getBoundingBox,
     getAddressLine,
     getAddressState,
@@ -30,20 +31,22 @@ function getZoom(location) {
     return !isEmpty(line) ? 'zoom=15' : 'zoom=8';
 }
 
-export default function StaticMap({locations, address, scale}) {
+export default function StaticMap({locations, scale}) {
     const params = ['size=600x400', 'key=' + mapsKey(), 'scale=' + (scale || 1)];
+    const geoLocations = getGeoLocations(locations);
     let src;
 
-    if (!isEmpty(locations)) {
-        const markers = locations.map((loc) => 'markers=' + encodeURIComponent(loc.location.lat + ',' + loc.location.lon));
-        params.push(getZoom(locations[0]));
+    if (!isEmpty(geoLocations)) {
+        const markers = geoLocations.map((loc) => 'markers=' + encodeURIComponent(loc.location.lat + ',' + loc.location.lon));
+        params.push(getZoom(geoLocations[0]));
         src = MAPS_URL + '?' + markers.concat(params).join('&');
     } else {
+        const location = locations[0];
         params.push('center=' + encodeURIComponent([
-            address.name,
-            getAddressLine(address),
-            getAddressState(address),
-            getAddressCountry(address),
+            location.name,
+            getAddressLine(location),
+            getAddressState(location),
+            getAddressCountry(location),
         ].filter((x) => !!x).join(', ')));
         src = MAPS_URL + '?' + params.join('&');
     }
@@ -56,7 +59,4 @@ export default function StaticMap({locations, address, scale}) {
 StaticMap.propTypes = {
     scale: PropTypes.number,
     locations: PropTypes.arrayOf(PropTypes.object),
-    address: PropTypes.shape({
-        name: PropTypes.string,
-    }),
 };
