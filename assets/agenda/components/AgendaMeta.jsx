@@ -1,10 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {hasLocation, getEventLinks, getLocationString, getPublicContacts} from 'agenda/utils';
-import {formatTime} from 'utils';
+import {formatTime, fullDate, isToday} from 'utils';
 
 
 function AgendaPreviewMeta({item}) {
+    const dates = [item.dates.start, item.dates.end !== item.dates.start ? item.dates.end : null]
+        .filter((d) => !!d)
+        .map((date) => isToday(date) ? formatTime(date) : fullDate(date));
+
     return (
         <div className='wire-articles__item__meta'>
             <div className='wire-articles__item__meta-info'>
@@ -14,14 +18,15 @@ function AgendaPreviewMeta({item}) {
                 </div>}
                 <div className='wire-articles__item__meta-row'>
                     <span><i className='icon-small--clock icon--gray'></i>
-                        {`${formatTime(item.dates.start)} - ${formatTime(item.dates.end)}`}</span>
+                        {dates.join(' - ')}
+                    </span>
                 </div>
                 {getPublicContacts(item).map((contact) => <div
                     className='wire-articles__item__meta-row'
                     key={contact.name}>
                     <i className='icon-small--user icon--gray'></i>
-                    <span>{`${contact.name} ${contact.phones || contact.mobiles}`}
-                        <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                    <span>{`${contact.name} ${contact.phone} ${contact.mobile}`}
+                        {contact.email && <a href={`mailto:${contact.email}`}>{contact.email}</a>}
                     </span>
                 </div>)}
                 {getEventLinks(item).map((link) => <div className='wire-articles__item__meta-row' key={link}>

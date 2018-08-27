@@ -133,8 +133,9 @@ export function getLocaleDate(dateString) {
  * @param {Date} date
  * @return {Boolean}
  */
-function isToday(date) {
-    return date.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
+export function isToday(date) {
+    const parsed = typeof date === 'string' ? parseDate(date) : date;
+    return parsed.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
 }
 
 
