@@ -6,7 +6,7 @@ import AgendaCalendarButton from './AgendaCalendarButton';
 
 function AgendaDateNavigation({selectDate, activeDate, activeGrouping, displayCalendar}) {
     return (<div className='d-none d-lg-flex align-items-center mr-3'>
-        {displayCalendar && <AgendaCalendarButton selectDate={selectDate}/>}
+        {displayCalendar && <AgendaCalendarButton selectDate={selectDate} />}
 
         {!displayCalendar && <AgendaDateButtons
             selectDate={selectDate} activeDate={activeDate} activeGrouping={activeGrouping}/>}

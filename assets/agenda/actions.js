@@ -137,7 +137,7 @@ function search(state, next) {
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to: createdFilter.to,
-        date_from: agendaDate,
+        date_from: isEmpty(createdFilter.from) && isEmpty(createdFilter.to) ? agendaDate : null,
         timezone_offset: getTimezoneOffset(),
     };
 
