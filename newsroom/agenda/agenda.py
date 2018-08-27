@@ -157,6 +157,7 @@ def _agenda_query():
     return {
         'bool': {
             'must': [{'term': {'_type': 'agenda'}}],
+            'must_not': [{'term': {'state': 'killed'}}],
         }
     }
 
