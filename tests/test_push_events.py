@@ -96,6 +96,7 @@ test_event = {
 
 test_planning = {
     "description_text": "description here",
+    "abstract": "abstract text",
     "_current_version": 1,
     "agendas": [],
     "anpa_category": [
@@ -249,8 +250,14 @@ def test_push_parsed_planning_for_an_existing_event(client, app):
     parsed = get_entity_or_404('foo4', 'agenda')
     assert parsed['headline'] == 'Planning headline'
     assert 2 == len(parsed['coverages'])
-    assert 1 == len(parsed['service'])
+    assert 2 == len(parsed['service'])
     assert 'e' == parsed['service'][0]['code']
+    assert 'a' == parsed['service'][1]['code']
+    assert parsed['name'] == test_event['name']
+    assert parsed['definition_short'] == test_event['definition_short']
+    assert parsed['definition_long'] == test_event['definition_long']
+    assert parsed['dates']['start'].isoformat() == test_event['dates']['start'].replace('0000', '00:00')
+    assert parsed['dates']['end'].isoformat() == test_event['dates']['end'].replace('0000', '00:00')
 
 
 def test_push_cancelled_planning_for_an_existing_event(client, app):
@@ -299,6 +306,8 @@ def test_push_parsed_adhoc_planning_for_an_non_existing_event(client, app):
     assert 2 == len(parsed['coverages'])
     assert 1 == len(parsed['planning_items'])
     assert parsed['headline'] == 'Planning headline'
+    assert parsed['definition_short'] == test_planning['description_text']
+    assert parsed['abstract'] == test_planning['abstract']
 
 
 def test_notify_topic_matches_for_new_event_item(client, app, mocker):
