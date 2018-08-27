@@ -293,30 +293,48 @@ def set_agenda_metadata_from_event(agenda, event):
 
 
 def format_qcode_items(items=None):
-    if items:
+    try:
         return [{'code': item.get('qcode'), 'name': item.get('name')} for item in items]
+    except (TypeError, AttributeError):
+        return []
 
 
 def set_agenda_metadata_from_planning(agenda, planning_item):
+    """Sets agenda metadata from a given planning.
+
+    Event data has priority, so don't override it, only add  planning if it's missing.
     """
-    Sets agenda metadata from a given planning
-    """
+    event = agenda.get('event', {})
     parse_dates(planning_item)
     set_dates(agenda)
 
-    agenda['headline'] = planning_item.get('headline')
-    agenda['slugline'] = planning_item.get('slugline', agenda.get('slugline'))
-    agenda['abstract'] = planning_item.get('abstract')
-    agenda['ednote'] = planning_item.get('ednote', agenda.get('ednote'))
-    agenda['name'] = planning_item.get('name')
-    agenda['place'] = planning_item.get('place', agenda.get('place'))
-    agenda['subject'] = planning_item.get('subject', agenda.get('subject'))
-    agenda['genre'] = planning_item.get('genre')
-    agenda['priority'] = planning_item.get('priority')
-    agenda['urgency'] = planning_item.get('urgency')
-    agenda['products'] = planning_item.get('products')
+    def get(key):
+        return event.get(key) or planning_item.get(key) or agenda.get(key)
 
-    service = format_qcode_items(planning_item.get('anpa_category'))
+    agenda['name'] = get('name')
+    agenda['headline'] = get('headline')
+    agenda['slugline'] = get('slugline')
+    agenda['abstract'] = get('abstract')
+    agenda['ednote'] = get('ednote')
+    agenda['place'] = get('place')
+    agenda['subject'] = get('subject')
+    agenda['products'] = get('products')
+    agenda['genre'] = planning_item.get('genre') or agenda.get('genre')
+    agenda['priority'] = planning_item.get('priority') or agenda.get('priority')
+    agenda['urgency'] = planning_item.get('urgency') or agenda.get('urgency')
+    agenda['definition_short'] = event.get('definition_short') \
+        or planning_item.get('description_text') \
+        or agenda.get('definition_short')
+    agenda['definition_long'] = event.get('definition_long') \
+        or planning_item.get('abstract') \
+        or agenda.get('definition_long')
+
+    service = unique_codes(
+        format_qcode_items(planning_item.get('anpa_category')),
+        format_qcode_items(event.get('anpa_category')),
+        format_qcode_items(agenda.get('service'))
+    )
+
     if service:
         agenda['service'] = service
 
@@ -551,3 +569,15 @@ def set_opacity(image, opacity=1):
     alpha = image.split()[3]
     alpha = ImageEnhance.Brightness(alpha).enhance(opacity)
     image.putalpha(alpha)
+
+
+def unique_codes(*groups):
+    """Get unique items from all lists using code."""
+    codes = set()
+    items = []
+    for group in groups:
+        for item in group:
+            if item.get('code') and item['code'] not in codes:
+                codes.add(item['code'])
+                items.append(item)
+    return items
