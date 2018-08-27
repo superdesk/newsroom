@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {isEmpty} from 'lodash';
-import {getLocations} from 'maps/utils';
+import {getLocations, getAddress, mapsKey} from 'maps/utils';
 import StaticMap from 'maps/components/static';
 
 /**
@@ -10,15 +10,20 @@ import StaticMap from 'maps/components/static';
  * @param {function} onClick
  */
 export default function AgendaPreviewImage({item, onClick}) {
-    const locations = getLocations(item);
+    if (isEmpty(mapsKey())) {
+        return null;
+    }
 
-    if (isEmpty(locations) || isEmpty(window.googleMapsKey)) {
+    const locations = getLocations(item);
+    const address = getAddress(item);
+
+    if (isEmpty(locations) && isEmpty(address)) {
         return null;
     }
 
     return (
         <figure className="wire-column__preview__image" onClick={() => onClick(item)}>
-            <StaticMap locations={locations} />
+            <StaticMap locations={locations} address={address} />
         </figure>
     );
 }

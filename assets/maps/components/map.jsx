@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getBounds, getLatLng} from '../utils';
+import {getBounds, getLatLng, mapsLoaded} from '../utils';
 
 let _map;
 
@@ -22,7 +22,7 @@ export default class Map extends React.PureComponent {
     }
 
     componentDidMount() {
-        if (!window.mapsLoaded) {
+        if (!mapsLoaded()) {
             return;
         }
 
@@ -57,7 +57,7 @@ export default class Map extends React.PureComponent {
     }
 
     render() {
-        if (!window.mapsLoaded) {
+        if (!mapsLoaded()) {
             return null;
         }
 

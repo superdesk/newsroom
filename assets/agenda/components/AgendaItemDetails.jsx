@@ -4,8 +4,9 @@ import {isEmpty} from 'lodash';
 
 import { gettext } from 'utils';
 
-import { getLocations } from 'maps/utils';
+import { getLocations, mapsLoaded, getAddress, mapsKey } from 'maps/utils';
 import Map from 'maps/components/map';
+import StaticMap from 'maps/components/static';
 
 import PreviewActionButtons from 'components/PreviewActionButtons';
 
@@ -29,8 +30,17 @@ import AgendaCoverages from './AgendaCoverages';
 import AgendaAttachments from './AgendaAttachments';
 
 export default function AgendaItemDetails({item, user, actions, onClose}) {
+    const address = getAddress(item);
     const locations = getLocations(item);
-    const map = !isEmpty(locations) && window.mapsLoaded && <Map locations={locations} />;
+    let map = null;
+
+    if (mapsLoaded() && !isEmpty(locations)) {
+        map = <Map locations={locations} />;
+    }
+
+    if (!map && mapsKey() && !isEmpty(address)) {
+        map = <StaticMap address={address} scale={2} />;
+    }
 
     return (
         <Content type="item-detail">
