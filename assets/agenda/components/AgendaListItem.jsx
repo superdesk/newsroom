@@ -93,7 +93,7 @@ class AgendaListItem extends React.Component {
                     {this.props.actions.length && (
                         <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
                             <div className='btn-group'>
-                                <span onClick={(event) => this.props.onActionList(event, this.props.item)}>
+                                <span onClick={(event) => this.props.onActionList(event, this.props.item, this.props.group)}>
                                     <i className='icon--more icon--gray-light'></i>
                                 </span>
                                 { this.props.showActions ? <ActionList
@@ -123,6 +123,7 @@ class AgendaListItem extends React.Component {
 
 AgendaListItem.propTypes = {
     item: PropTypes.object.isRequired,
+    group: PropTypes.string,
     isActive: PropTypes.bool.isRequired,
     isSelected: PropTypes.bool.isRequired,
     isRead: PropTypes.bool.isRequired,

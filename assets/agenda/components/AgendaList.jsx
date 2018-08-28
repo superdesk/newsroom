@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 import { get } from 'lodash';
 import classNames from 'classnames';
 import moment from 'moment/moment';
@@ -20,6 +21,36 @@ const Groupers = {
     'month': formatMonth,
 };
 
+const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
+const activeDateSelector = (state) => get(state, 'agenda.activeDate');
+const activeGroupingSelector = (state) => get(state, 'agenda.activeGrouping');
+
+const groupedItemsSelector = createSelector(
+    [itemsSelector, activeDateSelector, activeGroupingSelector],
+    (items, activeDate, activeGrouping) => {
+        const maxStart = moment(activeDate);
+        const groupedItems = {};
+        const grouper = Groupers[activeGrouping];
+
+        items.forEach((item) => {
+            const start = moment.max(maxStart, moment(item.dates.start));
+            const end = moment(get(item, 'dates.end', start));
+            let key = null;
+
+            for (let day = start; day.isSameOrBefore(end); day = day.add(1, 'd')) {
+                if (grouper(day) !== key) {
+                    key = grouper(day);
+                    const groupList = groupedItems[key] || [];
+                    groupList.push(item._id);
+                    groupedItems[key] = groupList;
+                }
+            }
+        });
+
+        return groupedItems;
+    }
+);
+
 class AgendaList extends React.Component {
     constructor(props) {
         super(props);
@@ -31,7 +62,6 @@ class AgendaList extends React.Component {
         this.onItemDoubleClick = this.onItemDoubleClick.bind(this);
         this.onActionList = this.onActionList.bind(this);
         this.filterActions = this.filterActions.bind(this);
-        this.getGroupedItems = this.getGroupedItems.bind(this);
     }
 
     onKeyDown(event) {
@@ -109,12 +139,12 @@ class AgendaList extends React.Component {
         this.props.dispatch(openItem(item));
     }
 
-    onActionList(event, item) {
+    onActionList(event, item, group) {
         event.stopPropagation();
         if (this.state.actioningItem && this.state.actioningItem._id === item._id) {
             this.setState({actioningItem: null});
         } else {
-            this.setState({actioningItem: item});
+            this.setState({actioningItem: item, activeGroup: group});
         }
     }
 
@@ -122,45 +152,19 @@ class AgendaList extends React.Component {
         return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
     }
 
-    getGroupedItems(items) {
-        const maxStart = moment(this.props.activeDate);
-        const groupedItems = {};
-        const grouper = Groupers[this.props.activeGrouping];
-
-        items.forEach((_id) => {
-            const item = this.props.itemsById[_id];
-            const start = moment.max(maxStart, moment(item.dates.start));
-            const end = moment(get(item, 'dates.end', start));
-            let key = null;
-
-            for (let day = start; day.isSameOrBefore(end); day = day.add(1, 'd')) {
-                if (grouper(day) !== key) {
-                    key = grouper(day);
-                    const groupList = groupedItems[key] || [];
-                    groupList.push(_id);
-                    groupedItems[key] = groupList;
-                }
-            }
-        });
-
-        return groupedItems;
-    }
-
     render() {
         const {items, itemsById, activeItem, activeView, selectedItems, readItems} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
-
-
-        const groupedItems = this.getGroupedItems(items);
-        const articleGroups = Object.keys(groupedItems).map((keyDate) =>
+        const articleGroups = Object.keys(this.props.groupedItems).map((keyDate) =>
             [
                 <div className='wire-articles__header' key={`${keyDate}header`}>
                     {keyDate}
                 </div>,
 
                 <div className = 'wire-articles__group' key={`${keyDate}group`}>
-                    {groupedItems[keyDate].map((_id) => <AgendaListItem
+                    {this.props.groupedItems[keyDate].map((_id) => <AgendaListItem
                         key={_id}
+                        group={keyDate}
                         item={itemsById[_id]}
                         isActive={activeItem === _id}
                         isSelected={selectedItems.indexOf(_id) !== -1}
@@ -168,7 +172,7 @@ class AgendaList extends React.Component {
                         onClick={this.onItemClick}
                         onDoubleClick={this.onItemDoubleClick}
                         onActionList={this.onActionList}
-                        showActions={!!this.state.actioningItem && this.state.actioningItem._id === _id}
+                        showActions={!!this.state.actioningItem && this.state.actioningItem._id === _id && keyDate === this.state.activeGroup}
                         toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
                         actions={this.filterActions(itemsById[_id])}
                         isExtended={isExtended}
@@ -212,8 +216,7 @@ AgendaList.propTypes = {
     user: PropTypes.string,
     company: PropTypes.string,
     activeView: PropTypes.string,
-    activeGrouping: PropTypes.string,
-    activeDate: PropTypes.number,
+    groupedItems: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -226,8 +229,7 @@ const mapStateToProps = (state) => ({
     bookmarks: state.bookmarks,
     user: state.user,
     company: state.company,
-    activeGrouping: get(state, 'agenda.activeGrouping'),
-    activeDate: get(state, 'agenda.activeDate'),
+    groupedItems: groupedItemsSelector(state),
 });
 
 export default connect(mapStateToProps)(AgendaList);

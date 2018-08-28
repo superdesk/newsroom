@@ -231,8 +231,8 @@ class AgendaService(newsroom.Service):
 
         source = {'query': query}
         source['sort'] = [{'dates.start': 'asc'}]
-        source['size'] = 25
-        source['from'] = int(req.args.get('from', 0))
+        source['size'] = 100  # we should fetch all items for given date
+        source['from'] = req.args.get('from', 0, type=int)
 
         filters = None
 
