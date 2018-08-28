@@ -92,22 +92,18 @@ export function getGeoLocation(item) {
  * @return {String}
  */
 export function getLocationString(item) {
-    if (hasLocation(item)) {
-        return item.location[0].name;
-        // return `${item.location[0].title}, ${get(item.location[0], 'address.line')} ${get(item.location[0], 'address.country')}`;
-    }
+    return get(item, 'location.0.name') || get(item, 'location.0.address.area') || get(item, 'location.0.address.locality');
 }
 
 /**
  * Returns item has location info
  *
  * @param {Object} item
- * @return {String}
+ * @return {Boolean}
  */
 export function hasLocation(item) {
-    return !isEmpty(get(item, 'location'));
+    return !!getLocationString(item);
 }
-
 
 /**
  * Returns public contacts
@@ -116,16 +112,13 @@ export function hasLocation(item) {
  * @return {String}
  */
 export function getPublicContacts(item) {
-    const publicContacts = [];
     const contacts = get(item, 'event.event_contact_info', []);
-    contacts.filter(c => c.public).map(c => publicContacts.push({
-        name: `${c.first_name} ${c.last_name}`,
+    return contacts.filter(c => c.public).map(c => ({
+        name: [c.first_name, c.last_name].filter((x) => !!x).join(' ') || c.organisation,
         email: c.contact_email,
-        mobiles: (c.mobile || []).filter(m => m.public).map(m => m.number),
-        phones: (c.phone || []).filter(m => m.public).map(m => m.number),
+        phone: (c.phone || []).filter(m => m.public).map(m => m.number).join(', '),
+        mobile: (c.mobile || []).filter(m => m.public).map(m => m.number).join(', '),
     }));
-
-    return publicContacts;
 }
 
 
