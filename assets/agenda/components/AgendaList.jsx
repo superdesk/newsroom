@@ -28,7 +28,7 @@ const activeGroupingSelector = (state) => get(state, 'agenda.activeGrouping');
 const groupedItemsSelector = createSelector(
     [itemsSelector, activeDateSelector, activeGroupingSelector],
     (items, activeDate, activeGrouping) => {
-        const maxStart = moment(activeDate);
+        const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
         const groupedItems = {};
         const grouper = Groupers[activeGrouping];
 
@@ -37,7 +37,8 @@ const groupedItemsSelector = createSelector(
             const end = moment(get(item, 'dates.end', start));
             let key = null;
 
-            for (let day = start; day.isSameOrBefore(end); day = day.add(1, 'd')) {
+            // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
+            for (const day = start.clone(); day.isSameOrBefore(end); day.add(1, 'd')) {
                 if (grouper(day) !== key) {
                     key = grouper(day);
                     const groupList = groupedItems[key] || [];
