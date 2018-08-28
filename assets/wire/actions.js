@@ -2,7 +2,7 @@
 import { get, isEmpty } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml } from 'utils';
+import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
 import { markItemAsRead, toggleNewsOnlyParam } from './utils';
 import { renderModal, closeModal } from 'actions';
 
@@ -105,6 +105,7 @@ export function copyPreviewContents(item) {
         const textarea = document.getElementById('copy-area');
         const contents = [];
 
+        contents.push(fullDate(item.versioncreated));
         item.slugline && contents.push(item.slugline);
         item.headline && contents.push(item.headline);
         item.byline && contents.push(gettext('By: {{ byline }}', {byline: get(item, 'byline')}));
