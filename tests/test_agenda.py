@@ -134,7 +134,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
 
 
 def test_coverage_request(client, app):
-    app.config['COVERAGE_REQUEST_RECIPIENTS'] = ['admin@bar.com']
+    app.config['COVERAGE_REQUEST_RECIPIENTS'] = 'admin@bar.com'
     with app.mail.record_messages() as outbox:
         resp = client.post('/agenda/request_coverage', data=json.dumps({
             'item': ['urn:conference'],

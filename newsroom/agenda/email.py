@@ -22,7 +22,7 @@ def send_coverage_request_email(user, message, item):
     :param item: agenda item that request is made against
     :return:
     """
-    recipients = current_app.config['COVERAGE_REQUEST_RECIPIENTS']
+    recipients = current_app.config['COVERAGE_REQUEST_RECIPIENTS'].split(',')
     assert recipients
     assert isinstance(recipients, list)
     url = url_for('agenda.item', _id=item, _external=True)
