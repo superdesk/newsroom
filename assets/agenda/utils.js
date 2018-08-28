@@ -2,7 +2,7 @@ import { get, isEmpty } from 'lodash';
 import moment from 'moment/moment';
 
 const STATUS_KILLED = 'killed';
-const STATUS_CANCELED = 'canceled';
+const STATUS_CANCELED = 'cancelled';
 const STATUS_POSTPONED = 'postponed';
 const STATUS_RESCHEDULED = 'rescheduled';
 
@@ -26,7 +26,7 @@ const navigationFunctions = {
 };
 
 /**
- * Test if an item is canceled
+ * Test if an item is canceled or killed
  *
  * @param {Object} item
  * @return {Boolean}

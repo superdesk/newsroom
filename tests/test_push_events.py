@@ -659,3 +659,24 @@ New coverage received for agenda item {{ agenda.name }}:
 {% endblock %}
         """.strip(), agenda=item, item=wire_item)
     )
+
+
+def test_filter_killed_events(client, app):
+    event = deepcopy(test_event)
+    post_json(client, '/push', event)
+    events = get_json(client, '/agenda/search')
+    assert 1 == len(events['_items'])
+
+    event['state'] = 'cancelled'
+    post_json(client, '/push', event)
+    events = get_json(client, '/agenda/search')
+    assert 1 == len(events['_items'])
+    assert 'cancelled' == events['_items'][0]['state']
+
+    event['state'] = 'killed'
+    post_json(client, '/push', event)
+    events = get_json(client, '/agenda/search')
+    assert 0 == len(events['_items'])
+
+    parsed = get_json(client, '/agenda/%s' % event['guid'])
+    assert 'killed' == parsed['state']
