@@ -110,10 +110,22 @@ export function copyPreviewContents(item) {
         item.headline && contents.push(item.headline);
         item.byline && contents.push(gettext('By: {{ byline }}', {byline: get(item, 'byline')}));
         item.source && contents.push(gettext('Source: {{ source }}', {source: item.source}));
+
         contents.push('');
-        contents.push(get(item, 'description_text') || getTextFromHtml(get(item, 'description_html')));
+
+        if (item.description_text) {
+            contents.push(item.description_text);
+        } else if (item.description_html) {
+            contents.push(getTextFromHtml(item.description_html));
+        }
+
         contents.push('');
-        contents.push(get(item, 'body_text') || getTextFromHtml(get(item, 'body_html')));
+
+        if (item.body_text) {
+            contents.push(item.body_text);
+        } else if (item.body_html) {
+            contents.push(getTextFromHtml(item.body_html));
+        }
 
         textarea.value = contents.join('\n');
         textarea.select();
