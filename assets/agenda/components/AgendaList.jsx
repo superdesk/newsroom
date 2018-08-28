@@ -123,16 +123,17 @@ class AgendaList extends React.Component {
     }
 
     getGroupedItems(items) {
+        const maxStart = moment(this.props.activeDate);
         const groupedItems = {};
         const grouper = Groupers[this.props.activeGrouping];
 
         items.forEach((_id) => {
             const item = this.props.itemsById[_id];
-            const start = moment(item.dates.start);
+            const start = moment.max(maxStart, moment(item.dates.start));
             const end = moment(get(item, 'dates.end', start));
             let key = null;
 
-            for (let day = start; day.isBefore(end); day = day.add(1, 'd')) {
+            for (let day = start; day.isSameOrBefore(end); day = day.add(1, 'd')) {
                 if (grouper(day) !== key) {
                     key = grouper(day);
                     const groupList = groupedItems[key] || [];
@@ -212,6 +213,7 @@ AgendaList.propTypes = {
     company: PropTypes.string,
     activeView: PropTypes.string,
     activeGrouping: PropTypes.string,
+    activeDate: PropTypes.number,
 };
 
 const mapStateToProps = (state) => ({
@@ -225,6 +227,7 @@ const mapStateToProps = (state) => ({
     user: state.user,
     company: state.company,
     activeGrouping: get(state, 'agenda.activeGrouping'),
+    activeDate: get(state, 'agenda.activeDate'),
 });
 
 export default connect(mapStateToProps)(AgendaList);
