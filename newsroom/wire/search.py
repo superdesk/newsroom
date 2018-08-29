@@ -175,7 +175,7 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, None).count()
 
-    def get(self, req, lookup):
+    def get(self, req, lookup, size=25, aggs=True):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
@@ -205,7 +205,7 @@ class WireSearchService(newsroom.Service):
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
-        source['size'] = 25
+        source['size'] = size
         source['from'] = int(req.args.get('from', 0))
 
         if app.config.get('FILTER_BY_POST_FILTER', False):
@@ -220,12 +220,22 @@ class WireSearchService(newsroom.Service):
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
             return abort(400)
 
-        if not source['from']:  # avoid aggregations when handling pagination
+        if not source['from'] and aggs:  # avoid aggregations when handling pagination
             source['aggs'] = aggregations
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
+
+    def has_permissions(self, item):
+        """Test if current user has permissions to view given item."""
+        req = ParsedRequest()
+        req.args = {}
+        try:
+            results = self.get(req, {'_id': item['_id']}, size=0, aggs=False)
+            return results.count() > 0
+        except Forbidden:
+            return False
 
     def get_product_items(self, product_id, size):
         query = _items_query()

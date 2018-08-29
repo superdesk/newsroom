@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 
 from tests.test_users import test_login_succeeds_for_admin, init as users_init
 
+PUBLIC_USER_ID = ObjectId('59b4c5c61d41c8d736852fbf')
+
 
 items = [
     {
@@ -126,7 +128,7 @@ def init_company(app, client):
     }])
 
     app.data.insert('users', [{
-        '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
+        '_id': PUBLIC_USER_ID,
         'email': 'foo@bar.com',
         'first_name': 'Foo',
         'last_name': 'Bar',

@@ -2,7 +2,8 @@ from flask import json
 from bson import ObjectId
 from datetime import datetime, timedelta
 
-from .fixtures import items, init_items, init_auth, init_company  # noqa
+from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
+from .utils import get_json
 
 
 def test_item_detail(client):
@@ -300,6 +301,7 @@ def test_search_created_from(client):
 
     resp = client.get('/search?created_from=now/M')
     data = json.loads(resp.get_data())
+
     assert 1 <= len(data['_items'])
 
 
@@ -314,3 +316,34 @@ def test_search_created_to(client):
     ))
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
+
+
+def test_item_detail_access(client, app):
+    item_url = '/wire/%s' % items[0]['_id']
+    data = get_json(client, item_url)
+    assert data['_access']
+    assert data['body_html']
+
+    # public user
+    with client.session_transaction() as session:
+        session['user'] = PUBLIC_USER_ID
+        session['user_type'] = 'public'
+
+    # no access by default
+    data = get_json(client, item_url)
+    assert not data['_access']
+    assert not data.get('body_html')
+
+    # add product
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'matching product',
+        'companies': ['1'],
+        'is_enabled': True,
+        'query': 'slugline:%s' % items[0]['slugline'],
+    }])
+
+    # normal access
+    data = get_json(client, item_url)
+    assert data['_access']
+    assert data['body_html']

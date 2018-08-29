@@ -23,6 +23,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_cache import Cache
 
+from newsroom.utils import is_json_request
 from newsroom.webpack import NewsroomWebpack
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.template_filters import (
@@ -148,9 +149,13 @@ class Newsroom(eve.Eve):
             return flask.jsonify({'error': err.args[0] if err.args else 1}), 400
 
         def render_404(err):
+            if flask.request and is_json_request(flask.request):
+                return flask.jsonify({'code': 404}), 404
             return flask.render_template('404.html'), 404
 
         def render_403(err):
+            if flask.request and is_json_request(flask.request):
+                return flask.jsonify({'code': 403, 'error': str(err), 'info': getattr(err, 'description', None)}), 403
             return flask.render_template('403.html'), 403
 
         self.register_error_handler(AssertionError, assertion_error)
