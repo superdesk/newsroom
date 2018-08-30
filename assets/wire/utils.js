@@ -161,7 +161,7 @@ export function isKilled(item) {
  * @return {Boolean}
  */
 export function isPreformatted(item) {
-    return item.body_html.includes('<pre>');
+    return (item.body_html || '').includes('<pre>');
 }
 
 /**

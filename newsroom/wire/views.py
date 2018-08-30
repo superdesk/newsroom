@@ -40,6 +40,15 @@ def get_services(user):
     return services
 
 
+def set_permissions(item):
+    item['_access'] = superdesk.get_resource_service('wire_search').has_permissions(item)
+    if not item['_access']:
+        item.pop('body_text', None)
+        item.pop('body_html', None)
+        item.pop('renditions', None)
+        item.pop('associations', None)
+
+
 def get_view_data():
     user = get_user()
     topics = get_user_topics(user['_id']) if user else []
@@ -276,8 +285,11 @@ def versions(_id):
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
+    set_permissions(item)
     if is_json_request(flask.request):
         return flask.jsonify(item)
+    if not item.get('_access'):
+        return flask.render_template('wire_item_access_restricted.html', item=item)
     previous_versions = get_previous_versions(item)
     if 'print' in flask.request.args:
         template = 'wire_item_print.html'

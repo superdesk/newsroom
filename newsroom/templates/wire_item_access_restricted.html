@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ item.headline }}{% endblock %}
+
+{% block content %}
+<section class="content">
+    <div class="jumbotron">
+        <h1>Access restricted</h1>
+        <p class="lead">Access to this content is restricted to subscribers only.</p>
+        <p>To access this content and other news items please <a href="{{ config.CONTACT_ADDRESS }}">contact our Newswire Account Managers</a>.</p>
+    </div>
+</section>
+
+{% endblock %}
