@@ -2,7 +2,7 @@
 from planning.output_formatters.json_event import JsonEventFormatter
 from copy import deepcopy
 from flask import json
-from .base import BaseFormatter
+from newsroom.formatter import BaseFormatter
 
 agenda_remove_fields = {'bookmarks', 'copies', 'shares'}
 

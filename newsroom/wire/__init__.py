@@ -39,10 +39,10 @@ def init_app(app):
     app.sidenav('Saved Items', 'wire.bookmarks', 'bookmark', group=1, blueprint='wire', badge='saved-items-count')
 
     from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter
-    app.add_download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'])
-    app.add_download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'])
-    app.add_download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'])
-    app.add_download_formatter('json', JsonFormatter(), 'Json', ['agenda'])
+    app.download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'])
+    app.download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'])
+    app.download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'])
+    app.download_formatter('json', JsonFormatter(), 'Json', ['agenda'])
 
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')
