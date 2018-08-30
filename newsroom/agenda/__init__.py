@@ -1,7 +1,8 @@
 import superdesk
 
 from flask import Blueprint, url_for
-from newsroom.agenda.agenda import AgendaResource, AgendaService
+from .agenda import AgendaResource, AgendaService
+from .featured import FeaturedResource, FeaturedService
 from . import formatters
 
 blueprint = Blueprint('agenda', __name__)
@@ -16,6 +17,8 @@ def url_for_agenda(item, _external=True):
 
 def init_app(app):
     superdesk.register_resource('agenda', AgendaResource, AgendaService, _app=app)
+    superdesk.register_resource('agenda_featured', FeaturedResource, FeaturedService, _app=app)
+
     app.section('agenda', 'Agenda')
     app.sidenav('Agenda', 'agenda.index', 'calendar', section='agenda')
     app.sidenav('Saved Items', 'agenda.bookmarks', 'bookmark', group=1, blueprint='agenda', badge='saved-items-count')

@@ -1,7 +1,9 @@
 from flask import json
+from datetime import datetime, timedelta
+from superdesk.utc import utc_to_local, local_to_utc
 
-from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company  # noqa
-from .utils import post_json, delete_json
+from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
+from .utils import post_json, delete_json, get_json
 
 
 def test_item_detail(client):
@@ -160,3 +162,79 @@ def test_watch_event(client, app):
 
     delete_json(client, '/agenda_watch', {'items': ['urn:conference']})
     assert 0 == get_bookmarks_count(client, user_id)
+
+
+def test_featured(client, app):
+    app.data.insert('products', [{
+        '_id': 12,
+        'name': 'product test',
+        'query': '_featured',
+        'companies': ['1'],
+        'navigations': ['51'],
+        'is_enabled': True,
+        'product_type': 'agenda',
+    }, {
+        '_id': 13,
+        'name': 'all items',
+        'query': '*:*',
+        'companies': ['1'],
+        'navigations': ['51'],
+        'is_enabled': True,
+        'product_type': 'agenda',
+    }])
+
+    _items = []
+    for i in range(5):
+        item = agenda_items[0].copy()
+        item['_id'] = 'urn:item:%d' % i
+        item['dates'] = item['dates'].copy()
+        item['dates']['start'] += timedelta(hours=1)
+        _items.append(item)
+    app.data.insert('agenda', _items)
+
+    # post first 2 items
+    date = utc_to_local('Australia/Sydney', datetime.utcnow().replace(microsecond=0))
+    _id = date.strftime('%Y%m%d')
+    featured = {
+        '_id': _id,
+        'type': 'planning_featured',
+        'item_id': _id,
+        'items': [item['_id'] for item in _items[:2]],
+        'tz': 'Australia/Sydney',
+    }
+    resp = post_json(client, 'push', featured)
+    assert 200 == resp.status_code
+
+    # public user
+    with client.session_transaction() as session:
+        session['user'] = PUBLIC_USER_ID
+        session['user_type'] = 'public'
+
+    data = get_json(client, '/agenda/search?navigation=51')
+    assert 2 == data['_meta']['total']
+    assert _items[0]['_id'] == data['_items'][0]['_id']
+    assert _items[1]['_id'] == data['_items'][1]['_id']
+    assert '_aggregations' in data
+    assert data['_items'][0]['_display_from'].replace('+0000', '+00:00') == \
+        local_to_utc('Australia/Sydney', date.replace(hour=0, minute=0, second=0)).isoformat()
+    assert data['_items'][0]['_display_to'].replace('+0000', '+00:00') == \
+        local_to_utc('Australia/Sydney', date.replace(hour=23, minute=59, second=59)).isoformat()
+
+    # post first 3 items in reverse order
+    featured['items'] = [item['_id'] for item in _items[:3]]
+    featured['items'].reverse()
+    resp = post_json(client, 'push', featured)
+    assert 200 == resp.status_code
+
+    data = get_json(client, '/agenda/search?navigation=51')
+    assert 3 == data['_meta']['total']
+    assert _items[2]['_id'] == data['_items'][0]['_id']
+    assert _items[1]['_id'] == data['_items'][1]['_id']
+    assert _items[0]['_id'] == data['_items'][2]['_id']
+
+    data = get_json(client, '/agenda/search?navigation=51&q=slugline:nonsense')
+    assert 0 == data['_meta']['total']
+
+    # search with no nav - featured disabled
+    data = get_json(client, '/agenda/search')
+    assert len(_items) <= data['_meta']['total']

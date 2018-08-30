@@ -25,6 +25,11 @@ aggregations = {
 }
 
 
+class FeaturedQuery(Exception):
+    """Raise when query is for featured items."""
+    pass
+
+
 def today(offset):
     return datetime.utcnow() + timedelta(minutes=offset)
 
@@ -110,7 +115,11 @@ def set_product_query(query, company, user=None, navigation_id=None):
 
     for product in products:
         if product.get('query'):
-            query['bool']['should'].append(query_string(product['query']))
+            if product['query'] == '_featured':
+                if navigation_id:  # only return featured when nav item is selected
+                    raise FeaturedQuery
+            else:
+                query['bool']['should'].append(query_string(product['query']))
 
     query['bool']['minimum_should_match'] = 1
 

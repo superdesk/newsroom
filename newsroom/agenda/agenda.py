@@ -5,18 +5,20 @@ import newsroom
 from flask import json, abort, url_for
 from eve.utils import ParsedRequest
 
+from superdesk import get_resource_service
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk.metadata.item import not_analyzed
 from planning.common import WORKFLOW_STATE_SCHEMA
 from newsroom.wire.search import get_local_date, versioncreated_range
-from newsroom.wire.search import query_string, set_product_query
+from newsroom.wire.search import query_string, set_product_query, FeaturedQuery
 from superdesk.resource import Resource, not_enabled
 from content_api.items.resource import code_mapping
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
 from newsroom.agenda.email import send_coverage_notification_email
+from superdesk.utils import ListCursor
 
 logger = logging.getLogger(__name__)
 
@@ -207,12 +209,23 @@ def _filter_terms(filters):
     return term_filters
 
 
+def set_post_filter(source, req):
+    filters = None
+    if req.args.get('filter'):
+        filters = json.loads(req.args['filter'])
+    if filters:
+        source['post_filter'] = {'bool': {'must': [_filter_terms(filters)]}}
+
+
 class AgendaService(newsroom.Service):
     def get(self, req, lookup):
         query = _agenda_query()
         user = get_user()
         company = get_user_company(user)
-        set_product_query(query, company, navigation_id=req.args.get('navigation'))
+        try:
+            set_product_query(query, company, navigation_id=req.args.get('navigation'))
+        except FeaturedQuery:
+            return self.featured(req, lookup)
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
@@ -234,13 +247,7 @@ class AgendaService(newsroom.Service):
         source['size'] = 100  # we should fetch all items for given date
         source['from'] = req.args.get('from', 0, type=int)
 
-        filters = None
-
-        if req.args.get('filter'):
-            filters = json.loads(req.args['filter'])
-
-        if filters:
-            source['post_filter'] = {'bool': {'must': [_filter_terms(filters)]}}
+        set_post_filter(source, req)
 
         if source['from'] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
@@ -252,6 +259,41 @@ class AgendaService(newsroom.Service):
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
+
+    def featured(self, req, lookup):
+        """Return featured items."""
+        featured = get_resource_service('agenda_featured').find_one_today()
+        if not featured or not featured.get('items'):
+            return ListCursor([])
+
+        query = _agenda_query()
+        query['bool']['must'].append({'terms': {'_id': featured['items']}})
+
+        if req.args.get('q'):
+            query['bool']['must'].append(query_string(req.args['q']))
+
+        source = {'query': query}
+        set_post_filter(source, req)
+        source['size'] = len(featured['items'])
+        source['from'] = req.args.get('from', 0, type=int)
+        if not source['from']:
+            source['aggs'] = aggregations
+
+        internal_req = ParsedRequest()
+        internal_req.args = {'source': json.dumps(source)}
+        cursor = super().get(internal_req, lookup)
+
+        docs_by_id = {}
+        for doc in cursor.docs:
+            docs_by_id[doc['_id']] = doc
+            # make the items display on the featured day,
+            # it's used in ui instead of dates.start and dates.end
+            doc.update({
+                '_display_from': featured['display_from'],
+                '_display_to': featured['display_to'],
+            })
+        cursor.docs = [docs_by_id[_id] for _id in featured['items'] if docs_by_id.get(_id)]
+        return cursor
 
     def get_items(self, item_ids):
         query = {
