@@ -60,7 +60,7 @@ class AgendaApp extends BaseApp {
 
     render() {
         const modal = this.renderModal(this.props.modal);
-        const showDatePicker = isEmpty(this.props.createdFilter.from) && isEmpty(this.props.createdFilter.to);
+        const showDatePicker = isEmpty(this.props.createdFilter.from) && isEmpty(this.props.createdFilter.to) && !this.props.bookmarks;
 
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
         const mainClassName = classNames('wire-column__main', {

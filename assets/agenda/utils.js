@@ -26,6 +26,12 @@ const navigationFunctions = {
 };
 
 /**
+ * Early enough date to use in querying all agenda items
+ * @type {number}
+ */
+export const EARLIEST_DATE = moment('20170101').valueOf();
+
+/**
  * Test if an item is canceled or killed
  *
  * @param {Object} item

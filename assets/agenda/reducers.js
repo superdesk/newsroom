@@ -9,10 +9,9 @@ import {
 
 import { get } from 'lodash';
 import { EXTENDED_VIEW } from 'wire/defaults';
-
 import { searchReducer } from 'search/reducers';
-
 import { defaultReducer } from '../reducers';
+import { EARLIEST_DATE } from './utils';
 
 const initialState = {
     items: [],
@@ -112,6 +111,11 @@ export default function agendaReducer(state = initialState, action) {
     case INIT_DATA: {
         const navigations = get(action, 'agendaData.navigations', []);
         const openItem = get(action, 'agendaData.item', null);
+        const agenda = {
+            ...state.agenda,
+            activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : state.agenda.activeDate,
+        };
+        
         return {
             ...state,
             readItems: action.readData || {},
@@ -124,6 +128,7 @@ export default function agendaReducer(state = initialState, action) {
             context: 'agenda',
             openItem: openItem,
             detail: !!openItem,
+            agenda,
             savedItemsCount: action.agendaData.saved_items || null,
         };
     }
