@@ -33,8 +33,8 @@ const groupedItemsSelector = createSelector(
         const grouper = Groupers[activeGrouping];
 
         items.forEach((item) => {
-            const start = moment.max(maxStart, moment(item.dates.start));
-            const end = moment(get(item, 'dates.end', start));
+            const start = item._display_from ? moment(item._display_from) : moment.max(maxStart, moment(item.dates.start));
+            const end = item._display_to ? moment(item._display_to) : moment(get(item, 'dates.end', start));
             let key = null;
 
             // use clone otherwise it would modify start and potentially also maxStart, moments are mutable

@@ -65,7 +65,7 @@ def fix_hrefs(doc):
 def push():
     assert_test_signature(flask.request)
     item = flask.json.loads(flask.request.get_data())
-    assert 'guid' in item, {'guid': 1}
+    assert 'guid' in item or '_id' in item, {'guid': 1}
     assert 'type' in item, {'type': 1}
 
     if item.get('type') == 'event':
@@ -79,6 +79,8 @@ def push():
         orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
         item['_id'] = publish_item(item)
         notify_new_item(item, check_topics=orig is None)
+    elif item['type'] == 'planning_featured':
+        publish_planning_featured(item)
     else:
         flask.abort(400, gettext('Unknown type {}'.format(item.get('type'))))
 
@@ -581,3 +583,15 @@ def unique_codes(*groups):
                 codes.add(item['code'])
                 items.append(item)
     return items
+
+
+def publish_planning_featured(item):
+    assert item.get('_id'), {'_id': 1}
+    assert item.get('tz'), {'tz': 1}
+    assert item.get('items'), {'items': 1}
+    service = superdesk.get_resource_service('agenda_featured')
+    orig = service.find_one(req=None, _id=item['_id'])
+    if orig:
+        service.update(orig['_id'], {'items': item['items']}, orig)
+    else:
+        service.create([item])
