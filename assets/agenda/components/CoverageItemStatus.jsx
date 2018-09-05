@@ -47,7 +47,7 @@ export default class CoverageItemStatus extends React.PureComponent {
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Wire')}:</span>,
                 this.state.wire._access
                     ? <a key="value" href={'/wire?item='+ this.state.wire._id}>{this.state.wire.headline}</a>
-                    : <a key="value" href={'/wire/' + this.state.wire._id} target="_blank">{this.state.wire.headline}</a>
+                    : <a key="value" href={'/wire/' + this.state.wire._id} target="_blank">{this.state.wire.headline}{' '}<i className="icon-small--lock icon--red"></i></a>
                 ,
             ];
         }
