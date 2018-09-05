@@ -2,7 +2,7 @@
 from lxml import etree
 from superdesk.publish.formatters.nitf_formatter import NITFFormatter as SuperdeskNITFFormatter
 
-from .base import BaseFormatter
+from newsroom.formatter import BaseFormatter
 
 
 class NITFFormatter(BaseFormatter):

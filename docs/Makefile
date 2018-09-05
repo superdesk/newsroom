@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = python -msphinx
+SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = Newsroom
 SOURCEDIR     = .
 BUILDDIR      = _build
@@ -13,6 +13,12 @@ help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 .PHONY: help Makefile
+
+livehtml:
+	sphinx-autobuild -b html \
+		--ignore "*.swp" \
+		--ignore "*.rst~" \
+		"$(SPHINXOPTS)" "$(BUILDDIR)/html"
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

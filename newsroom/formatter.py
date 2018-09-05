@@ -4,9 +4,19 @@ from superdesk.utc import utcnow
 
 
 class BaseFormatter():
+    """Base formatter class.
 
+    Extend it to implement custom formatter.
+    """
+
+    #: Response mime type when downloading single file (eg. ``text/plain``).
     MIMETYPE = None
+
+    #: File extension to use for downloaded file.
     FILE_EXTENSION = None
+
+    def format_item(self, item, item_type=None):
+        raise NotImplementedError
 
     def format_filename(self, item):
         assert self.FILE_EXTENSION

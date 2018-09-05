@@ -7,7 +7,7 @@ from superdesk.utc import utcnow
 
 from newsroom.agenda.contacts import get_contact_name, get_contact_email
 
-from newsroom.wire.formatters.base import BaseFormatter
+from newsroom.formatter import BaseFormatter
 
 
 def datetime(value):

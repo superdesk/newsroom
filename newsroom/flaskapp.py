@@ -36,7 +36,15 @@ NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class Newsroom(eve.Eve):
-    """The main Newsroom object."""
+    """The main Newsroom object.
+
+    Usage::
+
+        from newsroom import Newsroom
+
+        app = Newsroom(__name__)
+        app.run()
+    """
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
@@ -75,6 +83,7 @@ class Newsroom(eve.Eve):
         self._setup_limiter()
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
+        self._setup_apps(self.config.get('INSTALLED_APPS', []))
         self._setup_babel()
         self._setup_webpack()
         self._setup_email()
@@ -83,7 +92,7 @@ class Newsroom(eve.Eve):
         self._setup_theme()
 
     def load_config(self):
-        """Override Eve.load_config in order to get default_settings."""
+        # Override Eve.load_config in order to get default_settings
         super(Newsroom, self).load_config()
         self.config.from_envvar('NEWSROOM_SETTINGS', silent=True)
         try:
@@ -100,6 +109,7 @@ class Newsroom(eve.Eve):
             self.register_blueprint(mod.blueprint)
 
     def _setup_apps(self, apps):
+        """Setup configured apps."""
         for name in apps:
             mod = importlib.import_module(name)
             if hasattr(mod, 'init_app'):
@@ -170,20 +180,14 @@ class Newsroom(eve.Eve):
             view_func=self.send_theme_file
         )
 
-    def sidenav(self, name, endpoint, icon=None, group=0, active=None, section=None, blueprint=None, badge=None):
-        """Register an item in sidebar menu."""
-        self.sidenavs.append({
-            'name': name,
-            'endpoint': endpoint,
-            'icon': icon,
-            'group': group,
-            'active': active,
-            'section': section,
-            'blueprint': blueprint,
-            'badge': badge,
-        })
+    def download_formatter(self, _format, formatter, name, types):
+        """Register new download formatter.
 
-    def add_download_formatter(self, _format, formatter, name, types):
+        :param _format: format id
+        :param formatter: formatter class, extending :class:`newsroom.formatter.BaseFormatter` class.
+        :param name: human readable name
+        :param types: list of supported types, eg. ``['wire', 'agenda']``
+        """
         self.download_formatters[_format] = {
             'format': _format,
             'formatter': formatter,
@@ -197,7 +201,60 @@ class Newsroom(eve.Eve):
         return self.send_static_file(filename)
 
     def section(self, _id, name):
+        """Define new app section.
+
+        App sections are used for permissions in company settings,
+        and for grouping products.
+
+        You can define new sections in module :meth:`init_app` method::
+
+            def init_app(app):
+                app.section('foo', 'Foo')
+
+        And then you can use it in views as decorator and it will check if user
+        has section active::
+
+            from newsroom.companies import section
+
+            @blueprint.route('/foo')
+            @section('foo')
+            def example():
+                # user company has section foo enabled
+                return flask.render_template('example_index.html)
+
+        You can also specify ``section`` param in sidenav and it will filter out
+        menu items with sections which are not enabled for company.
+
+        :param _id: section _id
+        :param name: section name
+        """
         self.sections.append({
             '_id': _id,
             'name': name,
+        })
+
+    def sidenav(self, name, endpoint, icon=None, group=0, section=None, blueprint=None, badge=None):
+        """Register an item in sidebar menu.
+
+        Use in module :meth:`init_app` method::
+
+            def init_app(app):
+                app.section('foo', 'Foo')
+
+        :param name: user readable name
+        :param endpoint: endpoint name, used with :meth:`flask.url_for`
+        :param icon: css icon class name
+        :param group: group number, ``0`` by default
+        :param section: section ``_id``, will be only visible if user has section enabled.
+        :param blueprint: blueprint name, will be only visible if blueprint is active
+        :param badge: badge id - will add badge html markup with given id
+        """
+        self.sidenavs.append({
+            'name': name,
+            'endpoint': endpoint,
+            'icon': icon,
+            'group': group,
+            'section': section,
+            'blueprint': blueprint,
+            'badge': badge,
         })

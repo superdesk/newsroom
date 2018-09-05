@@ -1,6 +1,6 @@
 
 import flask
-from .base import BaseFormatter
+from newsroom.formatter import BaseFormatter
 
 
 class TextFormatter(BaseFormatter):
