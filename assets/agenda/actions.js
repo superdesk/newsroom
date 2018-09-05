@@ -137,7 +137,7 @@ function search(state, next) {
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to: createdFilter.to,
-        date_from: isEmpty(createdFilter.from) && isEmpty(createdFilter.to) ? agendaDate : null,
+        date_from: isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : null,
         timezone_offset: getTimezoneOffset(),
     };
 

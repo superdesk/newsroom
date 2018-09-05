@@ -253,7 +253,7 @@ class AgendaService(newsroom.Service):
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
             return abort(400)
 
-        if not source['from']:  # avoid aggregations when handling pagination
+        if not source['from'] and not req.args.get('bookmarks'):  # avoid aggregations when handling pagination
             source['aggs'] = aggregations
 
         internal_req = ParsedRequest()
