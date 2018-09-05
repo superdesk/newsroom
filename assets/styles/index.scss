@@ -1352,6 +1352,15 @@ article.list {
         text-decoration: line-through;
     }
 }
+// watched item
+.wire-articles__item--watched {
+    background-color: #f6f6f6;
+    background-image: url(/static/watched-icon.svg);
+    background-size: 62px;
+    background-repeat: no-repeat;
+    background-position: right 72px center;
+
+}
 
 // grid view 
 .wire-articles--grid {
@@ -1502,6 +1511,10 @@ article.list {
         font-size: 1rem;
         font-weight: 400;
         margin-bottom: 4px;
+    }
+    .wire-articles__item--watched {
+        background-position: right 120px center;
+        background-size: 52px;
     }
 }
 
@@ -1967,6 +1980,9 @@ article.list {
     .wire-column__preview--rescheduled & i,
     .wire-column__preview__content--rescheduled & i {
         color: $green-dark;
+    }
+    .wire-articles__item--watched & {
+        background-color: #f2f2f2;
     }
 }
 
