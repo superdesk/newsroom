@@ -170,6 +170,9 @@ NEWS_ONLY_FILTERS = [
     {'match': {'source': 'PMF'}},
 ]
 
+# Places navigation item(s) for featured story products to the top of the list under All
+AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE = True
+
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 

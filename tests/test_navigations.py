@@ -3,6 +3,7 @@ from flask import json
 from pytest import fixture
 
 from .test_users import test_login_succeeds_for_admin, init as user_init
+from newsroom.navigations.navigations import get_navigations_by_company
 
 
 @fixture(autouse=True)
@@ -95,3 +96,44 @@ def test_save_navigation_products(client, app):
     data = json.loads(response.get_data())
     assert [p for p in data if p['_id'] == 'p-1'][0]['navigations'] == []
     assert [p for p in data if p['_id'] == 'p-2'][0]['navigations'] == ['n-1']
+
+
+def test_get_agenda_navigations_by_company_returns_ordered(client, app):
+    app.data.insert('navigations', [{
+        '_id': 'n-1',
+        'name': 'Uber',
+        'is_enabled': True,
+    }])
+
+    app.data.insert('companies', [{
+        '_id': 'c-1',
+        'phone': '2132132134',
+        'sd_subscriber_id': '12345',
+        'name': 'Press Co.',
+        'is_enabled': True,
+        'contact_name': 'Tom'
+    }])
+
+    app.data.insert('products', [{
+        '_id': 'p-1',
+        'name': 'Top Things',
+        'navigations': ['n-1'],
+        'companies': ['c-1'],
+        'is_enabled': True,
+        'query': '_featured',
+        'product_type': 'agenda',
+    }, {
+        '_id': 'p-2',
+        'name': 'A News',
+        'navigations': ['59b4c5c61d41c8d736852fbf'],
+        'companies': ['c-1'],
+        'description': 'news product',
+        'is_enabled': True,
+        'product_type': 'agenda',
+        'query': 'latest',
+    }])
+
+    test_login_succeeds_for_admin(client)
+    navigations = get_navigations_by_company('c-1', 'agenda')
+    assert navigations[0].get('name') == 'Uber'
+    assert navigations[1].get('name') == 'Sport'
