@@ -27,14 +27,14 @@ function AgendaListItemIcons({item, hideCoverages, row}) {
                 </div>
             }
 
-            {hasLocation(item) && <div className='wire-articles__item__meta-info flex-row align-items-start'>
-                <span className='mr-2'>
+            <div className='wire-articles__item__meta-info flex-row align-items-start'>
+                {hasLocation(item) && <span className='mr-2'>
                     <i className='icon-small--location icon--gray'></i>
-                </span>
-                <span>{getLocationString(item)}</span>
+                </span>}
+                {hasLocation(item) && <span>{getLocationString(item)}</span>}
 
                 <AgendaListItemLabels item={item} />
-            </div>}
+            </div>
         </div>
     );
 }
