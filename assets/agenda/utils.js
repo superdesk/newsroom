@@ -120,7 +120,8 @@ export function hasLocation(item) {
 export function getPublicContacts(item) {
     const contacts = get(item, 'event.event_contact_info', []);
     return contacts.filter(c => c.public).map(c => ({
-        name: [c.first_name, c.last_name].filter((x) => !!x).join(' ') || c.organisation,
+        name: [c.first_name, c.last_name].filter((x) => !!x).join(' '),
+        organisation: c.organisation || '',
         email: (c.contact_email || []).join(', '),
         phone: (c.contact_phone || []).filter(m => m.public).map(m => m.number).join(', '),
         mobile: (c.mobile || []).filter(m => m.public).map(m => m.number).join(', '),

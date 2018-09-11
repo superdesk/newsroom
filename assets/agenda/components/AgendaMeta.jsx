@@ -25,7 +25,7 @@ function AgendaPreviewMeta({item}) {
                     className='wire-articles__item__meta-row'
                     key={`${contact.name}-${index}`}>
                     <i className='icon-small--user icon--gray'></i>
-                    <span>{`${contact.name} ${contact.phone} ${contact.mobile} `}
+                    <span>{`${contact.name}${(contact.name && contact.organisation) ? ', ' : ''}${contact.organisation} ${contact.phone} ${contact.mobile} `}
                         {contact.email && <a href={`mailto:${contact.email}`}>{contact.email}</a>}
                     </span>
                 </div>)}
