@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
-import { gettext, formatDate } from 'utils';
+import { gettext, formatCoverageDate } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
 
 const getCoverageStatusClass = (coverage) =>
@@ -22,7 +22,7 @@ export default function AgendaCoverages({coverages}) {
                 <span className='d-flex'>
                     <i className='icon-small--clock icon--gray mr-1'></i>
                     <span className='coverage-item__text-label mr-1'>{gettext('due by')}:</span>
-                    <span>{formatDate(coverage.scheduled)}</span>
+                    <span>{formatCoverageDate(coverage.scheduled)}</span>
                 </span>
             </div>
 
