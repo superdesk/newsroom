@@ -102,7 +102,7 @@
 .icon-small--calendar:before {
     content: "\e60b";
 }
-.icon-small--coverage-graphic:before {
+.icon-small--coverage-infographics:before {
     content: "\e60c";
 }
 .icon-small--attachment:before {
@@ -110,4 +110,16 @@
 }
 .icon-small--lock:before {
     content: "\e60e";
+}
+.icon-small--coverage-live-video:before {
+    content: "\e60f";
+}
+.icon-small--coverage-audio:before {
+    content: "\e610";
+}
+.icon-small--coverage-live-blog:before {
+    content: "\e611";
+}
+.icon-small--coverage-unrecognized:before {
+    content: "\e612";
 }
