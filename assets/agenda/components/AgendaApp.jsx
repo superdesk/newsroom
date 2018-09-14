@@ -99,7 +99,7 @@ class AgendaApp extends BaseApp {
                         </span>}
 
                         {this.props.bookmarks &&
-                            <BookmarkTabs active="agenda" />
+                            <BookmarkTabs active="agenda" sections={this.props.userSections}/>
                         }
 
                         <SearchBar
@@ -219,6 +219,7 @@ AgendaApp.propTypes = {
     requestCoverage: PropTypes.func,
     detail: PropTypes.bool,
     savedItemsCount: PropTypes.number,
+    userSections: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -246,6 +247,7 @@ const mapStateToProps = (state) => ({
     activeGrouping: get(state, 'agenda.activeGrouping'),
     detail: get(state, 'detail', false),
     savedItemsCount: state.savedItemsCount,
+    userSections: state.userSections,
 });
 
 const mapDispatchToProps = (dispatch) => ({

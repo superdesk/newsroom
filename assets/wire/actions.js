@@ -165,6 +165,7 @@ function search(state, next) {
         created_to: createdFilter.to,
         timezone_offset: getTimezoneOffset(),
         newsOnly,
+        section: state.bookmarks && state.user ? state.context : null,
     };
 
     const queryString = Object.keys(params)

@@ -33,6 +33,7 @@ const initialState = {
         newsOnly: false,
     },
     search: searchReducer(),
+    userSections: {},
 };
 
 function recieveItems(state, data) {
@@ -88,8 +89,9 @@ export default function wireReducer(state = initialState, action) {
             formats: action.wireData.formats || [],
             wire: Object.assign({}, state.wire, {newsOnly: action.newsOnly}),
             search: Object.assign({}, state.search, {navigations}),
-            context: 'wire',
+            context: action.wireData.context || 'wire',
             savedItemsCount: action.wireData.saved_items || null,
+            userSections: action.wireData.userSections || {},
         };
     }
 

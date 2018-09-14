@@ -62,7 +62,12 @@ def get_json_or_400():
 
 def get_type():
     item_type = request.args.get('type', 'wire')
-    return 'items' if item_type == 'wire' else 'agenda'
+    types = {
+        'wire': 'items',
+        'agenda': 'agenda',
+        'am_news': 'items'
+    }
+    return types[item_type]
 
 
 def parse_dates(item):

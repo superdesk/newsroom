@@ -1,7 +1,7 @@
 import superdesk
 from functools import wraps
 
-from flask import Blueprint, abort
+from flask import Blueprint, abort, current_app as newsroom_app
 from newsroom.auth import get_user
 from newsroom.template_filters import sidenavs
 
@@ -13,6 +13,18 @@ blueprint = Blueprint('companies', __name__)
 def get_user_company(user):
     if user and user.get('company'):
         return superdesk.get_resource_service('companies').find_one(req=None, _id=user['company'])
+
+
+def get_company_sections(company_id):
+    """get the section configured for the company"""
+    if not company_id:
+        return newsroom_app.sections
+
+    company = superdesk.get_resource_service('companies').find_one(req=None, _id=company_id)
+    if not company or not company.get('sections'):
+        return newsroom_app.sections
+
+    return [s for s in newsroom_app.sections if company.get('sections').get(s['_id'])]
 
 
 def get_user_company_name(user=None):

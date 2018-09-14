@@ -35,7 +35,6 @@ class ProductsResource(newsroom.Resource):
         },
         'product_type': {
             'type': 'string',
-            'allowed': ['agenda', 'wire'],
             'default': 'wire'
         },
     }
@@ -57,10 +56,12 @@ def get_products_by_navigation(navigation_id):
                 get(req=None, lookup={'navigations': str(navigation_id), 'is_enabled': True}))
 
 
-def get_products_by_company(company_id, navigation_id=None):
+def get_products_by_company(company_id, navigation_id=None, product_type=None):
     lookup = {'is_enabled': True, 'companies': str(company_id)}
     if navigation_id:
         lookup['navigations'] = str(navigation_id)
+    if product_type:
+        lookup['product_type'] = product_type
     return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
 
 

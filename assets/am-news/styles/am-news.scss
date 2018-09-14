@@ -1,0 +1,26 @@
+.am-news {
+    &__nav-tabs {
+        padding-top: 10px;
+        background-color: #fff;
+        .active {
+            background-color: #f8f8f8 !important;
+            border-bottom-color: #f8f8f8 !important;
+            font-weight: 600;
+            cursor: default;
+        }
+        a {
+            color: #444;
+        }
+    }
+
+    .wire-articles__header {
+        font-weight: 600;
+        color: #0A0;
+    }
+
+    .wire-articles__item__text {
+        p {
+            margin: 0px;
+        }
+    }
+}

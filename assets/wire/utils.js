@@ -181,9 +181,9 @@ export function showItemVersions(item, next) {
  * @param {Item} item
  * @return {Node}
  */
-export function shortText(item, length=40) {
-    const html = item.description_html || item.body_html || '<p></p>';
-    const text = item.description_text || getTextFromHtml(html);
+export function shortText(item, length=40, useBody=false) {
+    const html = (useBody ? item.body_html : item.description_html || item.body_html) || '<p></p>';
+    const text = useBody ?  getTextFromHtml(html) : item.description_text || getTextFromHtml(html);
     const words = text.split(/\s/).filter((w) => w);
     return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
 }

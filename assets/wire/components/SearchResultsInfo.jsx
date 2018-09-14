@@ -39,7 +39,8 @@ class SearchResultsInfo extends React.Component {
 
     render() {
         const isFollowing = this.props.user && this.props.activeTopic;
-        const displayFollowTopic = this.props.user && !this.props.bookmarks && !isEmpty(this.props.searchCriteria);
+        const displayFollowTopic = this.props.topicType && this.props.user &&
+            !this.props.bookmarks && !isEmpty(this.props.searchCriteria);
 
         const displayTotalItems = this.props.bookmarks ||
           !isEmpty(this.props.searchCriteria) ||
@@ -110,10 +111,8 @@ SearchResultsInfo.propTypes = {
     newsOnly: PropTypes.bool,
     scrollClass: PropTypes.string,
     topicType: PropTypes.string,
-
     searchCriteria: PropTypes.object,
     resultsFiltered: PropTypes.bool,
-
     followTopic: PropTypes.func.isRequired,
 };
 

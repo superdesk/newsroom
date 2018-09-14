@@ -28,7 +28,7 @@ def get_user_topics(user_id):
 
 
 def get_wire_notification_topics():
-    lookup = {'$and': [{'notifications': True}, {'topic_type': {'$ne': 'agenda'}}]}
+    lookup = {'$and': [{'notifications': True}, {'topic_type': 'wire'}]}
     return list(superdesk.get_resource_service('topics').get(req=None, lookup=lookup))
 
 

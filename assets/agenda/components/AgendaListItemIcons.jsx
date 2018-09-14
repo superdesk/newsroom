@@ -7,11 +7,14 @@ import {
     isCoverageForExtraDay,
     hasLocation,
     getLocationString,
-    getCoverageIcon
+    getCoverageIcon,
+    isRecurring
 } from '../utils';
+
 import AgendaListItemLabels from './AgendaListItemLabels';
-import MetaTime from './MetaTime';
 import {gettext, formatDate, formatTime} from 'utils';
+import MetaTime from 'ui/components/MetaTime';
+
 
 function AgendaListItemIcons({item, group, hideCoverages, row}) {
     const className = bem('wire-articles', 'item__meta', {
@@ -20,7 +23,12 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
 
     return (
         <div className={className}>
-            <MetaTime item={item} borderRight={true} />
+            <MetaTime
+                date={item.dates.start}
+                borderRight={true}
+                isRecurring={isRecurring(item)}
+                hasCoverages={hasCoverages(item)}
+            />
 
             {hasCoverages(item) && !hideCoverages &&
                 <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
