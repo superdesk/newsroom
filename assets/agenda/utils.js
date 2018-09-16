@@ -1,5 +1,6 @@
 import { get, isEmpty, includes } from 'lodash';
 import moment from 'moment/moment';
+import {formatDate, formatMonth, formatWeek} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -23,6 +24,12 @@ const navigationFunctions = {
         'previous': getPreviousMonth,
         'format': (dateString) => moment(dateString).format('MMMM, YYYY'),
     }
+};
+
+const Groupers = {
+    'day': formatDate,
+    'week': formatWeek,
+    'month': formatMonth,
 };
 
 /**
@@ -80,6 +87,32 @@ export function hasCoverages(item) {
  */
 export function isWatched(item, userId) {
     return userId && includes(get(item, 'watches', []), userId);
+}
+
+
+/**
+ * Test if a coverage is in boundary of event start and end dates
+ *
+ * @param {Object} item
+ * @param {Object} coverage
+ * @return {Boolean}
+ */
+export function isCoverageBetweenEventDates(item, coverage) {
+    const coverageDate = moment(coverage.scheduled);
+    const eventStartDate = moment(item.dates.start);
+    const eventEndDate = moment(get(item, 'dates.end', eventStartDate));
+    return coverageDate.isBetween(eventStartDate, eventEndDate, null, '[]');
+}
+
+/**
+ * Test if a coverage is for given date string
+ *
+ * @param {Object} coverage
+ * @param {String} dateString
+ * @return {Boolean}
+ */
+export function isCoverageForExtraDay(coverage, dateString) {
+    return formatDate(moment(coverage.scheduled)) === dateString;
 }
 
 /**
@@ -290,4 +323,69 @@ export function hasAttachments(item) {
  */
 export function getName(item) {
     return item.name || item.headline;
+}
+
+
+/**
+ * Gets the extra days outside the event days
+ *
+ * @param {Object} item
+ * @return {Array} list of dates
+ */
+export function getExtraDates(item) {
+    return get(item, 'extra_dates', []).map(ed => moment(ed.start));
+}
+
+/**
+ * Checks if a date is in extra dates
+ *
+ * @param {Object} item
+ * @param {Date} date to check (moment)
+ * @return {Boolean}
+ */
+export function containsExtraDate(item, dateToCheck) {
+    return get(item, 'extra_dates', []).map(ed => moment(ed.start).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
+}
+
+
+/**
+ * Groups given agenda items per given grouping
+ * @param items: list of agenda items
+ * @param activeDate: date that the grouping will start from
+ * @param activeGrouping: type of grouping i.e. day, week, month
+ */
+export function groupItems (items, activeDate, activeGrouping) {
+    const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
+    const groupedItems = {};
+    const grouper = Groupers[activeGrouping];
+
+    items.forEach((item) => {
+        const itemExtraDates = getExtraDates(item);
+        const itemStartDate = moment(item.dates.start);
+
+        const start = item._display_from ? moment(item._display_from) :
+            moment.max(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
+
+        const itemEndDate = moment(get(item, 'dates.end', start));
+
+        const end = item._display_to ? moment(item._display_to) :
+            moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
+        let key = null;
+
+        // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
+        for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
+
+            const isBetween = day.isBetween(itemStartDate, itemEndDate, 'day', '[]');
+            const containsExtra = containsExtraDate(item, day);
+
+            if (grouper(day) !== key && (isBetween || containsExtra)) {
+                key = grouper(day);
+                const groupList = groupedItems[key] || [];
+                groupList.push(item._id);
+                groupedItems[key] = groupList;
+            }
+        }
+    });
+
+    return groupedItems;
 }

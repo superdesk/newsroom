@@ -10,7 +10,7 @@ import moment from 'moment';
 
 export const now = moment(); // to enable mocking in tests
 const TIME_FORMAT = getConfig('time_format');
-const DATE_FORMAT = getConfig('date_format');
+const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
 const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
 
