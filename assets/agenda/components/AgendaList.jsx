@@ -25,6 +25,18 @@ const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
 const activeDateSelector = (state) => get(state, 'agenda.activeDate');
 const activeGroupingSelector = (state) => get(state, 'agenda.activeGrouping');
 
+const timeComparer = (item1, item2) => moment(item1.dates.start, 'HH:mm').isBefore(moment(item2.dates.start, 'HH:mm')) ? -1 : 1;
+
+const sortGroupedItems = (groupedItems) => {
+    // sorts items in every group by their start times
+
+    Object.keys(groupedItems).map((key) => {
+        groupedItems[key] = groupedItems[key].sort(timeComparer).map(i => i._id);
+    });
+
+    return groupedItems;
+};
+
 const groupedItemsSelector = createSelector(
     [itemsSelector, activeDateSelector, activeGroupingSelector],
     (items, activeDate, activeGrouping) => {
@@ -42,13 +54,13 @@ const groupedItemsSelector = createSelector(
                 if (grouper(day) !== key) {
                     key = grouper(day);
                     const groupList = groupedItems[key] || [];
-                    groupList.push(item._id);
+                    groupList.push(item);
                     groupedItems[key] = groupList;
                 }
             }
         });
 
-        return groupedItems;
+        return sortGroupedItems(groupedItems);
     }
 );
 
