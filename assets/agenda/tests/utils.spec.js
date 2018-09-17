@@ -50,7 +50,7 @@ describe('utils', () => {
                 {
                     _id: 'foo',
                     dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-17T05:00:00+0000', tz: 'Australia/Sydney'},
-                    extra_dates: [{start: '2018-10-13T10:00:00+0000'}]
+                    display_dates: [{date: '2018-10-13T10:00:00+0000'}]
                 }];
 
             const groupedItems = utils.groupItems(items, '2018-10-11', 'day');

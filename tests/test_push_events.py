@@ -283,8 +283,8 @@ def test_push_coverages_with_different_dates_for_an_existing_event(client, app):
     assert parsed['name'] == test_event['name']
     assert parsed['dates']['start'].isoformat() == event['dates']['start'].replace('0000', '00:00')
     assert parsed['dates']['end'].isoformat() == event['dates']['end'].replace('0000', '00:00')
-    assert 1 == len(parsed['extra_dates'])
-    assert parsed['extra_dates'][0]['start'].isoformat() == \
+    assert 1 == len(parsed['display_dates'])
+    assert parsed['display_dates'][0]['date'].isoformat() == \
         planning['coverages'][0]['planning']['scheduled'].replace('0000', '00:00')
 
 
@@ -310,8 +310,8 @@ def test_push_planning_with_different_dates_for_an_existing_event(client, app):
     assert parsed['name'] == test_event['name']
     assert parsed['dates']['start'].isoformat() == event['dates']['start'].replace('0000', '00:00')
     assert parsed['dates']['end'].isoformat() == event['dates']['end'].replace('0000', '00:00')
-    assert 1 == len(parsed['extra_dates'])
-    assert parsed['extra_dates'][0]['start'].isoformat() == planning['planning_date'].replace('0000', '00:00')
+    assert 1 == len(parsed['display_dates'])
+    assert parsed['display_dates'][0]['date'].isoformat() == planning['planning_date'].replace('0000', '00:00')
 
 
 def test_push_cancelled_planning_for_an_existing_event(client, app):

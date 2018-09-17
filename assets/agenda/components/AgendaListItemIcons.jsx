@@ -21,16 +21,16 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
                         const coverageClass = `icon--coverage-${coverage.coverage_type}`;
                         const statusClass = coverage.workflow_status === 'active' ? 'icon--green' : 'icon--gray-light';
                         return (!group || (isCoverageBetweenEventDates(item, coverage) || isCoverageForExtraDay(coverage, group)) &&
-				<span
-                            className='wire-articles__item__icon'
-                            key={coverage.coverage_id}
-                            title={gettext('{{ status }} on {{date}} {{time}}', {
-                                status: coverage.workflow_status,
-                                date: formatDate(coverage.scheduled),
-                                time: formatTime(coverage.scheduled)
-                            })}>
-                            <i className={`${coverageClass} ${statusClass}`}></i>
-                        </span>);
+                          <span
+                              className='wire-articles__item__icon'
+                              key={coverage.coverage_id}
+                              title={gettext('{{ status }} on {{date}} {{time}}', {
+                                  status: coverage.workflow_status,
+                                  date: formatDate(coverage.scheduled),
+                                  time: formatTime(coverage.scheduled)
+                              })}>
+                              <i className={`${coverageClass} ${statusClass}`}></i>
+                          </span>);
                     })
                     }
                 </div>

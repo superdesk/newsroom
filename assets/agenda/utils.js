@@ -333,7 +333,7 @@ export function getName(item) {
  * @return {Array} list of dates
  */
 export function getExtraDates(item) {
-    return get(item, 'extra_dates', []).map(ed => moment(ed.start));
+    return get(item, 'display_dates', []).map(ed => moment(ed.date));
 }
 
 /**
@@ -344,7 +344,7 @@ export function getExtraDates(item) {
  * @return {Boolean}
  */
 export function containsExtraDate(item, dateToCheck) {
-    return get(item, 'extra_dates', []).map(ed => moment(ed.start).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
+    return get(item, 'display_dates', []).map(ed => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
 }
 
 

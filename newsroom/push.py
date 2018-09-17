@@ -354,17 +354,17 @@ def set_agenda_planning_items(agenda, planning_item, action='add'):
         agenda['planning_items'].append(planning_item)
 
     agenda['coverages'] = get_coverages(agenda['planning_items'])
-    agenda['extra_dates'] = get_extra_dates(agenda['dates'], agenda['planning_items'])
+    agenda['display_dates'] = get_display_dates(agenda['dates'], agenda['planning_items'])
 
 
-def get_extra_dates(agenda_date, planning_items):
+def get_display_dates(agenda_date, planning_items):
     """
     Returns the list of dates where a planning item or a coverage falls outside
     of the agenda item dates
     """
-    extra_dates = []
+    display_dates = []
 
-    def parse_extra_dates(date):
+    def parse_display_dates(date):
         if type(date) == datetime:
             return date
         if date and type(date) == str:
@@ -373,26 +373,26 @@ def get_extra_dates(agenda_date, planning_items):
     def should_add(date):
         try:
             return not (agenda_date['start'].date() <= date.date() <= agenda_date['end'].date()) and \
-                   not date.date() in [d['start'].date() for d in extra_dates]
+                   not date.date() in [d['date'].date() for d in display_dates]
         except (AttributeError, TypeError):
             return False
 
     for planning_item in planning_items:
         if not planning_item.get('coverages'):
-            parsed_date = parse_extra_dates(planning_item['planning_date'])
+            parsed_date = parse_display_dates(planning_item['planning_date'])
             if should_add(parsed_date):
-                extra_dates.append({
-                    'start': parsed_date
+                display_dates.append({
+                    'date': parsed_date
                 })
 
         for coverage in planning_item.get('coverages', []):
-            parsed_date = parse_extra_dates(coverage['planning']['scheduled'])
+            parsed_date = parse_display_dates(coverage['planning']['scheduled'])
             if should_add(parsed_date):
-                extra_dates.append({
-                    'start': parsed_date
+                display_dates.append({
+                    'date': parsed_date
                 })
 
-    return extra_dates
+    return display_dates
 
 
 def get_coverages(planning_items):
