@@ -1,4 +1,4 @@
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, includes } from 'lodash';
 import moment from 'moment/moment';
 
 const STATUS_KILLED = 'killed';
@@ -69,6 +69,17 @@ export function isRescheduled(item) {
  */
 export function hasCoverages(item) {
     return !isEmpty(get(item, 'coverages'));
+}
+
+/**
+ * Test if an item is watched
+ *
+ * @param {Object} item
+ * @param {String} userId
+ * @return {Boolean}
+ */
+export function isWatched(item, userId) {
+    return userId && includes(get(item, 'watches', []), userId);
 }
 
 /**

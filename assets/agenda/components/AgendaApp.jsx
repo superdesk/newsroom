@@ -43,6 +43,7 @@ import { getItemActions } from 'wire/item-actions';
 import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
+import { isWatched } from '../utils';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -261,7 +262,7 @@ const mapDispatchToProps = (dispatch) => ({
             name: gettext('Stop watching'),
             icon: 'unwatch',
             multi: true,
-            when: (state, item) => state.user && includes(get(item, 'watches', []), state.user),
+            when: (state, item) => isWatched(item, state.user),
             action: (items) => dispatch(stopWatchingEvents(items)),
         },
     ]),

@@ -6,7 +6,7 @@ import ActionList from 'components/ActionList';
 import ActionButton from 'components/ActionButton';
 
 import AgendaListItemIcons from './AgendaListItemIcons';
-import {hasCoverages, isCanceled, isPostponed, isRescheduled, getName} from '../utils';
+import {hasCoverages, isCanceled, isPostponed, isRescheduled, getName, isWatched} from '../utils';
 
 class AgendaListItem extends React.Component {
     constructor(props) {
@@ -44,6 +44,7 @@ class AgendaListItem extends React.Component {
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--covering': hasCoverages(this.props.item),
+            'wire-articles__item--watched': isWatched(this.props.item, this.props.user),
             'wire-articles__item--not-covering': !hasCoverages(this.props.item),
             'wire-articles__item--postponed': isPostponed(this.props.item),
             'wire-articles__item--canceled': isCanceled(this.props.item),
