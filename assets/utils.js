@@ -11,6 +11,7 @@ import moment from 'moment';
 export const now = moment(); // to enable mocking in tests
 const TIME_FORMAT = getConfig('time_format');
 const DATE_FORMAT = getConfig('date_format');
+const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
 
 /**
@@ -182,6 +183,16 @@ export function formatTime(dateString) {
  */
 export function formatDate(dateString) {
     return parseDate(dateString).format(DATE_FORMAT);
+}
+
+/**
+ * Format coverage date ('HH:mm DD/MM')
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatCoverageDate(dateString) {
+    return parseDate(dateString).format(COVERAGE_DATE_FORMAT);
 }
 
 /**

@@ -205,6 +205,7 @@ SERVICES = [
 
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'DD/MM/YYYY'
+CLIENT_COVERAGE_DATE_FORMAT = 'HH:mm DD/MM'
 
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
