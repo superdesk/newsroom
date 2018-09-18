@@ -67,6 +67,7 @@ def get_view_data():
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='agenda'),
         'saved_items': get_resource_service('agenda').get_saved_items_count(),
+        'coverage_types': app.config['COVERAGE_TYPES'],
     }
 
 

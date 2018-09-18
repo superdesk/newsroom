@@ -1,6 +1,6 @@
 import { get, isEmpty, includes } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek} from '../utils';
+import {formatDate, formatMonth, formatWeek, getConfig} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -76,6 +76,28 @@ export function isRescheduled(item) {
  */
 export function hasCoverages(item) {
     return !isEmpty(get(item, 'coverages'));
+}
+
+/**
+ * Returns icon name of the given coverage type
+ *
+ * @param coverageType
+ * @returns {*}
+ */
+export function getCoverageIcon(coverageType) {
+    const coverageTypes = getConfig('coverage_types', {}, 'agendaData');
+    return get(coverageTypes, `${coverageType}.icon`, 'unrecognized');
+}
+
+/**
+ * Returns display name of the given coverage type
+ *
+ * @param coverageType
+ * @returns {*}
+ */
+export function getCoverageDisplayName(coverageType) {
+    const coverageTypes = getConfig('coverage_types', {}, 'agendaData');
+    return get(coverageTypes, `${coverageType}.name`, coverageType);
 }
 
 /**
