@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bem} from 'ui/utils';
-import {hasCoverages, hasLocation, getLocationString} from '../utils';
+import {hasCoverages, isCoverageBetweenEventDates, isCoverageForExtraDay, hasLocation, getLocationString} from '../utils';
 import AgendaListItemLabels from './AgendaListItemLabels';
 import MetaTime from './MetaTime';
 import {gettext, formatDate, formatTime} from 'utils';
 
-function AgendaListItemIcons({item, hideCoverages, row}) {
+function AgendaListItemIcons({item, group, hideCoverages, row}) {
     const className = bem('wire-articles', 'item__meta', {
         row,
     });
@@ -20,16 +20,17 @@ function AgendaListItemIcons({item, hideCoverages, row}) {
                     {item.coverages.map((coverage) => {
                         const coverageClass = `icon--coverage-${coverage.coverage_type}`;
                         const statusClass = coverage.workflow_status === 'active' ? 'icon--green' : 'icon--gray-light';
-                        return (<span
-                            className='wire-articles__item__icon'
-                            key={coverage.coverage_id}
-                            title={gettext('{{ status }} on {{date}} {{time}}', {
-                                status: coverage.workflow_status,
-                                date: formatDate(coverage.scheduled),
-                                time: formatTime(coverage.scheduled)
-                            })}>
-                            <i className={`${coverageClass} ${statusClass}`}></i>
-                        </span>);
+                        return (!group || (isCoverageBetweenEventDates(item, coverage) || isCoverageForExtraDay(coverage, group)) &&
+                          <span
+                              className='wire-articles__item__icon'
+                              key={coverage.coverage_id}
+                              title={gettext('{{ status }} on {{date}} {{time}}', {
+                                  status: coverage.workflow_status,
+                                  date: formatDate(coverage.scheduled),
+                                  time: formatTime(coverage.scheduled)
+                              })}>
+                              <i className={`${coverageClass} ${statusClass}`}></i>
+                          </span>);
                     })
                     }
                 </div>
@@ -49,6 +50,7 @@ function AgendaListItemIcons({item, hideCoverages, row}) {
 
 AgendaListItemIcons.propTypes = {
     item: PropTypes.object,
+    group: PropTypes.string,
     hideCoverages: PropTypes.bool,
     row: PropTypes.bool,
 };

@@ -40,7 +40,7 @@ class AgendaListItem extends React.Component {
     }
 
     render() {
-        const {item, onClick, onDoubleClick, isExtended} = this.props;
+        const {item, onClick, onDoubleClick, isExtended, group} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--covering': hasCoverages(this.props.item),
@@ -81,7 +81,7 @@ class AgendaListItem extends React.Component {
                             {getName(item)}
                         </h4>
 
-                        <AgendaListItemIcons item={item} />
+                        <AgendaListItemIcons item={item} group={group} />
 
                         {isExtended && item.definition_short && (
                             <p className="wire-articles__item__text">

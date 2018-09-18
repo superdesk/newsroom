@@ -4,22 +4,18 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { get } from 'lodash';
 import classNames from 'classnames';
-import moment from 'moment/moment';
 
-import { gettext, formatDate, formatWeek, formatMonth } from 'utils';
+import { gettext } from 'utils';
 import AgendaListItem from './AgendaListItem';
 import { setActive, previewItem, toggleSelected, openItem } from '../actions';
 import { EXTENDED_VIEW } from 'wire/defaults';
 import { getIntVersion } from 'wire/utils';
+import { groupItems } from 'agenda/utils';
+
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
-const Groupers = {
-    'day': formatDate,
-    'week': formatWeek,
-    'month': formatMonth,
-};
 
 const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
 const activeDateSelector = (state) => get(state, 'agenda.activeDate');
@@ -27,30 +23,8 @@ const activeGroupingSelector = (state) => get(state, 'agenda.activeGrouping');
 
 const groupedItemsSelector = createSelector(
     [itemsSelector, activeDateSelector, activeGroupingSelector],
-    (items, activeDate, activeGrouping) => {
-        const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
-        const groupedItems = {};
-        const grouper = Groupers[activeGrouping];
+    groupItems);
 
-        items.forEach((item) => {
-            const start = item._display_from ? moment(item._display_from) : moment.max(maxStart, moment(item.dates.start));
-            const end = item._display_to ? moment(item._display_to) : moment(get(item, 'dates.end', start));
-            let key = null;
-
-            // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
-            for (const day = start.clone(); day.isSameOrBefore(end); day.add(1, 'd')) {
-                if (grouper(day) !== key) {
-                    key = grouper(day);
-                    const groupList = groupedItems[key] || [];
-                    groupList.push(item._id);
-                    groupedItems[key] = groupList;
-                }
-            }
-        });
-
-        return groupedItems;
-    }
-);
 
 class AgendaList extends React.Component {
     constructor(props) {

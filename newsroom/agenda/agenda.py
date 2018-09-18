@@ -79,6 +79,18 @@ class AgendaResource(newsroom.Resource):
         }
     }
 
+    # additional dates from coverages or planning to be used in searching agenda items
+    schema['display_dates'] = {
+        'type': 'list',
+        'nullable': True,
+        'mappping': {
+            'type': 'dict',
+            'schema': {
+                'date': {'type': 'datetime'},
+            }
+        }
+    }
+
     # coverages
     schema['coverages'] = {
         'type': 'object',
@@ -159,7 +171,9 @@ def _agenda_query():
     return {
         'bool': {
             'must': [{'term': {'_type': 'agenda'}}],
+            'should': [],
             'must_not': [{'term': {'state': 'killed'}}],
+            'minimum_should_match': 1,
         }
     }
 
@@ -171,7 +185,15 @@ def _event_date_range(args):
     """
     offset = int(args.get('timezone_offset', '0'))
     if args.get('date_from'):
-        return {'range': {'dates.end': {'gt': get_local_date(args['date_from'], '00:00:00', offset)}}},
+        return {'range': {'dates.end': {'gt': get_local_date(args['date_from'], '00:00:00', offset)}}}
+
+
+def _display_date_range(args):
+    """Get events for extra dates for coverages and planning.
+    """
+    offset = int(args.get('timezone_offset', '0'))
+    if args.get('date_from'):
+        return {'range': {'display_dates.date': {'gt': get_local_date(args['date_from'], '00:00:00', offset)}}}
 
 
 aggregations = {
@@ -237,7 +259,8 @@ class AgendaService(newsroom.Service):
             set_saved_items_query(query, req.args['bookmarks'])
 
         if req.args.get('date_from'):
-            query['bool']['must'].append(_event_date_range(req.args))
+            query['bool']['should'].append(_event_date_range(req.args))
+            query['bool']['should'].append(_display_date_range(req.args))
 
         if req.args.get('created_from') or req.args.get('created_to'):
             query['bool']['must'].append(versioncreated_range(req.args))

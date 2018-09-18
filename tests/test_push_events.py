@@ -260,6 +260,60 @@ def test_push_parsed_planning_for_an_existing_event(client, app):
     assert parsed['dates']['end'].isoformat() == test_event['dates']['end'].replace('0000', '00:00')
 
 
+def test_push_coverages_with_different_dates_for_an_existing_event(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo4'
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+    parsed = get_entity_or_404(event['guid'], 'agenda')
+    assert type(parsed['firstcreated']) == datetime
+    assert 1 == len(parsed['event']['event_contact_info'])
+    assert 1 == len(parsed['location'])
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar1'
+    planning['event_item'] = 'foo4'
+    planning['coverages'][0]['planning']['scheduled'] = "2018-06-28T10:51:52+0000"
+    planning['coverages'][1]['planning']['scheduled'] = "2018-06-28T13:51:52+0000"
+
+    # planning['planning_date'] = "2018-05-28T10:51:52+0000"
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo4', 'agenda')
+    assert parsed['headline'] == 'Planning headline'
+    assert 2 == len(parsed['coverages'])
+    assert parsed['name'] == test_event['name']
+    assert parsed['dates']['start'].isoformat() == event['dates']['start'].replace('0000', '00:00')
+    assert parsed['dates']['end'].isoformat() == event['dates']['end'].replace('0000', '00:00')
+    assert 1 == len(parsed['display_dates'])
+    assert parsed['display_dates'][0]['date'].isoformat() == \
+        planning['coverages'][0]['planning']['scheduled'].replace('0000', '00:00')
+
+
+def test_push_planning_with_different_dates_for_an_existing_event(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo4'
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+    parsed = get_entity_or_404(event['guid'], 'agenda')
+    assert type(parsed['firstcreated']) == datetime
+    assert 1 == len(parsed['event']['event_contact_info'])
+    assert 1 == len(parsed['location'])
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar1'
+    planning['event_item'] = 'foo4'
+    # remove coverages so planning date gets into account
+    planning.pop('coverages', None)
+
+    planning['planning_date'] = "2018-07-28T10:51:52+0000"
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo4', 'agenda')
+    assert parsed['headline'] == 'Planning headline'
+    assert parsed['name'] == test_event['name']
+    assert parsed['dates']['start'].isoformat() == event['dates']['start'].replace('0000', '00:00')
+    assert parsed['dates']['end'].isoformat() == event['dates']['end'].replace('0000', '00:00')
+    assert 1 == len(parsed['display_dates'])
+    assert parsed['display_dates'][0]['date'].isoformat() == planning['planning_date'].replace('0000', '00:00')
+
+
 def test_push_cancelled_planning_for_an_existing_event(client, app):
     event = deepcopy(test_event)
     event['guid'] = 'foo5'
