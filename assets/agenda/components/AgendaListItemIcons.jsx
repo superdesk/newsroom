@@ -25,7 +25,7 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
                               className='wire-articles__item__icon'
                               key={coverage.coverage_id}
                               title={gettext('{{ status }} on {{date}} {{time}}', {
-                                  status: coverage.workflow_status,
+                                  status: coverage.coverage_status,
                                   date: formatDate(coverage.scheduled),
                                   time: formatTime(coverage.scheduled)
                               })}>
