@@ -217,6 +217,8 @@ GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
 COVERAGE_TYPES = {
     'text': {'name': 'Text', 'icon': 'text'},
     'photo': {'name': 'Photo', 'icon': 'photo'},
+    'picture': {'name': 'Picture', 'icon': 'photo'},
+    'audio': {'name': 'Audio', 'icon': 'audio'},
     'video': {'name': 'Video', 'icon': 'video'},
     'explainer': {'name': 'Explainer', 'icon': 'explainer'},
     'infographics': {'name': 'Infographics', 'icon': 'infographics'},
