@@ -1,7 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bem} from 'ui/utils';
-import {hasCoverages, isCoverageBetweenEventDates, isCoverageForExtraDay, hasLocation, getLocationString} from '../utils';
+import {
+    hasCoverages,
+    isCoverageBetweenEventDates,
+    isCoverageForExtraDay,
+    hasLocation,
+    getLocationString,
+    getCoverageIcon
+} from '../utils';
 import AgendaListItemLabels from './AgendaListItemLabels';
 import MetaTime from './MetaTime';
 import {gettext, formatDate, formatTime} from 'utils';
@@ -18,7 +25,7 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
             {hasCoverages(item) && !hideCoverages &&
                 <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
                     {item.coverages.map((coverage) => {
-                        const coverageClass = `icon--coverage-${coverage.coverage_type}`;
+                        const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
                         const statusClass = coverage.workflow_status === 'active' ? 'icon--green' : 'icon--gray-light';
                         return (!group || (isCoverageBetweenEventDates(item, coverage) || isCoverageForExtraDay(coverage, group)) &&
                           <span

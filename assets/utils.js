@@ -375,10 +375,11 @@ export function errorHandler(error, dispatch, setError) {
  *
  * @param {String} key
  * @param {Mixed} defaultValue
+ * @param {String} namespace
  * @return {Mixed}
  */
-export function getConfig(key, defaultValue) {
-    return get(window.newsroom, key, defaultValue);
+export function getConfig(key, defaultValue, namespace='newsroom') {
+    return get(window[namespace], key, defaultValue);
 }
 
 export function getTimezoneOffset() {
