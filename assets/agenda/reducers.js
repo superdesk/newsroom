@@ -41,6 +41,7 @@ const initialState = {
     },
     search: searchReducer(),
     detail: false,
+    userSections: {}
 };
 
 function recieveItems(state, data) {
@@ -130,6 +131,7 @@ export default function agendaReducer(state = initialState, action) {
             detail: !!openItem,
             agenda,
             savedItemsCount: action.agendaData.saved_items || null,
+            userSections: action.agendaData.userSections || {}
         };
     }
 

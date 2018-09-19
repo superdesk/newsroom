@@ -5,12 +5,12 @@ import {bem} from 'ui/utils';
 import {formatDate} from 'utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
-import MetaTime from './MetaTime';
+import MetaTime from 'ui/components/MetaTime';
 
 export default function AgendaTime({item}) {
     return (
         <div className="wire-column__preview__content-header mb-2">
-            <MetaTime item={item} />
+            <MetaTime date={item.dates.start} />
             <div className={bem('wire-column__preview', 'date', 'event')}>{formatDate(item.dates.start)}</div>
             <AgendaListItemLabels item={item} />
         </div>

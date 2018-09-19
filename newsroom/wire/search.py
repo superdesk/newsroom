@@ -53,8 +53,8 @@ def get_local_date(date, time, offset):
     return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
 
 
-def get_bookmarks_count(user_id):
-    return superdesk.get_resource_service('wire_search').get_bookmarks_count(user_id)
+def get_bookmarks_count(user_id, product_type):
+    return superdesk.get_resource_service('wire_search').get_bookmarks_count(user_id, product_type)
 
 
 class WireSearchResource(newsroom.Resource):
@@ -82,7 +82,7 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
-def set_product_query(query, company, user=None, navigation_id=None):
+def set_product_query(query, company, user=None, navigation_id=None, product_type=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -92,21 +92,25 @@ def set_product_query(query, company, user=None, navigation_id=None):
     :param company: company
     :param user: user to check against (used for notification checking)
     :param navigation_id: navigation to filter products
+    :param product_type: product_type to filter products
     If not provided session user will be checked
     """
     products = None
 
-    if is_admin(user):
-        if navigation_id:
-            products = get_products_by_navigation(navigation_id)
-        else:
-            return  # admin will see everything by default
-
-    if company:
-        products = get_products_by_company(company['_id'], navigation_id)
+    if product_type and company:
+        products = get_products_by_company(company['_id'], product_type=product_type)
     else:
-        # user does not belong to a company so blocking all stories
-        abort(403, gettext('User does not belong to a company.'))
+        if is_admin(user):
+            if navigation_id:
+                products = get_products_by_navigation(navigation_id)
+            else:
+                return  # admin will see everything by default
+
+        if company:
+            products = get_products_by_company(company['_id'], navigation_id)
+        else:
+            # user does not belong to a company so blocking all stories
+            abort(403, gettext('User does not belong to a company.'))
 
     query['bool']['should'] = []
     product_ids = [p['sd_product_id'] for p in products if p.get('sd_product_id')]
@@ -170,12 +174,12 @@ def _items_query():
 
 
 class WireSearchService(newsroom.Service):
-    def get_bookmarks_count(self, user_id):
+    def get_bookmarks_count(self, user_id, product_type):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
         try:
-            set_product_query(query, company)
+            set_product_query(query, company, product_type=product_type)
         except Forbidden:
             return 0
         set_bookmarks_query(query, user_id)
@@ -188,12 +192,14 @@ class WireSearchService(newsroom.Service):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        set_product_query(query, company, navigation_id=req.args.get('navigation'))
+        set_product_query(query, company,
+                          navigation_id=req.args.get('navigation'),
+                          product_type=req.args.get('section') if req.args.get('bookmarks') else None)
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
 
-        if req.args.get('newsOnly') and not req.args.get('navigation'):
+        if req.args.get('newsOnly') and not (req.args.get('navigation') or req.args.get('product_type')):
             for f in app.config.get('NEWS_ONLY_FILTERS', []):
                 query['bool']['must_not'].append(f)
 

@@ -65,31 +65,31 @@ class WireApp extends BaseApp {
                 item={this.props.itemToOpen}
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
-                onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
+                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />
-                    <nav className='content-bar navbar justify-content-start flex-nowrap flex-sm-wrap'>
+                    <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
                         {this.state.withSidebar && <span
                             className='content-bar__menu content-bar__menu--nav--open'
                             ref={(elem) => this.elemOpen = elem}
                             title={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
-                            <i className='icon--close-thin icon--white'></i>
+                            <i className="icon--close-thin icon--white" />
                         </span>}
 
                         {this.props.bookmarks && 
-                            <BookmarkTabs active="wire" />
+                            <BookmarkTabs active="wire" sections={this.props.userSections}/>
                         }
 
                         {!this.state.withSidebar && !this.props.bookmarks && <span
-                            className='content-bar__menu content-bar__menu--nav'
+                            className="content-bar__menu content-bar__menu--nav"
                             ref={(elem) => this.elemClose = elem}
                             title={gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
-                            <i className='icon--hamburger'></i>
+                            <i className="icon--hamburger" />
                         </span>}
 
                         <SearchBar
@@ -155,8 +155,7 @@ class WireApp extends BaseApp {
                 this.renderNavBreadcrumb(
                     this.props.navigations,
                     this.props.activeNavigation,
-                    this.props.activeTopic
-                ),
+                    this.props.activeTopic),
                 this.renderSavedItemsCount(),
             ])
         );
@@ -195,6 +194,7 @@ WireApp.propTypes = {
     newsOnly: PropTypes.bool,
     activeTopic: PropTypes.object,
     savedItemsCount: PropTypes.number,
+    userSections: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -216,7 +216,7 @@ const mapStateToProps = (state) => ({
     newsOnly: !!get(state, 'wire.newsOnly'),
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
-
+    userSections: state.userSections,
     activeTopic: activeTopicSelector(state),
 });
 

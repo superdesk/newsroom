@@ -13,7 +13,7 @@ from newsroom.auth.views import send_token, add_token_data, send_reset_password_
     is_current_user_admin, is_current_user
 from newsroom.topics import get_user_topics
 from flask import jsonify, current_app as app
-from newsroom.companies import get_user_company_name
+from newsroom.companies import get_user_company_name, get_company_sections
 import re
 
 
@@ -34,6 +34,7 @@ def get_view_data():
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': get_user_topics(user['_id']) if user else [],
         'companyName': get_user_company_name(user),
+        'userSections': get_company_sections(user['company'] if user and user.get('company') else None)
     }
 
 

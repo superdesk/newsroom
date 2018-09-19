@@ -1,4 +1,4 @@
-import { createStore, render, initWebSocket } from 'utils';
+import { createStore, render, initWebSocket, getInitData } from 'utils';
 
 import agendaReducer from './reducers';
 import {getReadItems} from 'wire/utils';
@@ -9,7 +9,7 @@ import { setView } from 'search/actions';
 const store = createStore(agendaReducer);
 
 // init data
-store.dispatch(initData(window.agendaData || {}, getReadItems()));
+store.dispatch(initData(getInitData(window.agendaData), getReadItems()));
 
 // init query
 const params = new URLSearchParams(window.location.search);

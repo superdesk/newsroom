@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isInteger } from 'lodash';
+import { get, isInteger, keyBy } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
@@ -398,3 +398,11 @@ export function isTouchDevice() {
 export function isWireContext() {
     return window.location.pathname.includes('/wire');
 }
+
+export const getInitData = (data) => {
+    let initData = data || {};
+    return {
+        ...initData,
+        userSections: keyBy(get(window.profileData, 'userSections', {}), '_id')
+    };
+};

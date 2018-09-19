@@ -14,19 +14,34 @@ export default function BookmarkTabs(props) {
             href: '/bookmarks_agenda',
             label: gettext('Agenda'),
         },
+        {
+            id: 'am_news',
+            href: '/bookmarks_am_news',
+            label: gettext('AM News'),
+        },
     ];
+
+    const sections = buttons.map((btn) =>
+        (
+            props.sections[btn.id] ?
+                <a key={btn.id}
+                    className={'btn btn-outline-primary' + (btn.id === props.active ? ' active' : '')}
+                    href={btn.href}>{btn.label}</a> : null
+        )
+    ).filter((btn) => btn);
+
+    if (sections.length < 2) {
+        return null;
+    }
 
     return (
         <div className="btn-group btn-group--navbar ml-3 mr-3">
-            {buttons.map((btn) => (
-                <a key={btn.id}
-                    className={'btn btn-outline-primary' + (btn.id === props.active ? ' active' : '')}
-                    href={btn.href}>{btn.label}</a>
-            ))}
+            {sections}
         </div>
     );
 }
 
 BookmarkTabs.propTypes = {
     active: PropTypes.string.isRequired,
+    sections: PropTypes.object.isRequired,
 };

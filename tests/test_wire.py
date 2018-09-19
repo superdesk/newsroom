@@ -54,8 +54,9 @@ def test_share_items(client, app):
     assert str(user_id) in data['shares']
 
 
-def get_bookmarks_count(client, user):
-    resp = client.get('/api/wire_search?bookmarks=%s' % str(user))
+def get_bookmarks_count(client, user, section=None):
+    resp = client.get('/api/wire_search?bookmarks=%s%s' % (str(user),
+                                                           '&section=%s' % section if section else ''))
     assert resp.status_code == 200
     data = json.loads(resp.get_data())
     return data['_meta']['total']
@@ -80,6 +81,45 @@ def test_bookmarks(client, app):
     assert resp.status_code == 200
 
     assert 0 == get_bookmarks_count(client, user_id)
+
+
+def test_bookmarks_by_section(client, app):
+    products = [
+        {
+            "_id": 1,
+            "name": "Service A",
+            "query": "service.code: a",
+            "is_enabled": True,
+            "description": "Service A",
+            "companies": ['1'],
+            "sd_product_id": None,
+            "product_type": "wire"
+        }
+    ]
+
+    app.data.insert('products', products)
+    product_id = app.data.find_all('products')[0]['_id']
+    assert product_id == 1
+
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
+
+    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID, section='wire')
+
+    resp = client.post('/wire_bookmark', data=json.dumps({
+        'items': [items[0]['_id']],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    assert 1 == get_bookmarks_count(client, PUBLIC_USER_ID, section='wire')
+
+    client.delete('/wire_bookmark', data=json.dumps({
+        'items': [items[0]['_id']],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID, section='wire')
 
 
 def test_item_copy(client, app):

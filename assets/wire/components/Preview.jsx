@@ -42,7 +42,7 @@ class Preview extends React.PureComponent {
 
                 <div className='wire-column__preview__top-bar'>
                     <div>
-                        {user && item.slugline && item.slugline.trim() &&
+                        {followStory && user && item.slugline && item.slugline.trim() &&
                             <button type="button"
                                 disabled={isFollowing}
                                 className="btn btn-outline-primary btn-responsive"

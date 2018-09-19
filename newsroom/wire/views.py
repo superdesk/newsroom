@@ -60,7 +60,8 @@ def get_view_data():
                     if 'wire' in f['types']],
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='wire'),
-        'saved_items': get_bookmarks_count(user['_id']),
+        'saved_items': get_bookmarks_count(user['_id'], 'wire'),
+        'context': 'wire'
     }
 
 
@@ -236,7 +237,7 @@ def bookmark():
     assert data.get('items')
     update_action_list(data.get('items'), 'bookmarks', item_type='items')
     user_id = get_user_id()
-    push_user_notification('saved_items', count=get_bookmarks_count(user_id))
+    push_user_notification('saved_items', count=get_bookmarks_count(user_id, 'wire'))
     return flask.jsonify(), 200
 
 
