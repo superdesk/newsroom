@@ -1,6 +1,6 @@
 import superdesk
 
-from flask import Blueprint
+from flask import Blueprint, url_for
 from flask_babel import gettext
 from newsroom.wire.search import WireSearchResource, WireSearchService
 from . import utils
@@ -9,6 +9,10 @@ from superdesk.metadata.item import not_analyzed
 blueprint = Blueprint('wire', __name__)
 
 from . import views  # noqa
+
+
+def url_for_wire(item, _external=True):
+    return url_for('wire.item', _id=item.get('_id', item.get('guid')), _external=_external)
 
 
 def init_app(app):
@@ -46,3 +50,4 @@ def init_app(app):
 
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')
+    app.add_template_global(url_for_wire)
