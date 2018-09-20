@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ gettext('Saved Items') }}{% endblock %}
+
+{% block breadcrumb %}
+<span class="breadcrumb-item active">{{ gettext('Saved Items') }}</span>
+{% endblock %}
+
+{% block content %}
+<div id="am-news-app" class="content am-news"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        amNewsData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('am_news_js') | safe }}
+{% endblock %}

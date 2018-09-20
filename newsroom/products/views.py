@@ -2,7 +2,7 @@ import re
 
 import flask
 from bson import ObjectId
-from flask import jsonify
+from flask import jsonify, current_app
 from flask_babel import gettext
 from superdesk import get_resource_service
 
@@ -16,9 +16,10 @@ from newsroom.utils import query_resource
 @admin_only
 def settings():
     data = {
-        'products': list(query_resource('products')),
-        "navigations": list(query_resource('navigations')),
-        "companies": list(query_resource('companies')),
+        'products': list(query_resource('products', max_results=200)),
+        'navigations': list(query_resource('navigations', max_results=200)),
+        'companies': list(query_resource('companies', max_results=200)),
+        'sections': current_app.sections,
     }
     return flask.render_template('settings.html', setting_type="products", data=data)
 
@@ -77,6 +78,7 @@ def edit(id):
         'sd_product_id': data.get('sd_product_id'),
         'query': data.get('query'),
         'is_enabled': data.get('is_enabled'),
+        'product_type': data.get('product_type', 'wire')
     }
 
     validation = validate_product(updates)

@@ -4,7 +4,17 @@ import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
 import { markItemAsRead, toggleNewsOnlyParam } from './utils';
-import { renderModal, closeModal } from 'actions';
+import { renderModal, closeModal, setSavedItemsCount } from 'actions';
+
+import {
+    setQuery,
+    toggleNavigation,
+    setCreatedFilter,
+} from 'search/actions';
+
+import {
+    fetchItems as fetchAgendaItems
+} from '../agenda/actions';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -58,11 +68,7 @@ export function openItem(item) {
     };
 }
 
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    query && analytics.event('search', query);
-    return {type: SET_QUERY, query};
-}
+
 
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {
@@ -138,7 +144,7 @@ export function copyPreviewContents(item) {
         }
 
         if (getState().user) {
-            server.post(`/wire/${item._id}/copy`)
+            server.post(`/wire/${item._id}/copy?type=${getState().context}`)
                 .then(dispatch(setCopyItem(item._id)))
                 .catch(errorHandler);
         }
@@ -147,7 +153,7 @@ export function copyPreviewContents(item) {
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        window.open(`/wire/${item._id}?print`, '_blank');
+        window.open(`/${getState().context}/${item._id}?print`, '_blank');
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
@@ -163,10 +169,10 @@ export function printItem(item) {
  * @return {Promise}
  */
 function search(state, next) {
-    const activeFilter = get(state, 'wire.activeFilter', {});
-    const activeNavigation = get(state, 'wire.activeNavigation');
-    const createdFilter = get(state, 'wire.createdFilter', {});
-    const newsOnly = !!state.newsOnly;
+    const activeFilter = get(state, 'search.activeFilter', {});
+    const activeNavigation = get(state, 'search.activeNavigation');
+    const createdFilter = get(state, 'search.createdFilter', {});
+    const newsOnly = !!get(state, 'wire.newsOnly');
 
     const params = {
         q: state.query,
@@ -178,6 +184,7 @@ function search(state, next) {
         created_to: createdFilter.to,
         timezone_offset: getTimezoneOffset(),
         newsOnly,
+        section: state.bookmarks && state.user ? state.context : null,
     };
 
     const queryString = Object.keys(params)
@@ -217,15 +224,6 @@ export function fetchItem(id) {
     };
 }
 
-/**
- * Start a follow topic action
- *
- * @param {String} topic
- */
-export function followTopic(topic) {
-    return renderModal('followTopic', {topic});
-}
-
 export function submitFollowTopic(data) {
     return (dispatch, getState) => {
         const user = getState().user;
@@ -261,17 +259,17 @@ export function shareItems(items) {
  */
 export function submitShareItem(data) {
     return (dispatch, getState) => {
-        return server.post('/wire_share', data)
+        return server.post(`/wire_share?type=${getState().context}`, data)
             .then(() => {
+                dispatch(closeModal());
+                dispatch(setShareItems(data.items));
                 if (data.items.length > 1) {
                     notify.success(gettext('Items were shared successfully.'));
                 } else {
                     notify.success(gettext('Item was shared successfully.'));
                 }
-                dispatch(closeModal());
             })
-            .then(() => multiItemEvent('share', data.items, getState()))
-            .then(() => dispatch(setShareItems(data.items)))
+            .then(() => analytics.multiItemEvent('share', data.items.map((_id) => getState().itemsById[_id])))
             .catch(errorHandler);
     };
 }
@@ -323,7 +321,7 @@ export function removeBookmarkItems(items) {
 
 export function bookmarkItems(items) {
     return (dispatch, getState) =>
-        server.post('/wire_bookmark', {items})
+        server.post(`/${getState().context}_bookmark`, {items})
             .then(() => {
                 if (items.length > 1) {
                     notify.success(gettext('Items were bookmarked successfully.'));
@@ -332,7 +330,7 @@ export function bookmarkItems(items) {
                 }
             })
             .then(() => {
-                multiItemEvent('bookmark', items, getState());
+                analytics.multiItemEvent('bookmark', items.map((_id) => getState().itemsById[_id]));
             })
             .then(() => dispatch(setBookmarkItems(items)))
             .catch(errorHandler);
@@ -340,7 +338,7 @@ export function bookmarkItems(items) {
 
 export function removeBookmarks(items) {
     return (dispatch, getState) =>
-        server.del('/wire_bookmark', {items})
+        server.del(`/${getState().context}_bookmark`, {items})
             .then(() => {
                 if (items.length > 1) {
                     notify.success(gettext('Items were removed from bookmarks successfully.'));
@@ -349,7 +347,7 @@ export function removeBookmarks(items) {
                 }
             })
             .then(() => dispatch(removeBookmarkItems(items)))
-            .then(() => getState().bookmarks && dispatch(fetchItems()))
+            .then(() => getState().bookmarks && (getState().context === 'agenda' ? dispatch(fetchAgendaItems()) : dispatch(fetchItems())))
             .catch(errorHandler);
 }
 
@@ -387,10 +385,10 @@ export function downloadItems(items) {
  */
 export function submitDownloadItems(items, format) {
     return (dispatch, getState) => {
-        window.open(`/download/${items.join(',')}?format=${format}`, '_blank');
+        window.open(`/download/${items.join(',')}?format=${format}&type=${getState().context}`, '_blank');
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
-        multiItemEvent('download', items, getState());
+        analytics.multiItemEvent('download', items.map((_id) => getState().itemsById[_id]));
     };
 }
 
@@ -424,6 +422,9 @@ export function pushNotification(push) {
 
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
+
+        case `saved_items:${user}`:
+            return dispatch(setSavedItemsCount(push.extra.count));
         }
     };
 }
@@ -432,7 +433,8 @@ function reloadTopics(user) {
     return function (dispatch) {
         return server.get(`/users/${user}/topics`)
             .then((data) => {
-                return dispatch(setTopics(data._items));
+                const wireTopics = data._items.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
+                return dispatch(setTopics(wireTopics));
             })
             .catch(errorHandler);
     };
@@ -460,19 +462,6 @@ export function fetchNext(item) {
         }
 
         return server.get(`/wire/${item.nextversion}?format=json`);
-    };
-}
-
-export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
-function _toggleNavigation(navigation) {
-    return {type: TOGGLE_NAVIGATION, navigation};
-}
-
-export function toggleNavigation(navigation) {
-    return (dispatch) => {
-        dispatch(setQuery(''));
-        dispatch(_toggleNavigation(navigation));
-        return dispatch(fetchItems());
     };
 }
 
@@ -530,27 +519,9 @@ export function initParams(params) {
     };
 }
 
-function _setCreatedFilter(filter) {
-    return {type: SET_CREATED_FILTER, filter};
-}
-
-export const SET_CREATED_FILTER = 'SET_CREATED_FILTER';
-export function setCreatedFilter(filter) {
-    return (dispatch) => {
-        dispatch(_setCreatedFilter(filter));
-    };
-}
-
-function _resetFilter(filter) {
-    return {type: RESET_FILTER, filter};
-}
-
 export const RESET_FILTER = 'RESET_FILTER';
 export function resetFilter(filter) {
-    return (dispatch) => {
-        dispatch(_resetFilter(filter));
-        dispatch(fetchItems());
-    };
+    return {type: RESET_FILTER, filter};
 }
 
 /**
@@ -561,27 +532,14 @@ export function resetFilter(filter) {
  */
 export function setTopicQuery(topic) {
     return (dispatch) => {
-        dispatch(_toggleNavigation());
+        dispatch(toggleNavigation());
         dispatch(setQuery(topic.query || ''));
-        dispatch(_resetFilter(topic.filter));
-        dispatch(_setCreatedFilter(topic.created));
+        dispatch(resetFilter(topic.filter));
+        dispatch(setCreatedFilter(topic.created));
         return dispatch(fetchItems());
     };
 }
 
-export const SET_VIEW = 'SET_VIEW';
-export function setView(view) {
-    localStorage.setItem('view', view);
-    return {type: SET_VIEW, view};
-}
-
 export function refresh() {
     return (dispatch, getState) => dispatch(recieveItems(getState().newItemsData));
-}
-
-function multiItemEvent(event, items, state) {
-    items.forEach((itemId) => {
-        const item = state.itemsById[itemId];
-        item && analytics.itemEvent(event, item);
-    });
 }

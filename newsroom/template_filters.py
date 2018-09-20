@@ -3,6 +3,7 @@ import arrow
 import flask
 import hashlib
 
+from flask import current_app as app
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
 from superdesk.text_utils import get_text, get_word_count
@@ -44,7 +45,7 @@ def date_short(datetime):
 
 
 def plain_text(html):
-    return get_text(html, lf_on_block=True)
+    return get_text(html, lf_on_block=True) if html else ''
 
 
 def word_count(html):
@@ -63,6 +64,7 @@ def newsroom_config():
         'websocket': os.environ.get('NEWSROOM_WEBSOCKET_URL', 'ws://localhost:%d' % (port + 100, )),
         'time_format': flask.current_app.config['CLIENT_TIME_FORMAT'],
         'date_format': flask.current_app.config['CLIENT_DATE_FORMAT'],
+        'coverage_date_format': flask.current_app.config['CLIENT_COVERAGE_DATE_FORMAT'],
         'analytics': os.environ.get('GOOGLE_ANALYTICS', 'UA-114768905-1'),
         'display_abstract': flask.current_app.config['DISPLAY_ABSTRACT'],
     }
@@ -75,3 +77,10 @@ def hash_string(value):
 
 def get_date():
     return utcnow()
+
+
+def sidenavs(blueprint=None):
+    def blueprint_matches(nav, blueprint):
+        return not nav.get('blueprint') or not blueprint or nav['blueprint'] == blueprint
+
+    return [nav for nav in app.sidenavs if blueprint_matches(nav, blueprint)]

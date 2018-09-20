@@ -17,9 +17,10 @@ from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json
 @admin_only
 def settings():
     data = {
-        'companies': list(query_resource('companies')),
+        'companies': list(query_resource('companies', max_results=200)),
         'services': app.config['SERVICES'],
-        'products': list(query_resource('products')),
+        'products': list(query_resource('products', max_results=200)),
+        'sections': app.sections,
     }
     return flask.render_template('settings.html', setting_type="companies", data=data)
 
@@ -113,18 +114,25 @@ def company_users(id):
     return jsonify(users), 200
 
 
-@blueprint.route('/companies/<id>/products', methods=['POST'])
-@admin_only
-def save_company_products(id):
-    get_entity_or_404(id, 'companies')
-    data = get_json_or_400()
-    products = list(query_resource('products'))
-
+def update_products(updates, company_id):
+    products = list(query_resource('products', max_results=200))
     db = app.data.get_mongo_collection('products')
     for product in products:
-        if str(product['_id']) in data.get('products', []):
-            db.update_one({'_id': product['_id']}, {'$addToSet': {'companies': id}})
+        if updates.get(str(product['_id'])):
+            db.update_one({'_id': product['_id']}, {'$addToSet': {'companies': company_id}})
         else:
-            db.update_one({'_id': product['_id']}, {'$pull': {'companies': id}})
+            db.update_one({'_id': product['_id']}, {'$pull': {'companies': company_id}})
 
+
+def update_sections(sections, _id):
+    get_resource_service('companies').patch(_id, updates={'sections': sections})
+
+
+@blueprint.route('/companies/<id>/permissions', methods=['POST'])
+@admin_only
+def save_company_permissions(id):
+    orig = get_entity_or_404(id, 'companies')
+    data = get_json_or_400()
+    update_products(data['products'], id)
+    update_sections(data['sections'], orig['_id'])
     return jsonify(), 200

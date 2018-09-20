@@ -52,6 +52,7 @@ BLUEPRINTS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
+    'newsroom.agenda'
 ]
 
 CORE_APPS = [
@@ -73,6 +74,7 @@ CORE_APPS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
+    'newsroom.agenda'
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -83,6 +85,8 @@ CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
 PRIVACY_POLICY = 'https://www.aap.com.au/legal/'
 TERMS_AND_CONDITIONS = 'https://www.aap.com.au/legal/'
 
+# Email addresses that will receive the coverage request emails (single or comma separated)
+COVERAGE_REQUEST_RECIPIENTS = os.environ.get('COVERAGE_REQUEST_RECIPIENTS')
 
 TEMPLATES_AUTO_RELOAD = True
 
@@ -97,6 +101,7 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 WEBPACK_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static', 'dist', 'manifest.json')
 WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL', '/static/dist/')
 WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL', 'http://localhost:8080/')
+
 
 # How many days a new account can stay active before it is approved by admin
 NEW_ACCOUNT_ACTIVE_DAYS = 14
@@ -166,6 +171,9 @@ NEWS_ONLY_FILTERS = [
     {'match': {'source': 'PMF'}},
 ]
 
+# Places navigation item(s) for featured story products to the top of the list under All
+AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE = True
+
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 
@@ -198,8 +206,23 @@ SERVICES = [
 
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'DD/MM/YYYY'
+CLIENT_COVERAGE_DATE_FORMAT = 'HH:mm DD/MM'
 
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
 
 WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')
+
+GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
+
+COVERAGE_TYPES = {
+    'text': {'name': 'Text', 'icon': 'text'},
+    'photo': {'name': 'Photo', 'icon': 'photo'},
+    'picture': {'name': 'Picture', 'icon': 'photo'},
+    'audio': {'name': 'Audio', 'icon': 'audio'},
+    'video': {'name': 'Video', 'icon': 'video'},
+    'explainer': {'name': 'Explainer', 'icon': 'explainer'},
+    'infographics': {'name': 'Infographics', 'icon': 'infographics'},
+    'live_video': {'name': 'Live Video', 'icon': 'live-video'},
+    'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'}
+}

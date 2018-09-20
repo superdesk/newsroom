@@ -1,5 +1,6 @@
 import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
+import { initSections } from 'features/sections/actions';
 
 
 export const SELECT_NAVIGATION = 'SELECT_NAVIGATION';
@@ -145,6 +146,7 @@ export function initViewData(data) {
     return function (dispatch) {
         dispatch(getNavigations(data.navigations));
         dispatch(getProducts(data.products));
+        dispatch(initSections(data.sections));
     };
 }
 

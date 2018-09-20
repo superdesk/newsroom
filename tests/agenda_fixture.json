@@ -1,0 +1,113 @@
+{
+    "_id": "urn:newsml:localhost:2018-07-18T08:31:19.071540:7ae19ded-0254-4919-8aa2-973040f5eb32", 
+    "guid": "urn:newsml:localhost:2018-07-18T08:31:19.071540:7ae19ded-0254-4919-8aa2-973040f5eb32", 
+    "ednote": null, 
+    "definition_short": "A TEST OF AN EVENT LASTING SIX WEEKS, WITH WEEKLY EVENTS AND SELECT COVERAGE", 
+    "dates": {
+      "tz": "Australia/Sydney", 
+      "start": "2018-09-11T03:00:00+0000", 
+      "end": "2018-10-16T04:00:00+0000"
+    }, 
+    "name": "A TEST OF AN EVENT LASTING SIX WEEKS, WITH WEEKLY EVENTS AND SELECT COVERAGE", 
+    "state": "scheduled", 
+    "event": {
+      "_id": "urn:newsml:localhost:2018-07-18T08:31:19.071540:7ae19ded-0254-4919-8aa2-973040f5eb32", 
+      "guid": "urn:newsml:localhost:2018-07-18T08:31:19.071540:7ae19ded-0254-4919-8aa2-973040f5eb32", 
+      "calendars": [
+        {
+          "is_active": true, 
+          "qcode": "Exhibitions", 
+          "name": "Exhibitions"
+        }
+      ], 
+      "dates": {
+        "tz": "Australia/Sydney", 
+        "start": "2018-09-11T03:00:00+0000", 
+        "end": "2018-10-16T04:00:00+0000", 
+        "recurring_rule": {
+          "interval": 1, 
+          "frequency": "WEEKLY", 
+          "count": null, 
+          "until": "2018-09-24T22:30:40+0000", 
+          "byday": "TU", 
+          "endRepeatMode": "until"
+        }
+      }, 
+      "definition_short": "A TEST OF AN EVENT LASTING SIX WEEKS, WITH WEEKLY EVENTS AND SELECT COVERAGE", 
+      "name": "A TEST OF AN EVENT LASTING SIX WEEKS, WITH WEEKLY EVENTS AND SELECT COVERAGE", 
+      "state": "scheduled", 
+      "schedule_settings": {
+        "time_zone": null, 
+        "utc_publish_schedule": null
+      }, 
+      "type": "event", 
+      "firstcreated": "2018-07-17T22:31:19+0000", 
+      "_current_version": 6366746374652125, 
+      "_type": "events", 
+      "recurrence_id": "urn:newsml:localhost:2018-07-18T08:31:19.069061:5be9345d-3763-4458-8db1-2cc1fcbba78b", 
+      "location": [
+        {
+          "address": {
+            "line": [
+              "6 College Street"
+            ], 
+            "area": "Darlinghurst", 
+            "country": "Australia", 
+            "postal_code": "2010", 
+            "locality": "NSW"
+          }, 
+          "qcode": "urn:newsml:localhost:2018-02-27T16:53:57.927352:de382f4d-14cd-4bcc-862b-8e8db80c83f4", 
+          "name": "Australian Museum"
+        }
+      ], 
+      "versioncreated": "2018-07-17T22:35:46+0000", 
+      "_updated": "2018-07-17T22:35:46+0000", 
+      "event_contact_info": [], 
+      "files": [], 
+      "occur_status": {
+        "label": "Confirmed", 
+        "qcode": "eocstat:eos5", 
+        "name": "Planned, occurs certainly"
+      }, 
+      "slugline": "MULTI-DAY EVENT", 
+      "item_id": "urn:newsml:localhost:2018-07-18T08:31:19.071540:7ae19ded-0254-4919-8aa2-973040f5eb32", 
+      "pubstatus": "usable", 
+      "_created": "2018-07-17T22:31:19+0000"
+    }, 
+    "calendars": [
+      {
+        "is_active": true, 
+        "qcode": "Exhibitions", 
+        "name": "Exhibitions"
+      }
+    ], 
+    "firstcreated": "2018-07-17T22:36:02+0000", 
+    "subject": null, 
+    "event_id": "urn:newsml:localhost:2018-07-18T08:31:19.071540:7ae19ded-0254-4919-8aa2-973040f5eb32", 
+    "recurrence_id": "urn:newsml:localhost:2018-07-18T08:31:19.069061:5be9345d-3763-4458-8db1-2cc1fcbba78b", 
+    "location": [
+      {
+        "address": {
+          "line": [
+            "6 College Street"
+          ], 
+          "area": "Darlinghurst", 
+          "country": "Australia", 
+          "postal_code": "2010", 
+          "locality": "NSW"
+        }, 
+        "qcode": "urn:newsml:localhost:2018-02-27T16:53:57.927352:de382f4d-14cd-4bcc-862b-8e8db80c83f4", 
+        "name": "Australian Museum"
+      }
+    ], 
+    "_etag": "193813984ae00cd35337bfd8d467b1b566ca121d", 
+    "versioncreated": "2018-07-17T22:36:02+0000", 
+    "_updated": "2018-07-17T22:36:02+0000", 
+    "place": null, 
+    "version": null, 
+    "products": null, 
+    "_created": "2018-07-17T22:36:02+0000", 
+    "slugline": "MULTI-DAY EVENT", 
+    "definition_long": null
+  }
+  

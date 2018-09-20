@@ -1,4 +1,4 @@
-from flask import json
+from flask import json, url_for
 from pytest import fixture
 from bson import ObjectId
 from .test_users import test_login_succeeds_for_admin, init as user_init
@@ -66,7 +66,7 @@ def test_get_company_users(client):
     assert 'foo' == users[0].get('first_name'), users[0].keys()
 
 
-def test_save_company_products(client, app):
+def test_save_company_permissions(client, app):
     app.data.insert('companies', [{
         '_id': 'c-1',
         'phone': '2132132134',
@@ -90,9 +90,27 @@ def test_save_company_products(client, app):
     }])
 
     test_login_succeeds_for_admin(client)
-    client.post('companies/c-1/products', data=json.dumps({'products': ['p-2']}), content_type='application/json')
+    data = json.dumps({'products': {'p-2': True}, 'sections': {'wire': True}})
+    client.post('companies/c-1/permissions', data=data, content_type='application/json')
 
     response = client.get('/products')
     data = json.loads(response.get_data())
     assert [p for p in data if p['_id'] == 'p-1'][0]['companies'] == []
     assert [p for p in data if p['_id'] == 'p-2'][0]['companies'] == ['c-1']
+
+    updated = app.data.find_one('companies', req=None, _id='c-1')
+    assert updated['sections']['wire']
+    assert not updated['sections'].get('agenda')
+
+    # available by default
+    resp = client.get(url_for('agenda.index'))
+    assert resp.status_code == 200
+
+    # set company with wire only
+    user = app.data.find_one('users', req=None, first_name='admin')
+    assert user
+    app.data.update('users', user['_id'], {'company': 'c-1'}, user)
+
+    # test section protection
+    resp = client.get(url_for('agenda.index'))
+    assert resp.status_code == 403

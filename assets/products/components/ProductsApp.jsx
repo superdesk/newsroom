@@ -8,7 +8,10 @@ import {
 } from '../actions';
 import Products from './Products';
 import ListBar from 'components/ListBar';
+import { gettext } from 'utils';
 
+import SectionSwitch from 'features/sections/SectionSwitch';
+import { sectionsPropType } from 'features/sections/types';
 
 class ProductsApp extends React.Component {
     constructor(props, context) {
@@ -16,41 +19,36 @@ class ProductsApp extends React.Component {
     }
 
     render() {
-        return (
-            [<ListBar
-                key="ProductBar"
+        return [
+            <ListBar key="bar"
                 onNewItem={this.props.newProduct}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchProducts}
-                buttonName={'Product'}
-            />,
-            <Products key="Products" />
-            ]
-        );
+                buttonName={gettext('Product')}
+            >
+                <SectionSwitch
+                    sections={this.props.sections}
+                    activeSection={this.props.activeSection}
+                />
+            </ListBar>,
+            <Products key="products" activeSection={this.props.activeSection} sections={this.props.sections} />
+        ];
     }
 }
 
 ProductsApp.propTypes = {
-    products: PropTypes.arrayOf(PropTypes.object),
-    productToEdit: PropTypes.object,
-    activeProductId: PropTypes.string,
-    selectProduct: PropTypes.func,
-    editProduct: PropTypes.func,
-    saveProduct: PropTypes.func,
-    deleteProduct: PropTypes.func,
-    newProduct: PropTypes.func,
-    cancelEdit: PropTypes.func,
-    isLoading: PropTypes.bool,
-    activeQuery: PropTypes.string,
-    totalProducts: PropTypes.number,
-    companies: PropTypes.arrayOf(PropTypes.object),
-    companiesById: PropTypes.object,
-    productsById: PropTypes.object,
+    sections: sectionsPropType,
+    activeSection: PropTypes.string.isRequired,
+
     fetchProducts: PropTypes.func,
     setQuery: PropTypes.func,
-    errors: PropTypes.object,
-    dispatch: PropTypes.func,
+    newProduct: PropTypes.func,
 };
+
+const mapStateToProps = (state) => ({
+    sections: state.sections.list,
+    activeSection: state.sections.active,
+});
 
 const mapDispatchToProps = {
     fetchProducts,
@@ -58,4 +56,4 @@ const mapDispatchToProps = {
     newProduct,
 };
 
-export default connect(null, mapDispatchToProps)(ProductsApp);
+export default connect(mapStateToProps, mapDispatchToProps)(ProductsApp);

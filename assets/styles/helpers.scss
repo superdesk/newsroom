@@ -46,3 +46,24 @@
 .overflow-visible {
     overflow: visible !important;
 }
+
+// Text ellipsis
+// --------------------------------------------------
+
+.text-overflow-ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+// Rotation
+// --------------------------------------------------
+.rotate-180 {
+    transform: rotate(180deg);
+}
+.rotate-90 {
+    transform: rotate(90deg);
+}
+.rotate-90-ccw {
+    transform: rotate(-90deg);
+}

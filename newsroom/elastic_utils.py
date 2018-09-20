@@ -6,31 +6,37 @@ import elasticsearch
 
 from flask import current_app as app
 from eve_elastic import get_es, get_indices, reindex
-from superdesk.utils import get_random_string
 
 
 def rebuild_elastic_index():
     index_name = app.config['CONTENTAPI_ELASTICSEARCH_INDEX']
-    print('Starting index rebuilding for index: {}'.format(index_name))
     try:
         es = get_es(app.config['CONTENTAPI_ELASTICSEARCH_URL'])
-        clone_name = index_name + '-' + get_random_string()
-        print('Creating index: ', clone_name)
-        app.data.elastic.create_index(clone_name, app.config['ELASTICSEARCH_SETTINGS'])
-        real_name = app.data.elastic.get_index_by_alias(clone_name)
-        print('Putting mapping for index: ', clone_name)
-        app.data.elastic.put_mapping(app, clone_name)
-        print('Starting index rebuilding.')
-        reindex(es, index_name, clone_name)
-        print('Finished index rebuilding.')
-        print('Deleting index: ', index_name)
-        get_indices(es).delete(index_name)
-        print('Creating alias: ', index_name)
-        get_indices(es).put_alias(index=real_name, name=index_name)
-        print('Alias created.')
-        print('Deleting clone name alias')
-        get_indices(es).delete_alias(name=clone_name, index=real_name)
-        print('Deleted clone name alias')
+        print('rebuilding index', index_name)
+
+        # remove alias from current index
+        old_index = app.data.elastic.get_index_by_alias(index_name)
+        print('removing old index alias', old_index)
+        get_indices(es).delete_alias(name=index_name, index=old_index)
+
+        # create new index
+        print('creating new index')
+        app.data.elastic.create_index(index_name, app.config['ELASTICSEARCH_SETTINGS'])
+        new_index = app.data.elastic.get_index_by_alias(index_name)
+
+        print('putting mapping to index', new_index)
+        app.data.elastic.put_mapping(app, new_index)
+
+        try:
+            print('starting index rebuilding')
+            reindex(es, old_index, new_index)
+            print('finished index rebuilding.')
+            print('deleting old index', old_index)
+            get_indices(es).delete(old_index)
+        except elasticsearch.helpers.BulkIndexError as err:
+            print('reindex error', err)
+            print('keeping old index', old_index)
+
+        print('index rebuilt done successfully', index_name)
     except elasticsearch.exceptions.NotFoundError as nfe:
         print(nfe)
-    print('Index {0} rebuilt successfully.'.format(index_name))

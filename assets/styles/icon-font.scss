@@ -13,13 +13,13 @@
 }
 @include fontFace('aap_newsroom_icons','/static/fonts/aap_newsroom_icons', normal, normal);
 
-@mixin icon-base {
+@mixin icon-base ($width: 24px, $height: 24px, $line-height: 24px, $font-size: 24px) {
     display: inline-block;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
+    width: $width;
+    height: $height;
+    line-height: $line-height;
     font-family: 'aap_newsroom_icons';
-    font-size: 24px;
+    font-size: $font-size;
     color: $main_blue;
     speak: none;
     font-style: normal;
@@ -58,6 +58,23 @@
     &.icon--pink {
         color: $pink;
     }
+    &.icon--green {
+        color: $green;
+    }
+    &.icon--red {
+        color: $red;
+    }
+    &.icon--orange {
+        color: $orange;
+    }
+}
+
+.icon--rotate-90 {
+    transform: rotate(90deg);
+}
+
+.icon--rotate-180 {
+    transform: rotate(180deg);
 }
 
 .icon--alert:before {
@@ -155,4 +172,51 @@
 }
 .icon--home:before {
     content: "\e61f";
+}
+.icon--coverage-text:before {
+    content: "\e620";
+}
+.icon--coverage-photo:before, .icon--coverage-picture:before {
+    content: "\e621";
+}
+.icon--coverage-video:before {
+    content: "\e622";
+}
+.icon--coverage-explainer:before {
+    content: "\e623";
+}
+.icon--arrow-right:before {
+    content: "\e624";
+}
+.icon--coverage-infographics:before {
+    content: "\e625";
+}
+.icon--watch:before {
+    content: "\e626";
+}
+.icon--unwatch:before {
+    content: "\e627";
+}
+.icon--watched:before {
+    content: "\e628";
+}
+.icon--coverage-live-video:before {
+    content: "\e629";
+}
+.icon--coverage-audio:before {
+    content: "\e62a";
+}
+.icon--coverage-live-blog:before {
+    content: "\e62b";
+}
+.icon--coverage-unrecognized:before {
+    content: "\e62c";
+}
+
+.icon--Features:before {
+  content: "\e900";
+}
+
+.icon--am:before {
+  content: "\e901";
 }

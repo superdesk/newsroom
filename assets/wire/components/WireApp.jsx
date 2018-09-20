@@ -3,24 +3,25 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
-import { createPortal } from 'react-dom';
 import { gettext } from 'utils';
 
 import {
-    followTopic,
     fetchItems,
     setQuery,
-    selectAll,
-    selectNone,
     fetchMoreItems,
-    setView,
     refresh,
     previewItem,
     toggleNews,
 } from 'wire/actions';
 
-import { getActiveQuery, isTopicActive } from 'wire/utils';
+import {
+    setView,
+    followTopic,
+} from 'search/actions';
 
+import { activeTopicSelector } from 'search/selectors';
+
+import BaseApp from 'layout/components/BaseApp';
 import Preview from './Preview';
 import ItemsList from './ItemsList';
 import SearchBar from '../../components/SearchBar';
@@ -34,7 +35,7 @@ import ItemDetails from './ItemDetails';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import { getItemActions } from '../item-actions';
-import {isTouchDevice} from '../../utils';
+import BookmarkTabs from 'components/BookmarkTabs';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -42,93 +43,14 @@ const modals = {
     downloadItems: DownloadItemsModal,
 };
 
-class WireApp extends React.Component {
+class WireApp extends BaseApp {
     constructor(props) {
         super(props);
-        this.state = {
-            withSidebar: false,
-            scrollClass: '',
-        };
-        this.toggleSidebar = this.toggleSidebar.bind(this);
-        this.onListScroll = this.onListScroll.bind(this);
-        this.filterActions = this.filterActions.bind(this);
-    }
-
-    renderModal(specs) {
-        if (specs) {
-            const Modal = modals[specs.modal];
-            return (
-                <Modal key="modal" data={specs.data} />
-            );
-        }
-    }
-
-    renderNavBreadcrumb(navigations, activeNavigation, activeTopic) {
-        const dest = document.getElementById('nav-breadcrumb');
-        if (!dest) {
-            return null;
-        }
-
-        let name = get(navigations.find((nav) => nav._id === activeNavigation), 'name', '');
-        if (!name && activeTopic) {
-            name = activeTopic.label;
-        }
-
-        return createPortal(name , dest);
-    }
-
-    toggleSidebar(event) {
-        event.preventDefault();
-        this.setState({withSidebar: !this.state.withSidebar});
-    }
-
-    onListScroll(event) {
-        const BUFFER = 10;
-        const container = event.target;
-        if (container.scrollTop + container.offsetHeight + BUFFER >= container.scrollHeight) {
-            this.props.fetchMoreItems()
-                .catch(() => null); // ignore
-        }
-
-        if(container.scrollTop > BUFFER) {
-            this.setState({ scrollClass: 'wire-column__main-header--small'});
-        }
-        else {
-            this.setState({ scrollClass: ''});
-        }
-    }
-
-    filterActions(item) {
-        return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
-    }
-
-    componentDidMount() {
-        if ( !isTouchDevice() ) {
-            this.elemOpen && $(this.elemOpen).tooltip();
-            this.elemClose && $(this.elemClose).tooltip();
-        }
-    }
-
-    componentWillUnmount() {
-        this.componentWillUpdate();
-    }
-
-    componentWillUpdate() {
-        this.elemOpen && $(this.elemOpen).tooltip('dispose');
-        this.elemClose && $(this.elemClose).tooltip('dispose');
-    }
-
-    componentDidUpdate(nextProps) {
-        if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery)) {
-            this.elemList.scrollTop = 0;
-        }
-        this.componentDidMount();
+        this.modals = modals;
     }
 
     render() {
         const modal = this.renderModal(this.props.modal);
-        const multiActionFilter = (action) => action.multi &&
-            this.props.selectedItems.every((item) => !action.when || action.when(this.props, this.props.itemsById[item]));
 
         const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
             this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
@@ -137,44 +59,37 @@ class WireApp extends React.Component {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,
         });
-
-        const searchCriteria = getActiveQuery(
-            this.props.activeQuery,
-            this.props.resultsFiltered ? this.props.activeFilter : {},
-            this.props.resultsFiltered ? this.props.createdFilter : {}
-        );
-        const activeTopic = this.props.topics.find((topic) => isTopicActive(topic, searchCriteria));
-
+        
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
-                onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
+                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
                 <section key="contentHeader" className='content-header'>
-                    {this.props.selectedItems && this.props.selectedItems.length > 0 &&
-                        <SelectedItemsBar
-                            selectedItems={this.props.selectedItems}
-                            selectAll={this.props.selectAll}
-                            selectNone={this.props.selectNone}
-                            actions={this.props.actions.filter(multiActionFilter)}
-                        />
-                    }
-                    <nav className='content-bar navbar justify-content-start flex-nowrap flex-sm-wrap'>
+                    <SelectedItemsBar
+                        actions={this.props.actions}
+                    />
+                    <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
                         {this.state.withSidebar && <span
                             className='content-bar__menu content-bar__menu--nav--open'
                             ref={(elem) => this.elemOpen = elem}
                             title={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
-                            <i className='icon--close-thin icon--white'></i>
+                            <i className="icon--close-thin icon--white" />
                         </span>}
-                        {!this.state.withSidebar && <span
-                            className='content-bar__menu content-bar__menu--nav'
+
+                        {this.props.bookmarks && 
+                            <BookmarkTabs active="wire" sections={this.props.userSections}/>
+                        }
+
+                        {!this.state.withSidebar && !this.props.bookmarks && <span
+                            className="content-bar__menu content-bar__menu--nav"
                             ref={(elem) => this.elemClose = elem}
                             title={gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
-                            <i className='icon--hamburger'></i>
+                            <i className="icon--hamburger" />
                         </span>}
 
                         <SearchBar
@@ -195,14 +110,7 @@ class WireApp extends React.Component {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar
-                                    topics={this.props.topics}
-                                    activeTopic={activeTopic}
-                                    setQuery={this.props.setQuery}
-                                    activeQuery={this.props.activeQuery}
-                                    navigations={this.props.navigations}
-                                    activeNavigation={this.props.activeNavigation}
-                                />
+                                <SearchSidebar tabs={this.tabs} props={this.props} />
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
@@ -211,16 +119,14 @@ class WireApp extends React.Component {
                                 query={this.props.activeQuery}
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
-                                followTopic={this.props.followTopic}
+                                topicType='wire'
                                 newItems={this.props.newItems}
                                 refresh={this.props.refresh}
-                                searchCriteria={searchCriteria}
-                                activeTopic={activeTopic}
+                                activeTopic={this.props.activeTopic}
                                 toggleNews={this.props.toggleNews}
                                 activeNavigation={this.props.activeNavigation}
                                 newsOnly={this.props.newsOnly}
                                 scrollClass={this.state.scrollClass}
-                                resultsFiltered = {this.props.resultsFiltered}
                             />
 
                             <ItemsList
@@ -249,23 +155,21 @@ class WireApp extends React.Component {
                 this.renderNavBreadcrumb(
                     this.props.navigations,
                     this.props.activeNavigation,
-                    activeTopic
-                )
+                    this.props.activeTopic),
+                this.renderSavedItemsCount(),
             ])
         );
     }
 }
 
 WireApp.propTypes = {
+    state: PropTypes.object,
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
     activeQuery: PropTypes.string,
-    activeFilter: PropTypes.object,
-    createdFilter: PropTypes.object,
     itemToPreview: PropTypes.object,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
-    followTopic: PropTypes.func,
     modal: PropTypes.object,
     user: PropTypes.string,
     company: PropTypes.string,
@@ -276,9 +180,6 @@ WireApp.propTypes = {
         action: PropTypes.func,
     })),
     setQuery: PropTypes.func.isRequired,
-    selectedItems: PropTypes.array,
-    selectAll: PropTypes.func,
-    selectNone: PropTypes.func,
     bookmarks: PropTypes.bool,
     fetchMoreItems: PropTypes.func,
     activeView: PropTypes.string,
@@ -291,15 +192,16 @@ WireApp.propTypes = {
     activeNavigation: PropTypes.string,
     toggleNews: PropTypes.func,
     newsOnly: PropTypes.bool,
-    resultsFiltered: PropTypes.bool,
+    activeTopic: PropTypes.object,
+    savedItemsCount: PropTypes.number,
+    userSections: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
+    state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
     activeQuery: state.activeQuery,
-    activeFilter: get(state, 'wire.activeFilter'),
-    createdFilter: get(state, 'wire.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -307,30 +209,25 @@ const mapStateToProps = (state) => ({
     user: state.user,
     company: state.company,
     topics: state.topics || [],
-    selectedItems: state.selectedItems,
-    activeView: get(state, 'wire.activeView'),
+    activeView: get(state, 'search.activeView'),
     newItems: state.newItems,
-    navigations: get(state, 'wire.navigations', []),
-    activeNavigation: get(state, 'wire.activeNavigation', null),
-    newsOnly: !!state.newsOnly,
+    navigations: get(state, 'search.navigations', []),
+    activeNavigation: get(state, 'search.activeNavigation', null),
+    newsOnly: !!get(state, 'wire.newsOnly'),
     bookmarks: state.bookmarks,
-    resultsFiltered: state.resultsFiltered,
+    savedItemsCount: state.savedItemsCount,
+    userSections: state.userSections,
+    activeTopic: activeTopicSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    followTopic: (query) => dispatch(followTopic(query)),
-    followStory: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`})),
+    followStory: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`}, 'wire')),
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {
         dispatch(toggleNews());
         dispatch(fetchItems());
     },
-    setQuery: (query) => {
-        dispatch(setQuery(query));
-        dispatch(fetchItems());
-    },
-    selectAll: () => dispatch(selectAll()),
-    selectNone: () => dispatch(selectNone()),
+    setQuery: (query) => dispatch(setQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),

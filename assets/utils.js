@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isInteger } from 'lodash';
+import { get, isInteger, keyBy } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
@@ -10,7 +10,8 @@ import moment from 'moment';
 
 export const now = moment(); // to enable mocking in tests
 const TIME_FORMAT = getConfig('time_format');
-const DATE_FORMAT = getConfig('date_format');
+const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
+const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
 
 /**
@@ -133,8 +134,9 @@ export function getLocaleDate(dateString) {
  * @param {Date} date
  * @return {Boolean}
  */
-function isToday(date) {
-    return date.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
+export function isToday(date) {
+    const parsed = typeof date === 'string' ? parseDate(date) : date;
+    return parsed.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
 }
 
 
@@ -181,6 +183,38 @@ export function formatTime(dateString) {
  */
 export function formatDate(dateString) {
     return parseDate(dateString).format(DATE_FORMAT);
+}
+
+/**
+ * Format coverage date ('HH:mm DD/MM')
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatCoverageDate(dateString) {
+    return parseDate(dateString).format(COVERAGE_DATE_FORMAT);
+}
+
+/**
+ * Format week of a date (without time)
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatWeek(dateString) {
+    const startDate = parseDate(dateString).isoWeekday(1);
+    const endDate = parseDate(dateString).isoWeekday(7);
+    return `${startDate.format(DATE_FORMAT)} - ${endDate.format(DATE_FORMAT)}`;
+}
+
+/**
+ * Format month of a date (without time)
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatMonth(dateString) {
+    return parseDate(dateString).format('MMMM');
 }
 
 /**
@@ -275,10 +309,10 @@ export function updateRouteParams(updates, state) {
 
     Object.keys(updates).forEach((key) => {
         if (updates[key]) {
-            dirty = dirty || updates[key] !== params.get(key);
+            dirty = dirty || updates[key] != params.get(key);
             params.set(key, updates[key]);
         } else {
-            dirty = dirty || params.has(key) || params.entries.length == 0;
+            dirty = dirty || params.has(key);
             params.delete(key);
         }
     });
@@ -341,10 +375,11 @@ export function errorHandler(error, dispatch, setError) {
  *
  * @param {String} key
  * @param {Mixed} defaultValue
+ * @param {String} namespace
  * @return {Mixed}
  */
-export function getConfig(key, defaultValue) {
-    return get(window.newsroom, key, defaultValue);
+export function getConfig(key, defaultValue, namespace='newsroom') {
+    return get(window[namespace], key, defaultValue);
 }
 
 export function getTimezoneOffset() {
@@ -355,3 +390,19 @@ export function isTouchDevice() {
     return 'ontouchstart' in window        // works on most browsers
     || navigator.maxTouchPoints;       // works on IE10/11 and Surface
 }
+
+/**
+ * Checks if wire context
+ * @returns {boolean}
+ */
+export function isWireContext() {
+    return window.location.pathname.includes('/wire');
+}
+
+export const getInitData = (data) => {
+    let initData = data || {};
+    return {
+        ...initData,
+        userSections: keyBy(get(window.profileData, 'userSections', {}), '_id')
+    };
+};

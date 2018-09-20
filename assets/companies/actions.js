@@ -138,16 +138,16 @@ export function fetchProducts() {
 
 
 /**
- * Saves products for a company
+ * Save permissions for a company
  *
  */
-export function saveProducts(products) {
-    return function (dispatch, getState) {
-        const company = getState().companyToEdit;
-        return server.post(`/companies/${company._id}/products`, {products})
+export function savePermissions(company, permissions) {
+    return function (dispatch) {
+        return server.post(`/companies/${company._id}/permissions`, permissions)
             .then(() => {
                 notify.success(gettext('Company updated successfully'));
                 dispatch(fetchProducts());
+                dispatch(fetchCompanies());
             })
             .catch((error) => errorHandler(error, dispatch, setError));
     };
@@ -175,11 +175,5 @@ export function deleteCompany() {
 
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data) {
-    return function (dispatch) {
-        dispatch(getCompanies(data.companies));
-        dispatch(getProducts(data.products));
-        return {type: INIT_VIEW_DATA, data};
-    };
+    return {type: INIT_VIEW_DATA, data};
 }
-
-

@@ -39,7 +39,7 @@ class HistoryService(newsroom.Service):
                 'user': user['_id'],
                 'company': user.get('company'),
                 'item': item['_id'],
-                'version': item['version'],
+                'version': item.get('version', item.get('_current_version')),
             }
 
         for doc in docs:

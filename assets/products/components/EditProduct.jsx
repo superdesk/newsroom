@@ -6,7 +6,6 @@ import CheckboxInput from 'components/CheckboxInput';
 import { gettext, getProductQuery } from 'utils';
 import EditPanel from '../../components/EditPanel';
 
-
 class EditProduct extends React.Component {
     constructor(props) {
         super(props);
@@ -103,7 +102,7 @@ class EditProduct extends React.Component {
                                             onChange={this.props.onChange}
                                         />
                                         {this.props.product.sd_product_id &&
-                                        <a href={`/wire?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
+                                        <a href={`/${this.props.product.product_type || 'wire'}?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
                                             className='btn btn-outline-secondary float-right mt-2'>{gettext('Test product id')}
                                         </a>}
                                     </div>
@@ -117,7 +116,7 @@ class EditProduct extends React.Component {
                                             onChange={this.props.onChange}
                                         />
                                         {this.props.product.query &&
-                                        <a href={`/wire?q=${this.props.product.query}`} target="_blank"
+                                        <a href={`/${this.props.product.product_type || 'wire'}?q=${this.props.product.query}`} target="_blank"
                                             className='btn btn-outline-secondary float-right mt-3'>{gettext('Test query')}
                                         </a>}
                                     </div>

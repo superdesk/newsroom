@@ -2,7 +2,8 @@ from flask import json
 from bson import ObjectId
 from datetime import datetime, timedelta
 
-from .fixtures import items, init_items, init_auth, init_company  # noqa
+from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
+from .utils import get_json
 
 
 def test_item_detail(client):
@@ -53,8 +54,9 @@ def test_share_items(client, app):
     assert str(user_id) in data['shares']
 
 
-def get_bookmarks_count(client, user):
-    resp = client.get('/api/wire_search?bookmarks=%s' % str(user))
+def get_bookmarks_count(client, user, section=None):
+    resp = client.get('/api/wire_search?bookmarks=%s%s' % (str(user),
+                                                           '&section=%s' % section if section else ''))
     assert resp.status_code == 200
     data = json.loads(resp.get_data())
     return data['_meta']['total']
@@ -79,6 +81,45 @@ def test_bookmarks(client, app):
     assert resp.status_code == 200
 
     assert 0 == get_bookmarks_count(client, user_id)
+
+
+def test_bookmarks_by_section(client, app):
+    products = [
+        {
+            "_id": 1,
+            "name": "Service A",
+            "query": "service.code: a",
+            "is_enabled": True,
+            "description": "Service A",
+            "companies": ['1'],
+            "sd_product_id": None,
+            "product_type": "wire"
+        }
+    ]
+
+    app.data.insert('products', products)
+    product_id = app.data.find_all('products')[0]['_id']
+    assert product_id == 1
+
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
+
+    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID, section='wire')
+
+    resp = client.post('/wire_bookmark', data=json.dumps({
+        'items': [items[0]['_id']],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    assert 1 == get_bookmarks_count(client, PUBLIC_USER_ID, section='wire')
+
+    client.delete('/wire_bookmark', data=json.dumps({
+        'items': [items[0]['_id']],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID, section='wire')
 
 
 def test_item_copy(client, app):
@@ -300,6 +341,7 @@ def test_search_created_from(client):
 
     resp = client.get('/search?created_from=now/M')
     data = json.loads(resp.get_data())
+
     assert 1 <= len(data['_items'])
 
 
@@ -314,3 +356,34 @@ def test_search_created_to(client):
     ))
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
+
+
+def test_item_detail_access(client, app):
+    item_url = '/wire/%s' % items[0]['_id']
+    data = get_json(client, item_url)
+    assert data['_access']
+    assert data['body_html']
+
+    # public user
+    with client.session_transaction() as session:
+        session['user'] = PUBLIC_USER_ID
+        session['user_type'] = 'public'
+
+    # no access by default
+    data = get_json(client, item_url)
+    assert not data['_access']
+    assert not data.get('body_html')
+
+    # add product
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'matching product',
+        'companies': ['1'],
+        'is_enabled': True,
+        'query': 'slugline:%s' % items[0]['slugline'],
+    }])
+
+    # normal access
+    data = get_json(client, item_url)
+    assert data['_access']
+    assert data['body_html']

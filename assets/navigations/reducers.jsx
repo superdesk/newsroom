@@ -11,6 +11,12 @@ import {
     GET_PRODUCTS,
 } from './actions';
 
+import {
+    INIT_SECTIONS,
+} from 'features/sections/actions';
+
+import { sectionsReducer } from 'features/sections/reducers';
+
 const initialState = {
     query: null,
     navigations: [],
@@ -20,6 +26,7 @@ const initialState = {
     totalNavigations: null,
     activeQuery: null,
     products: [],
+    sections: sectionsReducer(),
 };
 
 export default function navigationReducer(state = initialState, action) {
@@ -88,6 +95,9 @@ export default function navigationReducer(state = initialState, action) {
     case GET_PRODUCTS: {
         return {...state, products: action.data};
     }
+
+    case INIT_SECTIONS:
+        return {...state, sections: sectionsReducer(state.sections, action)};
 
     default:
         return state;

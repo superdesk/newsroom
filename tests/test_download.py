@@ -1,18 +1,20 @@
 import io
+import json
 import lxml
 import zipfile
+import icalendar
 
 from datetime import timedelta
 from superdesk.utc import utcnow
 
-from .fixtures import items, init_items, init_auth  # noqa
+from .fixtures import items, init_items, init_auth, agenda_items, init_agenda_items  # noqa
 
 items_ids = [item['_id'] for item in items[:2]]
 item = items[:2][0]
 
 
-def download_file(client, _format):
-    resp = client.get('/download/%s?format=%s' % (','.join(items_ids), _format))
+def download_zip_file(client, _format):
+    resp = client.get('/download/%s?format=%s&type=wire' % (','.join(items_ids), _format))
     assert resp.status_code == 200
     assert resp.mimetype == 'application/zip'
     assert resp.headers.get('Content-Disposition') == 'attachment; filename={}-newsroom.zip'.format(
@@ -43,11 +45,29 @@ def newsmlg2_content_test(content):
     assert 'newsMessage' in root.tag
 
 
+def text_agenda_content_test(content):
+    content = content.decode('utf-8').split('\n')
+    assert 'Conference Planning' in content[0]
+    assert 'Slugline:Prime Conference' in content[1]
+    assert '<p>' not in content
+
+
+def json_agenda_content_test(content):
+    data = json.loads(content.decode('utf-8'))
+    assert data['name'] == 'Conference Planning'
+    assert data['slugline'] == 'Prime Conference'
+
+
+def ical_agenda_content_test(content):
+    cal = icalendar.cal.Calendar.from_ical(content)
+    assert cal
+
+
 def filename(filename, item):
     return '%s-%s' % (item['versioncreated'].strftime('%Y%m%d%H%M'), filename)
 
 
-formats = [
+wire_formats = [
     {
         'format': 'text',
         'mimetype': 'text/plain',
@@ -65,21 +85,43 @@ formats = [
         'mimetype': 'application/vnd.iptc.g2.newsitem+xml',
         'filename': filename('amazon-bookstore-opening.xml', item),
         'test_content': newsmlg2_content_test,
-    }
+    },
+]
+
+
+agenda_formats = [
+    {
+        'format': 'text',
+        'mimetype': 'text/plain',
+        'filename': 'prime-conference.txt',
+        'test_content': text_agenda_content_test,
+    },
+    {
+        'format': 'json',
+        'mimetype': 'application/json',
+        'filename': 'prime-conference.json',
+        'test_content': json_agenda_content_test,
+    },
+    {
+        'format': 'ical',
+        'mimetype': 'text/calendar',
+        'filename': 'prime-conference.ical',
+        'test_content': ical_agenda_content_test,
+    },
 ]
 
 
 def test_download_single(client, app):
-    for _format in formats:
+    for _format in wire_formats:
         resp = client.get('/download/%s?format=%s' % (item['_id'], _format['format']))
         assert resp.status_code == 200
         assert resp.mimetype == _format['mimetype']
         assert resp.headers.get('Content-Disposition') == 'attachment; filename=%s' % _format['filename']
 
 
-def test_item_download(client, app):
-    for _format in formats:
-        _file = download_file(client, _format['format'])
+def test_wire_download(client, app):
+    for _format in wire_formats:
+        _file = download_zip_file(client, _format['format'])
         with zipfile.ZipFile(_file) as zf:
             assert _format['filename'] in zf.namelist()
             content = zf.open(_format['filename']).read()
@@ -91,4 +133,21 @@ def test_item_download(client, app):
     assert history[0].get('created') + timedelta(seconds=2) >= utcnow()
     assert history[0].get('item') in items_ids
     assert history[0].get('version')
+    assert history[0].get('company') is None
+
+
+def test_agenda_download(client, app):
+    for _format in agenda_formats:
+        resp = client.get('/download/%s?format=%s&type=agenda' % (agenda_items[0]['_id'], _format['format']))
+        assert resp.status_code == 200, resp.get_data()
+        assert resp.mimetype == _format['mimetype']
+        _format['test_content'](resp.get_data())
+        assert resp.headers.get('content-disposition') == 'attachment; filename=%s' % filename(
+            _format['filename'], agenda_items[0])
+    history = app.data.find('history', None, None)
+    assert 1 == history.count()
+    assert 'download' == history[0]['action']
+    assert history[0].get('user')
+    assert history[0].get('created') + timedelta(seconds=2) >= utcnow()
+    assert history[0].get('item') == agenda_items[0]['_id']
     assert history[0].get('company') is None

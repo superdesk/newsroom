@@ -1,14 +1,15 @@
-import { createStore, render, initWebSocket } from 'utils';
+import { createStore, render, initWebSocket, getInitData } from 'utils';
 
 import wireReducer from './reducers';
 import {getNewsOnlyParam, getReadItems} from './utils';
 import WireApp from './components/WireApp';
-import { fetchItems, setState, initData, initParams, pushNotification, setView } from './actions';
+import { fetchItems, setState, initData, initParams, pushNotification, } from './actions';
+import { setView } from 'search/actions';
 
 const store = createStore(wireReducer);
 
 // init data
-store.dispatch(initData(window.wireData || {}, getReadItems(), getNewsOnlyParam()));
+store.dispatch(initData(getInitData(window.wireData), getReadItems(), getNewsOnlyParam()));
 
 // init query
 const params = new URLSearchParams(window.location.search);
@@ -21,7 +22,9 @@ if (localStorage.getItem('view')) {
 
 // handle history
 window.onpopstate = function(event) {
-    store.dispatch(setState(event.state));
+    if (event.state) {
+        store.dispatch(setState(event.state));
+    }
 };
 
 // fetch items & render

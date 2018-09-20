@@ -1,0 +1,240 @@
+{% extends "layout.html" %}
+
+{% block title %}Item Detail{% endblock %}
+
+{% block content %}
+<div class="content content--item-detail">
+
+    <section class="content-header">
+        <div class="content-bar navbar justify-content-between">
+
+            <span class="content-bar__menu">
+                <i class="icon--close-thin"></i>
+            </span>
+
+            <div class="wire-column__preview__buttons">
+                <button class="icon-button"><i class="icon--share"></i></button>
+                <button class="icon-button"><i class="icon--print"></i></button>
+                <button class="icon-button"><i class="icon--copy"></i></button>
+                <button class="icon-button"><i class="icon--download"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <article class="wire-column__preview__content--item-detail-wrap">
+        <div class="wire-column__preview__content wire-column__preview__content--covering">            
+            <figure class="wire-column__preview__image">
+                <span>
+                    <img src="{{ url_for('static', filename = 'gmap-detail.jpg') }}">
+                </span>                            
+            </figure>            
+
+            <div class="wire-column__preview__content--item-detail-text-wrap">
+                <div class="wire-column__preview__content--item-detail-item-text">
+                    <div class="wire-column__preview__content-header mb-2">
+                        <div class="wire-articles__item__meta-time">
+                            <span class="time-label">20:00</span>
+                            <span class="time-icon"><i class="icon-small--repeat"></i></span>
+                        </div>
+                        <div class="wire-column__preview__date wire-column__preview__date--event">Friday, April 20, 2018</div>
+                        <!-- <span class="label label--green-dark ml-4">rescheduled</span> --> <!-- lebel example -->
+                    </div>
+                    <h2 class="wire-column__preview__headline">NT invests $229m to fix juvenile justice</h2>
+                    <div class="wire-articles__item__meta">                
+                        <div class="wire-articles__item__meta-info">
+                            <div class="wire-articles__item__meta-row">
+                                <i class="icon-small--location icon--gray"></i>
+                                <span>Litchfield Room, NT Parliament House, Darwin</span>
+                            </div>
+                            <div class="wire-articles__item__meta-row">
+                                <span><i class="icon-small--clock icon--gray"></i>20:00 - 20:30</span>
+                            </div>
+                            <div class="wire-articles__item__meta-row">
+                                <i class="icon-small--user icon--gray"></i> 
+                                <span>Victor Stojcevski 0477 384 629 <a href="#">Victor.Stojcevski@justice.tas.gov.au</a></span>
+                            </div>
+                            <div class="wire-articles__item__meta-row">
+                                <i class="icon-small--globe icon--gray"></i>
+                                <span><a href="#">www.eventrelatedurl.com</a></span>
+                            </div>
+                        </div>                        
+                    </div>               
+                    <div class="wire-column__preview__text">
+                        <p>The Northern Territory Government will spend $229.6 million to implement more than 200 recommendations of the Royal Commission into its broken, scandal-plagued youth justice system.</p>
+                        <p>The Territory’s infamous Don Dale youth detention centre, where leaked video showed youths being tear-gassed and mistreated, and it’s Alice Springs equivalent will be replaced.</p>
+                        <p>The money also includes $66.9 million on a new IT system better linking health and police databases and significant funding for children and families to keep young people out of detention.</p>
+                    </div>
+                </div>
+
+                <div class="wire-column__preview__content--event-detail-info-wrap">
+
+                    <div class="wire-column__preview__tags mt-3">
+                        <span class="column__preview__tags__box-headline">Coverages</span>
+                        <div class="column__preview__tags__column pt-4 pb-2">
+                            <div class="coverage-item mb-3">
+                                <div class="coverage-item__row">
+                                    <span class="d-flex coverage-item--element-grow text-overflow-ellipsis">
+                                        <i class="icon-small--coverage-text icon--green mr-2"></i>
+                                        <span class="text-overflow-ellipsis">Text</span>
+                                    </span>
+                                    <span class="d-flex">
+                                        <i class="icon-small--clock icon--gray mr-1"></i>
+                                        <span class="coverage-item__text-label mr-1">due by:</span>
+                                        <span>Saturday, 21. April 13:40</span>
+                                    </span>
+                                </div>
+                                <div class="coverage-item__row">
+                                    <span class="coverage-item__text-label mr-1">Source:</span>
+                                    <span class="mr-2">Agencies</span>
+                                    <span class="coverage-item__text-label mr-1">Status</span>
+                                    <span>on merit</span>
+                                </div>
+                            </div>
+                            <div class="coverage-item mb-3">
+                                <div class="coverage-item__row">
+                                    <span class="d-flex coverage-item--element-grow text-overflow-ellipsis">
+                                        <i class="icon-small--coverage-photo icon--green mr-2"></i>
+                                        <span class="text-overflow-ellipsis">Photo</span>
+                                    </span>
+                                    <span class="d-flex">
+                                        <i class="icon-small--clock icon--gray mr-1"></i>
+                                        <span class="coverage-item__text-label mr-1">due by:</span>
+                                        <span>Saturday, 21. April 13:40</span>
+                                    </span>
+                                </div>
+                                <div class="coverage-item__row">
+                                    <span class="coverage-item__text-label mr-1">Source:</span>
+                                    <span class="mr-2">Agencies</span>
+                                    <span class="coverage-item__text-label mr-1">Status</span>
+                                    <span>on merit</span>
+                                </div>
+                            </div>
+                            <div class="coverage-item mb-3">
+                                <div class="coverage-item__row">
+                                    <span class="d-flex coverage-item--element-grow text-overflow-ellipsis">
+                                        <i class="icon-small--coverage-video icon--gray-light mr-2"></i>
+                                        <span class="text-overflow-ellipsis">Video</span>
+                                    </span>
+                                    <span class="d-flex">
+                                        <i class="icon-small--clock icon--gray mr-1"></i>
+                                        <span class="coverage-item__text-label mr-1">due by:</span>
+                                        <span>Saturday, 21. April 13:40</span>
+                                    </span>
+                                </div>
+                                <div class="coverage-item__row">
+                                    <span class="coverage-item__text-label mr-1">Source:</span>
+                                    <span class="mr-2">Agencies</span>
+                                    <span class="coverage-item__text-label mr-1">Status</span>
+                                    <span>on merit</span>
+                                </div>
+                            </div>                
+                            <div class="coverage-item mb-3">
+                                <div class="coverage-item__row">
+                                    <span class="d-flex coverage-item--element-grow text-overflow-ellipsis">
+                                        <i class="icon-small--coverage-explainer icon--gray-light mr-2"></i>
+                                        <span class="text-overflow-ellipsis">Explainer</span>
+                                    </span>
+                                    <span class="d-flex">
+                                        <i class="icon-small--clock icon--gray mr-1"></i>
+                                        <span class="coverage-item__text-label mr-1">due by:</span>
+                                        <span>Saturday, 21. April 13:40</span>
+                                    </span>
+                                </div>
+                                <div class="coverage-item__row">
+                                    <span class="coverage-item__text-label mr-1">Source:</span>
+                                    <span class="mr-2">Agencies</span>
+                                    <span class="coverage-item__text-label mr-1">Status</span>
+                                    <span>on merit</span>
+                                </div>
+                            </div>
+                            <div class="coverage-item mb-3">
+                                <div class="coverage-item__row">
+                                    <span class="d-flex coverage-item--element-grow text-overflow-ellipsis">
+                                        <i class="icon-small--coverage-infographics icon--gray-light mr-2"></i>
+                                        <span class="text-overflow-ellipsis">Infographics</span>
+                                    </span>
+                                    <span class="d-flex">
+                                        <i class="icon-small--clock icon--gray mr-1"></i>
+                                        <span class="coverage-item__text-label mr-1">due by:</span>
+                                        <span>Saturday, 21. April 13:40</span>
+                                    </span>
+                                </div>
+                                <div class="coverage-item__row">
+                                    <span class="coverage-item__text-label mr-1">Source:</span>
+                                    <span class="mr-2">Agencies</span>
+                                    <span class="coverage-item__text-label mr-1">Status</span>
+                                    <span>on merit</span>
+                                </div>
+                            </div>
+                            <div class="collapsible">
+                                <a href="#" class="collapsible__link">
+                                    <i class="icon-small--arrow-down rotate-90-ccw mr-1"></i>Request coverage
+                                </a>
+                                <div class="collapsible__form">
+                                    <div class="form-group">
+                                        <div class="field">
+                                            <textarea class="form-control" placeholder="your request"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="button" class="btn btn-outline-secondary" value="Cancel">
+                                        <input type="button" class="btn btn-outline-primary ml-2" value="Send Request">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="column__preview__tags__box-headline">Attachments</span>
+                        <div class="column__preview__tags__column pt-4 pb-2">
+                            <div class="coverage-item flex-row">
+                                    <div class="coverage-item__column coverage-item__column--grow">
+                                        <div class="coverage-item__row">
+                                            <span class="d-flex coverage-item--element-grow text-overflow-ellipsis">
+                                                <i class="icon-small--attachment icon--green mr-2"></i>
+                                                <span class="text-overflow-ellipsis">File name</span>
+                                            </span>                        
+                                        </div>
+                                        <div class="coverage-item__row">
+                                            <span class="coverage-item__text-label mr-1">Size:</span>
+                                            <span class="mr-2">2 MB</span>
+                                            <span class="coverage-item__text-label mr-1">MIME type:</span>
+                                            <span>test type</span>
+                                        </div>
+                                    </div>
+                                    <div class="coverage-item__column">
+                                        <button class="icon-button"><i class="icon--download icon--gray"></i></button>
+                                    </div>
+                            </div>
+                            <div class="coverage-item flex-row">
+                                    <div class="coverage-item__column coverage-item__column--grow">
+                                        <div class="coverage-item__row">
+                                            <span class="d-flex coverage-item--element-grow text-overflow-ellipsis">
+                                                <i class="icon-small--attachment icon--green mr-2"></i>
+                                                <span class="text-overflow-ellipsis">File name</span>
+                                            </span>                        
+                                        </div>
+                                        <div class="coverage-item__row">
+                                            <span class="coverage-item__text-label mr-1">Size:</span>
+                                            <span class="mr-2">2 MB</span>
+                                            <span class="coverage-item__text-label mr-1">MIME type:</span>
+                                            <span>test type</span>
+                                        </div>
+                                    </div>
+                                    <div class="coverage-item__column">
+                                        <button class="icon-button"><i class="icon--download icon--gray"></i></button>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="wire-column__preview__editorial-note mt-0">
+                            <i class="icon-small--info icon--gray"></i>
+                            <span>Laboris Lorem velit irure tempor aliquip deserunt sint ut cupidatat nostrud adipisicing.</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </article>
+
+</div>
+{% endblock %}

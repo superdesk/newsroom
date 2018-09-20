@@ -29,6 +29,7 @@ export default function homeReducer(state = initialState, action) {
             user: action.data.user,
             company: action.data.company,
             formats: action.data.formats || [],
+            userSections: action.data.userSections,
         };
 
     case OPEN_ITEM:{

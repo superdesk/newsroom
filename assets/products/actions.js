@@ -1,5 +1,6 @@
 import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
+import { initSections } from 'features/sections/actions';
 
 
 export const SELECT_PRODUCT = 'SELECT_PRODUCT';
@@ -189,6 +190,6 @@ export function initViewData(data) {
         dispatch(getProducts(data.products));
         dispatch(getCompanies(data.companies));
         dispatch(getNavigations(data.navigations));
+        dispatch(initSections(data.sections));
     };
 }
-

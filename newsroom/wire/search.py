@@ -25,6 +25,11 @@ aggregations = {
 }
 
 
+class FeaturedQuery(Exception):
+    """Raise when query is for featured items."""
+    pass
+
+
 def today(offset):
     return datetime.utcnow() + timedelta(minutes=offset)
 
@@ -48,8 +53,8 @@ def get_local_date(date, time, offset):
     return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
 
 
-def get_bookmarks_count(user_id):
-    return superdesk.get_resource_service('wire_search').get_bookmarks_count(user_id)
+def get_bookmarks_count(user_id, product_type):
+    return superdesk.get_resource_service('wire_search').get_bookmarks_count(user_id, product_type)
 
 
 class WireSearchResource(newsroom.Resource):
@@ -66,6 +71,7 @@ class WireSearchResource(newsroom.Resource):
             'ancestors': 1,
             'wordcount': 1,
         },
+        'elastic_filter': {'bool': {'must': [{'term': {'_type': 'items'}}]}},
     }
 
     item_methods = ['GET']
@@ -76,31 +82,35 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
-def _set_product_query(query, company, user=None, navigation_id=None):
+def set_product_query(query, company, user=None, navigation_id=None, product_type=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
     If user is not administrator then products apply if user has a company
-    If user is not administrator and has no company then everthing will be filtered
+    If user is not administrator and has no company then everything will be filtered
     :param query: search query
     :param company: company
     :param user: user to check against (used for notification checking)
     :param navigation_id: navigation to filter products
+    :param product_type: product_type to filter products
     If not provided session user will be checked
     """
     products = None
 
-    if is_admin(user):
-        if navigation_id:
-            products = get_products_by_navigation(navigation_id)
-        else:
-            return  # admin will see everything by default
-
-    if company:
-        products = get_products_by_company(company['_id'], navigation_id)
+    if product_type and company:
+        products = get_products_by_company(company['_id'], product_type=product_type)
     else:
-        # user does not belong to a company so blocking all stories
-        abort(403, gettext('User does not belong to a company.'))
+        if is_admin(user):
+            if navigation_id:
+                products = get_products_by_navigation(navigation_id)
+            else:
+                return  # admin will see everything by default
+
+        if company:
+            products = get_products_by_company(company['_id'], navigation_id)
+        else:
+            # user does not belong to a company so blocking all stories
+            abort(403, gettext('User does not belong to a company.'))
 
     query['bool']['should'] = []
     product_ids = [p['sd_product_id'] for p in products if p.get('sd_product_id')]
@@ -109,7 +119,11 @@ def _set_product_query(query, company, user=None, navigation_id=None):
 
     for product in products:
         if product.get('query'):
-            query['bool']['should'].append(_query_string(product['query']))
+            if product['query'] == '_featured':
+                if navigation_id:  # only return featured when nav item is selected
+                    raise FeaturedQuery
+            else:
+                query['bool']['should'].append(query_string(product['query']))
 
     query['bool']['minimum_should_match'] = 1
 
@@ -117,7 +131,7 @@ def _set_product_query(query, company, user=None, navigation_id=None):
         abort(403, gettext('Your company doesn\'t have any products defined.'))
 
 
-def _query_string(query):
+def query_string(query):
     return {
         'query_string': {
             'query': query,
@@ -127,7 +141,7 @@ def _query_string(query):
     }
 
 
-def _versioncreated_range(created):
+def versioncreated_range(created):
     _range = {}
     offset = int(created.get('timezone_offset', '0'))
     if created.get('created_from'):
@@ -141,7 +155,7 @@ def _filter_terms(filters):
     return [{'terms': {get_aggregation_field(key): val}} for key, val in filters.items() if val]
 
 
-def _set_bookmarks_query(query, user_id):
+def set_bookmarks_query(query, user_id):
     query['bool']['must'].append({
         'term': {'bookmarks': str(user_id)},
     })
@@ -154,41 +168,43 @@ def _items_query():
                 {'term': {'type': 'composite'}},
                 {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
             ],
-            'must': [],
+            'must': [{'term': {'_type': 'items'}}],
         }
     }
 
 
 class WireSearchService(newsroom.Service):
-    def get_bookmarks_count(self, user_id):
+    def get_bookmarks_count(self, user_id, product_type):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
         try:
-            _set_product_query(query, company)
+            set_product_query(query, company, product_type=product_type)
         except Forbidden:
             return 0
-        _set_bookmarks_query(query, user_id)
+        set_bookmarks_query(query, user_id)
         source = {'query': query, 'size': 0}
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, None).count()
 
-    def get(self, req, lookup):
+    def get(self, req, lookup, size=25, aggs=True):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        _set_product_query(query, company, navigation_id=req.args.get('navigation'))
+        set_product_query(query, company,
+                          navigation_id=req.args.get('navigation'),
+                          product_type=req.args.get('section') if req.args.get('bookmarks') else None)
 
         if req.args.get('q'):
-            query['bool']['must'].append(_query_string(req.args['q']))
+            query['bool']['must'].append(query_string(req.args['q']))
 
-        if req.args.get('newsOnly') and not req.args.get('navigation'):
+        if req.args.get('newsOnly') and not (req.args.get('navigation') or req.args.get('product_type')):
             for f in app.config.get('NEWS_ONLY_FILTERS', []):
                 query['bool']['must_not'].append(f)
 
         if req.args.get('bookmarks'):
-            _set_bookmarks_query(query, req.args['bookmarks'])
+            set_bookmarks_query(query, req.args['bookmarks'])
 
         filters = None
 
@@ -200,11 +216,11 @@ class WireSearchService(newsroom.Service):
                 query['bool']['must'] += _filter_terms(filters)
 
             if req.args.get('created_from') or req.args.get('created_to'):
-                query['bool']['must'].append(_versioncreated_range(req.args))
+                query['bool']['must'].append(versioncreated_range(req.args))
 
         source = {'query': query}
         source['sort'] = [{'versioncreated': 'desc'}]
-        source['size'] = 25
+        source['size'] = size
         source['from'] = int(req.args.get('from', 0))
 
         if app.config.get('FILTER_BY_POST_FILTER', False):
@@ -213,18 +229,28 @@ class WireSearchService(newsroom.Service):
             if filters:
                 source['post_filter']['bool']['must'] += _filter_terms(filters)
             if req.args.get('created_from') or req.args.get('created_to'):
-                source['post_filter']['bool']['must'].append(_versioncreated_range(req.args))
+                source['post_filter']['bool']['must'].append(versioncreated_range(req.args))
 
         if source['from'] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
             return abort(400)
 
-        if not source['from']:  # avoid aggregations when handling pagination
+        if not source['from'] and aggs:  # avoid aggregations when handling pagination
             source['aggs'] = aggregations
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
+
+    def has_permissions(self, item):
+        """Test if current user has permissions to view given item."""
+        req = ParsedRequest()
+        req.args = {}
+        try:
+            results = self.get(req, {'_id': item['_id']}, size=0, aggs=False)
+            return results.count() > 0
+        except Forbidden:
+            return False
 
     def get_product_items(self, product_id, size):
         query = _items_query()
@@ -240,7 +266,7 @@ class WireSearchService(newsroom.Service):
             query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
 
         if product.get('query'):
-            query['bool']['should'].append(_query_string(product['query']))
+            query['bool']['should'].append(query_string(product['query']))
 
         query['bool']['minimum_should_match'] = 1
 
@@ -294,10 +320,10 @@ class WireSearchService(newsroom.Service):
             topic_filter = {'bool': {'must': []}}
 
             if topic.get('query'):
-                topic_filter['bool']['must'].append(_query_string(topic['query']))
+                topic_filter['bool']['must'].append(query_string(topic['query']))
 
             if topic.get('created'):
-                topic_filter['bool']['must'].append(_versioncreated_range(dict(
+                topic_filter['bool']['must'].append(versioncreated_range(dict(
                     created_from=topic['created'].get('from'),
                     created_to=topic['created'].get('to'),
                     timezone_offset=topic.get('timezone_offset', '0')
@@ -311,7 +337,7 @@ class WireSearchService(newsroom.Service):
             # for now even if there's no active company matching for the user
             # continuing with the search
             try:
-                _set_product_query(query, company, user)
+                set_product_query(query, company, user)
             except Forbidden:
                 logger.info('Notification for user:{} and topic:{} is skipped'
                             .format(user.get('_id'), topic.get('_id')))
@@ -369,9 +395,9 @@ class WireSearchService(newsroom.Service):
     def get_matching_bookmarks(self, item_ids, active_users, active_companies):
         """
         Returns a list of user ids bookmarked any of the given items
-        :param item_id: list of ids of items to be searched
-        :param users: user_id, user dictionary
-        :param companies: company_id, company dictionary
+        :param item_ids: list of ids of items to be searched
+        :param active_users: user_id, user dictionary
+        :param active_companies: company_id, company dictionary
         :return:
         """
         bookmark_users = []
@@ -402,7 +428,7 @@ class WireSearchService(newsroom.Service):
             query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
 
         if product.get('query'):
-            query['bool']['should'].append(_query_string(product['query']))
+            query['bool']['should'].append(query_string(product['query']))
 
         query['bool']['minimum_should_match'] = 1
         query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})

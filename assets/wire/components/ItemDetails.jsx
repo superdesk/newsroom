@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import PreviewActionButtons from './PreviewActionButtons';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
+import AgendaLinks from './AgendaLinks';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
+import PreviewActionButtons from 'components/PreviewActionButtons';
 import { gettext, fullDate, formatHTML } from 'utils';
 import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT, isPreformatted } from 'wire/utils';
+
 
 function ItemDetails({item, user, actions, onClose}) {
     const picture = getPicture(item);
@@ -27,7 +29,7 @@ function ItemDetails({item, user, actions, onClose}) {
 
             </section>
 
-            <article id='preview-article' className="wire-column__preview__content--item-detal-wrap">
+            <article id='preview-article' className="wire-column__preview__content--item-detail-wrap">
                 <div className="wire-column__preview__content">
                     {getDetailRendition(picture) && !isKilled(item) && (
                         <figure className="wire-column__preview__image">
@@ -74,6 +76,8 @@ function ItemDetails({item, user, actions, onClose}) {
                             {showItemVersions(item) &&
                                 <ListItemPreviousVersions item={item} isPreview={true}/>
                             }
+
+                            <AgendaLinks item={item} />
                         </div>
 
                     </div>

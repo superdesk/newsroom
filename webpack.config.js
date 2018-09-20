@@ -16,9 +16,12 @@ module.exports = {
         newsroom_css: './assets/style.js',
         wire_js: './assets/wire/index.js',
         home_js: './assets/home/index.js',
+        agenda_js: './assets/agenda/index.js',
         notifications_js: './assets/notifications/index.js',
         company_reports_js: './assets/company-reports/index.js',
         print_reports_js: './assets/company-reports/components/index.js',
+        am_news_js: './assets/am-news/index.js',
+        am_news_css: './assets/am-news/style.js',
         common: [
             'alertifyjs',
             'bootstrap',

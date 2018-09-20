@@ -5,7 +5,7 @@ from flask import current_app as app
 from superdesk.publish.formatters.nitf_formatter import NITFFormatter
 from superdesk.publish.formatters.newsml_g2_formatter import NewsMLG2Formatter as SuperdeskFormatter
 
-from .base import BaseFormatter
+from newsroom.formatter import BaseFormatter
 
 
 class NewsroomFormatter(SuperdeskFormatter):
@@ -33,7 +33,7 @@ class NewsMLG2Formatter(BaseFormatter):
     formatter = NewsroomFormatter()
     nitf_formatter = NITFFormatter()
 
-    def format_item(self, item):
+    def format_item(self, item, item_type='items'):
         item = item.copy()
         item.setdefault('guid', item['_id'])
         item.setdefault('_current_version', item['version'])

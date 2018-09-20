@@ -1,0 +1,8 @@
+{% extends "email_layout.html" %}
+
+{% block content %}
+<p>New coverage received for agenda item {{ agenda.name }}:</p>
+
+{% include "email_item.html" %}
+
+{% endblock %}

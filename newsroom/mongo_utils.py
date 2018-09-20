@@ -14,27 +14,30 @@ default_page_size = 500
 def index_elastic_from_mongo():
     print('Starting indexing from mongodb for "items" collection')
 
-    resource = 'items'
-    for items in _get_mongo_items(resource):
-        print('{} Inserting {} items'.format(time.strftime('%X %x %Z'), len(items)))
-        s = time.time()
+    resources = ['items', 'agenda']
+    for resource in resources:
+        print('Starting indexing collection {}'.format(resource))
 
-        for i in range(1, 4):
-            try:
-                success, failed = superdesk.app.data._search_backend(resource).bulk_insert(resource, items)
-            except Exception as ex:
-                print('Exception thrown on insert to elastic {}', ex)
-                time.sleep(10)
-                continue
-            else:
-                break
+        for items in _get_mongo_items(resource):
+            print('{} Inserting {} items'.format(time.strftime('%X %x %Z'), len(items)))
+            s = time.time()
 
-        print('{} Inserted {} items in {:.3f} seconds'.format(time.strftime('%X %x %Z'), success, time.time() - s))
-        if failed:
-            print('Failed to do bulk insert of items {}. Errors: {}'.format(len(failed), failed))
-            raise BulkIndexError(resource=resource, errors=failed)
+            for i in range(1, 4):
+                try:
+                    success, failed = superdesk.app.data._search_backend(resource).bulk_insert(resource, items)
+                except Exception as ex:
+                    print('Exception thrown on insert to elastic {}', ex)
+                    time.sleep(10)
+                    continue
+                else:
+                    break
 
-    print('Finished indexing collection {}'.format(resource))
+            print('{} Inserted {} items in {:.3f} seconds'.format(time.strftime('%X %x %Z'), success, time.time() - s))
+            if failed:
+                print('Failed to do bulk insert of items {}. Errors: {}'.format(len(failed), failed))
+                raise BulkIndexError(resource=resource, errors=failed)
+
+        print('Finished indexing collection {}'.format(resource))
 
 
 def _get_mongo_items(mongo_collection_name):

@@ -4,13 +4,11 @@ import {
     INIT_DATA,
     CLEAR_NOTIFICATION,
     CLEAR_ALL_NOTIFICATIONS,
-    SET_BOOKMARKS_COUNT,
 } from './actions';
 
 const initialState = {
     user: null,
     notifications: [],
-    bookmarksCount: 0,
 };
 
 export default function notificationReducer(state = initialState, action) {
@@ -45,12 +43,8 @@ export default function notificationReducer(state = initialState, action) {
             ...state,
             user: action.data.user || null,
             notifications: action.data.notifications || [],
-            bookmarksCount: action.data.bookmarksCount || 0,
         };
     }
-
-    case SET_BOOKMARKS_COUNT:
-        return {...state, bookmarksCount: action.count};
 
     default:
         return state;

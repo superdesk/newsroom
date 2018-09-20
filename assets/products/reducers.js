@@ -10,8 +10,12 @@ import {
     SET_ERROR,
     GET_COMPANIES,
     GET_NAVIGATIONS,
-    UPDATE_PRODUCT_COMPANIES, UPDATE_PRODUCT_NAVIGATIONS
+    UPDATE_PRODUCT_COMPANIES,
+    UPDATE_PRODUCT_NAVIGATIONS,
 } from './actions';
+
+import { INIT_SECTIONS, SELECT_SECTION } from 'features/sections/actions';
+import { sectionsReducer } from 'features/sections/reducers';
 
 const initialState = {
     query: null,
@@ -23,6 +27,7 @@ const initialState = {
     activeQuery: null,
     companies: [],
     navigations: [],
+    sections: sectionsReducer(),
 };
 
 export default function productReducer(state = initialState, action) {
@@ -56,6 +61,7 @@ export default function productReducer(state = initialState, action) {
             is_enabled: true,
             name: '',
             description: '',
+            product_type: state.sections.active,
         };
 
         return {...state, productToEdit, errors: null};
@@ -117,6 +123,10 @@ export default function productReducer(state = initialState, action) {
 
         return {...state, productsById, productToEdit: product};
     }
+
+    case INIT_SECTIONS:
+    case SELECT_SECTION:
+        return {...state, sections: sectionsReducer(state.sections, action)};
 
     default:
         return state;

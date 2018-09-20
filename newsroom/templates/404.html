@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="content">
+    <div class="jumbotron">
+        <h1>{{ _("404. That's an error.") }}</h1>
+        <p class="lead">{{ _('The requested url <code>%(url)s</code> was not found on the server.', url=request.path) }}</p>
+    </div>
+</section>
+{% endblock %}
