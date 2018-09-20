@@ -31,7 +31,9 @@ export function getReadItems() {
  */
 export function markItemAsRead(item, state) {
     if (item && item._id && item.version) {
-        store.assign(READ_ITEMS_STORE, {[item._id]: getMaxVersion(state.readItems[item._id], item.version)});
+        const readItems = get(state, 'readItems', getReadItems()) || {};
+
+        store.assign(READ_ITEMS_STORE, {[item._id]: getMaxVersion(readItems[item._id], item.version)});
     }
 }
 

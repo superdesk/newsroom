@@ -686,6 +686,7 @@ def test_push_item_with_coverage(client, app, mocker):
     assert coverages[0]['delivery_href'] == '/wire/%s' % test_item['guid']
 
     wire_item = get_json(client, '/wire/item')
+    assert wire_item['_id'] == 'item'
     assert wire_item['agenda_id'] == 'foo'
     assert wire_item['agenda_href'] == '/agenda/foo'
 
@@ -703,7 +704,7 @@ New coverage received for agenda item {{ agenda.name }}:
 {% endblock %}
         """.strip(), agenda=item, item=wire_item),
         html_body=render_template_string("""
-{% extends "email_layout.txt" %}
+{% extends "email_layout.html" %}
 
 {% block content %}
 <p>New coverage received for agenda item {{ agenda.name }}:</p>

@@ -17,7 +17,7 @@ from newsroom.utils import query_resource
 def settings():
     data = {
         'products': list(query_resource('products', max_results=200)),
-        "navigations": list(query_resource('navigations', max_results=200)),
+        'navigations': list(query_resource('navigations', max_results=200)),
         'sections': app.sections,
     }
     return flask.render_template('settings.html', setting_type="navigations", data=data)
@@ -25,7 +25,7 @@ def settings():
 
 @blueprint.route('/navigations', methods=['GET'])
 def index():
-    navigations = list(query_resource('navigations', lookup=None, max_results=200))
+    navigations = list(query_resource('navigations', lookup=None))
     return jsonify(navigations), 200
 
 
@@ -36,7 +36,7 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'name': regex}
-    products = list(query_resource('navigations', lookup=lookup, max_results=200))
+    products = list(query_resource('navigations', lookup=lookup))
     return jsonify(products), 200
 
 
@@ -91,7 +91,7 @@ def delete(id):
 def save_navigation_products(id):
     get_entity_or_404(id, 'navigations')
     data = get_json_or_400()
-    products = list(query_resource('products', max_results=200))
+    products = list(query_resource('products'))
 
     db = app.data.get_mongo_collection('products')
     for product in products:

@@ -339,7 +339,9 @@ class WireSearchService(newsroom.Service):
             try:
                 set_product_query(query, company, user)
             except Forbidden:
-                return []
+                logger.info('Notification for user:{} and topic:{} is skipped'
+                            .format(user.get('_id'), topic.get('_id')))
+                continue
 
             aggs['topics']['filters']['filters'][str(topic['_id'])] = topic_filter
             queried_topics.append(topic)

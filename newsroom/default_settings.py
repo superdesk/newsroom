@@ -3,6 +3,7 @@ import tzlocal
 
 from superdesk.default_settings import (   # noqa
     VERSION,
+    MONGO_URI,
     CONTENTAPI_MONGO_URI,
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,

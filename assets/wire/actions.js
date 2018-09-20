@@ -2,7 +2,7 @@
 import { get, isEmpty } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml } from 'utils';
+import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
 import { markItemAsRead, toggleNewsOnlyParam } from './utils';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 
@@ -109,12 +109,31 @@ export function toggleNews() {
 export function copyPreviewContents(item) {
     return (dispatch, getState) => {
         const textarea = document.getElementById('copy-area');
+        const contents = [];
 
-        textarea.value = [
-            get(item, 'headline', get(item, 'slugline')),
-            '',
-            get(item, 'body_text') || getTextFromHtml(get(item, 'body_html'))
-        ].join('\n');
+        contents.push(fullDate(item.versioncreated));
+        item.slugline && contents.push(item.slugline);
+        item.headline && contents.push(item.headline);
+        item.byline && contents.push(gettext('By: {{ byline }}', {byline: get(item, 'byline')}));
+        item.source && contents.push(gettext('Source: {{ source }}', {source: item.source}));
+
+        contents.push('');
+
+        if (item.description_text) {
+            contents.push(item.description_text);
+        } else if (item.description_html) {
+            contents.push(getTextFromHtml(item.description_html));
+        }
+
+        contents.push('');
+
+        if (item.body_text) {
+            contents.push(item.body_text);
+        } else if (item.body_html) {
+            contents.push(getTextFromHtml(item.body_html));
+        }
+
+        textarea.value = contents.join('\n');
         textarea.select();
 
         if (document.execCommand('copy')) {

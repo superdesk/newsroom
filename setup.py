@@ -17,8 +17,8 @@ install_requires = [
 
 setup(
     name='Newsroom',
-    version='0.1',
-    description='Newsroom client app',
+    version='1.0',
+    description='Newsroom app',
     author='Sourcefabric',
     url='https://github.com/superdesk/newsroom',
     license='GPLv3',
