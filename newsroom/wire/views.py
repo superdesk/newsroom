@@ -70,7 +70,7 @@ def _fetch_photos(url, count):
     request = urllib.request.Request(url, headers=headers)
 
     try:
-        with urllib.request.urlopen(request) as response:
+        with urllib.request.urlopen(request, timeout=10) as response:
             data = response.read()
             json_data = json.loads(data.decode("utf-8"))
             return json_data['GalleryContainers'][:count]
@@ -168,7 +168,6 @@ def download(_ids):
     items = [get_entity_or_404(_id, item_type) for _id in _ids.split(',')]
     _file = io.BytesIO()
     formatter = app.download_formatters[_format]['formatter']
-
     mimetype = None
     attachment_filename = '%s-newsroom.zip' % utcnow().strftime('%Y%m%d%H%M')
     if len(items) == 1:
@@ -217,7 +216,8 @@ def share():
             send_email(
                 [user['email']],
                 gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
-                flask.render_template('share_{}.txt'.format(item_type), **template_kwargs),
+                text_body=flask.render_template('share_{}.txt'.format(item_type), **template_kwargs),
+                html_body=flask.render_template('share_{}.html'.format(item_type), **template_kwargs),
                 sender=current_user['email'],
                 connection=connection
             )

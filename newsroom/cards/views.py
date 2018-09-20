@@ -15,8 +15,8 @@ from newsroom.utils import query_resource
 @admin_only
 def settings():
     data = {
-        'products': list(query_resource('products', lookup={'is_enabled': True}, max_results=200)),
-        "cards": list(query_resource('cards', max_results=200)),
+        'products': list(query_resource('products', lookup={'is_enabled': True})),
+        "cards": list(query_resource('cards')),
     }
     return flask.render_template('settings.html', setting_type="cards", data=data)
 
@@ -24,7 +24,7 @@ def settings():
 @blueprint.route('/cards', methods=['GET'])
 @login_required
 def index():
-    cards = list(query_resource('cards', lookup=None, max_results=200))
+    cards = list(query_resource('cards', lookup=None))
     return jsonify(cards), 200
 
 
@@ -35,7 +35,7 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'label': regex}
-    products = list(query_resource('cards', lookup=lookup, max_results=200))
+    products = list(query_resource('cards', lookup=lookup))
     return jsonify(products), 200
 
 

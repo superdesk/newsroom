@@ -17,9 +17,9 @@ from newsroom.utils import query_resource
 def settings():
     data = {
         'products': list(query_resource('products', max_results=200)),
-        "navigations": list(query_resource('navigations', max_results=200)),
-        "companies": list(query_resource('companies', max_results=200)),
-        "sections": current_app.sections,
+        'navigations': list(query_resource('navigations', max_results=200)),
+        'companies': list(query_resource('companies', max_results=200)),
+        'sections': current_app.sections,
     }
     return flask.render_template('settings.html', setting_type="products", data=data)
 
@@ -30,7 +30,7 @@ def index():
     lookup = None
     if flask.request.args.get('q'):
         lookup = flask.request.args.get('q')
-    products = list(query_resource('products', lookup=lookup, max_results=200))
+    products = list(query_resource('products', lookup=lookup))
     return jsonify(products), 200
 
 
@@ -41,7 +41,7 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'name': regex}
-    products = list(query_resource('products', lookup=lookup, max_results=200))
+    products = list(query_resource('products', lookup=lookup))
     return jsonify(products), 200
 
 

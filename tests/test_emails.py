@@ -1,10 +1,11 @@
 from newsroom.email import send_new_item_notification_email
-from flask import render_template_string, json
+from flask import render_template_string, json, url_for
 
 
 def test_item_notification_template(client, app, mocker):
     user = {'email': 'foo@example.com'}
     item = {
+        '_id': 'tag:localhost:2018:bcc9fd45',
         'guid': 'tag:localhost:2018:bcc9fd45',
         'versioncreated': json.loads('{"date": "2018-07-02T09:15:48+0000"}')['date'],
         'slugline': 'Albion Park Greys',
@@ -16,7 +17,7 @@ def test_item_notification_template(client, app, mocker):
         'type': 'text',
     }
 
-    item_url = 'http://localhost:5050/wire/tag:localhost:2018:bcc9fd45'
+    item_url = url_for('wire.item', _id=item['_id'], _external=True)
 
     sub = mocker.patch('newsroom.email.send_email')
 

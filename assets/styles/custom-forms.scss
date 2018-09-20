@@ -41,6 +41,7 @@ $enable-shadows:true;
     .custom-control-label {
       color: $gray-500;
       font-weight: 300;
+      font-size: 0.8rem;
     }
     .custom-control-input:checked ~ .custom-control-label {
       color: $gray-200;

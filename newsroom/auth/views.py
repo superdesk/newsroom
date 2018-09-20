@@ -8,7 +8,7 @@ import bcrypt
 from newsroom.auth import blueprint
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
 from newsroom.email import send_validate_account_email, \
-    send_reset_password_email, send_new_signup_email
+    send_reset_password_email, send_new_signup_email, send_new_account_email
 from newsroom.utils import get_random_string
 from bson import ObjectId
 from flask_babel import gettext
@@ -26,6 +26,7 @@ def login():
         user = get_resource_service('auth_user').find_one(req=None, email=form.email.data)
 
         if user is not None and _is_password_valid(form.password.data.encode('UTF-8'), user):
+
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
 
             if not _is_company_enabled(user):
@@ -85,16 +86,19 @@ def _is_password_valid(password, user):
     Checks the password of the user
     """
     # user is found so save the id in login attempts
-    previous_login_attempt = app.cache.get(user.get('email'))
+    previous_login_attempt = app.cache.get(user.get('email')) or {}
     previous_login_attempt['user_id'] = user.get('_id')
     app.cache.set(user.get('email'), previous_login_attempt)
 
     try:
-        hashed = user.get('password').encode('UTF-8')
-    except AttributeError:
+        hashed = user['password'].encode('UTF-8')
+    except (AttributeError, KeyError):
         return False
 
-    if not bcrypt.checkpw(password, hashed):
+    try:
+        if not bcrypt.checkpw(password, hashed):
+            return False
+    except (TypeError, ValueError):
         return False
 
     # login successful so remove the login attempt check record
@@ -246,7 +250,7 @@ def reset_password(token):
 
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        updates = {'password': form.new_password.data, 'token': None, 'token_expiry_date': None}
+        updates = {'is_validated': True, 'password': form.new_password.data, 'token': None, 'token_expiry_date': None}
         get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
         flask.flash(gettext('Your password has been changed. Please login again.'), 'success')
         return flask.redirect(flask.url_for('auth.login'))
@@ -285,6 +289,8 @@ def send_token(user, token_type='validate'):
         get_resource_service('users').patch(id=ObjectId(user['_id']), updates=updates)
         if token_type == 'validate':
             send_validate_account_email(user['first_name'], user['email'], updates['token'])
+        if token_type == 'new_account':
+            send_new_account_email(user['first_name'], user['email'], updates['token'])
         elif token_type == 'reset_password':
             send_reset_password_email(user['first_name'], user['email'], updates['token'])
         return True

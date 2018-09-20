@@ -1,6 +1,8 @@
 from flask import url_for
 from pytest import fixture
 from bson import ObjectId
+from flask import json
+
 from superdesk import get_resource_service
 
 
@@ -155,19 +157,23 @@ def test_create_new_user_succeeds(app, client):
         'is_enabled': True,
         'contact_name': 'Tom'
     }])
-    # Insert a new user
-    response = client.post('/users/new', data={
-        'email': 'newuser@abc.org',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'password': 'abc',
-        'country': 'Australia',
-        'phone': '1234567',
-        'company': company_ids[0],
-        'user_type': 'public',
-        'is_enabled': True
-    })
-    assert response.status_code == 201
+    with app.mail.record_messages() as outbox:
+        # Insert a new user
+        response = client.post('/users/new', data={
+            'email': 'newuser@abc.org',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'password': 'abc',
+            'country': 'Australia',
+            'phone': '1234567',
+            'company': company_ids[0],
+            'user_type': 'public',
+            'is_enabled': True
+        })
+        assert response.status_code == 201
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['newuser@abc.org']
+        assert 'account created' in outbox[0].subject
 
     # get reset password token
     user = list(app.data.find('users', req=None, lookup={'email': 'newuser@abc.org'}))[0]
@@ -235,3 +241,20 @@ def test_new_user_can_be_deleted(client):
 
     user = get_resource_service('users').find_one(req=None, email='newuser@abc.org')
     assert user is None
+
+
+def test_return_search_for_all_users(client, app):
+    test_login_succeeds_for_admin(client)
+
+    for i in range(250):
+        app.data.insert('users', [{
+            'email': 'foo%s@bar.com' % i,
+            'first_name': 'Foo%s' % i,
+            'is_enabled': True,
+            'receive_email': True,
+            'company': '',
+        }])
+
+    resp = client.get('/users/search?q=fo')
+    data = json.loads(resp.get_data())
+    assert 250 == len(data)

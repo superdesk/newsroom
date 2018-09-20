@@ -32,7 +32,7 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'name': regex}
-    companies = list(query_resource('companies', lookup=lookup, max_results=200))
+    companies = list(query_resource('companies', lookup=lookup))
     return jsonify(companies), 200
 
 
@@ -110,7 +110,7 @@ def delete(id):
 @login_required
 def company_users(id):
     """TODO(petr): use projection to hide fields like token/email."""
-    users = list(query_resource('users', lookup={'company': ObjectId(id)}, max_results=50))
+    users = list(query_resource('users', lookup={'company': ObjectId(id)}))
     return jsonify(users), 200
 
 

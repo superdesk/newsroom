@@ -495,6 +495,32 @@ def test_matching_topics_for_public_user(client, app):
     assert ['query'] == matching
 
 
+def test_matching_topics_for_user_with_inactive_company(client, app):
+    app.data.insert('products', [{
+        '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
+        'name': 'Sport',
+        'description': 'Top level sport product',
+        'sd_product_id': 'p-1',
+        'is_enabled': True,
+        'companies': ['1'],
+    }])
+
+    item['products'] = [{'code': 'p-1'}]
+    client.post('/push', data=json.dumps(item), content_type='application/json')
+    search = get_resource_service('wire_search')
+
+    users = {'foo': {'company': '1', 'user_type': 'public'}, 'bar': {'company': '2', 'user_type': 'public'}}
+    companies = {'1': {'_id': '1', 'name': 'test-comp'}}
+    topics = [
+        {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'bar'},
+        {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},
+        {'_id': 'filter', 'filter': {'genre': ['other']}, 'user': 'bar'},
+        {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
+    ]
+    matching = search.get_matching_topics(item['guid'], topics, users, companies)
+    assert ['query'] == matching
+
+
 def test_push_parsed_item(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'wire_search')
