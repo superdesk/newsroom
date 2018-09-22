@@ -1,9 +1,10 @@
-from flask import url_for
-from pytest import fixture
 from bson import ObjectId
 from flask import json
-
+from flask import url_for
+from pytest import fixture
 from superdesk import get_resource_service
+
+from newsroom.auth import get_user_by_email
 
 
 @fixture(autouse=True)
@@ -119,7 +120,7 @@ def test_new_user_has_correct_flags(client):
     assert not user['is_enabled']
 
 
-def test_new_user_fails_if_email_is_used_before(client):
+def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
     test_login_succeeds_for_admin(client)
     # Register a new account
     response = client.post('/users/new', data={
@@ -133,7 +134,7 @@ def test_new_user_fails_if_email_is_used_before(client):
     })
 
     response = client.post('/users/new', data={
-        'email': 'newuser@abc.org',
+        'email': 'newUser@abc.org',
         'first_name': 'John',
         'last_name': 'Smith',
         'password': 'abc',
@@ -160,7 +161,7 @@ def test_create_new_user_succeeds(app, client):
     with app.mail.record_messages() as outbox:
         # Insert a new user
         response = client.post('/users/new', data={
-            'email': 'newuser@abc.org',
+            'email': 'New.User@abc.org',
             'first_name': 'John',
             'last_name': 'Doe',
             'password': 'abc',
@@ -172,11 +173,11 @@ def test_create_new_user_succeeds(app, client):
         })
         assert response.status_code == 201
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['newuser@abc.org']
+        assert outbox[0].recipients == ['New.User@abc.org']
         assert 'account created' in outbox[0].subject
 
     # get reset password token
-    user = list(app.data.find('users', req=None, lookup={'email': 'newuser@abc.org'}))[0]
+    user = get_user_by_email('new.user@abc.org')
     client.get(url_for('auth.reset_password', token=user['token']))
 
     # change the password
@@ -189,7 +190,7 @@ def test_create_new_user_succeeds(app, client):
     # Login with the new account succeeds
     response = client.post(
         url_for('auth.login'),
-        data={'email': 'newuser@abc.org', 'password': 'abc123def'},
+        data={'email': 'new.user@abc.org', 'password': 'abc123def'},
         follow_redirects=True
     )
     assert response.status_code == 200

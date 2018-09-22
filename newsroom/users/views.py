@@ -1,20 +1,22 @@
+import re
+
 import flask
-from newsroom.utils import query_resource, find_one
 from bson import ObjectId
-from werkzeug.exceptions import BadRequest, NotFound
-from newsroom.users.forms import UserForm
-from superdesk import get_resource_service
-from newsroom.users import blueprint
+from flask import jsonify, current_app as app
 from flask_babel import gettext
-from newsroom.notifications.notifications import get_user_notifications
-from newsroom.auth import get_user
+from superdesk import get_resource_service
+from werkzeug.exceptions import BadRequest, NotFound
+
+from newsroom.auth import get_user, get_user_by_email
 from newsroom.auth.decorator import admin_only, login_required
 from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user
-from newsroom.topics import get_user_topics
-from flask import jsonify, current_app as app
 from newsroom.companies import get_user_company_name, get_company_sections
-import re
+from newsroom.notifications.notifications import get_user_notifications
+from newsroom.topics import get_user_topics
+from newsroom.users import blueprint
+from newsroom.users.forms import UserForm
+from newsroom.utils import query_resource, find_one
 
 
 @blueprint.route('/settings/users', methods=['GET'])
@@ -74,10 +76,8 @@ def create():
 
 
 def _is_email_address_valid(email):
-    existing_users = query_resource('users', {'email': email})
-    if existing_users.count() > 0:
-        return False
-    return True
+    existing_user = get_user_by_email(email)
+    return not existing_user
 
 
 @blueprint.route('/users/<id>', methods=['GET', 'POST'])
