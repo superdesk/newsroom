@@ -2,13 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import NavigationListItem from './NavigationListItem';
 import { gettext } from 'utils';
+import {getProductTypes} from '../utils';
 
 
-function NavigationList({navigations, onClick, activeNavigationId}) {
+function NavigationList({navigations, products, onClick, activeNavigationId}) {
     const list = navigations.map((navigation) =>
         <NavigationListItem
             key={navigation._id}
             navigation={navigation}
+            productTypes={getProductTypes(navigation, products)}
             onClick={onClick}
             isActive={activeNavigationId===navigation._id}/>
     );
@@ -21,6 +23,7 @@ function NavigationList({navigations, onClick, activeNavigationId}) {
                         <tr>
                             <th>{ gettext('Name') }</th>
                             <th>{ gettext('Description') }</th>
+                            <th>{ gettext('Product Types') }</th>
                             <th>{ gettext('Status') }</th>
                             <th>{ gettext('Created On') }</th>
                         </tr>
@@ -34,6 +37,7 @@ function NavigationList({navigations, onClick, activeNavigationId}) {
 
 NavigationList.propTypes = {
     navigations: PropTypes.array.isRequired,
+    products: PropTypes.arrayOf(PropTypes.object),
     onClick: PropTypes.func.isRequired,
     activeNavigationId: PropTypes.string
 };
