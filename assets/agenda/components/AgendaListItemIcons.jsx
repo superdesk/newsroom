@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {bem} from 'ui/utils';
 import {
     hasCoverages,
-    isCoverageBetweenEventDates,
     isCoverageForExtraDay,
     hasLocation,
     getLocationString,
@@ -35,7 +34,7 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
                     {item.coverages.map((coverage) => {
                         const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
                         const statusClass = coverage.workflow_status === 'active' ? 'icon--green' : 'icon--gray-light';
-                        return (!group || (isCoverageBetweenEventDates(item, coverage) || isCoverageForExtraDay(coverage, group)) &&
+                        return (!group || isCoverageForExtraDay(coverage, group) &&
                           <span
                               className='wire-articles__item__icon'
                               key={coverage.coverage_id}
