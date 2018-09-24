@@ -442,3 +442,5 @@ export const getInitData = (data) => {
         userSections: keyBy(get(window.profileData, 'userSections', {}), '_id')
     };
 };
+
+export const isDisplayed = (field, config) => get(config, `${field}.displayed`, true);

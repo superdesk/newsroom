@@ -1,12 +1,13 @@
 import flask
-import logging
+
 from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal
 
 from superdesk import get_resource_service
-from newsroom.am_news import blueprint
+from newsroom.market_place import blueprint
 from newsroom.auth import get_user, login_required, get_user_id
+from newsroom.topics import get_user_topics
 from newsroom.companies import section
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.wire.search import get_bookmarks_count
@@ -14,48 +15,51 @@ from newsroom.wire.views import update_action_list, get_previous_versions, set_p
 from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type
 from newsroom.notifications import push_user_notification
 
-logger = logging.getLogger(__name__)
-
 
 def get_view_data():
     """Get the view data"""
     user = get_user()
+    topics = get_user_topics(user['_id']) if user else []
+    navigations = get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
+                                             product_type='market_place')
+    get_resource_service('market_place_search').get_navigation_story_count(navigations)
     return {
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
-        'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
-                                                  product_type='am_news'),
+        'topics': [t for t in topics if t.get('topic_type') == 'market_place'],
+        'navigations': navigations,
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
                     if 'wire' in f['types']],
-        'saved_items': get_bookmarks_count(user['_id'], 'am_news'),
-        'context': 'am_news',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('am_news')
+        'saved_items': get_bookmarks_count(user['_id'], 'market_place'),
+        'context': 'market_place',
+        'ui_config': get_resource_service('ui_config').getSectionConfig('market_place')
     }
 
 
-@blueprint.route('/am_news')
+@blueprint.route('/market_place')
 @login_required
-@section('am_news')
+@section('market_place')
 def index():
-    return flask.render_template('am_news_index.html', data=get_view_data())
+    return flask.render_template('market_place_index.html', data=get_view_data())
 
 
-@blueprint.route('/am_news/search')
+@blueprint.route('/market_place/search')
 @login_required
 def search():
-    response = get_internal('am_news_search')
-    return send_response('am_news_search', response)
+    response = get_internal('market_place_search')
+    return send_response('market_place_search', response)
 
 
-@blueprint.route('/bookmarks_am_news')
+@blueprint.route('/bookmarks_market_place')
 @login_required
+@section('market_place')
 def bookmarks():
     data = get_view_data()
     data['bookmarks'] = True
-    return flask.render_template('am_news_bookmarks.html', data=data)
+    return flask.render_template('market_place_bookmarks.html', data=data)
 
 
-@blueprint.route('/am_news_bookmark', methods=['POST', 'DELETE'])
+@blueprint.route('/market_place_bookmark', methods=['POST', 'DELETE'])
 @login_required
 def bookmark():
     """Bookmark an item.
@@ -67,11 +71,11 @@ def bookmark():
     assert data.get('items')
     update_action_list(data.get('items'), 'bookmarks', item_type='items')
     user_id = get_user_id()
-    push_user_notification('saved_items', count=get_bookmarks_count(user_id, 'am_news'))
+    push_user_notification('saved_items', count=get_bookmarks_count(user_id, 'market_place'))
     return flask.jsonify(), 200
 
 
-@blueprint.route('/am_news/<_id>/copy', methods=['POST'])
+@blueprint.route('/market_place/<_id>/copy', methods=['POST'])
 @login_required
 def copy(_id):
     item_type = get_type()
@@ -80,7 +84,7 @@ def copy(_id):
     return flask.jsonify(), 200
 
 
-@blueprint.route('/am_news/<_id>/versions')
+@blueprint.route('/market_place/<_id>/versions')
 @login_required
 def versions(_id):
     item = get_entity_or_404(_id, 'items')
@@ -88,11 +92,11 @@ def versions(_id):
     return flask.jsonify({'_items': items})
 
 
-@blueprint.route('/am_news/<_id>')
+@blueprint.route('/market_place/<_id>')
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
-    set_permissions(item, 'am_news')
+    set_permissions(item)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):

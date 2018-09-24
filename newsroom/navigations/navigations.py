@@ -30,7 +30,13 @@ class NavigationsResource(newsroom.Resource):
             'type': 'string',
             'default': 'wire'
         },
+        # list of images for tile based navigation
+        'tile_images': {
+            'type': 'list',
+            'nullable': 'true'
+        }
     }
+
     datasource = {
         'source': 'navigations',
         'default_sort': [('order', 1), ('name', 1)]

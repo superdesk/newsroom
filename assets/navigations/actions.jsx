@@ -2,6 +2,8 @@ import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
 import { initSections } from 'features/sections/actions';
 
+// number of image that a navigation can have
+export const MAX_TILE_IMAGES = 4;
 
 export const SELECT_NAVIGATION = 'SELECT_NAVIGATION';
 export function selectNavigation(id) {
@@ -73,9 +75,23 @@ export function postNavigation() {
     return function (dispatch, getState) {
 
         const navigation = getState().navigationToEdit;
-        const url = `/navigations/${navigation._id ? navigation._id : 'new'}`;
+        if (!navigation._id) {
+            // set the action section for new navigation
+            navigation.product_type = getState().sections.active;
+        }
 
-        return server.post(url, navigation)
+        const url = `/navigations/${navigation._id ? navigation._id : 'new'}`;
+        let data = new FormData();
+
+        data.append('navigation', JSON.stringify(navigation));
+        for(let i = 0; i < MAX_TILE_IMAGES; i++) {
+            const fileInput = document.getElementById(`tile_images_file_${i}`);
+            if (fileInput && fileInput.files.length > 0) {
+                data.append(`file${i}`, fileInput.files[0]);
+            }
+        }
+
+        return server.postFiles(url, data)
             .then(function() {
                 if (navigation._id) {
                     notify.success(gettext('Navigation updated successfully'));

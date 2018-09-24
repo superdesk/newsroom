@@ -1,4 +1,4 @@
-
+import { startsWith, set } from 'lodash';
 import {
     GET_NAVIGATIONS,
     SELECT_NAVIGATION,
@@ -52,7 +52,14 @@ export default function navigationReducer(state = initialState, action) {
         const target = action.event.target;
         const field = target.name;
         let navigation = state.navigationToEdit;
-        navigation[field] = target.type === 'checkbox' ? target.checked : target.value;
+        if (startsWith(field, 'tile_images_file')) {
+            const fileData = field.split('_');
+            const fileIndex = parseInt(fileData[3], 10);
+            set(navigation, `tile_images[${fileIndex}].file`, target.value);
+        } else {
+            navigation[field] = target.type === 'checkbox' ? target.checked : target.value;
+        }
+
         return {...state, navigationToEdit: navigation, errors: null};
     }
 

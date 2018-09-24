@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 
-import { gettext } from 'utils';
+import { gettext, isDisplayed } from 'utils';
 import {
     getPicture,
     getPreviewRendition,
@@ -37,14 +38,15 @@ class WirePreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, followStory, isFollowing} = this.props;
+        const {item, user, actions, followStory, isFollowing, previewConfig} = this.props;
         const picture = getPicture(item);
         const previousVersions = 'preview_versions';
+        const canFollowStory = followStory && user && (get(item, 'slugline') || '').trim();
         return (
             <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
                 <div className='wire-column__preview__top-bar'>
                     <div>
-                        {followStory && user && item.slugline && item.slugline.trim() &&
+                        {isDisplayed('follow_story', previewConfig) && canFollowStory &&
                             <button type="button"
                                 disabled={isFollowing}
                                 className="btn btn-outline-primary btn-responsive"
@@ -57,25 +59,29 @@ class WirePreview extends React.PureComponent {
                     <PreviewActionButtons item={item} user={user} actions={actions} />
                 </div>
                 <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
-                    <ArticleSlugline item={item}/>
-                    <ArticleHeadline item={item}/>
-                    <ArticleAuthor item={item} />
+                    {isDisplayed('slugline', previewConfig) && <ArticleSlugline item={item}/>}
+                    {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
+                    {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
+                        <ArticleAuthor item={item} displayConfig={previewConfig} />}
                     {picture && <ArticlePicture
                         picture={getPreviewRendition(picture)}
                         isKilled={isKilled(item)}
                         caption={getCaption(picture)}/>}
-                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions}/>
-                    <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>
-                    <ArticleBodyHtml item={item}/>
-                    <PreviewTags item={item} isItemDetail={false}/>
-                    {showItemVersions(item) &&
+                    {isDisplayed('metadata_section', previewConfig) &&
+                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig}/>}
+                    {isDisplayed('abstract', previewConfig) &&
+                    <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
+                    {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
+                    {isDisplayed('tags_section', previewConfig) &&
+                        <PreviewTags item={item} isItemDetail={false} displayConfig={previewConfig}/>}
+                    {isDisplayed('item_versions', previewConfig) && showItemVersions(item) &&
                         <ListItemPreviousVersions
                             item={item}
                             isPreview={true}
                             inputId={previousVersions}
                         />
                     }
-                    <AgendaLinks item={item} preview={true} />
+                    {isDisplayed('agenda_links', previewConfig) && <AgendaLinks item={item} preview={true} />}
                 </div>
             </Preview>
         );
@@ -93,6 +99,7 @@ WirePreview.propTypes = {
     followStory: PropTypes.func,
     isFollowing: PropTypes.bool,
     closePreview: PropTypes.func,
+    previewConfig: PropTypes.object,
 };
 
 export default WirePreview;

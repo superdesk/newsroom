@@ -65,6 +65,7 @@ class WireApp extends BaseApp {
                 item={this.props.itemToOpen}
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
+                detailsConfig={this.props.detailsConfig}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
                 <section key="contentHeader" className='content-header'>
@@ -81,7 +82,7 @@ class WireApp extends BaseApp {
                         </span>}
 
                         {this.props.bookmarks && 
-                            <BookmarkTabs active="wire" sections={this.props.userSections}/>
+                            <BookmarkTabs active={this.props.context} sections={this.props.userSections}/>
                         }
 
                         {!this.state.withSidebar && !this.props.bookmarks && <span
@@ -103,6 +104,7 @@ class WireApp extends BaseApp {
                             activeNavigation={this.props.activeNavigation}
                             newsOnly={this.props.newsOnly}
                             toggleNews={this.props.toggleNews}
+                            hideNewsOnly={this.props.context !== 'wire'}
                         />
                     </nav>
                 </section>,
@@ -119,7 +121,7 @@ class WireApp extends BaseApp {
                                 query={this.props.activeQuery}
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
-                                topicType='wire'
+                                topicType={this.props.context}
                                 newItems={this.props.newItems}
                                 refresh={this.props.refresh}
                                 activeTopic={this.props.activeTopic}
@@ -144,6 +146,7 @@ class WireApp extends BaseApp {
                                 followStory={this.props.followStory}
                                 isFollowing={!!isFollowing}
                                 closePreview={this.props.closePreview}
+                                previewConfig={this.props.previewConfig}
                             />
                             }
 
@@ -195,6 +198,9 @@ WireApp.propTypes = {
     activeTopic: PropTypes.object,
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
+    context: PropTypes.string.isRequired,
+    previewConfig: PropTypes.object,
+    detailsConfig: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -218,6 +224,9 @@ const mapStateToProps = (state) => ({
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
     activeTopic: activeTopicSelector(state),
+    context: state.context,
+    previewConfig: get(state.uiConfig, 'preview') || {},
+    detailsConfig: get(state.uiConfig, 'details') || {},
 });
 
 const mapDispatchToProps = (dispatch) => ({

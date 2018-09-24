@@ -58,6 +58,7 @@ class WireListItem extends React.Component {
             'wire-articles__item--selected': this.props.isSelected,
         });
         const picture = getPicture(item);
+        const isWire = this.props.context === 'wire';
         return (
             <article key={item._id}
                 className={cardClassName}
@@ -86,7 +87,7 @@ class WireListItem extends React.Component {
                             {item.headline}
                         </h4>
 
-                        {isExtended && (
+                        {isExtended && isWire && (
                             <div className='wire-articles__item__meta'>
                                 <WireListItemIcons item={item} picture={picture} />
                                 <div className='wire-articles__item__meta-info'>
@@ -99,6 +100,17 @@ class WireListItem extends React.Component {
                             </div>
                         )}
 
+                        {isExtended && !isWire && (
+                            [<div key='mage' className='wire-articles__item__meta'>
+                                <img src={`/theme/logo/${item.source}.png`}/>
+                            </div>,
+                            <div key='meta' className='wire-articles__item__meta'>
+                                <WireListItemIcons item={item} picture={picture}/>
+                                <div className='wire-articles__item__meta-info'>
+                                    <span>{this.wordCount} {gettext('words')}</span>
+                                </div>
+                            </div>]
+                        )}
                         {!isExtended && (
                             <div className='wire-articles__item__meta'>
                                 <div className='wire-articles__item__meta-info'>
@@ -173,6 +185,7 @@ WireListItem.propTypes = {
     })),
     isExtended: PropTypes.bool.isRequired,
     user: PropTypes.string,
+    context: PropTypes.string,
 };
 
 export default WireListItem;
