@@ -51,7 +51,7 @@ def get_user_by_email(email):
 
 
 def _get_user_by_email(email, repo):
-    lookup = {'email': {'$regex': re.compile('^{}$'.format(email), re.IGNORECASE)}}
+    lookup = {'email': {'$regex': re.compile('^{}$'.format(re.escape(email)), re.IGNORECASE)}}
     users = list(superdesk.get_resource_service(repo).get(req=None, lookup=lookup))
     return users[0] if users else None
 
