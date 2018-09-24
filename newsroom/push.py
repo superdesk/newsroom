@@ -257,6 +257,8 @@ def init_adhoc_agenda(planning):
         'end': planning['planning_date'],
     }
 
+    agenda['state'] = planning['state']
+
     return agenda
 
 

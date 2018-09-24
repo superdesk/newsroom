@@ -111,7 +111,7 @@ test_planning = {
     "slugline": "Vivid planning item",
     "headline": "Planning headline",
     "planning_date": "2018-05-28T10:51:52+0000",
-    "state": "draft",
+    "state": "scheduled",
     "item_class": "plinat:newscoverage",
     "coverages": [
         {
@@ -735,3 +735,28 @@ def test_filter_killed_events(client, app):
 
     parsed = get_json(client, '/agenda/%s' % event['guid'])
     assert 'killed' == parsed['state']
+
+
+def test_push_cancelled_planning_cancels_adhoc_planning(client, app):
+    # pushing an event to create the index
+    event = deepcopy(test_event)
+    event['guid'] = 'foo6'
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    # remove event link from planning item
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar3'
+    planning['event_item'] = None
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('bar3', 'agenda')
+    assert parsed['state'] == 'scheduled'
+
+    # cancel planning item
+    planning['state'] = 'cancelled'
+    planning['ednote'] = '-------------------------\nPlanning cancelled\nReason: Test\n',
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('bar3', 'agenda')
+    assert parsed['state'] == 'cancelled'
+    assert 'Reason' in parsed['ednote'][0]
