@@ -1,17 +1,19 @@
-import flask
 from datetime import datetime
+from datetime import timedelta
+
+import bcrypt
+import flask
+from bson import ObjectId
+from flask import current_app as app, abort
+from flask_babel import gettext
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
-from datetime import timedelta
-from flask import current_app as app, abort
-import bcrypt
-from newsroom.auth import blueprint
+
+from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
 from newsroom.email import send_validate_account_email, \
     send_reset_password_email, send_new_signup_email, send_new_account_email
 from newsroom.utils import get_random_string
-from bson import ObjectId
-from flask_babel import gettext
 from .token import generate_auth_token, verify_auth_token
 
 
@@ -23,7 +25,7 @@ def login():
         if not is_valid_login_attempt(form.email.data):
             return flask.render_template('account_locked.html', form=form)
 
-        user = get_resource_service('auth_user').find_one(req=None, email=form.email.data)
+        user = get_auth_user_by_email(form.email.data)
 
         if user is not None and _is_password_valid(form.password.data.encode('UTF-8'), user):
 
@@ -169,7 +171,7 @@ def get_login_token():
     if not is_valid_login_attempt(email):
         abort(401, gettext('Exceeded number of allowed login attempts'))
 
-    user = get_resource_service('auth_user').find_one(req=None, email=email)
+    user = get_auth_user_by_email(email)
 
     if user is not None and _is_password_valid(password.encode('UTF-8'), user):
         user = get_resource_service('users').find_one(req=None, _id=user['_id'])
@@ -265,7 +267,7 @@ def token(token_type):
     contact_address = app.config['CONTACT_ADDRESS']
     form = TokenForm()
     if form.validate_on_submit():
-        user = get_resource_service('users').find_one(req=None, email=form.email.data)
+        user = get_user_by_email(form.email.data)
         token_sent = send_token(user, token_type)
         if token_sent:
             flask.flash(gettext('A reset password token has been sent to your email address.'), 'success')

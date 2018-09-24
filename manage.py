@@ -5,6 +5,7 @@ from newsroom import Newsroom
 from superdesk import get_resource_service
 from newsroom.elastic_utils import rebuild_elastic_index
 from newsroom.mongo_utils import index_elastic_from_mongo
+from newsroom.auth import get_user_by_email
 
 app = Newsroom()
 manager = Manager(app)
@@ -25,7 +26,7 @@ def create_user(email, password, first_name, last_name, is_admin):
 
     with app.test_request_context('/users', method='POST'):
 
-        user = get_resource_service('users').find_one(email=email, req=None)
+        user = get_user_by_email(email)
 
         if user:
             print('user already exists %s' % str(new_user))
