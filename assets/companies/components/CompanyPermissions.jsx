@@ -53,6 +53,14 @@ class CompanyPermissions extends React.Component {
         this.setState({[key]: field});
     }
 
+    getLabel(group, item) {
+        if (group._id === 'products') {
+            return `${item.name} [${item.product_type || 'wire'}]`;
+        }
+
+        return item.name;
+    }
+
     render() {
         return (
             <div className='tab-pane active' id='company-permissions'>
@@ -69,7 +77,7 @@ class CompanyPermissions extends React.Component {
                                         <li key={item._id}>
                                             <CheckboxInput
                                                 name={item._id}
-                                                label={item.name}
+                                                label={this.getLabel(group, item)}
                                                 value={!!this.state[group._id][item._id]}
                                                 onChange={() => this.toggle(group._id, item._id)} />
                                         </li>

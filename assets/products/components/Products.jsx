@@ -99,6 +99,7 @@ class Products extends React.Component {
                         navigations={this.props.navigations}
                         saveCompanies={this.props.saveCompanies}
                         saveNavigations={this.props.saveNavigations}
+                        products={this.props.products}
                     />
                 }
             </div>

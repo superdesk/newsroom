@@ -78,6 +78,7 @@ class Navigations extends React.Component {
                         }
                         <NavigationList
                             navigations={this.props.navigations}
+                            products={this.props.products}
                             onClick={this.props.selectNavigation}
                             activeNavigationId={this.props.activeNavigationId} />
                     </div>
