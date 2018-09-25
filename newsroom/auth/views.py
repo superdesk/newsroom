@@ -14,10 +14,12 @@ from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordF
 from newsroom.email import send_validate_account_email, \
     send_reset_password_email, send_new_signup_email, send_new_account_email
 from newsroom.utils import get_random_string
+from newsroom.limiter import limiter
 from .token import generate_auth_token, verify_auth_token
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
+@limiter.limit('60/hour')
 def login():
     form = LoginForm()
     if form.validate_on_submit():
