@@ -91,3 +91,18 @@ for single run, or to watch for changes:
 ```
 npm run test start
 ```
+
+## Translations
+
+Extract client messages to `newsroom-client.pot`:
+
+```
+$ npm run extract_messages
+```
+
+Extract server messages to `newsroom-server.pot`:
+
+```
+$ python setup.py extract_messages
+```
+

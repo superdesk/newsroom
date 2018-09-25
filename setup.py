@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 
 install_requires = [
+    'Babel>=2.5.3,<3.0',
     'eve==0.7.8',
     'flask>=0.12,<1.0',
     'flask-babel>=0.11.2,<0.12',
@@ -37,5 +38,5 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-    ]
+    ],
 )

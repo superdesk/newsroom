@@ -3,7 +3,8 @@
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "build": "webpack --config webpack.config.js --progress --profile --colors",
     "lint": "eslint assets --ext .js --ext .jsx",
-    "test": "karma start --single-run"
+    "test": "karma start --single-run",
+    "extract_messages": "react-gettext-parser --output newsroom-client.pot 'assets/**/{*.js,*.jsx}'"
   },
   "dependencies": {
     "alertifyjs": "^1.11.0",
@@ -54,6 +55,7 @@
     "karma-jasmine": "^1.1.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.4",
+    "react-gettext-parser": "^1.6.0",
     "react-test-renderer": "^16.0.0",
     "sinon": "^4.0.0"
   }
