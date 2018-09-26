@@ -39,7 +39,7 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
 
     const groupFilter = get(activeFilter, group.field, []);
 
-    const buckets =  aggregations[group.field] ? get(aggregations[group.field], 'buckets', group.buckets)
+    const buckets =  aggregations && aggregations[group.field] ? get(aggregations[group.field], 'buckets', group.buckets)
         .sort(compareFunction)
         .map((bucket) => <FilterItem
             key={bucket.key}

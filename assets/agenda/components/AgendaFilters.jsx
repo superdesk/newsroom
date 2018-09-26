@@ -30,7 +30,7 @@ const getDropdownItems = (filter, aggregations, toggleFilter, processBuckets) =>
         return processBuckets(aggregations[filter.field][filter.nestedField].buckets, filter, toggleFilter);
     }
 
-    return null;
+    return [];
 };
 
 function AgendaFilters({aggregations, toggleFilter, activeFilter}) {
