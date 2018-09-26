@@ -133,9 +133,8 @@ CLIENT_URL = 'http://localhost:5050'
 MEDIA_PREFIX = os.environ.get('MEDIA_PREFIX', '/assets')
 
 # Flask Limiter Settings
-RATELIMIT_DEFAULT = '60/hour'
-RATELIMIT_STRATEGY = 'fixed-window'
 RATELIMIT_ENABLED = True
+RATELIMIT_STRATEGY = 'fixed-window'
 
 # Cache Settings
 CACHE_TYPE = os.environ.get('CACHE_TYPE', 'simple')  # in-memory cache

@@ -19,13 +19,12 @@ from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from newsroom.auth import SessionAuth
 from flask_mail import Mail
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from flask_cache import Cache
 
 from newsroom.utils import is_json_request
 from newsroom.webpack import NewsroomWebpack
 from newsroom.notifications.notifications import get_initial_notifications
+from newsroom.limiter import limiter
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, newsroom_config, is_admin,
@@ -104,8 +103,6 @@ class Newsroom(eve.Eve):
         """Setup configured blueprints."""
         for name in modules:
             mod = importlib.import_module(name)
-            if name != 'newsroom.auth':
-                self.limiter.exempt(mod.blueprint)
             self.register_blueprint(mod.blueprint)
 
     def _setup_apps(self, apps):
@@ -148,7 +145,7 @@ class Newsroom(eve.Eve):
         self.mail = Mail(self)
 
     def _setup_limiter(self):
-        self.limiter = Limiter(self, key_func=get_remote_address)
+        limiter.init_app(self)
 
     def _setup_cache(self):
         # configuring for in-memory cache for now
