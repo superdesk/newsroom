@@ -355,7 +355,7 @@ def set_agenda_planning_items(agenda, planning_item, action='add'):
     if action == 'add':
         agenda['planning_items'].append(planning_item)
 
-    agenda['coverages'] = get_coverages(agenda['planning_items'])
+    agenda['coverages'] = get_coverages(agenda['planning_items'], agenda.get('coverages', []))
     agenda['display_dates'] = get_display_dates(agenda['dates'], agenda['planning_items'])
 
 
@@ -397,10 +397,13 @@ def get_display_dates(agenda_date, planning_items):
     return display_dates
 
 
-def get_coverages(planning_items):
+def get_coverages(planning_items, original_coverages=[]):
     """
     Returns list of coverages for given planning items
     """
+    def get_existing_coverage(id):
+        return next((o for o in original_coverages if o['coverage_id'] == id), {})
+
     coverages = []
     for planning_item in planning_items:
         for coverage in planning_item.get('coverages', []):
@@ -412,6 +415,8 @@ def get_coverages(planning_items):
                 'workflow_status': coverage['workflow_status'],
                 'coverage_status': coverage.get('news_coverage_status', {}).get('label'),
                 'coverage_provider': coverage['planning'].get('coverage_provider'),
+                'delivery_id': get_existing_coverage(coverage['coverage_id']).get('delivery_id'),
+                'delivery_href': get_existing_coverage(coverage['coverage_id']).get('delivery_href'),
             })
 
     return coverages

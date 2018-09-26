@@ -760,3 +760,36 @@ def test_push_cancelled_planning_cancels_adhoc_planning(client, app):
     parsed = get_entity_or_404('bar3', 'agenda')
     assert parsed['state'] == 'cancelled'
     assert 'Reason' in parsed['ednote'][0]
+
+
+def test_push_updated_planning_with_existing_delivery_preserves_delivery(client, app, mocker):
+    test_item = {
+        'type': 'text',
+        'guid': 'item',
+        'planning_id': test_planning['_id'],
+        'coverage_id': test_planning['coverages'][0]['coverage_id'],
+    }
+    planning = deepcopy(test_planning)
+    post_json(client, '/push', test_event)
+    post_json(client, '/push', planning)
+    post_json(client, '/push', test_item)
+
+    item = get_json(client, '/agenda/foo')
+    coverages = item.get('coverages')
+
+    assert coverages[0]['coverage_id'] == test_item['coverage_id']
+    assert coverages[0]['delivery_id'] == test_item['guid']
+    assert coverages[0]['delivery_href'] == '/wire/%s' % test_item['guid']
+
+    # update coverages
+    planning['coverages'][0]['planning']['scheduled'] = "2018-06-28T10:51:52+0000"
+    planning['coverages'][1]['planning']['scheduled'] = "2018-06-28T13:51:52+0000"
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+
+    item = get_json(client, '/agenda/foo')
+    coverages = item.get('coverages')
+
+    assert coverages[0]['coverage_id'] == test_item['coverage_id']
+    assert coverages[0]['delivery_id'] == test_item['guid']
+    assert coverages[0]['delivery_href'] == '/wire/%s' % test_item['guid']
