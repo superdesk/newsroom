@@ -5,7 +5,7 @@ import logging
 import superdesk
 from datetime import datetime
 
-from copy import copy
+from copy import copy, deepcopy
 from PIL import Image, ImageEnhance
 from flask import current_app as app
 from flask_babel import gettext
@@ -158,6 +158,7 @@ def publish_event(event, orig):
             }
 
             service.patch(event['guid'], updates)
+            superdesk.get_resource_service('agenda').notify_agenda_update('event_unposted', orig)
 
         elif event.get('state') in [WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED]:
             # schedule is changed, recalculate the dates, planning id and coverages from dates will be removed
@@ -167,6 +168,7 @@ def publish_event(event, orig):
             updates['coverages'] = None
             updates['planning_items'] = None
             service.patch(event['guid'], updates)
+            superdesk.get_resource_service('agenda').notify_agenda_update('event_updated', orig)
 
         elif event.get('state') == WORKFLOW_STATE.SCHEDULED:
             # event is reposted (possibly after a cancel)
@@ -178,6 +180,7 @@ def publish_event(event, orig):
             }
             set_agenda_metadata_from_event(updates, event)
             service.patch(event['guid'], updates)
+            superdesk.get_resource_service('agenda').notify_agenda_update('event_updated', orig)
 
     return _id
 
@@ -349,13 +352,24 @@ def set_agenda_planning_items(agenda, planning_item, action='add'):
     Updates the list of planning items of agenda. If action is 'add' then adds the new one.
     And updates the list of coverages
     """
-    existing_planning_items = agenda.get('planning_items', [])
+    existing_planning_items = deepcopy(agenda.get('planning_items', []))
     agenda['planning_items'] = [p for p in existing_planning_items if p['guid'] != planning_item['guid']] or []
 
     if action == 'add':
+        if len(existing_planning_items) == len(agenda['planning_items']):
+            # planning item is newly added
+            superdesk.get_resource_service('agenda').notify_agenda_update('planning_added', agenda)
+
         agenda['planning_items'].append(planning_item)
 
-    agenda['coverages'] = get_coverages(agenda['planning_items'], agenda.get('coverages', []))
+    if action == 'remove':
+        superdesk.get_resource_service('agenda').notify_agenda_update('planning_cancelled', agenda)
+
+    agenda['coverages'], coverage_changes = get_coverages(agenda['planning_items'], agenda.get('coverages', []))
+
+    if coverage_changes.get('coverage_added'):
+        superdesk.get_resource_service('agenda').notify_agenda_update('coverage_added', agenda)
+
     agenda['display_dates'] = get_display_dates(agenda['dates'], agenda['planning_items'])
 
 
@@ -405,8 +419,10 @@ def get_coverages(planning_items, original_coverages=[]):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
 
     coverages = []
+    coverage_changes = {}
     for planning_item in planning_items:
         for coverage in planning_item.get('coverages', []):
+            existing_coverage = get_existing_coverage(coverage['coverage_id'])
             coverages.append({
                 'planning_id': planning_item['guid'],
                 'coverage_id': coverage['coverage_id'],
@@ -415,11 +431,14 @@ def get_coverages(planning_items, original_coverages=[]):
                 'workflow_status': coverage['workflow_status'],
                 'coverage_status': coverage.get('news_coverage_status', {}).get('label'),
                 'coverage_provider': coverage['planning'].get('coverage_provider'),
-                'delivery_id': get_existing_coverage(coverage['coverage_id']).get('delivery_id'),
-                'delivery_href': get_existing_coverage(coverage['coverage_id']).get('delivery_href'),
+                'delivery_id': existing_coverage.get('delivery_id'),
+                'delivery_href': existing_coverage.get('delivery_href'),
             })
 
-    return coverages
+            if original_coverages and not existing_coverage:
+                coverage_changes['coverage_added'] = True
+
+    return coverages, coverage_changes
 
 
 def notify_new_item(item, check_topics=True):

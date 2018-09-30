@@ -14,6 +14,16 @@ def send_coverage_notification_email(user, agenda, wire_item):
         )
 
 
+def send_agenda_notification_email(user, agenda, message, subject):
+    if agenda and user.get('receive_email'):
+        send_email(
+            to=[user['email']],
+            subject=subject,
+            text_body=render_template('agenda_updated_email.txt', message=message, item=agenda),
+            html_body=render_template('agenda_updated_email.html', message=message, item=agenda)
+        )
+
+
 def send_coverage_request_email(user, message, item):
     """
     Forms and sends coverage request email

@@ -716,6 +716,116 @@ New coverage received for agenda item {{ agenda.name }}:
     )
 
 
+def test_watched_event_sends_notification_for_event_update(client, app, mocker):
+    event = deepcopy(test_event)
+    post_json(client, '/push', event)
+    post_json(client, '/agenda_watch', {'items': [event['guid']]})
+
+    # update comes in
+    event['state'] = 'rescheduled'
+    event['dates'] = {
+        'start': '2018-05-27T08:00:00+0000',
+        'end': '2018-06-30T09:00:00+0000',
+        'tz': 'Australia/Sydney'
+    }
+
+    mocker.patch('newsroom.push.push_notification')
+    with app.mail.record_messages() as outbox:
+        post_json(client, '/push', event)
+    assert len(outbox) == 1
+    assert 'Subject: Agenda updated' in str(outbox[0])
+
+
+def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
+    event = deepcopy(test_event)
+    planning = deepcopy(test_planning)
+    post_json(client, '/push', event)
+    post_json(client, '/push', planning)
+    post_json(client, '/agenda_watch', {'items': [event['guid']]})
+
+    # update the event for unpost
+    event['pubstatus'] = 'cancelled'
+    event['state'] = 'cancelled'
+
+    mocker.patch('newsroom.push.push_notification')
+    with app.mail.record_messages() as outbox:
+        post_json(client, '/push', event)
+    assert len(outbox) == 1
+    assert 'Subject: Agenda unposted' in str(outbox[0])
+
+
+def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
+    event = deepcopy(test_event)
+    post_json(client, '/push', event)
+    post_json(client, '/agenda_watch', {'items': [event['guid']]})
+
+    # planning comes in
+    planning = deepcopy(test_planning)
+
+    mocker.patch('newsroom.push.push_notification')
+    with app.mail.record_messages() as outbox:
+        post_json(client, '/push', planning)
+    assert len(outbox) == 1
+    assert 'Subject: Planning added' in str(outbox[0])
+
+
+def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
+    event = deepcopy(test_event)
+    planning = deepcopy(test_planning)
+    post_json(client, '/push', event)
+    post_json(client, '/push', planning)
+    post_json(client, '/agenda_watch', {'items': [event['guid']]})
+
+    # update the planning for cancel
+    planning['pubstatus'] = 'cancelled'
+    planning['state'] = 'cancelled'
+
+    mocker.patch('newsroom.push.push_notification')
+    with app.mail.record_messages() as outbox:
+        post_json(client, '/push', planning)
+    assert len(outbox) == 1
+    assert 'Subject: Planning cancelled' in str(outbox[0])
+
+
+def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
+    event = deepcopy(test_event)
+    planning = deepcopy(test_planning)
+    post_json(client, '/push', event)
+    post_json(client, '/push', planning)
+    post_json(client, '/agenda_watch', {'items': [event['guid']]})
+
+    # update the planning with an added coverage
+    planning['coverages'].append({
+        "planning": {
+            "g2_content_type": "video",
+            "slugline": "Vivid planning item",
+            "internal_note": "internal note here",
+            "genre": [
+                {
+                    "name": "Article (news)",
+                    "qcode": "Article"
+                }
+            ],
+            "ednote": "ed note here",
+            "scheduled": "2018-05-29T10:51:52+0000"
+        },
+        "coverage_status": {
+            "name": "coverage intended",
+            "label": "Planned",
+            "qcode": "ncostat:int"
+        },
+        "workflow_status": "draft",
+        "firstcreated": "2018-05-29T10:55:00+0000",
+        "coverage_id": "coverage-3"
+    })
+
+    mocker.patch('newsroom.push.push_notification')
+    with app.mail.record_messages() as outbox:
+        post_json(client, '/push', planning)
+    assert len(outbox) == 1
+    assert 'Subject: Coverage added' in str(outbox[0])
+
+
 def test_filter_killed_events(client, app):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
