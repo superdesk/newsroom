@@ -8,6 +8,8 @@ import {
 } from '../actions';
 import Navigations from './Navigations';
 import ListBar from 'components/ListBar';
+import SectionSwitch from '../../features/sections/SectionSwitch';
+import {sectionsPropType} from '../../features/sections/types';
 
 
 class NavigationsApp extends React.Component {
@@ -23,8 +25,16 @@ class NavigationsApp extends React.Component {
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchNavigations}
                 buttonName={'Navigation'}
-            />,
-            <Navigations key="Navigations"
+            >
+                <SectionSwitch
+                    sections={this.props.sections}
+                    activeSection={this.props.activeSection}
+                />
+            </ListBar>,
+            <Navigations
+                key="Navigations"
+                activeSection={this.props.activeSection}
+                sections={this.props.sections}
             />]
         );
     }
@@ -34,7 +44,14 @@ NavigationsApp.propTypes = {
     newNavigation: PropTypes.func,
     fetchNavigations: PropTypes.func,
     setQuery: PropTypes.func,
+    sections: sectionsPropType,
+    activeSection: PropTypes.string.isRequired,
 };
+
+const mapStateToProps = (state) => ({
+    sections: state.sections.list,
+    activeSection: state.sections.active,
+});
 
 const mapDispatchToProps = {
     newNavigation,
@@ -42,4 +59,4 @@ const mapDispatchToProps = {
     setQuery,
 };
 
-export default connect(null, mapDispatchToProps)(NavigationsApp);
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationsApp);

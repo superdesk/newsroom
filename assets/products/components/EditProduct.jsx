@@ -5,7 +5,7 @@ import CheckboxInput from 'components/CheckboxInput';
 
 import { gettext, getProductQuery } from 'utils';
 import EditPanel from '../../components/EditPanel';
-import {getProductTypes} from 'navigations/utils';
+import {sectionsPropType} from '../../features/sections/types';
 
 class EditProduct extends React.Component {
     constructor(props) {
@@ -44,12 +44,6 @@ class EditProduct extends React.Component {
                 </a>
             );
         }
-    }
-
-    getNavigationsWithProductTypes() {
-        return this.props.navigations.map(n => {
-            return {...n, name: `${n.name} [${getProductTypes(n, this.props.products)}]`};
-        });
     }
 
     render() {
@@ -162,9 +156,12 @@ class EditProduct extends React.Component {
                     {this.state.activeTab === 'navigations' &&
                         <EditPanel
                             parent={this.props.product}
-                            items={this.getNavigationsWithProductTypes()}
+                            items={this.props.navigations}
                             field="navigations"
                             onSave={this.props.saveNavigations}
+                            groups={this.props.sections}
+                            groupField={'product_type'}
+                            groupDefaultValue={'wire'}
                         />
                     }
                 </div>
@@ -187,6 +184,7 @@ EditProduct.propTypes = {
     fetchCompanies: PropTypes.func.isRequired,
     fetchNavigations: PropTypes.func.isRequired,
     products: PropTypes.arrayOf(PropTypes.object),
+    sections: sectionsPropType,
 };
 
 export default EditProduct;

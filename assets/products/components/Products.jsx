@@ -19,6 +19,7 @@ import {
 } from '../actions';
 import {gettext} from 'utils';
 import { get } from 'lodash';
+import {sectionsPropType} from '../../features/sections/types';
 
 class Products extends React.Component {
     constructor(props, context) {
@@ -99,7 +100,7 @@ class Products extends React.Component {
                         navigations={this.props.navigations}
                         saveCompanies={this.props.saveCompanies}
                         saveNavigations={this.props.saveNavigations}
-                        products={this.props.products}
+                        sections={this.props.sections}
                     />
                 }
             </div>
@@ -128,6 +129,7 @@ Products.propTypes = {
     dispatch: PropTypes.func,
     companies: PropTypes.arrayOf(PropTypes.object),
     navigations: PropTypes.arrayOf(PropTypes.object),
+    sections: sectionsPropType,
     saveCompanies: PropTypes.func.isRequired,
     saveNavigations: PropTypes.func.isRequired,
 };
@@ -143,6 +145,7 @@ const mapStateToProps = (state) => ({
     companiesById: state.companiesById,
     navigations: state.navigations,
     errors: state.errors,
+    sections: state.sections.list,
 });
 
 const mapDispatchToProps = (dispatch) => ({
