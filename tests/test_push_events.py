@@ -793,3 +793,47 @@ def test_push_updated_planning_with_existing_delivery_preserves_delivery(client,
     assert coverages[0]['coverage_id'] == test_item['coverage_id']
     assert coverages[0]['delivery_id'] == test_item['guid']
     assert coverages[0]['delivery_href'] == '/wire/%s' % test_item['guid']
+
+
+def test_push_update_for_an_item_with_coverage(client, app, mocker):
+    test_item = {
+        'type': 'text',
+        'guid': 'item',
+        'planning_id': test_planning['_id'],
+        'coverage_id': test_planning['coverages'][0]['coverage_id'],
+    }
+    post_json(client, '/push', test_event)
+    post_json(client, '/push', test_planning)
+    post_json(client, '/push', test_item)
+
+    item = get_json(client, '/agenda/foo')
+    coverages = item.get('coverages')
+
+    assert coverages[0]['coverage_id'] == test_item['coverage_id']
+    assert coverages[0]['delivery_id'] == test_item['guid']
+    assert coverages[0]['delivery_href'] == '/wire/%s' % test_item['guid']
+
+    wire_item = get_json(client, '/wire/item')
+    assert wire_item['_id'] == 'item'
+    assert wire_item['agenda_id'] == 'foo'
+    assert wire_item['agenda_href'] == '/agenda/foo'
+
+    updated_item = {
+        'type': 'text',
+        'guid': 'update',
+        'evolvedfrom': 'item',
+    }
+
+    post_json(client, '/push', updated_item)
+
+    item = get_json(client, '/agenda/foo')
+    coverages = item.get('coverages')
+
+    assert coverages[0]['coverage_id'] == test_item['coverage_id']
+    assert coverages[0]['delivery_id'] == updated_item['guid']
+    assert coverages[0]['delivery_href'] == '/wire/%s' % updated_item['guid']
+
+    wire_item = get_json(client, '/wire/update')
+    assert wire_item['_id'] == 'update'
+    assert wire_item['agenda_id'] == 'foo'
+    assert wire_item['agenda_href'] == '/agenda/foo'

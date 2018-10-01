@@ -109,6 +109,8 @@ def publish_item(doc):
             doc['ancestors'] = copy(parent_item.get('ancestors', []))
             doc['ancestors'].append(doc['evolvedfrom'])
             doc['bookmarks'] = parent_item.get('bookmarks', [])
+            doc['planning_id'] = parent_item.get('planning_id')
+            doc['coverage_id'] = parent_item.get('coverage_id')
         else:
             logger.warning("Failed to find evolvedfrom item %s for %s", doc['evolvedfrom'], doc['guid'])
     fix_hrefs(doc)
