@@ -4,6 +4,7 @@ import newsroom
 
 from flask import json, abort, url_for
 from eve.utils import ParsedRequest
+from flask_babel import gettext
 
 from superdesk import get_resource_service
 from planning.events.events_schema import events_schema
@@ -17,10 +18,35 @@ from content_api.items.resource import code_mapping
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
-from newsroom.agenda.email import send_coverage_notification_email
+from newsroom.agenda.email import send_coverage_notification_email, send_agenda_notification_email
+
 from superdesk.utils import ListCursor
 
 logger = logging.getLogger(__name__)
+
+
+agenda_notifications = {
+    'event_updated': {
+        'message': gettext('An agenda you have been watching has been updated'),
+        'subject': gettext('Agenda updated')
+    },
+    'event_unposted': {
+        'message': gettext('An agenda you have been watching has been unposted'),
+        'subject': gettext('Agenda unposted')
+    },
+    'planning_added': {
+        'message': gettext('An agenda you have been watching has a new planning'),
+        'subject': gettext('Planning added')
+    },
+    'planning_cancelled': {
+        'message': gettext('An agenda you have been watching has a planning cancelled'),
+        'subject': gettext('Planning cancelled')
+    },
+    'coverage_added': {
+        'message': gettext('An agenda you have been watching has a new coverage added'),
+        'subject': gettext('Coverage added')
+    },
+}
 
 
 def set_saved_items_query(query, user_id):
@@ -409,6 +435,20 @@ class AgendaService(newsroom.Service):
         for user_id in notify_user_ids:
             user = user_dict[str(user_id)]
             send_coverage_notification_email(user, agenda, wire_item)
+
+    def notify_agenda_update(self, update, agenda):
+        if agenda:
+            user_dict = get_user_dict()
+            company_dict = get_company_dict()
+            notify_user_ids = filter_active_users(agenda.get('watches', []), user_dict, company_dict)
+            for user_id in notify_user_ids:
+                user = user_dict[str(user_id)]
+                send_agenda_notification_email(
+                    user,
+                    agenda,
+                    agenda_notifications[update]['message'],
+                    agenda_notifications[update]['subject'],
+                )
 
     def get_saved_items_count(self):
         query = _agenda_query()
