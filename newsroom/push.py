@@ -3,7 +3,6 @@ import hmac
 import flask
 import logging
 import superdesk
-import json
 from datetime import datetime
 
 from copy import copy, deepcopy
@@ -127,7 +126,7 @@ def publish_item(doc):
     try:
         _id = service.create([doc])[0]
     except Exception as exc:
-        logger.error('Error in indexing item: {}'.format(json.dumps(doc)), exc, exc_info=True)
+        logger.exception("Error in publish item:")
 
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
