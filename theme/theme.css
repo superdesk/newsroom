@@ -1,0 +1,43 @@
+/* STT theme css */
+
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,400i');
+
+.font-stt {
+    font-family: "Montserrat", Arial, sans-serif;
+    font-size: 0.875rem;
+}
+.font-stt--big {
+    font-size: 1.25rem;
+}
+.navbar__logo {
+    max-width: 230px;
+}
+.navbar__logo img {
+    max-width: 80px;
+}
+.navbar__logo a {
+    display: flex;
+    align-items: center;
+}
+.navbar__logo a,
+.navbar__logo a:hover {
+    text-decoration: none;
+    color: #969696;
+}
+
+.navbar__logo a span {
+    padding-top: 2px;
+}
+
+@media only screen and (min-width: 576px) {
+    .font-stt {
+        font-size: 1rem;
+    }
+    .font-stt--big {
+        font-size: 1.25rem;
+    }
+    .navbar__logo {
+        max-width: 230px;
+        padding: 0 0.5rem 0 1.2rem;
+    }
+}
