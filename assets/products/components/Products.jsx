@@ -64,6 +64,7 @@ class Products extends React.Component {
     render() {
         const progressStyle = {width: '25%'};
         const sectionFilter = (product) => !this.props.activeSection || get(product, 'product_type', 'wire') === this.props.activeSection;
+        const getActiveSection = () => this.props.sections.filter(s => s._id === this.props.activeSection);
 
         return (
             <div className="flex-row">
@@ -100,7 +101,7 @@ class Products extends React.Component {
                         navigations={this.props.navigations}
                         saveCompanies={this.props.saveCompanies}
                         saveNavigations={this.props.saveNavigations}
-                        sections={this.props.sections}
+                        sections={getActiveSection()}
                     />
                 }
             </div>
