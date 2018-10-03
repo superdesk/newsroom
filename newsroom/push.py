@@ -123,10 +123,7 @@ def publish_item(doc):
     if doc.get('coverage_id'):
         superdesk.get_resource_service('agenda').set_delivery(doc)
 
-    try:
-        _id = service.create([doc])[0]
-    except Exception as exc:
-        logger.exception("Error in publish item:")
+    _id = service.create([doc])[0]
 
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
