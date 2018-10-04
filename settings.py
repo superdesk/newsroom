@@ -1,0 +1,2 @@
+SITE_NAME = 'Newsroom'
+COPYRIGHT_HOLDER = 'STT'
