@@ -192,7 +192,7 @@ function search(state, next) {
         .map((key) => [key, params[key]].join('='))
         .join('&');
 
-    return server.get(`/search?${queryString}`);
+    return server.get(`/search?${queryString}&tick=${Date.now().toString()}`);
 }
 
 /**

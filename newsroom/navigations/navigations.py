@@ -2,6 +2,8 @@ import newsroom
 import superdesk
 from flask import current_app
 
+from newsroom.products.products import get_products_by_company
+
 
 class NavigationsResource(newsroom.Resource):
     """
@@ -42,8 +44,7 @@ def get_navigations_by_company(company_id, product_type='wire'):
     Returns list of navigations for given company id
     Navigations will contain the list of product ids
     """
-    product_lookup = {'is_enabled': True, 'companies': str(company_id), 'product_type': product_type}
-    products = list(superdesk.get_resource_service('products').get(req=None, lookup=product_lookup))
+    products = get_products_by_company(company_id, None, product_type)
 
     # Get the navigation ids used across products
     navigation_ids = []
