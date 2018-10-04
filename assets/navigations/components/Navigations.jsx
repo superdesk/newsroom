@@ -17,6 +17,7 @@ import {
 } from '../actions';
 import {gettext} from 'utils';
 import { sectionsPropType } from 'features/sections/types';
+import { get } from 'lodash';
 
 class Navigations extends React.Component {
     constructor(props, context) {
@@ -60,6 +61,8 @@ class Navigations extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
+        const sectionFilter = (navigation) => !this.props.activeSection || get(navigation, 'product_type', 'wire') === this.props.activeSection;
+        const getActiveSection = () => this.props.sections.filter(s => s._id === this.props.activeSection);
 
         return (
             <div className="flex-row">
@@ -77,8 +80,7 @@ class Navigations extends React.Component {
                             query={this.props.activeQuery} />
                         }
                         <NavigationList
-                            navigations={this.props.navigations}
-                            products={this.props.products}
+                            navigations={this.props.navigations.filter(sectionFilter)}
                             onClick={this.props.selectNavigation}
                             activeNavigationId={this.props.activeNavigationId} />
                     </div>
@@ -94,7 +96,7 @@ class Navigations extends React.Component {
                         products={this.props.products}
                         saveProducts={this.props.saveProducts}
                         fetchProducts={this.props.fetchProducts}
-                        sections={this.props.sections}
+                        sections={getActiveSection()}
                     />
                 }
             </div>
@@ -103,6 +105,7 @@ class Navigations extends React.Component {
 }
 
 Navigations.propTypes = {
+    activeSection: PropTypes.string.isRequired,
     navigations: PropTypes.arrayOf(PropTypes.object),
     navigationToEdit: PropTypes.object,
     activeNavigationId: PropTypes.string,

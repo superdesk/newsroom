@@ -12,7 +12,8 @@ import {
 } from './actions';
 
 import {
-    INIT_SECTIONS,
+    INIT_SECTIONS, 
+    SELECT_SECTION,
 } from 'features/sections/actions';
 
 import { sectionsReducer } from 'features/sections/reducers';
@@ -60,6 +61,7 @@ export default function navigationReducer(state = initialState, action) {
             is_enabled: true,
             name: '',
             description: '',
+            product_type: state.sections.active,
         };
 
         return {...state, navigationToEdit, errors: null};
@@ -97,6 +99,7 @@ export default function navigationReducer(state = initialState, action) {
     }
 
     case INIT_SECTIONS:
+    case SELECT_SECTION:
         return {...state, sections: sectionsReducer(state.sections, action)};
 
     default:

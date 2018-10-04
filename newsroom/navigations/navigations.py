@@ -23,7 +23,11 @@ class NavigationsResource(newsroom.Resource):
         'order': {
             'type': 'integer',
             'nullable': 'true'
-        }
+        },
+        'product_type': {
+            'type': 'string',
+            'default': 'wire'
+        },
     }
     datasource = {
         'source': 'navigations',

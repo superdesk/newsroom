@@ -19,6 +19,7 @@ import {
 } from '../actions';
 import {gettext} from 'utils';
 import { get } from 'lodash';
+import {sectionsPropType} from '../../features/sections/types';
 
 class Products extends React.Component {
     constructor(props, context) {
@@ -63,6 +64,7 @@ class Products extends React.Component {
     render() {
         const progressStyle = {width: '25%'};
         const sectionFilter = (product) => !this.props.activeSection || get(product, 'product_type', 'wire') === this.props.activeSection;
+        const getActiveSection = () => this.props.sections.filter(s => s._id === this.props.activeSection);
 
         return (
             <div className="flex-row">
@@ -99,7 +101,7 @@ class Products extends React.Component {
                         navigations={this.props.navigations}
                         saveCompanies={this.props.saveCompanies}
                         saveNavigations={this.props.saveNavigations}
-                        products={this.props.products}
+                        sections={getActiveSection()}
                     />
                 }
             </div>
@@ -128,6 +130,7 @@ Products.propTypes = {
     dispatch: PropTypes.func,
     companies: PropTypes.arrayOf(PropTypes.object),
     navigations: PropTypes.arrayOf(PropTypes.object),
+    sections: sectionsPropType,
     saveCompanies: PropTypes.func.isRequired,
     saveNavigations: PropTypes.func.isRequired,
 };
@@ -143,6 +146,7 @@ const mapStateToProps = (state) => ({
     companiesById: state.companiesById,
     navigations: state.navigations,
     errors: state.errors,
+    sections: state.sections.list,
 });
 
 const mapDispatchToProps = (dispatch) => ({
