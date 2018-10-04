@@ -49,7 +49,7 @@ def app():
     cfg = Config(root)
     cfg.from_object('newsroom.default_settings')
     update_config(cfg)
-    return Newsroom(config=cfg)
+    return Newsroom(config=cfg, testing=True)
 
 
 @fixture
