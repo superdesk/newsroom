@@ -60,9 +60,12 @@ def get_products_by_company(company_id, navigation_id=None, product_type=None):
     lookup = {'is_enabled': True, 'companies': str(company_id)}
     if navigation_id:
         lookup['navigations'] = str(navigation_id)
+
+    products = list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
     if product_type:
-        lookup['product_type'] = product_type
-    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
+        return [p for p in products if p.get('product_type', 'wire') == product_type]
+
+    return products
 
 
 def get_products_dict_by_company(company_id):
