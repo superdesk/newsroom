@@ -45,7 +45,7 @@ class Newsroom(eve.Eve):
         app.run()
     """
 
-    def __init__(self, import_name=__package__, config=None, **kwargs):
+    def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
         to create an instance using ``app = Newsroom()``
         """
@@ -54,6 +54,7 @@ class Newsroom(eve.Eve):
         self.extensions = {}
         self.theme_folder = 'theme'
         self.sections = []
+        self._testing = testing
 
         app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
 
@@ -94,10 +95,11 @@ class Newsroom(eve.Eve):
         # Override Eve.load_config in order to get default_settings
         super(Newsroom, self).load_config()
         self.config.from_envvar('NEWSROOM_SETTINGS', silent=True)
-        try:
-            self.config.from_pyfile(os.path.join(os.getcwd(), 'settings.py'))
-        except FileNotFoundError:
-            pass
+        if not self._testing:
+            try:
+                self.config.from_pyfile(os.path.join(os.getcwd(), 'settings.py'))
+            except FileNotFoundError:
+                pass
 
     def _setup_blueprints(self, modules):
         """Setup configured blueprints."""
