@@ -471,8 +471,8 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
     history_users = get_history_users(related_items, user_ids, company_ids)
 
     bookmark_users = []
-    if item.get('type') == 'agenda':
-        bookmark_users = superdesk.get_resource_service('agenda').\
+    if item.get('type') == 'text':
+        bookmark_users = superdesk.get_resource_service('wire_search').\
             get_matching_bookmarks(related_items, users_dict, companies_dict)
 
     history_users.extend(bookmark_users)
