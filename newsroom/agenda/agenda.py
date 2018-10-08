@@ -1,8 +1,10 @@
 
 import logging
+
+
 import newsroom
 
-from flask import json, abort, url_for
+from flask import json, abort, url_for, current_app as app
 from eve.utils import ParsedRequest
 from flask_babel import gettext
 
@@ -19,6 +21,7 @@ from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
 from newsroom.agenda.email import send_coverage_notification_email, send_agenda_notification_email
+from newsroom.notifications import push_notification
 
 from superdesk.utils import ListCursor
 
@@ -441,14 +444,21 @@ class AgendaService(newsroom.Service):
             user_dict = get_user_dict()
             company_dict = get_company_dict()
             notify_user_ids = filter_active_users(agenda.get('watches', []), user_dict, company_dict)
-            for user_id in notify_user_ids:
-                user = user_dict[str(user_id)]
+            users = [user_dict[str(user_id)] for user_id in notify_user_ids]
+            for user in users:
+                app.data.insert('notifications', [{
+                    'item': agenda['_id'],
+                    'user': user['_id']
+                }])
                 send_agenda_notification_email(
                     user,
                     agenda,
                     agenda_notifications[update]['message'],
                     agenda_notifications[update]['subject'],
                 )
+            push_notification('agenda_update',
+                              item=agenda,
+                              users=notify_user_ids)
 
     def get_saved_items_count(self):
         query = _agenda_query()
