@@ -748,7 +748,7 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Agenda updated' in str(outbox[0])
+    assert 'Subject: Event updated' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -774,7 +774,7 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Agenda unposted' in str(outbox[0])
+    assert 'Subject: Event cancelled' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1

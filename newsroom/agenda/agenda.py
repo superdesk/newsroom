@@ -30,23 +30,23 @@ logger = logging.getLogger(__name__)
 
 agenda_notifications = {
     'event_updated': {
-        'message': gettext('An agenda you have been watching has been updated'),
-        'subject': gettext('Agenda updated')
+        'message': gettext('An event you have been watching has been updated'),
+        'subject': gettext('Event updated')
     },
     'event_unposted': {
-        'message': gettext('An agenda you have been watching has been unposted'),
-        'subject': gettext('Agenda unposted')
+        'message': gettext('An event you have been watching has been cancelled'),
+        'subject': gettext('Event cancelled')
     },
     'planning_added': {
-        'message': gettext('An agenda you have been watching has a new planning'),
+        'message': gettext('An event you have been watching has a new planning'),
         'subject': gettext('Planning added')
     },
     'planning_cancelled': {
-        'message': gettext('An agenda you have been watching has a planning cancelled'),
+        'message': gettext('An event you have been watching has a planning cancelled'),
         'subject': gettext('Planning cancelled')
     },
     'coverage_added': {
-        'message': gettext('An agenda you have been watching has a new coverage added'),
+        'message': gettext('An event you have been watching has a new coverage added'),
         'subject': gettext('Coverage added')
     },
 }
