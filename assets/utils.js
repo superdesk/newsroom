@@ -58,7 +58,7 @@ export function render(store, App, element) {
  * @return {String}
  */
 export function gettext(text, params) {
-    let translated = text; // temporary
+    let translated = get(window.translations, text, text);
 
     if (params) {
         Object.keys(params).forEach((param) => {

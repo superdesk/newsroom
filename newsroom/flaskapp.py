@@ -12,7 +12,6 @@ import flask
 import jinja2
 import importlib
 
-from flask_babel import Babel
 from eve.io.mongo import MongoJSONEncoder
 
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
@@ -30,6 +29,8 @@ from newsroom.template_filters import (
     plain_text, word_count, newsroom_config, is_admin,
     hash_string, date_header, get_date, sidenavs,
 )
+
+from newsroom.gettext import setup_babel
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -115,11 +116,14 @@ class Newsroom(eve.Eve):
                 mod.init_app(self)
 
     def _setup_babel(self):
+        self.config.setdefault(
+            'BABEL_TRANSLATION_DIRECTORIES',
+            os.path.join(NEWSROOM_DIR, 'translations'))
         # avoid events on this
         self.babel_tzinfo = None
         self.babel_locale = None
         self.babel_translations = None
-        Babel(self)
+        setup_babel(self)
 
     def _setup_jinja(self):
         self.add_template_filter(datetime_short)

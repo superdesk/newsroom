@@ -225,3 +225,6 @@ COVERAGE_TYPES = {
     'live_video': {'name': 'Live Video', 'icon': 'live-video'},
     'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'}
 }
+
+LANGUAGES = ['en']
+DEFAULT_LANGUAGE = 'en'
