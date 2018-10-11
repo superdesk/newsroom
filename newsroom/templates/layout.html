@@ -105,6 +105,8 @@
     window.notificationData = {{ get_initial_notifications() | tojson | safe }};
     window.profileData = {{ get_user_profile_data() | tojson | safe }};
     window.translations = {{ get_client_translations() | tojson | safe }};
+    window.locales = {{ get_client_locales() | tojson | safe }};
+    window.locale = {{ get_locale() | tojson | safe }};
 </script>
 
 {{ javascript_tag('newsroom_js') | safe }}

@@ -1,5 +1,5 @@
 
-from babel import support
+from babel import support, core
 from flask import request, current_app
 from flask_babel import Babel, get_locale
 from newsroom.auth import get_user
@@ -17,12 +17,17 @@ def get_client_translations(domain='client'):
     return {}
 
 
+def get_client_locales():
+    return [
+        {'locale': locale, 'name': core.Locale(locale).display_name} for locale in current_app.config['LANGUAGES']
+    ]
+
+
 def setup_babel(app):
     babel = Babel(app)
-    app.add_template_global(get_client_translations)
 
     @babel.localeselector
-    def get_locale():
+    def _get_locale():
         try:
             user = get_user()
             if user and user.get('locale'):
@@ -32,3 +37,7 @@ def setup_babel(app):
         if request:
             return request.accept_languages.best_match(app.config['LANGUAGES'])
         return app.config['DEFAULT_LANGUAGE']
+
+    app.add_template_global(get_client_translations)
+    app.add_template_global(get_client_locales)
+    app.add_template_global(_get_locale, 'get_locale')

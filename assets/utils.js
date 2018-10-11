@@ -223,6 +223,7 @@ export function formatMonth(dateString) {
 export const notify = {
     success: (message) => alertify.success(message),
     error: (message) => alertify.error(message),
+    warning: (message) => alertify.warning(message),
 };
 
 /**
