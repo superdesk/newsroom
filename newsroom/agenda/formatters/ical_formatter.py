@@ -62,7 +62,7 @@ class iCalFormatter(BaseFormatter):
         # calendar as category
         for calendar in item.get('calendars', []):
             if calendar.get('name'):
-                event.add('categories', calendar['name'])
+                event.add('categories', [calendar['name']])
 
         # dates
         dates = item.get('dates', {})
