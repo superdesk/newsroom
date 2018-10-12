@@ -215,6 +215,7 @@ DISPLAY_ABSTRACT = False
 WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')
 
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
+GOOGLE_ANALYTICS = os.environ.get('GOOGLE_ANALYTICS')
 
 COVERAGE_TYPES = {
     'text': {'name': 'Text', 'icon': 'text'},

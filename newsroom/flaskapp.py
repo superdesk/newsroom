@@ -58,6 +58,7 @@ class Newsroom(eve.Eve):
         self.theme_folder = 'theme'
         self.sections = []
         self._testing = testing
+        self._general_settings = {}
 
         app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
 
@@ -272,3 +273,11 @@ class Newsroom(eve.Eve):
             data=data,
             weight=weight
         ))
+
+    def general_setting(self, _id, label, _type='text', default=None, weight=0):
+        self._general_settings[_id] = {
+            'type': _type,
+            'label': label,
+            'weight': weight,
+            'default': default,
+        }
