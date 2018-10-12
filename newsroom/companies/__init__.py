@@ -2,12 +2,15 @@ import superdesk
 from functools import wraps
 
 from flask import Blueprint, abort, current_app as newsroom_app
+from flask_babel import gettext
 from newsroom.auth import get_user
 from newsroom.template_filters import sidenavs
 
 from .companies import CompaniesResource, CompaniesService
 
 blueprint = Blueprint('companies', __name__)
+
+from . import views   # noqa
 
 
 def get_user_company(user):
@@ -66,6 +69,4 @@ def init_app(app):
     superdesk.register_resource('companies', CompaniesResource, CompaniesService, _app=app)
     app.add_template_global(get_user_company_name)
     app.add_template_global(get_company_sidenavs, 'sidenavs')
-
-
-from . import views   # noqa
+    app.settings_app('companies', gettext('Company Management'), weight=100, data=views.get_settings_data)

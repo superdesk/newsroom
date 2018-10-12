@@ -21,6 +21,7 @@ from newsroom.auth import SessionAuth
 from flask_mail import Mail
 from flask_cache import Cache
 
+from newsroom.settings import SettingsApp
 from newsroom.utils import is_json_request
 from newsroom.webpack import NewsroomWebpack
 from newsroom.notifications.notifications import get_initial_notifications
@@ -50,6 +51,7 @@ class Newsroom(eve.Eve):
         to create an instance using ``app = Newsroom()``
         """
         self.sidenavs = []
+        self.settings_apps = []
         self.download_formatters = {}
         self.extensions = {}
         self.theme_folder = 'theme'
@@ -81,10 +83,10 @@ class Newsroom(eve.Eve):
             self.media = SuperdeskGridFSMediaStorage(self)
         self._setup_jinja()
         self._setup_limiter()
+        self._setup_babel()
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
         self._setup_apps(self.config.get('INSTALLED_APPS', []))
-        self._setup_babel()
         self._setup_webpack()
         self._setup_email()
         self._setup_cache()
@@ -135,6 +137,7 @@ class Newsroom(eve.Eve):
         self.add_template_global(get_initial_notifications)
         self.add_template_global(hash_string, 'hash')
         self.add_template_global(get_date, 'get_date')
+        self.add_template_global(self.settings_apps, 'settings_apps')
         self.jinja_loader = jinja2.ChoiceLoader([
             jinja2.FileSystemLoader('theme'),
             jinja2.FileSystemLoader(self.template_folder),
@@ -257,3 +260,11 @@ class Newsroom(eve.Eve):
             'blueprint': blueprint,
             'badge': badge,
         })
+
+    def settings_app(self, app, name, weight=1000, data=None):
+        self.settings_apps.append(SettingsApp(
+            _id=app,
+            name=name,
+            data=data,
+            weight=weight
+        ))

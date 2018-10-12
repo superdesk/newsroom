@@ -26,7 +26,7 @@ def send_email(to, subject, text_body, html_body=None, sender=None, connection=N
 
 def send_new_signup_email(user):
     app_name = current_app.config['SITE_NAME']
-    url = url_for('users.settings', _external=True)
+    url = url_for('settings.app', app_id='users', _external=True)
     recipients = current_app.config['SIGNUP_EMAIL_RECIPIENTS'].split(',')
     subject = gettext('A new newsroom signup request')
     text_body = render_template(
