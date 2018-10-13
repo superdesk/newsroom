@@ -26,7 +26,7 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
                 date={item.dates.start}
                 borderRight={true}
                 isRecurring={isRecurring(item)}
-                hasCoverages={hasCoverages(item)}
+                cssClass={bem('time-label', null, {covering: hasCoverages(item)})}
             />
 
             {hasCoverages(item) && !hideCoverages &&
