@@ -40,12 +40,11 @@ class SearchResultsInfo extends React.Component {
     render() {
         const isFollowing = this.props.user && this.props.activeTopic;
         const displayFollowTopic = this.props.topicType && this.props.user &&
-            !this.props.bookmarks && !isEmpty(this.props.searchCriteria);
+            !this.props.bookmarks && (this.props.resultsFiltered || this.props.query);
 
         const displayTotalItems = this.props.bookmarks ||
-          !isEmpty(this.props.searchCriteria) ||
           !isEmpty(this.props.activeTopic) ||
-          this.props.resultsFiltered;
+          this.props.resultsFiltered || this.props.query;
 
         const displayHeader = !isEmpty(this.props.newItems) || displayTotalItems || displayFollowTopic || this.props.query;
         return (

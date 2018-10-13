@@ -128,6 +128,11 @@ function search(state, next) {
     const createdFilter = get(state, 'search.createdFilter', {});
     const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
 
+    let dateTo = createdFilter.to;
+    if (createdFilter.from && createdFilter.from.indexOf('now') >= 0) {
+        dateTo = createdFilter.from;
+    }
+
     const params = {
         q: state.query,
         id: state.queryId,
@@ -135,9 +140,8 @@ function search(state, next) {
         navigation: activeNavigation,
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
-        created_from: createdFilter.from,
-        created_to: createdFilter.to,
-        date_from: isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : null,
+        date_from: isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : createdFilter.from,
+        date_to: dateTo,
         timezone_offset: getTimezoneOffset(),
     };
 
