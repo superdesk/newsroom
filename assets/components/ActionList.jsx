@@ -3,21 +3,38 @@ import PropTypes from 'prop-types';
 import ActionButton from './ActionButton';
 
 
-function ActionList({item, user, actions}) {
-    return (
-        <div className='dropdown-menu dropdown-menu-right show'>
-            {actions.map((action) => !action.shortcut &&
-                <ActionButton
-                    key={action.name}
-                    action={action}
-                    className='dropdown-item'
-                    isVisited={action.visited && action.visited(user, item)}
-                    displayName={true}
-                    item={item}
-                />
-            )}
-        </div>
-    );
+class ActionList extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    componentDidMount() {
+        this.elem.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'start'});
+    }
+
+    render () {
+        const {item, user, actions} = this.props;
+
+        return (
+            <div
+                className='dropdown-menu dropdown-menu-right show'
+                ref={(elem) => this.elem = elem}
+            >
+                {actions.map((action) => !action.shortcut &&
+                    <ActionButton
+                        key={action.name}
+                        action={action}
+                        className='dropdown-item'
+                        isVisited={action.visited && action.visited(user, item)}
+                        displayName={true}
+                        item={item}
+                    />
+                )}
+            </div>
+        );
+
+    }
+
 }
 
 ActionList.propTypes = {
