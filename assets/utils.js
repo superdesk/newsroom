@@ -186,6 +186,37 @@ export function formatDate(dateString) {
 }
 
 /**
+ * Format agenda item start and end dates
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatAgendaDate(agendaDate) {
+    const start = parseDate(agendaDate.start);
+    const end = parseDate(agendaDate.end);
+    const duration = moment.duration(end.diff(start)).asMinutes();
+    const dayInMinutes = 1440; // 24 * 60
+
+    if (duration > dayInMinutes) {
+        // Multi day event
+        return `${formatTime(start)} ${formatDate(start)} - ${formatTime(end)} ${formatDate(end)}`;
+    }
+
+    if (duration == dayInMinutes) {
+        // All day event
+        return `${gettext('ALL DAY')} | ${formatDate(start)}`;
+    }
+
+    if (duration == 0) {
+        // start and end times are the same
+        return `${formatTime(start)} ${formatDate(start)}`;
+    }
+
+    // single day event
+    return `${formatTime(start)} - ${formatTime(end)} | ${formatDate(start)}`;
+}
+
+/**
  * Format coverage date ('HH:mm DD/MM')
  *
  * @param {String} dateString
