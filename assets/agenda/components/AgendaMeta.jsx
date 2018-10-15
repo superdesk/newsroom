@@ -1,14 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {hasLocation, getEventLinks, getLocationString, getPublicContacts} from 'agenda/utils';
-// import {formatTime, fullDate, isToday} from 'utils';
 
 
 function AgendaPreviewMeta({item}) {
-    // const dates = [item.dates.start, item.dates.end !== item.dates.start ? item.dates.end : null]
-    //     .filter((d) => !!d)
-    //     .map((date) => isToday(date) ? formatTime(date) : fullDate(date));
-
     return (
         <div className='wire-articles__item__meta'>
             <div className='wire-articles__item__meta-info'>
@@ -16,11 +11,6 @@ function AgendaPreviewMeta({item}) {
                     <i className='icon-small--location icon--gray'></i>
                     <span>{getLocationString(item)}</span>
                 </div>}
-                {/*<div className='wire-articles__item__meta-row'>*/}
-                {/*<span><i className='icon-small--clock icon--gray'></i>*/}
-                {/*{dates.join(' - ')}*/}
-                {/*</span>*/}
-                {/*</div>*/}
                 {getPublicContacts(item).map((contact, index) => <div
                     className='wire-articles__item__meta-row'
                     key={`${contact.name}-${index}`}>

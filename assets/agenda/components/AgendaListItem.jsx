@@ -60,8 +60,8 @@ class AgendaListItem extends React.Component {
                 className={cardClassName}
                 tabIndex='0'
                 ref={(elem) => this.articleElem = elem}
-                onClick={() => onClick(item)}
-                onDoubleClick={() => onDoubleClick(item)}
+                onClick={() => onClick(item, group)}
+                onDoubleClick={() => onDoubleClick(item, group)}
                 onMouseEnter={() => this.setState({isHover: true})}
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}

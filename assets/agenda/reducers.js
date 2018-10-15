@@ -19,6 +19,7 @@ const initialState = {
     aggregations: null,
     activeItem: null,
     previewItem: null,
+    previewGroup: null,
     openItem: null,
     isLoading: false,
     totalItems: null,

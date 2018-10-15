@@ -5,13 +5,11 @@ import {bem} from 'ui/utils';
 import {formatAgendaDate} from 'utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
-// import MetaTime from 'ui/components/MetaTime';
 
-export default function AgendaTime({item}) {
+export default function AgendaTime({item, group}) {
     return (
         <div className="wire-column__preview__content-header mb-2">
-            {/*<MetaTime date={item.dates.start} />*/}
-            <div className={bem('wire-column__preview', 'date', 'event')}>{formatAgendaDate(item.dates)}</div>
+            <div className={bem('wire-column__preview', 'date', 'event')}>{formatAgendaDate(item.dates, group)}</div>
             <AgendaListItemLabels item={item} />
         </div>
     );
@@ -19,4 +17,5 @@ export default function AgendaTime({item}) {
 
 AgendaTime.propTypes = {
     item: PropTypes.object.isRequired,
+    group: PropTypes.string,
 };

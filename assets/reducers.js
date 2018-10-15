@@ -103,12 +103,13 @@ export function defaultReducer(state, action) {
         };
 
     case PREVIEW_ITEM: {
-        const readItems = getReadItems(state, action.item);
+        const readItems = getReadItems(state, action.item, action.group);
 
         return {
             ...state,
             readItems,
             previewItem: action.item ? action.item._id : null,
+            previewGroup: action.group,
         };
     }
 
@@ -125,6 +126,7 @@ export function defaultReducer(state, action) {
             readItems,
             itemsById,
             openItem: action.item || null,
+            previewGroup: action.group || null,
         };
     }
 

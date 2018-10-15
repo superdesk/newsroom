@@ -189,17 +189,20 @@ export function formatDate(dateString) {
  * Format agenda item start and end dates
  *
  * @param {String} dateString
+ * @param {String} group: date of the selected event group
  * @return {String}
  */
-export function formatAgendaDate(agendaDate) {
+export function formatAgendaDate(agendaDate, group) {
     const start = parseDate(agendaDate.start);
     const end = parseDate(agendaDate.end);
-    const duration = moment.duration(end.diff(start)).asMinutes();
-    const dayInMinutes = 1440; // 24 * 60
+    const duration = end.diff(start, 'minutes');
+    const dayInMinutes = 1439; // 24 * 60 - 1
+    const dateGroup = group ? moment(group, DATE_FORMAT) : null;
 
     if (duration > dayInMinutes) {
         // Multi day event
-        return `${formatTime(start)} ${formatDate(start)} - ${formatTime(end)} ${formatDate(end)}`;
+        return `${formatTime(start)} ${formatDate(start)} - 
+        ${formatTime(end)} ${formatDate(end)} ${dateGroup ? `| ${formatDate(dateGroup)}` : ''}`;
     }
 
     if (duration == dayInMinutes) {
