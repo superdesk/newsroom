@@ -57,7 +57,7 @@ export function requestCoverage(item, message) {
         const url = '/agenda/request_coverage';
         const data = { item: item._id, message };
         return server.post(url, data)
-            .then(() => notify.success(gettext('Your request has been sent successfully')))
+            .then(() => notify.success(gettext('Your inquiry has been sent successfully')))
             .catch(errorHandler);
     };
 }
