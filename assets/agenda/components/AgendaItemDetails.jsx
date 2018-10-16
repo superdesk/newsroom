@@ -29,6 +29,7 @@ import AgendaEdNote from './AgendaEdNote';
 import AgendaCoverages from './AgendaCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
+import AgendaMap from './AgendaMap';
 
 export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group}) {
     const locations = getLocations(item);
@@ -51,10 +52,11 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                 </ContentBar>
             </ContentHeader>
 
-            <Article image={map} covering={hasCoverages(item)}>
+            <Article covering={hasCoverages(item)}>
                 <ArticleBody>
                     <AgendaTime item={item} group={group} />
                     <AgendaName item={item} />
+                    <AgendaMap image={map}/>
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} />
                 </ArticleBody>
