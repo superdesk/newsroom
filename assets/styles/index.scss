@@ -2177,7 +2177,20 @@ a.wire-articles__versions {
         
         @include xl {
             padding: 0 10px 20px 0px;
-            font-size: 1.125rem;
+            font-size: 1rem;
+            line-height: 1.5rem;
+        }
+    }
+
+    &.wire-column__preview__date--dashed-border {
+        margin-right: 8px;
+        padding-right: 8px;
+        border-right: 1px dotted #c4c4c4;
+        float: left;
+
+        @include xl {
+            padding-right: 10px;
+            font-size: 1rem;
             line-height: 1.5rem;
         }
     }

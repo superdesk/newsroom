@@ -190,7 +190,7 @@ export function formatDate(dateString) {
  *
  * @param {String} dateString
  * @param {String} group: date of the selected event group
- * @return {String}
+ * @return {Array} [time string, date string]
  */
 export function formatAgendaDate(agendaDate, group) {
     const start = parseDate(agendaDate.start);
@@ -201,22 +201,22 @@ export function formatAgendaDate(agendaDate, group) {
 
     if (duration > dayInMinutes) {
         // Multi day event
-        return `${formatTime(start)} ${formatDate(start)} - 
-        ${formatTime(end)} ${formatDate(end)} ${dateGroup ? `| ${formatDate(dateGroup)}` : ''}`;
+        return [`(${formatTime(start)} ${formatDate(start)} - ${formatTime(end)} ${formatDate(end)})`,
+            dateGroup ? formatDate(dateGroup) : ''];
     }
 
     if (duration == dayInMinutes) {
         // All day event
-        return `${gettext('ALL DAY')} | ${formatDate(start)}`;
+        return [gettext('ALL DAY'), formatDate(start)];
     }
 
     if (duration == 0) {
         // start and end times are the same
-        return `${formatTime(start)} ${formatDate(start)}`;
+        return [`${formatTime(start)} ${formatDate(start)}`, ''];
     }
 
     // single day event
-    return `${formatTime(start)} - ${formatTime(end)} | ${formatDate(start)}`;
+    return [`${formatTime(start)} - ${formatTime(end)}`, formatDate(start)];
 }
 
 /**
