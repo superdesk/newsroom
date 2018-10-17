@@ -77,6 +77,7 @@ class AgendaApp extends BaseApp {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
                 onClose={onDetailClose}
+                requestCoverage={this.props.requestCoverage}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar

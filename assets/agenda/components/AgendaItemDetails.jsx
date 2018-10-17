@@ -28,8 +28,9 @@ import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaCoverages from './AgendaCoverages';
 import AgendaAttachments from './AgendaAttachments';
+import AgendaCoverageRequest from './AgendaCoverageRequest';
 
-export default function AgendaItemDetails({item, user, actions, onClose}) {
+export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage}) {
     const locations = getLocations(item);
     const geoLocations = getGeoLocations(locations);
     let map = null;
@@ -58,11 +59,10 @@ export default function AgendaItemDetails({item, user, actions, onClose}) {
                     <AgendaLongDescription item={item} />
                 </ArticleBody>
                 <ArticleSidebar>
-                    {hasCoverages(item) && (
-                        <ArticleSidebarBox label={gettext('Coverages')}>
-                            <AgendaCoverages coverages={item.coverages} />
-                        </ArticleSidebarBox>
-                    )}
+                    <ArticleSidebarBox label={gettext('Coverages')}>
+                        {hasCoverages(item) && <AgendaCoverages coverages={item.coverages} />}
+                        <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
+                    </ArticleSidebarBox>
                     {hasAttachments(item) && (
                         <ArticleSidebarBox label={gettext('Attachments')}>
                             <AgendaAttachments item={item} />
@@ -84,4 +84,5 @@ AgendaItemDetails.propTypes = {
         url: PropTypes.func,
     })),
     onClose: PropTypes.func,
+    requestCoverage: PropTypes.func,
 };
