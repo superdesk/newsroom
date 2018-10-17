@@ -12,6 +12,7 @@ def init(app):
     app.data.insert('navigations', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
         'name': 'Sport',
+        'product_type': 'wire',
         'description': 'Top level sport navigation',
         'is_enabled': True,
     }])
@@ -29,6 +30,7 @@ def test_save_and_return_navigations(client):
     client.post('/navigations/new', data=json.dumps({
         'name': 'Breaking',
         'description': 'Breaking news',
+        'product_type': 'wire',
         'is_enabled': True,
     }), content_type='application/json')
 
@@ -42,6 +44,7 @@ def test_update_navigation(client):
     client.post('/navigations/59b4c5c61d41c8d736852fbf/',
                 data=json.dumps({'name': 'Sport',
                                  'description': 'foo',
+                                 'product_type': 'wire',
                                  'is_enabled': True}),
                 content_type='application/json')
 
@@ -57,7 +60,8 @@ def test_delete_navigation_removes_references(client):
         'description': 'Breaking news',
         'navigations': '59b4c5c61d41c8d736852fbf',
         'is_enabled': True,
-        'query': 'foo',
+        'product_type': 'wire',
+        'query': 'foo'
     }), content_type='application/json')
 
     client.delete('/navigations/59b4c5c61d41c8d736852fbf')
@@ -74,6 +78,7 @@ def test_save_navigation_products(client, app):
         '_id': 'n-1',
         'name': 'Navigation 1',
         'is_enabled': True,
+        'product_type': 'wire'
     }])
 
     app.data.insert('products', [{
@@ -82,11 +87,13 @@ def test_save_navigation_products(client, app):
         'description': 'sport product',
         'navigations': ['n-1'],
         'is_enabled': True,
+        'product_type': 'wire'
     }, {
         '_id': 'p-2',
         'name': 'News',
         'description': 'news product',
         'is_enabled': True,
+        'product_type': 'wire'
     }])
 
     test_login_succeeds_for_admin(client)
@@ -103,6 +110,7 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
         '_id': 'n-1',
         'name': 'Uber',
         'is_enabled': True,
+        'product_type': 'agenda',
     }])
 
     app.data.insert('companies', [{
@@ -121,7 +129,7 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
         'companies': ['c-1'],
         'is_enabled': True,
         'query': '_featured',
-        'product_type': 'agenda',
+        'product_type': 'agenda'
     }, {
         '_id': 'p-2',
         'name': 'A News',
@@ -129,11 +137,12 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
         'companies': ['c-1'],
         'description': 'news product',
         'is_enabled': True,
-        'product_type': 'agenda',
-        'query': 'latest',
+        'product_type': 'wire',
+        'query': 'latest'
     }])
 
     test_login_succeeds_for_admin(client)
     navigations = get_navigations_by_company('c-1', 'agenda')
     assert navigations[0].get('name') == 'Uber'
-    assert navigations[1].get('name') == 'Sport'
+    navigations = get_navigations_by_company('c-1', 'wire')
+    assert navigations[0].get('name') == 'Sport'

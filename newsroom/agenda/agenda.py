@@ -291,10 +291,13 @@ def set_post_filter(source, req):
 
 
 class AgendaService(newsroom.Service):
+    section = 'agenda'
+
     def get(self, req, lookup):
         query = _agenda_query()
         user = get_user()
         company = get_user_company(user)
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
         try:
             set_product_query(query, company, navigation_id=req.args.get('navigation'))
         except FeaturedQuery:
@@ -341,6 +344,7 @@ class AgendaService(newsroom.Service):
             return ListCursor([])
 
         query = _agenda_query()
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
         query['bool']['must'].append({'terms': {'_id': featured['items']}})
 
         if req.args.get('q'):
@@ -377,7 +381,7 @@ class AgendaService(newsroom.Service):
                 ],
             }
         }
-
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
         return self.get_items_by_query(query, size=len(item_ids))
 
     def get_items_by_query(self, query, size=50):
@@ -484,6 +488,7 @@ class AgendaService(newsroom.Service):
 
     def get_saved_items_count(self):
         query = _agenda_query()
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
         user = get_user()
         company = get_user_company(user)
         set_product_query(query, company)

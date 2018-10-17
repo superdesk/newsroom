@@ -14,8 +14,8 @@ from newsroom.utils import query_resource
 
 def get_settings_data():
     return {
-        'products': list(query_resource('products', max_results=200)),
-        'navigations': list(query_resource('navigations', max_results=200)),
+        'products': list(query_resource('products')),
+        'navigations': list(query_resource('navigations')),
         'sections': app.sections,
     }
 

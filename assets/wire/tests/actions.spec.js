@@ -17,8 +17,8 @@ describe('wire actions', () => {
 
     beforeEach(() => {
         spyOn(now, 'utcOffset').and.returnValue('');
-        fetchMock.get('begin:/search?&tick=', response);
-        fetchMock.get('begin:/search?q=foo&tick=', response);
+        fetchMock.get('begin:/wire/search?&tick=', response);
+        fetchMock.get('begin:/wire/search?q=foo&tick=', response);
         store = createStore(wireApp, applyMiddleware(thunk));
     });
 
@@ -138,7 +138,7 @@ describe('wire actions', () => {
     });
 
     it('can fetch more items', (done) => {
-        fetchMock.get('begin:/search?from=1&tick=', {_items: [{_id: 'bar'}]});
+        fetchMock.get('begin:/wire/search?from=1&tick=', {_items: [{_id: 'bar'}]});
         return store.dispatch(actions.fetchItems())
             .then(() => {
                 expect(store.getState().totalItems).toBe(2);

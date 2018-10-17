@@ -39,7 +39,7 @@ class EditProduct extends React.Component {
 
         if (q) {
             return (
-                <a href={`/wire?q=${q}`} target="_blank"
+                <a href={`/${product.product_type}?q=${q}`} target="_blank"
                     className='btn btn-outline-secondary float-right'>{gettext('Test product')}
                 </a>
             );
@@ -184,7 +184,7 @@ EditProduct.propTypes = {
     fetchCompanies: PropTypes.func.isRequired,
     fetchNavigations: PropTypes.func.isRequired,
     products: PropTypes.arrayOf(PropTypes.object),
-    sections: sectionsPropType,
+    sections: sectionsPropType
 };
 
 export default EditProduct;

@@ -48,12 +48,13 @@ BLUEPRINTS = [
     'newsroom.upload',
     'newsroom.notifications',
     'newsroom.products',
+    'newsroom.section_filters',
     'newsroom.navigations',
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
     'newsroom.agenda',
-    'newsroom.settings',
+    'newsroom.settings'
 ]
 
 CORE_APPS = [
@@ -71,12 +72,13 @@ CORE_APPS = [
     'newsroom.history',
     'newsroom.notifications',
     'newsroom.products',
+    'newsroom.section_filters',
     'newsroom.navigations',
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
     'newsroom.agenda',
-    'newsroom.settings',
+    'newsroom.settings'
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -169,8 +171,8 @@ HOMEPAGE_CAROUSEL = [{
 
 # List of filters to remove matching stories when news only switch is turned on
 NEWS_ONLY_FILTERS = [
-    {'match': {'genre.code': 'Results (sport)'}},
-    {'match': {'source': 'PMF'}},
+   {'match': {'genre.code': 'Results (sport)'}},
+   {'match': {'source': 'PMF'}},
 ]
 
 # Places navigation item(s) for featured story products to the top of the list under All

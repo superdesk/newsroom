@@ -1,7 +1,9 @@
-
 import flask
-
+import logging
 from flask import current_app as app
+from eve.render import send_response
+from eve.methods.get import get_internal
+
 from newsroom.am_news import blueprint
 from newsroom.auth import get_user, login_required, get_user_id
 from newsroom.companies import section
@@ -10,6 +12,8 @@ from newsroom.wire.search import get_bookmarks_count
 from newsroom.wire.views import update_action_list, get_previous_versions, set_permissions
 from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type
 from newsroom.notifications import push_user_notification
+
+logger = logging.getLogger(__name__)
 
 
 def get_view_data():
@@ -32,6 +36,13 @@ def get_view_data():
 @section('am_news')
 def index():
     return flask.render_template('am_news_index.html', data=get_view_data())
+
+
+@blueprint.route('/am_news/search')
+@login_required
+def search():
+    response = get_internal('am_news_search')
+    return send_response('am_news_search', response)
 
 
 @blueprint.route('/bookmarks_am_news')
@@ -79,7 +90,7 @@ def versions(_id):
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
-    set_permissions(item)
+    set_permissions(item, 'am_news')
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):

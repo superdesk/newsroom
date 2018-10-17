@@ -479,6 +479,7 @@ def test_matching_topics_for_public_user(client, app):
         'sd_product_id': 'p-1',
         'is_enabled': True,
         'companies': ['1'],
+        'product_type': 'wire'
     }])
 
     item['products'] = [{'code': 'p-1'}]
@@ -505,6 +506,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         'sd_product_id': 'p-1',
         'is_enabled': True,
         'companies': ['1'],
+        'product_type': 'wire'
     }])
 
     item['products'] = [{'code': 'p-1'}]

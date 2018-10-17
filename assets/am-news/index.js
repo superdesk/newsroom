@@ -29,7 +29,7 @@ store.dispatch(initParams(params));
 
 // init first navigations
 const firstNavigation = get(window.amNewsData, 'navigations[0]');
-if (firstNavigation) {
+if (firstNavigation && !get(window.amNewsData, 'bookmarks', false)) {
     store.dispatch(toggleNavigation(firstNavigation));
 }
 
@@ -41,12 +41,9 @@ window.onpopstate = function(event) {
 };
 
 // fetch items & render if there are navigations
-if (firstNavigation) {
-    store.dispatch(fetchItems()).then(() =>
-        render(store, AmNewsApp, document.getElementById('am-news-app'))
-    );
-}
-
+store.dispatch(fetchItems()).then(() =>
+    render(store, AmNewsApp, document.getElementById('am-news-app'))
+);
 
 // initialize web socket listener
 initWebSocket(store, pushNotification);

@@ -29,7 +29,7 @@ def test_item_detail(app, client):
     assert 2 == len(data['_items'])
     assert 'tag:weather' == data['_items'][0]['_id']
 
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     assert resp.status_code == 200
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])
@@ -47,7 +47,7 @@ def test_index_from_mongo_hours_from(app, client):
     html = resp.get_data().decode('utf-8')
     assert 'Amazon Is Opening More Bookstores' in html
 
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     assert resp.status_code == 200
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
@@ -65,7 +65,7 @@ def test_index_from_mongo_collection(app, client):
     html = resp.get_data().decode('utf-8')
     assert 'Amazon Is Opening More Bookstores' in html
 
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     assert resp.status_code == 200
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])
