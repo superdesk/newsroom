@@ -13,16 +13,13 @@ from newsroom.companies import blueprint
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400
 
 
-@blueprint.route('/settings/companies', methods=['GET'])
-@admin_only
-def settings():
-    data = {
+def get_settings_data():
+    return {
         'companies': list(query_resource('companies', max_results=200)),
         'services': app.config['SERVICES'],
         'products': list(query_resource('products', max_results=200)),
         'sections': app.sections,
     }
-    return flask.render_template('settings.html', setting_type="companies", data=data)
 
 
 @blueprint.route('/companies/search', methods=['GET'])

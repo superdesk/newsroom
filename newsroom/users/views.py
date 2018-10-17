@@ -19,14 +19,11 @@ from newsroom.users.forms import UserForm
 from newsroom.utils import query_resource, find_one
 
 
-@blueprint.route('/settings/users', methods=['GET'])
-@admin_only
-def settings():
-    data = {
+def get_settings_data():
+    return {
         'users': list(query_resource('users')),
         "companies": list(query_resource('companies')),
     }
-    return flask.render_template('settings.html', setting_type="users", data=data)
 
 
 def get_view_data():

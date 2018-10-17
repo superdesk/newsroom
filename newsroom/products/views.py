@@ -12,16 +12,13 @@ from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.utils import query_resource
 
 
-@blueprint.route('/products/settings', methods=['GET'])
-@admin_only
-def settings():
-    data = {
+def get_settings_data():
+    return {
         'products': list(query_resource('products', max_results=200)),
         'navigations': list(query_resource('navigations', max_results=200)),
         'companies': list(query_resource('companies', max_results=200)),
         'sections': current_app.sections,
     }
-    return flask.render_template('settings.html', setting_type="products", data=data)
 
 
 @blueprint.route('/products', methods=['GET'])

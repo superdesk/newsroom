@@ -11,14 +11,11 @@ from newsroom.utils import get_entity_or_404, get_file
 from newsroom.utils import query_resource
 
 
-@blueprint.route('/cards/settings', methods=['GET'])
-@admin_only
-def settings():
-    data = {
+def get_settings_data():
+    return {
         'products': list(query_resource('products', lookup={'is_enabled': True})),
         "cards": list(query_resource('cards')),
     }
-    return flask.render_template('settings.html', setting_type="cards", data=data)
 
 
 @blueprint.route('/cards', methods=['GET'])
