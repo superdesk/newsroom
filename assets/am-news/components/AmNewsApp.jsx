@@ -42,6 +42,7 @@ class AmNewsApp extends BaseApp {
     }
 
     renderItemDetails() {
+        // this.resetFields(this.props.itemToOpen);
         return ([
             <ItemDetails
                 key="itemDetails"
@@ -52,10 +53,21 @@ class AmNewsApp extends BaseApp {
         ]);
     }
 
+    resetFields(item) {
+        if (item) {
+            item.urgency = null;
+            item.genre = null;
+        }
+    }
+
     renderListAndPreview() {
         const mainClassName = classNames('wire-column__main', {
             'wire-articles__one-side-pane': this.props.itemToPreview,
         });
+
+        if (this.props.itemToPreview) {
+            this.resetFields(this.props.itemToPreview);
+        }
 
         return (
             [

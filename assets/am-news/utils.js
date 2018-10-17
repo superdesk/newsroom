@@ -6,7 +6,8 @@ export const isDataItem = (item) => ((get(item, 'source') || '').toLowerCase() =
 export const isFuel = (item) => (get(item, 'slugline') || '').match(/fuel/gi);
 export const isWeather = (item) => (get(item, 'slugline') || '').match(/weather|observation|forecast/gi);
 export const isTraffic = (item) => (get(item, 'slugline') || '').match(/traffic/gi);
-export const isAlert = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/alert/gi);
+export const isAlert = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/^alert /gi);
+export const isQuote = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/^quote /gi);
 export const isHeadlines = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/headlines/gi);
 
 export const getAMNewsIcon = (item) => {
@@ -24,6 +25,8 @@ export const getAMNewsIcon = (item) => {
         iconType = 'am-alert';
     } else if (isHeadlines(item)) {
         iconType = 'am-headlines';
+    } else if (isQuote(item)) {
+        iconType = 'am-quote';
     }
 
     return iconType;
@@ -44,6 +47,8 @@ export const getAMNewsToolTip = (item) => {
         iconType = gettext('Alert');
     } else if (isHeadlines(item)) {
         iconType = gettext('Headlines');
+    } else if (isQuote(item)) {
+        iconType = gettext('Quote');
     }
 
     return iconType;
