@@ -44,6 +44,9 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
         map = <StaticMap locations={locations} scale={2} />;
     }
 
+    const header = [<AgendaTime key='time' item={item} />,
+        <AgendaName key='name' item={item} />,
+        <AgendaMap key='map' image={map} />];
     return (
         <Content type="item-detail">
             <ContentHeader>
@@ -52,11 +55,8 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                 </ContentBar>
             </ContentHeader>
 
-            <Article covering={hasCoverages(item)}>
+            <Article covering={hasCoverages(item)} header={header}>
                 <ArticleBody>
-                    <AgendaTime item={item} group={group} />
-                    <AgendaName item={item} />
-                    <AgendaMap image={map}/>
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} />
                 </ArticleBody>
