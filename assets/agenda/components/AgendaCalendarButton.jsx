@@ -30,7 +30,7 @@ class AgendaCalendarButton extends React.Component {
     constructor (props) {
         super(props);
 
-        this.state = { startDate: moment() };
+        this.state = { startDate: moment(this.props.activeDate) };
         this.handleChange = this.handleChange.bind(this);
     }
 
@@ -46,6 +46,7 @@ class AgendaCalendarButton extends React.Component {
             todayButton={gettext('Today')}
             selected={this.state.startDate}
             onChange={this.handleChange}
+            highlightDates={[moment()]}
             popperModifiers={{
                 offset: {
                     enabled: true,
@@ -64,6 +65,7 @@ class AgendaCalendarButton extends React.Component {
 
 AgendaCalendarButton.propTypes = {
     selectDate: PropTypes.func,
+    activeDate: PropTypes.number,
 };
 
 export default AgendaCalendarButton;
