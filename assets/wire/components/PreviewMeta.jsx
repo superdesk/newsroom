@@ -7,7 +7,7 @@ const DEFAULT_URGENCY = 4;
 
 
 
-function PreviewMeta({item, isItemDetail, inputRef}) {
+function PreviewMeta({item, isItemDetail, inputRef, displayUrgency}) {
     const picture = getPicture(item);
     const onClick = () => {
         const previousVersions = document.getElementById(inputRef);
@@ -29,7 +29,8 @@ function PreviewMeta({item, isItemDetail, inputRef}) {
                 )}
             </div>
             <div className='wire-articles__item__meta-info'>
-                <span>{item.urgency && gettext('News Value: {{ value }}', {value: item.urgency || DEFAULT_URGENCY})}</span>
+                <span>{displayUrgency &&
+                gettext('News Value: {{ value }}', {value: item.urgency || DEFAULT_URGENCY})}</span>
                 <span>{gettext('Words:')}<span> {wordCount(item)}</span></span>
                 <span>{gettext('Source: {{ source }}', {source: item.source})}
                     {!isItemDetail && ' // '}
@@ -46,6 +47,11 @@ PreviewMeta.propTypes = {
     item: PropTypes.object,
     isItemDetail: PropTypes.bool,
     inputRef: PropTypes.string,
+    displayUrgency: PropTypes.bool,
+};
+
+PreviewMeta.defaultProps = {
+    displayUrgency: true
 };
 
 export default PreviewMeta;
