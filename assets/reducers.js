@@ -134,7 +134,7 @@ export function defaultReducer(state, action) {
     }
 
     case QUERY_ITEMS: {
-        const resultsFiltered = !isEmpty(get(state, 'search.activeFilter')) || !isEmpty(get(state, 'search.createdFilter'));
+        const resultsFiltered = !isEmpty(get(state, 'search.activeFilter')) || !isEmpty(get(state, 'search.createdFilter.from')) || !isEmpty(get(state, 'search.createdFilter.to'));
         return {...state, isLoading: true, totalItems: null, activeQuery: state.query, resultsFiltered};
     }
 

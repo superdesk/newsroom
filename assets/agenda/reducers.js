@@ -54,7 +54,7 @@ function recieveItems(state, data) {
     const createdFilter = get(state, 'search.createdFilter', {});
     const agenda = {
         ...state.agenda,
-        activeDate: !isEmpty(createdFilter) ? EARLIEST_DATE : Date.now(),
+        activeDate: !isEmpty(createdFilter.from) || !isEmpty(createdFilter.to) ? EARLIEST_DATE : Date.now(),
     };
 
     return {

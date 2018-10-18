@@ -46,6 +46,8 @@ class FiltersTab extends React.Component {
 
         this.toggleGroup = this.toggleGroup.bind(this);
         this.getFilterGroups = this.getFilterGroups.bind(this);
+        this.toggleFilterAndSearch = this.toggleFilterAndSearch.bind(this);
+        this.setCreatedFilterAndSearch = this.setCreatedFilterAndSearch.bind(this);
     }
 
     toggleGroup(event, group) {
@@ -55,6 +57,16 @@ class FiltersTab extends React.Component {
         )});
     }
 
+    toggleFilterAndSearch(field, key, single, wasActive) {
+        this.props.toggleFilter(field, key, single);
+        wasActive && this.props.resultsFiltered && this.props.fetchItems();
+    }
+
+    setCreatedFilterAndSearch(createdFilter) {
+        this.props.setCreatedFilter(createdFilter);
+        this.props.resultsFiltered && this.props.fetchItems();
+    }
+
     getFilterGroups() {
         return this.state.groups.map((group) => <FilterGroup
             key={group.label}
@@ -62,7 +74,7 @@ class FiltersTab extends React.Component {
             activeFilter={this.props.activeFilter}
             aggregations={this.props.aggregations}
             toggleGroup={this.toggleGroup}
-            toggleFilter={this.props.toggleFilter}
+            toggleFilter={this.toggleFilterAndSearch}
         />);
     }
 
@@ -72,7 +84,11 @@ class FiltersTab extends React.Component {
             || Object.keys(createdFilter).find((key) => !isEmpty(createdFilter[key]));
 
         return this.getFilterGroups().filter((group) => !!group).concat([
-            <NavCreatedPicker key="created" createdFilter={createdFilter} setCreatedFilter={this.props.setCreatedFilter} />,
+            <NavCreatedPicker
+                key="created"
+                createdFilter={createdFilter}
+                setCreatedFilter={this.setCreatedFilterAndSearch}
+            />,
             isResetActive || this.props.resultsFiltered ? (
                 [<div key="reset-buffer" id="reset-filter-buffer"></div>,
                     <FilterButton
