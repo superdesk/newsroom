@@ -1,29 +1,28 @@
 
 import logging
+from datetime import timedelta
 
-
-import newsroom
-
-from flask import json, abort, url_for, current_app as app
+from content_api.items.resource import code_mapping
+from dateutil.relativedelta import relativedelta
 from eve.utils import ParsedRequest
+from flask import json, abort, url_for, current_app as app
 from flask_babel import gettext
-
-from superdesk import get_resource_service
+from planning.common import WORKFLOW_STATE_SCHEMA
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
+from superdesk import get_resource_service
 from superdesk.metadata.item import not_analyzed
-from planning.common import WORKFLOW_STATE_SCHEMA
-from newsroom.wire.search import get_local_date, versioncreated_range
-from newsroom.wire.search import query_string, set_product_query, FeaturedQuery
 from superdesk.resource import Resource, not_enabled
-from content_api.items.resource import code_mapping
+from superdesk.utils import ListCursor
+
+import newsroom
+from newsroom.agenda.email import send_coverage_notification_email, send_agenda_notification_email
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
-from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
-from newsroom.agenda.email import send_coverage_notification_email, send_agenda_notification_email
 from newsroom.notifications import push_notification
-
-from superdesk.utils import ListCursor
+from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
+from newsroom.wire.search import get_local_date
+from newsroom.wire.search import query_string, set_product_query, FeaturedQuery
 
 logger = logging.getLogger(__name__)
 
@@ -207,22 +206,38 @@ def _agenda_query():
     }
 
 
+def get_end_date(date_range, start_date):
+    if date_range == 'now/d':
+        return start_date
+    if date_range == 'now/w':
+        return start_date + timedelta(days=6)
+    if date_range == 'now/M':
+        return start_date + relativedelta(months=+1) - timedelta(days=1)
+    return start_date
+
+
+def _get_date_filters(args):
+    range = {}
+    offset = int(args.get('timezone_offset', '0'))
+    if args.get('date_from'):
+        range['gt'] = get_local_date(args['date_from'], '00:00:00', offset)
+    if args.get('date_to'):
+        range['lt'] = get_end_date(args['date_to'], get_local_date(args['date_to'], '23:59:59', offset))
+    return range
+
+
 def _event_date_range(args):
     """Get events for selected date.
 
     ATM it should display everything not finished by that date, even starting later.
     """
-    offset = int(args.get('timezone_offset', '0'))
-    if args.get('date_from'):
-        return {'range': {'dates.end': {'gt': get_local_date(args['date_from'], '00:00:00', offset)}}}
+    return {'range': {'dates.end': _get_date_filters(args)}}
 
 
 def _display_date_range(args):
     """Get events for extra dates for coverages and planning.
     """
-    offset = int(args.get('timezone_offset', '0'))
-    if args.get('date_from'):
-        return {'range': {'display_dates.date': {'gt': get_local_date(args['date_from'], '00:00:00', offset)}}}
+    return {'range': {'display_dates.date': _get_date_filters(args)}}
 
 
 aggregations = {
@@ -287,12 +302,9 @@ class AgendaService(newsroom.Service):
         if req.args.get('bookmarks'):
             set_saved_items_query(query, req.args['bookmarks'])
 
-        if req.args.get('date_from'):
+        if req.args.get('date_from') or req.args.get('date_to'):
             query['bool']['should'].append(_event_date_range(req.args))
             query['bool']['should'].append(_display_date_range(req.args))
-
-        if req.args.get('created_from') or req.args.get('created_to'):
-            query['bool']['must'].append(versioncreated_range(req.args))
 
         source = {'query': query}
         source['sort'] = [{'dates.start': 'asc'}]

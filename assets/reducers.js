@@ -35,7 +35,7 @@ import {
 import {getMaxVersion} from './wire/utils';
 import {REMOVE_NEW_ITEMS, SET_NEW_ITEMS_BY_TOPIC} from './agenda/actions';
 import {toggleValue} from 'utils';
-import {get} from 'lodash';
+import {get, isEmpty} from 'lodash';
 
 export function modalReducer(state, action) {
     switch (action.type) {
@@ -133,8 +133,10 @@ export function defaultReducer(state, action) {
         return {...state, query: action.query, activeItem: null, search: search};
     }
 
-    case QUERY_ITEMS:
-        return {...state, isLoading: true, totalItems: null, activeQuery: state.query};
+    case QUERY_ITEMS: {
+        const resultsFiltered = !isEmpty(get(state, 'search.activeFilter')) || !isEmpty(get(state, 'search.createdFilter.from')) || !isEmpty(get(state, 'search.createdFilter.to'));
+        return {...state, isLoading: true, totalItems: null, activeQuery: state.query, resultsFiltered};
+    }
 
     case RECIEVE_ITEM: {
         const itemsById = Object.assign({}, state.itemsById);
