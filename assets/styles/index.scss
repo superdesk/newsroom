@@ -1310,7 +1310,7 @@ article.list {
 .wire-articles__item--rescheduled {
     &:before {
         width: 4px;
-        background-color: $green-dark;
+        background-color: $orange;
     }
     .date-round__number {
         color: $green-dark;
@@ -1930,7 +1930,7 @@ article.list {
     .wire-articles__item--rescheduled &,
     .wire-column__preview--rescheduled &,
     .wire-column__preview__content--rescheduled & {
-        background-color: $green-dark;
+        background-color: $orange;
     }
 
     .wire-column__preview--canceled & {
@@ -1979,7 +1979,7 @@ article.list {
     .wire-articles__item--rescheduled & i,
     .wire-column__preview--rescheduled & i,
     .wire-column__preview__content--rescheduled & i {
-        color: $green-dark;
+        color: $orange;
     }
     .wire-articles__item--watched & {
         background-color: #f2f2f2;
