@@ -51,3 +51,14 @@ def init_app(app):
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')
     app.add_template_global(url_for_wire)
+
+    app.general_setting(
+        'news_only_filter',
+        gettext('News only filter'),
+        weight=200,
+        description=gettext('''
+This query defines what is NOT considered "news" content.
+It is used by the News only switch to filter the view.
+When switched on, stories matching this filter will not be displayed.
+        ''')
+    )

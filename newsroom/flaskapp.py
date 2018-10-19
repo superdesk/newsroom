@@ -274,10 +274,14 @@ class Newsroom(eve.Eve):
             weight=weight
         ))
 
-    def general_setting(self, _id, label, _type='text', default=None, weight=0):
+    def general_setting(self, _id, label, _type='text', default=None, weight=0, description=None):
         self._general_settings[_id] = {
             'type': _type,
             'label': label,
             'weight': weight,
             'default': default,
+            'description': description,
         }
+
+        if flask.g:  # reset settings cache
+            flask.g.settings = None
