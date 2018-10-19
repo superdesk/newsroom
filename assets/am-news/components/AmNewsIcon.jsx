@@ -18,8 +18,13 @@ const AMNewsIcon = ({iconType, borderRight, toolTip}) => {
 
 AMNewsIcon.propTypes = {
     iconType: PropTypes.string.isRequired,
-    borderRight: PropTypes.boolean,
     toolTip: PropTypes.string,
+    borderRight: PropTypes.bool,
+
+};
+
+AMNewsIcon.defaultProps = {
+    borderRight: false
 };
 
 export default AMNewsIcon;

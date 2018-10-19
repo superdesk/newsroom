@@ -14,7 +14,7 @@ function formatCV(items, field) {
     ));
 }
 
-function PreviewTags({item, isItemDetail}) {
+function PreviewTags({item, isItemDetail, displayGenre}) {
     const genres = item.genre && formatCV(item.genre, 'genre.name');
     const subjects = item.subject && formatCV(item.subject, 'subject.name');
 
@@ -26,7 +26,7 @@ function PreviewTags({item, isItemDetail}) {
                 </PreviewTagsBlock>
             }
 
-            {genres &&
+            {genres && displayGenre &&
                 <PreviewTagsBlock label={gettext('Content Type')}>
                     {genres}
                 </PreviewTagsBlock>
@@ -38,6 +38,11 @@ function PreviewTags({item, isItemDetail}) {
 PreviewTags.propTypes = {
     item: PropTypes.object,
     isItemDetail: PropTypes.bool,
+    displayGenre: PropTypes.bool,
+};
+
+PreviewTags.defaultProps = {
+    displayGenre: true
 };
 
 export default PreviewTags;

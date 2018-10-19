@@ -22,7 +22,7 @@ import {
 import { activeTopicSelector } from 'search/selectors';
 
 import BaseApp from 'layout/components/BaseApp';
-import Preview from './Preview';
+import WirePreview from './WirePreview';
 import ItemsList from './ItemsList';
 import SearchBar from '../../components/SearchBar';
 import SearchResultsInfo from './SearchResultsInfo';
@@ -137,7 +137,7 @@ class WireApp extends BaseApp {
 
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
-                            <Preview
+                            <WirePreview
                                 item={this.props.itemToPreview}
                                 user={this.props.user}
                                 actions={this.filterActions(this.props.itemToPreview)}

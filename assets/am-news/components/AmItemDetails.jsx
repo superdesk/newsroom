@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import PreviewMeta from './PreviewMeta';
-import PreviewTags from './PreviewTags';
-import AgendaLinks from './AgendaLinks';
-import ListItemPreviousVersions from './ListItemPreviousVersions';
-import ListItemNextVersion from './ListItemNextVersion';
+import PreviewMeta from 'wire/components/PreviewMeta';
+import PreviewTags from 'wire/components/PreviewTags';
+import ListItemPreviousVersions from 'wire/components/ListItemPreviousVersions';
+import ListItemNextVersion from 'wire/components/ListItemNextVersion';
 import PreviewActionButtons from 'components/PreviewActionButtons';
 import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT, isPreformatted } from 'wire/utils';
 import Content from 'ui/components/Content';
@@ -22,7 +21,7 @@ import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
 import ArticleBody from 'ui/components/ArticleBody';
 
 
-function ItemDetails({item, user, actions, onClose}) {
+const AmItemDetails = ({item, user, actions, onClose}) => {
     const picture = getPicture(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
     return (
@@ -30,7 +29,7 @@ function ItemDetails({item, user, actions, onClose}) {
             <ContentHeader>
                 <ContentBar onClose={onClose}>
                     <PreviewActionButtons item={item} user={user} actions={actions}/>
-                </ContentBar>                
+                </ContentBar>
             </ContentHeader>
             <ArticleItemDetails>
                 <ArticleContent>
@@ -46,27 +45,24 @@ function ItemDetails({item, user, actions, onClose}) {
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>
                             <ArticleBodyHtml item={item}/>
                         </ArticleBody>
-                        <PreviewMeta item={item} isItemDetail={true}/>
+                        <PreviewMeta item={item} isItemDetail={true} displayUrgency={false}/>
                         <ArticleContentInfoWrapper>
-                            <PreviewTags item={item} isItemDetail={true}/>
-
+                            <PreviewTags item={item} isItemDetail={true} displayGenre={false}/>
                             {showItemVersions(item, true) &&
                                 <ListItemNextVersion item={item} />
                             }
                             {showItemVersions(item) &&
                                 <ListItemPreviousVersions item={item} isPreview={true}/>
                             }
-
-                            <AgendaLinks item={item} />
                         </ArticleContentInfoWrapper>
                     </ArticleContentWrapper>
                 </ArticleContent>
             </ArticleItemDetails>
         </Content>
     );
-}
+};
 
-ItemDetails.propTypes = {
+AmItemDetails.propTypes = {
     item: PropTypes.object.isRequired,
     user: PropTypes.string.isRequired,
     actions: PropTypes.arrayOf(PropTypes.shape({
@@ -77,5 +73,4 @@ ItemDetails.propTypes = {
     onClose: PropTypes.func,
 };
 
-export default ItemDetails;
-
+export default AmItemDetails;
