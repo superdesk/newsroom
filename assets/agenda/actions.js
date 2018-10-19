@@ -34,22 +34,22 @@ export function setActive(item) {
 }
 
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item) {
-    return {type: PREVIEW_ITEM, item};
+export function preview(item, group) {
+    return {type: PREVIEW_ITEM, item, group};
 }
 
 
-export function previewItem(item) {
+export function previewItem(item, group) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(preview(item));
+        dispatch(preview(item, group));
         item && analytics.itemEvent('preview', item);
     };
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item) {
-    return {type: OPEN_ITEM, item};
+export function openItemDetails(item, group) {
+    return {type: OPEN_ITEM, item, group};
 }
 
 export function requestCoverage(item, message) {
@@ -62,10 +62,10 @@ export function requestCoverage(item, message) {
     };
 }
 
-export function openItem(item) {
+export function openItem(item, group) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(openItemDetails(item));
+        dispatch(openItemDetails(item, group));
         updateRouteParams({
             item: item ? item._id : null
         }, getState());

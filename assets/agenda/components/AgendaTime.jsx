@@ -2,16 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {bem} from 'ui/utils';
-import {formatDate} from 'utils';
+import {formatAgendaDate} from 'utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
-import MetaTime from 'ui/components/MetaTime';
 
-export default function AgendaTime({item}) {
+export default function AgendaTime({item, group}) {
+    const getDates = () => {
+        const dates = formatAgendaDate(item.dates, group);
+        if (dates[1]) {
+            return [<div key='time' className={bem('wire-column__preview', 'date', 'dashed-border')}>{dates[0]}</div>, dates[1]];
+        }
+        return dates[0];
+    };
+    
     return (
         <div className="wire-column__preview__content-header mb-2">
-            <MetaTime date={item.dates.start} />
-            <div className={bem('wire-column__preview', 'date', 'event')}>{formatDate(item.dates.start)}</div>
+            <div className={bem('wire-column__preview', 'date', 'event')}>{getDates()}</div>
             <AgendaListItemLabels item={item} />
         </div>
     );
@@ -19,4 +25,5 @@ export default function AgendaTime({item}) {
 
 AgendaTime.propTypes = {
     item: PropTypes.object.isRequired,
+    group: PropTypes.string,
 };

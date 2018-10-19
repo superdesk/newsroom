@@ -30,7 +30,7 @@ import AgendaCoverages from './AgendaCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 
-export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage}) {
+export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group}) {
     const locations = getLocations(item);
     const geoLocations = getGeoLocations(locations);
     let map = null;
@@ -53,7 +53,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
 
             <Article image={map} covering={hasCoverages(item)}>
                 <ArticleBody>
-                    <AgendaTime item={item} />
+                    <AgendaTime item={item} group={group} />
                     <AgendaName item={item} />
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} />
@@ -85,4 +85,5 @@ AgendaItemDetails.propTypes = {
     })),
     onClose: PropTypes.func,
     requestCoverage: PropTypes.func,
+    group: PropTypes.string,
 };

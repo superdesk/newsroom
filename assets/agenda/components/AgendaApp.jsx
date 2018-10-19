@@ -78,6 +78,7 @@ class AgendaApp extends BaseApp {
                 actions={this.filterActions(this.props.itemToOpen)}
                 onClose={onDetailClose}
                 requestCoverage={this.props.requestCoverage}
+                group={this.props.previewGroup}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar
@@ -166,6 +167,7 @@ class AgendaApp extends BaseApp {
                             closePreview={this.props.closePreview}
                             openItemDetails={this.props.openItemDetails}
                             requestCoverage={this.props.requestCoverage}
+                            previewGroup={this.props.previewGroup}
                         />
                     </div>
                 </section>
@@ -190,6 +192,7 @@ AgendaApp.propTypes = {
     activeFilter: PropTypes.object,
     createdFilter: PropTypes.object,
     itemToPreview: PropTypes.object,
+    previewGroup: PropTypes.string,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
     modal: PropTypes.object,
@@ -231,6 +234,7 @@ const mapStateToProps = (state) => ({
     activeFilter: get(state, 'search.activeFilter'),
     createdFilter: get(state, 'search.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
+    previewGroup: state.previewGroup,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
     modal: state.modal,
