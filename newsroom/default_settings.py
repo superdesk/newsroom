@@ -86,6 +86,7 @@ USAGE_TERMS = ''
 CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
 PRIVACY_POLICY = 'https://www.aap.com.au/legal/'
 TERMS_AND_CONDITIONS = 'https://www.aap.com.au/legal/'
+SHOW_COPYRIGHT = True
 
 # Email addresses that will receive the coverage request emails (single or comma separated)
 COVERAGE_REQUEST_RECIPIENTS = os.environ.get('COVERAGE_REQUEST_RECIPIENTS')
