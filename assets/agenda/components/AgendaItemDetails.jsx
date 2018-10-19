@@ -21,15 +21,12 @@ import ArticleSidebarBox from 'ui/components/ArticleSidebarBox';
 
 import { hasCoverages, hasAttachments } from '../utils';
 
-import AgendaTime from './AgendaTime';
-import AgendaName from './AgendaName';
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaCoverages from './AgendaCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
-import AgendaMap from './AgendaMap';
 
 export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group}) {
     const locations = getLocations(item);
@@ -44,9 +41,6 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
         map = <StaticMap locations={locations} scale={2} />;
     }
 
-    const header = [<AgendaTime key='time' item={item} />,
-        <AgendaName key='name' item={item} />,
-        <AgendaMap key='map' image={map} />];
     return (
         <Content type="item-detail">
             <ContentHeader>
@@ -55,7 +49,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                 </ContentBar>
             </ContentHeader>
 
-            <Article covering={hasCoverages(item)} header={header}>
+            <Article image={map} item={item} group={group}>
                 <ArticleBody>
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} />
