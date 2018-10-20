@@ -53,9 +53,17 @@ function recieveItems(state, data) {
         return item._id;
     });
     const createdFilter = get(state, 'search.createdFilter', {});
+
+    let activeDate = state.agenda.activeDate || Date.now();
+    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to)) {
+        activeDate = EARLIEST_DATE;
+    } else if (activeDate === EARLIEST_DATE) {
+        activeDate = Date.now();
+    }
+
     const agenda = {
         ...state.agenda,
-        activeDate: !isEmpty(createdFilter.from) || !isEmpty(createdFilter.to) ? EARLIEST_DATE : Date.now(),
+        activeDate,
     };
 
     return {

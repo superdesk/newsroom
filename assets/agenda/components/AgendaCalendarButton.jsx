@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import {EARLIEST_DATE} from '../utils';
 
 class AgendaCalendarButtonWrapper extends React.Component {
     render() {
@@ -37,6 +38,10 @@ class AgendaCalendarButton extends React.Component {
     handleChange(date) {
         this.props.selectDate(date.valueOf(), 'day');
         this.setState({ startDate: date });
+    }
+
+    componentDidUpdate(prevProps) {
+        prevProps.activeDate === EARLIEST_DATE && this.setState({ startDate: moment(this.props.activeDate) });
     }
 
     render() {
