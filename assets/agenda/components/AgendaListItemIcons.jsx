@@ -20,6 +20,33 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
         row,
     });
 
+    const getCoverageTootip = (coverage) => {
+
+        const status = {
+            draft: 'planned',
+            assigned: 'planned',
+            active: 'in progress',
+            completed: 'available',
+        };
+
+        if (['draft', 'assigned', 'active'].includes(coverage.workflow_status)) {
+            return gettext('{{ type }} coverage {{ status }}, due {{date}} at {{time}}', {
+                type: coverage.coverage_type,
+                status: status[coverage.workflow_status],
+                date: formatDate(coverage.scheduled),
+                time: formatTime(coverage.scheduled)
+            });
+        }
+
+        if (coverage.workflow_status === 'completed') {
+            return gettext('{{ type }} coverage available', {
+                type: coverage.coverage_type
+            });
+        }
+
+        return '';
+    };
+
     return (
         <div className={className}>
             <MetaTime
@@ -38,11 +65,7 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
                           <span
                               className='wire-articles__item__icon'
                               key={coverage.coverage_id}
-                              title={gettext('{{ status }} on {{date}} {{time}}', {
-                                  status: coverage.coverage_status,
-                                  date: formatDate(coverage.scheduled),
-                                  time: formatTime(coverage.scheduled)
-                              })}>
+                              title={getCoverageTootip(coverage)}>
                               <i className={`${coverageClass} ${statusClass}`}></i>
                           </span>);
                     })
