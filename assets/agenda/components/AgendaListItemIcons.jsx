@@ -7,7 +7,8 @@ import {
     hasLocation,
     getLocationString,
     getCoverageIcon,
-    isRecurring
+    isRecurring,
+    WORKFLOW_STATUS_TEXTS
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -22,17 +23,10 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
 
     const getCoverageTootip = (coverage) => {
 
-        const status = {
-            draft: 'planned',
-            assigned: 'planned',
-            active: 'in progress',
-            completed: 'available',
-        };
-
         if (['draft', 'assigned', 'active'].includes(coverage.workflow_status)) {
             return gettext('{{ type }} coverage {{ status }}, due {{date}} at {{time}}', {
                 type: coverage.coverage_type,
-                status: status[coverage.workflow_status],
+                status: WORKFLOW_STATUS_TEXTS[coverage.workflow_status],
                 date: formatDate(coverage.scheduled),
                 time: formatTime(coverage.scheduled)
             });

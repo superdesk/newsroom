@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import server from 'server';
 import { get } from 'lodash';
 import { gettext } from 'utils';
+import { WORKFLOW_STATUS_TEXTS } from '../utils';
 
 function getDeliveryHref(coverage) {
     return get(coverage, 'delivery_href');
@@ -35,10 +36,11 @@ export default class CoverageItemStatus extends React.PureComponent {
     render() {
         const {coverage} = this.props;
 
-        if (coverage.coverage_status && !this.state.wire) {
+        if (coverage.workflow_status && !this.state.wire) {
             return [
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>,
-                <span key="value">{coverage.coverage_status}</span>,
+                <span key="value">{gettext('coverage {{ state }} ',
+                    {state: get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, 'planned')})}</span>,
             ];
         }
 

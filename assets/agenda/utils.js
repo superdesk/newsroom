@@ -32,6 +32,14 @@ const Groupers = {
     'month': formatMonth,
 };
 
+export const WORKFLOW_STATUS_TEXTS = {
+    draft: 'planned',
+    assigned: 'planned',
+    active: 'in progress',
+    completed: 'available',
+    cancelled: 'cancelled',
+};
+
 /**
  * Early enough date to use in querying all agenda items
  * @type {number}
