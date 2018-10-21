@@ -23,6 +23,7 @@ from newsroom.notifications import push_notification
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
 from newsroom.wire.search import get_local_date
 from newsroom.wire.search import query_string, set_product_query, FeaturedQuery
+from newsroom.template_filters import is_admin_or_internal
 
 logger = logging.getLogger(__name__)
 
@@ -275,6 +276,12 @@ def _filter_terms(filters):
     return term_filters
 
 
+def _remove_attachments(source):
+    source['_source'] = {
+        'exclude': ['event.files']
+    }
+
+
 def set_post_filter(source, req):
     filters = None
     if req.args.get('filter'):
@@ -319,6 +326,9 @@ class AgendaService(newsroom.Service):
 
         if not source['from'] and not req.args.get('bookmarks'):  # avoid aggregations when handling pagination
             source['aggs'] = aggregations
+
+        if not is_admin_or_internal(user):
+            _remove_attachments(source)
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
