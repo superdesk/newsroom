@@ -21,8 +21,6 @@ import ArticleSidebarBox from 'ui/components/ArticleSidebarBox';
 
 import { hasCoverages, hasAttachments } from '../utils';
 
-import AgendaTime from './AgendaTime';
-import AgendaName from './AgendaName';
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
@@ -51,10 +49,8 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                 </ContentBar>
             </ContentHeader>
 
-            <Article image={map} covering={hasCoverages(item)}>
+            <Article image={map} item={item} group={group}>
                 <ArticleBody>
-                    <AgendaTime item={item} group={group} />
-                    <AgendaName item={item} />
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} />
                 </ArticleBody>
