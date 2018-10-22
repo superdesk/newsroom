@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { gettext } from 'utils';
 
 import TextInput from 'components/TextInput';
+import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 
 import {
@@ -50,6 +51,9 @@ class UserProfile extends React.Component {
     render() {
         const {user, onChange, errors} = this.props;
         const onCancel = () => this.props.fetchUser(this.props.user._id);
+        const localeOptions = (window.locales || [])
+            .filter((locale) => locale.locale !== window.locale) // this will be default value
+            .map((locale) => ({value: locale.locale, text: locale.name}));
         return (
             <form className="profile-content container-fluid">
                 <div className="row">
@@ -116,6 +120,18 @@ class UserProfile extends React.Component {
                                     value={!!user.receive_email}
                                     onChange={onChange} />
                             </div>
+                            {localeOptions.length &&
+                                <div className="col-lg-6">
+                                    <SelectInput
+                                        name='locale'
+                                        label={gettext('Language')}
+                                        value={user.locale}
+                                        onChange={onChange}
+                                        options={localeOptions}
+                                        defaultOption={window.locales.find((locale) => locale.locale === window.locale).name}
+                                    />
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

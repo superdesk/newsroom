@@ -29,3 +29,4 @@ class UserForm(FlaskForm):
     is_enabled = BooleanField(gettext('Account Enabled'), default=True, validators=[])
     is_approved = BooleanField(gettext('Account Approved'), validators=[])
     receive_email = BooleanField(gettext('Receive notifications via email'), validators=[])
+    locale = StringField(gettext('Locale'))
