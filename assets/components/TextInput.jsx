@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
-function TextInput({type, name, label, onChange, value, error, required, readOnly, maxLength}) {
+function TextInput({type, name, label, onChange, value, error, required, readOnly, maxLength, placeholder}) {
     let wrapperClass = 'form-group';
 
     if (error && error.length > 0) {
@@ -27,6 +27,7 @@ function TextInput({type, name, label, onChange, value, error, required, readOnl
                     required={required}
                     maxLength={maxLength}
                     readOnly={readOnly}
+                    placeholder={placeholder}
                 />
                 {error && <div className="alert alert-danger">{error}</div>}
             </div>
@@ -44,6 +45,7 @@ TextInput.propTypes = {
     required: PropTypes.bool,
     readOnly: PropTypes.bool,
     maxLength: PropTypes.number,
+    placeholder: PropTypes.string,
 };
 
 export default TextInput;

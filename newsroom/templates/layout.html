@@ -118,15 +118,15 @@
 
 {% block script %}{% endblock %}
 
-{% if newsroom_config().analytics %}
+{% if get_setting('google_analytics') %}
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ newsroom_config().analytics | safe }}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ get_setting('google_analytics') | safe }}"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', {{ newsroom_config().analytics | tojson | safe }}, {
+  gtag('config', {{ get_setting('google_analytics') | tojson | safe }}, {
       custom_map: {
           dimension1: 'company',
           dimension2: 'user',

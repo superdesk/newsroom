@@ -22,6 +22,7 @@ module.exports = {
         print_reports_js: './assets/company-reports/components/index.js',
         am_news_js: './assets/am-news/index.js',
         am_news_css: './assets/am-news/style.js',
+        'general-settings_js': './assets/general-settings/index.js',
         common: [
             'alertifyjs',
             'bootstrap',
