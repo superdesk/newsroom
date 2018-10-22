@@ -17,6 +17,18 @@ def test_item_json(client):
     resp = client.get('/agenda/urn:conference?format=json')
     data = json.loads(resp.get_data())
     assert 'headline' in data
+    assert 'files' in data['event']
+
+
+def test_item_json_does_not_return_files(client, app):
+    # public user
+    with client.session_transaction() as session:
+        session['user'] = PUBLIC_USER_ID
+        session['user_type'] = 'public'
+
+    data = get_json(client, '/agenda/urn:conference?format=json')
+    assert 'headline' in data
+    assert 'files' not in data['event']
 
 
 def get_bookmarks_count(client, user):
@@ -129,6 +141,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
+    assert 'files' not in data['_items'][0]['event']
     resp = client.get('/agenda/search?navigation=51')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])

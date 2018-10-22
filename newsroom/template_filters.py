@@ -58,6 +58,13 @@ def is_admin(user=None):
     return flask.session.get('user_type') == 'administrator'
 
 
+def is_admin_or_internal(user=None):
+    if user:
+        return user.get('user_type') == 'administrator' or user.get('user_type') == 'internal'
+    return flask.session.get('user_type') == 'administrator' or \
+        flask.session.get('user_type') == 'internal'
+
+
 def newsroom_config():
     port = int(os.environ.get('PORT', '5000'))
     return {
