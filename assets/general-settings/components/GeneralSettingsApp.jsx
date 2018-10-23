@@ -43,6 +43,7 @@ class GeneralSettingsApp extends React.Component {
                         value={this.state.values[_id]}
                         placeholder={field.default}
                         onChange={(event) => this.onChange(_id, event.target.value)}
+                        description={field.description}
                     />
                 );
             }

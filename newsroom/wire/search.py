@@ -12,6 +12,7 @@ from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.products.products import get_products_by_company, get_products_by_navigation
 from newsroom.template_filters import is_admin
+from newsroom.settings import get_setting
 
 logger = logging.getLogger(__name__)
 
@@ -200,8 +201,12 @@ class WireSearchService(newsroom.Service):
             query['bool']['must'].append(query_string(req.args['q']))
 
         if req.args.get('newsOnly') and not (req.args.get('navigation') or req.args.get('product_type')):
-            for f in app.config.get('NEWS_ONLY_FILTERS', []):
-                query['bool']['must_not'].append(f)
+            news_only_filter = get_setting('news_only_filter')
+            if news_only_filter:
+                query['bool']['must_not'].append(query_string(news_only_filter))
+            elif app.config.get('NEWS_ONLY_FILTERS'):
+                for f in app.config.get('NEWS_ONLY_FILTERS', []):
+                    query['bool']['must_not'].append(f)
 
         if req.args.get('bookmarks'):
             set_bookmarks_query(query, req.args['bookmarks'])
