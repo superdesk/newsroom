@@ -40,7 +40,7 @@ export default class CoverageItemStatus extends React.PureComponent {
             return [
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>,
                 <span key="value">{gettext('coverage {{ state }} ',
-                    {state: get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, 'planned')})}</span>,
+                    {state: get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')})}</span>,
             ];
         }
 

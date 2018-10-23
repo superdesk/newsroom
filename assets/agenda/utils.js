@@ -1,6 +1,6 @@
 import { get, isEmpty, includes } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek, getConfig} from '../utils';
+import {formatDate, formatMonth, formatWeek, getConfig, gettext} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -33,11 +33,11 @@ const Groupers = {
 };
 
 export const WORKFLOW_STATUS_TEXTS = {
-    draft: 'planned',
-    assigned: 'planned',
-    active: 'in progress',
-    completed: 'available',
-    cancelled: 'cancelled',
+    draft: gettext('planned'),
+    assigned: gettext('planned'),
+    active: gettext('in progress'),
+    completed: gettext('available'),
+    cancelled: gettext('cancelled'),
 };
 
 /**
