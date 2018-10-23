@@ -48,12 +48,13 @@ def elastic_init():
     app.data.init_elastic(app)
 
 
-@manager.command
-def index_from_mongo():
+@manager.option('-h', '--hours', dest='hours', default=None)
+@manager.option('-c', '--collection', dest='collection', default=None)
+def index_from_mongo(hours, collection):
     print('Checking if elastic index exists, a new one will be created if not')
     app.data.init_elastic(app)
     print('Elastic index check has been completed')
-    index_elastic_from_mongo()
+    index_elastic_from_mongo(hours=hours, collection=collection)
 
 
 @manager.command
