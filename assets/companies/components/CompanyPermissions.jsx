@@ -38,7 +38,9 @@ class CompanyPermissions extends React.Component {
             });
         }
 
-        return {sections, products};
+        const archive_access = !!this.props.company.archive_access;
+
+        return {sections, products, archive_access};
     }
 
     componentDidUpdate(prevProps) {
@@ -69,6 +71,20 @@ class CompanyPermissions extends React.Component {
                     this.props.savePermissions(this.props.company, this.state);
                 }}>
                     <div className="list-item__preview-form">
+                        <div className="form-group">
+                            <label>{gettext('General')}</label>
+                            <ul className="list-unstyled">
+                                <li>
+                                    <CheckboxInput
+                                        name="archive_access"
+                                        label={gettext('Archive access')}
+                                        value={!!this.state.archive_access}
+                                        onChange={() => this.setState({archive_access: !this.state.archive_access})}
+                                    />
+                                </li>
+                            </ul>
+                        </div>
+
                         {this.groups.map((group) => (
                             <div className="form-group" key={group._id}>
                                 <label>{group.label}</label>
@@ -103,6 +119,7 @@ CompanyPermissions.propTypes = {
     company: PropTypes.shape({
         _id: PropTypes.string.isRequired,
         sections: PropTypes.object,
+        archive_access: PropTypes.bool,
     }).isRequired,
 
     sections: PropTypes.arrayOf(PropTypes.shape({

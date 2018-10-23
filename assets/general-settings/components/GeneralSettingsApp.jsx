@@ -8,6 +8,10 @@ import {save} from '../actions';
 
 import TextInput from 'components/TextInput';
 
+function isInput(field) {
+    return field.type === 'text' || field.type === 'number';
+}
+
 class GeneralSettingsApp extends React.Component {
     constructor(props) {
         super(props);
@@ -33,17 +37,18 @@ class GeneralSettingsApp extends React.Component {
         const {config} = this.props;
         const fields = sortBy(Object.keys(config), (_id) => config[_id].weight).map((_id) => {
             const field = config[_id];
-            if (field.type === 'text') {
+            if (isInput(field)) {
                 return (
                     <TextInput
                         key={_id}
-                        type="text"
+                        type={field.type}
                         name={_id}
                         label={field.label}
                         value={this.state.values[_id]}
                         placeholder={field.default}
                         onChange={(event) => this.onChange(_id, event.target.value)}
                         description={field.description}
+                        min={field.min}
                     />
                 );
             }
