@@ -124,6 +124,12 @@ def set_product_query(query, company, user=None, navigation_id=None):
 
     query['bool']['minimum_should_match'] = 1
 
+    wire_time_limit_days = get_setting('wire_time_limit_days')
+    if company and not is_admin(user) and not company.get('archive_access', False) and wire_time_limit_days:
+        query['bool']['must'].append({'range': {'versioncreated': {
+            'gte': 'now-%dd/d' % int(wire_time_limit_days),
+        }}})
+
     if not query['bool']['should']:
         abort(403, gettext('Your company doesn\'t have any products defined.'))
 

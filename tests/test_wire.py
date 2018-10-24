@@ -1,4 +1,4 @@
-from flask import json
+from flask import json, g
 from bson import ObjectId
 from datetime import datetime, timedelta
 
@@ -477,3 +477,39 @@ def test_administrator_gets_results_based_on_section_filter(client, app):
     resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
+
+
+def test_time_limited_access(client, app):
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'product test',
+        'query': 'versioncreated:<=now-2d',
+        'companies': ['1'],
+        'is_enabled': True,
+    }])
+
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
+
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 2 == len(data['_items'])
+    print(data['_items'][0]['versioncreated'])
+
+    g.settings['wire_time_limit_days']['value'] = 1
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 0 == len(data['_items'])
+
+    g.settings['wire_time_limit_days']['value'] = 100
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 2 == len(data['_items'])
+
+    g.settings['wire_time_limit_days']['value'] = 1
+    company = app.data.find_one('companies', req=None, _id=1)
+    app.data.update('companies', 1, {'archive_access': True}, company)
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 2 == len(data['_items'])
