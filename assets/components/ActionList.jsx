@@ -5,7 +5,7 @@ import ActionButton from './ActionButton';
 
 function ActionList({item, user, actions}) {
     return (
-        <div className='dropdown-menu dropdown-menu-right show'>
+        <div>
             {actions.map((action) => !action.shortcut &&
                 <ActionButton
                     key={action.name}
