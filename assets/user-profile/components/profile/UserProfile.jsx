@@ -120,7 +120,7 @@ class UserProfile extends React.Component {
                                     value={!!user.receive_email}
                                     onChange={onChange} />
                             </div>
-                            {localeOptions.length &&
+                            {!!localeOptions.length &&
                                 <div className="col-lg-6">
                                     <SelectInput
                                         name='locale'
