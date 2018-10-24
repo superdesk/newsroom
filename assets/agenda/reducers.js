@@ -55,7 +55,7 @@ function recieveItems(state, data) {
     const createdFilter = get(state, 'search.createdFilter', {});
 
     let activeDate = state.agenda.activeDate || Date.now();
-    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to)) {
+    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to) || state.bookmarks) {
         activeDate = EARLIEST_DATE;
     } else if (activeDate === EARLIEST_DATE) {
         activeDate = Date.now();
