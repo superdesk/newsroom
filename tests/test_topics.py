@@ -5,6 +5,7 @@ topic = {
     'label': 'Foo',
     'query': 'foo',
     'notifications': False,
+    'topic_type': 'wire'
 }
 
 user = str(ObjectId())

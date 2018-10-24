@@ -14,7 +14,7 @@ from newsroom.utils import query_resource
 def get_settings_data():
     return {
         'products': list(query_resource('products', lookup={'is_enabled': True})),
-        "cards": list(query_resource('cards')),
+        'cards': list(query_resource('cards')),
     }
 
 

@@ -1,12 +1,15 @@
+import superdesk
 from flask import Blueprint
-
 
 blueprint = Blueprint('am_news', __name__)
 
+from .search import AmNewsSearchResource, AmNewsSearchService  # noqa
 from . import views  # noqa
 
 
 def init_app(app):
+    superdesk.register_resource('am_news_search', AmNewsSearchResource, AmNewsSearchService, _app=app)
+
     app.section('am_news', 'AM News')
     app.sidenav('AM News', 'am_news.index', 'am', section='am_news')
 

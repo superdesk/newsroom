@@ -15,9 +15,9 @@ from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json
 
 def get_settings_data():
     return {
-        'companies': list(query_resource('companies', max_results=200)),
+        'companies': list(query_resource('companies')),
         'services': app.config['SERVICES'],
-        'products': list(query_resource('products', max_results=200)),
+        'products': list(query_resource('products')),
         'sections': app.sections,
     }
 
@@ -112,7 +112,7 @@ def company_users(id):
 
 
 def update_products(updates, company_id):
-    products = list(query_resource('products', max_results=200))
+    products = list(query_resource('products'))
     db = app.data.get_mongo_collection('products')
     for product in products:
         if updates.get(str(product['_id'])):

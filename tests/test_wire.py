@@ -54,9 +54,8 @@ def test_share_items(client, app):
     assert str(user_id) in data['shares']
 
 
-def get_bookmarks_count(client, user, section=None):
-    resp = client.get('/api/wire_search?bookmarks=%s%s' % (str(user),
-                                                           '&section=%s' % section if section else ''))
+def get_bookmarks_count(client, user):
+    resp = client.get('/api/wire_search?bookmarks=%s' % str(user))
     assert resp.status_code == 200
     data = json.loads(resp.get_data())
     return data['_meta']['total']
@@ -105,21 +104,21 @@ def test_bookmarks_by_section(client, app):
         session['user'] = '59b4c5c61d41c8d736852fbf'
         session['user_type'] = 'public'
 
-    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID, section='wire')
+    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID)
 
     resp = client.post('/wire_bookmark', data=json.dumps({
         'items': [items[0]['_id']],
     }), content_type='application/json')
     assert resp.status_code == 200
 
-    assert 1 == get_bookmarks_count(client, PUBLIC_USER_ID, section='wire')
+    assert 1 == get_bookmarks_count(client, PUBLIC_USER_ID)
 
     client.delete('/wire_bookmark', data=json.dumps({
         'items': [items[0]['_id']],
     }), content_type='application/json')
     assert resp.status_code == 200
 
-    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID, section='wire')
+    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID)
 
 
 def test_item_copy(client, app):
@@ -147,7 +146,7 @@ def test_versions(client, app):
 
 
 def test_search_filters_items_with_updates(client, app):
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])
     assert 'tag:weather' not in [item['_id'] for item in data['_items']]
@@ -155,26 +154,26 @@ def test_search_filters_items_with_updates(client, app):
 
 def test_search_includes_killed_items(client, app):
     app.data.insert('items', [{'_id': 'foo', 'pubstatus': 'canceled', 'headline': 'killed'}])
-    resp = client.get('/search?q=headline:killed')
+    resp = client.get('/wire/search?q=headline:killed')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
 
 def test_search_by_products_id(client, app):
     app.data.insert('items', [{'_id': 'foo', 'headline': 'product test', 'products': [{'code': '12345'}]}])
-    resp = client.get('/search?q=products.code:12345')
+    resp = client.get('/wire/search?q=products.code:12345')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
 
 def test_search_filter_by_category(client, app):
-    resp = client.get('/search?filter=%s' % json.dumps({'service': ['Service A']}))
+    resp = client.get('/wire/search?filter=%s' % json.dumps({'service': ['Service A']}))
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
 
 def test_filter_by_product_anonymous_user_gets_all(client, app):
-    resp = client.get('/search?products=%s' % json.dumps({'10': True}))
+    resp = client.get('/wire/search?products=%s' % json.dumps({'10': True}))
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])
     assert '_aggregations' in data
@@ -184,7 +183,7 @@ def test_logged_in_user_no_product_gets_no_results(client, app):
     with client.session_transaction() as session:
         session['user'] = '59b4c5c61d41c8d736852fbf'
         session['user_type'] = 'public'
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     assert 403 == resp.status_code
 
 
@@ -193,7 +192,7 @@ def test_logged_in_user_no_company_gets_no_results(client, app):
         session['user'] = str(ObjectId())
         session['user_type'] = 'public'
 
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     assert resp.status_code == 403
 
 
@@ -202,7 +201,7 @@ def test_administrator_gets_all_results(client, app):
         session['user'] = str(ObjectId())
         session['user_type'] = 'administrator'
 
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])
 
@@ -214,13 +213,14 @@ def test_search_filtered_by_users_products(client, app):
         'sd_product_id': 1,
         'companies': ['1'],
         'is_enabled': True,
+        'product_type': 'wire'
     }])
 
     with client.session_transaction() as session:
         session['user'] = '59b4c5c61d41c8d736852fbf'
         session['user_type'] = 'public'
 
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
@@ -231,10 +231,12 @@ def test_search_filter_by_individual_navigation(client, app):
         '_id': 51,
         'name': 'navigation-1',
         'is_enabled': True,
+        'product_type': 'wire'
     }, {
         '_id': 52,
         'name': 'navigation-2',
         'is_enabled': True,
+        'product_type': 'wire'
     }])
 
     app.data.insert('products', [{
@@ -243,24 +245,26 @@ def test_search_filter_by_individual_navigation(client, app):
         'sd_product_id': 1,
         'companies': ['1'],
         'navigations': ['51'],
-        'is_enabled': True,
+        'product_type': 'wire',
+        'is_enabled': True
     }, {
         '_id': 11,
         'name': 'product test 2',
         'sd_product_id': 2,
         'companies': ['1'],
         'navigations': ['52'],
-        'is_enabled': True,
+        'product_type': 'wire',
+        'is_enabled': True
     }])
     with client.session_transaction() as session:
         session['user'] = '59b4c5c61d41c8d736852fbf'
         session['user_type'] = 'public'
 
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/search?navigation=51')
+    resp = client.get('/wire/search?navigation=51')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
@@ -269,11 +273,11 @@ def test_search_filter_by_individual_navigation(client, app):
     with client.session_transaction() as session:
         session['user_type'] = 'administrator'
 
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])  # gets all by default
 
-    resp = client.get('/search?navigation=51')
+    resp = client.get('/wire/search?navigation=51')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
@@ -283,10 +287,12 @@ def test_search_filtered_by_query_product(client, app):
         '_id': 51,
         'name': 'navigation-1',
         'is_enabled': True,
+        'product_type': 'wire',
     }, {
         '_id': 52,
         'name': 'navigation-2',
         'is_enabled': True,
+        'product_type': 'wire'
     }])
 
     app.data.insert('products', [{
@@ -295,62 +301,64 @@ def test_search_filtered_by_query_product(client, app):
         'query': 'headline:more',
         'companies': ['1'],
         'navigations': ['51'],
-        'is_enabled': True,
+        'product_type': 'wire',
+        'is_enabled': True
     }, {
         '_id': 13,
         'name': 'product test 2',
         'query': 'headline:Weather',
         'companies': ['1'],
         'navigations': ['52'],
-        'is_enabled': True,
+        'product_type': 'wire',
+        'is_enabled': True
     }])
 
     with client.session_transaction() as session:
         session['user'] = '59b4c5c61d41c8d736852fbf'
         session['user_type'] = 'public'
 
-    resp = client.get('/search')
+    resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/search?navigation=52')
+    resp = client.get('/wire/search?navigation=52')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
 
 
 def test_search_pagination(client):
-    resp = client.get('/search?from=25')
+    resp = client.get('/wire/search?from=25')
     assert 200 == resp.status_code
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
     assert '_aggregations' not in data
 
-    resp = client.get('/search?from=2000')
+    resp = client.get('/wire/search?from=2000')
     assert 400 == resp.status_code
 
 
 def test_search_created_from(client):
-    resp = client.get('/search?created_from=now/d')
+    resp = client.get('/wire/search?created_from=now/d')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
-    resp = client.get('/search?created_from=now/w')
+    resp = client.get('/wire/search?created_from=now/w')
     data = json.loads(resp.get_data())
     assert 1 <= len(data['_items'])
 
-    resp = client.get('/search?created_from=now/M')
+    resp = client.get('/wire/search?created_from=now/M')
     data = json.loads(resp.get_data())
 
     assert 1 <= len(data['_items'])
 
 
 def test_search_created_to(client):
-    resp = client.get('/search?created_to=%s' % datetime.now().strftime('%Y-%m-%d'))
+    resp = client.get('/wire/search?created_to=%s' % datetime.now().strftime('%Y-%m-%d'))
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])
 
-    resp = client.get('/search?created_to=%s&timezone_offset=%s' % (
+    resp = client.get('/wire/search?created_to=%s&timezone_offset=%s' % (
         (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d'),
         -120
     ))
@@ -380,10 +388,92 @@ def test_item_detail_access(client, app):
         'name': 'matching product',
         'companies': ['1'],
         'is_enabled': True,
-        'query': 'slugline:%s' % items[0]['slugline'],
+        'product_type': 'wire',
+        'query': 'slugline:%s' % items[0]['slugline']
     }])
 
     # normal access
     data = get_json(client, item_url)
     assert data['_access']
     assert data['body_html']
+
+
+def test_search_using_section_filter_for_public_user(client, app):
+    app.data.insert('navigations', [{
+        '_id': 51,
+        'name': 'navigation-1',
+        'is_enabled': True,
+        'product_type': 'wire'
+    }, {
+        '_id': 52,
+        'name': 'navigation-2',
+        'is_enabled': True,
+        'product_type': 'wire'
+    }])
+
+    app.data.insert('products', [{
+        '_id': 12,
+        'name': 'product test',
+        'query': 'headline:more',
+        'companies': ['1'],
+        'navigations': ['51'],
+        'is_enabled': True
+    }, {
+        '_id': 13,
+        'name': 'product test 2',
+        'query': 'headline:Weather',
+        'companies': ['1'],
+        'navigations': ['52'],
+        'is_enabled': True
+    }])
+
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
+
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 2 == len(data['_items'])
+    assert '_aggregations' in data
+    resp = client.get('/wire/search?navigation=52')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+    assert '_aggregations' in data
+
+    app.data.insert('section_filters', [{
+        '_id': 'f-1',
+        'name': 'product test 2',
+        'query': 'headline:Weather',
+        'is_enabled': True,
+        'filter_type': 'wire'
+    }])
+
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+
+    resp = client.get('/wire/search?navigation=52')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+
+    resp = client.get('/wire/search?navigation=51')
+    data = json.loads(resp.get_data())
+    assert 0 == len(data['_items'])
+
+
+def test_administrator_gets_results_based_on_section_filter(client, app):
+    with client.session_transaction() as session:
+        session['user'] = str(ObjectId())
+        session['user_type'] = 'administrator'
+
+    app.data.insert('section_filters', [{
+        '_id': 'f-1',
+        'name': 'product test 2',
+        'query': 'headline:Weather',
+        'is_enabled': True,
+        'filter_type': 'wire'
+    }])
+
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])

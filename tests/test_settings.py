@@ -27,10 +27,10 @@ def test_news_only_filter(client, app):
     # reset default filter
     app.config['NEWS_ONLY_FILTER'] = []
 
-    _items = get_json(client, '/search?newsOnly=1')['_items']
+    _items = get_json(client, '/wire/search?newsOnly=1')['_items']
     assert len(_items) == 3
 
     post_json(client, '/settings/general_settings', {'news_only_filter': 'type:text'})
 
-    _items = get_json(client, '/search?newsOnly=1')['_items']
+    _items = get_json(client, '/wire/search?newsOnly=1')['_items']
     assert len(_items) == 0

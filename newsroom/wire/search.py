@@ -1,7 +1,6 @@
 import pytz
 import logging
 import newsroom
-import superdesk
 
 from datetime import datetime, timedelta
 from werkzeug.exceptions import Forbidden
@@ -13,6 +12,7 @@ from newsroom.companies import get_user_company
 from newsroom.products.products import get_products_by_company, get_products_by_navigation
 from newsroom.template_filters import is_admin
 from newsroom.settings import get_setting
+from superdesk import get_resource_service
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ def get_local_date(date, time, offset):
 
 
 def get_bookmarks_count(user_id, product_type):
-    return superdesk.get_resource_service('wire_search').get_bookmarks_count(user_id, product_type)
+    return get_resource_service('{}_search'.format(product_type)).get_bookmarks_count(user_id)
 
 
 class WireSearchResource(newsroom.Resource):
@@ -83,7 +83,7 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
-def set_product_query(query, company, user=None, navigation_id=None, product_type=None):
+def set_product_query(query, company, user=None, navigation_id=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -93,25 +93,21 @@ def set_product_query(query, company, user=None, navigation_id=None, product_typ
     :param company: company
     :param user: user to check against (used for notification checking)
     :param navigation_id: navigation to filter products
-    :param product_type: product_type to filter products
     If not provided session user will be checked
     """
     products = None
 
-    if product_type and company:
-        products = get_products_by_company(company['_id'], product_type=product_type)
-    else:
-        if is_admin(user):
-            if navigation_id:
-                products = get_products_by_navigation(navigation_id)
-            else:
-                return  # admin will see everything by default
-
-        if company:
-            products = get_products_by_company(company['_id'], navigation_id)
+    if is_admin(user):
+        if navigation_id:
+            products = get_products_by_navigation(navigation_id)
         else:
-            # user does not belong to a company so blocking all stories
-            abort(403, gettext('User does not belong to a company.'))
+            return  # admin will see everything by default
+
+    if company:
+        products = get_products_by_company(company['_id'], navigation_id)
+    else:
+        # user does not belong to a company so blocking all stories
+        abort(403, gettext('User does not belong to a company.'))
 
     query['bool']['should'] = []
     product_ids = [p['sd_product_id'] for p in products if p.get('sd_product_id')]
@@ -175,12 +171,15 @@ def _items_query():
 
 
 class WireSearchService(newsroom.Service):
-    def get_bookmarks_count(self, user_id, product_type):
+    section = 'wire'
+
+    def get_bookmarks_count(self, user_id):
         query = _items_query()
         user = get_user()
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
         company = get_user_company(user)
         try:
-            set_product_query(query, company, product_type=product_type)
+            set_product_query(query, company)
         except Forbidden:
             return 0
         set_bookmarks_query(query, user_id)
@@ -193,9 +192,9 @@ class WireSearchService(newsroom.Service):
         query = _items_query()
         user = get_user()
         company = get_user_company(user)
-        set_product_query(query, company,
-                          navigation_id=req.args.get('navigation'),
-                          product_type=req.args.get('section') if req.args.get('bookmarks') else None)
+
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
+        set_product_query(query, company, navigation_id=req.args.get('navigation'))
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
@@ -260,12 +259,13 @@ class WireSearchService(newsroom.Service):
     def get_product_items(self, product_id, size):
         query = _items_query()
 
-        product = superdesk.get_resource_service('products').find_one(req=None, _id=product_id)
+        product = get_resource_service('products').find_one(req=None, _id=product_id)
 
         if not product:
             return
 
         query['bool']['should'] = []
+        get_resource_service('section_filters').apply_section_filter(query, product.get('product_type'))
 
         if product.get('sd_product_id'):
             query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
@@ -314,9 +314,16 @@ class WireSearchService(newsroom.Service):
         }
 
         queried_topics = []
+        # get all section filters
+        section_filters = get_resource_service('section_filters').get_section_filters_dict()
 
         for topic in topics:
             query['bool']['must'] = [{'term': {'_id': item_id}}]
+
+            # apply the base product query for each topic type
+            get_resource_service('section_filters').apply_section_filter(query,
+                                                                         topic.get('topic_type'),
+                                                                         section_filters)
 
             user = users.get(str(topic['user']))
             if not user:
@@ -421,13 +428,16 @@ class WireSearchService(newsroom.Service):
 
         return bookmark_users
 
-    def get_product_item_report(self, product):
+    def get_product_item_report(self, product, section_filters=None):
         query = _items_query()
 
         if not product:
             return
 
         query['bool']['should'] = []
+        get_resource_service('section_filters').apply_section_filter(query,
+                                                                     product.get('product_type'),
+                                                                     section_filters)
 
         if product.get('sd_product_id'):
             query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
