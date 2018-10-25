@@ -75,6 +75,7 @@ $badge-font-weight: 400;
 // Grid breakpoints
 $grid-breakpoints: (
     xs: 0,
+    xsm: 321px,
     sm: 576px,
     md: 768px,
     lg: 992px,
@@ -87,6 +88,7 @@ $grid-breakpoints: (
   // Define the maximum width of `.container` for different screen sizes.
   
   $container-max-widths: (
+    xsm: 300px,
     sm: 540px,
     md: 720px,
     lg: 960px,

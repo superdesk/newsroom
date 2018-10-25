@@ -11,6 +11,7 @@
 }
 .navbar__logo {
     max-width: 230px;
+    padding: 0 0 0 0.5rem;
 }
 .navbar__logo img {
     max-width: 80px;

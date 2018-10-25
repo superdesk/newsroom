@@ -1,7 +1,12 @@
 // Breakpoints
 
 // Extra small devices (portrait phones, less than 576px)
-// No media query since this is the default in Bootstrap
+
+@mixin xsm() {
+    @media only screen and (min-width: 321px) {
+        @content;
+    }
+}
 
 // Small devices (landscape phones, 576px and up)
 @mixin sm() {
