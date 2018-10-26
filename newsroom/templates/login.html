@@ -27,6 +27,16 @@
                             <label for="password">{{ form.password.label.text }}</label>
                             {{ form.password(class="form-control", id="password", required="true") }}
                         </div>
+                        <div class="form-group">
+                            <label for="language">Language</label>
+                            <div class="field">
+                                <select name="language" class="form-control">
+                                    <option value=""></option>
+                                    <option value="en">English</option>
+                                    <option value="nz">Finish</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="form-check mb-4 p-0">
                             <div class="custom-control custom-checkbox">
                                 {{ form.remember_me(class="custom-control-input", id="remember_me") }}
