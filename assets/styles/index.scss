@@ -567,6 +567,10 @@ article.list {
     padding: 20px;
     flex: 1;
     overflow: auto;
+
+    &--bg-white {
+        background-color: white;
+    }
 }
 .list-item {
     background-color: #ccc;
