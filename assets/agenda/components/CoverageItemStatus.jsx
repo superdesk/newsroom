@@ -19,7 +19,7 @@ export default class CoverageItemStatus extends React.PureComponent {
     fetchWire() {
         const url = getDeliveryHref(this.props.coverage);
 
-        if (url) {
+        if (url && this.props.coverage.coverage_type === 'text') {
             server.getJson(url).then((wire) => {
                 this.setState({wire});
             });
@@ -48,9 +48,27 @@ export default class CoverageItemStatus extends React.PureComponent {
             return [
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Wire')}:</span>,
                 this.state.wire._access
-                    ? <a key="value" href={'/wire?item='+ this.state.wire._id}>{this.state.wire.headline}</a>
-                    : <a key="value" href={'/wire/' + this.state.wire._id} target="_blank">{this.state.wire.headline}{' '}<i className="icon-small--lock icon--red"></i></a>
+                    ? <a className="wire-column__preview__coverage__available-story"
+                        key="value"
+                        href={'/wire?item='+ this.state.wire._id}
+                        target="_blank"
+                        title={gettext('Open in new tab')}>{this.state.wire.headline}</a>
+                    : <a className="wire-column__preview__coverage__restricted-story"
+                        key="value" href={'/wire/' + this.state.wire._id}
+                        target="_blank">{this.state.wire.headline}
+                    </a>
                 ,
+            ];
+        }
+
+        if (coverage.workflow_status === 'completed' && coverage.coverage_type === 'picture' && getDeliveryHref(coverage)) {
+            return [
+                <span key="label" className='coverage-item__text-label mr-1'>{gettext('Picture')}:</span>,
+                <a className="wire-column__preview__coverage__available-story"
+                    key="picture"
+                    href={coverage.delivery_href}
+                    target="_blank"
+                    title={gettext('Open in new tab')}>{this.state.wire.headline || coverage.slugline}</a>
             ];
         }
 
@@ -62,5 +80,7 @@ CoverageItemStatus.propTypes = {
     coverage: PropTypes.shape({
         delivery_href: PropTypes.string,
         coverage_status: PropTypes.string,
+        workflow_status: PropTypes.string,
+        coverage_type: PropTypes.string,
     }),
 };
