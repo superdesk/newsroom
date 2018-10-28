@@ -40,6 +40,15 @@ export const WORKFLOW_STATUS_TEXTS = {
     cancelled: gettext('cancelled'),
 };
 
+export const WORKFLOW_COLORS = {
+    draft: 'mid-blue-light',
+    assigned: 'mid-blue-light',
+    active: 'cyan',
+    completed: 'green',
+    cancelled: 'red',
+};
+
+
 /**
  * Early enough date to use in querying all agenda items
  * @type {number}
