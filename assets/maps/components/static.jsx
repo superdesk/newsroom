@@ -31,6 +31,14 @@ function getZoom(location) {
     return !isEmpty(line) ? 'zoom=15' : 'zoom=8';
 }
 
+function getLocationDetails(location) {
+    return [location.name,
+        getAddressLine(location),
+        getAddressState(location),
+        getAddressCountry(location),
+    ].filter((x) => !!x).join(', ');
+}
+
 export default function StaticMap({locations, scale}) {
     const params = ['size=600x400', 'key=' + mapsKey(), 'scale=' + (scale || 1)];
     const geoLocations = getGeoLocations(locations);
@@ -42,12 +50,8 @@ export default function StaticMap({locations, scale}) {
         src = MAPS_URL + '?' + markers.concat(params).join('&');
     } else {
         const location = locations[0];
-        params.push('center=' + encodeURIComponent([
-            location.name,
-            getAddressLine(location),
-            getAddressState(location),
-            getAddressCountry(location),
-        ].filter((x) => !!x).join(', ')));
+        params.push('center=' + encodeURIComponent(getLocationDetails(location)));
+        params.push('markers=' + encodeURIComponent(getLocationDetails(location)));
         src = MAPS_URL + '?' + params.join('&');
     }
 

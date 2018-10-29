@@ -4,8 +4,7 @@ import {isEmpty} from 'lodash';
 
 import { gettext } from 'utils';
 
-import { getLocations, mapsLoaded, getGeoLocations, mapsKey } from 'maps/utils';
-import Map from 'maps/components/map';
+import { getLocations, mapsKey } from 'maps/utils';
 import StaticMap from 'maps/components/static';
 
 import PreviewActionButtons from 'components/PreviewActionButtons';
@@ -30,12 +29,13 @@ import AgendaCoverageRequest from './AgendaCoverageRequest';
 
 export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group}) {
     const locations = getLocations(item);
-    const geoLocations = getGeoLocations(locations);
     let map = null;
 
-    if (mapsLoaded() && !isEmpty(geoLocations)) {
-        map = <Map locations={geoLocations} />;
-    }
+    // Ta: disabling the embedded map for now for ticket SDAN-334
+    // const geoLocations = getGeoLocations(locations);
+    // if (mapsLoaded() && !isEmpty(geoLocations)) {
+    //     map = <Map locations={geoLocations} />;
+    // }
 
     if (!map && mapsKey() && !isEmpty(locations)) {
         map = <StaticMap locations={locations} scale={2} />;
