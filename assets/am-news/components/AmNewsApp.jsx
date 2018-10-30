@@ -9,9 +9,7 @@ import { get } from 'lodash';
 import BaseApp from '../../layout/components/BaseApp';
 import SearchBar from '../../components/SearchBar';
 import SearchResultsInfo from '../../wire/components/SearchResultsInfo';
-import Preview from '../../wire/components/Preview';
 import DownloadItemsModal from '../../wire/components/DownloadItemsModal';
-import ItemDetails from '../../wire/components/ItemDetails';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import ShareItemModal from '../../components/ShareItemModal';
 import BookmarkTabs from 'components/BookmarkTabs';
@@ -28,6 +26,8 @@ import {
 } from '../../search/actions';
 import Navigations from './Navigations';
 import AmNewsList from './AmNewsList';
+import AmPreview from './AmPreview';
+import AmItemDetails from './AmItemDetails';
 
 
 const modals = {
@@ -43,7 +43,7 @@ class AmNewsApp extends BaseApp {
 
     renderItemDetails() {
         return ([
-            <ItemDetails
+            <AmItemDetails
                 key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
@@ -102,12 +102,10 @@ class AmNewsApp extends BaseApp {
 
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
-                                <Preview
+                                <AmPreview
                                     item={this.props.itemToPreview}
                                     user={this.props.user}
                                     actions={this.filterActions(this.props.itemToPreview)}
-                                    followStory={null}
-                                    isFollowing={false}
                                     closePreview={this.props.closePreview}
                                 />
                             }

@@ -6,6 +6,8 @@ from flask import current_app as app
 from eve.methods.get import get_internal
 from eve.render import send_response
 from superdesk import get_resource_service
+
+from newsroom.template_filters import is_admin_or_internal
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.auth import get_user, login_required
@@ -35,6 +37,11 @@ def bookmarks():
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'agenda')
+
+    user = get_user()
+    if not is_admin_or_internal(user):
+        item.get('event', {}).pop('files', None)
+
     if is_json_request(flask.request):
         return flask.jsonify(item)
 

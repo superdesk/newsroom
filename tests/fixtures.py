@@ -97,6 +97,11 @@ agenda_items = [{
         'end': datetime(2018, 7, 20, 4, 0, 0, tzinfo=utc),
         'start': datetime(2018, 7, 20, 4, 0, 0, tzinfo=utc),
     },
+    'event': {
+        "definition_short": "Blah Blah",
+        "pubstatus": "usable",
+        "files": [{'media': 'media', 'name': 'test.txt', 'mimetype': 'text/plain'}]
+    },
     'firstcreated': '2018-06-27T11:12:04+0000',
     '_current_version': 1,
     'headline': 'test headline',

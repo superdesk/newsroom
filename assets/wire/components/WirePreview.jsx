@@ -1,13 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { gettext, fullDate, formatHTML } from 'utils';
+import { gettext } from 'utils';
 import {
     getPicture,
     getPreviewRendition,
     showItemVersions,
     getCaption,
     isEqualItem, isKilled, DISPLAY_ABSTRACT } from 'wire/utils';
+
+import Preview from 'ui/components/Preview';
+import ArticleSlugline from 'ui/components/ArticleSlugline';
+import ArticleAuthor from  'ui/components/ArticleAuthor';
+import ArticlePicture from  'ui/components/ArticlePicture';
+import ArticleHeadline from 'ui/components/ArticleHeadline';
+import ArticleAbstract from 'ui/components/ArticleAbstract';
+import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
+
+
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewActionButtons from 'components/PreviewActionButtons';
 import PreviewTags from './PreviewTags';
@@ -15,7 +25,7 @@ import PreviewMeta from './PreviewMeta';
 import AgendaLinks from './AgendaLinks';
 
 
-class Preview extends React.PureComponent {
+class WirePreview extends React.PureComponent {
     constructor(props) {
         super(props);
     }
@@ -31,15 +41,7 @@ class Preview extends React.PureComponent {
         const picture = getPicture(item);
         const previousVersions = 'preview_versions';
         return (
-            <div className='wire-column__preview__items'>
-
-                <div className="wire-column__preview__top-bar pt-2 pb-0">
-                    <div className='wire-column__preview__date'>{gettext('Published')}{' '}{fullDate(item.versioncreated)}</div>
-                    <button className="icon-button" onClick={this.props.closePreview}>
-                        <i className="icon--close-thin icon--gray"></i>
-                    </button>
-                </div>
-
+            <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
                 <div className='wire-column__preview__top-bar'>
                     <div>
                         {followStory && user && item.slugline && item.slugline.trim() &&
@@ -54,43 +56,18 @@ class Preview extends React.PureComponent {
 
                     <PreviewActionButtons item={item} user={user} actions={actions} />
                 </div>
-
                 <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
-                    {item.slugline &&
-                        <span className='wire-column__preview__slug'>{item.slugline}</span>
-                    }
-                    <h2 className='wire-column__preview__headline'>{item.headline}</h2>
-                    {(item.byline || item.located) && (
-                        <p className='wire-column__preview__author'>
-                            {item.byline && (
-                                <span>{gettext('By')}{' '}
-                                    <b>{item.byline}</b>{' '}
-                                </span>
-                            )}
-                            {item.located && (
-                                <span>{gettext('in {{ located}}', {located: item.located})}</span>
-                            )}
-                        </p>
-                    )}
-                    {getPreviewRendition(picture) && !isKilled(item) && (
-                        <figure className='wire-column__preview__image'>
-                            <img src={getPreviewRendition(picture).href} />
-                            <figcaption className='wire-column__preview__caption'>{getCaption(picture)}</figcaption>
-                        </figure>
-                    )}
-
+                    <ArticleSlugline item={item}/>
+                    <ArticleHeadline item={item}/>
+                    <ArticleAuthor item={item} />
+                    {picture && <ArticlePicture
+                        picture={getPreviewRendition(picture)}
+                        isKilled={isKilled(item)}
+                        caption={getCaption(picture)}/>}
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions}/>
-
-                    {item.description_text && DISPLAY_ABSTRACT &&
-                        <p className='wire-column__preview__lead'>{item.description_text}</p>
-                    }
-                    
-                    {item.body_html &&
-                            <div className='wire-column__preview__text' id='preview-body' dangerouslySetInnerHTML={({__html: formatHTML(item.body_html)})} />
-                    }
-
-                    <PreviewTags item={item} isItemDetail={false} />
-
+                    <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>
+                    <ArticleBodyHtml item={item}/>
+                    <PreviewTags item={item} isItemDetail={false}/>
                     {showItemVersions(item) &&
                         <ListItemPreviousVersions
                             item={item}
@@ -98,15 +75,14 @@ class Preview extends React.PureComponent {
                             inputId={previousVersions}
                         />
                     }
-
                     <AgendaLinks item={item} preview={true} />
                 </div>
-            </div>
+            </Preview>
         );
     }
 }
 
-Preview.propTypes = {
+WirePreview.propTypes = {
     user: PropTypes.string,
     item: PropTypes.object.isRequired,
     actions: PropTypes.arrayOf(PropTypes.shape({
@@ -119,4 +95,4 @@ Preview.propTypes = {
     closePreview: PropTypes.func,
 };
 
-export default Preview;
+export default WirePreview;

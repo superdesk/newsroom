@@ -52,6 +52,9 @@
     &.icon--mid-blue {
         color: $mid-blue;
     }
+    &.icon--mid-blue-light {
+        color: $mid-blue-light;
+    }
     &.icon--white {
         color: #fff;
     }
@@ -66,6 +69,9 @@
     }
     &.icon--orange {
         color: $orange;
+    }
+    &.icon--cyan {
+        color: $cyan;
     }
 }
 
@@ -217,4 +223,25 @@
 }
 .icon--am:before {
   content: "\e62e";
+}
+.icon--am-traffic:before {
+  content: "\e62f";
+}
+.icon--am-quote:before {
+  content: "\e630";
+}
+.icon--am-fuel:before {
+  content: "\e631";
+}
+.icon--am-announce:before {
+  content: "\e632";
+}
+.icon--am-alert:before {
+  content: "\e634";
+}
+.icon--am-weather:before {
+  content: "\e635";
+}
+.icon--am-headlines:before {
+  content: "\e636";
 }

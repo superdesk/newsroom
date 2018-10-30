@@ -31,7 +31,7 @@ class AgendaPreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, openItemDetails, requestCoverage} = this.props;
+        const {item, user, actions, openItemDetails, requestCoverage, previewGroup} = this.props;
 
         const isWatching = get(item, 'watches', []).includes(user);
 
@@ -55,7 +55,7 @@ class AgendaPreview extends React.PureComponent {
 
                         <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
                             <AgendaName item={item} />
-                            <AgendaTime item={item} />
+                            <AgendaTime item={item} group={previewGroup} />
                             <AgendaPreviewImage item={item} onClick={openItemDetails} />
                             <AgendaMeta item={item} />
                             <AgendaLongDescription item={item} />
@@ -83,6 +83,7 @@ AgendaPreview.propTypes = {
     closePreview: PropTypes.func,
     openItemDetails: PropTypes.func,
     requestCoverage: PropTypes.func,
+    previewGroup: PropTypes.string,
 };
 
 export default AgendaPreview;

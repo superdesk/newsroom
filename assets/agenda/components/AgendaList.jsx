@@ -91,7 +91,7 @@ class AgendaList extends React.Component {
         }
     }
 
-    onItemClick(item) {
+    onItemClick(item, group) {
         const itemId = item._id;
         this.setState({actioningItem: null});
         this.cancelPreviewTimeout();
@@ -101,17 +101,17 @@ class AgendaList extends React.Component {
             this.props.dispatch(setActive(itemId));
 
             if (this.props.previewItem !== itemId) {
-                this.props.dispatch(previewItem(item));
+                this.props.dispatch(previewItem(item, group));
             } else {
-                this.props.dispatch(previewItem(null));
+                this.props.dispatch(previewItem(null, null));
             }
         }, CLICK_TIMEOUT);
     }
 
-    onItemDoubleClick(item) {
+    onItemDoubleClick(item, group) {
         this.cancelClickTimeout();
         this.props.dispatch(setActive(item._id));
-        this.props.dispatch(openItem(item));
+        this.props.dispatch(openItem(item, group));
     }
 
     onActionList(event, item, group) {

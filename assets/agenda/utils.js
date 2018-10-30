@@ -1,6 +1,6 @@
 import { get, isEmpty, includes } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek, getConfig} from '../utils';
+import {formatDate, formatMonth, formatWeek, getConfig, gettext} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -31,6 +31,23 @@ const Groupers = {
     'week': formatWeek,
     'month': formatMonth,
 };
+
+export const WORKFLOW_STATUS_TEXTS = {
+    draft: gettext('planned'),
+    assigned: gettext('planned'),
+    active: gettext('in progress'),
+    completed: gettext('available'),
+    cancelled: gettext('cancelled'),
+};
+
+export const WORKFLOW_COLORS = {
+    draft: 'icon--mid-blue-light',
+    assigned: 'icon--mid-blue-light',
+    active: 'icon--cyan',
+    completed: 'icon--green',
+    cancelled: 'icon--red',
+};
+
 
 /**
  * Early enough date to use in querying all agenda items
@@ -158,13 +175,20 @@ export function getGeoLocation(item) {
 }
 
 /**
- * Returns item location in string
+ * Returns item address in string
  *
  * @param {Object} item
  * @return {String}
  */
 export function getLocationString(item) {
-    return get(item, 'location.0.name') || get(item, 'location.0.address.area') || get(item, 'location.0.address.locality');
+    return [
+        get(item, 'location.0.address.title'),
+        get(item, 'location.0.address.line.0'),
+        get(item, 'location.0.address.area'),
+        get(item, 'location.0.address.locality'),
+        get(item, 'location.0.address.postal_code'),
+        get(item, 'location.0.address.country'),
+    ].filter((d) => d).join(', ');
 }
 
 /**

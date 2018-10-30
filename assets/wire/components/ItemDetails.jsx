@@ -6,68 +6,48 @@ import AgendaLinks from './AgendaLinks';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import PreviewActionButtons from 'components/PreviewActionButtons';
-import { gettext, fullDate, formatHTML } from 'utils';
 import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT, isPreformatted } from 'wire/utils';
+import Content from 'ui/components/Content';
+import ContentHeader from 'ui/components/ContentHeader';
+import ContentBar from 'ui/components/ContentBar';
+import ArticleItemDetails from 'ui/components/ArticleItemDetails';
+import ArticleContent from 'ui/components/ArticleContent';
+import ArticlePicture from 'ui/components/ArticlePicture';
+import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
+import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
+import ArticleSlugline from 'ui/components/ArticleSlugline';
+import ArticleHeadline from 'ui/components/ArticleHeadline';
+import ArticleAbstract from 'ui/components/ArticleAbstract';
+import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
+import ArticleBody from 'ui/components/ArticleBody';
 
 
 function ItemDetails({item, user, actions, onClose}) {
     const picture = getPicture(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
-    const itemDetailClassName = `wire-column__preview__content--item-detail-item-${itemType}`;
-    const itemWrapperClassName = `wire-column__preview__content--item-detail-${itemType}-wrap`;
     return (
-        <div className='content--item-detail'>
-            <section className='content-header'>
-                <div className='content-bar navbar justify-content-between'>
-
-                    <span className='content-bar__menu' onClick={onClose}>
-                        <i className='icon--close-thin'></i>
-                    </span>
-
+        <Content type="item-detail">
+            <ContentHeader>
+                <ContentBar onClose={onClose}>
                     <PreviewActionButtons item={item} user={user} actions={actions}/>
-                </div>
-
-            </section>
-
-            <article id='preview-article' className="wire-column__preview__content--item-detail-wrap">
-                <div className="wire-column__preview__content">
-                    {getDetailRendition(picture) && !isKilled(item) && (
-                        <figure className="wire-column__preview__image">
-                            <span>
-                                <img src={getDetailRendition(picture).href} />
-                            </span>
-                            <figcaption className="wire-column__preview__caption">{getCaption(picture)}</figcaption>
-                        </figure>
-                    )}
-
-                    <div className={itemWrapperClassName}>
-                        <div className={itemDetailClassName}>
-                            <span className="wire-column__preview__slug">{item.slugline}</span>
-                            <h2 className="wire-column__preview__headline">{item.headline}</h2>
-
-                            <p className="wire-column__preview__author">
-                                {item.byline && (
-                                    <span>{gettext('By')}{' '}
-                                        <b>{item.byline}</b>
-                                    </span>
-                                )}
-                                {` ${gettext('at')} `}
-                                {fullDate(item.versioncreated)}
-                            </p>
-
-                            {item.description_text && DISPLAY_ABSTRACT &&
-                                <p className="wire-column__preview__lead">{item.description_text}</p>}
-
-                            {item.body_html &&
-                          <div className="wire-column__preview__text"
-                              dangerouslySetInnerHTML={({__html: formatHTML(item.body_html)})}/>
-                            }
-                        </div>
-
-                        <PreviewMeta item={item} isItemDetail={true} />
-
-                        <div className="wire-column__preview__content--item-detail-info-wrap">
-
+                </ContentBar>                
+            </ContentHeader>
+            <ArticleItemDetails>
+                <ArticleContent>
+                    {picture && <ArticlePicture
+                        picture={getDetailRendition(picture)}
+                        isKilled={isKilled(item)}
+                        caption={getCaption(picture)}
+                        isItemDetails/>}
+                    <ArticleContentWrapper itemType={itemType}>
+                        <ArticleBody itemType={itemType}>
+                            <ArticleSlugline item={item}/>
+                            <ArticleHeadline item={item}/>
+                            <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>
+                            <ArticleBodyHtml item={item}/>
+                        </ArticleBody>
+                        <PreviewMeta item={item} isItemDetail={true}/>
+                        <ArticleContentInfoWrapper>
                             <PreviewTags item={item} isItemDetail={true}/>
 
                             {showItemVersions(item, true) &&
@@ -78,13 +58,11 @@ function ItemDetails({item, user, actions, onClose}) {
                             }
 
                             <AgendaLinks item={item} />
-                        </div>
-
-                    </div>
-
-                </div>
-            </article>
-        </div>
+                        </ArticleContentInfoWrapper>
+                    </ArticleContentWrapper>
+                </ArticleContent>
+            </ArticleItemDetails>
+        </Content>
     );
 }
 
@@ -100,3 +78,4 @@ ItemDetails.propTypes = {
 };
 
 export default ItemDetails;
+

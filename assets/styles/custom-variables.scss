@@ -6,11 +6,13 @@ $gray-mid: #9a9a9a;
 $background-color: #f8f8f8;
 $main-blue: #00acec;
 $mid-blue: #006f98;
+$mid-blue-light: #6b8d9a;
 $pink: #d50089;
 $red: #cb0002;
 $green: #7ed321;
 $green-dark: #64a51c;
 $orange: #f7941d;
+$cyan: #0ce7e7;
 
 // Custom bootstrap variables
 
@@ -75,6 +77,7 @@ $badge-font-weight: 400;
 // Grid breakpoints
 $grid-breakpoints: (
     xs: 0,
+    xsm: 321px,
     sm: 576px,
     md: 768px,
     lg: 992px,
@@ -87,6 +90,7 @@ $grid-breakpoints: (
   // Define the maximum width of `.container` for different screen sizes.
   
   $container-max-widths: (
+    xsm: 300px,
     sm: 540px,
     md: 720px,
     lg: 960px,

@@ -12,7 +12,7 @@ export default function FilterItem({bucket, group, toggleFilter, groupFilter}) {
                 checked={isActive}
                 id={bucket.key}
                 onChange={() => {
-                    toggleFilter(group.field, bucket.key, group.single);
+                    toggleFilter(group.field, bucket.key, group.single, isActive);
                 }} />
             <label
                 className="custom-control-label"

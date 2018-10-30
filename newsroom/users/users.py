@@ -72,7 +72,10 @@ class UsersResource(newsroom.Resource):
         'receive_email': {
             'type': 'boolean',
             'default': False
-        }
+        },
+        'locale': {
+            'type': 'string',
+        },
     }
 
     item_methods = ['GET', 'PATCH', 'PUT']

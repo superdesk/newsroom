@@ -1,0 +1,144 @@
+{% extends "layout_settings.html" %}
+
+{% block title %}Users Design{% endblock %}
+
+{% block adminNavigation %}
+
+<nav class="side-navigation">
+    <ul>
+        <li><a class="side-navigation__btn" href="#">Companies Management</a></li>
+        <li><a class="side-navigation__btn" href="#">User Management</a></li>
+        <li><a class="side-navigation__btn" href="#">Navigation</a></li>
+        <li><a class="side-navigation__btn" href="#">Products</a></li>        
+        <li><a class="side-navigation__btn" href="#">Section Filters</a></li>
+        <li><a class="side-navigation__btn" href="#">Home page cards</a></li>        
+        <li><a class="side-navigation__btn active" href="#">General Settings</a></li>
+    </ul>
+</nav>
+
+{% endblock %}
+
+{% block contentMain %}
+<div class="list-items-container list-items-container--bg-white">
+    <div class="row">
+        <div class="col-12 col-xl-6">
+            <form>
+                <div class="form-group">
+                    <label for="google_analytics">Google Analytics ID</label>
+                    <div class="field">
+                        <input type="text" id="google_analytics" name="google_analytics" class="form-control" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="news_only_filter">News only filter</label>
+                    <div class="field">
+                        <input type="text" id="news_only_filter" name="news_only_filter" class="form-control" value="">
+                        <small class="form-text text-muted">
+                            This query defines what is NOT considered "news" content.
+                            It is used by the News only switch to filter the view.
+                            When switched on, stories matching this filter will not be displayed.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="wire_time_limit_days">Time limit for Wire products (in days)</label>
+                    <div class="field">
+                        <input type="number" id="wire_time_limit_days" name="wire_time_limit_days" class="form-control" placeholder="0" min="0" value="">
+                        <small class="form-text text-muted">
+                            You can create an additional filter on top of the product definition.
+                            The time limit can be enabled for each company in the Permissions.
+                        </small>
+                    </div>
+                </div>                
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-xl-6">
+            <h6>Language settings</h6>
+            <small>Select languages that would be offered to users.</small>
+            <table class="table mt-3">
+                <tbody>
+                    <tr>                        
+                        <td>                            
+                            <div class="form-check">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" value="on" id="english">
+                                    <label class="custom-control-label" for="english">English</label>
+                                </div>                        
+                            </div>
+                        </td>
+                        <td>                            
+                            <div class="form-check">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" value="on" id="default">
+                                    <label class="custom-control-label" for="default">Default</label>
+                                </div>                        
+                            </div>
+                        </td>
+                    </tr>                    
+                    <tr>                        
+                        <td>                            
+                            <div class="form-check">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" value="on" id="finnish">
+                                    <label class="custom-control-label" for="finnish">Finnish</label>
+                                </div>                        
+                            </div>
+                        </td>
+                        <td>                            
+                            <div class="form-check">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" value="on" id="default2">
+                                    <label class="custom-control-label" for="default2">Default</label>
+                                </div>                        
+                            </div>
+                        </td>
+                    </tr>                    
+                    <tr>                        
+                        <td>                            
+                            <div class="form-check">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" value="on" id="german">
+                                    <label class="custom-control-label" for="german">German</label>
+                                </div>                        
+                            </div>
+                        </td>
+                        <td>                            
+                            <div class="form-check">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" value="on" id="default3">
+                                    <label class="custom-control-label" for="default3">Default</label>
+                                </div>                        
+                            </div>
+                        </td>
+                    </tr>                    
+                    <tr>                        
+                        <td>                            
+                            <div class="form-check">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" value="on" id="czech">
+                                    <label class="custom-control-label" for="czech">Czech</label>
+                                </div>                        
+                            </div>
+                        </td>
+                        <td>                            
+                            <div class="form-check">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" value="on" id="default4">
+                                    <label class="custom-control-label" for="default4">Default</label>
+                                </div>                        
+                            </div>
+                        </td>
+                    </tr>                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-xl-6">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

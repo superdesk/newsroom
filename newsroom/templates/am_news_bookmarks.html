@@ -2,6 +2,10 @@
 
 {% block title %}{{ gettext('Saved Items') }}{% endblock %}
 
+{% block sectioncss %}
+    {{ javascript_tag('am_news_css') | safe }}
+{% endblock %}
+
 {% block breadcrumb %}
 <span class="breadcrumb-item active">{{ gettext('Saved Items') }}</span>
 {% endblock %}

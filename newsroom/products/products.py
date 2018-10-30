@@ -53,16 +53,25 @@ class ProductsService(newsroom.Service):
 
 def get_products_by_navigation(navigation_id):
     return list(superdesk.get_resource_service('products').
-                get(req=None, lookup={'navigations': str(navigation_id), 'is_enabled': True}))
+                get(req=None, lookup={'navigations': str(navigation_id),
+                                      'is_enabled': True}))
 
 
 def get_products_by_company(company_id, navigation_id=None, product_type=None):
+    """Get the list of products for a company
+
+    :param company_id: Company Id
+    :param navigation_id: Navigation Id
+    :param product_type: Type of the product
+    """
     lookup = {'is_enabled': True, 'companies': str(company_id)}
     if navigation_id:
         lookup['navigations'] = str(navigation_id)
     if product_type:
         lookup['product_type'] = product_type
-    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
+
+    products = list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
+    return products
 
 
 def get_products_dict_by_company(company_id):

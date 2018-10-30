@@ -45,7 +45,7 @@ def test_ical_formatter_item(client, app, mocker):
     assert vevent['attach'] == 'http://localhost:5050/assets/media-id'
     assert vevent['geo'].to_ical() == '-33.8548157;151.2164539'
     assert vevent['location'] == 'Sydney'
-    assert vevent['categories'] == 'Sport'
+    assert vevent['categories'].to_ical() == b'Sport'
     assert vevent['comment'] == event['ednote']
     assert vevent['url'] == event['links'][0]
     assert vevent['contact'] == 'Professor Tom Jones, AAP, jones@foo.com'

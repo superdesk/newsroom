@@ -58,6 +58,13 @@ def is_admin(user=None):
     return flask.session.get('user_type') == 'administrator'
 
 
+def is_admin_or_internal(user=None):
+    if user:
+        return user.get('user_type') == 'administrator' or user.get('user_type') == 'internal'
+    return flask.session.get('user_type') == 'administrator' or \
+        flask.session.get('user_type') == 'internal'
+
+
 def newsroom_config():
     port = int(os.environ.get('PORT', '5000'))
     return {
@@ -65,7 +72,6 @@ def newsroom_config():
         'time_format': flask.current_app.config['CLIENT_TIME_FORMAT'],
         'date_format': flask.current_app.config['CLIENT_DATE_FORMAT'],
         'coverage_date_format': flask.current_app.config['CLIENT_COVERAGE_DATE_FORMAT'],
-        'analytics': os.environ.get('GOOGLE_ANALYTICS', 'UA-114768905-1'),
         'display_abstract': flask.current_app.config['DISPLAY_ABSTRACT'],
     }
 

@@ -17,6 +17,18 @@ def test_item_json(client):
     resp = client.get('/agenda/urn:conference?format=json')
     data = json.loads(resp.get_data())
     assert 'headline' in data
+    assert 'files' in data['event']
+
+
+def test_item_json_does_not_return_files(client, app):
+    # public user
+    with client.session_transaction() as session:
+        session['user'] = PUBLIC_USER_ID
+        session['user_type'] = 'public'
+
+    data = get_json(client, '/agenda/urn:conference?format=json')
+    assert 'headline' in data
+    assert 'files' not in data['event']
 
 
 def get_bookmarks_count(client, user):
@@ -97,10 +109,12 @@ def test_agenda_search_filtered_by_query_product(client, app):
         '_id': 51,
         'name': 'navigation-1',
         'is_enabled': True,
+        'product_type': 'agenda'
     }, {
         '_id': 52,
         'name': 'navigation-2',
         'is_enabled': True,
+        'product_type': 'agenda'
     }])
 
     app.data.insert('products', [{
@@ -110,7 +124,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
         'companies': ['1'],
         'navigations': ['51'],
         'is_enabled': True,
-        'product_type': 'agenda',
+        'product_type': 'agenda'
     }, {
         '_id': 13,
         'name': 'product test 2',
@@ -118,7 +132,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
         'companies': ['1'],
         'navigations': ['52'],
         'is_enabled': True,
-        'product_type': 'agenda',
+        'product_type': 'agenda'
     }])
 
     with client.session_transaction() as session:
@@ -129,6 +143,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
+    assert 'files' not in data['_items'][0]['event']
     resp = client.get('/agenda/search?navigation=51')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
@@ -172,7 +187,7 @@ def test_featured(client, app):
         'companies': ['1'],
         'navigations': ['51'],
         'is_enabled': True,
-        'product_type': 'agenda',
+        'product_type': 'agenda'
     }, {
         '_id': 13,
         'name': 'all items',
@@ -180,13 +195,14 @@ def test_featured(client, app):
         'companies': ['1'],
         'navigations': ['51'],
         'is_enabled': True,
-        'product_type': 'agenda',
+        'product_type': 'agenda'
     }])
 
     _items = []
     for i in range(5):
         item = agenda_items[0].copy()
         item['_id'] = 'urn:item:%d' % i
+        item['slugline'] = 'event slugline'
         item['dates'] = item['dates'].copy()
         item['dates']['start'] += timedelta(hours=1)
         _items.append(item)
@@ -238,3 +254,17 @@ def test_featured(client, app):
     # search with no nav - featured disabled
     data = get_json(client, '/agenda/search')
     assert len(_items) <= data['_meta']['total']
+
+    app.data.insert('section_filters', [{
+        '_id': 12,
+        'name': 'filter test',
+        'query': 'NOT slugline:slugline',
+        'is_enabled': True,
+        'filter_type': 'agenda'
+    }])
+
+    data = get_json(client, '/agenda/search?navigation=51')
+    assert 0 == data['_meta']['total']
+
+    data = get_json(client, '/agenda/search')
+    assert 0 <= data['_meta']['total']

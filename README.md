@@ -94,6 +94,8 @@ npm run test start
 
 ## Translations
 
+### Extract messages
+
 Extract client messages to `newsroom-client.pot`:
 
 ```
@@ -105,4 +107,27 @@ Extract server messages to `newsroom-server.pot`:
 ```
 $ python setup.py extract_messages
 ```
+
+### Translate
+
+We translate on [transifex](https://www.transifex.com/sourcefabric/superdesk-newshub/).
+
+### Adding translated po files
+
+Copy server po file to `newsroom/translations/<locale>/LC_MESSAGES/messages.po`
+and client po file to `newsroom/translations/<locale>/LC_MESSAGES/client.po`.
+
+Then run compile to generate mo files for server messages:
+
+```
+$ pybabel compile -l <locale> -d newsroom/translations/
+```
+
+And client messages:
+
+```
+$ pybabel compile -l <locale> -d newsroom/translations/ -D client
+```
+
+When compiled you can add locale to `settings.LANGUAGES` to enable it.
 

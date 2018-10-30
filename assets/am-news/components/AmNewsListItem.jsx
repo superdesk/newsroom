@@ -8,8 +8,16 @@ import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire
 import ActionList from 'components/ActionList';
 import ActionButton from 'components/ActionButton';
 import MetaTime from 'ui/components/MetaTime';
+import AMNewsIcon from './AmNewsIcon';
 
 import ListItemPreviousVersions from '../../wire/components/ListItemPreviousVersions';
+import {
+    getAMNewsIcon,
+    isAlert,
+    isDataItem,
+    getAMNewsToolTip,
+} from '../utils';
+
 
 class AmNewsListItem extends React.Component {
     constructor(props) {
@@ -56,6 +64,12 @@ class AmNewsListItem extends React.Component {
             'wire-articles__item--visited': this.props.isRead,
             'wire-articles__item--open': this.props.isActive,
             'wire-articles__item--selected': this.props.isSelected,
+            'wire-articles__item--alert': isAlert(item),
+            'wire-articles__item--not-alert': !isAlert(item),
+        });
+        const metaTimeClassName = classNames('', {
+            'time-label--data': isDataItem(item),
+            'time-label--stories': !isDataItem(item),
         });
         const picture = getPicture(item);
 
@@ -74,7 +88,6 @@ class AmNewsListItem extends React.Component {
 
                 <div className={wrapClassName}>
                     <div className='wire-articles__item-text'>
-
                         <h4 className='wire-articles__item-headline'>
                             <div className='no-bindable-select wire-articles__item-select' onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
@@ -82,7 +95,13 @@ class AmNewsListItem extends React.Component {
                                     <i></i>
                                 </label>
                             </div>
-                            <MetaTime date={item.versioncreated} borderRight={true}/>{item.headline}
+                            <MetaTime
+                                date={item.versioncreated} borderRight={true}
+                                cssClass={metaTimeClassName}/>
+                            <AMNewsIcon
+                                iconType={getAMNewsIcon(item)}
+                                toolTip={getAMNewsToolTip(item)}
+                                borderRight={true}/>{item.headline}
                         </h4>
 
                         <div className="wire-articles__item__text">

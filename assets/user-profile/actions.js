@@ -71,6 +71,9 @@ export function saveUser() {
             .then(function() {
                 notify.success(gettext('User updated successfully'));
                 dispatch(fetchUser(editedUser._id));
+                if (editedUser.locale && window.locale !== editedUser.locale) {
+                    notify.warning(gettext('Please reload the page in order to change language.'));
+                }
             })
             .catch((error) => errorHandler(error, dispatch, setError));
 

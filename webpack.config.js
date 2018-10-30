@@ -10,6 +10,7 @@ module.exports = {
         companies_js: './assets/companies/index.js',
         users_js: './assets/users/index.js',
         products_js: './assets/products/index.js',
+        'section-filters_js': './assets/section-filters/index.js',
         navigations_js: './assets/navigations/index.js',
         cards_js: './assets/cards/index.js',
         user_profile_js: './assets/user-profile/index.js',
@@ -22,6 +23,7 @@ module.exports = {
         print_reports_js: './assets/company-reports/components/index.js',
         am_news_js: './assets/am-news/index.js',
         am_news_css: './assets/am-news/style.js',
+        'general-settings_js': './assets/general-settings/index.js',
         common: [
             'alertifyjs',
             'bootstrap',

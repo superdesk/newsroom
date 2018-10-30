@@ -567,6 +567,10 @@ article.list {
     padding: 20px;
     flex: 1;
     overflow: auto;
+
+    &--bg-white {
+        background-color: white;
+    }
 }
 .list-item {
     background-color: #ccc;
@@ -1310,7 +1314,7 @@ article.list {
 .wire-articles__item--rescheduled {
     &:before {
         width: 4px;
-        background-color: $green-dark;
+        background-color: $orange;
     }
     .date-round__number {
         color: $green-dark;
@@ -1930,7 +1934,7 @@ article.list {
     .wire-articles__item--rescheduled &,
     .wire-column__preview--rescheduled &,
     .wire-column__preview__content--rescheduled & {
-        background-color: $green-dark;
+        background-color: $orange;
     }
 
     .wire-column__preview--canceled & {
@@ -1979,7 +1983,7 @@ article.list {
     .wire-articles__item--rescheduled & i,
     .wire-column__preview--rescheduled & i,
     .wire-column__preview__content--rescheduled & i {
-        color: $green-dark;
+        color: $orange;
     }
     .wire-articles__item--watched & {
         background-color: #f2f2f2;
@@ -2173,11 +2177,24 @@ a.wire-articles__versions {
     font-size: .8125rem;
 
     &.wire-column__preview__date--event {
-        padding: 0 10px 10px 20px;
+        padding: 0 10px 10px 0px;
         
         @include xl {
-            padding: 0 10px 20px 20px;
-            font-size: 1.125rem;
+            padding: 0 10px 20px 0px;
+            font-size: 1rem;
+            line-height: 1.5rem;
+        }
+    }
+
+    &.wire-column__preview__date--dashed-border {
+        margin-right: 8px;
+        padding-right: 8px;
+        border-right: 1px dotted #c4c4c4;
+        float: left;
+
+        @include xl {
+            padding-right: 10px;
+            font-size: 1rem;
             line-height: 1.5rem;
         }
     }

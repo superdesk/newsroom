@@ -34,22 +34,22 @@ export function setActive(item) {
 }
 
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item) {
-    return {type: PREVIEW_ITEM, item};
+export function preview(item, group) {
+    return {type: PREVIEW_ITEM, item, group};
 }
 
 
-export function previewItem(item) {
+export function previewItem(item, group) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(preview(item));
+        dispatch(preview(item, group));
         item && analytics.itemEvent('preview', item);
     };
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item) {
-    return {type: OPEN_ITEM, item};
+export function openItemDetails(item, group) {
+    return {type: OPEN_ITEM, item, group};
 }
 
 export function requestCoverage(item, message) {
@@ -57,15 +57,15 @@ export function requestCoverage(item, message) {
         const url = '/agenda/request_coverage';
         const data = { item: item._id, message };
         return server.post(url, data)
-            .then(() => notify.success(gettext('Your request has been sent successfully')))
+            .then(() => notify.success(gettext('Your inquiry has been sent successfully')))
             .catch(errorHandler);
     };
 }
 
-export function openItem(item) {
+export function openItem(item, group) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(openItemDetails(item));
+        dispatch(openItemDetails(item, group));
         updateRouteParams({
             item: item ? item._id : null
         }, getState());
@@ -128,6 +128,11 @@ function search(state, next) {
     const createdFilter = get(state, 'search.createdFilter', {});
     const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
 
+    let dateTo = createdFilter.to;
+    if (createdFilter.from && createdFilter.from.indexOf('now') >= 0) {
+        dateTo = createdFilter.from;
+    }
+
     const params = {
         q: state.query,
         id: state.queryId,
@@ -135,9 +140,8 @@ function search(state, next) {
         navigation: activeNavigation,
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
-        created_from: createdFilter.from,
-        created_to: createdFilter.to,
-        date_from: isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : null,
+        date_from: isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : createdFilter.from,
+        date_to: dateTo,
         timezone_offset: getTimezoneOffset(),
     };
 
