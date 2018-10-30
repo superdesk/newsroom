@@ -78,7 +78,8 @@ CORE_APPS = [
     'newsroom.reports',
     'newsroom.public',
     'newsroom.agenda',
-    'newsroom.settings'
+    'newsroom.settings',
+    'newsroom.photos'
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -159,10 +160,6 @@ FILTER_BY_POST_FILTER = True
 
 # Base64 Encoded Token
 AAPPHOTOS_TOKEN = os.environ.get('AAPPHOTOS_TOKEN')
-
-# Base Url for photos: i.e. https://photos.aap.com.au/search/
-# If provided it will be used for populating delivery_href
-PHOTO_URL = os.environ.get('PHOTO_URL')
 
 # Home Page Carousel Sources
 HOMEPAGE_CAROUSEL = [{

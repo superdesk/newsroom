@@ -413,18 +413,11 @@ def get_display_dates(agenda_date, planning_items):
     return display_dates
 
 
-def set_coverage_delivery_href(coverage, slugline):
-    if app.config.get('PHOTO_URL') and \
-            coverage['coverage_type'] == 'picture' and \
-            coverage['workflow_status'] == 'completed':
-        q = '{"DateRange":[{"Start":"%s"}],"DateCreatedFilter":"true"}' % coverage['scheduled'][:10]
-        coverage['delivery_href'] = '{}"{}"?q={}'.format(app.config.get('PHOTO_URL'), slugline, q)
-
-
 def get_coverages(planning_items, original_coverages=[]):
     """
     Returns list of coverages for given planning items
     """
+
     def get_existing_coverage(id):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
 
@@ -441,13 +434,11 @@ def get_coverages(planning_items, original_coverages=[]):
                 'workflow_status': coverage['workflow_status'],
                 'coverage_status': coverage.get('news_coverage_status', {}).get('label'),
                 'coverage_provider': coverage['planning'].get('coverage_provider'),
-                'delivery_id': existing_coverage.get('delivery_id'),
-                'delivery_href': existing_coverage.get('delivery_href'),
+                'delivery_id': existing_coverage.get('delivery_id')
             }
 
-            set_coverage_delivery_href(
-                new_coverage,
-                coverage['planning'].get('slugline', planning_item.get('slugline')))
+            new_coverage['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item) \
+                or existing_coverage.get('delivery_href')
             coverages.append(new_coverage)
 
             if original_coverages and not existing_coverage:

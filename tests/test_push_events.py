@@ -999,23 +999,3 @@ def test_push_update_for_an_item_with_coverage(client, app, mocker):
     assert wire_item['_id'] == 'update'
     assert wire_item['agenda_id'] == 'foo'
     assert wire_item['agenda_href'] == '/agenda/foo'
-
-
-def test_push_completed_picture_coverage(client, app):
-    app.config['PHOTO_URL'] = 'https://photos.aap.com.au/search/'
-    event = deepcopy(test_event)
-    event['guid'] = 'foo4'
-    client.post('/push', data=json.dumps(event), content_type='application/json')
-
-    planning = deepcopy(test_planning)
-    planning['guid'] = 'bar1'
-    planning['event_item'] = 'foo4'
-    planning['coverages'][1]['planning']['scheduled'] = "2018-06-28T13:51:52+0000"
-    planning['coverages'][1]['workflow_status'] = "completed"
-
-    client.post('/push', data=json.dumps(planning), content_type='application/json')
-    parsed = get_entity_or_404('foo4', 'agenda')
-    assert 2 == len(parsed['coverages'])
-    assert parsed['coverages'][1]['delivery_href'] == \
-        'https://photos.aap.com.au/search/"Vivid planning item"?' \
-        'q={"DateRange":[{"Start":"2018-06-28"}],"DateCreatedFilter":"true"}'
