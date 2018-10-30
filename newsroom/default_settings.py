@@ -234,3 +234,6 @@ COVERAGE_TYPES = {
 
 LANGUAGES = ['en']
 DEFAULT_LANGUAGE = 'en'
+
+# Enable iframely support for item body_html
+IFRAMELY = True
