@@ -41,11 +41,11 @@ export const WORKFLOW_STATUS_TEXTS = {
 };
 
 export const WORKFLOW_COLORS = {
-    draft: 'mid-blue-light',
-    assigned: 'mid-blue-light',
-    active: 'cyan',
-    completed: 'green',
-    cancelled: 'red',
+    draft: 'icon--mid-blue-light',
+    assigned: 'icon--mid-blue-light',
+    active: 'icon--cyan',
+    completed: 'icon--green',
+    cancelled: 'icon--red',
 };
 
 
