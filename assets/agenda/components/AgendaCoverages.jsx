@@ -3,10 +3,8 @@ import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import { gettext, formatCoverageDate } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
-import {getCoverageDisplayName, getCoverageIcon} from '../utils';
+import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS} from '../utils';
 
-const getCoverageStatusClass = (coverage) =>
-    coverage.workflow_status === 'active' ? 'icon--green' : 'icon--gray-light';
 
 export default function AgendaCoverages({coverages}) {
     if (isEmpty(coverages)) {
@@ -17,7 +15,7 @@ export default function AgendaCoverages({coverages}) {
         <div className='coverage-item' key={coverage.coverage_id}>
             <div className='coverage-item__row'>
                 <span className='d-flex coverage-item--element-grow text-overflow-ellipsis'>
-                    <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} ${getCoverageStatusClass(coverage)} mr-2`}></i>
+                    <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} ${WORKFLOW_COLORS[coverage.workflow_status]} mr-2`}></i>
                     <span className='text-overflow-ellipsis'>{getCoverageDisplayName(coverage.coverage_type)}</span>
                 </span>
                 <span className='d-flex'>

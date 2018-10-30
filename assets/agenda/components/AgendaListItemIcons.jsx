@@ -8,7 +8,8 @@ import {
     getLocationString,
     getCoverageIcon,
     isRecurring,
-    WORKFLOW_STATUS_TEXTS
+    WORKFLOW_STATUS_TEXTS,
+    WORKFLOW_COLORS,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -54,13 +55,12 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
                 <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
                     {item.coverages.map((coverage) => {
                         const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
-                        const statusClass = coverage.workflow_status === 'active' ? 'icon--green' : 'icon--gray-light';
                         return (!group || isCoverageForExtraDay(coverage, group) &&
                           <span
                               className='wire-articles__item__icon'
                               key={coverage.coverage_id}
                               title={getCoverageTootip(coverage)}>
-                              <i className={`${coverageClass} ${statusClass}`}></i>
+                              <i className={`${coverageClass} ${WORKFLOW_COLORS[coverage.workflow_status]}`}></i>
                           </span>);
                     })
                     }
