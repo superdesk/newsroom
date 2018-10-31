@@ -417,6 +417,7 @@ def get_coverages(planning_items, original_coverages=[]):
     """
     Returns list of coverages for given planning items
     """
+
     def get_existing_coverage(id):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
 
@@ -425,7 +426,7 @@ def get_coverages(planning_items, original_coverages=[]):
     for planning_item in planning_items:
         for coverage in planning_item.get('coverages', []):
             existing_coverage = get_existing_coverage(coverage['coverage_id'])
-            coverages.append({
+            new_coverage = {
                 'planning_id': planning_item['guid'],
                 'coverage_id': coverage['coverage_id'],
                 'scheduled': coverage['planning']['scheduled'],
@@ -433,9 +434,12 @@ def get_coverages(planning_items, original_coverages=[]):
                 'workflow_status': coverage['workflow_status'],
                 'coverage_status': coverage.get('news_coverage_status', {}).get('label'),
                 'coverage_provider': coverage['planning'].get('coverage_provider'),
-                'delivery_id': existing_coverage.get('delivery_id'),
-                'delivery_href': existing_coverage.get('delivery_href'),
-            })
+                'delivery_id': existing_coverage.get('delivery_id')
+            }
+
+            new_coverage['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item) \
+                or existing_coverage.get('delivery_href')
+            coverages.append(new_coverage)
 
             if original_coverages and not existing_coverage:
                 coverage_changes['coverage_added'] = True

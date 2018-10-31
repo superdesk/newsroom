@@ -2349,6 +2349,15 @@ a.wire-articles__versions {
     margin-bottom: 20px;
 }
 
+.wire-column__preview__coverage__available-story {
+    color: #7ed321;
+}
+
+.wire-column__preview__coverage__restricted-story {
+    color: #bfc3c7;
+    pointer-events: none;
+}
+
 .wire-column__preview__editorial-note {
     font-size: 0.815rem;
     margin-top: 30px;
