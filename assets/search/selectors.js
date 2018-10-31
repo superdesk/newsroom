@@ -1,6 +1,6 @@
 
 import { createSelector } from 'reselect';
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 import { getActiveQuery, isTopicActive } from 'wire/utils';
 
 const activeQuerySelector = (state) => state.activeQuery;
@@ -14,7 +14,7 @@ export const searchCriteriaSelector = createSelector([
     createdFilterSelector,
 ], getActiveQuery);
 
-export const resultsFilteredSelector = (state) => !isEmpty(get(state, 'search.activeFilter')) || !isEmpty(get(state, 'search.createdFilter'));
+export const resultsFilteredSelector = (state) => state.resultsFiltered;
 
 export const activeTopicSelector = createSelector(
     [topicsSelector, searchCriteriaSelector],

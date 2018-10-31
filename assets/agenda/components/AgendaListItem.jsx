@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import ActionList from 'components/ActionList';
 import ActionButton from 'components/ActionButton';
 
 import AgendaListItemIcons from './AgendaListItemIcons';
 import {hasCoverages, isCanceled, isPostponed, isRescheduled, getName, isWatched} from '../utils';
+import ActionMenu from '../../components/ActionMenu';
 
 class AgendaListItem extends React.Component {
     constructor(props) {
@@ -60,8 +60,8 @@ class AgendaListItem extends React.Component {
                 className={cardClassName}
                 tabIndex='0'
                 ref={(elem) => this.articleElem = elem}
-                onClick={() => onClick(item)}
-                onDoubleClick={() => onDoubleClick(item)}
+                onClick={() => onClick(item, group)}
+                onDoubleClick={() => onDoubleClick(item, group)}
                 onMouseEnter={() => this.setState({isHover: true})}
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
@@ -93,16 +93,14 @@ class AgendaListItem extends React.Component {
 
                     {this.props.actions.length && (
                         <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
-                            <div className='btn-group'>
-                                <span onClick={(event) => this.props.onActionList(event, this.props.item, this.props.group)}>
-                                    <i className='icon--more icon--gray-light'></i>
-                                </span>
-                                { this.props.showActions ? <ActionList
-                                    item={this.props.item}
-                                    user={this.props.user}
-                                    actions={this.props.actions}
-                                /> : null }
-                            </div>
+                            <ActionMenu
+                                item={this.props.item}
+                                user={this.props.user}
+                                group={this.props.group}
+                                actions={this.props.actions}
+                                onActionList={this.props.onActionList}
+                                showActions={this.props.showActions}
+                            />
 
                             {this.props.actions.map((action) =>
                                 action.shortcut &&

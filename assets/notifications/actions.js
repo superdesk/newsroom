@@ -73,6 +73,7 @@ export function pushNotification(push) {
         const user = getState().user;
         switch (push.event) {
         case 'history_matches':
+        case 'agenda_update':
             if (push.extra.users && push.extra.users.includes(user)) {
                 return dispatch(newNotification(push.extra));
             }

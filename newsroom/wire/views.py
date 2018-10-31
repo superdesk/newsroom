@@ -40,8 +40,8 @@ def get_services(user):
     return services
 
 
-def set_permissions(item):
-    item['_access'] = superdesk.get_resource_service('wire_search').has_permissions(item)
+def set_permissions(item, section='wire'):
+    item['_access'] = superdesk.get_resource_service('{}_search'.format(section)).has_permissions(item)
     if not item['_access']:
         item.pop('body_text', None)
         item.pop('body_html', None)
@@ -153,7 +153,7 @@ def bookmarks():
     return flask.render_template('wire_bookmarks.html', data=data)
 
 
-@blueprint.route('/search')
+@blueprint.route('/wire/search')
 def search():
     response = get_internal('wire_search')
     return send_response('wire_search', response)
@@ -286,7 +286,7 @@ def versions(_id):
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
-    set_permissions(item)
+    set_permissions(item, 'wire')
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):

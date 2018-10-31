@@ -16,7 +16,7 @@ function setup(state) {
 }
 
 function getActions(enzymeWrapper) {
-    return enzymeWrapper.find('Preview').props().actions;
+    return enzymeWrapper.find('WirePreview').props().actions;
 }
 
 function getMultiActions(enzymeWrapper) {

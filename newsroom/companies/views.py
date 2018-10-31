@@ -13,16 +13,13 @@ from newsroom.companies import blueprint
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400
 
 
-@blueprint.route('/settings/companies', methods=['GET'])
-@admin_only
-def settings():
-    data = {
-        'companies': list(query_resource('companies', max_results=200)),
+def get_settings_data():
+    return {
+        'companies': list(query_resource('companies')),
         'services': app.config['SERVICES'],
-        'products': list(query_resource('products', max_results=200)),
+        'products': list(query_resource('products')),
         'sections': app.sections,
     }
-    return flask.render_template('settings.html', setting_type="companies", data=data)
 
 
 @blueprint.route('/companies/search', methods=['GET'])
@@ -115,7 +112,7 @@ def company_users(id):
 
 
 def update_products(updates, company_id):
-    products = list(query_resource('products', max_results=200))
+    products = list(query_resource('products'))
     db = app.data.get_mongo_collection('products')
     for product in products:
         if updates.get(str(product['_id'])):
@@ -124,8 +121,9 @@ def update_products(updates, company_id):
             db.update_one({'_id': product['_id']}, {'$pull': {'companies': company_id}})
 
 
-def update_sections(sections, _id):
-    get_resource_service('companies').patch(_id, updates={'sections': sections})
+def update_company(data, _id):
+    updates = {k: v for k, v in data.items() if k in ('sections', 'archive_access')}
+    get_resource_service('companies').patch(_id, updates=updates)
 
 
 @blueprint.route('/companies/<id>/permissions', methods=['POST'])
@@ -134,5 +132,5 @@ def save_company_permissions(id):
     orig = get_entity_or_404(id, 'companies')
     data = get_json_or_400()
     update_products(data['products'], id)
-    update_sections(data['sections'], orig['_id'])
+    update_company(data, orig['_id'])
     return jsonify(), 200

@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import {EARLIEST_DATE} from '../utils';
 
 class AgendaCalendarButtonWrapper extends React.Component {
     render() {
@@ -30,13 +31,17 @@ class AgendaCalendarButton extends React.Component {
     constructor (props) {
         super(props);
 
-        this.state = { startDate: moment() };
+        this.state = { startDate: moment(this.props.activeDate) };
         this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange(date) {
         this.props.selectDate(date.valueOf(), 'day');
         this.setState({ startDate: date });
+    }
+
+    componentDidUpdate(prevProps) {
+        prevProps.activeDate === EARLIEST_DATE && this.setState({ startDate: moment(this.props.activeDate) });
     }
 
     render() {
@@ -46,6 +51,7 @@ class AgendaCalendarButton extends React.Component {
             todayButton={gettext('Today')}
             selected={this.state.startDate}
             onChange={this.handleChange}
+            highlightDates={[moment()]}
             popperModifiers={{
                 offset: {
                     enabled: true,
@@ -64,6 +70,7 @@ class AgendaCalendarButton extends React.Component {
 
 AgendaCalendarButton.propTypes = {
     selectDate: PropTypes.func,
+    activeDate: PropTypes.number,
 };
 
 export default AgendaCalendarButton;

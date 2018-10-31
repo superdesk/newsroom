@@ -90,7 +90,7 @@ def get_user_dict():
     """Get all active users indexed by _id."""
     if 'user_dict' not in g or app.testing:
         lookup = {'is_enabled': True}
-        all_users = list(query_resource('users', lookup=lookup, max_results=200))
+        all_users = list(query_resource('users', lookup=lookup))
         g.user_dict = {str(user['_id']): user for user in all_users}
     return g.user_dict
 
@@ -102,7 +102,7 @@ def get_company_dict():
     """
     if 'company_dict' not in g or app.testing:
         lookup = {'is_enabled': True}
-        all_companies = list(query_resource('companies', lookup=lookup, max_results=200))
+        all_companies = list(query_resource('companies', lookup=lookup))
         g.company_dict = {str(company['_id']): company for company in all_companies}
     return g.company_dict
 

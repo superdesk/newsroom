@@ -51,3 +51,27 @@ def init_app(app):
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')
     app.add_template_global(url_for_wire)
+
+    app.general_setting(
+        'news_only_filter',
+        gettext('News only filter'),
+        weight=200,
+        description=gettext('''
+This query defines what is NOT considered "news" content.
+It is used by the News only switch to filter the view.
+When switched on, stories matching this filter will not be displayed.
+        ''')
+    )
+
+    app.general_setting(
+        'wire_time_limit_days',
+        gettext('Time limit for Wire products (in days)'),
+        type='number',
+        min=0,
+        weight=300,
+        description=gettext('''
+You can create an additional filter on top of the product definition.
+The time limit can be enabled for each company in the Permissions.
+        '''),
+        default=app.config.get('WIRE_TIME_LIMIT_DAYS', 0),
+    )

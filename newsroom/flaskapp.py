@@ -12,7 +12,6 @@ import flask
 import jinja2
 import importlib
 
-from flask_babel import Babel
 from eve.io.mongo import MongoJSONEncoder
 
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
@@ -21,6 +20,7 @@ from newsroom.auth import SessionAuth
 from flask_mail import Mail
 from flask_cache import Cache
 
+from newsroom.settings import SettingsApp
 from newsroom.utils import is_json_request
 from newsroom.webpack import NewsroomWebpack
 from newsroom.notifications.notifications import get_initial_notifications
@@ -30,6 +30,8 @@ from newsroom.template_filters import (
     plain_text, word_count, newsroom_config, is_admin,
     hash_string, date_header, get_date, sidenavs,
 )
+
+from newsroom.gettext import setup_babel
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -45,15 +47,18 @@ class Newsroom(eve.Eve):
         app.run()
     """
 
-    def __init__(self, import_name=__package__, config=None, **kwargs):
+    def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
         to create an instance using ``app = Newsroom()``
         """
         self.sidenavs = []
+        self.settings_apps = []
         self.download_formatters = {}
         self.extensions = {}
         self.theme_folder = 'theme'
         self.sections = []
+        self._testing = testing
+        self._general_settings = {}
 
         app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
 
@@ -80,10 +85,10 @@ class Newsroom(eve.Eve):
             self.media = SuperdeskGridFSMediaStorage(self)
         self._setup_jinja()
         self._setup_limiter()
+        self._setup_babel()
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
         self._setup_apps(self.config.get('INSTALLED_APPS', []))
-        self._setup_babel()
         self._setup_webpack()
         self._setup_email()
         self._setup_cache()
@@ -94,10 +99,11 @@ class Newsroom(eve.Eve):
         # Override Eve.load_config in order to get default_settings
         super(Newsroom, self).load_config()
         self.config.from_envvar('NEWSROOM_SETTINGS', silent=True)
-        try:
-            self.config.from_pyfile(os.path.join(os.getcwd(), 'settings.py'))
-        except FileNotFoundError:
-            pass
+        if not self._testing:
+            try:
+                self.config.from_pyfile(os.path.join(os.getcwd(), 'settings.py'))
+            except FileNotFoundError:
+                pass
 
     def _setup_blueprints(self, modules):
         """Setup configured blueprints."""
@@ -113,11 +119,14 @@ class Newsroom(eve.Eve):
                 mod.init_app(self)
 
     def _setup_babel(self):
+        self.config.setdefault(
+            'BABEL_TRANSLATION_DIRECTORIES',
+            os.path.join(NEWSROOM_DIR, 'translations'))
         # avoid events on this
         self.babel_tzinfo = None
         self.babel_locale = None
         self.babel_translations = None
-        Babel(self)
+        setup_babel(self)
 
     def _setup_jinja(self):
         self.add_template_filter(datetime_short)
@@ -133,6 +142,7 @@ class Newsroom(eve.Eve):
         self.add_template_global(get_initial_notifications)
         self.add_template_global(hash_string, 'hash')
         self.add_template_global(get_date, 'get_date')
+        self.add_template_global(self.settings_apps, 'settings_apps')
         self.jinja_loader = jinja2.ChoiceLoader([
             jinja2.FileSystemLoader('theme'),
             jinja2.FileSystemLoader(self.template_folder),
@@ -255,3 +265,24 @@ class Newsroom(eve.Eve):
             'blueprint': blueprint,
             'badge': badge,
         })
+
+    def settings_app(self, app, name, weight=1000, data=None):
+        self.settings_apps.append(SettingsApp(
+            _id=app,
+            name=name,
+            data=data,
+            weight=weight
+        ))
+
+    def general_setting(self, _id, label, type='text', default=None, weight=0, description=None, min=None):
+        self._general_settings[_id] = {
+            'type': type,
+            'label': label,
+            'weight': weight,
+            'default': default,
+            'description': description,
+            'min': min,
+        }
+
+        if flask.g:  # reset settings cache
+            flask.g.settings = None

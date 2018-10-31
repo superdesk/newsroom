@@ -13,6 +13,8 @@ const TIME_FORMAT = getConfig('time_format');
 const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
 const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
+const DAY_IN_MINUTES = 24 * 60 - 1;
+
 
 /**
  * Create redux store with default middleware
@@ -58,7 +60,7 @@ export function render(store, App, element) {
  * @return {String}
  */
 export function gettext(text, params) {
-    let translated = text; // temporary
+    let translated = get(window.translations, text, text);
 
     if (params) {
         Object.keys(params).forEach((param) => {
@@ -186,6 +188,39 @@ export function formatDate(dateString) {
 }
 
 /**
+ * Format agenda item start and end dates
+ *
+ * @param {String} dateString
+ * @param {String} group: date of the selected event group
+ * @return {Array} [time string, date string]
+ */
+export function formatAgendaDate(agendaDate, group) {
+    const start = parseDate(agendaDate.start);
+    const end = parseDate(agendaDate.end);
+    const duration = end.diff(start, 'minutes');
+    const dateGroup = group ? moment(group, DATE_FORMAT) : null;
+
+    if (duration > DAY_IN_MINUTES) {
+        // Multi day event
+        return [`(${formatTime(start)} ${formatDate(start)} - ${formatTime(end)} ${formatDate(end)})`,
+            dateGroup ? formatDate(dateGroup) : ''];
+    }
+
+    if (duration == DAY_IN_MINUTES) {
+        // All day event
+        return [gettext('ALL DAY'), formatDate(start)];
+    }
+
+    if (duration == 0) {
+        // start and end times are the same
+        return [`${formatTime(start)} ${formatDate(start)}`, ''];
+    }
+
+    // single day event
+    return [`${formatTime(start)} - ${formatTime(end)}`, formatDate(start)];
+}
+
+/**
  * Format coverage date ('HH:mm DD/MM')
  *
  * @param {String} dateString
@@ -223,6 +258,7 @@ export function formatMonth(dateString) {
 export const notify = {
     success: (message) => alertify.success(message),
     error: (message) => alertify.error(message),
+    warning: (message) => alertify.warning(message),
 };
 
 /**

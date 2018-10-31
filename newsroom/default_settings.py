@@ -48,11 +48,13 @@ BLUEPRINTS = [
     'newsroom.upload',
     'newsroom.notifications',
     'newsroom.products',
+    'newsroom.section_filters',
     'newsroom.navigations',
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.agenda'
+    'newsroom.agenda',
+    'newsroom.settings'
 ]
 
 CORE_APPS = [
@@ -70,11 +72,13 @@ CORE_APPS = [
     'newsroom.history',
     'newsroom.notifications',
     'newsroom.products',
+    'newsroom.section_filters',
     'newsroom.navigations',
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.agenda'
+    'newsroom.agenda',
+    'newsroom.settings'
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -84,6 +88,7 @@ USAGE_TERMS = ''
 CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
 PRIVACY_POLICY = 'https://www.aap.com.au/legal/'
 TERMS_AND_CONDITIONS = 'https://www.aap.com.au/legal/'
+SHOW_COPYRIGHT = True
 
 # Email addresses that will receive the coverage request emails (single or comma separated)
 COVERAGE_REQUEST_RECIPIENTS = os.environ.get('COVERAGE_REQUEST_RECIPIENTS')
@@ -166,8 +171,8 @@ HOMEPAGE_CAROUSEL = [{
 
 # List of filters to remove matching stories when news only switch is turned on
 NEWS_ONLY_FILTERS = [
-    {'match': {'genre.code': 'Results (sport)'}},
-    {'match': {'source': 'PMF'}},
+   {'match': {'genre.code': 'Results (sport)'}},
+   {'match': {'source': 'PMF'}},
 ]
 
 # Places navigation item(s) for featured story products to the top of the list under All
@@ -213,6 +218,7 @@ DISPLAY_ABSTRACT = False
 WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')
 
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
+GOOGLE_ANALYTICS = os.environ.get('GOOGLE_ANALYTICS')
 
 COVERAGE_TYPES = {
     'text': {'name': 'Text', 'icon': 'text'},
@@ -225,3 +231,6 @@ COVERAGE_TYPES = {
     'live_video': {'name': 'Live Video', 'icon': 'live-video'},
     'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'}
 }
+
+LANGUAGES = ['en']
+DEFAULT_LANGUAGE = 'en'

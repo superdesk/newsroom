@@ -90,7 +90,7 @@ def test_save_company_permissions(client, app):
     }])
 
     test_login_succeeds_for_admin(client)
-    data = json.dumps({'products': {'p-2': True}, 'sections': {'wire': True}})
+    data = json.dumps({'products': {'p-2': True}, 'sections': {'wire': True}, 'archive_access': True})
     client.post('companies/c-1/permissions', data=data, content_type='application/json')
 
     response = client.get('/products')
@@ -101,6 +101,7 @@ def test_save_company_permissions(client, app):
     updated = app.data.find_one('companies', req=None, _id='c-1')
     assert updated['sections']['wire']
     assert not updated['sections'].get('agenda')
+    assert updated['archive_access']
 
     # available by default
     resp = client.get(url_for('agenda.index'))

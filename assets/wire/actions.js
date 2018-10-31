@@ -173,6 +173,7 @@ function search(state, next) {
     const activeNavigation = get(state, 'search.activeNavigation');
     const createdFilter = get(state, 'search.createdFilter', {});
     const newsOnly = !!get(state, 'wire.newsOnly');
+    const context = get(state, 'context', 'wire');
 
     const params = {
         q: state.query,
@@ -183,8 +184,7 @@ function search(state, next) {
         created_from: createdFilter.from,
         created_to: createdFilter.to,
         timezone_offset: getTimezoneOffset(),
-        newsOnly,
-        section: state.bookmarks && state.user ? state.context : null,
+        newsOnly
     };
 
     const queryString = Object.keys(params)
@@ -192,7 +192,7 @@ function search(state, next) {
         .map((key) => [key, params[key]].join('='))
         .join('&');
 
-    return server.get(`/search?${queryString}`);
+    return server.get(`/${context}/search?${queryString}&tick=${Date.now().toString()}`);
 }
 
 /**

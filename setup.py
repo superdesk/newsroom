@@ -13,7 +13,7 @@ install_requires = [
     'honcho>=1.0.1',
     'gunicorn>=19.7.1',
     'superdesk-core>=1.24,<1.25',
-    'icalendar>=4.0.2,<4.1',
+    'icalendar>=4.0.3,<4.1',
 ]
 
 setup(

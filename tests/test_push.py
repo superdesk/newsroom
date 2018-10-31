@@ -347,7 +347,9 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     headers = get_signature_headers(data, key)
     resp = client.post('/push', data=data, content_type='application/json', headers=headers)
     assert 200 == resp.status_code
-    push_mock.assert_called_once_with('new_item', item='bar')
+    assert push_mock.call_args_list[0][0][0] == 'new_item'
+    assert push_mock.call_args_list[1][0][0] == 'history_matches'
+    assert push_mock.call_args[1]['item']['_id']
 
 
 def test_do_not_notify_inactive_user(client, app, mocker):
@@ -477,6 +479,7 @@ def test_matching_topics_for_public_user(client, app):
         'sd_product_id': 'p-1',
         'is_enabled': True,
         'companies': ['1'],
+        'product_type': 'wire'
     }])
 
     item['products'] = [{'code': 'p-1'}]
@@ -503,6 +506,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         'sd_product_id': 'p-1',
         'is_enabled': True,
         'companies': ['1'],
+        'product_type': 'wire'
     }])
 
     item['products'] = [{'code': 'p-1'}]

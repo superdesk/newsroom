@@ -7,7 +7,7 @@ import {
     STOP_WATCHING_EVENTS,
 } from './actions';
 
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { EXTENDED_VIEW } from 'wire/defaults';
 import { searchReducer } from 'search/reducers';
 import { defaultReducer } from '../reducers';
@@ -19,8 +19,10 @@ const initialState = {
     aggregations: null,
     activeItem: null,
     previewItem: null,
+    previewGroup: null,
     openItem: null,
     isLoading: false,
+    resultsFiltered: false,
     totalItems: null,
     activeQuery: null,
     user: null,
@@ -50,6 +52,19 @@ function recieveItems(state, data) {
         itemsById[item._id] = item;
         return item._id;
     });
+    const createdFilter = get(state, 'search.createdFilter', {});
+
+    let activeDate = state.agenda.activeDate || Date.now();
+    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to) || state.bookmarks) {
+        activeDate = EARLIEST_DATE;
+    } else if (activeDate === EARLIEST_DATE) {
+        activeDate = Date.now();
+    }
+
+    const agenda = {
+        ...state.agenda,
+        activeDate,
+    };
 
     return {
         ...state,
@@ -60,6 +75,7 @@ function recieveItems(state, data) {
         aggregations: data._aggregations || null,
         newItems: [],
         newItemsData: null,
+        agenda,
     };
 }
 

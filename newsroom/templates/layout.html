@@ -52,11 +52,13 @@
         <nav class="sidenav">
             <ul class="sidenav-icons">
                 {% if is_admin() %}
-                <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.endpoint == 'companies.settings' %}active{% endif %}">
-                  <a href="{{ url_for('companies.settings') }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
+                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first %}
+                <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.blueprint == 'settings' %}active{% endif %}">
+                  <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
                       <i class="icon--cog icon--mid-blue"></i>
                   </a>
                 </li>
+                {% endif %}{% endfor %}
                 <li class="sidenav-icons__item sidenav-icons__item--report {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
                   <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" data-toggle="tooltip" data-placement="right">
                       <i class="icon--report icon--mid-blue"></i>
@@ -102,6 +104,9 @@
     window.newsroom = {{ newsroom_config() | tojson | safe }};
     window.notificationData = {{ get_initial_notifications() | tojson | safe }};
     window.profileData = {{ get_user_profile_data() | tojson | safe }};
+    window.translations = {{ get_client_translations() | tojson | safe }};
+    window.locales = {{ get_client_locales() | tojson | safe }};
+    window.locale = {{ get_locale() | tojson | safe }};
 </script>
 
 {{ javascript_tag('newsroom_js') | safe }}
@@ -113,15 +118,15 @@
 
 {% block script %}{% endblock %}
 
-{% if newsroom_config().analytics %}
+{% if get_setting('google_analytics') %}
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ newsroom_config().analytics | safe }}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ get_setting('google_analytics') | safe }}"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', {{ newsroom_config().analytics | tojson | safe }}, {
+  gtag('config', {{ get_setting('google_analytics') | tojson | safe }}, {
       custom_map: {
           dimension1: 'company',
           dimension2: 'user',

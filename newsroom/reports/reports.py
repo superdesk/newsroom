@@ -74,7 +74,7 @@ def get_company_products():
             company_products[company] = company_product
 
     for _id, details in company_products.items():
-        if companies[ObjectId(_id)]:
+        if companies.get(ObjectId(_id)):
             results.append({
                 '_id': _id,
                 'name': companies[ObjectId(_id)]['name'],
@@ -91,6 +91,7 @@ def get_product_stories():
 
     results = []
     products = query_resource('products')
+    section_filters = superdesk.get_resource_service('section_filters').get_section_filters_dict()
 
     for product in products:
         product_stories = {
@@ -98,7 +99,7 @@ def get_product_stories():
             'name': product.get('name'),
             'is_enabled': product.get('is_enabled'),
         }
-        counts = superdesk.get_resource_service('wire_search').get_product_item_report(product)
+        counts = superdesk.get_resource_service('wire_search').get_product_item_report(product, section_filters)
         for key, value in counts.hits['aggregations'].items():
             product_stories[key] = value['buckets'][0]['doc_count']
 

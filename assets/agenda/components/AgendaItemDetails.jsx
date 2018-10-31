@@ -4,8 +4,7 @@ import {isEmpty} from 'lodash';
 
 import { gettext } from 'utils';
 
-import { getLocations, mapsLoaded, getGeoLocations, mapsKey } from 'maps/utils';
-import Map from 'maps/components/map';
+import { getLocations, mapsKey } from 'maps/utils';
 import StaticMap from 'maps/components/static';
 
 import PreviewActionButtons from 'components/PreviewActionButtons';
@@ -21,22 +20,22 @@ import ArticleSidebarBox from 'ui/components/ArticleSidebarBox';
 
 import { hasCoverages, hasAttachments } from '../utils';
 
-import AgendaTime from './AgendaTime';
-import AgendaName from './AgendaName';
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaCoverages from './AgendaCoverages';
 import AgendaAttachments from './AgendaAttachments';
+import AgendaCoverageRequest from './AgendaCoverageRequest';
 
-export default function AgendaItemDetails({item, user, actions, onClose}) {
+export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group}) {
     const locations = getLocations(item);
-    const geoLocations = getGeoLocations(locations);
     let map = null;
 
-    if (mapsLoaded() && !isEmpty(geoLocations)) {
-        map = <Map locations={geoLocations} />;
-    }
+    // Ta: disabling the embedded map for now for ticket SDAN-334
+    // const geoLocations = getGeoLocations(locations);
+    // if (mapsLoaded() && !isEmpty(geoLocations)) {
+    //     map = <Map locations={geoLocations} />;
+    // }
 
     if (!map && mapsKey() && !isEmpty(locations)) {
         map = <StaticMap locations={locations} scale={2} />;
@@ -50,19 +49,16 @@ export default function AgendaItemDetails({item, user, actions, onClose}) {
                 </ContentBar>
             </ContentHeader>
 
-            <Article image={map} covering={hasCoverages(item)}>
+            <Article image={map} item={item} group={group}>
                 <ArticleBody>
-                    <AgendaTime item={item} />
-                    <AgendaName item={item} />
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} />
                 </ArticleBody>
                 <ArticleSidebar>
-                    {hasCoverages(item) && (
-                        <ArticleSidebarBox label={gettext('Coverages')}>
-                            <AgendaCoverages coverages={item.coverages} />
-                        </ArticleSidebarBox>
-                    )}
+                    <ArticleSidebarBox label={gettext('Coverages')}>
+                        {hasCoverages(item) && <AgendaCoverages coverages={item.coverages} />}
+                        <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
+                    </ArticleSidebarBox>
                     {hasAttachments(item) && (
                         <ArticleSidebarBox label={gettext('Attachments')}>
                             <AgendaAttachments item={item} />
@@ -84,4 +80,6 @@ AgendaItemDetails.propTypes = {
         url: PropTypes.func,
     })),
     onClose: PropTypes.func,
+    requestCoverage: PropTypes.func,
+    group: PropTypes.string,
 };

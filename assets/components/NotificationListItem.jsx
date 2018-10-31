@@ -6,7 +6,7 @@ import CloseButton from './CloseButton';
 
 
 const getAgendaNotification = (item) => [
-    <div key='message' className="notif__list__info">{gettext('An agenda you downloaded has been updated')}</div>,
+    <div key='message' className="notif__list__info">{gettext('An event you are watching has been updated')}</div>,
     <div key='name' className="notif__list__headline">
         <a href={`/agenda?item=${item._id}`} >{item.name}</a>
     </div>];
