@@ -182,7 +182,7 @@ export function getGeoLocation(item) {
  */
 export function getLocationString(item) {
     return [
-        get(item, 'location.0.address.title'),
+        get(item, 'location.0.name', get(item, 'location.0.address.title')),
         get(item, 'location.0.address.line.0'),
         get(item, 'location.0.address.area'),
         get(item, 'location.0.address.locality'),
