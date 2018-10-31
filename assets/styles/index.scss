@@ -1352,6 +1352,7 @@ article.list {
     .wire-articles__item-headline,
     .wire-articles__item__meta-info span:not(.label),
     .wire-articles__item__text,
+    .wire-articles__item__meta-time,
     .time-label {
         text-decoration: line-through;
     }
@@ -1484,6 +1485,7 @@ article.list {
         @include md {
             margin-right: 6px;
         }
+        margin-bottom: 5px;
     }
     .wire-articles__item-select {
         margin-right: 6px;
@@ -1492,9 +1494,10 @@ article.list {
         }
     }
     .wire-articles__item__meta {
-        margin-top: 0;
+        margin-top: 5px;        
         @include xl {
             margin-top: 2px;
+            margin-left: 8px;
         }
     }
     .wire-articles__item__meta-time {
@@ -1502,7 +1505,7 @@ article.list {
         margin-bottom: 6px;
         
         @include md {
-            margin-left: 34px;
+            margin-left: 10px;
         }
         @include lg {
             margin-bottom: 0;
@@ -1519,6 +1522,9 @@ article.list {
     .wire-articles__item--watched {
         background-position: right 120px center;
         background-size: 52px;
+    }
+    .wire-articles__item__meta-info {
+        margin-bottom: 5px;
     }
 }
 
@@ -1823,7 +1829,9 @@ article.list {
 }
 
 .wire-articles__item__icons {
-    display: flex;    
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
     
     &--dashed-border {
         margin-right: 8px;
@@ -1840,6 +1848,7 @@ article.list {
 .wire-articles__item__icon {
     margin-right: 10px;
     display: flex;
+    position: relative;
 }
 
 .wire-articles__item__divider {
@@ -1855,6 +1864,7 @@ article.list {
     display: flex;
     flex-direction: column;
     overflow-y: visible;
+    margin-bottom: 10px;
     .bold {
         color: $body-text;
         font-weight: 500;
@@ -1889,7 +1899,8 @@ article.list {
     position: relative;
     display: inline-block;
     align-self: flex-start;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
+    font-size: 0.8125rem;
 
     &--border-right {
         margin-right: 8px;
@@ -1899,6 +1910,7 @@ article.list {
         @include lg {
             margin-right: 16px;
             padding-right: 20px;
+            font-size: 0.875rem;
         }
 
     }
