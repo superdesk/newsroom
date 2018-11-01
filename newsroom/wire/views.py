@@ -28,6 +28,7 @@ from newsroom.companies import section
 from .search import get_bookmarks_count
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
+AAP_PHOTOS_TOKEN = 'AAPPHOTOS_TOKEN'
 
 
 def get_services(user):
@@ -68,7 +69,7 @@ def get_view_data():
 
 
 def _fetch_photos(url, count):
-    headers = {'Authorization': 'Basic {}'.format(app.config.get('AAPPHOTOS_TOKEN'))}
+    headers = {'Authorization': 'Basic {}'.format(app.config.get(AAP_PHOTOS_TOKEN))}
     request = urllib.request.Request(url, headers=headers)
 
     try:
@@ -81,6 +82,9 @@ def _fetch_photos(url, count):
 
 
 def get_photos():
+    if not app.config.get(AAP_PHOTOS_TOKEN):
+        return []
+
     if app.cache.get('home_photos'):
         return app.cache.get('home_photos')
 
