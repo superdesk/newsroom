@@ -13,7 +13,7 @@ const TIME_FORMAT = getConfig('time_format');
 const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
 const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
-const DAY_IN_MINUTES = 24 * 60 - 1;
+export const DAY_IN_MINUTES = 24 * 60 - 1;
 
 
 /**
@@ -219,6 +219,7 @@ export function formatAgendaDate(agendaDate, group) {
     // single day event
     return [`${formatTime(start)} - ${formatTime(end)}`, formatDate(start)];
 }
+
 
 /**
  * Format coverage date ('HH:mm DD/MM')
