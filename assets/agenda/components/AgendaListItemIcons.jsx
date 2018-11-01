@@ -13,8 +13,8 @@ import {
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
+import AgendaMetaTime from './AgendaMetaTime';
 import {gettext, formatDate, formatTime} from 'utils';
-import MetaTime from 'ui/components/MetaTime';
 
 
 function AgendaListItemIcons({item, group, hideCoverages, row}) {
@@ -44,11 +44,10 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
 
     return (
         <div className={className}>
-            <MetaTime
-                date={item.dates.start}
+            <AgendaMetaTime
+                item={item}
                 borderRight={true}
                 isRecurring={isRecurring(item)}
-                cssClass={bem('time-label', null, {covering: hasCoverages(item)})}
             />
 
             {hasCoverages(item) && !hideCoverages &&
