@@ -535,3 +535,44 @@ class WireSearchService(newsroom.Service):
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, None)
+
+    def get_navigation_story_count(self, navigations):
+        """Get story count by navigation"""
+        query = _items_query()
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
+
+        aggs = {
+            'navigations': {
+                'filters': {
+                    'filters': {}
+                }
+            }
+        }
+
+        for navigation in navigations:
+            navigation_id = navigation.get('_id')
+            products = get_products_by_navigation(navigation_id) or []
+            navigation_filter = {'bool': {'should': [], 'minimum_should_match': 1}}
+            for product in products:
+                if product.get('query'):
+                    navigation_filter['bool']['should'].append(query_string(product.get('query')))
+
+            if navigation_filter['bool']['should']:
+                aggs['navigations']['filters']['filters'][str(navigation_id)] = navigation_filter
+
+        source = {'query': query, 'aggs': aggs, 'size': 0}
+        req = ParsedRequest()
+        req.args = {'source': json.dumps(source)}
+
+        try:
+            results = super().get(req, None)
+            buckets = results.hits['aggregations']['navigations']['buckets']
+            for navigation in navigations:
+                navigation_id = navigation.get('_id')
+                doc_count = buckets.get(str(navigation_id), {}).get('doc_count', 0)
+                if doc_count > 0:
+                    navigation['story_count'] = doc_count
+
+        except Exception as exc:
+            logger.error('Error in get_navigation_story_count for query: {}'.format(json.dumps(source)),
+                         exc, exc_info=True)

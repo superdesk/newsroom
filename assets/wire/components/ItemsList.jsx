@@ -140,6 +140,7 @@ class ItemsList extends React.Component {
                 actions={this.filterActions(itemsById[_id])}
                 isExtended={isExtended}
                 user={this.props.user}
+                context={this.props.context}
             />
         );
 
@@ -176,6 +177,7 @@ ItemsList.propTypes = {
     user: PropTypes.string,
     company: PropTypes.string,
     activeView: PropTypes.string,
+    context: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -188,6 +190,7 @@ const mapStateToProps = (state) => ({
     bookmarks: state.bookmarks,
     user: state.user,
     company: state.company,
+    context: state.context,
 });
 
 export default connect(mapStateToProps)(ItemsList);

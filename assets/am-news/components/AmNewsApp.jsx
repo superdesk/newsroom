@@ -13,6 +13,8 @@ import DownloadItemsModal from '../../wire/components/DownloadItemsModal';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import ShareItemModal from '../../components/ShareItemModal';
 import BookmarkTabs from 'components/BookmarkTabs';
+import WirePreview from '../../wire/components/WirePreview';
+import ItemDetails from '../../wire/components/ItemDetails';
 import {getItemActions} from '../../wire/item-actions';
 import {
     fetchItems,
@@ -26,8 +28,6 @@ import {
 } from '../../search/actions';
 import Navigations from './Navigations';
 import AmNewsList from './AmNewsList';
-import AmPreview from './AmPreview';
-import AmItemDetails from './AmItemDetails';
 
 
 const modals = {
@@ -43,11 +43,12 @@ class AmNewsApp extends BaseApp {
 
     renderItemDetails() {
         return ([
-            <AmItemDetails
+            <ItemDetails
                 key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
+                detailsConfig={this.props.detailsConfig}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}/>
         ]);
     }
@@ -102,11 +103,12 @@ class AmNewsApp extends BaseApp {
 
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
-                                <AmPreview
+                                <WirePreview
                                     item={this.props.itemToPreview}
                                     user={this.props.user}
                                     actions={this.filterActions(this.props.itemToPreview)}
                                     closePreview={this.props.closePreview}
+                                    previewConfig={this.props.previewConfig}
                                 />
                             }
                         </div>
@@ -162,6 +164,8 @@ AmNewsApp.propTypes = {
     activeNavigation: PropTypes.string,
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
+    previewConfig: PropTypes.object,
+    detailsConfig: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -182,6 +186,8 @@ const mapStateToProps = (state) => ({
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
+    previewConfig: get(state.uiConfig, 'preview') || {},
+    detailsConfig: get(state.uiConfig, 'details') || {},
 });
 
 const mapDispatchToProps = (dispatch) => ({

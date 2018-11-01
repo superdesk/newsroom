@@ -17,9 +17,9 @@ class CardRow extends React.Component {
     render() {
         return (
             <div className='row' ref={(elem) => this.cardElem = elem}>
-                <MoreNewsButton
+                {this.props.moreNews && <MoreNewsButton
                     title={this.props.title}
-                    product={this.props.product}/>
+                    product={this.props.product}/>}
                 {this.props.children}
             </div>
         );
@@ -31,6 +31,11 @@ CardRow.propTypes = {
     product: PropTypes.object,
     isActive: PropTypes.bool,
     children: PropTypes.node.isRequired,
+    moreNews: PropTypes.bool,
+};
+
+CardRow.defaultProps = {
+    moreNews: true
 };
 
 export default CardRow;

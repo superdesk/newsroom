@@ -14,6 +14,7 @@ from werkzeug.utils import secure_filename
 from flask_babel import gettext
 from superdesk.utc import utcnow
 
+from superdesk import get_resource_service
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
@@ -55,13 +56,14 @@ def get_view_data():
     return {
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
-        'topics': [t for t in topics if t.get('topic_type') != 'agenda'],
+        'topics': [t for t in topics if t.get('topic_type') == 'wire'],
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
                     if 'wire' in f['types']],
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='wire'),
         'saved_items': get_bookmarks_count(user['_id'], 'wire'),
-        'context': 'wire'
+        'context': 'wire',
+        'ui_config': get_resource_service('ui_config').getSectionConfig('wire')
     }
 
 
@@ -145,7 +147,7 @@ def wire():
     return flask.render_template('wire_index.html', data=get_view_data())
 
 
-@blueprint.route('/bookmarks')
+@blueprint.route('/bookmarks_wire')
 @login_required
 def bookmarks():
     data = get_view_data()

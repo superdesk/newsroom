@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
+import { isDisplayed } from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import PreviewActionButtons from 'components/PreviewActionButtons';
@@ -22,7 +23,7 @@ import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
 import ArticleBody from 'ui/components/ArticleBody';
 
 
-function ItemDetails({item, user, actions, onClose}) {
+function ItemDetails({item, user, actions, onClose, detailsConfig}) {
     const picture = getPicture(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
     return (
@@ -41,23 +42,26 @@ function ItemDetails({item, user, actions, onClose}) {
                         isItemDetails/>}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
-                            <ArticleSlugline item={item}/>
-                            <ArticleHeadline item={item}/>
-                            <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>
-                            <ArticleBodyHtml item={item}/>
+                            {isDisplayed('slugline', detailsConfig) && <ArticleSlugline item={item}/>}
+                            {isDisplayed('headline', detailsConfig) && <ArticleHeadline item={item}/>}
+                            {isDisplayed('abstract', detailsConfig) &&
+                            <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
+                            {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
                         </ArticleBody>
-                        <PreviewMeta item={item} isItemDetail={true}/>
+                        {isDisplayed('metadata_section', detailsConfig) &&
+                            <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
                         <ArticleContentInfoWrapper>
-                            <PreviewTags item={item} isItemDetail={true}/>
+                            {isDisplayed('tags_section', detailsConfig) &&
+                                <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
 
-                            {showItemVersions(item, true) &&
+                            {isDisplayed('item_versions', detailsConfig) && showItemVersions(item, true) &&
                                 <ListItemNextVersion item={item} />
                             }
-                            {showItemVersions(item) &&
+                            {isDisplayed('item_versions', detailsConfig) && showItemVersions(item) &&
                                 <ListItemPreviousVersions item={item} isPreview={true}/>
                             }
 
-                            <AgendaLinks item={item} />
+                            {isDisplayed('agenda_links', detailsConfig) && <AgendaLinks item={item} />}
                         </ArticleContentInfoWrapper>
                     </ArticleContentWrapper>
                 </ArticleContent>
@@ -75,6 +79,7 @@ ItemDetails.propTypes = {
         url: PropTypes.func,
     })),
     onClose: PropTypes.func,
+    detailsConfig: PropTypes.object,
 };
 
 export default ItemDetails;

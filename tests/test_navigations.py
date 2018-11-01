@@ -27,12 +27,12 @@ def test_navigation_list_succeeds_for_anonymous_user(client):
 def test_save_and_return_navigations(client):
     test_login_succeeds_for_admin(client)
     # Save a new navigation
-    client.post('/navigations/new', data=json.dumps({
+    client.post('/navigations/new', data={'navigation': json.dumps({
         'name': 'Breaking',
         'description': 'Breaking news',
         'product_type': 'wire',
         'is_enabled': True,
-    }), content_type='application/json')
+    })})
 
     response = client.get('/navigations')
     assert 'Breaking' in response.get_data(as_text=True)
@@ -42,11 +42,11 @@ def test_update_navigation(client):
     test_login_succeeds_for_admin(client)
 
     client.post('/navigations/59b4c5c61d41c8d736852fbf/',
-                data=json.dumps({'name': 'Sport',
-                                 'description': 'foo',
-                                 'product_type': 'wire',
-                                 'is_enabled': True}),
-                content_type='application/json')
+                data={'navigation': json.dumps({
+                    'name': 'Sport',
+                    'description': 'foo',
+                    'product_type': 'wire',
+                    'is_enabled': True})})
 
     response = client.get('/navigations')
     assert 'foo' in response.get_data(as_text=True)
