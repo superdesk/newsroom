@@ -24,7 +24,7 @@ class GeneralSettingsApp extends React.Component {
     }
 
     onChange(key, val) {
-        const values = {...values, [key]: val};
+        const values = {...this.state.values, [key]: val};
         this.setState({values});
     }
 
