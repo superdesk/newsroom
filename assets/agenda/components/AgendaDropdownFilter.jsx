@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import AgendaFilterButton from './AgendaFilterButton';
 
+const compareFunction = (a, b) => String(a.key).localeCompare(String(b.key));
 
-const processBuckets = (buckets, filter, toggleFilter) => buckets.map((bucket) =>
+const processBuckets = (buckets, filter, toggleFilter) => buckets.sort(compareFunction).map((bucket) =>
     <button
         key={bucket.key}
         className='dropdown-item'

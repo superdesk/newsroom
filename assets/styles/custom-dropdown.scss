@@ -5,6 +5,9 @@
   margin-top: 0px;
   border-radius: 0px;
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
+  max-height: 495px;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   [class^="icon--"], [class*=" icon--"] {
       vertical-align: middle;
