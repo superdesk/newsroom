@@ -2402,6 +2402,9 @@ a.wire-articles__versions {
     & + .coverage-item__row {
         margin-top: 4px;
     }
+    a:hover {
+        text-decoration: none;
+    }
 }
 .coverage-item__column {
     display: flex;
