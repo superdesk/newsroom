@@ -337,9 +337,7 @@ export function pushNotification(push) {
             return dispatch(setNewItemsByTopic(push.extra));
 
         case 'new_item':
-            return new Promise((resolve, reject) => {
-                dispatch(fetchNewItems()).then(resolve).catch(reject);
-            });
+            return dispatch(setNewItems(push.extra));
 
         case `topics:${user}`:
             return dispatch(reloadTopics(user));

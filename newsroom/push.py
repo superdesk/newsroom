@@ -71,10 +71,12 @@ def push():
 
     if item.get('type') == 'event':
         orig = app.data.find_one('agenda', req=None, _id=item['guid'])
-        item['_id'] = publish_event(item, orig)
-        notify_new_item(item, check_topics=True)
+        id = publish_event(item, orig)
+        agenda = app.data.find_one('agenda', req=None, _id=id)
+        notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'planning':
-        agenda = publish_planning(item)
+        published = publish_planning(item)
+        agenda = app.data.find_one('agenda', req=None, _id=published['_id'])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
         orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
@@ -457,7 +459,7 @@ def notify_new_item(item, check_topics=True):
     company_dict = get_company_dict()
     company_ids = [c['_id'] for c in company_dict.values()]
 
-    push_notification('new_item', item=item['_id'])
+    push_notification('new_item', _items=[item])
 
     if check_topics:
         if item.get('type') == 'text':
@@ -497,7 +499,7 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
 def send_user_notification_emails(item, user_matches, users):
     for user_id in user_matches:
         user = users.get(str(user_id))
-        if item.get('pubstatus') in ['canceled', 'cancelled']:
+        if item.get('pubstatus', item.get('state')) in ['canceled', 'cancelled']:
             send_item_killed_notification_email(user, item=item)
         else:
             if user.get('receive_email'):
