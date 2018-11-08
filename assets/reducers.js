@@ -73,14 +73,6 @@ function updateItemActions(state, items, action) {
     return itemsById;
 }
 
-function setNewItemsById(state, action) {
-    let itemsById = state.itemsById;
-    if (get(action.data, 'item._id') && state.itemsById[action.data.item._id]) {
-        itemsById = Object.assign({}, itemsById);
-        itemsById[action.data.item._id] = action.data.item;
-    }
-    return itemsById;
-}
 
 
 export function defaultReducer(state, action) {
@@ -276,7 +268,11 @@ export function defaultReducer(state, action) {
             newItemsByTopic[topic] = previous.concat([action.data.item]);
         });
 
-        const itemsById = setNewItemsById(state, action);
+        let itemsById = state.itemsById;
+        if (get(action.data, 'item._id') && state.itemsById[action.data.item._id]) {
+            itemsById = Object.assign({}, itemsById);
+            itemsById[action.data.item._id] = action.data.item;
+        }
 
         return {
             ...state,
@@ -297,10 +293,8 @@ export function defaultReducer(state, action) {
     case SET_NEW_ITEMS: {
         const newItems = action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id);
         const newItemsData = action.data;
-        const itemsById = setNewItemsById(state, action);
         return {
             ...state,
-            itemsById,
             newItems,
             newItemsData,
         };
