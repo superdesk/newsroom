@@ -7,7 +7,7 @@ from datetime import datetime
 
 from copy import copy, deepcopy
 from PIL import Image, ImageEnhance
-from flask import current_app as app
+from flask import current_app as app, url_for
 from flask_babel import gettext
 from eve_elastic.elastic import parse_date
 
@@ -421,6 +421,11 @@ def get_coverages(planning_items, original_coverages=[]):
     def get_existing_coverage(id):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
 
+    def set_text_delivery(coverage, deliveries):
+        if coverage['coverage_type'] == 'text' and deliveries:
+            coverage['delivery_id'] = deliveries[0]
+            coverage['delivery_href'] = url_for('wire.item', _id=deliveries[0])
+
     coverages = []
     coverage_changes = {}
     for planning_item in planning_items:
@@ -439,6 +444,7 @@ def get_coverages(planning_items, original_coverages=[]):
 
             new_coverage['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item) \
                 or existing_coverage.get('delivery_href')
+            set_text_delivery(new_coverage, coverage.get('deliveries'))
             coverages.append(new_coverage)
 
             if original_coverages and not existing_coverage:
