@@ -1,6 +1,6 @@
 
 from babel import support, core
-from flask import request, current_app
+from flask import request, current_app, session
 from flask_babel import Babel, get_locale
 from newsroom.auth import get_user
 
@@ -29,6 +29,8 @@ def setup_babel(app):
     @babel.localeselector
     def _get_locale():
         try:
+            if session.get('locale'):
+                return session['locale']
             user = get_user()
             if user and user.get('locale'):
                 return user['locale']
