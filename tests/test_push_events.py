@@ -1009,7 +1009,7 @@ def test_push_coverages_with_linked_stories(client, app):
     planning = deepcopy(test_planning)
     planning['guid'] = 'bar7'
     planning['event_item'] = 'foo7'
-    planning['coverages'][0]['deliveries'] = ['item7']
+    planning['coverages'][0]['deliveries'] = [{'item_id': 'item7'}]
 
     client.post('/push', data=json.dumps(planning), content_type='application/json')
     parsed = get_entity_or_404('foo7', 'agenda')

@@ -423,8 +423,8 @@ def get_coverages(planning_items, original_coverages=[]):
 
     def set_text_delivery(coverage, deliveries):
         if coverage['coverage_type'] == 'text' and deliveries:
-            coverage['delivery_id'] = deliveries[0]
-            coverage['delivery_href'] = url_for('wire.item', _id=deliveries[0])
+            coverage['delivery_id'] = deliveries[0]['item_id']
+            coverage['delivery_href'] = url_for('wire.item', _id=deliveries[0]['item_id'])
 
     coverages = []
     coverage_changes = {}
