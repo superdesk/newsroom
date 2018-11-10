@@ -456,6 +456,7 @@ class AgendaService(newsroom.Service):
                     self.system_update(item['_id'], {'coverages': coverages}, item)
                     self.notify_new_coverage(item, wire_item)
                     break
+        return agenda_items
 
     def notify_new_coverage(self, agenda, wire_item):
         user_dict = get_user_dict()
