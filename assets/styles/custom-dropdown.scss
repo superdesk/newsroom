@@ -14,6 +14,10 @@
   }
 }
 
+.dropdown-menu-typeahead {
+  overflow: visible;
+}
+
 .dropdown-item {
   padding: 0.7rem 1rem;
   [class^="icon--"], [class*=" icon--"] {
@@ -65,4 +69,8 @@
 
 .dropdown-divider {
   margin: 0.3rem 0;
+}
+
+.rbt-input-hint {
+  top: 3px !important;
 }
