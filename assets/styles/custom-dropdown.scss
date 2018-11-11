@@ -16,6 +16,7 @@
 
 .dropdown-menu-typeahead {
   overflow: visible;
+  width: 300px;
 }
 
 .dropdown-item {
@@ -73,4 +74,9 @@
 
 .rbt-input-hint {
   top: 3px !important;
+  width: 100%;
+}
+
+.rbt-input-hint-container {
+  overflow: hidden;
 }
