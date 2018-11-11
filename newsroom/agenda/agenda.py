@@ -242,8 +242,8 @@ def _display_date_range(args):
 
 
 aggregations = {
-    'calendar': {'terms': {'field': 'calendars.name', 'size': 20}},
-    'location': {'terms': {'field': 'location.name', 'size': 20}},
+    'calendar': {'terms': {'field': 'calendars.name', 'size': 0}},
+    'location': {'terms': {'field': 'location.name', 'size': 0}},
     'genre': {'terms': {'field': 'genre.name', 'size': 50}},
     'service': {'terms': {'field': 'service.name', 'size': 50}},
     'subject': {'terms': {'field': 'subject.name', 'size': 20}},

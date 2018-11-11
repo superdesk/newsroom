@@ -15,6 +15,7 @@
 }
 
 .dropdown-item {
+  padding: 0.7rem 1rem;
   [class^="icon--"], [class*=" icon--"] {
     margin-right: 1rem;
   }
@@ -60,4 +61,8 @@
   font-weight: 500;
   padding: 1rem;
   border-bottom: 1px solid #e7e7e7;
+}
+
+.dropdown-divider {
+  margin: 0.3rem 0;
 }
