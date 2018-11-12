@@ -19,7 +19,7 @@ function AgendaTypeAheadFilter({aggregations, filter, toggleFilter, activeFilter
             filter={filter}
             activeFilter={activeFilter}
         />
-        <div className='dropdown-menu' aria-labelledby={filter.field}>
+        <div className='dropdown-menu dropdown-menu-typeahead' aria-labelledby={filter.field}>
             <button
                 type='button'
                 className='dropdown-item'

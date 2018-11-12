@@ -24,7 +24,7 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
 
     const getCoverageTootip = (coverage) => {
 
-        if (['draft', 'assigned', 'active'].includes(coverage.workflow_status)) {
+        if (['draft', 'assigned', 'active', 'cancelled'].includes(coverage.workflow_status)) {
             return gettext('{{ type }} coverage {{ status }}, due {{date}} at {{time}}', {
                 type: coverage.coverage_type,
                 status: WORKFLOW_STATUS_TEXTS[coverage.workflow_status],
