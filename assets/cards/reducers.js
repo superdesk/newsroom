@@ -1,3 +1,4 @@
+import {set, get} from 'lodash';
 
 import {
     GET_CARDS,
@@ -56,11 +57,13 @@ export default function cardReducer(state = initialState, action) {
     case EDIT_CARD: {
         const target = action.event.target;
         const field = target.name;
-        let card = state.cardToEdit;
+        let card = {...state.cardToEdit};
 
         if (field === 'type') {
             if (target.value == '2x2-events') {
                 card['config'] = {events: [{}, {}, {}, {}]};
+            } else if (target.value == '4-photo-gallery') {
+                card['config'] = {sources: [{}, {}, {}, {}]};
             } else {
                 card['config'] = {};
             }
@@ -68,14 +71,19 @@ export default function cardReducer(state = initialState, action) {
             card[field] = target.value;
 
         } else if (field === 'product') {
-            card['config']['product'] = target.value;
+            set(card, 'config.product', target.value);
         } else if (field.indexOf('event') >= 0) {
-            const eventData = field.split('_');
-            const events = card['config']['events'] || [{}, {}, {}, {}];
-            events[parseInt(eventData[1])][eventData[2]] = target.value;
-            card['config']['events'] = events;
+            if (get(card, 'config.events.length', 0) < cardSizes[state.cardToEdit.type]) {
+                card.config.events = [{}, {}, {}, {}];
+            }
+            set(card, field, target.value);
+        } else if (field.indexOf('source') >= 0) {
+            if (get(card, 'config.sources.length', 0) < cardSizes[state.cardToEdit.type]) {
+                card.config.sources = [{}, {}, {}, {}];
+            }
+            set(card, field, target.value);
         } else {
-            card[field] = target.value;
+            set(card, field, target.value);
         }
 
         card['config']['size'] = cardSizes[state.cardToEdit.type];

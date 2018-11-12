@@ -68,6 +68,14 @@ def _get_card_data(data):
             if file_url:
                 event['file_url'] = file_url
 
+    if data.get('type') == '4-photo-gallery':
+        for source in (data.get('config') or {}).get('sources'):
+            if source.get("url") and source.get("count"):
+                source['count'] = int(source.get("count")) if source.get('count') else source.get('count')
+            else:
+                source.pop('url', None)
+                source.pop('count', None)
+
     return card_data
 
 
