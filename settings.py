@@ -1,2 +1,2 @@
-SITE_NAME = 'Newsroom'
+SITE_NAME = 'Mediapankki'
 COPYRIGHT_HOLDER = 'STT'
