@@ -78,11 +78,15 @@ class HomeApp extends React.Component {
 
     getPanels(card) {
         const Panel = panels[card.type];
+        const items = this.props.itemsByCard[card.label] || [];
+
         if (card.type === '4-photo-gallery') {
             return <Panel
                 key={card.label}
-                photos={this.props.photos}
+                photos={items}
                 title={card.label}
+                moreUrl={card.config.more_url}
+                moreUrlLabel={card.config.more_url_label}
             />;
         }
         if (card.type === '2x2-events') {
@@ -93,7 +97,6 @@ class HomeApp extends React.Component {
             />;
         }
 
-        const items = this.props.itemsByCard[card.label] || [];
         return <Panel
             key={card.label}
             type={card.type}
@@ -138,7 +141,6 @@ class HomeApp extends React.Component {
 }
 
 HomeApp.propTypes = {
-    photos: PropTypes.array,
     cards: PropTypes.arrayOf(PropTypes.object),
     itemsByCard: PropTypes.object,
     products: PropTypes.array,
@@ -156,7 +158,6 @@ HomeApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    photos: state.photos,
     cards: state.cards,
     itemsByCard: state.itemsByCard,
     products: state.products,

@@ -8,60 +8,65 @@ import TextAreaInput from'components/TextAreaInput';
 import { gettext } from 'utils';
 
 
-function EventDetails ({event, onChange, errors, index}) {
+function EventDetails ({card, onChange, errors}) {
 
-    const prefix = `event_${index}_`;
+    const events = card.config.events || [{}, {}, {}, {}];
 
     return (
-        <div className='card' style={{display:'block', marginBottom: '20px'}}>
-            <div className='card-header'>
-                {`Event ${index + 1}`}
-            </div>
-            <div className='card-body'>
-                <TextInput
-                    name={`${prefix}headline`}
-                    label={gettext('Headline')}
-                    value={event.headline}
-                    onChange={onChange}
-                    error={errors ? errors[`${prefix}headline`] : null}/>
+        events.map((event, index) => {
+            const prefix = `config.events[${index}].`;
+            return (
+                <div key={prefix} className='card' style={{display:'block', marginBottom: '20px'}}>
+                    <div className='card-header'>
+                        {`Event ${index + 1}`}
+                    </div>
+                    <div className='card-body'>
+                        <TextInput
+                            name={`${prefix}headline`}
+                            label={gettext('Headline')}
+                            value={event.headline}
+                            onChange={onChange}
+                            error={errors ? errors[`${prefix}headline`] : null}/>
 
-                <TextAreaInput
-                    name={`${prefix}abstract`}
-                    label={gettext('Abstract')}
-                    value={event.abstract}
-                    onChange={onChange}
-                    error={errors ? errors[`${prefix}abstract`] : null}/>
+                        <TextAreaInput
+                            name={`${prefix}abstract`}
+                            label={gettext('Abstract')}
+                            value={event.abstract}
+                            onChange={onChange}
+                            error={errors ? errors[`${prefix}abstract`] : null}/>
 
-                <DateInput
-                    name={`${prefix}startDate`}
-                    label={gettext('Start Date')}
-                    value={event.startDate}
-                    onChange={onChange}
-                    error={errors ? errors[`${prefix}startDate`] : null}
-                    required={true}/>
+                        <DateInput
+                            name={`${prefix}startDate`}
+                            label={gettext('Start Date')}
+                            value={event.startDate}
+                            onChange={onChange}
+                            error={errors ? errors[`${prefix}startDate`] : null}
+                            required={true}/>
 
-                <DateInput
-                    name={`${prefix}endDate`}
-                    label={gettext('End Date')}
-                    value={event.endDate}
-                    onChange={onChange}
-                    error={errors ? errors[`${prefix}endDate`] : null}
-                    required={false}/>
+                        <DateInput
+                            name={`${prefix}endDate`}
+                            label={gettext('End Date')}
+                            value={event.endDate}
+                            onChange={onChange}
+                            error={errors ? errors[`${prefix}endDate`] : null}
+                            required={false}/>
 
-                <TextInput
-                    name={`${prefix}location`}
-                    label={gettext('Location')}
-                    value={event.location}
-                    onChange={onChange}
-                    error={errors ? errors[`${prefix}location`] : null}/>
+                        <TextInput
+                            name={`${prefix}location`}
+                            label={gettext('Location')}
+                            value={event.location}
+                            onChange={onChange}
+                            error={errors ? errors[`${prefix}location`] : null}/>
 
-                {index < 2 && <FileInput
-                    name={`${prefix}file`}
-                    label={`${gettext('Image')} - ${event.file}`}
-                    onChange={onChange}
-                    error={errors ? errors[`${prefix}file`] : null} />}
-            </div>
-        </div>
+                        {index < 2 && <FileInput
+                            name={`${prefix}file`}
+                            label={`${gettext('Image')} - ${event.file}`}
+                            onChange={onChange}
+                            error={errors ? errors[`${prefix}file`] : null} />}
+                    </div>
+                </div>
+            );
+        })
     );
 }
 
