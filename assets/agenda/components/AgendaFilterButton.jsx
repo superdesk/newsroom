@@ -14,7 +14,7 @@ function AgendaFilterButton({filter, activeFilter}) {
         data-toggle='dropdown'
         aria-haspopup='true'
         aria-expanded='false'>
-        <i className='icon-small--calendar d-sm-none'></i>
+        <i className={`${filter.icon} d-sm-none`}></i>
         <span className='d-none d-sm-block'>{getActiveFilterLabel(filter, activeFilter)}</span>
         <i className='icon-small--arrow-down ml-1'></i>
     </button>);
