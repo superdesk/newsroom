@@ -99,8 +99,9 @@ def get_home_data():
 
 def get_previous_versions(item):
     if item.get('ancestors'):
+        ancestors = superdesk.get_resource_service('wire_search').get_items(item['ancestors'])
         return sorted(
-            list(app.data.find_list_of_ids('wire_search', item['ancestors'])),
+            ancestors,
             key=itemgetter('versioncreated'),
             reverse=True
         )
