@@ -52,6 +52,7 @@ items = [
         'version': 2,
         'nextversion': 'urn:localhost:weather',
         'versioncreated': datetime.now() - timedelta(days=8),
+        'source': 'AAP'
     },
     {
         '_id': 'tag:weather:old',
@@ -59,6 +60,7 @@ items = [
         'version': 2,
         'nextversion': 'tag:weather',
         'versioncreated': datetime.now() - timedelta(days=10),
+        'service': [{'code': 'c', 'name': 'Service C'}],
     }
 ]
 
