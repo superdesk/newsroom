@@ -52,6 +52,7 @@ class AgendaCalendarButton extends React.Component {
             selected={this.state.startDate}
             onChange={this.handleChange}
             highlightDates={[moment()]}
+            locale={window.locale || 'en'}
             popperModifiers={{
                 offset: {
                     enabled: true,
