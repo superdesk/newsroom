@@ -1359,7 +1359,7 @@ article.list {
 }
 // watched item
 .wire-articles__item--watched {
-    background-color: #f6f6f6;
+    background-color: #e5eaec;
     background-image: url(/static/watched-icon.svg);
     background-size: 62px;
     background-repeat: no-repeat;
@@ -2003,7 +2003,7 @@ article.list {
         color: $orange;
     }
     .wire-articles__item--watched & {
-        background-color: #f2f2f2;
+        background-color: #e5eaec;
     }
 }
 
