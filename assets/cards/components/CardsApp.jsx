@@ -8,6 +8,7 @@ import {
 } from '../actions';
 import Cards from './Cards';
 import ListBar from 'components/ListBar';
+import DashboardSwitch from 'features/dashboard/DashboardSwitch';
 
 
 class CardsApp extends React.Component {
@@ -23,9 +24,13 @@ class CardsApp extends React.Component {
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchCards}
                 buttonName={'Card'}
-            />,
-            <Cards key="Cards"
-            />]
+            >
+                <DashboardSwitch
+                    dashboards={this.props.dashboards}
+                    activeDashboard={this.props.activeDashboard}
+                />
+            </ListBar>,
+            <Cards key="Cards" activeDashboard={this.props.activeDashboard} dashboards={this.props.dashboards}/>]
         );
     }
 }
@@ -34,7 +39,14 @@ CardsApp.propTypes = {
     newCard: PropTypes.func,
     fetchCards: PropTypes.func,
     setQuery: PropTypes.func,
+    dashboards: PropTypes.array,
+    activeDashboard: PropTypes.string,
 };
+
+const mapStateToProps = (state) => ({
+    dashboards: state.dashboards.list,
+    activeDashboard: state.dashboards.active,
+});
 
 const mapDispatchToProps = {
     newCard,
@@ -42,4 +54,4 @@ const mapDispatchToProps = {
     setQuery,
 };
 
-export default connect(null, mapDispatchToProps)(CardsApp);
+export default connect(mapStateToProps, mapDispatchToProps)(CardsApp);

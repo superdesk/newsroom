@@ -20,7 +20,7 @@ from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
-from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request
+from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource
 from newsroom.notifications import push_user_notification
 from newsroom.companies import section
 from .search import get_bookmarks_count
@@ -83,7 +83,7 @@ def get_items_by_card(cards):
 
 def get_home_data():
     user = get_user()
-    cards = list(superdesk.get_resource_service('cards').get(None, None))
+    cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
     company_id = str(user['company']) if user and user.get('company') else None
     items_by_card = get_items_by_card(cards)
 

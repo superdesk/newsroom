@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import analytics from 'analytics';
 import { renderModal } from 'actions';
 
@@ -50,4 +51,18 @@ export function setView(view) {
 export function followTopic(topic, type) {
     topic.topic_type = type;
     return renderModal('followTopic', {topic});
+}
+
+/**
+ * Toggle navigation by id
+ *
+ * @param {String} navigationId
+ */
+export function toggleNavigationById(navigationId) {
+    return (dispatch, getState) => {
+        const navigation = (get(getState().search, 'navigations') || []).find((nav) => navigationId === nav._id);
+        if (navigation) {
+            dispatch(toggleNavigation(navigation));
+        }
+    };
 }

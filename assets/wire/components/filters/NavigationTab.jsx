@@ -6,7 +6,7 @@ import NavLink from './NavLink';
 
 import { toggleNavigation } from 'search/actions';
 
-function NavigationTab({navigations, activeNavigation, toggleNavigation, fetchItems, context}) {
+function NavigationTab({navigations, activeNavigation, toggleNavigation, fetchItems}) {
     const navLinks = navigations.map((navigation) => (
         <NavLink key={navigation.name}
             isActive={activeNavigation === navigation._id || navigations.length === 1}
@@ -31,7 +31,7 @@ function NavigationTab({navigations, activeNavigation, toggleNavigation, fetchIt
         />
     );
 
-    return navLinks.length > 1 && context === 'wire' ? [all].concat(navLinks) : navLinks;
+    return navLinks.length > 1 ? [all].concat(navLinks) : navLinks;
 }
 
 NavigationTab.propTypes = {
@@ -39,7 +39,6 @@ NavigationTab.propTypes = {
     activeNavigation: PropTypes.string,
     toggleNavigation: PropTypes.func.isRequired,
     fetchItems: PropTypes.func.isRequired,
-    context: PropTypes.string,
 };
 
 const mapDispatchToProps = {

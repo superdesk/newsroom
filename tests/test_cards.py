@@ -12,6 +12,7 @@ def init(app):
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
         'label': 'Sport',
         'type': '6-text-only',
+        'dashboard': 'newsroom',
         'config': {
             'product': '5a23c1131d41c82b8dd4267d',
             'size': 6,
@@ -31,6 +32,7 @@ def test_save_and_return_cards(client):
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
         'label': 'Local News',
         'type': '4-picture-text',
+        'dashboard': 'newsroom',
         'config': {
             'product': '5a23c1131d41c82b8dd4267d',
             'size': 4,
@@ -46,6 +48,7 @@ def test_update_card(client):
 
     client.post('/cards/59b4c5c61d41c8d736852fbf/',
                 data={'card': json.dumps({'label': 'Sport',
+                                          'dashboard': 'newsroom',
                                           'type': '4-picture-text'})})
 
     response = client.get('/cards')

@@ -4,24 +4,10 @@ import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 
 import { gettext } from 'utils';
-import CardDetails from './CardDetails';
-import EventDetails from './EventDetails';
-import ExternalMediaCardDetails from './ExternalMediaCardsDetails';
-
-
-const cardTypes = [
-    {value: '', text: '', component: CardDetails},
-    {value: '6-text-only', text: gettext('6-text-only'), component: CardDetails},
-    {value: '4-picture-text', text: gettext('4-picture-text'), component: CardDetails},
-    {value: '4-media-gallery', text: gettext('4-media-gallery'), component: CardDetails},
-    {value: '4-photo-gallery', text: gettext('4-photo-gallery'), component: ExternalMediaCardDetails},
-    {value: '4-text-only', text: gettext('4-text-only'), component: CardDetails},
-    {value: '1x1-top-news', text: gettext('1x1-top-news'), component: CardDetails},
-    {value: '2x2-top-news', text: gettext('2x2-top-news'), component: CardDetails},
-    {value: '3-text-only', text: gettext('3-text-only'), component: CardDetails},
-    {value: '3-picture-text', text: gettext('3-picture-text'), component: CardDetails},
-    {value: '2x2-events', text: gettext('2x2-events'), component: EventDetails},
-];
+import {
+    CARD_TYPES,
+    getCardEditComponent,
+} from 'components/cards/utils';
 
 
 class EditCard extends React.Component {
@@ -31,14 +17,22 @@ class EditCard extends React.Component {
 
     render() {
         const cardType = this.props.card.type || '';
-        const CardComponent = cardTypes.find((card) => card.value === cardType).component || CardDetails;
+        const CardComponent = getCardEditComponent(cardType);
+        const cardTypes = CARD_TYPES.filter(
+            (card) => card.dashboard.includes(this.props.card.dashboard)
+        ).map((c) => ({value: c._id, text: c.text}));
+
+        cardTypes.unshift({value: '', text: '', component: getCardEditComponent('')});
+
         const cardProps = {
             card: this.props.card,
             onChange: this.props.onChange,
             errors: this.props.errors
         };
 
-        if (!['4-photo-gallery', '2x2-events'].includes(cardType)) {
+        if (cardType.includes('navigation')) {
+            cardProps.navigations = this.props.navigations;
+        } else if (!['4-photo-gallery', '2x2-events'].includes(cardType)) {
             cardProps.products = this.props.products;
         }
 
@@ -78,7 +72,7 @@ class EditCard extends React.Component {
                             name='order'
                             type='number'
                             label={gettext('Order')}
-                            value={this.props.card.order}
+                            value={`${this.props.card.order}`}
                             onChange={this.props.onChange}
                             error={this.props.errors ? this.props.errors.order : null}/>
 
@@ -107,6 +101,7 @@ EditCard.propTypes = {
     onChange: PropTypes.func,
     errors: PropTypes.object,
     products: PropTypes.arrayOf(PropTypes.object),
+    navigations: PropTypes.arrayOf(PropTypes.object),
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
