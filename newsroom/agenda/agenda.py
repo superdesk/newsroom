@@ -298,8 +298,10 @@ class AgendaService(newsroom.Service):
         user = get_user()
         company = get_user_company(user)
         get_resource_service('section_filters').apply_section_filter(query, self.section)
+        product_query = {'bool': {'must': [], 'should': []}}
         try:
-            set_product_query(query, company, navigation_id=req.args.get('navigation'))
+            set_product_query(product_query, company, navigation_id=req.args.get('navigation'))
+            query['bool']['must'].append(product_query)
         except FeaturedQuery:
             return self.featured(req, lookup)
 
