@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from  'prop-types';
+import {gettext} from '../utils';
 
 
 export default function BookmarkTabs(props) {
@@ -8,7 +9,7 @@ export default function BookmarkTabs(props) {
 
         return <a key={section._id}
             className={'btn btn-outline-primary' + (section._id === props.active ? ' active' : '')}
-            href={`/bookmarks_${section._id}`}>{section.name}</a>;
+            href={`/bookmarks_${section._id}`}>{gettext(section.name)}</a>;
     });
 
     if (sections.length < 2) {
