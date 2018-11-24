@@ -12,7 +12,8 @@ import { get, isEmpty } from 'lodash';
 import { EXTENDED_VIEW } from 'wire/defaults';
 import { searchReducer } from 'search/reducers';
 import { defaultReducer } from '../reducers';
-import { EARLIEST_DATE } from './utils';
+import { EARLIEST_DATE, getPreviousMonth } from './utils';
+import moment from 'moment';
 
 const initialState = {
     items: [],
@@ -56,8 +57,21 @@ function recieveItems(state, data) {
     const createdFilter = get(state, 'search.createdFilter', {});
 
     let activeDate = state.agenda.activeDate || Date.now();
-    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to) || state.bookmarks) {
+    if (state.bookmarks) {
         activeDate = EARLIEST_DATE;
+    }
+    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to)) {
+        if (createdFilter.from === 'now/d') {
+            activeDate = Date.now();
+        } else if (createdFilter.from === 'now/w') {
+            activeDate =  moment(activeDate).isoWeekday(1).valueOf();
+        } else if (createdFilter.from === 'now/M') {
+            activeDate = getPreviousMonth(activeDate);
+        } else if (!isEmpty(createdFilter.from)) {
+            activeDate = moment(createdFilter.from).valueOf();
+        } else {
+            activeDate = EARLIEST_DATE;
+        }
     } else if (activeDate === EARLIEST_DATE) {
         activeDate = Date.now();
     }
