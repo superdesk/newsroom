@@ -11,7 +11,7 @@ const getActiveTypeahead = (filter, activeFilter) => {
     return activeFilter[filter.field] ? activeFilter[filter.field][0] : [];
 };
 
-const processBuckets = (buckets) => buckets.map((bucket) => bucket.key);
+const processBuckets = (buckets) => buckets.map((bucket) => bucket.key).sort();
 
 function AgendaTypeAheadFilter({aggregations, filter, toggleFilter, activeFilter, getDropdownItems}) {
     return (<div className="btn-group" key={filter.field}>
