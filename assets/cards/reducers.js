@@ -10,7 +10,12 @@ import {
     NEW_CARD,
     SET_ERROR,
     GET_PRODUCTS,
+    GET_NAVIGATIONS,
 } from './actions';
+import { INIT_DASHBOARD, SELECT_DASHBOARD } from 'features/dashboard/actions';
+import { dashboardReducer } from 'features/dashboard/reducers';
+import { getCard } from 'components/cards/utils';
+
 
 const initialState = {
     query: null,
@@ -21,19 +26,8 @@ const initialState = {
     totalCards: null,
     activeQuery: null,
     products: [],
-};
-
-const cardSizes = {
-    '6-text-only': 6,
-    '4-picture-text': 4,
-    '4-media-gallery': 4,
-    '4-photo-gallery': 4,
-    '4-text-only': 4,
-    '1x1-top-news': 2,
-    '2x2-top-news': 4,
-    '3-text-only': 3,
-    '3-picture-text': 3,
-    '2x2-events': 4,
+    navigations: [],
+    dashboards: dashboardReducer(),
 };
 
 export default function cardReducer(state = initialState, action) {
@@ -58,6 +52,11 @@ export default function cardReducer(state = initialState, action) {
         const target = action.event.target;
         const field = target.name;
         let card = {...state.cardToEdit};
+        let size = get(getCard(card.type), 'size', 0);
+
+        if (!card.dashboard) {
+            card.dashboard = 'newsroom';
+        }
 
         if (field === 'type') {
             if (target.value == '2x2-events') {
@@ -73,12 +72,12 @@ export default function cardReducer(state = initialState, action) {
         } else if (field === 'product') {
             set(card, 'config.product', target.value);
         } else if (field.indexOf('event') >= 0) {
-            if (get(card, 'config.events.length', 0) < cardSizes[state.cardToEdit.type]) {
+            if (get(card, 'config.events.length', 0) < size) {
                 card.config.events = [{}, {}, {}, {}];
             }
             set(card, field, target.value);
         } else if (field.indexOf('source') >= 0) {
-            if (get(card, 'config.sources.length', 0) < cardSizes[state.cardToEdit.type]) {
+            if (get(card, 'config.sources.length', 0) < size) {
                 card.config.sources = [{}, {}, {}, {}];
             }
             set(card, field, target.value);
@@ -86,7 +85,7 @@ export default function cardReducer(state = initialState, action) {
             set(card, field, target.value);
         }
 
-        card['config']['size'] = cardSizes[state.cardToEdit.type];
+        card['config']['size'] = size;
 
         return {...state, cardToEdit: card, errors: null};
     }
@@ -96,6 +95,7 @@ export default function cardReducer(state = initialState, action) {
             label: '',
             type: '',
             config: {},
+            dashboard: state.dashboards.active,
         };
 
         return {...state, cardToEdit, errors: null};
@@ -131,6 +131,14 @@ export default function cardReducer(state = initialState, action) {
     case GET_PRODUCTS: {
         return {...state, products: action.data};
     }
+
+    case GET_NAVIGATIONS: {
+        return {...state, navigations: action.data};
+    }
+
+    case INIT_DASHBOARD:
+    case SELECT_DASHBOARD:
+        return {...state, dashboards: dashboardReducer(state.dashboards, action)};
 
     default:
         return state;

@@ -1,7 +1,7 @@
 import re
 import flask
 from bson import ObjectId
-from flask import jsonify, json
+from flask import jsonify, json, current_app
 from flask_babel import gettext
 from superdesk import get_resource_service
 
@@ -15,6 +15,8 @@ def get_settings_data():
     return {
         'products': list(query_resource('products', lookup={'is_enabled': True})),
         'cards': list(query_resource('cards')),
+        'dashboards': current_app.dashboards,
+        'navigations': list(query_resource('navigations', lookup={'is_enabled': True}))
     }
 
 
@@ -55,9 +57,13 @@ def _get_card_data(data):
     if not data.get('type'):
         return jsonify(gettext('Type not found')), 400
 
+    if not data.get('dashboard'):
+        return jsonify(gettext('Dashboard type not found')), 400
+
     card_data = {
         'label': data.get('label'),
         'type': data.get('type'),
+        'dashboard': data.get('dashboard', 'newsroom'),
         'config': data.get('config'),
         'order': int(data.get('order', 0) or 0),
     }

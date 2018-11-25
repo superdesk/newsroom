@@ -5,7 +5,7 @@ import SelectInput from 'components/SelectInput';
 import { gettext } from 'utils';
 
 
-class CardDetails extends React.Component {
+class ConfigProduct extends React.Component {
     constructor(props) {
         super(props);
 
@@ -34,11 +34,11 @@ class CardDetails extends React.Component {
     }
 }
 
-CardDetails.propTypes = {
+ConfigProduct.propTypes = {
     card: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     errors: PropTypes.object,
     products: PropTypes.arrayOf(PropTypes.object),
 };
 
-export default CardDetails;
+export default ConfigProduct;

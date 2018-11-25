@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 import EditCard from './EditCard';
 import CardList from './CardList';
 import SearchResultsInfo from 'wire/components/SearchResultsInfo';
@@ -65,6 +66,8 @@ class Cards extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
+        const cardFilter = (card) =>  !this.props.activeDashboard ||
+            get(card, 'dashboard', 'newsroom') === this.props.activeDashboard;
 
         return (
             <div className="flex-row">
@@ -82,7 +85,7 @@ class Cards extends React.Component {
                             query={this.props.activeQuery} />
                         }
                         <CardList
-                            cards={this.props.cards}
+                            cards={this.props.cards.filter(cardFilter)}
                             products={this.props.products}
                             onClick={this.props.selectCard}
                             activeCardId={this.props.activeCardId} />
@@ -99,6 +102,7 @@ class Cards extends React.Component {
                         products={this.props.products}
                         saveProducts={this.props.saveProducts}
                         fetchProducts={this.props.fetchProducts}
+                        navigations={this.props.navigations}
                     />
                 }
             </div>
@@ -124,6 +128,8 @@ Cards.propTypes = {
     products: PropTypes.arrayOf(PropTypes.object),
     saveProducts: PropTypes.func.isRequired,
     fetchProducts: PropTypes.func.isRequired,
+    navigations: PropTypes.arrayOf(PropTypes.object),
+    activeDashboard: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -135,6 +141,8 @@ const mapStateToProps = (state) => ({
     totalCards: state.totalCards,
     errors: state.errors,
     products: state.products,
+    navigations: state.navigations,
+    activeDashboard: state.dashboards.active,
 });
 
 const mapDispatchToProps = (dispatch) => ({

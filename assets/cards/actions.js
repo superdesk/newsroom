@@ -1,5 +1,6 @@
 import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
+import { initDashboard } from 'features/dashboard/actions';
 
 
 export const SELECT_CARD = 'SELECT_CARD';
@@ -47,6 +48,10 @@ export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
+export const GET_NAVIGATIONS = 'GET_NAVIGATIONS';
+export function getNavigations(data) {
+    return {type: GET_NAVIGATIONS, data};
+}
 
 /**
  * Fetches cards
@@ -179,6 +184,8 @@ export function initViewData(data) {
     return function (dispatch) {
         dispatch(getCards(data.cards));
         dispatch(getProducts(data.products));
+        dispatch(getNavigations(data.navigations));
+        dispatch(initDashboard(data.dashboards));
     };
 }
 

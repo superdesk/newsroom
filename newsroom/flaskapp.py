@@ -57,6 +57,7 @@ class Newsroom(eve.Eve):
         self.extensions = {}
         self.theme_folder = 'theme'
         self.sections = []
+        self.dashboards = []
         self._testing = testing
         self._general_settings = {}
 
@@ -237,7 +238,7 @@ class Newsroom(eve.Eve):
         """
         self.sections.append({
             '_id': _id,
-            'name': name,
+            'name': name
         })
 
     def sidenav(self, name, endpoint, icon=None, group=0, section=None, blueprint=None, badge=None):
@@ -286,3 +287,10 @@ class Newsroom(eve.Eve):
 
         if flask.g:  # reset settings cache
             flask.g.settings = None
+
+    def dashboard(self, _id, name):
+        """Define new dashboard"""
+        self.dashboards.append({
+            '_id': _id,
+            'name': name
+        })

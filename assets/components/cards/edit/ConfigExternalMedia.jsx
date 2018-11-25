@@ -5,7 +5,7 @@ import { gettext } from 'utils';
 import {get} from 'lodash';
 
 
-function ExternalMediaCardDetails ({card, onChange, errors}) {
+function ConfigExternalMedia ({card, onChange, errors}) {
     const sources = card.config.sources || [{}, {}, {}, {}];
 
     return (
@@ -57,10 +57,10 @@ function ExternalMediaCardDetails ({card, onChange, errors}) {
     );
 }
 
-ExternalMediaCardDetails.propTypes = {
+ConfigExternalMedia.propTypes = {
     card: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     errors: PropTypes.object,
 };
 
-export default ExternalMediaCardDetails;
+export default ConfigExternalMedia;

@@ -34,6 +34,7 @@ describe('WireApp', () => {
         itemsById: {'foo': {}},
         previewItem: 'foo',
         selectedItems: ['foo'],
+        context: 'wire',
     };
 
     it('can filter actions if there is no user or company', () => {
