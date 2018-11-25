@@ -263,9 +263,14 @@ def _filter_terms(filters):
     return term_filters
 
 
-def _remove_attachments(source):
+def _remove_private_fields(source):
     source['_source'] = {
-        'exclude': ['event.files']
+        'exclude': [
+            'event.files',
+            'event.internal_note',
+            'planning_items.internal_note',
+            'coverages.planning.internal_note'
+        ]
     }
 
 
@@ -323,7 +328,7 @@ class AgendaService(newsroom.Service):
             source['aggs'] = aggregations
 
         if not is_admin_or_internal(user):
-            _remove_attachments(source)
+            _remove_private_fields(source)
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}

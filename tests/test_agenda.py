@@ -19,6 +19,9 @@ def test_item_json(client):
     data = json.loads(resp.get_data())
     assert 'headline' in data
     assert 'files' in data['event']
+    assert 'internal_note' in data['event']
+    assert 'internal_note' in data['planning_items'][0]
+    assert 'internal_note' in data['coverages'][0]['planning']
 
 
 def test_item_json_does_not_return_files(client, app):
@@ -30,6 +33,9 @@ def test_item_json_does_not_return_files(client, app):
     data = get_json(client, '/agenda/urn:conference?format=json')
     assert 'headline' in data
     assert 'files' not in data['event']
+    assert 'internal_note' not in data['event']
+    assert 'internal_note' not in data['planning_items'][0]
+    assert 'internal_note' not in data['coverages'][0]['planning']
 
 
 def get_bookmarks_count(client, user):
@@ -145,6 +151,9 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
     assert 'files' not in data['_items'][0]['event']
+    assert 'internal_note' not in data['_items'][0]['event']
+    assert 'internal_note' not in data['_items'][0]['planning_items'][0]
+    assert 'internal_note' not in data['_items'][0]['coverages'][0]['planning']
     resp = client.get('/agenda/search?navigation=51')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])

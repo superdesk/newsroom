@@ -13,6 +13,7 @@ import AgendaName from './AgendaName';
 import AgendaTime from './AgendaTime';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
+import AgendaInternalNote from './AgendaInternalNote';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import AgendaPreviewImage from './AgendaPreviewImage';
 import AgendaLongDescription from './AgendaLongDescription';
@@ -63,6 +64,7 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                             <AgendaPreviewAttachments item={item} />
                             <AgendaEdNote item={item} />
+                            <AgendaInternalNote item={item} />
                         </div>
                     </Preview>
                 }

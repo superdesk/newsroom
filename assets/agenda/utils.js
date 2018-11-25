@@ -378,6 +378,19 @@ export function getAttachments(item) {
 }
 
 /**
+ * Get list of internal notes
+ *
+ * @param {Object} item
+ * @return {Array}
+ */
+export function getInternalNotes(item) {
+    const internalNotes = [];
+    internalNotes.push(get(item, 'event.internal_note'));
+    get(item, 'planning_items', []).forEach(p => internalNotes.push(p.internal_note));
+    return internalNotes.filter(note => !!note);
+}
+
+/**
  * Test if item has any attachments
  * 
  * @param {Object} item

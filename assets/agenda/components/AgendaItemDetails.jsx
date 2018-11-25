@@ -23,6 +23,7 @@ import { hasCoverages, hasAttachments } from '../utils';
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
+import AgendaInternalNote from './AgendaInternalNote';
 import AgendaCoverages from './AgendaCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
@@ -65,6 +66,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                         </ArticleSidebarBox>
                     )}
                     <AgendaEdNote item={item} />
+                    <AgendaInternalNote item={item} />
                 </ArticleSidebar>
             </Article>
         </Content>
