@@ -49,6 +49,7 @@
 
     <div class="contentWrap flex-column flex-sm-row">
 
+        {% if session.get('name') %}
         <nav class="sidenav">
             <ul class="sidenav-icons">
                 {% if is_admin() %}
@@ -88,6 +89,7 @@
             {% block sidenav %}
             {% endblock %}
         </nav>
+        {% endif %}
 
         {% block content %}
         {% endblock %}
