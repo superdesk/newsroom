@@ -30,7 +30,7 @@ def index():
 def bookmarks():
     data = get_view_data()
     data['bookmarks'] = True
-    return flask.render_template('agenda_index.html', data=data)
+    return flask.render_template('agenda_bookmarks.html', data=data)
 
 
 @blueprint.route('/agenda/<_id>')

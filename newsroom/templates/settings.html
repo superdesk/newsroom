@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}{{ config.SITE_NAME }} - {{ gettext('Settings') }}{% endblock %}
+{% block title %}{{ gettext('Settings') }}{% endblock %}
 
 {% block breadcrumb %}
     <span class="breadcrumb-item active">{{ gettext('Settings') }}</span>
@@ -19,7 +19,7 @@
                 <li>
                     <a class="side-navigation__btn {{ "active" if setting_type == app._id }}"
                         href="{{ url_for('settings.app', app_id=app._id) }}">
-                        {{ app.name }}</a>
+                        {{ gettext(app.name) }}</a>
                 </li>
                 {% endfor %}
             </ul>

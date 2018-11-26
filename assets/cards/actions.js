@@ -1,5 +1,6 @@
 import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
+import { initDashboard } from 'features/dashboard/actions';
 
 
 export const SELECT_CARD = 'SELECT_CARD';
@@ -47,6 +48,10 @@ export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
+export const GET_NAVIGATIONS = 'GET_NAVIGATIONS';
+export function getNavigations(data) {
+    return {type: GET_NAVIGATIONS, data};
+}
 
 /**
  * Fetches cards
@@ -74,6 +79,45 @@ export function postCard() {
         const card = getState().cardToEdit;
         let data = new FormData();
         data.append('card', JSON.stringify(card));
+
+        if (card.type === '4-photo-gallery') {
+            const errors = {
+                config: {
+                    sources: [{}, {}, {}, {}]
+                }
+            };
+            let errorFound = false;
+            let mediaCount = 0;
+            (card.config.sources || []).forEach((source, index) => {
+                if (!source.url && parseInt(source.count, 10) > 0) {
+                    errors.config.sources[index].url = gettext('Invalid Url.');
+                    errorFound = true;
+                }
+
+                if (source.url && !source.count) {
+                    errors.config.sources[index].count = gettext('Invalid count of media.');
+                    errorFound = true;
+                }
+
+                if (parseInt(source.count, 10) > 0) {
+                    mediaCount += parseInt(source.count, 10);
+                } else if (parseInt(source.count, 10) <= 0) {
+                    errors.config.sources[index].count = gettext('Count of media should be greater than zero.');
+                    errorFound = true;
+                }
+            });
+
+            if (mediaCount > 4 || mediaCount === 0) {
+                notify.error(gettext('Total media count across all media config should be between 1 and 4.'));
+                return;
+            }
+
+            if (errorFound) {
+                notify.error(gettext('Failed to update Card.'));
+                dispatch(setError(errors));
+                return;
+            }
+        }
 
         if (card.type === '2x2-events') {
             [...Array(4)].forEach((_, i) => {
@@ -140,6 +184,8 @@ export function initViewData(data) {
     return function (dispatch) {
         dispatch(getCards(data.cards));
         dispatch(getProducts(data.products));
+        dispatch(getNavigations(data.navigations));
+        dispatch(initDashboard(data.dashboards));
     };
 }
 

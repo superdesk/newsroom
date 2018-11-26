@@ -46,7 +46,9 @@ export default class BaseApp extends React.Component {
 
         let name = get(navigations.find((nav) => nav._id === activeNavigation), 'name', '');
         if (!name && activeTopic) {
-            name = activeTopic.label;
+            name = `/ ${activeTopic.label}`;
+        } else if (name) {
+            name = `/ ${name}`;
         }
 
         return createPortal(name , dest);

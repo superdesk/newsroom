@@ -54,7 +54,7 @@ BLUEPRINTS = [
     'newsroom.reports',
     'newsroom.public',
     'newsroom.agenda',
-    'newsroom.settings',
+    'newsroom.settings'
 ]
 
 CORE_APPS = [
@@ -80,7 +80,7 @@ CORE_APPS = [
     'newsroom.public',
     'newsroom.agenda',
     'newsroom.settings',
-    'newsroom.photos',
+    'newsroom.photos'
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -159,18 +159,6 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 # If false, aggregations will change by filters applied
 FILTER_BY_POST_FILTER = True
 
-# Base64 Encoded Token
-AAPPHOTOS_TOKEN = os.environ.get('AAPPHOTOS_TOKEN')
-
-# Home Page Carousel Sources
-HOMEPAGE_CAROUSEL = [{
-    'source': 'https://photos-api.aap.com.au/api/v3/Galleries/Newsroom/AUSTRALIAN%20NEWS',
-    'count': 2
-}, {
-    'source': 'https://photos-api.aap.com.au/api/v3/Galleries/Newsroom/AUSTRALIAN%20SPORT',
-    'count': 2
-}]
-
 # List of filters to remove matching stories when news only switch is turned on
 NEWS_ONLY_FILTERS = [
    {'match': {'genre.code': 'Results (sport)'}},
@@ -234,7 +222,7 @@ COVERAGE_TYPES = {
     'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'}
 }
 
-LANGUAGES = ['en']
+LANGUAGES = ['en', 'fi', 'cs']
 DEFAULT_LANGUAGE = 'en'
 
 # Enable iframely support for item body_html

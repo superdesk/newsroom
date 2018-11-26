@@ -12,12 +12,6 @@ class CompanyPermissions extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.groups = [
-            {_id: 'sections', label: gettext('Sections')},
-            {_id: 'products', label: gettext('Products')},
-        ];
-
         this.state = this.setup();
     }
 
@@ -55,14 +49,6 @@ class CompanyPermissions extends React.Component {
         this.setState({[key]: field});
     }
 
-    getLabel(group, item) {
-        if (group._id === 'products') {
-            return `${item.name} [${item.product_type || 'wire'}]`;
-        }
-
-        return item.name;
-    }
-
     render() {
         return (
             <div className='tab-pane active' id='company-permissions'>
@@ -70,7 +56,7 @@ class CompanyPermissions extends React.Component {
                     event.preventDefault();
                     this.props.savePermissions(this.props.company, this.state);
                 }}>
-                    <div className="list-item__preview-form">
+                    <div className="list-item__preview-form" key='general'>
                         <div className="form-group">
                             <label>{gettext('General')}</label>
                             <ul className="list-unstyled">
@@ -85,22 +71,39 @@ class CompanyPermissions extends React.Component {
                             </ul>
                         </div>
 
-                        {this.groups.map((group) => (
-                            <div className="form-group" key={group._id}>
-                                <label>{group.label}</label>
-                                <ul className="list-unstyled">
-                                    {this.props[group._id].map((item) => (
-                                        <li key={item._id}>
-                                            <CheckboxInput
-                                                name={item._id}
-                                                label={this.getLabel(group, item)}
-                                                value={!!this.state[group._id][item._id]}
-                                                onChange={() => this.toggle(group._id, item._id)} />
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
+                        <div className="form-group" key='sections'>
+                            <label>{gettext('Sections')}</label>
+                            <ul className="list-unstyled">
+                                {this.props['sections'].map((item) => (
+                                    <li key={item._id}>
+                                        <CheckboxInput
+                                            name={item._id}
+                                            label={item.name}
+                                            value={!!this.state['sections'][item._id]}
+                                            onChange={() => this.toggle('sections', item._id)} />
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div className="form-group" key='products'>
+                            {this.props['sections'].map((section) => (
+                                [<label key={`${section.id}label`}>{gettext('Products')} {`(${section.name})`}</label>,
+                                    <ul key={`${section.id}product`} className="list-unstyled">
+                                        {this.props['products'].filter((p) => (p.product_type || 'wire').toLowerCase() === section.name.toLowerCase())
+                                            .map((product) => (
+                                                <li key={product._id}>
+                                                    <CheckboxInput
+                                                        name={product._id}
+                                                        label={product.name}
+                                                        value={!!this.state['products'][product._id]}
+                                                        onChange={() => this.toggle('products', product._id)} />
+                                                </li>
+                                            ))}
+                                    </ul>]
+                            ))}
+                        </div>
+
                     </div>
                     <div className='list-item__preview-footer'>
                         <input

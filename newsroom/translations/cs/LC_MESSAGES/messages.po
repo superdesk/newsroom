@@ -1,0 +1,617 @@
+# Translations template for Newsroom.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the Newsroom project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+# 
+# Translators:
+# Karel Petrak <karel.petrak@sourcefabric.org>, 2018
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Newsroom 1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-10-23 14:18+0200\n"
+"PO-Revision-Date: 2018-09-24 11:22+0000\n"
+"Last-Translator: Karel Petrak <karel.petrak@sourcefabric.org>, 2018\n"
+"Language-Team: Czech (https://www.transifex.com/sourcefabric/teams/6584/cs/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: newsroom/email.py:31
+msgid "A new newsroom signup request"
+msgstr "Nový požadavek na zřízení uživatelského účtu"
+
+#: newsroom/email.py:53 newsroom/email.py:74
+msgid "{} account created"
+msgstr "{} účet vytvořen"
+
+#: newsroom/email.py:93
+msgid "{} password reset"
+msgstr "{} heslo resetováno"
+
+#: newsroom/email.py:112
+msgid "New story for followed topic: {}"
+msgstr "Nová zpráva ze sledovaného tématu: {}"
+
+#: newsroom/email.py:130
+msgid "New update for followed agenda: {}"
+msgstr "Aktualizace sledované události: {}"
+
+#: newsroom/email.py:156
+msgid "New update for your previously accessed story: {}"
+msgstr "Aktualizace zprávy, kterou jste navštívili: {}"
+
+#: newsroom/email.py:174
+msgid "New update for your previously accessed agenda: {}"
+msgstr "Aktualizace události, kterou jste navštívili: {}"
+
+#: newsroom/email.py:198
+msgid "Kill/Takedown notice"
+msgstr "Upozornění na storno"
+
+#: newsroom/email.py:207
+msgid "Agenda cancelled notice"
+msgstr "Upozornění na zrušení události"
+
+#: newsroom/push.py:86
+msgid "Unknown type {}"
+msgstr "Neznámý typ {}"
+
+#: newsroom/settings.py:52
+msgid "General Settings"
+msgstr "Obecná nastavení"
+
+#: newsroom/settings.py:56
+msgid "Google Analytics ID"
+msgstr "Google Analytics ID"
+
+#: newsroom/agenda/agenda.py:33
+msgid "An event you have been watching has been updated"
+msgstr ""
+
+#: newsroom/agenda/agenda.py:34
+msgid "Event updated"
+msgstr ""
+
+#: newsroom/agenda/agenda.py:37
+msgid "An event you have been watching has been cancelled"
+msgstr ""
+
+#: newsroom/agenda/agenda.py:38
+msgid "Event cancelled"
+msgstr ""
+
+#: newsroom/agenda/agenda.py:41
+msgid "An event you have been watching has a new planning"
+msgstr ""
+
+#: newsroom/agenda/agenda.py:42
+msgid "Planning added"
+msgstr ""
+
+#: newsroom/agenda/agenda.py:45
+msgid "An event you have been watching has a planning cancelled"
+msgstr ""
+
+#: newsroom/agenda/agenda.py:46
+msgid "Planning cancelled"
+msgstr ""
+
+#: newsroom/agenda/agenda.py:49
+msgid "An event you have been watching has a new coverage added"
+msgstr ""
+
+#: newsroom/agenda/agenda.py:50
+msgid "Coverage added"
+msgstr ""
+
+#: newsroom/agenda/email.py:11
+msgid "New coverage"
+msgstr ""
+
+#: newsroom/agenda/email.py:42
+msgid "A new coverage request"
+msgstr ""
+
+#: newsroom/auth/forms.py:9
+msgid "Editor"
+msgstr ""
+
+#: newsroom/auth/forms.py:10
+msgid "Journalist"
+msgstr ""
+
+#: newsroom/auth/forms.py:11
+msgid "Sales"
+msgstr ""
+
+#: newsroom/auth/forms.py:12
+msgid "CTO"
+msgstr ""
+
+#: newsroom/auth/forms.py:13
+msgid "CEO"
+msgstr ""
+
+#: newsroom/auth/forms.py:14
+msgid "Other"
+msgstr ""
+
+#: newsroom/auth/forms.py:16
+msgid "Your email"
+msgstr ""
+
+#: newsroom/auth/forms.py:17
+msgid "Your First Name"
+msgstr ""
+
+#: newsroom/auth/forms.py:18
+msgid "Your Last Name"
+msgstr ""
+
+#: newsroom/auth/forms.py:19
+msgid "Your telephone number"
+msgstr ""
+
+#: newsroom/auth/forms.py:20
+msgid "Your company"
+msgstr ""
+
+#: newsroom/auth/forms.py:21
+msgid "Your country"
+msgstr ""
+
+#: newsroom/auth/forms.py:22
+msgid "Your position"
+msgstr ""
+
+#: newsroom/auth/forms.py:23
+msgid "Size of your company"
+msgstr ""
+
+#: newsroom/auth/forms.py:28 newsroom/auth/forms.py:34
+#: newsroom/users/forms.py:21
+msgid "Email"
+msgstr ""
+
+#: newsroom/auth/forms.py:29
+msgid "Password"
+msgstr ""
+
+#: newsroom/auth/forms.py:30
+msgid "Remember Me"
+msgstr ""
+
+#: newsroom/auth/forms.py:41
+msgid "Passwords must match."
+msgstr ""
+
+#: newsroom/auth/forms.py:42
+msgid "Old password"
+msgstr ""
+
+#: newsroom/auth/forms.py:43
+msgid "New password"
+msgstr ""
+
+#: newsroom/auth/forms.py:44
+msgid "Confirm new password"
+msgstr ""
+
+#: newsroom/auth/views.py:37 newsroom/auth/views.py:182
+msgid "Company account has been disabled."
+msgstr ""
+
+#: newsroom/auth/views.py:48 newsroom/auth/views.py:190
+msgid "Account is disabled."
+msgstr ""
+
+#: newsroom/auth/views.py:50 newsroom/auth/views.py:192
+msgid "Invalid username or password."
+msgstr ""
+
+#: newsroom/auth/views.py:140
+msgid "Account is disabled"
+msgstr ""
+
+#: newsroom/auth/views.py:147
+msgid "Account has not been approved"
+msgstr ""
+
+#: newsroom/auth/views.py:174
+msgid "Exceeded number of allowed login attempts"
+msgstr ""
+
+#: newsroom/auth/views.py:198 newsroom/auth/views.py:202
+msgid "Invalid token"
+msgstr ""
+
+#: newsroom/auth/views.py:242
+msgid "Your account has been validated."
+msgstr ""
+
+#: newsroom/auth/views.py:245
+msgid "Token has expired. Please create a new token"
+msgstr ""
+
+#: newsroom/auth/views.py:259
+msgid "Your password has been changed. Please login again."
+msgstr ""
+
+#: newsroom/auth/views.py:275
+msgid "A reset password token has been sent to your email address."
+msgstr ""
+
+#: newsroom/cards/__init__.py:14
+msgid "Home Page Cards"
+msgstr ""
+
+#: newsroom/cards/views.py:53
+msgid "Label not found"
+msgstr ""
+
+#: newsroom/cards/views.py:56
+msgid "Type not found"
+msgstr ""
+
+#: newsroom/companies/__init__.py:72
+msgid "Company Management"
+msgstr ""
+
+#: newsroom/companies/views.py:48 newsroom/navigations/views.py:45
+#: newsroom/navigations/views.py:57 newsroom/products/views.py:47
+msgid "Name not found"
+msgstr ""
+
+#: newsroom/companies/views.py:54
+msgid "Wrong date format"
+msgstr ""
+
+#: newsroom/companies/views.py:83
+msgid "Company not found"
+msgstr ""
+
+#: newsroom/navigations/__init__.py:14
+msgid "Navigation"
+msgstr ""
+
+#: newsroom/products/__init__.py:14
+msgid "Products"
+msgstr ""
+
+#: newsroom/reports/reports.py:32
+msgid "Saved searches per company"
+msgstr ""
+
+#: newsroom/reports/reports.py:58
+msgid "Saved searches per user"
+msgstr ""
+
+#: newsroom/reports/reports.py:86
+msgid "Products per company"
+msgstr ""
+
+#: newsroom/reports/reports.py:108
+msgid "Stories per product"
+msgstr ""
+
+#: newsroom/reports/views.py:15 newsroom/reports/views.py:36
+msgid "Unknown report {}"
+msgstr ""
+
+#: newsroom/templates/403.html:6
+msgid "403. Forbidden"
+msgstr ""
+
+#: newsroom/templates/403.html:7
+msgid "The requested resource is not available for your subscription."
+msgstr ""
+
+#: newsroom/templates/404.html:6
+msgid "404. That's an error."
+msgstr ""
+
+#: newsroom/templates/404.html:7
+#, python-format
+msgid "The requested url <code>%(url)s</code> was not found on the server."
+msgstr ""
+
+#: newsroom/templates/account_locked.html:12
+msgid "Your account has been locked"
+msgstr ""
+
+#: newsroom/templates/account_locked.html:15
+msgid ""
+"We have detected suspicious activity on your account and have locked it."
+msgstr ""
+
+#: newsroom/templates/account_locked.html:16
+msgid "Please contact Newsroom administrator to unlock your account"
+msgstr ""
+
+#: newsroom/templates/account_locked.html:17 newsroom/templates/home.html:3
+#: newsroom/templates/home.html:6 newsroom/templates/signup_success.html:18
+msgid "Home"
+msgstr ""
+
+#: newsroom/templates/agenda_index.html:3
+#: newsroom/templates/agenda_index.html:6
+msgid "Agenda"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:11
+#: newsroom/templates/wire_item_print.html:10
+msgid "On:"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:20
+msgid "Coverages:"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:23
+msgid "On"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:25
+msgid "Coverage Type"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:27
+msgid "Workflow Status"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:29
+msgid "Coverage Status"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:37
+#: newsroom/templates/wire_item.html:70
+#: newsroom/templates/wire_item_print.html:21
+msgid "Metadata"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:40
+#: newsroom/templates/wire_item.html:73
+#: newsroom/templates/wire_item_print.html:24
+msgid "Category"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:44
+#: newsroom/templates/wire_item.html:83
+#: newsroom/templates/wire_item_print.html:28
+msgid "Content Type"
+msgstr ""
+
+#: newsroom/templates/agenda_item_print.html:48
+msgid "Place"
+msgstr ""
+
+#: newsroom/templates/am_news_bookmarks.html:3
+#: newsroom/templates/am_news_bookmarks.html:10
+#: newsroom/templates/wire_bookmarks.html:3
+#: newsroom/templates/wire_bookmarks.html:6
+msgid "Saved Items"
+msgstr ""
+
+#: newsroom/templates/am_news_index.html:3
+#: newsroom/templates/am_news_index.html:10
+msgid "AM News"
+msgstr ""
+
+#: newsroom/templates/company_reports.html:6 newsroom/templates/layout.html:63
+msgid "Reports"
+msgstr ""
+
+#: newsroom/templates/copyright.html:3 newsroom/templates/footer.html:5
+msgid "Copyright"
+msgstr ""
+
+#: newsroom/templates/footer.html:2
+msgid "Privacy Policy"
+msgstr ""
+
+#: newsroom/templates/footer.html:3
+msgid "Terms and Conditions"
+msgstr ""
+
+#: newsroom/templates/footer.html:4 newsroom/templates/layout.html:45
+msgid "Contact Us"
+msgstr ""
+
+#: newsroom/templates/layout.html:42 newsroom/templates/login.html:13
+#: newsroom/templates/login.html:36
+msgid "Login"
+msgstr ""
+
+#: newsroom/templates/layout.html:57 newsroom/templates/settings.html:3
+#: newsroom/templates/settings.html:6
+msgid "Settings"
+msgstr ""
+
+#: newsroom/templates/login.html:40
+msgid "Forgot your password?"
+msgstr ""
+
+#: newsroom/templates/login.html:40
+msgid "Click here to reset."
+msgstr ""
+
+#: newsroom/templates/request_token.html:12
+msgid "Password Reset"
+msgstr ""
+
+#: newsroom/templates/request_token.html:27
+msgid "Validate"
+msgstr ""
+
+#: newsroom/templates/request_token.html:29
+msgid "Reset Password"
+msgstr ""
+
+#: newsroom/templates/reset_password.html:12
+msgid "Reset password"
+msgstr ""
+
+#: newsroom/templates/reset_password.html:30
+msgid "Please use 8 or more characters."
+msgstr ""
+
+#: newsroom/templates/reset_password.html:37
+msgid "Change Password"
+msgstr ""
+
+#: newsroom/templates/reset_password.html:38
+msgid "Cancel"
+msgstr ""
+
+#: newsroom/templates/signup.html:13 newsroom/templates/signup.html:60
+msgid "Sign up"
+msgstr ""
+
+#: newsroom/templates/signup_success.html:12
+msgid "Newsroom sign up"
+msgstr ""
+
+#: newsroom/templates/signup_success.html:15
+msgid "Thank you for your interest in Newsroom"
+msgstr ""
+
+#: newsroom/templates/signup_success.html:16
+msgid "Your sign up request has been sent successfully"
+msgstr ""
+
+#: newsroom/templates/signup_success.html:17
+msgid "One of our team members will be in touch with you shortly"
+msgstr ""
+
+#: newsroom/templates/wire_index.html:3 newsroom/templates/wire_index.html:6
+msgid "Wire"
+msgstr ""
+
+#: newsroom/templates/wire_item.html:40
+#: newsroom/templates/wire_item_print.html:10
+msgid "By:"
+msgstr ""
+
+#: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:105
+msgid "words"
+msgstr ""
+
+#: newsroom/templates/wire_item.html:63
+msgid "Source:"
+msgstr ""
+
+#: newsroom/templates/wire_item.html:95
+msgid "Previous versions"
+msgstr ""
+
+#: newsroom/topics/views.py:80 newsroom/wire/views.py:218
+#, python-format
+msgid "From %s: %s"
+msgstr "Od %s: %s"
+
+#: newsroom/users/__init__.py:14
+msgid "User Management"
+msgstr ""
+
+#: newsroom/users/forms.py:14
+msgid "Administrator"
+msgstr ""
+
+#: newsroom/users/forms.py:15
+msgid "Public"
+msgstr ""
+
+#: newsroom/users/forms.py:16
+msgid "Internal"
+msgstr ""
+
+#: newsroom/users/forms.py:19
+msgid "First Name"
+msgstr ""
+
+#: newsroom/users/forms.py:20
+msgid "Last Name"
+msgstr ""
+
+#: newsroom/users/forms.py:22
+msgid "Telephone"
+msgstr ""
+
+#: newsroom/users/forms.py:23
+msgid "Mobile"
+msgstr ""
+
+#: newsroom/users/forms.py:24
+msgid "Role"
+msgstr ""
+
+#: newsroom/users/forms.py:25
+msgid "User Type"
+msgstr ""
+
+#: newsroom/users/forms.py:26
+msgid "Company"
+msgstr ""
+
+#: newsroom/users/forms.py:27
+msgid "Sign Up Details"
+msgstr ""
+
+#: newsroom/users/forms.py:28
+msgid "Email Validated"
+msgstr ""
+
+#: newsroom/users/forms.py:29
+msgid "Account Enabled"
+msgstr ""
+
+#: newsroom/users/forms.py:30
+msgid "Account Approved"
+msgstr ""
+
+#: newsroom/users/forms.py:31
+msgid "Receive notifications via email"
+msgstr ""
+
+#: newsroom/users/forms.py:32
+msgid "Locale"
+msgstr ""
+
+#: newsroom/users/views.py:89 newsroom/users/views.py:133
+msgid "User not found"
+msgstr ""
+
+#: newsroom/users/views.py:128
+msgid "User id not provided"
+msgstr ""
+
+#: newsroom/wire/__init__.py:46
+msgid "Plain Text"
+msgstr ""
+
+#: newsroom/wire/__init__.py:57
+msgid "News only filter"
+msgstr ""
+
+#: newsroom/wire/__init__.py:59
+msgid ""
+"\n"
+"This query defines what is NOT considered \"news\" content.\n"
+"It is used by the News only switch to filter the view.\n"
+"When switched on, stories matching this filter will not be displayed.\n"
+"        "
+msgstr ""
+
+#: newsroom/wire/search.py:114
+msgid "User does not belong to a company."
+msgstr ""
+
+#: newsroom/wire/search.py:132
+msgid "Your company doesn't have any products defined."
+msgstr ""

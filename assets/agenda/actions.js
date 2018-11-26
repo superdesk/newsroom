@@ -338,6 +338,7 @@ export function pushNotification(push) {
 
         case 'new_item':
             return new Promise((resolve, reject) => {
+                dispatch(updateItems(push.extra));
                 dispatch(fetchNewItems()).then(resolve).catch(reject);
             });
 
@@ -369,6 +370,11 @@ function setTopics(topics) {
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
 export function setNewItems(data) {
     return {type: SET_NEW_ITEMS, data};
+}
+
+export const UPDATE_ITEMS = 'UPDATE_ITEMS';
+export function updateItems(data) {
+    return {type: UPDATE_ITEMS, data};
 }
 
 export function fetchNewItems() {

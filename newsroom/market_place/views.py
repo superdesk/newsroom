@@ -12,7 +12,7 @@ from newsroom.companies import section
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.wire.search import get_bookmarks_count
 from newsroom.wire.views import update_action_list, get_previous_versions, set_permissions
-from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type
+from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type, query_resource
 from newsroom.notifications import push_user_notification
 
 
@@ -32,7 +32,25 @@ def get_view_data():
                     if 'wire' in f['types']],
         'saved_items': get_bookmarks_count(user['_id'], 'market_place'),
         'context': 'market_place',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('market_place')
+        'ui_config': get_resource_service('ui_config').getSectionConfig('market_place'),
+        'home_page': False
+    }
+
+
+def get_home_page_data():
+    """Get home page data for market place"""
+    user = get_user()
+    navigations = get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
+                                             product_type='market_place')
+    get_resource_service('market_place_search').get_navigation_story_count(navigations)
+    return {
+        'user': str(user['_id']) if user else None,
+        'company': str(user['company']) if user and user.get('company') else None,
+        'navigations': navigations,
+        'cards': list(query_resource('cards', lookup={'dashboard': 'market_place'})),
+        'saved_items': get_bookmarks_count(user['_id'], 'market_place'),
+        'context': 'market_place',
+        'home_page': True
     }
 
 
@@ -41,6 +59,13 @@ def get_view_data():
 @section('market_place')
 def index():
     return flask.render_template('market_place_index.html', data=get_view_data())
+
+
+@blueprint.route('/market_place/home')
+@login_required
+@section('market_place')
+def home():
+    return flask.render_template('market_place_home.html', data=get_home_page_data())
 
 
 @blueprint.route('/market_place/search')

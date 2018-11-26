@@ -35,44 +35,46 @@ export default class CoverageItemStatus extends React.PureComponent {
 
     render() {
         const {coverage} = this.props;
-
-        if (coverage.workflow_status && !this.state.wire) {
-            return [
-                <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>,
+        const content = [
+            <span className="coverage-item--element-grow" key="topRow">
+                <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>
                 <span key="value">{gettext('coverage {{ state }} ',
-                    {state: get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')})}</span>,
-            ];
+                    {state: get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')})}</span>
+            </span>
+        ];
+
+        if (coverage.workflow_status === 'completed' && coverage.coverage_type === 'picture' && getDeliveryHref(coverage)) {
+            content.push(
+                <span key="contentLink" className="label label--available">
+                    <a  href={coverage.delivery_href}
+                        className="wire-column__preview__coverage__available-story"
+                        target="_blank"
+                        title={gettext('Open in new tab')}>
+                        {gettext('View Content')}
+                    </a>
+                </span>
+            );
         }
 
         if (this.state.wire) {
-            return [
-                <span key="label" className='coverage-item__text-label mr-1'>{gettext('Wire')}:</span>,
+            content.push(
                 this.state.wire._access
-                    ? <a className="wire-column__preview__coverage__available-story"
-                        key="value"
-                        href={'/wire?item='+ this.state.wire._id}
-                        target="_blank"
-                        title={gettext('Open in new tab')}>{this.state.wire.headline}</a>
-                    : <a className="wire-column__preview__coverage__restricted-story"
-                        key="value" href={'/wire/' + this.state.wire._id}
-                        target="_blank">{this.state.wire.headline}
-                    </a>
-                ,
-            ];
+                    ? <span key="contentLink" className="label label--available">
+                        <a className="wire-column__preview__coverage__available-story"
+                            key="value"
+                            href={'/wire?item='+ this.state.wire._id}
+                            target="_blank"
+                            title={gettext('Open in new tab')}>
+                            {gettext('View Content')}
+                        </a></span>
+                    : <span key="contentLink" className="label label--restricted">
+                        <a className="wire-column__preview__coverage__restricted-story"
+                            key="value" href="#"
+                            target="_blank">{gettext('View Content')}</a></span>
+            );
         }
 
-        if (coverage.workflow_status === 'completed' && coverage.coverage_type === 'picture' && getDeliveryHref(coverage)) {
-            return [
-                <span key="label" className='coverage-item__text-label mr-1'>{gettext('Picture')}:</span>,
-                <a className="wire-column__preview__coverage__available-story"
-                    key="picture"
-                    href={coverage.delivery_href}
-                    target="_blank"
-                    title={gettext('Open in new tab')}>{this.state.wire.headline || coverage.slugline}</a>
-            ];
-        }
-
-        return null;
+        return content;
     }
 }
 

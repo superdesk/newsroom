@@ -999,3 +999,21 @@ def test_push_update_for_an_item_with_coverage(client, app, mocker):
     assert wire_item['_id'] == 'update'
     assert wire_item['agenda_id'] == 'foo'
     assert wire_item['agenda_href'] == '/agenda/foo'
+
+
+def test_push_coverages_with_linked_stories(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo7'
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar7'
+    planning['event_item'] = 'foo7'
+    planning['coverages'][0]['deliveries'] = [{'item_id': 'item7'}]
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert parsed['headline'] == 'Planning headline'
+    assert 2 == len(parsed['coverages'])
+    assert parsed['coverages'][0]['delivery_id'] == 'item7'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'

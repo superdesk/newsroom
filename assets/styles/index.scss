@@ -1128,7 +1128,7 @@ article.list {
     flex-shrink: 0;
     height: 56px;
     transition: all .2s ease;
-    z-index: 10;
+    z-index: 100;
     background-color: white;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
    
@@ -1359,7 +1359,7 @@ article.list {
 }
 // watched item
 .wire-articles__item--watched {
-    background-color: #f6f6f6;
+    background-color: #e5eaec;
     background-image: url(/static/watched-icon.svg);
     background-size: 62px;
     background-repeat: no-repeat;
@@ -2003,7 +2003,7 @@ article.list {
         color: $orange;
     }
     .wire-articles__item--watched & {
-        background-color: #f2f2f2;
+        background-color: #e5eaec;
     }
 }
 
@@ -2401,6 +2401,9 @@ a.wire-articles__versions {
 
     & + .coverage-item__row {
         margin-top: 4px;
+    }
+    a:hover {
+        text-decoration: none;
     }
 }
 .coverage-item__column {

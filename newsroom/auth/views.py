@@ -43,6 +43,10 @@ def login():
                 flask.session['user_type'] = user['user_type']
                 flask.session.permanent = form.remember_me.data
                 flask.flash('login', 'analytics')
+
+                if flask.session.get('locale') and flask.session['locale'] != user.get('locale'):
+                    get_resource_service('users').system_update(user['_id'], {'locale': flask.session['locale']}, user)
+
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
             else:
                 flask.flash(gettext('Account is disabled.'), 'danger')
@@ -280,6 +284,14 @@ def token(token_type):
             flask.flash(gettext(message), 'danger')
         return flask.redirect(flask.url_for('auth.login'))
     return flask.render_template('request_token.html', form=form, token_type=token_type)
+
+
+@blueprint.route('/login_locale', methods=['POST'])
+def set_locale():
+    locale = flask.request.form.get('locale')
+    if locale and locale in app.config['LANGUAGES']:
+        flask.session['locale'] = locale
+    return flask.redirect(flask.url_for('auth.login'))
 
 
 def send_token(user, token_type='validate'):

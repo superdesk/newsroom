@@ -5,6 +5,7 @@ import {
     SELECT_DATE,
     WATCH_EVENTS,
     STOP_WATCHING_EVENTS,
+    UPDATE_ITEMS,
 } from './actions';
 
 import { get, isEmpty } from 'lodash';
@@ -123,6 +124,20 @@ export default function agendaReducer(state = initialState, action) {
         });
 
         return {...state, itemsById};
+    }
+
+    case UPDATE_ITEMS: {
+        const itemsById = Object.assign({}, state.itemsById);
+        get(action.data, '_items', []).map(item => {
+            if(itemsById[item._id]) {
+                itemsById[item._id] = item;
+            }
+        });
+
+        return {
+            ...state,
+            itemsById,
+        };
     }
 
     case INIT_DATA: {

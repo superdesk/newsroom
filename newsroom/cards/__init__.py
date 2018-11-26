@@ -11,4 +11,4 @@ from . import views   # noqa
 
 def init_app(app):
     superdesk.register_resource('cards', CardsResource, CardsService, _app=app)
-    app.settings_app('cards', gettext('Home Page Cards'), weight=500, data=views.get_settings_data)
+    app.settings_app('cards', gettext('Dashboards'), weight=500, data=views.get_settings_data)

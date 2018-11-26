@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import { selectSection } from './actions';
 import { sectionsPropType } from './types';
+import {gettext} from '../../utils';
 
 function SectionSwitch({sections, activeSection, selectSection}) {
     return (
@@ -12,7 +13,7 @@ function SectionSwitch({sections, activeSection, selectSection}) {
                 <button key={section._id}
                     className={'btn btn-outline-primary' + (section._id === activeSection ? ' active' : '')}
                     onClick={() => selectSection(section._id)}
-                >{section.name}</button>
+                >{gettext(section.name)}</button>
             ))}
         </div>
     );

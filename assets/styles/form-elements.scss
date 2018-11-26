@@ -38,7 +38,7 @@
         margin: 0;
         vertical-align: #{$valign};
         border: 2px solid rgba(200, 200, 200, 0.4);
-        z-index: 100;
+        z-index: 90;
         transition: background 200ms ease;
 
         @if $rounded == "circle" {

@@ -1,9 +1,10 @@
 import bcrypt
-from flask import current_app as app
+from flask import current_app as app, session
 
 import newsroom
 from content_api import MONGO_PREFIX
 from superdesk.utils import is_hashed, get_hash
+from newsroom.auth import get_user_id
 
 
 class UsersResource(newsroom.Resource):
@@ -108,6 +109,11 @@ class UsersService(newsroom.Service):
     def on_update(self, updates, original):
         if 'password' in updates:
             updates['password'] = self._get_password_hash(updates['password'])
+
+    def on_updated(self, updates, original):
+        # set session locale if updating locale for current user
+        if updates.get('locale') and original['_id'] == get_user_id() and updates['locale'] != original.get('locale'):
+            session['locale'] = updates['locale']
 
     def _get_password_hash(self, password):
         return get_hash(password, app.config.get('BCRYPT_GENSALT_WORK_FACTOR', 12))

@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ gettext('Saved Items') }}{% endblock %}
+
+{% block breadcrumb %}
+<span class="breadcrumb-item active">{{ gettext('Saved Items') }}</span>
+{% endblock %}
+
+{% block content %}
+<div id="agenda-app" class="content"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        agendaData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('agenda_js') | safe }}
+{% endblock %}
