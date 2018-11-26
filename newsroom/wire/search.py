@@ -1,18 +1,19 @@
-import pytz
 import logging
-import newsroom
-
 from datetime import datetime, timedelta
-from werkzeug.exceptions import Forbidden
-from flask import current_app as app, json, abort
+
 from eve.utils import ParsedRequest
+from flask import current_app as app, json, abort
 from flask_babel import gettext
+from superdesk import get_resource_service
+from werkzeug.exceptions import Forbidden
+
+import newsroom
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.products.products import get_products_by_company, get_products_by_navigation
-from newsroom.template_filters import is_admin
 from newsroom.settings import get_setting
-from superdesk import get_resource_service
+from newsroom.template_filters import is_admin
+from newsroom.wire.utils import get_local_date, get_end_date
 
 logger = logging.getLogger(__name__)
 
@@ -29,29 +30,6 @@ aggregations = {
 class FeaturedQuery(Exception):
     """Raise when query is for featured items."""
     pass
-
-
-def today(offset):
-    return datetime.utcnow() + timedelta(minutes=offset)
-
-
-def format_date(date, offset):
-    FORMAT = '%Y-%m-%d'
-    if date == 'now/d':
-        return today(offset).strftime(FORMAT)
-    if date == 'now/w':
-        _today = today(offset)
-        monday = _today - timedelta(days=_today.weekday())
-        return monday.strftime(FORMAT)
-    if date == 'now/M':
-        month = today(offset).replace(day=1)
-        return month.strftime(FORMAT)
-    return date
-
-
-def get_local_date(date, time, offset):
-    local_dt = datetime.strptime('%sT%s' % (format_date(date, offset), time), '%Y-%m-%dT%H:%M:%S')
-    return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
 
 
 def get_bookmarks_count(user_id, product_type):
@@ -150,7 +128,7 @@ def versioncreated_range(created):
     if created.get('created_from'):
         _range['gte'] = get_local_date(created['created_from'], '00:00:00', offset)
     if created.get('created_to'):
-        _range['lte'] = get_local_date(created['created_to'], '23:59:59', offset)
+        _range['lte'] = get_end_date(created['created_to'], get_local_date(created['created_to'], '23:59:59', offset))
     return {'range': {'versioncreated': _range}}
 
 

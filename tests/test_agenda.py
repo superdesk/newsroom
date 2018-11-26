@@ -1,7 +1,7 @@
 from flask import json
 from datetime import datetime, timedelta
 from superdesk.utc import utc_to_local, local_to_utc
-from newsroom.agenda.agenda import get_local_date, get_end_date
+from newsroom.wire.utils import get_local_date, get_end_date
 
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import post_json, delete_json, get_json
@@ -275,7 +275,7 @@ def test_local_time(client, app, mocker):
     # 9 am Sydney Time - day light saving on
     format = '%Y-%m-%dT%H:%M:%S'
     test_utcnow = datetime.strptime('2018-11-23T22:00:00', format)
-    with mocker.patch('newsroom.agenda.agenda.get_utcnow', return_value=test_utcnow):
+    with mocker.patch('newsroom.wire.utils.get_utcnow', return_value=test_utcnow):
         local_date = get_local_date('now/d', '00:00:00', -660)
         assert '2018-11-23T13:00:00' == local_date.strftime(format)
 

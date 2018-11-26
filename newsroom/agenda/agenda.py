@@ -1,9 +1,6 @@
-import pytz
 import logging
-from datetime import datetime, timedelta
 
 from content_api.items.resource import code_mapping
-from dateutil.relativedelta import relativedelta
 from eve.utils import ParsedRequest
 from flask import json, abort, url_for, current_app as app
 from flask_babel import gettext
@@ -20,9 +17,10 @@ from newsroom.agenda.email import send_coverage_notification_email, send_agenda_
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
+from newsroom.template_filters import is_admin_or_internal
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
 from newsroom.wire.search import query_string, set_product_query, FeaturedQuery
-from newsroom.template_filters import is_admin_or_internal
+from newsroom.wire.utils import get_local_date, get_end_date
 
 logger = logging.getLogger(__name__)
 
@@ -204,45 +202,6 @@ def _agenda_query():
             'minimum_should_match': 1,
         }
     }
-
-
-def get_utcnow():
-    'added for unit tests'
-    return datetime.utcnow()
-
-
-def today(time, offset):
-    user_local_date = get_utcnow() - timedelta(minutes=offset)
-    local_start_date = datetime.strptime('%sT%s' % (user_local_date.strftime('%Y-%m-%d'), time), '%Y-%m-%dT%H:%M:%S')
-    return local_start_date
-
-
-def format_date(date, time, offset):
-    if date == 'now/d':
-        return today(time, offset)
-    if date == 'now/w':
-        _today = today(time, offset)
-        monday = _today - timedelta(days=_today.weekday())
-        return monday
-    if date == 'now/M':
-        month = today(time, offset).replace(day=1)
-        return month
-    return datetime.strptime('%sT%s' % (date, time), '%Y-%m-%dT%H:%M:%S')
-
-
-def get_local_date(date, time, offset):
-    local_dt = format_date(date, time, offset)
-    return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
-
-
-def get_end_date(date_range, start_date):
-    if date_range == 'now/d':
-        return start_date
-    if date_range == 'now/w':
-        return start_date + timedelta(days=6)
-    if date_range == 'now/M':
-        return start_date + relativedelta(months=+1) - timedelta(days=1)
-    return start_date
 
 
 def _get_date_filters(args):
