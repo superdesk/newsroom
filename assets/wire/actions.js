@@ -13,7 +13,8 @@ import {
 } from 'search/actions';
 
 import {
-    fetchItems as fetchAgendaItems
+    fetchItems as fetchAgendaItems,
+    copyPreviewContents as copyPreviewContentsOfAgendaItem
 } from '../agenda/actions';
 
 export const SET_STATE = 'SET_STATE';
@@ -37,9 +38,9 @@ export function preview(item) {
 }
 
 export function previewAndCopy(item) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         dispatch(previewItem(item));
-        dispatch(copyPreviewContents(item));
+        dispatch(getState().context === 'agenda' ? copyPreviewContentsOfAgendaItem(item) : copyPreviewContents(item));
     };
 }
 
