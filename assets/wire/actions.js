@@ -14,7 +14,6 @@ import {
 
 import {
     fetchItems as fetchAgendaItems,
-    copyPreviewContents as copyPreviewContentsOfAgendaItem
 } from '../agenda/actions';
 
 export const SET_STATE = 'SET_STATE';
@@ -38,9 +37,9 @@ export function preview(item) {
 }
 
 export function previewAndCopy(item) {
-    return (dispatch, getState) => {
+    return (dispatch) => {
         dispatch(previewItem(item));
-        dispatch(getState().context === 'agenda' ? copyPreviewContentsOfAgendaItem(item) : copyPreviewContents(item));
+        dispatch(copyPreviewContents(item));
     };
 }
 
