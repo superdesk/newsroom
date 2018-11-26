@@ -127,6 +127,12 @@ class AgendaList extends React.Component {
         return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
     }
 
+    componentDidUpdate(nextProps) {
+        if ((nextProps.activeDate || this.props.activeDate) && (nextProps.activeDate !== this.props.activeDate)) {
+            this.elem.scrollTop = 0;
+        }
+    }
+
     render() {
         const {items, itemsById, activeItem, activeView, selectedItems, readItems} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
@@ -163,7 +169,7 @@ class AgendaList extends React.Component {
         });
 
         return (
-            <div className={listClassName} onKeyDown={this.onKeyDown}>
+            <div className={listClassName} onKeyDown={this.onKeyDown} ref={(elem) => this.elem = elem}>
                 {articleGroups}
                 {!items.length &&
                     <div className="wire-articles__item-wrap col-12">
@@ -192,6 +198,7 @@ AgendaList.propTypes = {
     company: PropTypes.string,
     activeView: PropTypes.string,
     groupedItems: PropTypes.object,
+    activeDate: PropTypes.number,
 };
 
 const mapStateToProps = (state) => ({
@@ -205,6 +212,7 @@ const mapStateToProps = (state) => ({
     user: state.user,
     company: state.company,
     groupedItems: groupedItemsSelector(state),
+    activeDate: get(state, 'agenda.activeDate'),
 });
 
 export default connect(mapStateToProps)(AgendaList);

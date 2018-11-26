@@ -167,7 +167,12 @@ export default function agendaReducer(state = initialState, action) {
     }
 
     case SELECT_DATE:
-        return {...state, agenda: _agendaReducer(state.agenda, action)};
+        return {
+            ...state,
+            activeItem: null,
+            previewItem: null,
+            agenda: _agendaReducer(state.agenda, action)
+        };
 
     default:
         return defaultReducer(state || initialState, action);
