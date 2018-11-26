@@ -143,6 +143,8 @@ def test_versions(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert 'tag:weather' == data['_items'][0]['_id']
+    assert 'AAP' == data['_items'][0]['source']
+    assert 'c' == data['_items'][1]['service'][0]['code']
 
 
 def test_search_filters_items_with_updates(client, app):

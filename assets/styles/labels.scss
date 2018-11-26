@@ -6,6 +6,8 @@ $labels-palette: (
   green-dark: $green-dark,
   orange: $orange,
   red: $red,
+  available: #7ed321,
+  restricted: #bfc3c7,
 );
 
 /// Generates base styles for a label.

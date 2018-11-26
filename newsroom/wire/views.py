@@ -2,8 +2,6 @@ import io
 import flask
 import zipfile
 import superdesk
-import urllib.request
-import json
 
 from bson import ObjectId
 from operator import itemgetter
@@ -22,13 +20,12 @@ from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
-from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request
+from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource
 from newsroom.notifications import push_user_notification
 from newsroom.companies import section
 from .search import get_bookmarks_count
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
-AAP_PHOTOS_TOKEN = 'AAPPHOTOS_TOKEN'
 
 
 def get_services(user):
@@ -68,35 +65,6 @@ def get_view_data():
     }
 
 
-def _fetch_photos(url, count):
-    headers = {'Authorization': 'Basic {}'.format(app.config.get(AAP_PHOTOS_TOKEN))}
-    request = urllib.request.Request(url, headers=headers)
-
-    try:
-        with urllib.request.urlopen(request, timeout=10) as response:
-            data = response.read()
-            json_data = json.loads(data.decode("utf-8"))
-            return json_data['GalleryContainers'][:count]
-    except Exception:
-        return []
-
-
-def get_photos():
-    if not app.config.get(AAP_PHOTOS_TOKEN):
-        return []
-
-    if app.cache.get('home_photos'):
-        return app.cache.get('home_photos')
-
-    photos = []
-    for item in app.config.get('HOMEPAGE_CAROUSEL', []):
-        if item.get('source'):
-            photos.extend(_fetch_photos(item.get('source'), item.get('count', 2)))
-
-    app.cache.set('home_photos', photos, timeout=300)
-    return photos
-
-
 def get_items_by_card(cards):
     if app.cache.get(HOME_ITEMS_CACHE_KEY):
         return app.cache.get(HOME_ITEMS_CACHE_KEY)
@@ -106,6 +74,8 @@ def get_items_by_card(cards):
         if card['config'].get('product'):
             items_by_card[card['label']] = superdesk.get_resource_service('wire_search').\
                 get_product_items(ObjectId(card['config']['product']), card['config']['size'])
+        elif card['type'] == '4-photo-gallery':
+            items_by_card[card['label']] = app.get_media_cards_external(card)
 
     app.cache.set(HOME_ITEMS_CACHE_KEY, items_by_card, timeout=300)
     return items_by_card
@@ -113,12 +83,11 @@ def get_items_by_card(cards):
 
 def get_home_data():
     user = get_user()
-    cards = list(superdesk.get_resource_service('cards').get(None, None))
+    cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
     company_id = str(user['company']) if user and user.get('company') else None
     items_by_card = get_items_by_card(cards)
 
     return {
-        'photos': get_photos(),
         'cards': cards,
         'itemsByCard': items_by_card,
         'products': get_products_by_company(company_id),
@@ -130,8 +99,9 @@ def get_home_data():
 
 def get_previous_versions(item):
     if item.get('ancestors'):
+        ancestors = superdesk.get_resource_service('wire_search').get_items(item['ancestors'])
         return sorted(
-            list(app.data.find_list_of_ids('wire_search', item['ancestors'])),
+            ancestors,
             key=itemgetter('versioncreated'),
             reverse=True
         )

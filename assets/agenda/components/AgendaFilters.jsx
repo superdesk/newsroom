@@ -7,17 +7,21 @@ import AgendaDropdownFilter from './AgendaDropdownFilter';
 const filters = [{
     label: gettext('Any calendar'),
     field: 'calendar',
+    icon: 'icon-small--calendar'
 }, {
     label: gettext('Any location'),
     field: 'location',
     typeAhead: true,
+    icon: 'icon-small--location'
 }, {
     label: gettext('Any region'),
-    field: 'place'
+    field: 'place',
+    icon: 'icon-small--region'
 }, {
     label: gettext('Any coverage'),
     field: 'coverage',
     nestedField: 'coverage_type',
+    icon: 'icon-small--coverage-text'
 }];
 
 

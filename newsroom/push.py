@@ -7,7 +7,7 @@ from datetime import datetime
 
 from copy import copy, deepcopy
 from PIL import Image, ImageEnhance
-from flask import current_app as app
+from flask import current_app as app, url_for
 from flask_babel import gettext
 from eve_elastic.elastic import parse_date
 
@@ -71,10 +71,12 @@ def push():
 
     if item.get('type') == 'event':
         orig = app.data.find_one('agenda', req=None, _id=item['guid'])
-        item['_id'] = publish_event(item, orig)
-        notify_new_item(item, check_topics=True)
+        id = publish_event(item, orig)
+        agenda = app.data.find_one('agenda', req=None, _id=id)
+        notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'planning':
-        agenda = publish_planning(item)
+        published = publish_planning(item)
+        agenda = app.data.find_one('agenda', req=None, _id=published['_id'])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
         orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
@@ -121,7 +123,9 @@ def publish_item(doc):
     if doc.get('associations', {}).get('featuremedia'):
         generate_thumbnails(doc)
     if doc.get('coverage_id'):
-        superdesk.get_resource_service('agenda').set_delivery(doc)
+        agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
+        if agenda_items:
+            [notify_new_item(item, check_topics=False) for item in agenda_items]
     _id = service.create([doc])[0]
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
@@ -421,6 +425,11 @@ def get_coverages(planning_items, original_coverages=[]):
     def get_existing_coverage(id):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
 
+    def set_text_delivery(coverage, deliveries):
+        if coverage['coverage_type'] == 'text' and deliveries:
+            coverage['delivery_id'] = deliveries[0]['item_id']
+            coverage['delivery_href'] = url_for('wire.item', _id=deliveries[0]['item_id'])
+
     coverages = []
     coverage_changes = {}
     for planning_item in planning_items:
@@ -439,6 +448,7 @@ def get_coverages(planning_items, original_coverages=[]):
 
             new_coverage['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item) \
                 or existing_coverage.get('delivery_href')
+            set_text_delivery(new_coverage, coverage.get('deliveries'))
             coverages.append(new_coverage)
 
             if original_coverages and not existing_coverage:
@@ -457,7 +467,7 @@ def notify_new_item(item, check_topics=True):
     company_dict = get_company_dict()
     company_ids = [c['_id'] for c in company_dict.values()]
 
-    push_notification('new_item', item=item['_id'])
+    push_notification('new_item', _items=[item])
 
     if check_topics:
         if item.get('type') == 'text':
@@ -497,7 +507,7 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
 def send_user_notification_emails(item, user_matches, users):
     for user_id in user_matches:
         user = users.get(str(user_id))
-        if item.get('pubstatus') in ['canceled', 'cancelled']:
+        if item.get('pubstatus', item.get('state')) in ['canceled', 'cancelled']:
             send_item_killed_notification_email(user, item=item)
         else:
             if user.get('receive_email'):

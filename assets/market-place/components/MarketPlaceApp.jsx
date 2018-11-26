@@ -1,64 +1,62 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 
-import { activeTopicSelector } from 'search/selectors';
 import {
     toggleNavigation
 } from '../../search/actions';
+import { gettext } from 'utils';
+
 import {
     fetchItems
 } from '../../wire/actions';
-import WireApp from '../../wire/components/WireApp';
-import NavigationCardsList from '../../home/components/NavigationCardsList';
+import BaseApp from 'layout/components/BaseApp';
+import NavigationSixPerRow from 'components/cards/render/NavigationSixPerRow';
 
 
-class MarketPlaceApp extends React.Component {
+class MarketPlaceApp extends BaseApp {
     constructor(props) {
         super(props);
-        this.onNavigationClick = this.onNavigationClick.bind(this);
-    }
-
-    onNavigationClick(nav) {
-        return this.props.fetchItems(nav);
     }
 
     render() {
-        const { activeNavigation, bookmarks, navigations, activeTopic } = this.props;
+        const {cards} = this.props;
 
-        return !activeNavigation && !bookmarks && !activeTopic &&
-            <NavigationCardsList key="navs"
-                navigations={navigations}
-                onNavigationClick={this.onNavigationClick} /> ||
-            <WireApp key="wire"/>;
+        return (
+            <Fragment>
+                <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4">
+                    <div className="container-fluid">
+                        {get(cards,  'length', 0) > 0 && cards.map(
+                            (card) => <NavigationSixPerRow key={card._id} card={card} onNavigationClick={() => {}}/>
+                        )}
+                        {get(cards,  'length', 0) === 0 && <div className="alert alert-warning" role="alert">
+                            <strong>{gettext('Warning')}!</strong> {gettext('There\'s no navigations defined!')}
+                        </div>}
+                    </div>
+                </section>
+                {this.renderSavedItemsCount()}
+            </Fragment>
+        );
     }
 }
 
 
 MarketPlaceApp.propTypes = {
-    state: PropTypes.object,
     user: PropTypes.string,
     company: PropTypes.string,
     navigations: PropTypes.array.isRequired,
-    activeNavigation: PropTypes.string,
-    userSections: PropTypes.object,
+    cards: PropTypes.array.isRequired,
     fetchItems: PropTypes.func,
-    bookmarks: PropTypes.bool,
     savedItemsCount: PropTypes.number,
-    activeTopic: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
-    state: state,
     user: state.user,
     company: state.company,
-    navigations: get(state, 'search.navigations', []),
-    activeNavigation: get(state, 'search.activeNavigation', null),
-    userSections: state.userSections,
-    bookmarks: state.bookmarks,
-    savedItemsCount: state.savedItemsCount,
-    activeTopic: activeTopicSelector(state),
+    navigations: get(state, 'navigations', []),
+    cards: get(state, 'cards', null),
+    savedItemsCount: state.savedItemsCount
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -242,8 +242,8 @@ def _display_date_range(args):
 
 
 aggregations = {
-    'calendar': {'terms': {'field': 'calendars.name', 'size': 20}},
-    'location': {'terms': {'field': 'location.name', 'size': 20}},
+    'calendar': {'terms': {'field': 'calendars.name', 'size': 0}},
+    'location': {'terms': {'field': 'location.name', 'size': 0}},
     'genre': {'terms': {'field': 'genre.name', 'size': 50}},
     'service': {'terms': {'field': 'service.name', 'size': 50}},
     'subject': {'terms': {'field': 'subject.name', 'size': 20}},
@@ -298,8 +298,10 @@ class AgendaService(newsroom.Service):
         user = get_user()
         company = get_user_company(user)
         get_resource_service('section_filters').apply_section_filter(query, self.section)
+        product_query = {'bool': {'must': [], 'should': []}}
         try:
-            set_product_query(query, company, navigation_id=req.args.get('navigation'))
+            set_product_query(product_query, company, navigation_id=req.args.get('navigation'))
+            query['bool']['must'].append(product_query)
         except FeaturedQuery:
             return self.featured(req, lookup)
 
@@ -456,6 +458,7 @@ class AgendaService(newsroom.Service):
                     self.system_update(item['_id'], {'coverages': coverages}, item)
                     self.notify_new_coverage(item, wire_item)
                     break
+        return agenda_items
 
     def notify_new_coverage(self, agenda, wire_item):
         user_dict = get_user_dict()
