@@ -71,6 +71,25 @@ class AgendaApp extends BaseApp {
 
         const onDetailClose = this.props.detail ? null : () => this.props.actions.filter(a => a.id == 'open')[0].action(null);
 
+        const groups = [
+            {
+                field: 'service',
+                label: gettext('Category'),
+            },
+            {
+                field: 'subject',
+                label: gettext('Subject'),
+            },
+            {
+                field: 'urgency',
+                label: gettext('News Value'),
+            },
+            {
+                field: 'place',
+                label: gettext('Place'),
+            },
+        ];
+
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
@@ -127,7 +146,7 @@ class AgendaApp extends BaseApp {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar tabs={this.tabs} props={this.props} />
+                                <SearchSidebar tabs={this.tabs} props={{...this.props, groups}} />
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>

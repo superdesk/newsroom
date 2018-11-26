@@ -315,7 +315,7 @@ function getNextMonth(dateString) {
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
  */
-function getPreviousMonth(dateString) {
+export function getPreviousMonth(dateString) {
     return moment(dateString).add(-1, 'months').startOf('month').valueOf();
 }
 

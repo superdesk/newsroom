@@ -1,9 +1,6 @@
-
 import logging
-from datetime import timedelta
 
 from content_api.items.resource import code_mapping
-from dateutil.relativedelta import relativedelta
 from eve.utils import ParsedRequest
 from flask import json, abort, url_for, current_app as app
 from flask_babel import gettext
@@ -20,10 +17,10 @@ from newsroom.agenda.email import send_coverage_notification_email, send_agenda_
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
-from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
-from newsroom.wire.search import get_local_date
-from newsroom.wire.search import query_string, set_product_query, FeaturedQuery
 from newsroom.template_filters import is_admin_or_internal
+from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
+from newsroom.wire.search import query_string, set_product_query, FeaturedQuery
+from newsroom.wire.utils import get_local_date, get_end_date
 
 logger = logging.getLogger(__name__)
 
@@ -205,16 +202,6 @@ def _agenda_query():
             'minimum_should_match': 1,
         }
     }
-
-
-def get_end_date(date_range, start_date):
-    if date_range == 'now/d':
-        return start_date
-    if date_range == 'now/w':
-        return start_date + timedelta(days=6)
-    if date_range == 'now/M':
-        return start_date + relativedelta(months=+1) - timedelta(days=1)
-    return start_date
 
 
 def _get_date_filters(args):
