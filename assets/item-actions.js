@@ -18,7 +18,7 @@ export function getItemActions(dispatch, actions) {
             id: 'open',
             name: gettext('Open'),
             icon: 'text',
-            when: (state) => !state.itemToOpen,
+            when: (state) => !state.itemToOpen && !state.openItem,
             action: (item) => dispatch(openItem(item)),
         },
         {
