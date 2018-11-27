@@ -15,6 +15,10 @@ export default function marketPlaceHomeReducer(state = initialState, action) {
             card.config.navigations = (get(card, 'config.navigations') || [])
                 .map((nav) => {
                     const navigation = get(navigationById, nav);
+                    if (!navigation) {
+                        // company does not have permission for navigation
+                        return null;
+                    }
                     navigation.href = `/market_place/?navigation=${navigation._id}`;
                     return navigation;
                 }).filter((nav) => nav);

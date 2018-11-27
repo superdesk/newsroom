@@ -419,14 +419,16 @@ def test_search_using_section_filter_for_public_user(client, app):
         'query': 'headline:more',
         'companies': ['1'],
         'navigations': ['51'],
-        'is_enabled': True
+        'is_enabled': True,
+        'product_type': 'wire'
     }, {
         '_id': 13,
         'name': 'product test 2',
         'query': 'headline:Weather',
         'companies': ['1'],
         'navigations': ['52'],
-        'is_enabled': True
+        'is_enabled': True,
+        'product_type': 'wire'
     }])
 
     with client.session_transaction() as session:
@@ -488,6 +490,7 @@ def test_time_limited_access(client, app):
         'query': 'versioncreated:<=now-2d',
         'companies': ['1'],
         'is_enabled': True,
+        'product_type': 'wire'
     }])
 
     with client.session_transaction() as session:
