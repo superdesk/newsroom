@@ -10,7 +10,7 @@ const processBuckets = (buckets, filter, toggleFilter) => buckets.sort(compareFu
         key={bucket.key}
         className='dropdown-item'
         onClick={() => toggleFilter(filter.field, bucket.key)}
-    >{bucket.key}</button>);
+    >{filter.transform ? filter.transform(bucket.key) : bucket.key}</button>);
 
 function AgendaDropdownFilter({aggregations, filter, toggleFilter, activeFilter, getDropdownItems}) {
     return (<div className="btn-group" key={filter.field}>
