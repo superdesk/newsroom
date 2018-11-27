@@ -83,7 +83,7 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
-def set_product_query(query, company, user=None, navigation_id=None):
+def set_product_query(query, company, section, user=None, navigation_id=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -91,6 +91,7 @@ def set_product_query(query, company, user=None, navigation_id=None):
     If user is not administrator and has no company then everything will be filtered
     :param query: search query
     :param company: company
+    :param section: section i.e. wire, agenda, marketplace etc
     :param user: user to check against (used for notification checking)
     :param navigation_id: navigation to filter products
     If not provided session user will be checked
@@ -104,7 +105,7 @@ def set_product_query(query, company, user=None, navigation_id=None):
             return  # admin will see everything by default
 
     if company:
-        products = get_products_by_company(company['_id'], navigation_id)
+        products = get_products_by_company(company['_id'], navigation_id, product_type=section)
     else:
         # user does not belong to a company so blocking all stories
         abort(403, gettext('User does not belong to a company.'))
@@ -185,7 +186,7 @@ class WireSearchService(newsroom.Service):
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         company = get_user_company(user)
         try:
-            set_product_query(query, company)
+            set_product_query(query, company, self.section)
         except Forbidden:
             return 0
         set_bookmarks_query(query, user_id)
@@ -200,7 +201,7 @@ class WireSearchService(newsroom.Service):
         company = get_user_company(user)
 
         get_resource_service('section_filters').apply_section_filter(query, self.section)
-        set_product_query(query, company, navigation_id=req.args.get('navigation'))
+        set_product_query(query, company, self.section, navigation_id=req.args.get('navigation'))
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
@@ -355,7 +356,7 @@ class WireSearchService(newsroom.Service):
             # for now even if there's no active company matching for the user
             # continuing with the search
             try:
-                set_product_query(query, company, user)
+                set_product_query(query, company, topic.get('topic_type'), user=user)
             except Forbidden:
                 logger.info('Notification for user:{} and topic:{} is skipped'
                             .format(user.get('_id'), topic.get('_id')))
