@@ -13,7 +13,7 @@ import {
 } from 'search/actions';
 
 import {
-    fetchItems as fetchAgendaItems
+    fetchItems as fetchAgendaItems,
 } from '../agenda/actions';
 
 export const SET_STATE = 'SET_STATE';

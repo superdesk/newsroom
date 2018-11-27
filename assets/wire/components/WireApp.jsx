@@ -34,7 +34,7 @@ import ItemDetails from './ItemDetails';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
-import { getItemActions } from '../item-actions';
+import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
 
 const modals = {

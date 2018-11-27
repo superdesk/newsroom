@@ -8,7 +8,7 @@ import {
 } from 'components/cards/utils';
 
 
-import {getItemActions} from 'wire/item-actions';
+import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
 import {openItemDetails, setActive} from '../actions';
 import FollowTopicModal from 'components/FollowTopicModal';

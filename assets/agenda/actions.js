@@ -2,10 +2,10 @@
 import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import { gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler } from 'utils';
+import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler} from 'utils';
 import { markItemAsRead } from 'wire/utils';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
-import {getDateInputDate} from './utils';
+import {getCalendars, getDateInputDate, getLocationString, getPublicContacts, hasCoverages, hasLocation} from './utils';
 
 import {
     setQuery,
@@ -15,6 +15,9 @@ import {
     toggleNavigation,
     setCreatedFilter,
 } from 'search/actions';
+
+import {getLocaleDate} from '../utils';
+
 
 const WATCH_URL = '/agenda_watch';
 
@@ -38,6 +41,12 @@ export function preview(item, group) {
     return {type: PREVIEW_ITEM, item, group};
 }
 
+export function previewAndCopy(item) {
+    return (dispatch) => {
+        dispatch(previewItem(item));
+        dispatch(copyPreviewContents(item));
+    };
+}
 
 export function previewItem(item, group) {
     return (dispatch, getState) => {
@@ -111,6 +120,56 @@ export function printItem(item) {
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
+        }
+    };
+}
+
+/**
+ * Copy contents of agenda preview.
+ *
+ * This is an initial version, should be updated with preview markup changes.
+ */
+export function copyPreviewContents(item) {
+    return (dispatch, getState) => {
+        const textarea = document.getElementById('copy-area');
+        const contents = [];
+
+        item.name && contents.push(item.name);
+        item.name && contents.push(gettext('Dates: {{ dates }}', {dates: `${getLocaleDate(item.dates.start)} - ${getLocaleDate(item.dates.end)}`}));
+        hasLocation(item) && contents.push(gettext('Location: {{ location }}', {location: getLocationString(item)}));
+        item.ednote && contents.push(gettext('Ednote: {{ ednote }}', {ednote: item.ednote}));
+
+        const contacts = getPublicContacts(item);
+        !isEmpty(contacts) && contents.push(gettext('Contacts: {{ contacts }}', {contacts: JSON.stringify(contacts)}));
+        contents.push(gettext('Calendars: {{ calendars }}', {calendars: getCalendars(item)}));
+
+        contents.push('');
+
+        if (hasCoverages(item)) {
+            contents.push(gettext('Coverages'));
+
+            item.coverages.map(coverage => {
+                contents.push(gettext('Coverage type: {{ type }}', {type: coverage.coverage_type}));
+                contents.push(gettext('Scheduled: {{ schedule }}', {schedule: coverage.scheduled}));
+                contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
+                contents.push('');
+            });
+        }
+
+        textarea.value = contents.join('\n');
+        textarea.select();
+
+        if (document.execCommand('copy')) {
+            notify.success(gettext('Item copied successfully.'));
+            item && analytics.itemEvent('copy', item);
+        } else {
+            notify.error(gettext('Sorry, Copy is not supported.'));
+        }
+
+        if (getState().user) {
+            server.post(`/wire/${item._id}/copy?type=${getState().context}`)
+                .then(dispatch(setCopyItem(item._id)))
+                .catch(errorHandler);
         }
     };
 }

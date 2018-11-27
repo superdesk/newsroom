@@ -218,6 +218,17 @@ export function getPublicContacts(item) {
     }));
 }
 
+/**
+ * Returns item calendars
+ *
+ * @param {Object} item
+ * @return {String}
+ */
+export function getCalendars(item) {
+    return get(item, 'calendars', []).map(cal => cal.name).join(', ');
+}
+
+
 
 /**
  * Returns item event link

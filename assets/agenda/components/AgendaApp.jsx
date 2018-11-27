@@ -2,12 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { get, includes, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { gettext } from 'utils';
 
 import {
-    watchEvents,
-    stopWatchingEvents,
     fetchItems,
     selectDate,
     fetchMoreItems,
@@ -39,11 +37,10 @@ import SearchResultsInfo from 'wire/components/SearchResultsInfo';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
-import { getItemActions } from 'wire/item-actions';
+import getItemActions from '../item-actions';
 import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
-import { isWatched } from '../utils';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -276,22 +273,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     fetchItems: () => dispatch(fetchItems()),
-    actions: getItemActions(dispatch).concat([
-        {
-            name: gettext('Watch'),
-            icon: 'watch',
-            multi: true,
-            when: (state, item) => state.user && !includes(get(item, 'watches', []), state.user),
-            action: (items) => dispatch(watchEvents(items)),
-        },
-        {
-            name: gettext('Stop watching'),
-            icon: 'unwatch',
-            multi: true,
-            when: (state, item) => isWatched(item, state.user),
-            action: (items) => dispatch(stopWatchingEvents(items)),
-        },
-    ]),
+    actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),
