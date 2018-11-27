@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import AgendaTypeAheadFilter from './AgendaTypeAheadFilter';
 import AgendaDropdownFilter from './AgendaDropdownFilter';
+import {getCoverageDisplayName} from '../utils';
 
 const filters = [{
     label: gettext('Any calendar'),
@@ -21,7 +22,8 @@ const filters = [{
     label: gettext('Any coverage'),
     field: 'coverage',
     nestedField: 'coverage_type',
-    icon: 'icon-small--coverage-text'
+    icon: 'icon-small--coverage-text',
+    transform: getCoverageDisplayName,
 }];
 
 
