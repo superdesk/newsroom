@@ -274,7 +274,10 @@ def set_post_filter(source, req):
     if req.args.get('filter'):
         filters = json.loads(req.args['filter'])
     if filters:
-        source['post_filter'] = {'bool': {'must': [_filter_terms(filters)]}}
+        if app.config.get('FILTER_BY_POST_FILTER', False):
+            source['post_filter'] = {'bool': {'must': [_filter_terms(filters)]}}
+        else:
+            source['query']['bool']['must'] += _filter_terms(filters)
 
 
 class AgendaService(newsroom.Service):
