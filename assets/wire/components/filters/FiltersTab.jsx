@@ -30,6 +30,9 @@ class FiltersTab extends React.Component {
         this.toggleFilterAndSearch = this.toggleFilterAndSearch.bind(this);
         this.setCreatedFilterAndSearch = this.setCreatedFilterAndSearch.bind(this);
         this.reset = this.reset.bind(this);
+        this.state = {
+            groups: this.props.groups
+        };
     }
 
     toggleGroup(event, group) {
@@ -50,7 +53,7 @@ class FiltersTab extends React.Component {
     }
 
     getFilterGroups() {
-        return this.props.groups.map((group) => <FilterGroup
+        return this.state.groups.map((group) => <FilterGroup
             key={group.label}
             group={group}
             activeFilter={this.props.activeFilter}
