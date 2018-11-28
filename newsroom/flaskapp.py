@@ -144,10 +144,19 @@ class Newsroom(eve.Eve):
         self.add_template_global(hash_string, 'hash')
         self.add_template_global(get_date, 'get_date')
         self.add_template_global(self.settings_apps, 'settings_apps')
-        self.jinja_loader = jinja2.ChoiceLoader([
-            jinja2.FileSystemLoader('theme'),
-            jinja2.FileSystemLoader(self.template_folder),
-        ])
+
+        jinja_loaders = []
+        if self.config.get('TEMPLATE_FOLDER'):
+            # to override email and print templates.
+            jinja_loaders.append(jinja2.FileSystemLoader(self.config.get('TEMPLATE_FOLDER')))
+
+        jinja_loaders.extend(
+            [
+                jinja2.FileSystemLoader('theme'),
+                jinja2.FileSystemLoader(self.template_folder)
+            ]
+        )
+        self.jinja_loader = jinja2.ChoiceLoader(jinja_loaders)
 
     def _setup_webpack(self):
         NewsroomWebpack(self)

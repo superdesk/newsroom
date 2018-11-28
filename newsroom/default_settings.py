@@ -227,3 +227,6 @@ DEFAULT_LANGUAGE = 'en'
 
 # Enable iframely support for item body_html
 IFRAMELY = True
+
+# path to template folder to override email/print templates
+TEMPLATES_FOLDER = os.environ.get('TEMPLATES_FOLDER')
