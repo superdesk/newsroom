@@ -40,6 +40,9 @@ class EditNavigation extends React.Component {
 
     render() {
         const tile_images = get(this.props, 'navigation.tile_images') || [];
+        const getActiveSection = () => this.props.sections.filter(
+            s => s._id === get(this.props.navigation, 'product_type')
+        );
 
         return (
             <div className='list-item__preview'>
@@ -129,7 +132,7 @@ class EditNavigation extends React.Component {
                             items={this.props.products}
                             field="products"
                             onSave={this.props.saveProducts}
-                            groups={this.props.sections}
+                            groups={getActiveSection()}
                             groupField={'product_type'}
                             groupDefaultValue={'wire'}
                         />

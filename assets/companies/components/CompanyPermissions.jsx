@@ -90,7 +90,7 @@ class CompanyPermissions extends React.Component {
                             {this.props['sections'].map((section) => (
                                 [<label key={`${section.id}label`}>{gettext('Products')} {`(${section.name})`}</label>,
                                     <ul key={`${section.id}product`} className="list-unstyled">
-                                        {this.props['products'].filter((p) => (p.product_type || 'wire').toLowerCase() === section.name.toLowerCase())
+                                        {this.props['products'].filter((p) => (p.product_type || 'wire').toLowerCase() === section._id.toLowerCase())
                                             .map((product) => (
                                                 <li key={product._id}>
                                                     <CheckboxInput
