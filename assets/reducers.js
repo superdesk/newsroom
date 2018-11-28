@@ -33,7 +33,7 @@ import {
     SET_QUERY,
 } from 'search/actions';
 
-import {getMaxVersion} from './wire/utils';
+import {getMaxVersion} from 'local-store';
 import {REMOVE_NEW_ITEMS, SET_NEW_ITEMS_BY_TOPIC} from './agenda/actions';
 import {toggleValue} from 'utils';
 import {get, isEmpty} from 'lodash';

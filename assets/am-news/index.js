@@ -2,7 +2,7 @@ import { get } from 'lodash';
 
 import { createStore, render, initWebSocket, getInitData} from '../utils';
 
-import {getReadItems} from '../wire/utils';
+import {getReadItems} from 'local-store';
 import  AmNewsApp from './components/AmNewsApp';
 import wireReducer from '../wire/reducers';
 import {

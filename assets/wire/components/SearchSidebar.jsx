@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { setActiveFilterTab, getActiveFilterTab } from '../utils';
+import { setActiveFilterTab, getActiveFilterTab } from 'local-store';
 
 class SearchSidebar extends React.Component {
     constructor(props) {

@@ -3,7 +3,7 @@ import { get, isEmpty } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
-import { markItemAsRead, toggleNewsOnlyParam } from './utils';
+import { markItemAsRead, toggleNewsOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 
 import {

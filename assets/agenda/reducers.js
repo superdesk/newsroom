@@ -72,7 +72,7 @@ function recieveItems(state, data) {
         } else {
             activeDate = EARLIEST_DATE;
         }
-    } else if (activeDate === EARLIEST_DATE) {
+    } else if (!state.bookmarks && activeDate === EARLIEST_DATE) {
         activeDate = Date.now();
     }
 
@@ -159,7 +159,7 @@ export default function agendaReducer(state = initialState, action) {
         const openItem = get(action, 'agendaData.item', null);
         const agenda = {
             ...state.agenda,
-            activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : state.agenda.activeDate,
+            activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : action.activeDate || state.agenda.activeDate,
         };
         
         return {
