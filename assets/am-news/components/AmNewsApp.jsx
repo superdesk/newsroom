@@ -15,7 +15,7 @@ import ShareItemModal from '../../components/ShareItemModal';
 import BookmarkTabs from 'components/BookmarkTabs';
 import WirePreview from '../../wire/components/WirePreview';
 import ItemDetails from '../../wire/components/ItemDetails';
-import {getItemActions} from '../../wire/item-actions';
+import getItemActions from '../../wire/item-actions';
 import {
     fetchItems,
     fetchMoreItems,
