@@ -2,7 +2,7 @@ import hmac
 import flask
 import logging
 import superdesk
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from copy import copy, deepcopy
 from flask import current_app as app
@@ -99,6 +99,13 @@ def set_dates(doc):
     doc.setdefault('versioncreated', now)
     doc.setdefault('version', 1)
     doc.setdefault(app.config['VERSION'], 1)
+
+    # stt specific, to be removed when archive is imported
+    # set versioncreated = firstpublished
+    if doc.get('firstpublished'):
+        firstpublished = parse_date(doc['firstpublished'])
+        if firstpublished < doc['versioncreated'] and firstpublished < now - timedelta(days=7):
+            doc['versioncreated'] = firstpublished
 
 
 def publish_item(doc, original):
