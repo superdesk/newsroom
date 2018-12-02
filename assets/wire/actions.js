@@ -12,9 +12,6 @@ import {
     setCreatedFilter,
 } from 'search/actions';
 
-import {
-    fetchItems as fetchAgendaItems,
-} from '../agenda/actions';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -353,7 +350,7 @@ export function removeBookmarks(items) {
                 }
             })
             .then(() => dispatch(removeBookmarkItems(items)))
-            .then(() => getState().bookmarks && (getState().context === 'agenda' ? dispatch(fetchAgendaItems()) : dispatch(fetchItems())))
+            .then(() => getState().bookmarks &&  dispatch(fetchItems()))
             .catch(errorHandler);
 }
 

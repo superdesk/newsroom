@@ -124,6 +124,7 @@ export function printItem(item) {
     };
 }
 
+
 /**
  * Copy contents of agenda preview.
  *
@@ -320,6 +321,49 @@ export function submitShareItem(data) {
             .then(() => dispatch(setShareItems(data.items)))
             .catch(errorHandler);
     };
+}
+
+
+export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
+export function setBookmarkItems(items) {
+    return {type: BOOKMARK_ITEMS, items};
+}
+
+export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
+export function removeBookmarkItems(items) {
+    return {type: REMOVE_BOOKMARK, items};
+}
+
+export function bookmarkItems(items) {
+    return (dispatch, getState) =>
+        server.post('/agenda_bookmark', {items})
+            .then(() => {
+                if (items.length > 1) {
+                    notify.success(gettext('Items were bookmarked successfully.'));
+                } else {
+                    notify.success(gettext('Item was bookmarked successfully.'));
+                }
+            })
+            .then(() => {
+                analytics.multiItemEvent('bookmark', items.map((_id) => getState().itemsById[_id]));
+            })
+            .then(() => dispatch(setBookmarkItems(items)))
+            .catch(errorHandler);
+}
+
+export function removeBookmarks(items) {
+    return (dispatch, getState) =>
+        server.del('/agenda_bookmark', {items})
+            .then(() => {
+                if (items.length > 1) {
+                    notify.success(gettext('Items were removed from bookmarks successfully.'));
+                } else {
+                    notify.success(gettext('Item was removed from bookmarks successfully.'));
+                }
+            })
+            .then(() => dispatch(removeBookmarkItems(items)))
+            .then(() => getState().bookmarks && dispatch(fetchItems()))
+            .catch(errorHandler);
 }
 
 export const TOGGLE_SELECTED = 'TOGGLE_SELECTED';
