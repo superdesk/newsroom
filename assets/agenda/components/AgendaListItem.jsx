@@ -62,7 +62,12 @@ class AgendaListItem extends React.Component {
                 ref={(elem) => this.articleElem = elem}
                 onClick={() => onClick(item, group)}
                 onDoubleClick={() => onDoubleClick(item, group)}
-                onMouseEnter={() => this.setState({isHover: true})}
+                onMouseEnter={() => {
+                    this.setState({isHover: true});
+                    if (this.props.actioningItem && this.props.actioningItem._id !== item._id) {
+                        this.props.resetActioningItem();
+                    }
+                }}
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
             >
@@ -137,6 +142,8 @@ AgendaListItem.propTypes = {
     })),
     isExtended: PropTypes.bool.isRequired,
     user: PropTypes.string,
+    actioningItem: PropTypes.object,
+    resetActioningItem: PropTypes.func,
 };
 
 export default AgendaListItem;

@@ -37,16 +37,19 @@ class AgendaList extends React.Component {
         this.onItemDoubleClick = this.onItemDoubleClick.bind(this);
         this.onActionList = this.onActionList.bind(this);
         this.filterActions = this.filterActions.bind(this);
+        this.resetActioningItem = this.resetActioningItem.bind(this);
     }
 
     onKeyDown(event) {
         let diff = 0;
         switch (event.key) {
         case 'ArrowDown':
+            this.setState({actioningItem: null});
             diff = 1;
             break;
 
         case 'ArrowUp':
+            this.setState({actioningItem: null});
             diff = -1;
             break;
 
@@ -108,6 +111,10 @@ class AgendaList extends React.Component {
         }, CLICK_TIMEOUT);
     }
 
+    resetActioningItem() {
+        this.setState({actioningItem: null});
+    }
+
     onItemDoubleClick(item, group) {
         this.cancelClickTimeout();
         this.props.dispatch(setActive(item._id));
@@ -158,6 +165,8 @@ class AgendaList extends React.Component {
                         actions={this.filterActions(itemsById[_id])}
                         isExtended={isExtended}
                         user={this.props.user}
+                        actioningItem={this.state.actioningItem}
+                        resetActioningItem={this.resetActioningItem}
                     />)}
                 </div>
             ]
