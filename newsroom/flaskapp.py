@@ -241,7 +241,7 @@ class Newsroom(eve.Eve):
             'name': name
         })
 
-    def sidenav(self, name, endpoint, icon=None, group=0, section=None, blueprint=None, badge=None):
+    def sidenav(self, name, endpoint=None, icon=None, group=0, section=None, blueprint=None, badge=None, url=None):
         """Register an item in sidebar menu.
 
         Use in module :meth:`init_app` method::
@@ -252,11 +252,14 @@ class Newsroom(eve.Eve):
         :param name: user readable name
         :param endpoint: endpoint name, used with :meth:`flask.url_for`
         :param icon: css icon class name
-        :param group: group number, ``0`` by default
+        :param group: group number, ``0`` by default, up to ``9``.
         :param section: section ``_id``, will be only visible if user has section enabled.
         :param blueprint: blueprint name, will be only visible if blueprint is active
         :param badge: badge id - will add badge html markup with given id
+        :param url: external url - will add external link badge and use target=_blank for link
         """
+        if endpoint is None and url is None:
+            raise ValueError('please specify endpoint or url')
         self.sidenavs.append({
             'name': name,
             'endpoint': endpoint,
@@ -265,6 +268,7 @@ class Newsroom(eve.Eve):
             'section': section,
             'blueprint': blueprint,
             'badge': badge,
+            'url': url,
         })
 
     def settings_app(self, app, name, weight=1000, data=None):
