@@ -13,6 +13,7 @@ import { EXTENDED_VIEW } from 'wire/defaults';
 import { searchReducer } from 'search/reducers';
 import { defaultReducer } from '../reducers';
 import { EARLIEST_DATE } from './utils';
+import moment from 'moment';
 
 const initialState = {
     items: [],
@@ -56,10 +57,24 @@ function recieveItems(state, data) {
     const createdFilter = get(state, 'search.createdFilter', {});
 
     let activeDate = state.agenda.activeDate || Date.now();
-    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to) || state.bookmarks) {
+    if (state.bookmarks) {
         activeDate = EARLIEST_DATE;
-    } else if (activeDate === EARLIEST_DATE) {
-        activeDate = Date.now();
+    }
+    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to)) {
+        activeDate = moment().valueOf(); // default for 'now/d'
+        if (createdFilter.from === 'now/d') {
+            activeDate = moment().valueOf();
+        } else if (createdFilter.from === 'now/w') {
+            activeDate =  moment(activeDate).isoWeekday(1).valueOf();
+        } else if (createdFilter.from === 'now/M') {
+            activeDate =  moment(activeDate).startOf('month').valueOf();
+        } else if (!isEmpty(createdFilter.from)) {
+            activeDate = moment(createdFilter.from).valueOf();
+        } else {
+            activeDate = EARLIEST_DATE;
+        }
+    } else if (!state.bookmarks && activeDate === EARLIEST_DATE) {
+        activeDate = moment().valueOf();
     }
 
     const agenda = {
@@ -145,7 +160,7 @@ export default function agendaReducer(state = initialState, action) {
         const openItem = get(action, 'agendaData.item', null);
         const agenda = {
             ...state.agenda,
-            activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : state.agenda.activeDate,
+            activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : action.activeDate || state.agenda.activeDate,
         };
         
         return {
@@ -167,7 +182,12 @@ export default function agendaReducer(state = initialState, action) {
     }
 
     case SELECT_DATE:
-        return {...state, agenda: _agendaReducer(state.agenda, action)};
+        return {
+            ...state,
+            activeItem: null,
+            previewItem: null,
+            agenda: _agendaReducer(state.agenda, action)
+        };
 
     default:
         return defaultReducer(state || initialState, action);

@@ -12,6 +12,10 @@ function NavigationSixPerRow({card, onNavigationClick}) {
         key={nav._id}
         onClickHandler={onNavigationClick}/>);
 
+    if (get(cards, 'length', 0) === 0) {
+        return null;
+    }
+
     return (
         <div className="row">
             <div className="col-12 col-sm-12">

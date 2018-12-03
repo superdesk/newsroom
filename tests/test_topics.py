@@ -8,6 +8,13 @@ topic = {
     'topic_type': 'wire'
 }
 
+agenda_topic = {
+    'label': 'Foo',
+    'query': 'foo',
+    'notifications': False,
+    'topic_type': 'agenda'
+}
+
 user = str(ObjectId())
 topics_url = 'api/users/%s/topics' % user
 
@@ -90,7 +97,7 @@ def test_delete_topic(client):
         assert 0 == len(data['_items'])
 
 
-def test_share_topics(client, app):
+def test_share_wire_topics(client, app):
     topic_ids = app.data.insert('topics', [topic])
     topic['_id'] = topic_ids[0]
     user_ids = app.data.insert('users', [{
@@ -122,3 +129,39 @@ def test_share_topics(client, app):
         assert 'System Admin shared ' in outbox[0].body
         assert topic['query'] in outbox[0].body
         assert 'Some info message' in outbox[0].body
+        assert '/wire' in outbox[0].body
+
+
+def test_share_agenda_topics(client, app):
+    topic_ids = app.data.insert('topics', [agenda_topic])
+    agenda_topic['_id'] = topic_ids[0]
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'last_name': 'Bar',
+    }, {
+        'email': 'admin@bar.com',
+        'first_name': 'System',
+        'last_name': 'Admin',
+    }])
+
+    with app.mail.record_messages() as outbox:
+        with client.session_transaction() as session:
+            session['user'] = user_ids[1]
+            session['name'] = 'tester'
+        resp = client.post('/topic_share', data=json.dumps({
+            'items': [agenda_topic],
+            'users': [str(user_ids[0])],
+            'message': 'Some info message',
+        }), content_type='application/json')
+
+        assert resp.status_code == 201, resp.get_data().decode('utf-8')
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['foo@bar.com']
+        assert outbox[0].sender == 'admin@bar.com'
+        assert outbox[0].subject == 'From AAP Newsroom: %s' % agenda_topic['label']
+        assert 'Hi Foo Bar' in outbox[0].body
+        assert 'System Admin shared ' in outbox[0].body
+        assert agenda_topic['query'] in outbox[0].body
+        assert 'Some info message' in outbox[0].body
+        assert '/agenda' in outbox[0].body

@@ -32,8 +32,23 @@ const Groupers = {
     'month': formatMonth,
 };
 
+export function getCoverageStatusText(coverage) {
+    if (coverage.workflow_status === 'draft') {
+        return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
+    }
+
+    return get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '');
+}
+
+export const DRAFT_STATUS_TEXTS = {
+    'coverage not planned': gettext('not planned'),
+    'coverage intended': gettext('planned'),
+    'coverage not decided': gettext('on merit'),
+    'coverage not decided yet': gettext('on merit'),
+    'coverage upon request': gettext('on request'),
+};
+
 export const WORKFLOW_STATUS_TEXTS = {
-    draft: gettext('planned'),
     assigned: gettext('planned'),
     active: gettext('in progress'),
     completed: gettext('available'),
@@ -41,7 +56,7 @@ export const WORKFLOW_STATUS_TEXTS = {
 };
 
 export const WORKFLOW_COLORS = {
-    draft: 'icon--mid-blue-light',
+    draft: 'icon--gray-light',
     assigned: 'icon--mid-blue-light',
     active: 'icon--cyan',
     completed: 'icon--green',
@@ -218,6 +233,17 @@ export function getPublicContacts(item) {
     }));
 }
 
+/**
+ * Returns item calendars
+ *
+ * @param {Object} item
+ * @return {String}
+ */
+export function getCalendars(item) {
+    return get(item, 'calendars', []).map(cal => cal.name).join(', ');
+}
+
+
 
 /**
  * Returns item event link
@@ -315,7 +341,7 @@ function getNextMonth(dateString) {
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
  */
-function getPreviousMonth(dateString) {
+export function getPreviousMonth(dateString) {
     return moment(dateString).add(-1, 'months').startOf('month').valueOf();
 }
 

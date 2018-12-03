@@ -34,7 +34,7 @@ import ItemDetails from './ItemDetails';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
-import { getItemActions } from '../item-actions';
+import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
 
 const modals = {
@@ -59,6 +59,29 @@ class WireApp extends BaseApp {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,
         });
+
+        const groups = [
+            {
+                field: 'service',
+                label: gettext('Category'),
+            },
+            {
+                field: 'subject',
+                label: gettext('Subject'),
+            },
+            {
+                field: 'genre',
+                label: gettext('Content Type'),
+            },
+            {
+                field: 'urgency',
+                label: gettext('News Value'),
+            },
+            {
+                field: 'place',
+                label: gettext('Place'),
+            },
+        ];
         
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
@@ -112,7 +135,7 @@ class WireApp extends BaseApp {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar tabs={this.tabs} props={this.props} />
+                                <SearchSidebar tabs={this.tabs} props={{...this.props, groups}} />
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>

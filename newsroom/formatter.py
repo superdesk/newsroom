@@ -20,7 +20,7 @@ class BaseFormatter():
 
     def format_filename(self, item):
         assert self.FILE_EXTENSION
-        _id = item.get('slugline', item['_id']).replace(' ', '-').lower()
+        _id = (item.get('slugline', item['_id']) or item['_id']).replace(' ', '-').lower()
         timestamp = item.get('versioncreated', item.get('_updated', utcnow()))
         return secure_filename('{timestamp}-{_id}.{ext}'.format(
             timestamp=timestamp.strftime('%Y%m%d%H%M'),

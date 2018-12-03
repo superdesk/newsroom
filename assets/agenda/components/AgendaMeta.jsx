@@ -16,12 +16,12 @@ function AgendaPreviewMeta({item}) {
                     key={`${contact.name}-${index}`}>
                     <i className='icon-small--user icon--gray'></i>
                     <span>{`${contact.name}${(contact.name && contact.organisation) ? ', ' : ''}${contact.organisation} ${contact.phone} ${contact.mobile} `}
-                        {contact.email && <a href={`mailto:${contact.email}`}>{contact.email}</a>}
+                        {contact.email && <a href={`mailto:${contact.email}`} target="_blank">{contact.email}</a>}
                     </span>
                 </div>)}
                 {getEventLinks(item).map((link) => <div className='wire-articles__item__meta-row' key={link}>
                     <i className='icon-small--globe icon--gray'></i>
-                    <span><a href={link}>{link}</a></span>
+                    <span><a href={link} target="_blank">{link}</a></span>
                 </div>)}
             </div>
         </div>

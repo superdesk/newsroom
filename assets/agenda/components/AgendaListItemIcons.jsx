@@ -10,6 +10,7 @@ import {
     isRecurring,
     WORKFLOW_STATUS_TEXTS,
     WORKFLOW_COLORS,
+    DRAFT_STATUS_TEXTS,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -24,12 +25,25 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
 
     const getCoverageTootip = (coverage) => {
 
-        if (['draft', 'assigned', 'active', 'cancelled'].includes(coverage.workflow_status)) {
+        if (coverage.workflow_status === 'draft') {
+            return gettext('{{ type }} coverage {{ status }}', {
+                type: coverage.coverage_type,
+                status: DRAFT_STATUS_TEXTS[coverage.coverage_status]
+            });
+        }
+
+        if (['assigned', 'active'].includes(coverage.workflow_status)) {
             return gettext('{{ type }} coverage {{ status }}, due {{date}} at {{time}}', {
                 type: coverage.coverage_type,
                 status: WORKFLOW_STATUS_TEXTS[coverage.workflow_status],
                 date: formatDate(coverage.scheduled),
                 time: formatTime(coverage.scheduled)
+            });
+        }
+
+        if (coverage.workflow_status === 'cancelled') {
+            return gettext('{{ type }} coverage cancelled', {
+                type: coverage.coverage_type
             });
         }
 

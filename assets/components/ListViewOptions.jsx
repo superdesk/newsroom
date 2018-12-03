@@ -17,6 +17,7 @@ class ListViewOptions extends React.PureComponent {
         ];
 
         this.toggleOpen = this.toggleOpen.bind(this);
+        this.handleClickOutside = this.handleClickOutside.bind(this);
     }
 
     toggleOpen() {
@@ -31,16 +32,24 @@ class ListViewOptions extends React.PureComponent {
     componentDidMount() {
         if ( !isTouchDevice() ) {
             this.elem && $(this.elem).tooltip();
+            document.addEventListener('mousedown', this.handleClickOutside);
         }
     }
 
     componentWillUnmount() {
         this.elem && $(this.elem).tooltip('dispose'); // make sure it's gone
+        document.removeEventListener('mousedown', this.handleClickOutside);
+    }
+
+    handleClickOutside(e) {
+        if (this.state.isOpen && !this.elem.contains(e.target)) {
+            this.setState({isOpen: false});
+        }
     }
 
     render() {
         return(
-            <div className='btn-group'>
+            <div className='btn-group' ref={(elem) => this.elem = elem}>
                 <span
                     className='content-bar__menu'
                     onClick={this.toggleOpen}

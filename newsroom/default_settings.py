@@ -157,7 +157,7 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 # Filter tab behaviour
 # If true, aggregations will be against all content all the time
 # If false, aggregations will change by filters applied
-FILTER_BY_POST_FILTER = True
+FILTER_BY_POST_FILTER = False
 
 # List of filters to remove matching stories when news only switch is turned on
 NEWS_ONLY_FILTERS = [

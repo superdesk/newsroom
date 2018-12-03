@@ -468,7 +468,7 @@ def test_matching_topics(client, app):
         {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
     ]
     matching = search.get_matching_topics(item['guid'], topics, users, companies)
-    assert ['query'] == matching
+    assert ['created_from_future', 'query'] == matching
 
 
 def test_matching_topics_for_public_user(client, app):
@@ -495,7 +495,7 @@ def test_matching_topics_for_public_user(client, app):
         {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
     ]
     matching = search.get_matching_topics(item['guid'], topics, users, companies)
-    assert ['query'] == matching
+    assert ['created_from_future', 'query'] == matching
 
 
 def test_matching_topics_for_user_with_inactive_company(client, app):
@@ -522,7 +522,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
     ]
     matching = search.get_matching_topics(item['guid'], topics, users, companies)
-    assert ['query'] == matching
+    assert ['created_from_future', 'query'] == matching
 
 
 def test_push_parsed_item(client, app):

@@ -1,3 +1,4 @@
+import {uniq} from 'lodash';
 import {
     CLOSE_MODAL, RENDER_MODAL,
     SAVED_ITEMS_COUNT,
@@ -32,7 +33,7 @@ import {
     SET_QUERY,
 } from 'search/actions';
 
-import {getMaxVersion} from './wire/utils';
+import {getMaxVersion} from 'local-store';
 import {REMOVE_NEW_ITEMS, SET_NEW_ITEMS_BY_TOPIC} from './agenda/actions';
 import {toggleValue} from 'utils';
 import {get, isEmpty} from 'lodash';
@@ -149,15 +150,13 @@ export function defaultReducer(state, action) {
 
     case RECIEVE_NEXT_ITEMS: {
         const itemsById = Object.assign({}, state.itemsById);
-        const items = state.items.concat(action.data._items.map((item) => {
-            if (itemsById[item._id]) {
-                return;
+        const newItems = action.data._items.map((item) => {
+            if (!itemsById[item._id]) {
+                itemsById[item._id] = item;
             }
-
-            itemsById[item._id] = item;
             return item._id;
-        }).filter((_id) => _id));
-        return {...state, items, itemsById, isLoading: false};
+        });
+        return {...state, items: uniq([...state.items, ...newItems]), itemsById, isLoading: false};
     }
 
     case SET_STATE:

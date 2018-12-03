@@ -1,7 +1,7 @@
 import { createStore, render, initWebSocket, getInitData } from 'utils';
 
 import wireReducer from './reducers';
-import {getNewsOnlyParam, getReadItems} from './utils';
+import {getNewsOnlyParam, getReadItems} from 'local-store';
 import WireApp from './components/WireApp';
 import { fetchItems, setState, initData, initParams, pushNotification, } from './actions';
 import { setView } from 'search/actions';

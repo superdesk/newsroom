@@ -94,6 +94,7 @@ def get_home_data():
         'user': str(user['_id']) if user else None,
         'company': company_id,
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()],
+        'context': 'wire',
     }
 
 

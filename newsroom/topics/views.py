@@ -71,7 +71,11 @@ def share():
                 'recipient': user,
                 'sender': current_user,
                 'topic': topic,
-                'url': '{}/wire?q={}'.format(app.config['CLIENT_URL'], parse.quote(topic['query'])),
+                'url': '{}/{}?q={}'.format(
+                    app.config['CLIENT_URL'],
+                    topic.get('topic_type'),
+                    parse.quote(topic['query'])
+                ),
                 'message': data.get('message'),
                 'app_name': app.config['SITE_NAME'],
             }

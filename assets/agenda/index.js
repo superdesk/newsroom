@@ -1,15 +1,20 @@
 import { createStore, render, initWebSocket, getInitData } from 'utils';
 
 import agendaReducer from './reducers';
-import {getReadItems} from 'wire/utils';
+import {getActiveDate, getAgendaDropdownFilters, getReadItems} from 'local-store';
 import AgendaApp from './components/AgendaApp';
 import { fetchItems, setState, initData, initParams, pushNotification } from './actions';
-import { setView } from 'search/actions';
+import { setView, toggleFilter } from 'search/actions';
 
 const store = createStore(agendaReducer);
 
 // init data
-store.dispatch(initData(getInitData(window.agendaData), getReadItems()));
+store.dispatch(initData(getInitData(window.agendaData), getReadItems(), getActiveDate()));
+
+const savedFilters = getAgendaDropdownFilters();
+for (const filter in savedFilters) {
+    store.dispatch(toggleFilter(filter, savedFilters[filter]));
+}
 
 // init query
 const params = new URLSearchParams(window.location.search);

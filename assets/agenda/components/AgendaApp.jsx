@@ -2,12 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { get, includes, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { gettext } from 'utils';
 
 import {
-    watchEvents,
-    stopWatchingEvents,
     fetchItems,
     selectDate,
     fetchMoreItems,
@@ -39,11 +37,11 @@ import SearchResultsInfo from 'wire/components/SearchResultsInfo';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
-import { getItemActions } from 'wire/item-actions';
+import getItemActions from '../item-actions';
 import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
-import { isWatched } from '../utils';
+import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -70,6 +68,25 @@ class AgendaApp extends BaseApp {
         });
 
         const onDetailClose = this.props.detail ? null : () => this.props.actions.filter(a => a.id == 'open')[0].action(null);
+
+        const groups = [
+            {
+                field: 'service',
+                label: gettext('Category'),
+            },
+            {
+                field: 'subject',
+                label: gettext('Subject'),
+            },
+            {
+                field: 'urgency',
+                label: gettext('News Value'),
+            },
+            {
+                field: 'place',
+                label: gettext('Place'),
+            },
+        ];
 
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
@@ -127,7 +144,7 @@ class AgendaApp extends BaseApp {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar tabs={this.tabs} props={this.props} />
+                                <SearchSidebar tabs={this.tabs} props={{...this.props, groups}} />
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
@@ -257,29 +274,18 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     fetchItems: () => dispatch(fetchItems()),
-    actions: getItemActions(dispatch).concat([
-        {
-            name: gettext('Watch'),
-            icon: 'watch',
-            multi: true,
-            when: (state, item) => state.user && !includes(get(item, 'watches', []), state.user),
-            action: (items) => dispatch(watchEvents(items)),
-        },
-        {
-            name: gettext('Stop watching'),
-            icon: 'unwatch',
-            multi: true,
-            when: (state, item) => isWatched(item, state.user),
-            action: (items) => dispatch(stopWatchingEvents(items)),
-        },
-    ]),
+    actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
-    toggleDropdownFilter: (field, value) => dispatch(toggleDropdownFilter(field, value)),
+    toggleDropdownFilter: (field, value) => {
+        setAgendaDropdownFilter(field, value);
+        dispatch(toggleDropdownFilter(field, value));
+    },
     selectDate: (dateString, grouping) => {
         dispatch(selectDate(dateString, grouping));
+        setActiveDate(dateString);
         dispatch(fetchItems());
     },
     openItemDetails: (item) => dispatch(openItemDetails(item)),

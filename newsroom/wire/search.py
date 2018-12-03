@@ -1,18 +1,19 @@
-import pytz
 import logging
-import newsroom
-
 from datetime import datetime, timedelta
-from werkzeug.exceptions import Forbidden
-from flask import current_app as app, json, abort
+
 from eve.utils import ParsedRequest
+from flask import current_app as app, json, abort
 from flask_babel import gettext
+from superdesk import get_resource_service
+from werkzeug.exceptions import Forbidden
+
+import newsroom
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.products.products import get_products_by_company, get_products_by_navigation
-from newsroom.template_filters import is_admin
 from newsroom.settings import get_setting
-from superdesk import get_resource_service
+from newsroom.template_filters import is_admin
+from newsroom.wire.utils import get_local_date, get_end_date
 
 logger = logging.getLogger(__name__)
 
@@ -29,29 +30,6 @@ aggregations = {
 class FeaturedQuery(Exception):
     """Raise when query is for featured items."""
     pass
-
-
-def today(offset):
-    return datetime.utcnow() + timedelta(minutes=offset)
-
-
-def format_date(date, offset):
-    FORMAT = '%Y-%m-%d'
-    if date == 'now/d':
-        return today(offset).strftime(FORMAT)
-    if date == 'now/w':
-        _today = today(offset)
-        monday = _today - timedelta(days=_today.weekday())
-        return monday.strftime(FORMAT)
-    if date == 'now/M':
-        month = today(offset).replace(day=1)
-        return month.strftime(FORMAT)
-    return date
-
-
-def get_local_date(date, time, offset):
-    local_dt = datetime.strptime('%sT%s' % (format_date(date, offset), time), '%Y-%m-%dT%H:%M:%S')
-    return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
 
 
 def get_bookmarks_count(user_id, product_type):
@@ -83,7 +61,7 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
-def set_product_query(query, company, user=None, navigation_id=None):
+def set_product_query(query, company, section, user=None, navigation_id=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -91,6 +69,7 @@ def set_product_query(query, company, user=None, navigation_id=None):
     If user is not administrator and has no company then everything will be filtered
     :param query: search query
     :param company: company
+    :param section: section i.e. wire, agenda, marketplace etc
     :param user: user to check against (used for notification checking)
     :param navigation_id: navigation to filter products
     If not provided session user will be checked
@@ -104,7 +83,7 @@ def set_product_query(query, company, user=None, navigation_id=None):
             return  # admin will see everything by default
 
     if company:
-        products = get_products_by_company(company['_id'], navigation_id)
+        products = get_products_by_company(company['_id'], navigation_id, product_type=section)
     else:
         # user does not belong to a company so blocking all stories
         abort(403, gettext('User does not belong to a company.'))
@@ -150,7 +129,7 @@ def versioncreated_range(created):
     if created.get('created_from'):
         _range['gte'] = get_local_date(created['created_from'], '00:00:00', offset)
     if created.get('created_to'):
-        _range['lte'] = get_local_date(created['created_to'], '23:59:59', offset)
+        _range['lte'] = get_end_date(created['created_to'], get_local_date(created['created_to'], '23:59:59', offset))
     return {'range': {'versioncreated': _range}}
 
 
@@ -185,7 +164,7 @@ class WireSearchService(newsroom.Service):
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         company = get_user_company(user)
         try:
-            set_product_query(query, company)
+            set_product_query(query, company, self.section)
         except Forbidden:
             return 0
         set_bookmarks_query(query, user_id)
@@ -200,7 +179,7 @@ class WireSearchService(newsroom.Service):
         company = get_user_company(user)
 
         get_resource_service('section_filters').apply_section_filter(query, self.section)
-        set_product_query(query, company, navigation_id=req.args.get('navigation'))
+        set_product_query(query, company, self.section, navigation_id=req.args.get('navigation'))
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
@@ -355,7 +334,7 @@ class WireSearchService(newsroom.Service):
             # for now even if there's no active company matching for the user
             # continuing with the search
             try:
-                set_product_query(query, company, user)
+                set_product_query(query, company, topic.get('topic_type'), user=user)
             except Forbidden:
                 logger.info('Notification for user:{} and topic:{} is skipped'
                             .format(user.get('_id'), topic.get('_id')))

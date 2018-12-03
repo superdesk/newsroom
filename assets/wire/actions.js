@@ -3,7 +3,7 @@ import { get, isEmpty } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
-import { markItemAsRead, toggleNewsOnlyParam } from './utils';
+import { markItemAsRead, toggleNewsOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 
 import {
@@ -12,9 +12,6 @@ import {
     setCreatedFilter,
 } from 'search/actions';
 
-import {
-    fetchItems as fetchAgendaItems
-} from '../agenda/actions';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -175,6 +172,12 @@ function search(state, next) {
     const newsOnly = !!get(state, 'wire.newsOnly');
     const context = get(state, 'context', 'wire');
 
+    let created_to = createdFilter.to;
+    if (createdFilter.from && createdFilter.from.indexOf('now') >= 0) {
+        created_to = createdFilter.from;
+    }
+
+
     const params = {
         q: state.query,
         bookmarks: state.bookmarks && state.user,
@@ -182,7 +185,7 @@ function search(state, next) {
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
-        created_to: createdFilter.to,
+        created_to,
         timezone_offset: getTimezoneOffset(),
         newsOnly
     };
@@ -347,7 +350,7 @@ export function removeBookmarks(items) {
                 }
             })
             .then(() => dispatch(removeBookmarkItems(items)))
-            .then(() => getState().bookmarks && (getState().context === 'agenda' ? dispatch(fetchAgendaItems()) : dispatch(fetchItems())))
+            .then(() => getState().bookmarks &&  dispatch(fetchItems()))
             .catch(errorHandler);
 }
 

@@ -1,6 +1,6 @@
 import { createStore, render, initWebSocket, getInitData} from '../utils';
 
-import {getReadItems} from '../wire/utils';
+import {getReadItems} from 'local-store';
 import  MarketPlaceApp from './components/MarketPlaceApp';
 import wireReducer from '../wire/reducers';
 import WireApp from '../wire/components/WireApp';
