@@ -1,6 +1,5 @@
 import {getItemActions} from '../item-actions';
 import * as agendaActions from './actions';
-import { bookmarkItems, removeBookmarks } from 'wire/actions';
 import {gettext} from '../utils';
 import {isWatched} from './utils';
 import { get, includes } from 'lodash';
@@ -8,7 +7,7 @@ import { get, includes } from 'lodash';
 
 export default (dispatch) => {
     const { watchEvents, stopWatchingEvents } = agendaActions;
-    return getItemActions(dispatch, { ...agendaActions, bookmarkItems, removeBookmarks }).concat([
+    return getItemActions(dispatch, { ...agendaActions }).concat([
         {
             name: gettext('Watch'),
             icon: 'watch',
