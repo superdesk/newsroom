@@ -67,23 +67,31 @@
                 </li>
                 {% endif %}
 
-                {% for group in range(0, 2) %}
+                {% for group in range(0, 10) %}
                     {% for nav in sidenavs(request.blueprint)|selectattr("group", "equalto", group) %}
-                    <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %} {% if nav.badge %}badge--top-right{% endif %}">
-                    <a href="{{ url_for(nav.endpoint) }}" title="{{  gettext(nav.name) }}" data-toggle="tooltip" data-placement="right">
+                    {% if group > 0 and loop.first and loop.length %}
+                    <li class="sidenav-icons__item"><span><i class="icon--more icon--rotate-90 icon--mid-blue"></i></span></li>
+                    {% endif %}
+
+                    <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %} {% if nav.badge or nav.url %}badge--top-right{% endif %}">
+                    <a href="{{ url_for(nav.endpoint) if nav.endpoint else nav.url }}" title="{{  gettext(nav.name) }}"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        {% if nav.url %}target="_blank"{% endif %}
+                    >
                         {% if nav.badge %}
                         <div id="{{ nav.badge }}" class="badge badge-pill badge-info badge-secondary"></div>
+                        {% endif %}
+                        {% if nav.url %}
+                        <div class="badge badge-pill badge-light badge--icon">
+                            <i class="icon-small--external icon--mid-blue"></i>
+                        </div>
                         {% endif %}
                         <i class="icon--{{ nav.icon }} icon--mid-blue"></i>
                     </a>
                     </li>
                     {% endfor %}
-
-                    {% if not loop.last %}
-                    <li class="sidenav-icons__item"><span><i class="icon--more icon--rotate-90 icon--mid-blue"></i></span></li>
-                    {% endif %}
                 {% endfor %}
-                
             </ul>
 
             {% block sidenav %}
