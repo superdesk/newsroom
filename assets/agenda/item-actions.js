@@ -7,7 +7,7 @@ import { get, includes } from 'lodash';
 
 export default (dispatch) => {
     const { watchEvents, stopWatchingEvents } = agendaActions;
-    return getItemActions(dispatch, agendaActions).concat([
+    return getItemActions(dispatch, { ...agendaActions }).concat([
         {
             name: gettext('Watch'),
             icon: 'watch',

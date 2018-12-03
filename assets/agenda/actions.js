@@ -3,7 +3,7 @@ import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
 import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler} from 'utils';
-import { markItemAsRead } from 'wire/utils';
+import { markItemAsRead } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 import {getCalendars, getDateInputDate, getLocationString, getPublicContacts, hasCoverages, hasLocation} from './utils';
 
@@ -99,8 +99,8 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(agendaData, readData) {
-    return {type: INIT_DATA, agendaData, readData};
+export function initData(agendaData, readData, activeDate) {
+    return {type: INIT_DATA, agendaData, readData, activeDate};
 }
 
 export const ADD_TOPIC = 'ADD_TOPIC';

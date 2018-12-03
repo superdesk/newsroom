@@ -1,88 +1,10 @@
-import Store from 'store';
-import localStorage from 'store/storages/localStorage';
-import operationsPlugin from 'store/plugins/operations';
-
 import { get, isEmpty, isEqual, pickBy } from 'lodash';
 import { getTextFromHtml, getConfig } from 'utils';
 
-const STATUS_KILLED = 'canceled';
-const READ_ITEMS_STORE = 'read_items';
-const NEWS_ONLY_STORE = 'news_only';
-const FILTER_TAB = 'filter_tab';
-
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
-const store = Store.createStore([localStorage], [operationsPlugin]);
+const STATUS_KILLED = 'canceled';
 
-/**
- * Get read items
- *
- * @returns {Object}
- */
-export function getReadItems() {
-    return store.get(READ_ITEMS_STORE);
-}
-
-/**
- * Marks the given item as read
- *
- * @param {Object} item
- * @param {Object} state
- */
-export function markItemAsRead(item, state) {
-    if (item && item._id && item.version) {
-        const readItems = get(state, 'readItems', getReadItems()) || {};
-
-        store.assign(READ_ITEMS_STORE, {[item._id]: getMaxVersion(readItems[item._id], item.version)});
-    }
-}
-
-/**
- * Get news only value
- *
- * @returns {boolean}
- */
-export function getNewsOnlyParam() {
-    return !!((store.get(NEWS_ONLY_STORE) || {}).value);
-}
-
-
-/**
- * Toggles news only value
- *
- */
-export function toggleNewsOnlyParam() {
-    store.assign(NEWS_ONLY_STORE, {value: !getNewsOnlyParam()});
-}
-
-/**
- * Get active filter tab
- *
- * @returns {boolean}
- */
-export function getActiveFilterTab() {
-    return (store.get(FILTER_TAB) || {}).value;
-}
-
-/**
- * Set active filter tab
- *
- */
-export function setActiveFilterTab(tab) {
-    store.assign(FILTER_TAB, {value: tab});
-}
-
-
-/**
- * Returns the greater version
- *
- * @param versionA
- * @param versionB
- * @returns {number}
- */
-export function getMaxVersion(versionA, versionB) {
-    return Math.max(parseInt(versionA, 10) || 0, parseInt(versionB, 10) || 0);
-}
 
 /**
  * Returns the item version as integer

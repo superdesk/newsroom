@@ -41,6 +41,7 @@ import getItemActions from '../item-actions';
 import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
+import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -278,9 +279,13 @@ const mapDispatchToProps = (dispatch) => ({
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
-    toggleDropdownFilter: (field, value) => dispatch(toggleDropdownFilter(field, value)),
+    toggleDropdownFilter: (field, value) => {
+        setAgendaDropdownFilter(field, value);
+        dispatch(toggleDropdownFilter(field, value));
+    },
     selectDate: (dateString, grouping) => {
         dispatch(selectDate(dateString, grouping));
+        setActiveDate(dateString);
         dispatch(fetchItems());
     },
     openItemDetails: (item) => dispatch(openItemDetails(item)),
