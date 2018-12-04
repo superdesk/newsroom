@@ -15,7 +15,8 @@ import {
 } from '../wire/actions';
 
 import {
-    toggleNavigationById
+    toggleNavigationById,
+    setView,
 } from 'search/actions';
 
 import {
@@ -48,6 +49,11 @@ if (window.marketPlaceData.home_page) {
     const params = new URLSearchParams(window.location.search);
     store.dispatch(initParams(params));
     handleHistory();
+
+    // init view
+    if (localStorage.getItem('view')) {
+        store.dispatch(setView(localStorage.getItem('view')));
+    }
 
     const navigationId = params.get('navigation');
     if (navigationId) {
