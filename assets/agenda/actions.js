@@ -5,7 +5,7 @@ import analytics from 'analytics';
 import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler} from 'utils';
 import { markItemAsRead } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
-import {getCalendars, getDateInputDate, getLocationString, getPublicContacts, hasCoverages, hasLocation} from './utils';
+import {getCalendars, getDateInputDate, getLocationString, getPublicContacts, hasLocation} from './utils';
 
 import {
     setQuery,
@@ -140,20 +140,40 @@ export function copyPreviewContents(item) {
         hasLocation(item) && contents.push(gettext('Location: {{ location }}', {location: getLocationString(item)}));
         item.ednote && contents.push(gettext('Ednote: {{ ednote }}', {ednote: item.ednote}));
 
+        if (item.definition_short) {
+            contents.push(gettext('Description: {{ description }}', {description: item.definition_short}));
+        }
+
         const contacts = getPublicContacts(item);
-        !isEmpty(contacts) && contents.push(gettext('Contacts: {{ contacts }}', {contacts: JSON.stringify(contacts)}));
-        contents.push(gettext('Calendars: {{ calendars }}', {calendars: getCalendars(item)}));
+        if (!isEmpty(contacts)) {
+            contents.push(gettext(''));
+            contents.push(gettext('Contacts'));
+            contacts.map(contact => {
+                contents.push(gettext('Name: {{ contact }}', {contact: contact.name}));
+                contact.organization && contents.push(gettext('Organisation: {{ organization }}', {organization: contact.organization}));
+                contact.contact_email && contents.push(gettext('Email: {{ email }}', {email: contact.contact_email}));
+                contact.phone && contents.push(gettext('Phone: {{ phone }}', {phone: contact.phone}));
+                contact.mobile && contents.push(gettext('Mobile: {{ mobile }}', {mobile: contact.mobile}));
+                contents.push('');
+            });
+        }
+
+        const calendars = getCalendars(item);
+        calendars && contents.push(gettext('Calendars: {{ calendars }}', {calendars}));
 
         contents.push('');
 
-        if (hasCoverages(item)) {
-            contents.push(gettext('Coverages'));
-
-            item.coverages.map(coverage => {
-                contents.push(gettext('Coverage type: {{ type }}', {type: coverage.coverage_type}));
-                contents.push(gettext('Scheduled: {{ schedule }}', {schedule: coverage.scheduled}));
-                contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
-                contents.push('');
+        if (!isEmpty(item.planning_items)) {
+            item.planning_items.map(pi => {
+                contents.push(gettext('Planning item'));
+                contents.push(gettext('Description: {{ description }}', {description: pi.description_text}));
+                pi.coverages &&  pi.coverages.map(coverage => {
+                    contents.push(gettext('Coverage type: {{ type }}', {type: coverage.planning.g2_content_type}));
+                    contents.push(gettext('Scheduled: {{ schedule }}', {schedule: getLocaleDate(coverage.planning.scheduled)}));
+                    contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
+                    coverage.planning.description_text && contents.push(gettext('Description: {{ description }}', {description: coverage.planning.description_text}));
+                    contents.push('');
+                });
             });
         }
 
