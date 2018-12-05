@@ -67,7 +67,7 @@ class SearchResultsInfo extends React.Component {
                     <button
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-none d-sm-block"
-                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType)}
+                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType, this.props.activeNavigation)}
                     >{gettext('Save as topic')}</button>
                 )}
 
@@ -75,7 +75,7 @@ class SearchResultsInfo extends React.Component {
                     <button
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-block d-sm-none"
-                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType)}
+                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType, this.props.activeNavigation)}
                     >{gettext('S')}</button>
                 )}
 

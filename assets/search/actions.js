@@ -51,8 +51,9 @@ export function setView(view) {
  * @param {String} topic
  * @param {String} type
  */
-export function followTopic(topic, type) {
+export function followTopic(topic, type, navigation) {
     topic.topic_type = type;
+    topic.navigation = navigation;
     return renderModal('followTopic', {topic});
 }
 
