@@ -3,7 +3,7 @@ import hmac
 import flask
 import logging
 import superdesk
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from copy import copy, deepcopy
 from PIL import Image, ImageEnhance
@@ -21,6 +21,7 @@ from newsroom.email import send_new_item_notification_email, \
 from newsroom.history import get_history_users
 from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
 from newsroom.upload import ASSETS_RESOURCE
+from newsroom.signals import publish_item as publish_item_signal
 
 from planning.common import WORKFLOW_STATE
 
@@ -99,13 +100,6 @@ def set_dates(doc):
     doc.setdefault('version', 1)
     doc.setdefault(app.config['VERSION'], 1)
 
-    # stt specific, to be removed when archive is imported
-    # set versioncreated = firstpublished
-    if doc.get('firstpublished'):
-        firstpublished = parse_date(doc['firstpublished'])
-        if firstpublished < doc['versioncreated'] and firstpublished < now - timedelta(days=7):
-            doc['versioncreated'] = firstpublished
-
 
 def publish_item(doc):
     """Duplicating the logic from content_api.publish service."""
@@ -133,6 +127,7 @@ def publish_item(doc):
         agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
         if agenda_items:
             [notify_new_item(item, check_topics=False) for item in agenda_items]
+    publish_item_signal.send(app._get_current_object(), item=doc)
     _id = service.create([doc])[0]
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)

@@ -18,15 +18,6 @@ from newsroom.wire.utils import get_local_date, get_end_date
 logger = logging.getLogger(__name__)
 
 
-aggregations = {
-    'genre': {'terms': {'field': 'genre.name', 'size': 50}},
-    'service': {'terms': {'field': 'service.name', 'size': 50}},
-    'subject': {'terms': {'field': 'subject.name', 'size': 20}},
-    'urgency': {'terms': {'field': 'urgency'}},
-    'place': {'terms': {'field': 'place.name', 'size': 50}},
-}
-
-
 class FeaturedQuery(Exception):
     """Raise when query is for featured items."""
     pass
@@ -34,6 +25,10 @@ class FeaturedQuery(Exception):
 
 def get_bookmarks_count(user_id, product_type):
     return get_resource_service('{}_search'.format(product_type)).get_bookmarks_count(user_id)
+
+
+def get_aggregations():
+    return app.config.get('WIRE_AGGS', {})
 
 
 class WireSearchResource(newsroom.Resource):
@@ -58,7 +53,7 @@ class WireSearchResource(newsroom.Resource):
 
 
 def get_aggregation_field(key):
-    return aggregations[key]['terms']['field']
+    return get_aggregations()[key]['terms']['field']
 
 
 def set_product_query(query, company, section, user=None, navigation_id=None):
@@ -225,7 +220,7 @@ class WireSearchService(newsroom.Service):
             return abort(400)
 
         if not source['from'] and aggs:  # avoid aggregations when handling pagination
-            source['aggs'] = aggregations
+            source['aggs'] = get_aggregations()
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
