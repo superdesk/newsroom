@@ -4,7 +4,7 @@ import agendaReducer from './reducers';
 import {getActiveDate, getAgendaDropdownFilters, getReadItems} from 'local-store';
 import AgendaApp from './components/AgendaApp';
 import { fetchItems, setState, initData, initParams, pushNotification } from './actions';
-import { setView, toggleFilter } from 'search/actions';
+import { setView, toggleFilter, toggleNavigationById } from 'search/actions';
 
 const store = createStore(agendaReducer);
 
@@ -31,6 +31,9 @@ window.onpopstate = function(event) {
         store.dispatch(setState(event.state));
     }
 };
+
+// set navigation
+store.dispatch(toggleNavigationById(params.get('navigation')));
 
 // fetch items & render
 store.dispatch(fetchItems()).then(() =>

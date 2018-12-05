@@ -4,7 +4,7 @@ import wireReducer from './reducers';
 import {getNewsOnlyParam, getReadItems} from 'local-store';
 import WireApp from './components/WireApp';
 import { fetchItems, setState, initData, initParams, pushNotification, } from './actions';
-import { setView } from 'search/actions';
+import { setView, toggleNavigationById } from 'search/actions';
 
 const store = createStore(wireReducer);
 
@@ -26,6 +26,9 @@ window.onpopstate = function(event) {
         store.dispatch(setState(event.state));
     }
 };
+
+// set navigation
+store.dispatch(toggleNavigationById(params.get('navigation')));
 
 // fetch items & render
 store.dispatch(fetchItems()).then(() =>
