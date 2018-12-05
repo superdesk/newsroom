@@ -23,7 +23,6 @@ const CARD_TYPES = [
         text: gettext('6-text-only'),
         editComponent: ConfigProduct,
         dashboardComponent: TextOnlyCard,
-        dashboard: ['newsroom'],
         size: 6,
     },
     {
@@ -31,7 +30,6 @@ const CARD_TYPES = [
         text: gettext('4-picture-text'),
         editComponent: ConfigProduct,
         dashboardComponent: PictureTextCard,
-        dashboard: ['newsroom'],
         size: 4,
     },
     {
@@ -39,7 +37,6 @@ const CARD_TYPES = [
         text: gettext('4-media-gallery'),
         editComponent: ConfigProduct,
         dashboardComponent: MediaGalleryCard,
-        dashboard: ['newsroom'],
         size: 4,
     },
     {
@@ -47,7 +44,6 @@ const CARD_TYPES = [
         text: gettext('4-photo-gallery'),
         editComponent: ConfigExternalMedia,
         dashboardComponent: PhotoGalleryCard,
-        dashboard: ['newsroom'],
         size: 4,
     },
     {
@@ -55,7 +51,6 @@ const CARD_TYPES = [
         text: gettext('1x1-top-news'),
         editComponent: ConfigProduct,
         dashboardComponent: TopNewsOneByOneCard,
-        dashboard: ['newsroom'],
         size: 2,
     },
     {
@@ -63,7 +58,6 @@ const CARD_TYPES = [
         text: gettext('2x2-top-news'),
         editComponent: ConfigProduct,
         dashboardComponent: TopNewsOneByOneCard,
-        dashboard: ['newsroom'],
         size: 4,
     },
     {
@@ -71,7 +65,6 @@ const CARD_TYPES = [
         text: gettext('3-text-only'),
         editComponent: ConfigProduct,
         dashboardComponent: LargeTextOnlyCard,
-        dashboard: ['newsroom'],
         size: 3,
     },
     {
@@ -79,7 +72,6 @@ const CARD_TYPES = [
         text: gettext('3-picture-text'),
         editComponent: ConfigProduct,
         dashboardComponent: LargePictureTextCard,
-        dashboard: ['newsroom'],
         size: 3,
     },
     {
@@ -87,7 +79,6 @@ const CARD_TYPES = [
         text: gettext('4-text-only'),
         editComponent: ConfigProduct,
         dashboardComponent: PictureTextCard,
-        dashboard: ['newsroom'],
         size: 4,
     },
     {
@@ -95,7 +86,6 @@ const CARD_TYPES = [
         text: gettext('2x2-events'),
         editComponent: ConfigEvent,
         dashboardComponent: EventsTwoByTwoCard,
-        dashboard: ['newsroom'],
         size: 4,
     },
     {
@@ -103,7 +93,6 @@ const CARD_TYPES = [
         text: gettext('6 Navigation Tiles Per Row'),
         editComponent: ConfigNavigation,
         dashboardComponent: NavigationSixPerRow,
-        dashboard: ['newsroom', 'market_place'],
         size: 6,
     }
 ];

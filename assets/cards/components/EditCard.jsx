@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
+
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 
@@ -16,10 +18,11 @@ class EditCard extends React.Component {
     }
 
     render() {
+        const dashboard = (get(this.props, 'dashboards') || []).find((d) => d._id === this.props.card.dashboard);
         const cardType = this.props.card.type || '';
         const CardComponent = getCardEditComponent(cardType);
         const cardTypes = CARD_TYPES.filter(
-            (card) => card.dashboard.includes(this.props.card.dashboard)
+            (card) =>  dashboard.cards.includes(card._id)
         ).map((c) => ({value: c._id, text: c.text}));
 
         cardTypes.unshift({value: '', text: '', component: getCardEditComponent('')});
@@ -105,6 +108,7 @@ EditCard.propTypes = {
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+    dashboards:  PropTypes.arrayOf(PropTypes.object),
 };
 
 export default EditCard;

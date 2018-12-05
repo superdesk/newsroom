@@ -36,7 +36,20 @@ def init_app(app):
     superdesk.register_resource('wire_search', WireSearchResource, WireSearchService, _app=app)
 
     app.section('wire', 'Wire')
-    app.dashboard('newsroom', gettext('Newsroom'))
+    app.dashboard('newsroom',
+                  gettext('Newsroom'),
+                  [
+                      '6-text-only',
+                      '4-picture-text',
+                      '4-media-gallery',
+                      '4-photo-gallery',
+                      '1x1-top-news',
+                      '2x2-top-news',
+                      '3-text-only',
+                      '3-picture-text',
+                      '4-text-only',
+                      '2x2-events'
+                  ])
 
     app.sidenav('Home', 'wire.index', 'home')
     app.sidenav('Wire', 'wire.wire', 'text', section='wire')

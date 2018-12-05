@@ -30,7 +30,7 @@ class CardsApp extends React.Component {
                     activeDashboard={this.props.activeDashboard}
                 />
             </ListBar>,
-            <Cards key="Cards" activeDashboard={this.props.activeDashboard} dashboards={this.props.dashboards}/>]
+            <Cards key="Cards"/>]
         );
     }
 }
