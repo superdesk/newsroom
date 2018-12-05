@@ -28,7 +28,7 @@ class MarketPlaceApp extends BaseApp {
                 <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4">
                     <div className="container-fluid">
                         {get(cards,  'length', 0) > 0 && cards.map(
-                            (card) => <NavigationSixPerRow key={card._id} card={card} onNavigationClick={() => {}}/>
+                            (card) => <NavigationSixPerRow key={card._id} card={card}/>
                         )}
                         {get(cards,  'length', 0) === 0 && <div className="alert alert-warning" role="alert">
                             <strong>{gettext('Warning')}!</strong> {gettext('There\'s no navigations defined!')}

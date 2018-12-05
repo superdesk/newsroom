@@ -5,7 +5,7 @@ from eve.render import send_response
 from eve.methods.get import get_internal
 
 from superdesk import get_resource_service
-from newsroom.market_place import blueprint
+from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
 from newsroom.auth import get_user, login_required, get_user_id
 from newsroom.topics import get_user_topics
 from newsroom.companies import section
@@ -16,24 +16,28 @@ from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, 
 from newsroom.notifications import push_user_notification
 
 
+search_endpoint_name = '{}_search'.format(SECTION_ID)
+
+
 def get_view_data():
     """Get the view data"""
     user = get_user()
     topics = get_user_topics(user['_id']) if user else []
     navigations = get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
-                                             product_type='market_place')
-    get_resource_service('market_place_search').get_navigation_story_count(navigations)
+                                             product_type=SECTION_ID)
+    get_resource_service(search_endpoint_name).get_navigation_story_count(navigations)
     return {
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
-        'topics': [t for t in topics if t.get('topic_type') == 'market_place'],
+        'topics': [t for t in topics if t.get('topic_type') == SECTION_ID],
         'navigations': navigations,
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
                     if 'wire' in f['types']],
-        'saved_items': get_bookmarks_count(user['_id'], 'market_place'),
-        'context': 'market_place',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('market_place'),
-        'home_page': False
+        'saved_items': get_bookmarks_count(user['_id'], SECTION_ID),
+        'context': SECTION_ID,
+        'ui_config': get_resource_service('ui_config').getSectionConfig(SECTION_ID),
+        'home_page': False,
+        'title': SECTION_NAME
     }
 
 
@@ -41,50 +45,51 @@ def get_home_page_data():
     """Get home page data for market place"""
     user = get_user()
     navigations = get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
-                                             product_type='market_place')
-    get_resource_service('market_place_search').get_navigation_story_count(navigations)
+                                             product_type=SECTION_ID)
+    get_resource_service(search_endpoint_name).get_navigation_story_count(navigations)
     return {
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
         'navigations': navigations,
-        'cards': list(query_resource('cards', lookup={'dashboard': 'market_place'})),
-        'saved_items': get_bookmarks_count(user['_id'], 'market_place'),
-        'context': 'market_place',
-        'home_page': True
+        'cards': list(query_resource('cards', lookup={'dashboard': SECTION_ID})),
+        'saved_items': get_bookmarks_count(user['_id'], SECTION_ID),
+        'context': SECTION_ID,
+        'home_page': True,
+        'title': SECTION_NAME
     }
 
 
-@blueprint.route('/market_place')
+@blueprint.route('/{}'.format(SECTION_ID))
 @login_required
-@section('market_place')
+@section(SECTION_ID)
 def index():
     return flask.render_template('market_place_index.html', data=get_view_data())
 
 
-@blueprint.route('/market_place/home')
+@blueprint.route('/{}/home'.format(SECTION_ID))
 @login_required
-@section('market_place')
+@section(SECTION_ID)
 def home():
     return flask.render_template('market_place_home.html', data=get_home_page_data())
 
 
-@blueprint.route('/market_place/search')
+@blueprint.route('/{}/search'.format(SECTION_ID))
 @login_required
 def search():
-    response = get_internal('market_place_search')
-    return send_response('market_place_search', response)
+    response = get_internal(search_endpoint_name)
+    return send_response(search_endpoint_name, response)
 
 
-@blueprint.route('/bookmarks_market_place')
+@blueprint.route('/bookmarks_{}'.format(SECTION_ID))
 @login_required
-@section('market_place')
+@section(SECTION_ID)
 def bookmarks():
     data = get_view_data()
     data['bookmarks'] = True
     return flask.render_template('market_place_bookmarks.html', data=data)
 
 
-@blueprint.route('/market_place_bookmark', methods=['POST', 'DELETE'])
+@blueprint.route('/{}_bookmark'.format(SECTION_ID), methods=['POST', 'DELETE'])
 @login_required
 def bookmark():
     """Bookmark an item.
@@ -96,11 +101,11 @@ def bookmark():
     assert data.get('items')
     update_action_list(data.get('items'), 'bookmarks', item_type='items')
     user_id = get_user_id()
-    push_user_notification('saved_items', count=get_bookmarks_count(user_id, 'market_place'))
+    push_user_notification('saved_items', count=get_bookmarks_count(user_id, SECTION_ID))
     return flask.jsonify(), 200
 
 
-@blueprint.route('/market_place/<_id>/copy', methods=['POST'])
+@blueprint.route('/{}/<_id>/copy'.format(SECTION_ID), methods=['POST'])
 @login_required
 def copy(_id):
     item_type = get_type()
@@ -109,7 +114,7 @@ def copy(_id):
     return flask.jsonify(), 200
 
 
-@blueprint.route('/market_place/<_id>/versions')
+@blueprint.route('/{}/<_id>/versions'.format(SECTION_ID))
 @login_required
 def versions(_id):
     item = get_entity_or_404(_id, 'items')
@@ -117,7 +122,7 @@ def versions(_id):
     return flask.jsonify({'_items': items})
 
 
-@blueprint.route('/market_place/<_id>')
+@blueprint.route('/{}/<_id>'.format(SECTION_ID))
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')

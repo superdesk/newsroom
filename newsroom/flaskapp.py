@@ -292,9 +292,16 @@ class Newsroom(eve.Eve):
         if flask.g:  # reset settings cache
             flask.g.settings = None
 
-    def dashboard(self, _id, name):
-        """Define new dashboard"""
+    def dashboard(self, _id, name, cards=[]):
+        """Define new dashboard
+
+        :param _id: id of the dashboard
+        :param name: display name of the dashboard
+        :param cards: list of cards id related to the dashboard to
+        populate the drop down in dashboard config.
+        """
         self.dashboards.append({
             '_id': _id,
-            'name': name
+            'name': name,
+            'cards': cards
         })

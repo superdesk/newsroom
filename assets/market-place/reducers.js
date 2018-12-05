@@ -19,7 +19,7 @@ export default function marketPlaceHomeReducer(state = initialState, action) {
                         // company does not have permission for navigation
                         return null;
                     }
-                    navigation.href = `/market_place/?navigation=${navigation._id}`;
+                    navigation.href = `/${action.data.context}/?navigation=${navigation._id}`;
                     return navigation;
                 }).filter((nav) => nav);
         });
