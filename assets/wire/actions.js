@@ -10,6 +10,7 @@ import {
     setQuery,
     toggleNavigation,
     setCreatedFilter,
+    toggleNavigationById,
 } from 'search/actions';
 
 
@@ -535,7 +536,7 @@ export function resetFilter(filter) {
  */
 export function setTopicQuery(topic) {
     return (dispatch) => {
-        dispatch(toggleNavigation());
+        topic.navigation ?  dispatch(toggleNavigationById(topic.navigation)) : dispatch(toggleNavigation());
         dispatch(setQuery(topic.query || ''));
         dispatch(resetFilter(topic.filter));
         dispatch(setCreatedFilter(topic.created));

@@ -14,6 +14,7 @@ import {
     toggleFilter,
     toggleNavigation,
     setCreatedFilter,
+    toggleNavigationById,
 } from 'search/actions';
 
 import {getLocaleDate} from '../utils';
@@ -567,7 +568,7 @@ export function initParams(params) {
  */
 export function setEventQuery(topic) {
     return (dispatch) => {
-        dispatch(toggleNavigation());
+        topic.navigation ? dispatch(toggleNavigationById(topic.navigation)) : dispatch(toggleNavigation());
         dispatch(toggleTopic(topic));
         dispatch(setQuery(topic.query));
         dispatch(resetFilter(topic.filter));

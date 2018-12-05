@@ -5,14 +5,16 @@ topic = {
     'label': 'Foo',
     'query': 'foo',
     'notifications': False,
-    'topic_type': 'wire'
+    'topic_type': 'wire',
+    'navigation': 'xyz',
 }
 
 agenda_topic = {
     'label': 'Foo',
     'query': 'foo',
     'notifications': False,
-    'topic_type': 'agenda'
+    'topic_type': 'agenda',
+    'navigation': 'abc',
 }
 
 user = str(ObjectId())
