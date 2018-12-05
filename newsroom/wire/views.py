@@ -61,7 +61,8 @@ def get_view_data():
                                                   product_type='wire'),
         'saved_items': get_bookmarks_count(user['_id'], 'wire'),
         'context': 'wire',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('wire')
+        'ui_config': get_resource_service('ui_config').getSectionConfig('wire'),
+        'groups': app.config.get('WIRE_GROUPS', []),
     }
 
 
