@@ -9,6 +9,7 @@ import {
 } from './actions';
 
 import { get, isEmpty } from 'lodash';
+import { getActiveDate } from 'local-store';
 import { EXTENDED_VIEW } from 'wire/defaults';
 import { searchReducer } from 'search/reducers';
 import { defaultReducer } from '../reducers';
@@ -74,7 +75,7 @@ function recieveItems(state, data) {
             activeDate = EARLIEST_DATE;
         }
     } else if (!state.bookmarks && activeDate === EARLIEST_DATE) {
-        activeDate = moment().valueOf();
+        activeDate = getActiveDate() || moment().valueOf();
     }
 
     const agenda = {
