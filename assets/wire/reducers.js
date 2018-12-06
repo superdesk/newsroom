@@ -35,6 +35,7 @@ const initialState = {
     search: searchReducer(),
     userSections: {},
     uiConfig: {},
+    groups: [],
 };
 
 function recieveItems(state, data) {
@@ -94,6 +95,7 @@ export default function wireReducer(state = initialState, action) {
             savedItemsCount: action.wireData.saved_items || null,
             userSections: action.wireData.userSections || {},
             uiConfig: action.wireData.ui_config || {},
+            groups: action.wireData.groups || [],
         };
     }
 

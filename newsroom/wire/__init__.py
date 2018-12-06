@@ -89,3 +89,34 @@ The time limit can be enabled for each company in the Permissions.
         '''),
         default=app.config.get('WIRE_TIME_LIMIT_DAYS', 0),
     )
+
+    app.config.setdefault('WIRE_AGGS', {
+        'genre': {'terms': {'field': 'genre.name', 'size': 50}},
+        'service': {'terms': {'field': 'service.name', 'size': 50}},
+        'subject': {'terms': {'field': 'subject.name', 'size': 20}},
+        'urgency': {'terms': {'field': 'urgency'}},
+        'place': {'terms': {'field': 'place.name', 'size': 50}},
+    })
+
+    app.config.setdefault('WIRE_GROUPS', [
+        {
+            'field': 'service',
+            'label': gettext('Category'),
+        },
+        {
+            'field': 'subject',
+            'label': gettext('Subject'),
+        },
+        {
+            'field': 'genre',
+            'label': gettext('Content Type'),
+        },
+        {
+            'field': 'urgency',
+            'label': gettext('News Value'),
+        },
+        {
+            'field': 'place',
+            'label': gettext('Place'),
+        },
+    ])
