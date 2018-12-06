@@ -15,7 +15,10 @@ import ShareItemModal from '../../components/ShareItemModal';
 import BookmarkTabs from 'components/BookmarkTabs';
 import WirePreview from '../../wire/components/WirePreview';
 import ItemDetails from '../../wire/components/ItemDetails';
+import SearchSidebar from '../../wire/components/SearchSidebar';
 import getItemActions from '../../wire/item-actions';
+import {gettext} from 'utils';
+
 import {
     fetchItems,
     fetchMoreItems,
@@ -54,9 +57,19 @@ class AmNewsApp extends BaseApp {
     }
 
     renderListAndPreview() {
-        const mainClassName = classNames('wire-column__main', {
-            'wire-articles__one-side-pane': this.props.itemToPreview,
-        });
+        const isMobile = window.innerWidth <= 768;
+        let mainClassName = '';
+        const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
+        if (isMobile) {
+            mainClassName = classNames('wire-column__main', {
+                'wire-articles__one-side-pane': panesCount === 1,
+                'wire-articles__two-side-panes': panesCount === 2,
+            });
+        } else {
+            mainClassName = classNames('wire-column__main', {
+                'wire-articles__one-side-pane': this.props.itemToPreview,
+            });
+        }
 
         return (
             [
@@ -65,6 +78,20 @@ class AmNewsApp extends BaseApp {
                         actions={this.props.actions}
                     />
                     <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
+                        {isMobile && this.state.withSidebar && <span
+                            className='content-bar__menu content-bar__menu--nav--open'
+                            ref={(elem) => this.elemOpen = elem}
+                            title={gettext('Close filter panel')}
+                            onClick={this.toggleSidebar}>
+                            <i className="icon--close-thin icon--white"></i>
+                        </span>}
+                        {isMobile && !this.state.withSidebar && !this.props.bookmarks && <span
+                            className='content-bar__menu content-bar__menu--nav'
+                            ref={(elem) => this.elemClose = elem}
+                            title={gettext('Open filter panel')}
+                            onClick={this.toggleSidebar}>
+                            <i className="icon--hamburger"></i>
+                        </span>}
                         {this.props.bookmarks &&
                             <BookmarkTabs active="am_news" sections={this.props.userSections}/>
                         }
@@ -73,17 +100,26 @@ class AmNewsApp extends BaseApp {
                             setQuery={this.props.setQuery}
                         />
                     </nav>
-                    {!this.props.bookmarks &&
-                        <Navigations
-                            navigations={this.props.navigations}
-                            toggleNavigation={this.props.toggleNavigation}
-                            activeNavigation={this.props.activeNavigation}
-                            fetchItems={this.props.fetchItems}/>
-                    }
                 </section>,
                 <section key="contentMain" className="content-main">
                     <div className="wire-column--3">
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
+                            {isMobile && <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                                {this.state.withSidebar &&
+                                    <SearchSidebar
+                                        tabs={this.tabs.filter((t) => t.id === 'nav')}
+                                        props={{...this.props, groups: []}} />
+                                }
+                            </div>}
+                            {!this.props.bookmarks && !isMobile &&
+                                <div className="wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap">
+                                    <Navigations
+                                        navigations={this.props.navigations}
+                                        toggleNavigation={this.props.toggleNavigation}
+                                        activeNavigation={this.props.activeNavigation}
+                                        fetchItems={this.props.fetchItems}/>
+                                </div>
+                            }
                             <SearchResultsInfo
                                 user={this.props.user}
                                 query={this.props.activeQuery}
