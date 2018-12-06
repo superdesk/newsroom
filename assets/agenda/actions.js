@@ -508,6 +508,8 @@ export function fetchNewItems() {
 
 export function toggleDropdownFilter(key, val) {
     return (dispatch) => {
+        dispatch(setActive(null));
+        dispatch(preview(null));
         dispatch(toggleFilter(key, val, true));
         dispatch(fetchItems());
     };

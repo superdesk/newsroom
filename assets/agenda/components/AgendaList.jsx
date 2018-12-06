@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { get } from 'lodash';
+import { get, isEqual } from 'lodash';
 import classNames from 'classnames';
 
 import { gettext } from 'utils';
@@ -135,7 +135,8 @@ class AgendaList extends React.Component {
     }
 
     componentDidUpdate(nextProps) {
-        if ((nextProps.activeDate || this.props.activeDate) && (nextProps.activeDate !== this.props.activeDate)) {
+        if (!isEqual(nextProps.activeDate, this.props.activeDate) ||
+          !isEqual(nextProps.activeFilter, this.props.activeFilter)) {
             this.elem.scrollTop = 0;
         }
     }
@@ -208,6 +209,7 @@ AgendaList.propTypes = {
     activeView: PropTypes.string,
     groupedItems: PropTypes.object,
     activeDate: PropTypes.number,
+    activeFilter: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -222,6 +224,7 @@ const mapStateToProps = (state) => ({
     company: state.company,
     groupedItems: groupedItemsSelector(state),
     activeDate: get(state, 'agenda.activeDate'),
+    activeFilter: get(state, 'search.activeFilter'),
 });
 
 export default connect(mapStateToProps)(AgendaList);
