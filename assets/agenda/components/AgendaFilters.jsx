@@ -19,7 +19,7 @@ const filters = [{
     field: 'place',
     icon: 'icon-small--region'
 }, {
-    label: gettext('Any coverage'),
+    label: gettext('Any coverage type'),
     field: 'coverage',
     nestedField: 'coverage_type',
     icon: 'icon-small--coverage-text',
