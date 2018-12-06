@@ -8,4 +8,5 @@ CONTACT_ADDRESS_EN = 'https://stt.fi/en/contact/'
 
 INSTALLED_APPS = [
     'stt.external_links',
+    'stt.filters',
 ]
