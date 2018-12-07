@@ -1,7 +1,6 @@
 import { get } from 'lodash';
 import analytics from 'analytics';
 import { renderModal } from 'actions';
-import { updateRouteParams } from 'utils';
 
 
 export const SET_QUERY = 'SET_QUERY';
@@ -17,9 +16,8 @@ export function toggleTopic(topic) {
 
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
 export function toggleNavigation(navigation) {
-    return (dispatch, getState) => {
+    return (dispatch) => {
         dispatch(setQuery(''));
-        updateRouteParams({navigation: get(navigation, '_id')}, getState());
         dispatch({type: TOGGLE_NAVIGATION, navigation});
     };
 }
