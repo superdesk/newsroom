@@ -136,7 +136,8 @@ class AgendaList extends React.Component {
 
     componentDidUpdate(nextProps) {
         if (!isEqual(nextProps.activeDate, this.props.activeDate) ||
-          !isEqual(nextProps.activeFilter, this.props.activeFilter)) {
+          !isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
+          (this.props.resultsFiltered && isEqual(nextProps.activeFilter, this.props.activeFilter))) {
             this.elem.scrollTop = 0;
         }
     }
@@ -210,6 +211,8 @@ AgendaList.propTypes = {
     groupedItems: PropTypes.object,
     activeDate: PropTypes.number,
     activeFilter: PropTypes.object,
+    activeNavigation: PropTypes.string,
+    resultsFiltered: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -225,6 +228,8 @@ const mapStateToProps = (state) => ({
     groupedItems: groupedItemsSelector(state),
     activeDate: get(state, 'agenda.activeDate'),
     activeFilter: get(state, 'search.activeFilter'),
+    activeNavigation: get(state, 'search.activeNavigation', null),
+    resultsFiltered: state.resultsFiltered,
 });
 
 export default connect(mapStateToProps)(AgendaList);
