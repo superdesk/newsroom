@@ -121,7 +121,7 @@ export function postCard() {
 
         if (card.type === '2x2-events') {
             [...Array(4)].forEach((_, i) => {
-                const input = document.getElementById(`event_${i}_file`);
+                const input = document.getElementById(`config.events[${i}].file`);
                 if (input && input.files.length > 0) {
                     data.append(`file${i}`, input.files[0]);
                 }
