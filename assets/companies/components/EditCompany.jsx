@@ -8,12 +8,7 @@ import DateInput from 'components/DateInput';
 import { isEmpty } from 'lodash';
 import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
 import CompanyPermissions from './CompanyPermissions';
-
-const countries = [
-    {value: 'au', text: gettext('Australia')},
-    {value: 'nz', text: gettext('New Zealand')},
-    {value: 'other', text: gettext('Other')},
-];
+import { countries } from '../utils';
 
 class EditCompany extends React.Component {
     constructor(props) {

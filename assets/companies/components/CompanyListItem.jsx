@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, shortDate, isInPast } from 'utils';
-
+import { getCountryLabel } from '../utils';
 
 function CompanyListItem({company, isActive, onClick}) {
     return (
@@ -15,7 +15,7 @@ function CompanyListItem({company, isActive, onClick}) {
             </td>
             <td>{company.contact_name}</td>
             <td>{company.phone}</td>
-            <td>{company.country}</td>
+            <td>{getCountryLabel(company.country)}</td>
             <td>{shortDate(company._created)}</td>
             <td>{company.expiry_date && shortDate(company.expiry_date)}</td>
         </tr>
