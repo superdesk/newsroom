@@ -45,7 +45,7 @@
                 <div class="card-body pt-1">
                     <form class="form" role="form" method="post" action="{{ url_for('auth.set_locale') }}">
                         <div class="form-group">
-                            <label for="language">Language</label>
+                            <label for="language">{{ gettext('Language') }}</label>
                             <div class="field">
                                 <select name="locale" class="form-control" onchange="this.form.submit()">
                                     {% for locale in get_client_locales() %}
