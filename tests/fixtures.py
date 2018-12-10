@@ -70,6 +70,7 @@ agenda_items = [{
     'versioncreated': datetime(2018, 6, 27, 11, 12, 4, tzinfo=utc),
     'name': 'Conference Planning',
     'slugline': 'Prime Conference',
+    'internal_note': 'Internal message for agenda',
     'planning_items': [
         {
             'versioncreated': '2018-06-27T11:07:17+0000',
@@ -90,11 +91,39 @@ agenda_items = [{
             'agendas': [],
             '_current_version': 1,
             'coverages': [],
-            'type': 'planning'
+            'type': 'planning',
+            'internal_note': 'Internal message for planning'
         }
     ],
     '_created': '2018-06-27T11:12:07+0000',
-    'coverages': [],
+    'coverages': [
+        {
+            'firstcreated': '2018-06-27T11:07:17+0000',
+            'planning': {
+                'g2_content_type': 'text',
+                'genre': [
+                    {
+                        'name': 'Article',
+                        'qcode': 'Article'
+                    }
+                ],
+                'ednote': 'An editorial Note',
+                'keyword': [
+                    'Motoring'
+                ],
+                'scheduled': '2018-04-09T14:00:53.000Z',
+                'slugline': 'Raiders',
+                'internal_note': 'Internal message for coverage'
+            },
+            'workflow_status': 'active',
+            'coverage_id': 'urn:coverage',
+            'news_coverage_status': {
+                'label': 'Planned',
+                'name': 'coverage intended',
+                'qcode': 'ncostat:int'
+            }
+        }
+    ],
     'dates': {
         'end': datetime(2018, 7, 20, 4, 0, 0, tzinfo=utc),
         'start': datetime(2018, 7, 20, 4, 0, 0, tzinfo=utc),
@@ -102,7 +131,8 @@ agenda_items = [{
     'event': {
         "definition_short": "Blah Blah",
         "pubstatus": "usable",
-        "files": [{'media': 'media', 'name': 'test.txt', 'mimetype': 'text/plain'}]
+        "files": [{'media': 'media', 'name': 'test.txt', 'mimetype': 'text/plain'}],
+        'internal_note': 'Internal message for event',
     },
     'firstcreated': '2018-06-27T11:12:04+0000',
     '_current_version': 1,

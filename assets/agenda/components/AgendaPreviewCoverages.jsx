@@ -12,7 +12,7 @@ export default function AgendaPreviewCoverages({item}) {
 
     return (
         <PreviewBox label={gettext('Coverages')}>
-            <AgendaCoverages coverages={item.coverages} />
+            <AgendaCoverages item={item} />
         </PreviewBox>
     );
 }

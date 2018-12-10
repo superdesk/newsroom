@@ -378,6 +378,34 @@ export function getAttachments(item) {
 }
 
 /**
+ * Get list of internal notes
+ *
+ * @param {Object} item
+ * @return {Array}
+ */
+export function getInternalNotes(item) {
+    const internalNotes = [];
+    internalNotes.push(get(item, 'event.internal_note'));
+    get(item, 'planning_items', []).forEach(p => internalNotes.push(p.internal_note));
+    return internalNotes.filter(note => !!note);
+}
+
+/**
+ * Get internal notes per coverage
+ *
+ * @param {Object} item
+ * @return {Object}
+ */
+export function getInternalNotesFromCoverages(item) {
+    const internalNotes = {};
+    const planningItems = get(item, 'planning_items', []);
+    planningItems.forEach(p => get(p, 'coverages', []).forEach(c => {
+        internalNotes[c.coverage_id] = get(c, 'planning.internal_note');
+    }));
+    return internalNotes;
+}
+
+/**
  * Test if item has any attachments
  * 
  * @param {Object} item
