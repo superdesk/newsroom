@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getInternalNotes} from '../utils';
 
-export default function AgendaInternalNote({item}) {
-    const internalNotes = getInternalNotes(item);
+export default function AgendaInternalNote({internalNotes}) {
 
     if (!internalNotes || !internalNotes.length) {
         return null;
@@ -18,5 +16,5 @@ export default function AgendaInternalNote({item}) {
 }
 
 AgendaInternalNote.propTypes = {
-    item: PropTypes.object.isRequired,
+    internalNotes: PropTypes.array,
 };

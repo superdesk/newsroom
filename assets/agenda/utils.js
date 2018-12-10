@@ -391,6 +391,21 @@ export function getInternalNotes(item) {
 }
 
 /**
+ * Get internal notes per coverage
+ *
+ * @param {Object} item
+ * @return {Object}
+ */
+export function getInternalNotesFromCoverages(item) {
+    const internalNotes = {};
+    const planningItems = get(item, 'planning_items', []);
+    planningItems.forEach(p => get(p, 'coverages', []).forEach(c => {
+        internalNotes[c.coverage_id] = get(c, 'planning.internal_note');
+    }));
+    return internalNotes;
+}
+
+/**
  * Test if item has any attachments
  * 
  * @param {Object} item

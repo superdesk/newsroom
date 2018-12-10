@@ -3,15 +3,18 @@ import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import { gettext, formatCoverageDate } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
-import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS} from '../utils';
+import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, getInternalNotesFromCoverages} from '../utils';
+import AgendaInternalNote from './AgendaInternalNote';
 
 
-export default function AgendaCoverages({coverages}) {
-    if (isEmpty(coverages)) {
+export default function AgendaCoverages({item}) {
+    if (isEmpty(item.coverages)) {
         return null;
     }
 
-    return coverages.map((coverage) => (
+    const internalNotes = getInternalNotesFromCoverages(item);
+
+    return item.coverages.map((coverage) => (
         <div className='coverage-item' key={coverage.coverage_id}>
             <div className='coverage-item__row'>
                 <span className='d-flex coverage-item--element-grow text-overflow-ellipsis'>
@@ -30,10 +33,14 @@ export default function AgendaCoverages({coverages}) {
                 {coverage.coverage_provider && <span className='mr-2'>{coverage.coverage_provider}</span>}
                 <CoverageItemStatus coverage={coverage} />
             </div>
+
+            {!isEmpty(internalNotes) && internalNotes[coverage.coverage_id] && <div className='coverage-item__row'>
+                <AgendaInternalNote internalNotes={[internalNotes[coverage.coverage_id]]} />
+            </div>}
         </div>
     ));
 }
 
 AgendaCoverages.propTypes = {
-    coverages: PropTypes.array,
+    item: PropTypes.object
 };

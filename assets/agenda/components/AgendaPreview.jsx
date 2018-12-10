@@ -8,7 +8,7 @@ import PreviewActionButtons from 'components/PreviewActionButtons';
 
 import Preview from 'ui/components/Preview';
 
-import {hasCoverages, isCanceled, isPostponed, isRescheduled} from '../utils';
+import {hasCoverages, isCanceled, isPostponed, isRescheduled, getInternalNotes} from '../utils';
 import AgendaName from './AgendaName';
 import AgendaTime from './AgendaTime';
 import AgendaMeta from './AgendaMeta';
@@ -64,7 +64,7 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                             <AgendaPreviewAttachments item={item} />
                             <AgendaEdNote item={item} />
-                            <AgendaInternalNote item={item} />
+                            <AgendaInternalNote internalNotes={getInternalNotes(item)} />
                         </div>
                     </Preview>
                 }
