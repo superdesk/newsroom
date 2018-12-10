@@ -151,7 +151,7 @@ export function copyPreviewContents(item) {
             contents.push(gettext('Contacts'));
             contacts.map(contact => {
                 contents.push(gettext('Name: {{ contact }}', {contact: contact.name}));
-                contact.organization && contents.push(gettext('Organisation: {{ organization }}', {organization: contact.organization}));
+                contact.organisation && contents.push(gettext('Organisation: {{ organisation }}', {organisation: contact.organisation}));
                 contact.contact_email && contents.push(gettext('Email: {{ email }}', {email: contact.contact_email}));
                 contact.phone && contents.push(gettext('Phone: {{ phone }}', {phone: contact.phone}));
                 contact.mobile && contents.push(gettext('Mobile: {{ mobile }}', {mobile: contact.mobile}));
