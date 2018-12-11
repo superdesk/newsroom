@@ -10,8 +10,8 @@ from . import views  # noqa
 def init_app(app):
     superdesk.register_resource('am_news_search', AmNewsSearchResource, AmNewsSearchService, _app=app)
 
-    app.section('am_news', 'AM News')
-    app.sidenav('AM News', 'am_news.index', 'am', section='am_news')
+    app.section('am_news', 'AM')
+    app.sidenav('AM', 'am_news.index', 'clock', section='am_news')
 
     app.sidenav('Saved Items', 'am_news.bookmarks', 'bookmark',
                 group=1, blueprint='am_news', badge='saved-items-count')
