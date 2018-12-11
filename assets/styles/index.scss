@@ -159,11 +159,18 @@ body.print {
       a, span {
           display: block;
           height: 56px;
-          padding: 0 10px;
+          padding: 0 8px;
           line-height: 56px;
           text-align: center;
+          @media screen and (min-width: 576px) and (max-height: 820px) {
+            height: 40px;
+            line-height: 40px;
+          }
           i {
               vertical-align: middle;
+          }
+          @include sm {
+            padding: 0 10px;
           }
       }
   }
@@ -184,11 +191,13 @@ body.print {
 
 .sidenav-icons__item--report {
   position: absolute;
-  bottom: 40px;
+  bottom: 0;
   left: auto;
-  right: 0;
+  right: 38px;
   @include sm {
       left: 0;
+      right: 0;
+      bottom: 40px;
   }
 }
 
@@ -2376,11 +2385,6 @@ a.wire-articles__versions {
 }
 
 .wire-column__preview__editorial-note {
-    font-size: 0.815rem;
-    margin-top: 30px;
-}
-
-.wire-column__preview__internal-note {
     font-size: 0.815rem;
     margin-top: 30px;
 }

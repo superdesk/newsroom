@@ -70,7 +70,7 @@
                 {% for group in range(0, 10) %}
                     {% for nav in sidenavs(request.blueprint)|selectattr("group", "equalto", group) %}
                     {% if group > 0 and loop.first and loop.length %}
-                    <li class="sidenav-icons__item"><span><i class="icon--more icon--rotate-90 icon--mid-blue"></i></span></li>
+                    <li class="sidenav-icons__item d-none d-sm-block"><span><i class="icon--more icon--rotate-90 icon--mid-blue"></i></span></li>
                     {% endif %}
 
                     <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint %}active{% endif %} {% if nav.badge or nav.url %}badge--top-right{% endif %}">
