@@ -18,11 +18,12 @@ import ArticleBody from 'ui/components/ArticleBody';
 import ArticleSidebar from 'ui/components/ArticleSidebar';
 import ArticleSidebarBox from 'ui/components/ArticleSidebarBox';
 
-import { hasCoverages, hasAttachments } from '../utils';
+import {hasCoverages, hasAttachments, getInternalNotes} from '../utils';
 
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
+import AgendaInternalNote from './AgendaInternalNote';
 import AgendaCoverages from './AgendaCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
@@ -56,7 +57,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                 </ArticleBody>
                 <ArticleSidebar>
                     <ArticleSidebarBox label={gettext('Coverages')}>
-                        {hasCoverages(item) && <AgendaCoverages coverages={item.coverages} />}
+                        {hasCoverages(item) && <AgendaCoverages item={item} />}
                         <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                     </ArticleSidebarBox>
                     {hasAttachments(item) && (
@@ -65,6 +66,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                         </ArticleSidebarBox>
                     )}
                     <AgendaEdNote item={item} />
+                    <AgendaInternalNote internalNotes={getInternalNotes(item)} />
                 </ArticleSidebar>
             </Article>
         </Content>

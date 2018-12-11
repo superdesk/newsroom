@@ -17,5 +17,9 @@
 .badge--icon {
   padding: 0;
   top: 10px !important;
-  right: 11px !important;
+  right: 2px !important;
+
+  @include sm {
+    right: 11px !important;
+  }
 }

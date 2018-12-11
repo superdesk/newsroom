@@ -2,6 +2,7 @@ import { get } from 'lodash';
 import analytics from 'analytics';
 import { renderModal } from 'actions';
 
+
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query) {
     query && analytics.event('search', query);
@@ -48,8 +49,9 @@ export function setView(view) {
  * @param {String} topic
  * @param {String} type
  */
-export function followTopic(topic, type) {
+export function followTopic(topic, type, navigation) {
     topic.topic_type = type;
+    topic.navigation = navigation;
     return renderModal('followTopic', {topic});
 }
 

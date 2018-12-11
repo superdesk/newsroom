@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { get } from 'lodash';
+import { get, isEqual } from 'lodash';
 import classNames from 'classnames';
 
 import { gettext } from 'utils';
@@ -37,16 +37,19 @@ class AgendaList extends React.Component {
         this.onItemDoubleClick = this.onItemDoubleClick.bind(this);
         this.onActionList = this.onActionList.bind(this);
         this.filterActions = this.filterActions.bind(this);
+        this.resetActioningItem = this.resetActioningItem.bind(this);
     }
 
     onKeyDown(event) {
         let diff = 0;
         switch (event.key) {
         case 'ArrowDown':
+            this.setState({actioningItem: null});
             diff = 1;
             break;
 
         case 'ArrowUp':
+            this.setState({actioningItem: null});
             diff = -1;
             break;
 
@@ -108,6 +111,10 @@ class AgendaList extends React.Component {
         }, CLICK_TIMEOUT);
     }
 
+    resetActioningItem() {
+        this.setState({actioningItem: null});
+    }
+
     onItemDoubleClick(item, group) {
         this.cancelClickTimeout();
         this.props.dispatch(setActive(item._id));
@@ -128,7 +135,9 @@ class AgendaList extends React.Component {
     }
 
     componentDidUpdate(nextProps) {
-        if ((nextProps.activeDate || this.props.activeDate) && (nextProps.activeDate !== this.props.activeDate)) {
+        if (!isEqual(nextProps.activeDate, this.props.activeDate) ||
+          !isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
+          (this.props.resultsFiltered && isEqual(nextProps.activeFilter, this.props.activeFilter))) {
             this.elem.scrollTop = 0;
         }
     }
@@ -158,6 +167,8 @@ class AgendaList extends React.Component {
                         actions={this.filterActions(itemsById[_id])}
                         isExtended={isExtended}
                         user={this.props.user}
+                        actioningItem={this.state.actioningItem}
+                        resetActioningItem={this.resetActioningItem}
                     />)}
                 </div>
             ]
@@ -199,6 +210,9 @@ AgendaList.propTypes = {
     activeView: PropTypes.string,
     groupedItems: PropTypes.object,
     activeDate: PropTypes.number,
+    activeFilter: PropTypes.object,
+    activeNavigation: PropTypes.string,
+    resultsFiltered: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -213,6 +227,9 @@ const mapStateToProps = (state) => ({
     company: state.company,
     groupedItems: groupedItemsSelector(state),
     activeDate: get(state, 'agenda.activeDate'),
+    activeFilter: get(state, 'search.activeFilter'),
+    activeNavigation: get(state, 'search.activeNavigation', null),
+    resultsFiltered: state.resultsFiltered,
 });
 
 export default connect(mapStateToProps)(AgendaList);

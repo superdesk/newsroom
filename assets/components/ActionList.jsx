@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import ActionButton from './ActionButton';
 
 
-function ActionList({item, user, actions}) {
+function ActionList({item, user, actions, onMouseLeave}) {
     return (
-        <div>
+        <div onMouseLeave={onMouseLeave}>
             {actions.map((action) => !action.shortcut &&
                 <ActionButton
                     key={action.name}
@@ -27,7 +27,8 @@ ActionList.propTypes = {
         name: PropTypes.string.isRequired,
         icon: PropTypes.string.isRequired,
         action: PropTypes.func.isRequired,
-    }))
+    })),
+    onMouseLeave: PropTypes.func,
 };
 
 export default ActionList;

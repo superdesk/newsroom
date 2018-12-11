@@ -41,6 +41,11 @@ def item(_id):
     user = get_user()
     if not is_admin_or_internal(user):
         item.get('event', {}).pop('files', None)
+        planning_items = item.get('planning_items', [])
+        [item.pop('internal_note', None) for item in planning_items]
+        coverages = item.get('coverages', [])
+        [c.get('planning', {}).pop('internal_note', None) for c in coverages]
+        item.get('event', {}).pop('internal_note', None)
 
     if is_json_request(flask.request):
         return flask.jsonify(item)

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, shortDate } from 'utils';
+import {getUserLabel} from '../utils';
 
 
 function UserListItem({user, isActive, onClick, companiesById}) {
@@ -13,7 +14,7 @@ function UserListItem({user, isActive, onClick, companiesById}) {
             <td>{user.phone}</td>
             <td>{user.mobile}</td>
             <td>{user.role}</td>
-            <td>{user.user_type}</td>
+            <td>{getUserLabel(user.user_type)}</td>
             <td>{(user.company && companiesById ? companiesById[user.company].name : null)}</td>
             <td>{(user.is_approved ? gettext('Approved') : gettext('Needs Approval'))} -
                 {(user.is_enabled ? gettext('Enabled') : gettext('Disabled'))}</td>

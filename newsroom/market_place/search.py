@@ -1,5 +1,6 @@
 import logging
 from newsroom.wire.search import WireSearchResource, WireSearchService
+from newsroom.market_place import SECTION_ID
 
 logger = logging.getLogger(__name__)
 
@@ -9,4 +10,4 @@ class MarketPlaceSearchResource(WireSearchResource):
 
 
 class MarketPlaceSearchService(WireSearchService):
-    section = 'market_place'
+    section = SECTION_ID

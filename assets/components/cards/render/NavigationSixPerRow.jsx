@@ -4,13 +4,12 @@ import {get} from 'lodash';
 import NavigationCard from './NavigationCard';
 
 
-function NavigationSixPerRow({card, onNavigationClick}) {
+function NavigationSixPerRow({card}) {
     const navigations = get(card, 'config.navigations') || [];
 
     const cards = navigations.map((nav) => <NavigationCard
         navigation={nav}
-        key={nav._id}
-        onClickHandler={onNavigationClick}/>);
+        key={nav._id} />);
 
     if (get(cards, 'length', 0) === 0) {
         return null;
@@ -28,7 +27,6 @@ function NavigationSixPerRow({card, onNavigationClick}) {
 
 NavigationSixPerRow.propTypes = {
     card: PropTypes.object.isRequired,
-    onNavigationClick: PropTypes.func,
 };
 
 export default NavigationSixPerRow;

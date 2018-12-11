@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 
-{% block title %}{{ gettext('Market Place') }}{% endblock %}
+{% block title %}{{ data.title }}{% endblock %}
 
 {% block breadcrumb %}
-<span class="breadcrumb-item active">{{ gettext('Market Place') }}</span>
+<span class="breadcrumb-item active">{{ data.title }}</span>
 <span id="nav-breadcrumb" class="breadcrumb-item active"></span>
 {% endblock %}
 

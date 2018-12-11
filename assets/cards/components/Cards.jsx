@@ -103,6 +103,7 @@ class Cards extends React.Component {
                         saveProducts={this.props.saveProducts}
                         fetchProducts={this.props.fetchProducts}
                         navigations={this.props.navigations}
+                        dashboards={this.props.dashboards}
                     />
                 }
             </div>
@@ -130,6 +131,7 @@ Cards.propTypes = {
     fetchProducts: PropTypes.func.isRequired,
     navigations: PropTypes.arrayOf(PropTypes.object),
     activeDashboard: PropTypes.string.isRequired,
+    dashboards: PropTypes.arrayOf(PropTypes.object),
 };
 
 const mapStateToProps = (state) => ({
@@ -143,6 +145,7 @@ const mapStateToProps = (state) => ({
     products: state.products,
     navigations: state.navigations,
     activeDashboard: state.dashboards.active,
+    dashboards: state.dashboards.list,
 });
 
 const mapDispatchToProps = (dispatch) => ({
