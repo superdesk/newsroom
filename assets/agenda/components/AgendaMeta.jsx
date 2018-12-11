@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {hasLocation, getEventLinks, getLocationString, getPublicContacts} from 'agenda/utils';
+import {hasLocation, getEventLinks, getLocationString, getPublicContacts, getCalendars} from 'agenda/utils';
 
 
 function AgendaPreviewMeta({item}) {
@@ -23,6 +23,10 @@ function AgendaPreviewMeta({item}) {
                     <i className='icon-small--globe icon--gray'></i>
                     <span><a href={link} target="_blank">{link}</a></span>
                 </div>)}
+                {getCalendars(item) && <div className='wire-articles__item__meta-row'>
+                    <i className='icon-small--calendar icon--gray'></i>
+                    <span>{getCalendars(item)}</span>
+                </div>}
             </div>
         </div>
     );
