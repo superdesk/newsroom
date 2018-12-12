@@ -1,4 +1,4 @@
-import { get, isEmpty, includes } from 'lodash';
+import { get, isEmpty, includes, uniqBy } from 'lodash';
 import moment from 'moment/moment';
 import {formatDate, formatMonth, formatWeek, getConfig, gettext} from '../utils';
 
@@ -421,7 +421,7 @@ export function getSubjects(item) {
         });
     });
 
-    return subjects.filter(subject => !isEmpty(subject));
+    return uniqBy(subjects.filter(subject => !isEmpty(subject)), 'qcode');
 }
 
 /**
