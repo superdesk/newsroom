@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
+
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 
@@ -12,6 +14,8 @@ class EditProduct extends React.Component {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getPoductTestButton = this.getPoductTestButton.bind(this);
+        this.getQueryString = this.getQueryString.bind(this);
+
         this.state = {
             activeTab: 'product-details',
             activeProduct: props.product._id,
@@ -35,7 +39,17 @@ class EditProduct extends React.Component {
     }
 
     getPoductTestButton(product) {
-        const q = getProductQuery(product);
+        let q;
+
+        if (product.product_type === 'agenda') {
+            q = JSON.stringify({
+                query: product.query,
+                planning_item_query: product.planning_item_query
+            });
+        } else {
+            q = getProductQuery(product);
+        }
+
 
         if (q) {
             return (
@@ -44,6 +58,13 @@ class EditProduct extends React.Component {
                 </a>
             );
         }
+    }
+
+    getQueryString(product, field) {
+        if (get(product, field) && product.product_type === 'agenda') {
+            return JSON.stringify({[field]: get(product, field)});
+        }
+        return get(product, field);
     }
 
     render() {
@@ -117,10 +138,24 @@ class EditProduct extends React.Component {
                                             onChange={this.props.onChange}
                                         />
                                         {this.props.product.query &&
-                                        <a href={`/${this.props.product.product_type || 'wire'}?q=${this.props.product.query}`} target="_blank"
+                                        <a href={`/${this.props.product.product_type || 'wire'}?q=${this.getQueryString(this.props.product, 'query')}`} target="_blank"
                                             className='btn btn-outline-secondary float-right mt-3'>{gettext('Test query')}
                                         </a>}
                                     </div>
+
+                                    {this.props.product.product_type === 'agenda' && <div className="form-group">
+                                        <label htmlFor="query">{gettext('Planning Item Query')}</label>
+                                        <textarea className="form-control"
+                                            id="planning_item_query"
+                                            name="planning_item_query"
+                                            value={this.props.product.planning_item_query || ''}
+                                            onChange={this.props.onChange}
+                                        />
+                                        {this.props.product.planning_item_query &&
+                                        <a href={`/${this.props.product.product_type || 'wire'}?q=${this.getQueryString(this.props.product, 'planning_item_query')}`} target="_blank"
+                                            className='btn btn-outline-secondary float-right mt-3'>{gettext('Test Planning Item query')}
+                                        </a>}
+                                    </div>}
 
                                     <CheckboxInput
                                         name='is_enabled'

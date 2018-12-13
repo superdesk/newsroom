@@ -112,6 +112,7 @@ export function defaultReducer(state, action) {
             readItems,
             previewItem: action.item ? action.item._id : null,
             previewGroup: action.group,
+            previewPlan: action.plan,
         };
     }
 
@@ -129,6 +130,7 @@ export function defaultReducer(state, action) {
             itemsById,
             openItem: action.item || null,
             previewGroup: action.group || null,
+            previewPlan: action.plan,
         };
     }
 

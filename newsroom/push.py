@@ -9,13 +9,12 @@ from copy import copy, deepcopy
 from PIL import Image, ImageEnhance
 from flask import current_app as app, url_for
 from flask_babel import gettext
-from eve_elastic.elastic import parse_date
 
 from superdesk.utc import utcnow
 from superdesk.text_utils import get_word_count
 from newsroom.notifications import push_notification
 from newsroom.topics.topics import get_wire_notification_topics, get_agenda_notification_topics
-from newsroom.utils import parse_dates, get_user_dict, get_company_dict
+from newsroom.utils import parse_dates, get_user_dict, get_company_dict, parse_date_str
 from newsroom.email import send_new_item_notification_email, \
     send_history_match_notification_email, send_item_killed_notification_email
 from newsroom.history import get_history_users
@@ -212,7 +211,7 @@ def publish_planning(planning):
     agenda = None
 
     # update dates
-    planning['planning_date'] = datetime.strptime(planning['planning_date'], '%Y-%m-%dT%H:%M:%S+0000')
+    planning['planning_date'] = parse_date_str(planning['planning_date'])
 
     if planning.get('event_item'):
         # this is a planning for an event item
@@ -238,10 +237,10 @@ def publish_planning(planning):
         agenda = init_adhoc_agenda(planning)
 
     # update agenda metadata
-    set_agenda_metadata_from_planning(agenda, planning)
+    new_plan = set_agenda_metadata_from_planning(agenda, planning)
 
     # add the planning item to the list
-    set_agenda_planning_items(agenda, planning, action='add')
+    set_agenda_planning_items(agenda, planning, action='add' if new_plan else 'update')
 
     if not agenda.get('_id'):
         # setting _id of agenda to be equal to planning if there's no event id
@@ -286,23 +285,19 @@ def set_agenda_metadata_from_event(agenda, event):
     agenda['event_id'] = event['guid']
     agenda['recurrence_id'] = event.get('recurrence_id')
     agenda['name'] = event.get('name')
-    agenda['slugline'] = event.get('slugline', agenda.get('slugline'))
+    agenda['slugline'] = event.get('slugline')
     agenda['definition_short'] = event.get('definition_short')
     agenda['definition_long'] = event.get('definition_long')
     agenda['version'] = event.get('version')
     agenda['calendars'] = event.get('calendars')
     agenda['location'] = event.get('location')
-    agenda['ednote'] = event.get('ednote', agenda.get('ednote'))
+    agenda['ednote'] = event.get('ednote')
     agenda['state'] = event.get('state')
+    agenda['state_reason'] = event.get('state_reason')
     agenda['place'] = event.get('place')
     agenda['subject'] = format_qcode_items(event.get('subject'))
     agenda['products'] = event.get('products')
-
-    # only set service if available
-    service = format_qcode_items(event.get('anpa_category'))
-    if service:
-        agenda['service'] = service
-
+    agenda['service'] = format_qcode_items(event.get('anpa_category'))
     agenda['event'] = event
 
     set_dates(agenda)
@@ -316,47 +311,62 @@ def format_qcode_items(items=None):
 
 
 def set_agenda_metadata_from_planning(agenda, planning_item):
-    """Sets agenda metadata from a given planning.
+    """Sets agenda metadata from a given planning"""
 
-    Event data has priority, so don't override it, only add  planning if it's missing.
-    """
-    event = agenda.get('event', {})
     parse_dates(planning_item)
     set_dates(agenda)
 
-    def get(key):
-        return event.get(key) or planning_item.get(key) or agenda.get(key)
+    if not planning_item.get('event_item'):
+        # adhoc planning item
+        agenda['name'] = planning_item.get('name')
+        agenda['headline'] = planning_item.get('headline')
+        agenda['slugline'] = planning_item.get('slugline')
+        agenda['ednote'] = planning_item.get('ednote')
+        agenda['place'] = planning_item.get('place')
+        agenda['subject'] = format_qcode_items(planning_item.get('subject'))
+        agenda['products'] = planning_item.get('products')
+        agenda['urgency'] = planning_item.get('urgency')
+        agenda['definition_short'] = planning_item.get('description_text') or agenda.get('definition_short')
+        agenda['definition_long'] = planning_item.get('abstract') or agenda.get('definition_long')
+        agenda['service'] = format_qcode_items(planning_item.get('anpa_category'))
+        agenda['state'] = planning_item.get('state')
+        agenda['state_reason'] = planning_item.get('state_reason')
 
-    agenda['name'] = get('name')
-    agenda['headline'] = get('headline')
-    agenda['slugline'] = get('slugline')
-    agenda['abstract'] = get('abstract')
-    agenda['ednote'] = get('ednote')
-    agenda['place'] = get('place')
-    agenda['subject'] = unique_codes(
-        agenda.get('subject', []),
-        format_qcode_items(event.get('subject')),
-        format_qcode_items(planning_item.get('subject'))
-    )
-    agenda['products'] = get('products')
-    agenda['genre'] = planning_item.get('genre') or agenda.get('genre')
-    agenda['priority'] = planning_item.get('priority') or agenda.get('priority')
-    agenda['urgency'] = planning_item.get('urgency') or agenda.get('urgency')
-    agenda['definition_short'] = event.get('definition_short') \
-        or planning_item.get('description_text') \
-        or agenda.get('definition_short')
-    agenda['definition_long'] = event.get('definition_long') \
-        or planning_item.get('abstract') \
-        or agenda.get('definition_long')
+    if not agenda.get('planning_items'):
+        agenda['planning_items'] = []
 
-    service = unique_codes(
-        format_qcode_items(planning_item.get('anpa_category')),
-        format_qcode_items(event.get('anpa_category')),
-        format_qcode_items(agenda.get('service'))
+    new_plan = False
+    plan = next(
+        (p for p in (agenda.get('planning_items')) if p.get('guid') == planning_item.get('guid')), {}
     )
 
-    if service:
-        agenda['service'] = service
+    if not plan:
+        new_plan = True
+
+    plan['_id'] = planning_item.get('_id')
+    plan['guid'] = planning_item.get('guid')
+    plan['slugline'] = planning_item.get('slugline')
+    plan['description_text'] = planning_item.get('description_text')
+    plan['headline'] = planning_item.get('headline')
+    plan['abstract'] = planning_item.get('abstract')
+    plan['place'] = planning_item.get('place')
+    plan['subject'] = format_qcode_items(planning_item.get('subject'))
+    plan['service'] = format_qcode_items(planning_item.get('anpa_category'))
+    plan['urgency'] = planning_item.get('urgency')
+    plan['planning_date'] = planning_item.get('planning_date')
+    plan['coverages'] = planning_item.get('coverages')
+    plan['ednote'] = planning_item.get('ednote')
+    plan['internal_note'] = planning_item.get('internal_note')
+    plan['versioncreated'] = parse_date_str(planning_item.get('versioncreated'))
+    plan['firstcreated'] = parse_date_str(planning_item.get('firstcreated'))
+    plan['state'] = planning_item.get('state')
+    plan['state_reason'] = planning_item.get('state_reason')
+    plan['products'] = planning_item.get('products')
+
+    if new_plan:
+        agenda['planning_items'].append(plan)
+
+    return new_plan
 
 
 def set_agenda_planning_items(agenda, planning_item, action='add'):
@@ -364,17 +374,13 @@ def set_agenda_planning_items(agenda, planning_item, action='add'):
     Updates the list of planning items of agenda. If action is 'add' then adds the new one.
     And updates the list of coverages
     """
-    existing_planning_items = deepcopy(agenda.get('planning_items', []))
-    agenda['planning_items'] = [p for p in existing_planning_items if p['guid'] != planning_item['guid']] or []
-
     if action == 'add':
-        if len(existing_planning_items) == len(agenda['planning_items']):
-            # planning item is newly added
-            superdesk.get_resource_service('agenda').notify_agenda_update('planning_added', agenda)
-
-        agenda['planning_items'].append(planning_item)
+        # planning item is newly added
+        superdesk.get_resource_service('agenda').notify_agenda_update('planning_added', agenda)
 
     if action == 'remove':
+        existing_planning_items = deepcopy(agenda.get('planning_items', []))
+        agenda['planning_items'] = [p for p in existing_planning_items if p['guid'] != planning_item['guid']] or []
         superdesk.get_resource_service('agenda').notify_agenda_update('planning_cancelled', agenda)
 
     agenda['coverages'], coverage_changes = get_coverages(agenda['planning_items'], agenda.get('coverages', []))
@@ -392,12 +398,6 @@ def get_display_dates(agenda_date, planning_items):
     """
     display_dates = []
 
-    def parse_display_dates(date):
-        if type(date) == datetime:
-            return date
-        if date and type(date) == str:
-            return parse_date(date)
-
     def should_add(date):
         try:
             return not (agenda_date['start'].date() <= date.date() <= agenda_date['end'].date()) and \
@@ -407,14 +407,14 @@ def get_display_dates(agenda_date, planning_items):
 
     for planning_item in planning_items:
         if not planning_item.get('coverages'):
-            parsed_date = parse_display_dates(planning_item['planning_date'])
+            parsed_date = parse_date_str(planning_item['planning_date'])
             if should_add(parsed_date):
                 display_dates.append({
                     'date': parsed_date
                 })
 
-        for coverage in planning_item.get('coverages', []):
-            parsed_date = parse_display_dates(coverage['planning']['scheduled'])
+        for coverage in planning_item.get('coverages') or []:
+            parsed_date = parse_date_str(coverage['planning']['scheduled'])
             if should_add(parsed_date):
                 display_dates.append({
                     'date': parsed_date
@@ -439,7 +439,7 @@ def get_coverages(planning_items, original_coverages=[]):
     coverages = []
     coverage_changes = {}
     for planning_item in planning_items:
-        for coverage in planning_item.get('coverages', []):
+        for coverage in planning_item.get('coverages') or []:
             existing_coverage = get_existing_coverage(coverage['coverage_id'])
             new_coverage = {
                 'planning_id': planning_item['guid'],
@@ -659,18 +659,6 @@ def set_opacity(image, opacity=1):
     alpha = image.split()[3]
     alpha = ImageEnhance.Brightness(alpha).enhance(opacity)
     image.putalpha(alpha)
-
-
-def unique_codes(*groups):
-    """Get unique items from all lists using code."""
-    codes = set()
-    items = []
-    for group in groups:
-        for item in group:
-            if item.get('code') and item['code'] not in codes:
-                codes.add(item['code'])
-                items.append(item)
-    return items
 
 
 def publish_planning_featured(item):

@@ -21,6 +21,9 @@ class ProductsResource(newsroom.Resource):
         'query': {
             'type': 'string'
         },
+        'planning_item_query': {
+            'type': 'string'
+        },
         'is_enabled': {
             'type': 'boolean',
             'default': True

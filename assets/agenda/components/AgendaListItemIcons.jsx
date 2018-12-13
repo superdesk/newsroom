@@ -18,7 +18,7 @@ import AgendaMetaTime from './AgendaMetaTime';
 import {gettext, formatDate, formatTime} from 'utils';
 
 
-function AgendaListItemIcons({item, group, hideCoverages, row}) {
+function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
     const className = bem('wire-articles', 'item__meta', {
         row,
     });
@@ -56,19 +56,23 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
         return '';
     };
 
+
+
     return (
         <div className={className}>
             <AgendaMetaTime
                 item={item}
                 borderRight={true}
                 isRecurring={isRecurring(item)}
+                group={group}
             />
 
             {hasCoverages(item) && !hideCoverages &&
                 <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
                     {item.coverages.map((coverage) => {
                         const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
-                        return (!group || isCoverageForExtraDay(coverage, group) &&
+                        return (!group || (isCoverageForExtraDay(coverage, group) &&
+                            coverage.planning_id === planningItem._id) &&
                           <span
                               className='wire-articles__item__icon'
                               key={coverage.coverage_id}
@@ -94,6 +98,7 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
 
 AgendaListItemIcons.propTypes = {
     item: PropTypes.object,
+    planningItem: PropTypes.object,
     group: PropTypes.string,
     hideCoverages: PropTypes.bool,
     row: PropTypes.bool,

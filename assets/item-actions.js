@@ -19,7 +19,7 @@ export function getItemActions(dispatch, actions) {
             name: gettext('Open'),
             icon: 'text',
             when: (state) => !state.itemToOpen && !state.openItem,
-            action: (item) => dispatch(openItem(item)),
+            action: (item, group, plan) => dispatch(openItem(item, group, plan)),
         },
         {
             name: gettext('Share'),

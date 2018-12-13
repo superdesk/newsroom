@@ -1,6 +1,6 @@
-import { get, isEmpty, includes } from 'lodash';
+import { get, isEmpty, includes, keyBy, sortBy } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek, getConfig, gettext} from '../utils';
+import {formatDate, formatMonth, formatWeek, getConfig, gettext, DATE_FORMAT} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -383,11 +383,8 @@ export function getAttachments(item) {
  * @param {Object} item
  * @return {Array}
  */
-export function getInternalNotes(item) {
-    const internalNotes = [];
-    internalNotes.push(get(item, 'event.internal_note'));
-    (get(item, 'planning_items', []) || []).forEach(p => internalNotes.push(p.internal_note));
-    return internalNotes.filter(note => !!note);
+export function getInternalNote(item, plan) {
+    return get(plan, 'internal_note') || get(item, 'internal_note');
 }
 
 /**
@@ -412,7 +409,7 @@ export function getInternalNotesFromCoverages(item) {
  * @return {Array}
  */
 export function getSubjects(item) {
-    return get(item, 'subject', []);
+    return get(item, 'subject') || [];
 }
 
 /**
@@ -432,7 +429,18 @@ export function hasAttachments(item) {
  * @return {String}
  */
 export function getName(item) {
-    return item.name || item.headline;
+    return item.name || item.slugline || item.headline;
+}
+
+/**
+ * Get agenda item description
+ *
+ * @param {Object} item
+ * @param {Object} plan
+ * @return {String}
+ */
+export function getDescription(item, plan) {
+    return plan.description_text || item.definition_short;
 }
 
 
@@ -497,5 +505,89 @@ export function groupItems (items, activeDate, activeGrouping) {
         }
     });
 
-    return groupedItems;
+    return sortBy(Object.keys(groupedItems).map((k) => ({date: k, items: groupedItems[k]})), 'date');
+}
+
+/**
+ * Get Planning Item for the day
+ * @param item: Agenda item
+ * @param group: Group Date
+ */
+export function getPlanningItemsByGroup(item, group) {
+    if (get(item, 'planning_items.length', 0) === 0) {
+        return [];
+    }
+
+    if (get(item, 'coverages.length', 0) === 0) {
+        return [];
+    }
+
+    const allPlans = keyBy(get(item, 'planning_items'), '_id');
+    const processed = {};
+
+    // get unique plans for that group based on the coverage.
+    const plans = item.coverages
+        .map((coverage) => {
+            if (isCoverageForExtraDay(coverage, group)) {
+                if (!processed[coverage.planning_id]) {
+                    processed[coverage.planning_id] = 1;
+                    return allPlans[coverage.planning_id];
+                }
+                return null;
+            }
+            return null;
+        })
+        .filter((p) => p);
+
+    if (plans.length === 0) {
+        return [];
+    }
+
+    return plans;
+}
+
+export function isCoverageOnPreviousDay(coverage, group) {
+    return moment(coverage.scheduled).isBefore(moment(group, DATE_FORMAT), 'day');
+}
+
+
+export function getCoveragesForDisplay(item, plan, group) {
+    const currentCoverage = [];
+    const previousCoverage = [];
+    // get current and preview coverages
+    if (!get(plan, 'guid')) {
+        currentCoverage.push(...(get(item, 'coverages') || []));
+    } else {
+        get(item, 'coverages', [])
+            .forEach((coverage) => {
+                if (coverage.planning_id === get(plan, 'guid')) {
+                    if (isCoverageForExtraDay(coverage, group)) {
+                        currentCoverage.push(coverage);
+                    } else if (isCoverageOnPreviousDay(coverage, group)) {
+                        previousCoverage.push(coverage);
+                    }
+                }
+            });
+    }
+
+    return {current: currentCoverage, previous: previousCoverage};
+}
+
+export function getListItems(groups, itemsById) {
+    const listItems = [];
+
+    groups.forEach((group) => {
+        group.items.forEach((_id) => {
+            const plans = getPlanningItemsByGroup(itemsById[_id], group.date);
+            // console.log(plans);
+            if (plans.length > 0) {
+                plans.forEach((plan) => {
+                    listItems.push({_id, group: group.date, plan});
+                });
+            } else {
+                listItems.push({_id, group: group.date, plan: null});
+            }
+        });
+    });
+    return listItems;
 }

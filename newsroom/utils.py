@@ -70,10 +70,16 @@ def get_type():
     return types[item_type]
 
 
+def parse_date_str(date):
+    if date and isinstance(date, str):
+        return parse_date(date)
+    return date
+
+
 def parse_dates(item):
     for field in ['firstcreated', 'versioncreated', 'embargoed']:
-        if item.get(field) and type(item[field]) == str:
-            item[field] = parse_date(item[field])
+        if parse_date_str(item.get(field)):
+            item[field] = parse_date_str(item[field])
 
 
 def get_entity_dict(items):
@@ -114,3 +120,15 @@ def filter_active_users(user_ids, user_dict, company_dict):
         if user and (not user.get('company') or str(user.get('company', '')) in company_dict):
             active.append(_id)
     return active
+
+
+def unique_codes(key, *groups):
+    """Get unique items from all lists using code."""
+    codes = set()
+    items = []
+    for group in groups:
+        for item in group:
+            if item.get(key) and item[key] not in codes:
+                codes.add(item[key])
+                items.append(item)
+    return items

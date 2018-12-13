@@ -67,7 +67,8 @@ class AgendaApp extends BaseApp {
             'wire-articles__two-side-panes': panesCount === 2,
         });
 
-        const onDetailClose = this.props.detail ? null : () => this.props.actions.filter(a => a.id == 'open')[0].action(null);
+        const onDetailClose = this.props.detail ? null :
+            () => this.props.actions.filter(a => a.id == 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
 
         const groups = [
             {
@@ -96,6 +97,7 @@ class AgendaApp extends BaseApp {
                 onClose={onDetailClose}
                 requestCoverage={this.props.requestCoverage}
                 group={this.props.previewGroup}
+                plan={this.props.previewPlan}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar
@@ -169,6 +171,7 @@ class AgendaApp extends BaseApp {
                                 activeNavigation={this.props.activeNavigation}
                                 newsOnly={this.props.newsOnly}
                                 scrollClass={this.state.scrollClass}
+                                hideTotalItems={false}
                             />
 
                             <AgendaList
@@ -185,6 +188,7 @@ class AgendaApp extends BaseApp {
                             openItemDetails={this.props.openItemDetails}
                             requestCoverage={this.props.requestCoverage}
                             previewGroup={this.props.previewGroup}
+                            previewPlan={this.props.previewPlan}
                         />
                     </div>
                 </section>
@@ -194,8 +198,7 @@ class AgendaApp extends BaseApp {
                     this.props.navigations,
                     this.props.activeNavigation,
                     this.props.activeTopic
-                ),
-                this.renderSavedItemsCount()
+                )
             ])
         );
     }
@@ -210,6 +213,7 @@ AgendaApp.propTypes = {
     createdFilter: PropTypes.object,
     itemToPreview: PropTypes.object,
     previewGroup: PropTypes.string,
+    previewPlan: PropTypes.object,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
     modal: PropTypes.object,
@@ -252,6 +256,7 @@ const mapStateToProps = (state) => ({
     createdFilter: get(state, 'search.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     previewGroup: state.previewGroup,
+    previewPlan: state.previewPlan,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
     modal: state.modal,

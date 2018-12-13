@@ -250,19 +250,30 @@ def test_push_parsed_planning_for_an_existing_event(client, app):
     planning['event_item'] = 'foo4'
     client.post('/push', data=json.dumps(planning), content_type='application/json')
     parsed = get_entity_or_404('foo4', 'agenda')
-    assert parsed['headline'] == 'Planning headline'
-    assert 2 == len(parsed['coverages'])
-    assert 2 == len(parsed['service'])
-    assert 'e' == parsed['service'][0]['code']
-    assert 'a' == parsed['service'][1]['code']
-    assert 2 == len(parsed['subject'])
-    assert '06002002' == parsed['subject'][0]['code']
-    assert '01009000' == parsed['subject'][1]['code']
     assert parsed['name'] == test_event['name']
     assert parsed['definition_short'] == test_event['definition_short']
+    assert parsed['slugline'] == test_event['slugline']
     assert parsed['definition_long'] == test_event['definition_long']
     assert parsed['dates']['start'].isoformat() == test_event['dates']['start'].replace('0000', '00:00')
     assert parsed['dates']['end'].isoformat() == test_event['dates']['end'].replace('0000', '00:00')
+    assert parsed['ednote'] == event['ednote']
+
+    assert 2 == len(parsed['coverages'])
+    assert 1 == len(parsed['service'])
+    assert 'a' == parsed['service'][0]['code']
+    assert 1 == len(parsed['subject'])
+    assert '06002002' == parsed['subject'][0]['code']
+
+    parsed_planning = parsed['planning_items'][0]
+    assert 1 == len(parsed_planning['service'])
+    assert 'e' == parsed_planning['service'][0]['code']
+    assert 1 == len(parsed_planning['subject'])
+    assert '01009000' == parsed_planning['subject'][0]['code']
+    assert parsed_planning['description_text'] == planning['description_text']
+    assert parsed_planning['slugline'] == planning['slugline']
+    assert parsed_planning['headline'] == planning['headline']
+    assert parsed_planning['ednote'] == planning['ednote']
+    assert 2 == len(parsed_planning['coverages'])
 
 
 def test_push_coverages_with_different_dates_for_an_existing_event(client, app):
@@ -283,9 +294,14 @@ def test_push_coverages_with_different_dates_for_an_existing_event(client, app):
     # planning['planning_date'] = "2018-05-28T10:51:52+0000"
     client.post('/push', data=json.dumps(planning), content_type='application/json')
     parsed = get_entity_or_404('foo4', 'agenda')
-    assert parsed['headline'] == 'Planning headline'
-    assert 2 == len(parsed['coverages'])
     assert parsed['name'] == test_event['name']
+    assert parsed['definition_short'] == test_event['definition_short']
+    assert parsed['slugline'] == test_event['slugline']
+
+    parsed_planning = parsed['planning_items'][0]
+    assert parsed_planning['description_text'] == planning['description_text']
+
+    assert 2 == len(parsed['coverages'])
     assert parsed['dates']['start'].isoformat() == event['dates']['start'].replace('0000', '00:00')
     assert parsed['dates']['end'].isoformat() == event['dates']['end'].replace('0000', '00:00')
     assert 1 == len(parsed['display_dates'])
@@ -311,12 +327,17 @@ def test_push_planning_with_different_dates_for_an_existing_event(client, app):
     planning['planning_date'] = "2018-07-28T10:51:52+0000"
     client.post('/push', data=json.dumps(planning), content_type='application/json')
     parsed = get_entity_or_404('foo4', 'agenda')
-    assert parsed['headline'] == 'Planning headline'
     assert parsed['name'] == test_event['name']
+    assert parsed['definition_short'] == test_event['definition_short']
+    assert parsed['slugline'] == test_event['slugline']
     assert parsed['dates']['start'].isoformat() == event['dates']['start'].replace('0000', '00:00')
     assert parsed['dates']['end'].isoformat() == event['dates']['end'].replace('0000', '00:00')
     assert 1 == len(parsed['display_dates'])
     assert parsed['display_dates'][0]['date'].isoformat() == planning['planning_date'].replace('0000', '00:00')
+
+    parsed_planning = parsed['planning_items'][0]
+    assert parsed_planning['description_text'] == planning['description_text']
+    assert parsed_planning['slugline'] == planning['slugline']
 
 
 def test_push_cancelled_planning_for_an_existing_event(client, app):
@@ -366,7 +387,7 @@ def test_push_parsed_adhoc_planning_for_an_non_existing_event(client, app):
     assert 1 == len(parsed['planning_items'])
     assert parsed['headline'] == 'Planning headline'
     assert parsed['definition_short'] == test_planning['description_text']
-    assert parsed['abstract'] == test_planning['abstract']
+    assert parsed['definition_long'] == test_planning['abstract']
 
 
 def test_notify_topic_matches_for_new_event_item(client, app, mocker):
@@ -1017,7 +1038,6 @@ def test_push_coverages_with_linked_stories(client, app):
 
     client.post('/push', data=json.dumps(planning), content_type='application/json')
     parsed = get_entity_or_404('foo7', 'agenda')
-    assert parsed['headline'] == 'Planning headline'
     assert 2 == len(parsed['coverages'])
     assert parsed['coverages'][0]['delivery_id'] == 'item7'
     assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'

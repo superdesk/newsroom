@@ -7,14 +7,14 @@ import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, getInternalNot
 import AgendaInternalNote from './AgendaInternalNote';
 
 
-export default function AgendaCoverages({item}) {
-    if (isEmpty(item.coverages)) {
+export default function AgendaCoverages({item, coverages}) {
+    if (isEmpty(coverages)) {
         return null;
     }
 
     const internalNotes = getInternalNotesFromCoverages(item);
 
-    return item.coverages.map((coverage) => (
+    return coverages.map((coverage) => (
         <div className='coverage-item' key={coverage.coverage_id}>
             <div className='coverage-item__row'>
                 <span className='d-flex coverage-item--element-grow text-overflow-ellipsis'>
@@ -35,12 +35,13 @@ export default function AgendaCoverages({item}) {
             </div>
 
             {!isEmpty(internalNotes) && internalNotes[coverage.coverage_id] && <div className='coverage-item__row'>
-                <AgendaInternalNote internalNotes={[internalNotes[coverage.coverage_id]]} />
+                <AgendaInternalNote internalNote={internalNotes[coverage.coverage_id]} />
             </div>}
         </div>
     ));
 }
 
 AgendaCoverages.propTypes = {
-    item: PropTypes.object
+    item: PropTypes.object,
+    coverages: PropTypes.arrayOf(PropTypes.object),
 };
