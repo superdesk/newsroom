@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isInteger, keyBy } from 'lodash';
+import { get, isInteger, keyBy, isEmpty } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
@@ -340,14 +340,19 @@ export function toggleValue(items, value) {
     return without.length === items.length ? without.concat([value]) : without;
 }
 
+
 export function updateRouteParams(updates, state) {
     const params = new URLSearchParams(window.location.search);
     let dirty = false;
 
     Object.keys(updates).forEach((key) => {
-        if (updates[key]) {
-            dirty = dirty || updates[key] != params.get(key);
-            params.set(key, updates[key]);
+        let updatedValue = updates[key];
+        if (!isEmpty(updatedValue)) {
+            if (typeof updatedValue === 'object') {
+                updatedValue = JSON.stringify(updatedValue);
+            }
+            dirty = dirty || updatedValue != params.get(key);
+            params.set(key, updatedValue);
         } else {
             dirty = dirty || params.has(key);
             params.delete(key);

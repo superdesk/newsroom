@@ -15,9 +15,11 @@ import {
     toggleNavigation,
     setCreatedFilter,
     toggleNavigationById,
+    initParams as initSearchParams,
 } from 'search/actions';
 
 import {getLocaleDate} from '../utils';
+import {clearAgendaDropdownFilters} from '../local-store';
 
 
 const WATCH_URL = '/agenda_watch';
@@ -247,6 +249,9 @@ export function fetchItems() {
                 const state = getState();
                 updateRouteParams({
                     q: state.query,
+                    filter: get(state, 'search.activeFilter'),
+                    navigation: get(state, 'search.activeNavigation'),
+                    created: get(state, 'search.createdFilter'),
                 }, state);
                 analytics.timingComplete('search', Date.now() - start);
             })
@@ -548,10 +553,11 @@ export function fetchMoreItems() {
  * @param {URLSearchParams} params
  */
 export function initParams(params) {
+    if (params.get('filter') || params.get('created')) {
+        clearAgendaDropdownFilters();
+    }
     return (dispatch, getState) => {
-        if (params.get('q')) {
-            dispatch(setQuery(params.get('q')));
-        }
+        dispatch(initSearchParams(params));
         if (params.get('item')) {
             dispatch(fetchItem(params.get('item')))
                 .then(() => {
