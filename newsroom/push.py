@@ -295,7 +295,7 @@ def set_agenda_metadata_from_event(agenda, event):
     agenda['ednote'] = event.get('ednote', agenda.get('ednote'))
     agenda['state'] = event.get('state')
     agenda['place'] = event.get('place')
-    agenda['subject'] = event.get('subject')
+    agenda['subject'] = format_qcode_items(event.get('subject'))
     agenda['products'] = event.get('products')
 
     # only set service if available
@@ -333,7 +333,11 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
     agenda['abstract'] = get('abstract')
     agenda['ednote'] = get('ednote')
     agenda['place'] = get('place')
-    agenda['subject'] = get('subject')
+    agenda['subject'] = unique_codes(
+        agenda.get('subject', []),
+        format_qcode_items(event.get('subject')),
+        format_qcode_items(planning_item.get('subject'))
+    )
     agenda['products'] = get('products')
     agenda['genre'] = planning_item.get('genre') or agenda.get('genre')
     agenda['priority'] = planning_item.get('priority') or agenda.get('priority')

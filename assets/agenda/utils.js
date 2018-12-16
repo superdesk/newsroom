@@ -1,4 +1,4 @@
-import { get, isEmpty, includes, uniqBy } from 'lodash';
+import { get, isEmpty, includes } from 'lodash';
 import moment from 'moment/moment';
 import {formatDate, formatMonth, formatWeek, getConfig, gettext} from '../utils';
 
@@ -412,16 +412,7 @@ export function getInternalNotesFromCoverages(item) {
  * @return {Array}
  */
 export function getSubjects(item) {
-    let subjects = get(item, 'event.subject') || [];
-    const planningItems = get(item, 'planning_items', []);
-    (planningItems || []).forEach(p => {
-        subjects = subjects.concat(p.subject || []);
-        get(p, 'coverages', []).forEach(c => {
-            subjects = subjects.concat(c.subject || []);
-        });
-    });
-
-    return uniqBy(subjects.filter(subject => !isEmpty(subject)), 'qcode');
+    return get(item, 'subject', []);
 }
 
 /**
