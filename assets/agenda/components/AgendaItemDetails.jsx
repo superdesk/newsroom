@@ -27,6 +27,7 @@ import AgendaInternalNote from './AgendaInternalNote';
 import AgendaCoverages from './AgendaCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
+import AgendaTags from './AgendaTags';
 
 export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group}) {
     const locations = getLocations(item);
@@ -65,6 +66,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                             <AgendaAttachments item={item} />
                         </ArticleSidebarBox>
                     )}
+                    <AgendaTags item={item} isItemDetail={true} />
                     <AgendaEdNote item={item} />
                     <AgendaInternalNote internalNotes={getInternalNotes(item)} />
                 </ArticleSidebar>
