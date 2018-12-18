@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isInteger, keyBy, isEmpty } from 'lodash';
+import { get, isInteger, keyBy, isEmpty, cloneDeep } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
@@ -360,7 +360,10 @@ export function updateRouteParams(updates, state) {
     });
 
     if (dirty) {
-        history.pushState(state, null, '?' + params.toString());
+        const stateClone = cloneDeep(state);
+        stateClone.items = [];
+        stateClone.itemsById = {};
+        history.pushState(stateClone, null, `?${params.toString()}`);
     }
 }
 
