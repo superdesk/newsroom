@@ -239,7 +239,7 @@ function search(state, next) {
 /**
  * Fetch items for current query
  */
-export function fetchItems() {
+export function fetchItems(updateRoute = true) {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
@@ -247,7 +247,7 @@ export function fetchItems() {
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
                 const state = getState();
-                updateRouteParams({
+                updateRoute && updateRouteParams({
                     q: state.query,
                     filter: get(state, 'search.activeFilter'),
                     navigation: get(state, 'search.activeNavigation'),

@@ -343,7 +343,6 @@ export function toggleValue(items, value) {
 
 export function updateRouteParams(updates, state) {
     const params = new URLSearchParams(window.location.search);
-    let dirty = false;
 
     Object.keys(updates).forEach((key) => {
         let updatedValue = updates[key];
@@ -351,20 +350,17 @@ export function updateRouteParams(updates, state) {
             if (typeof updatedValue === 'object') {
                 updatedValue = JSON.stringify(updatedValue);
             }
-            dirty = dirty || updatedValue != params.get(key);
             params.set(key, updatedValue);
         } else {
-            dirty = dirty || params.has(key);
             params.delete(key);
         }
     });
 
-    if (dirty) {
-        const stateClone = cloneDeep(state);
-        stateClone.items = [];
-        stateClone.itemsById = {};
-        history.pushState(stateClone, null, `?${params.toString()}`);
-    }
+    
+    const stateClone = cloneDeep(state);
+    stateClone.items = [];
+    stateClone.itemsById = {};
+    history.pushState(stateClone, null, `?${params.toString()}`);
 }
 
 const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
