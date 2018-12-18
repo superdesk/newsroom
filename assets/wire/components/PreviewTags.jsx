@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { uniqBy } from 'lodash';
 import { gettext, isDisplayed } from 'utils';
 import InfoBox from './InfoBox';
 import PreviewTagsBlock from './PreviewTagsBlock';
 import PreviewTagsLink from './PreviewTagsLink';
 
 function formatCV(items, field) {
-    return items && items.map((item) => (
+    return items && uniqBy(items, (item) => item.code).map((item) => (
         <PreviewTagsLink key={item.code}
             href={`/wire?q=${field}:"${item.name}"`}
             text={item.name}
