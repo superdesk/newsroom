@@ -205,6 +205,9 @@ CLIENT_COVERAGE_DATE_FORMAT = 'HH:mm DD/MM'
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
 
+# Enables or disables the animations for list item select boxes
+USE_ANIMATIONS = True
+
 WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')
 
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')

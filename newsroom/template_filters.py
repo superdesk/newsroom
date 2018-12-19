@@ -73,6 +73,7 @@ def newsroom_config():
         'date_format': flask.current_app.config['CLIENT_DATE_FORMAT'],
         'coverage_date_format': flask.current_app.config['CLIENT_COVERAGE_DATE_FORMAT'],
         'display_abstract': flask.current_app.config['DISPLAY_ABSTRACT'],
+        'use_animations': flask.current_app.config['USE_ANIMATIONS'],
     }
 
 

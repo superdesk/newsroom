@@ -7,6 +7,7 @@ import ActionButton from 'components/ActionButton';
 import AgendaListItemIcons from './AgendaListItemIcons';
 import {hasCoverages, isCanceled, isPostponed, isRescheduled, getName, isWatched} from '../utils';
 import ActionMenu from '../../components/ActionMenu';
+import { USE_ANIMATIONS } from 'utils';
 
 class AgendaListItem extends React.Component {
     constructor(props) {
@@ -51,6 +52,10 @@ class AgendaListItem extends React.Component {
             'wire-articles__item--rescheduled': isRescheduled(this.props.item),
             'wire-articles__item--selected': this.props.isSelected,
         });
+        const selectClassName = classNames('no-bindable-select', {
+            'wire-articles__item-select-visible': !USE_ANIMATIONS,
+            'wire-articles__item-select': USE_ANIMATIONS,
+        });
         const articleClassName = classNames('wire-articles__item-text', {
             'flex-column align-items-start': !isExtended
         });
@@ -76,7 +81,7 @@ class AgendaListItem extends React.Component {
                     <div className={articleClassName}>
 
                         <h4 className='wire-articles__item-headline'>
-                            <div className='no-bindable-select wire-articles__item-select' onClick={this.stopPropagation}>
+                            <div className={selectClassName} onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
                                     <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
                                     <i></i>

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { wordCount } from 'utils';
+import {USE_ANIMATIONS, wordCount} from 'utils';
 import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
 
 import ActionList from 'components/ActionList';
@@ -67,6 +67,10 @@ class AmNewsListItem extends React.Component {
             'wire-articles__item--alert': isAlert(item),
             'wire-articles__item--not-alert': !isAlert(item),
         });
+        const selectClassName = classNames('no-bindable-select', {
+            'wire-articles__item-select-visible': !USE_ANIMATIONS,
+            'wire-articles__item-select': USE_ANIMATIONS,
+        });
         const metaTimeClassName = classNames('', {
             'time-label--data': isDataItem(item),
             'time-label--stories': !isDataItem(item),
@@ -89,7 +93,7 @@ class AmNewsListItem extends React.Component {
                 <div className={wrapClassName}>
                     <div className='wire-articles__item-text'>
                         <h4 className='wire-articles__item-headline'>
-                            <div className='no-bindable-select wire-articles__item-select' onClick={this.stopPropagation}>
+                            <div className={selectClassName} onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
                                     <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
                                     <i></i>
