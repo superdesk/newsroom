@@ -423,7 +423,8 @@ export function errorHandler(error, dispatch, setError) {
  * @return {Mixed}
  */
 export function getConfig(key, defaultValue) {
-    return get(window[NEWSROOM][CLIENT_CONFIG], key, defaultValue);
+    const clientConfig = get(window, `${NEWSROOM}.${CLIENT_CONFIG}`, {});
+    return get(clientConfig, key, defaultValue);
 }
 
 export function getTimezoneOffset() {
