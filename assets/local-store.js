@@ -135,3 +135,11 @@ export function getAgendaDropdownFilters() {
     store.removeExpiredKeys();
     return store.get(DROPDOWN_FILTERS);
 }
+
+/**
+ * Clears filters
+ * @returns {object}
+ */
+export function clearAgendaDropdownFilters() {
+    store.remove(DROPDOWN_FILTERS);
+}

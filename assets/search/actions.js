@@ -68,3 +68,30 @@ export function toggleNavigationById(navigationId) {
         }
     };
 }
+
+/**
+ * Set state on app init using url params
+ *
+ * @param {URLSearchParams} params
+ */
+export function initParams(params) {
+    return (dispatch) => {
+        if (params.get('navigation')) {
+            dispatch(toggleNavigationById(params.get('navigation')));
+        }
+        if (params.get('q')) {
+            dispatch(setQuery(params.get('q')));
+        }
+        if (params.get('filter')) {
+            const filters = JSON.parse(params.get('filter'));
+            for (const filter in filters) {
+                filters[filter].map(val => dispatch(toggleFilter(filter, val)));
+            }
+        }
+        if (params.get('created')) {
+            const dates = JSON.parse(params.get('created'));
+            dispatch(setCreatedFilter(dates));
+        }
+
+    };
+}
