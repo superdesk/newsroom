@@ -10,3 +10,47 @@ INSTALLED_APPS = [
     'stt.external_links',
     'stt.filters',
 ]
+
+CORE_APPS = [
+    'superdesk.notification',
+    'content_api.items',
+    'content_api.items_versions',
+    'content_api.search',
+    'content_api.auth',
+    'content_api.publish',
+    'newsroom.users',
+    'newsroom.companies',
+    'newsroom.wire',
+    'newsroom.topics',
+    'newsroom.upload',
+    'newsroom.history',
+    'newsroom.ui_config',
+    'newsroom.notifications',
+    'newsroom.products',
+    'newsroom.section_filters',
+    'newsroom.navigations',
+    'newsroom.cards',
+    'newsroom.reports',
+    'newsroom.public',
+    'newsroom.settings',
+    'newsroom.photos'
+]
+
+BLUEPRINTS = [
+    'newsroom.wire',
+    'newsroom.auth',
+    'newsroom.users',
+    'newsroom.companies',
+    'newsroom.design',
+    'newsroom.push',
+    'newsroom.topics',
+    'newsroom.upload',
+    'newsroom.notifications',
+    'newsroom.products',
+    'newsroom.section_filters',
+    'newsroom.navigations',
+    'newsroom.cards',
+    'newsroom.reports',
+    'newsroom.public',
+    'newsroom.settings'
+]
