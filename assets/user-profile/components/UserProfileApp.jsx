@@ -50,7 +50,7 @@ class UserProfileApp extends React.Component {
         if (specs) {
             const Modal = modals[specs.modal];
             return ReactDOM.createPortal(
-                <Modal data={specs.data} />,
+                <Modal data={{...specs.data, isTopic: true}} />,
                 document.getElementById('modal-container')
             );
         }
