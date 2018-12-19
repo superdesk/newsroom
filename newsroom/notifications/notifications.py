@@ -69,8 +69,14 @@ def get_initial_notifications():
     saved_notifications = get_user_notifications(session['user'])
     item_ids = [n['item'] for n in saved_notifications]
     items = []
-    items.extend(superdesk.get_resource_service('wire_search').get_items(item_ids))
-    items.extend(superdesk.get_resource_service('agenda').get_items(item_ids))
+    try:
+        items.extend(superdesk.get_resource_service('wire_search').get_items(item_ids))
+    except KeyError:  # wire disabled
+        pass
+    try:
+        items.extend(superdesk.get_resource_service('agenda').get_items(item_ids))
+    except KeyError:  # agenda disabled
+        pass
     return {
         'user': str(session['user']) if session['user'] else None,
         'notifications': list(items),
