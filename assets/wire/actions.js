@@ -11,6 +11,7 @@ import {
     toggleNavigation,
     setCreatedFilter,
     toggleNavigationById,
+    initParams as initSearchParams,
 } from 'search/actions';
 
 
@@ -202,7 +203,7 @@ function search(state, next) {
 /**
  * Fetch items for current query
  */
-export function fetchItems() {
+export function fetchItems(updateRoute = true) {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
@@ -210,8 +211,11 @@ export function fetchItems() {
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
                 const state = getState();
-                updateRouteParams({
+                updateRoute && updateRouteParams({
                     q: state.query,
+                    filter: get(state, 'search.activeFilter'),
+                    navigation: get(state, 'search.activeNavigation'),
+                    created: get(state, 'search.createdFilter'),
                 }, state);
                 analytics.timingComplete('search', Date.now() - start);
             })
@@ -263,7 +267,7 @@ export function shareItems(items) {
  */
 export function submitShareItem(data) {
     return (dispatch, getState) => {
-        return server.post(`/wire_share?type=${getState().context}`, data)
+        return server.post(`/wire_share?type=${getState().context || data.items[0].topic_type}`, data)
             .then(() => {
                 dispatch(closeModal());
                 dispatch(setShareItems(data.items));
@@ -510,9 +514,7 @@ export function fetchMoreItems() {
  */
 export function initParams(params) {
     return (dispatch, getState) => {
-        if (params.get('q')) {
-            dispatch(setQuery(params.get('q')));
-        }
+        dispatch(initSearchParams(params));
         if (params.get('item')) {
             dispatch(fetchItem(params.get('item')))
                 .then(() => {
@@ -522,6 +524,7 @@ export function initParams(params) {
         }
     };
 }
+
 
 export const RESET_FILTER = 'RESET_FILTER';
 export function resetFilter(filter) {

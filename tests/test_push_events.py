@@ -184,6 +184,7 @@ def test_push_parsed_event(client, app):
     assert 1 == len(parsed['event']['event_contact_info'])
     assert 1 == len(parsed['location'])
     assert 1 == len(parsed['service'])
+    assert 1 == len(parsed['subject'])
     assert 'a' == parsed['service'][0]['code']
 
     init_auth(app, client)
@@ -254,6 +255,9 @@ def test_push_parsed_planning_for_an_existing_event(client, app):
     assert 2 == len(parsed['service'])
     assert 'e' == parsed['service'][0]['code']
     assert 'a' == parsed['service'][1]['code']
+    assert 2 == len(parsed['subject'])
+    assert '06002002' == parsed['subject'][0]['code']
+    assert '01009000' == parsed['subject'][1]['code']
     assert parsed['name'] == test_event['name']
     assert parsed['definition_short'] == test_event['definition_short']
     assert parsed['definition_long'] == test_event['definition_long']

@@ -386,7 +386,7 @@ export function getAttachments(item) {
 export function getInternalNotes(item) {
     const internalNotes = [];
     internalNotes.push(get(item, 'event.internal_note'));
-    get(item, 'planning_items', []).forEach(p => internalNotes.push(p.internal_note));
+    (get(item, 'planning_items', []) || []).forEach(p => internalNotes.push(p.internal_note));
     return internalNotes.filter(note => !!note);
 }
 
@@ -403,6 +403,16 @@ export function getInternalNotesFromCoverages(item) {
         internalNotes[c.coverage_id] = get(c, 'planning.internal_note');
     }));
     return internalNotes;
+}
+
+/**
+ * Get list of subjects
+ *
+ * @param {Object} item
+ * @return {Array}
+ */
+export function getSubjects(item) {
+    return get(item, 'subject', []);
 }
 
 /**

@@ -19,7 +19,7 @@ class ShareItemModal extends React.Component {
     onSubmit(event) {
         event.preventDefault();
         if (this.state.users.length) {
-            this.props.submit(this.isFollowedTopic(), this.state);
+            this.props.submit(!!this.props.data.isTopic, this.state);
         }
     }
 
@@ -41,10 +41,6 @@ class ShareItemModal extends React.Component {
         this.setState({
             users: this.users.length === this.state.users.length ? [] : this.users.map((u) => u._id),
         });
-    }
-
-    isFollowedTopic() {
-        return !!this.state.items[0].query;
     }
 
     render() {
@@ -108,7 +104,8 @@ ShareItemModal.propTypes = {
             first_name: PropTypes.string.isRequired,
             last_name: PropTypes.string.isRequired,
         })),
-    })
+        isTopic: PropTypes.bool,
+    }),
 };
 
 const mapDispatchToProps = (dispatch) => ({

@@ -1,5 +1,7 @@
 from flask import json
 from bson import ObjectId
+from newsroom.topics.views import get_topic_url
+
 
 topic = {
     'label': 'Foo',
@@ -167,3 +169,28 @@ def test_share_agenda_topics(client, app):
         assert agenda_topic['query'] in outbox[0].body
         assert 'Some info message' in outbox[0].body
         assert '/agenda' in outbox[0].body
+
+
+def test_get_topic_share_url(client, app):
+    app.config['CLIENT_URL'] = 'http://newsroom.com'
+
+    topic = {'topic_type': 'wire', 'query': 'art exhibition'}
+    assert get_topic_url(topic) == 'http://newsroom.com/wire?q=art%20exhibition'
+
+    topic = {'topic_type': 'wire', 'filter': {"location": [["Sydney"]]}}
+    assert get_topic_url(topic) == 'http://newsroom.com/wire?filter=%7B%22location%22%3A%20%5B%5B%22Sydney%22%5D%5D%7D'
+
+    topic = {'topic_type': 'wire', 'navigation': '123'}
+    assert get_topic_url(topic) == 'http://newsroom.com/wire?navigation=123'
+
+    topic = {'topic_type': 'wire', 'created': {'from': '2018-06-01'}}
+    assert get_topic_url(topic) == 'http://newsroom.com/wire?created=%7B%22from%22%3A%20%222018-06-01%22%7D'
+
+    topic = {
+        'topic_type': 'wire',
+        'query': 'art exhibition',
+        'filter': {"urgency": [3]},
+        'navigation': '123',
+        'created': {'from': '2018-06-01'},
+    }
+    assert get_topic_url(topic) == 'http://newsroom.com/wire?q=art%20exhibition&filter=%7B%22urgency%22%3A%20%5B3%5D%7D&navigation=123&created=%7B%22from%22%3A%20%222018-06-01%22%7D' # noqa
