@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import {USE_ANIMATIONS, wordCount} from 'utils';
+import {LIST_ANIMATIONS, wordCount} from 'utils';
 import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
 
 import ActionList from 'components/ActionList';
@@ -68,8 +68,8 @@ class AmNewsListItem extends React.Component {
             'wire-articles__item--not-alert': !isAlert(item),
         });
         const selectClassName = classNames('no-bindable-select', {
-            'wire-articles__item-select-visible': !USE_ANIMATIONS,
-            'wire-articles__item-select': USE_ANIMATIONS,
+            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const metaTimeClassName = classNames('', {
             'time-label--data': isDataItem(item),

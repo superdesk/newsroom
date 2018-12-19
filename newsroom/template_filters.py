@@ -69,11 +69,7 @@ def newsroom_config():
     port = int(os.environ.get('PORT', '5000'))
     return {
         'websocket': os.environ.get('NEWSROOM_WEBSOCKET_URL', 'ws://localhost:%d' % (port + 100, )),
-        'time_format': flask.current_app.config['CLIENT_TIME_FORMAT'],
-        'date_format': flask.current_app.config['CLIENT_DATE_FORMAT'],
-        'coverage_date_format': flask.current_app.config['CLIENT_COVERAGE_DATE_FORMAT'],
-        'display_abstract': flask.current_app.config['DISPLAY_ABSTRACT'],
-        'use_animations': flask.current_app.config['USE_ANIMATIONS'],
+        'client_config': flask.current_app.config['CLIENT_CONFIG'],
     }
 
 

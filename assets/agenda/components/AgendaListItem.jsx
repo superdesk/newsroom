@@ -7,7 +7,7 @@ import ActionButton from 'components/ActionButton';
 import AgendaListItemIcons from './AgendaListItemIcons';
 import {hasCoverages, isCanceled, isPostponed, isRescheduled, getName, isWatched} from '../utils';
 import ActionMenu from '../../components/ActionMenu';
-import { USE_ANIMATIONS } from 'utils';
+import { LIST_ANIMATIONS } from 'utils';
 
 class AgendaListItem extends React.Component {
     constructor(props) {
@@ -53,8 +53,8 @@ class AgendaListItem extends React.Component {
             'wire-articles__item--selected': this.props.isSelected,
         });
         const selectClassName = classNames('no-bindable-select', {
-            'wire-articles__item-select-visible': !USE_ANIMATIONS,
-            'wire-articles__item-select': USE_ANIMATIONS,
+            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const articleClassName = classNames('wire-articles__item-text', {
             'flex-column align-items-start': !isExtended

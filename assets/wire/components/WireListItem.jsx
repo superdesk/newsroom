@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { gettext, shortDate, fullDate, wordCount, USE_ANIMATIONS } from 'utils';
+import { gettext, shortDate, fullDate, wordCount, LIST_ANIMATIONS } from 'utils';
 import { getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled } from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -58,8 +58,8 @@ class WireListItem extends React.Component {
             'wire-articles__item--selected': this.props.isSelected,
         });
         const selectClassName = classNames('no-bindable-select', {
-            'wire-articles__item-select-visible': !USE_ANIMATIONS,
-            'wire-articles__item-select': USE_ANIMATIONS,
+            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const picture = getPicture(item);
         const isWire = this.props.context === 'wire';
