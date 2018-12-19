@@ -9,11 +9,15 @@ import alertify from 'alertifyjs';
 import moment from 'moment';
 
 export const now = moment(); // to enable mocking in tests
+const NEWSROOM = 'newsroom';
+const CLIENT_CONFIG = 'client_config';
+
 const TIME_FORMAT = getConfig('time_format');
 const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
 const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
 export const DAY_IN_MINUTES = 24 * 60 - 1;
+export const LIST_ANIMATIONS = getConfig('list_animations', true);
 
 
 /**
@@ -416,11 +420,11 @@ export function errorHandler(error, dispatch, setError) {
  *
  * @param {String} key
  * @param {Mixed} defaultValue
- * @param {String} namespace
  * @return {Mixed}
  */
-export function getConfig(key, defaultValue, namespace='newsroom') {
-    return get(window[namespace], key, defaultValue);
+export function getConfig(key, defaultValue) {
+    const clientConfig = get(window, `${NEWSROOM}.${CLIENT_CONFIG}`, {});
+    return get(clientConfig, key, defaultValue);
 }
 
 export function getTimezoneOffset() {
