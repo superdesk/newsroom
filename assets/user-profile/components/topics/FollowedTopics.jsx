@@ -32,20 +32,21 @@ class FollowedTopics extends React.Component {
         return (
             <div className="profile-content container-fluid">
                 <div className="row pt-xl-4 pt-3 px-xl-4">
-                    {this.props.topics && this.props.topics.map((topic) => (
-                        <div key={topic._id} className='simple-card-wrap col-12 col-lg-6'>
-                            <div className="simple-card">
-                                <div className="simple-card__header simple-card__header-with-icons">
-                                    <h6 className="simple-card__headline">{topic.label}</h6>
-                                    <div className='simple-card__icons'>
-                                        {this.getActionButtons(topic)}
+                    {this.props.topics && this.props.topics.filter((topic) => topic.topic_type === this.props.topicType)
+                        .map((topic) => (
+                            <div key={topic._id} className='simple-card-wrap col-12 col-lg-6'>
+                                <div className="simple-card">
+                                    <div className="simple-card__header simple-card__header-with-icons">
+                                        <h6 className="simple-card__headline">{topic.label}</h6>
+                                        <div className='simple-card__icons'>
+                                            {this.getActionButtons(topic)}
+                                        </div>
                                     </div>
+                                    <p>{topic.description || ' '}</p>
+                                    <span className="simple-card__date">{gettext('Created on')} {getLocaleDate(topic._created)}</span>
                                 </div>
-                                <p>{topic.description || ' '}</p>
-                                <span className="simple-card__date">{gettext('Created on')} {getLocaleDate(topic._created)}</span>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </div>
         );
@@ -63,7 +64,8 @@ FollowedTopics.propTypes = {
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         action: PropTypes.func,
-    }))
+    })),
+    topicType: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -86,7 +88,9 @@ const mapDispatchToProps = (dispatch) => ({
         {
             name: gettext('Delete'),
             icon: 'trash',
-            action: (topic) => confirm(gettext('Would you like to delete topic {{name}}?', {name: topic.label})) && dispatch(deleteTopic(topic)),
+            action: (topic) => confirm(
+                gettext('Would you like to delete {{topicType}} {{name}}?',
+                    {topicType: topic.topic_type === 'wire' ? 'topic' : 'event',  name: topic.label})) && dispatch(deleteTopic(topic)),
         },
     ],
 });

@@ -36,6 +36,13 @@ class UserProfileApp extends React.Component {
                 name: 'topics',
                 label: gettext('My Topics'),
                 content: FollowedTopics,
+                type: 'wire',
+            },
+            {
+                name: 'events',
+                label: gettext('My Events'),
+                content: FollowedTopics,
+                type: 'agenda',
             },
             /**
             {
@@ -64,6 +71,7 @@ class UserProfileApp extends React.Component {
 
         const modal = this.renderModal(this.props.modal);
         const ActiveContent = links.find((link) => link.active).content;
+        const topicType = links.find((link) => link.active).type;
 
         return (
             <div className="profile-container">
@@ -95,7 +103,7 @@ class UserProfileApp extends React.Component {
                             </nav>
                         </section>
                         <section className="content-main">
-                            <ActiveContent />
+                            <ActiveContent topicType={topicType}/>
                         </section>
                     </div>
                     {modal}
