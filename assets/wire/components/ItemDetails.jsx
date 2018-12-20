@@ -21,6 +21,7 @@ import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
 import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
 import ArticleBody from 'ui/components/ArticleBody';
+import ArticleAuthor from 'ui/components/ArticleAuthor';
 
 
 function ItemDetails({item, user, actions, onClose, detailsConfig}) {
@@ -44,6 +45,7 @@ function ItemDetails({item, user, actions, onClose, detailsConfig}) {
                         <ArticleBody itemType={itemType}>
                             {isDisplayed('slugline', detailsConfig) && <ArticleSlugline item={item}/>}
                             {isDisplayed('headline', detailsConfig) && <ArticleHeadline item={item}/>}
+                            <ArticleAuthor item={item} isPreview={false} displayConfig={detailsConfig} />
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
