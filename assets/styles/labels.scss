@@ -42,4 +42,9 @@ $labels-palette: (
             text-decoration-color: $color;
         }
     }
+
+    &.label--big {
+        font-size: 11px;
+        padding: 3px 10px 2px 10px;
+    }
 }
