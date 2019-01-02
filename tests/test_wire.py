@@ -518,3 +518,43 @@ def test_time_limited_access(client, app):
     resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
+
+
+def test_company_type_filter(client, app):
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'product test',
+        'query': 'versioncreated:<=now-2d',
+        'companies': ['1'],
+        'is_enabled': True,
+        'product_type': 'wire'
+    }])
+
+    with client.session_transaction() as session:
+        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user_type'] = 'public'
+
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 2 == len(data['_items'])
+
+    app.config['COMPANY_TYPES'] = [
+        dict(id='test', wire_must={'term': {'service.code': 'b'}}),
+    ]
+
+    company = app.data.find_one('companies', req=None, _id=1)
+    app.data.update('companies', 1, {'company_type': 'test'}, company)
+
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+    assert 'WEATHER' == data['_items'][0]['slugline']
+
+    app.config['COMPANY_TYPES'] = [
+        dict(id='test', wire_must_not={'term': {'service.code': 'b'}}),
+    ]
+
+    resp = client.get('/wire/search')
+    data = json.loads(resp.get_data())
+    assert 1 == len(data['_items'])
+    assert 'WEATHER' != data['_items'][0]['slugline']

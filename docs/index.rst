@@ -15,6 +15,7 @@ Developers Guide
     :maxdepth: 2
 
     developers
+    company
 
 API Reference
 -------------

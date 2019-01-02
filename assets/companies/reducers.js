@@ -23,6 +23,7 @@ const initialState = {
     activeQuery: null,
     services: [],
     sections: [],
+    companyTypes: [],
 };
 
 function setupCompanies(companyList, state) {
@@ -127,6 +128,7 @@ export default function companyReducer(state = initialState, action) {
             services: action.data.services,
             products: action.data.products,
             sections: action.data.sections,
+            companyTypes: action.data.company_types || [],
         };
 
         return setupCompanies(action.data.companies, nextState);
