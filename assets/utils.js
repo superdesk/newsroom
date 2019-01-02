@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isInteger, keyBy, isEmpty, cloneDeep } from 'lodash';
+import { get, isInteger, keyBy, isEmpty, cloneDeep, throttle } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
@@ -453,3 +453,21 @@ export const getInitData = (data) => {
 };
 
 export const isDisplayed = (field, config) => get(config, `${field}.displayed`, true);
+
+const getNow = throttle(moment, 500);
+
+/**
+ * Test if item is embargoed, if not returns null, otherwise returns its embargo time
+ * @param {String} embargoed 
+ * @return {Moment}
+ */
+export function getEmbargo(item) {
+    if (!item.embargoed) {
+        return null;
+    }
+
+    const now = getNow();
+    const parsed = moment(item.embargoed);
+
+    return parsed.isAfter(now) ? parsed : null;
+}
