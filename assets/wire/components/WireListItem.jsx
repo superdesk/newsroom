@@ -96,7 +96,7 @@ class WireListItem extends React.Component {
                                 <WireListItemIcons item={item} picture={picture} />
                                 <div className='wire-articles__item__meta-info'>
                                     <span className='bold'>{this.slugline}</span>
-                                    <span>{gettext('{{ source }}', {source: item.source})}
+                                    <span>{item.source}
                                         {' // '}<span>{this.wordCount}</span> {gettext('words')}
                                         {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
                                     </span>
