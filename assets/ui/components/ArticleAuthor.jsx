@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, isDisplayed } from 'utils';
+import { gettext, isDisplayed, fullDate } from 'utils';
 
-export default function ArticleAuthor({item, displayConfig}) {
+export default function ArticleAuthor({item, isPreview, displayConfig}) {
     return (
         (item.byline || item.located) && (
             <p className='wire-column__preview__author'>
@@ -11,8 +11,11 @@ export default function ArticleAuthor({item, displayConfig}) {
                         <b>{item.byline}</b>{' '}
                     </span>
                 )}
-                {isDisplayed('located', displayConfig) && item.located && (
+                {isPreview && isDisplayed('located', displayConfig) && item.located && (
                     <span>{gettext('in {{ located}}', {located: item.located})}</span>
+                )}
+                {!isPreview && item.versioncreated && (
+                    <span>{`${gettext('on')} ${fullDate(item.versioncreated)}`}</span>
                 )}
             </p>
         ) || null
@@ -21,5 +24,6 @@ export default function ArticleAuthor({item, displayConfig}) {
 
 ArticleAuthor.propTypes = {
     item: PropTypes.object.isRequired,
+    isPreview: PropTypes.bool.isRequired,
     displayConfig: PropTypes.object,
 };

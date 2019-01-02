@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { gettext, shortDate, fullDate, wordCount, LIST_ANIMATIONS } from 'utils';
+import { gettext, fullDate, wordCount, LIST_ANIMATIONS } from 'utils';
 import { getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled } from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -98,7 +98,7 @@ class WireListItem extends React.Component {
                                     <span className='bold'>{this.slugline}</span>
                                     <span>{gettext('{{ source }}', {source: item.source})}
                                         {' // '}<span>{this.wordCount}</span> {gettext('words')}
-                                        {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                                        {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
                                     </span>
                                 </div>
                             </div>
@@ -118,7 +118,7 @@ class WireListItem extends React.Component {
                         {!isExtended && (
                             <div className='wire-articles__item__meta'>
                                 <div className='wire-articles__item__meta-info'>
-                                    <time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                                    <time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
                                 </div>
                             </div>
                         )}
