@@ -1043,3 +1043,41 @@ def test_push_coverages_with_linked_stories(client, app):
     assert 2 == len(parsed['coverages'])
     assert parsed['coverages'][0]['delivery_id'] == 'item7'
     assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
+
+
+def test_push_event_from_planning(client, app):
+    plan = deepcopy(test_planning)
+    plan['guid'] = 'adhoc_plan'
+    plan['planning_date'] = '2018-05-29T00:00:00+0000'
+    plan.pop('event_item', None)
+    post_json(client, '/push', plan)
+    parsed = get_entity_or_404(plan['guid'], 'agenda')
+
+    assert parsed['slugline'] == test_planning['slugline']
+    assert parsed['headline'] == test_planning['headline']
+    assert parsed['definition_short'] == test_planning['description_text']
+    assert 1 == len(parsed['service'])
+    assert 'e' == parsed['service'][0]['code']
+    assert 1 == len(parsed['subject'])
+    assert '01009000' == parsed['subject'][0]['code']
+    assert parsed.get('event_id') is None
+    assert parsed['guid'] == plan['guid']
+    assert parsed['dates']['start'].isoformat() == plan['planning_date'].replace('0000', '00:00')
+    assert parsed['dates']['end'].isoformat() == plan['planning_date'].replace('0000', '00:00')
+
+    event = deepcopy(test_event)
+    event['guid'] = 'retrospective_event'
+    event['plans'] = ['adhoc_plan']
+    post_json(client, '/push', event)
+    parsed = get_entity_or_404(plan['guid'], 'agenda')
+
+    assert parsed['slugline'] == test_event['slugline']
+    assert parsed['definition_short'] == test_event['definition_short']
+    assert parsed['guid'] == event['guid']
+
+    assert 1 == len(parsed['service'])
+    assert 'a' == parsed['service'][0]['code']
+    assert 1 == len(parsed['subject'])
+    assert '06002002' == parsed['subject'][0]['code']
+    assert parsed['dates']['start'].isoformat() == event['dates']['start'].replace('0000', '00:00')
+    assert parsed['dates']['end'].isoformat() == event['dates']['end'].replace('0000', '00:00')

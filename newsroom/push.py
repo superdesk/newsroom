@@ -145,6 +145,15 @@ def publish_event(event, orig):
     _id = event['guid']
     service = superdesk.get_resource_service('agenda')
 
+    event_created_after_planning = False
+    if not orig and event.get('plans'):
+        # event is created planning item
+        orig = superdesk.get_resource_service('agenda').find_one(req=None, guid=event.get('plans')[0])
+        if orig:
+            event_created_after_planning = True
+
+    event.pop('plans', None)
+
     if not orig:
         # new event
         agenda = {}
@@ -185,8 +194,9 @@ def publish_event(event, orig):
                 'state': event['state'],
                 'dates': get_event_dates(event),
             }
-            set_agenda_metadata_from_event(updates, event)
-            service.patch(event['guid'], updates)
+
+            set_agenda_metadata_from_event(updates, event, False)
+            service.patch(orig['_id'] if event_created_after_planning else event['guid'], updates)
             superdesk.get_resource_service('agenda').notify_agenda_update('event_updated', orig)
 
     return _id
@@ -216,7 +226,7 @@ def publish_planning(planning):
     if planning.get('event_item'):
         # this is a planning for an event item
         # if there's an event then _id field will have the same value as event_id
-        agenda = app.data.find_one('agenda', req=None, _id=planning['event_item'])
+        agenda = app.data.find_one('agenda', req=None, guid=planning['event_item'])
 
         if not agenda:
             # event id exists in planning item but event is not in the system
@@ -272,14 +282,15 @@ def init_adhoc_agenda(planning):
     return agenda
 
 
-def set_agenda_metadata_from_event(agenda, event):
+def set_agenda_metadata_from_event(agenda, event, set_doc_id=True):
     """
     Sets agenda metadata from a given event
     """
     parse_dates(event)
 
     # setting _id of agenda to be equal to event
-    agenda.setdefault('_id', event['guid'])
+    if set_doc_id:
+        agenda.setdefault('_id', event['guid'])
 
     agenda['guid'] = event['guid']
     agenda['event_id'] = event['guid']
