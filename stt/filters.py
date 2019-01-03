@@ -1,5 +1,5 @@
-from flask_babel import gettext
 from datetime import timedelta
+from flask_babel import gettext
 from eve_elastic.elastic import parse_date
 
 from superdesk.utc import utcnow
@@ -7,7 +7,7 @@ from superdesk.resource import not_analyzed
 from newsroom.signals import publish_item
 
 
-STT_FIELDS = ['sttdepartment', 'sttversion', 'sttgenre']
+STT_FIELDS = ['sttdepartment', 'sttversion', 'sttgenre', 'sttdone1']
 
 
 def on_publish_item(app, item, **kwargs):
@@ -16,6 +16,7 @@ def on_publish_item(app, item, **kwargs):
         for subject in item['subject']:
             if subject.get('scheme', '') in STT_FIELDS:
                 item[subject['scheme']] = subject.get('name', subject.get('code'))
+        item['subject'] = [subject for subject in item['subject'] if subject.get('scheme') != 'sttdone1']
 
     # set versioncreated for archive items
     if item.get('firstpublished'):
@@ -29,12 +30,15 @@ def init_app(app):
 
     # add extra fields to elastic mapping
     for field in STT_FIELDS:
-        app.config['DOMAIN']['items']['schema'].update({
-            field: {'type': 'string', 'mapping': not_analyzed},
-        })
-        app.config['SOURCES']['items']['projection'].update({
-            field: 1,
-        })
+        for resource in ('items', 'content_api'):
+            app.config['DOMAIN'][resource]['schema'].update({
+                field: {'type': 'string', 'mapping': not_analyzed},
+            })
+
+            app.config['SOURCES'][resource]['projection'].update({
+                field: 1,
+            })
+
         app.config['WIRE_AGGS'].update({
             field: {'terms': {'field': field, 'size': 50}},
         })
