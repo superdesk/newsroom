@@ -367,7 +367,7 @@ class AgendaService(newsroom.Service):
 
     def _enhance_items(self, docs):
         for doc in docs:
-            inner_hits = doc.pop('inner_hits', None)
+            inner_hits = doc.pop('_inner_hits', None)
             if not inner_hits or not inner_hits.get('planning_items'):
                 continue
 
