@@ -398,27 +398,18 @@ def get_display_dates(agenda_date, planning_items):
     """
     display_dates = []
 
-    def should_add(date):
-        try:
-            return not (agenda_date['start'].date() <= date.date() <= agenda_date['end'].date()) and \
-                   not date.date() in [d['date'].date() for d in display_dates]
-        except (AttributeError, TypeError):
-            return False
-
     for planning_item in planning_items:
         if not planning_item.get('coverages'):
             parsed_date = parse_date_str(planning_item['planning_date'])
-            if should_add(parsed_date):
-                display_dates.append({
-                    'date': parsed_date
-                })
+            display_dates.append({
+                'date': parsed_date
+            })
 
         for coverage in planning_item.get('coverages') or []:
             parsed_date = parse_date_str(coverage['planning']['scheduled'])
-            if should_add(parsed_date):
-                display_dates.append({
-                    'date': parsed_date
-                })
+            display_dates.append({
+                'date': parsed_date
+            })
 
     return display_dates
 

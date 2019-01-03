@@ -69,7 +69,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                         <AgendaPreviewCoverages
                             item={item}
                             currentCoverage={displayCoverages.current}
-                            previousCoverage={displayCoverages.previous} />}
+                            previousCoverage={displayCoverages.previous}/>}
                         <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                     </div>
                     {hasAttachments(item) && (

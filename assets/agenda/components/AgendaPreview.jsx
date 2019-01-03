@@ -72,7 +72,8 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaLongDescription item={item} plan={previewPlan}/>
                             <AgendaPreviewCoverages item={item}
                                 currentCoverage={displayCoverages.current}
-                                previousCoverage={displayCoverages.previous} />
+                                previousCoverage={displayCoverages.previous}
+                            />
                             <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                             <AgendaPreviewAttachments item={item} />
                             <AgendaTags item={item} plan={previewPlan || {}} isItemDetail={false} />

@@ -374,6 +374,7 @@ class AgendaService(newsroom.Service):
             items_by_key = {p.get('guid'): p for p in inner_hits.get('planning_items')}
             doc['planning_items'] = [p for p in doc['planning_items']
                                      if items_by_key.get(p.get('guid'))]
+            doc['coverages'] = [c for c in doc['coverages'] if items_by_key.get(c.get('planning_id'))]
 
     def get(self, req, lookup):
         query = _agenda_query()

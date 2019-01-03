@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {get} from 'lodash';
 import {bem} from 'ui/utils';
 import {
     hasCoverages,
@@ -72,7 +73,7 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
                     {item.coverages.map((coverage) => {
                         const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
                         return (!group || (isCoverageForExtraDay(coverage, group) &&
-                            coverage.planning_id === planningItem._id) &&
+                            coverage.planning_id === get(planningItem, 'guid')) &&
                           <span
                               className='wire-articles__item__icon'
                               key={coverage.coverage_id}

@@ -555,20 +555,16 @@ export function getCoveragesForDisplay(item, plan, group) {
     const currentCoverage = [];
     const previousCoverage = [];
     // get current and preview coverages
-    if (!get(plan, 'guid')) {
-        currentCoverage.push(...(get(item, 'coverages') || []));
-    } else {
-        get(item, 'coverages', [])
-            .forEach((coverage) => {
-                if (coverage.planning_id === get(plan, 'guid')) {
-                    if (isCoverageForExtraDay(coverage, group)) {
-                        currentCoverage.push(coverage);
-                    } else if (isCoverageOnPreviousDay(coverage, group)) {
-                        previousCoverage.push(coverage);
-                    }
+    get(item, 'coverages', [])
+        .forEach((coverage) => {
+            if (coverage.planning_id === get(plan, 'guid')) {
+                if (isCoverageForExtraDay(coverage, group)) {
+                    currentCoverage.push(coverage);
+                } else if (isCoverageOnPreviousDay(coverage, group)) {
+                    previousCoverage.push(coverage);
                 }
-            });
-    }
+            }
+        });
 
     return {current: currentCoverage, previous: previousCoverage};
 }

@@ -304,9 +304,11 @@ def test_push_coverages_with_different_dates_for_an_existing_event(client, app):
     assert 2 == len(parsed['coverages'])
     assert parsed['dates']['start'].isoformat() == event['dates']['start'].replace('0000', '00:00')
     assert parsed['dates']['end'].isoformat() == event['dates']['end'].replace('0000', '00:00')
-    assert 1 == len(parsed['display_dates'])
+    assert 2 == len(parsed['display_dates'])
     assert parsed['display_dates'][0]['date'].isoformat() == \
         planning['coverages'][0]['planning']['scheduled'].replace('0000', '00:00')
+    assert parsed['display_dates'][1]['date'].isoformat() == \
+        planning['coverages'][1]['planning']['scheduled'].replace('0000', '00:00')
 
 
 def test_push_planning_with_different_dates_for_an_existing_event(client, app):
