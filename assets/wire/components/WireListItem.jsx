@@ -9,6 +9,7 @@ import ActionButton from 'components/ActionButton';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import WireListItemIcons from './WireListItemIcons';
+import WireListItemEmbargoed from './WireListItemEmbargoed';
 import ActionMenu from '../../components/ActionMenu';
 
 class WireListItem extends React.Component {
@@ -99,6 +100,7 @@ class WireListItem extends React.Component {
                                     <span>{item.source}
                                         {' // '}<span>{this.wordCount}</span> {gettext('words')}
                                         {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
+                                        <WireListItemEmbargoed item={item} />
                                     </span>
                                 </div>
                             </div>

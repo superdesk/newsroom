@@ -533,9 +533,13 @@ def test_push_parsed_item(client, app):
 
 
 def test_push_parsed_dates(client, app):
-    client.post('/push', data=json.dumps(item), content_type='application/json')
+    payload = item.copy()
+    payload['embargoed'] = '2019-01-31T00:01:00+00:00'
+    client.post('/push', data=json.dumps(payload), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'items')
     assert type(parsed['firstcreated']) == datetime
+    assert type(parsed['versioncreated']) == datetime
+    assert type(parsed['embargoed']) == datetime
 
 
 def test_push_event_coverage_info(client, app):
