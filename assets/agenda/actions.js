@@ -2,10 +2,17 @@
 import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler} from 'utils';
+import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler, formatAgendaDate, getLocaleDate} from 'utils';
 import { markItemAsRead } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
-import {getCalendars, getDateInputDate, getLocationString, getPublicContacts, hasLocation} from './utils';
+import {
+    getCalendars,
+    getDateInputDate,
+    getLocationString,
+    getPublicContacts,
+    hasLocation,
+    getEventLinks,
+} from './utils';
 
 import {
     setQuery,
@@ -18,8 +25,8 @@ import {
     initParams as initSearchParams,
 } from 'search/actions';
 
-import {getLocaleDate} from '../utils';
 import {clearAgendaDropdownFilters} from '../local-store';
+import {getLocations, getMapSource} from '../maps/utils';
 
 
 const WATCH_URL = '/agenda_watch';
@@ -121,7 +128,20 @@ export function selectDate(dateString, grouping) {
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        window.open(`/agenda/${item._id}?print`, '_blank');
+        const map = getMapSource(getLocations(item), 2);
+        const dates = formatAgendaDate(item.dates);
+        const dateString =  dates[1] ? `${dates[0]}, ${dates[1]}` : `${dates[0]}`;
+        const location = getLocationString(item);
+        const contacts = getPublicContacts(item);
+        const links = getEventLinks(item);
+        const data = { item, map, dateString, location, contacts, links };
+
+        const newTab = window.open('', '_blank');
+        server.post('/agenda_print', data)
+            .then(() => {
+                newTab.location.href = `/agenda/${item._id}?print`;
+            }).catch(errorHandler);
+
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));

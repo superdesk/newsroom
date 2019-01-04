@@ -51,9 +51,20 @@ def item(_id):
         return flask.jsonify(item)
 
     if 'print' in flask.request.args:
-        template = 'agenda_item_print.html'
-        update_action_list([_id], 'prints', force_insert=True)
-        return flask.render_template(template, item=item)
+        data = app.cache.get(_id)
+        if data:
+            template = 'agenda_item_print.html'
+            update_action_list([_id], 'prints', force_insert=True)
+            return flask.render_template(
+                template,
+                item=item,
+                map=data.get('map'),
+                dateString=data.get('dateString'),
+                location=data.get('location'),
+                contacts=data.get('contacts', []),
+                links=data.get('links', []),
+                is_admin=is_admin_or_internal(user)
+            )
 
     data = get_view_data()
     data['item'] = item
@@ -111,4 +122,14 @@ def follow():
     assert data.get('items')
     update_action_list(data.get('items'), 'watches', item_type='agenda')
     push_user_notification('saved_items', count=get_resource_service('agenda').get_saved_items_count())
+    return flask.jsonify(), 200
+
+
+@blueprint.route('/agenda_print', methods=['POST'])
+@login_required
+def print_agenda():
+    data = get_json_or_400()
+    assert data.get('item')
+    item = data.get('item')
+    app.cache.set(item['_id'], data, timeout=300)
     return flask.jsonify(), 200
