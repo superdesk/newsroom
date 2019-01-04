@@ -47,6 +47,10 @@ class CompaniesResource(newsroom.Resource):
         'archive_access': {
             'type': 'boolean',
         },
+        'company_type': {
+            'type': 'string',
+            'nullable': True,
+        },
     }
     datasource = {
         'source': 'companies',

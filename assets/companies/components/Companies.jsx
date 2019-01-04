@@ -76,7 +76,9 @@ class Companies extends React.Component {
                         <CompanyList
                             companies={this.props.companies}
                             onClick={this.props.selectCompany}
-                            activeCompanyId={this.props.activeCompanyId} />
+                            activeCompanyId={this.props.activeCompanyId}
+                            companyTypes={this.props.companyTypes}
+                        />
                     </div>
                 )}
                 {this.props.companyToEdit &&
@@ -90,6 +92,7 @@ class Companies extends React.Component {
                         users={this.props.companyUsers}
                         fetchCompanyUsers={this.props.fetchCompanyUsers}
                         products={this.props.products}
+                        companyTypes={this.props.companyTypes}
                     />
                 }
             </div>
@@ -115,6 +118,7 @@ Companies.propTypes = {
     errors: PropTypes.object,
     dispatch: PropTypes.func,
     products: PropTypes.array,
+    companyTypes: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -129,6 +133,7 @@ const mapStateToProps = (state) => ({
     companiesById: state.companiesById,
     companyUsers: state.companyUsers,
     errors: state.errors,
+    companyTypes: state.companyTypes,
 });
 
 

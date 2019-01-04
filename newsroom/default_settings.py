@@ -238,3 +238,5 @@ DEFAULT_LANGUAGE = 'en'
 
 # Enable iframely support for item body_html
 IFRAMELY = True
+
+COMPANY_TYPES = []

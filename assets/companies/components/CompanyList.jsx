@@ -4,13 +4,15 @@ import CompanyListItem from './CompanyListItem';
 import { gettext } from 'utils';
 
 
-function CompanyList({companies, onClick, activeCompanyId}) {
+function CompanyList({companies, onClick, activeCompanyId, companyTypes}) {
     const list = companies.map((company) =>
         <CompanyListItem
             key={company._id}
             company={company}
             onClick={onClick}
-            isActive={activeCompanyId===company._id}/>
+            isActive={activeCompanyId===company._id}
+            type={companyTypes.find((ctype) => ctype.id === company.company_type)}
+        />
     );
 
     return (
@@ -20,6 +22,7 @@ function CompanyList({companies, onClick, activeCompanyId}) {
                     <thead>
                         <tr>
                             <th>{ gettext('Name') }</th>
+                            <th>{ gettext('Type') }</th>
                             <th>{ gettext('Superdesk Subscriber Id') }</th>
                             <th>{ gettext('Status') }</th>
                             <th>{ gettext('Contact') }</th>
@@ -39,7 +42,8 @@ function CompanyList({companies, onClick, activeCompanyId}) {
 CompanyList.propTypes = {
     companies: PropTypes.array.isRequired,
     onClick: PropTypes.func.isRequired,
-    activeCompanyId: PropTypes.string
+    activeCompanyId: PropTypes.string,
+    companyTypes: PropTypes.array,
 };
 
 export default CompanyList;

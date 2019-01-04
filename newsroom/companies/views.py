@@ -13,12 +13,20 @@ from newsroom.companies import blueprint
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400
 
 
+def get_company_types_options(company_types):
+    return [
+        dict([(k, v) for k, v in company_type.items() if k in {'id', 'name'}])
+        for company_type in company_types
+    ]
+
+
 def get_settings_data():
     return {
         'companies': list(query_resource('companies')),
         'services': app.config['SERVICES'],
         'products': list(query_resource('products')),
         'sections': app.sections,
+        'company_types': get_company_types_options(app.config.get('COMPANY_TYPES', [])),
     }
 
 
@@ -64,6 +72,7 @@ def get_company_updates(company):
         'phone': company.get('phone'),
         'country': company.get('country'),
         'is_enabled': company.get('is_enabled'),
+        'company_type': company.get('company_type'),
     }
 
     if company.get('expiry_date'):
