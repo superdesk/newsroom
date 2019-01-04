@@ -5,8 +5,7 @@ import 'react-toggle/style.css';
 import { connect } from 'react-redux';
 
 import { isEmpty } from 'lodash';
-import { gettext } from 'utils';
-import {isTouchDevice} from '../../utils';
+import { gettext, isTouchDevice, isWireContext } from 'utils';
 
 import {
     followTopic,
@@ -68,7 +67,7 @@ class SearchResultsInfo extends React.Component {
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-none d-sm-block"
                         onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType, this.props.activeNavigation)}
-                    >{gettext('Save as topic')}</button>
+                    >{isWireContext() ? gettext('Save as topic') : gettext('Save search to my events')}</button>
                 )}
 
                 {displayFollowTopic && (

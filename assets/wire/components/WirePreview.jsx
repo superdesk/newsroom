@@ -17,6 +17,7 @@ import ArticlePicture from  'ui/components/ArticlePicture';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
 import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
+import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
@@ -59,10 +60,11 @@ class WirePreview extends React.PureComponent {
                     <PreviewActionButtons item={item} user={user} actions={actions} />
                 </div>
                 <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
+                    <ArticleEmbargoed item={item} />
                     {isDisplayed('slugline', previewConfig) && <ArticleSlugline item={item}/>}
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
-                        <ArticleAuthor item={item} displayConfig={previewConfig} />}
+                        <ArticleAuthor item={item} isPreview={true} displayConfig={previewConfig} />}
                     {picture && <ArticlePicture
                         picture={getPreviewRendition(picture)}
                         isKilled={isKilled(item)}

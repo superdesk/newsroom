@@ -2,13 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { gettext, shortDate, fullDate, wordCount } from 'utils';
+import { gettext, fullDate, wordCount, LIST_ANIMATIONS } from 'utils';
 import { getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled } from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import WireListItemIcons from './WireListItemIcons';
+import WireListItemEmbargoed from './WireListItemEmbargoed';
 import ActionMenu from '../../components/ActionMenu';
 
 class WireListItem extends React.Component {
@@ -57,6 +58,10 @@ class WireListItem extends React.Component {
             'wire-articles__item--open': this.props.isActive,
             'wire-articles__item--selected': this.props.isSelected,
         });
+        const selectClassName = classNames('no-bindable-select', {
+            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
+        });
         const picture = getPicture(item);
         const isWire = this.props.context === 'wire';
         return (
@@ -75,7 +80,7 @@ class WireListItem extends React.Component {
                     <div className='wire-articles__item-text'>
 
                         <h4 className='wire-articles__item-headline'>
-                            <div className='no-bindable-select wire-articles__item-select' onClick={this.stopPropagation}>
+                            <div className={selectClassName} onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
                                     <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
                                     <i></i>
@@ -94,7 +99,8 @@ class WireListItem extends React.Component {
                                     <span className='bold'>{this.slugline}</span>
                                     <span>{item.source}
                                         {' // '}<span>{this.wordCount}</span> {gettext('words')}
-                                        {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                                        {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
+                                        <WireListItemEmbargoed item={item} />
                                     </span>
                                 </div>
                             </div>
@@ -114,7 +120,7 @@ class WireListItem extends React.Component {
                         {!isExtended && (
                             <div className='wire-articles__item__meta'>
                                 <div className='wire-articles__item__meta-info'>
-                                    <time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                                    <time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
                                 </div>
                             </div>
                         )}

@@ -88,6 +88,15 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
     if product_ids:
         query['bool']['should'].append({'terms': {'products.code': product_ids}})
 
+    # add company type filters (if any)
+    if company and company.get('company_type'):
+        for company_type in app.config.get('COMPANY_TYPES', []):
+            if company_type['id'] == company['company_type']:
+                if company_type.get('wire_must'):
+                    query['bool']['must'].append(company_type['wire_must'])
+                if company_type.get('wire_must_not'):
+                    query['bool']['must_not'].append(company_type['wire_must_not'])
+
     for product in products:
         if product.get('query'):
             if product['query'] == '_featured':

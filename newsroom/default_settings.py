@@ -205,6 +205,7 @@ CLIENT_COVERAGE_DATE_FORMAT = 'HH:mm DD/MM'
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
 
+
 WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')
 
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
@@ -222,8 +223,20 @@ COVERAGE_TYPES = {
     'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'}
 }
 
+# Client configuration
+CLIENT_CONFIG = {
+    'time_format': CLIENT_TIME_FORMAT,
+    'date_format': CLIENT_DATE_FORMAT,
+    'coverage_date_format': CLIENT_COVERAGE_DATE_FORMAT,
+    'coverage_types': COVERAGE_TYPES,
+    'display_abstract': DISPLAY_ABSTRACT,
+    'list_animations': True,  # Enables or disables the animations for list item select boxes
+}
+
 LANGUAGES = ['en', 'fi', 'cs']
 DEFAULT_LANGUAGE = 'en'
 
 # Enable iframely support for item body_html
 IFRAMELY = True
+
+COMPANY_TYPES = []

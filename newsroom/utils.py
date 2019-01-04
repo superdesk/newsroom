@@ -71,7 +71,7 @@ def get_type():
 
 
 def parse_dates(item):
-    for field in ['firstcreated', 'versioncreated']:
+    for field in ['firstcreated', 'versioncreated', 'embargoed']:
         if item.get(field) and type(item[field]) == str:
             item[field] = parse_date(item[field])
 

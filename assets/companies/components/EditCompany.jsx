@@ -95,6 +95,15 @@ class EditCompany extends React.Component {
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.name : null}/>
 
+                                    <SelectInput
+                                        name='company_type'
+                                        label={gettext('Company Type')}
+                                        value={this.props.company.company_type}
+                                        options={this.props.companyTypes.map((ctype) => ({text: ctype.name, value: ctype.id}))}
+                                        defaultOption=""
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.company_type : null}/>
+
                                     <TextInput
                                         name='url'
                                         label={gettext('Company Url')}
@@ -195,6 +204,7 @@ EditCompany.propTypes = {
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     fetchCompanyUsers: PropTypes.func.isRequired,
+    companyTypes: PropTypes.array,
 };
 
 export default EditCompany;

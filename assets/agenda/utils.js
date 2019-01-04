@@ -117,7 +117,7 @@ export function hasCoverages(item) {
  * @returns {*}
  */
 export function getCoverageIcon(coverageType) {
-    const coverageTypes = getConfig('coverage_types', {}, 'agendaData');
+    const coverageTypes = getConfig('coverage_types', {});
     return get(coverageTypes, `${coverageType}.icon`, 'unrecognized');
 }
 
@@ -128,7 +128,7 @@ export function getCoverageIcon(coverageType) {
  * @returns {*}
  */
 export function getCoverageDisplayName(coverageType) {
-    const coverageTypes = getConfig('coverage_types', {}, 'agendaData');
+    const coverageTypes = getConfig('coverage_types', {});
     return get(coverageTypes, `${coverageType}.name`, coverageType);
 }
 

@@ -20,6 +20,7 @@ class FollowTopicModal extends React.Component {
 
         this.onSubmit = this.onSubmit.bind(this);
         this.onChangeHandler = this.onChangeHandler.bind(this);
+        this.getTitle = this.getTitle.bind(this);
     }
 
     onSubmit(event) {
@@ -45,9 +46,14 @@ class FollowTopicModal extends React.Component {
         return this.state.topic && !this.state.topic._id;
     }
 
+    getTitle() {
+        return this.state.topic && this.state.topic.topic_type === 'agenda' ?
+            gettext('Save event search') : gettext('Save as topic');
+    }
+
     render() {
         return (
-            <Modal title={gettext('Save as topic')} onSubmit={this.onSubmit}>
+            <Modal title={this.getTitle()} onSubmit={this.onSubmit}>
                 <form onSubmit={this.onSubmit}>
                     <TextInput
                         label={gettext('Name')}
