@@ -54,3 +54,24 @@ BLUEPRINTS = [
     'newsroom.public',
     'newsroom.settings'
 ]
+
+COMPANY_TYPES = [
+    dict(
+        id='premium',
+        name='Premium',
+        # no filter, gets all
+    ),
+    dict(
+        id='non-premium',
+        name='Non-premium',
+        wire_must_not={'bool': {'must': [  # filter out
+            {'term': {'sttdone1': '5'}},  # premium
+            {'range': {'embargoed': {'gte': 'now'}}},  # with embargo
+        ]}},
+    ),
+    dict(
+        id='non-media',
+        name='Non-media',
+        wire_must_not={'range': {'embargoed': {'gte': 'now'}}},  # filter out embargo
+    ),
+]
