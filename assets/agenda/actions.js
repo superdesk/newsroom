@@ -2,7 +2,7 @@
 import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler, formatAgendaDate, getLocaleDate} from 'utils';
+import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler, getLocaleDate} from 'utils';
 import { markItemAsRead } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 import {
@@ -11,7 +11,6 @@ import {
     getLocationString,
     getPublicContacts,
     hasLocation,
-    getEventLinks,
 } from './utils';
 
 import {
@@ -128,19 +127,8 @@ export function selectDate(dateString, grouping) {
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        const map = getMapSource(getLocations(item), 2);
-        const dates = formatAgendaDate(item.dates);
-        const dateString =  dates[1] ? `${dates[0]}, ${dates[1]}` : `${dates[0]}`;
-        const location = getLocationString(item);
-        const contacts = getPublicContacts(item);
-        const links = getEventLinks(item);
-        const data = { item, map, dateString, location, contacts, links };
-
-        const newTab = window.open('', '_blank');
-        server.post('/agenda_print', data)
-            .then(() => {
-                newTab.location.href = `/agenda/${item._id}?print`;
-            }).catch(errorHandler);
+        const map = encodeURIComponent(getMapSource(getLocations(item), 2));
+        window.open(`/agenda/${item._id}?print&map=${map}`, '_blank');
 
         item && analytics.itemEvent('print', item);
         if (getState().user) {
