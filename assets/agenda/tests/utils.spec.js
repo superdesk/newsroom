@@ -8,11 +8,13 @@ describe('utils', () => {
             const items = [
                 {
                     _id: 'foo',
-                    dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-15T05:00:00+0000', tz: 'Australia/Sydney'}
+                    dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-15T05:00:00+0000', tz: 'Australia/Sydney'},
+                    event: {_id: 'foo'}
                 },
                 {
                     _id: 'bar',
-                    dates: {start: '2018-10-18T06:00:00+0000', end: '2018-10-18T09:00:00+0000', tz: 'Australia/Sydney'}
+                    dates: {start: '2018-10-18T06:00:00+0000', end: '2018-10-18T09:00:00+0000', tz: 'Australia/Sydney'},
+                    event: {_id: 'bar'}
                 },
             ];
 
@@ -30,11 +32,13 @@ describe('utils', () => {
             const items = [
                 {
                     _id: 'foo',
-                    dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-17T05:00:00+0000', tz: 'Australia/Sydney'}
+                    dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-17T05:00:00+0000', tz: 'Australia/Sydney'},
+                    event: {_id: 'foo'}
                 },
                 {
                     _id: 'bar',
-                    dates: {start: '2018-10-17T06:00:00+0000', end: '2018-10-18T09:00:00+0000', tz: 'Australia/Sydney'}
+                    dates: {start: '2018-10-17T06:00:00+0000', end: '2018-10-18T09:00:00+0000', tz: 'Australia/Sydney'},
+                    event: {_id: 'bar'}
                 },
             ];
 
@@ -52,7 +56,8 @@ describe('utils', () => {
                 {
                     _id: 'foo',
                     dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-17T05:00:00+0000', tz: 'Australia/Sydney'},
-                    display_dates: [{date: '2018-10-13T10:00:00+0000'}]
+                    display_dates: [{date: '2018-10-13T10:00:00+0000'}],
+                    event: {_id: 'foo'}
                 }];
 
             const groupedItems = keyBy(utils.groupItems(items, '2018-10-11', 'day'), 'date');
@@ -66,6 +71,46 @@ describe('utils', () => {
             expect(groupedItems['17-10-2018']['items']).toEqual(['foo']);
             expect(groupedItems.hasOwnProperty('18-10-2018')).toBe(false);
         });
+
+        it('returns grouped ad-hoc plan based on extra days', () => {
+            const items = [
+                {
+                    _id: 'foo',
+                    dates: {start: '2018-10-17T04:00:00+0000', end: '2018-10-17T04:00:00+0000'},
+                    display_dates: [
+                        {date: '2018-10-16T04:00:00+0000'},
+                        {date: '2018-10-18T04:00:00+0000'}
+                    ],
+                    event: null
+                }];
+
+            const groupedItems = keyBy(utils.groupItems(items, '2018-10-15', 'day'), 'date');
+
+            expect(groupedItems.hasOwnProperty('15-10-2018')).toBe(false);
+            expect(groupedItems.hasOwnProperty('17-10-2018')).toBe(false);
+            expect(groupedItems.hasOwnProperty('16-10-2018')).toBe(true);
+            expect(groupedItems.hasOwnProperty('18-10-2018')).toBe(true);
+            expect(groupedItems['16-10-2018']['items']).toEqual(['foo']);
+            expect(groupedItems['18-10-2018']['items']).toEqual(['foo']);
+        });
+
+        it('returns grouped ad-hoc plan with no extra days', () => {
+            const items = [
+                {
+                    _id: 'foo',
+                    dates: {start: '2018-10-17T04:00:00+0000', end: '2018-10-17T04:00:00+0000'},
+                    display_dates: [{date: '2018-10-17T04:00:00+0000'}],
+                    event: null
+                }];
+
+            const groupedItems = keyBy(utils.groupItems(items, '2018-10-15', 'day'), 'date');
+
+            expect(groupedItems.hasOwnProperty('15-10-2018')).toBe(false);
+            expect(groupedItems.hasOwnProperty('16-10-2018')).toBe(false);
+            expect(groupedItems.hasOwnProperty('17-10-2018')).toBe(true);
+            expect(groupedItems.hasOwnProperty('18-10-2018')).toBe(false);
+            expect(groupedItems['17-10-2018']['items']).toEqual(['foo']);
+        });
     });
 
     describe('listItems', () => {
@@ -78,6 +123,7 @@ describe('utils', () => {
                         {date: '2018-10-14T04:00:00+0000'},
                         {date: '2018-10-16T04:00:00+0000'},
                     ],
+                    event: {_id: 'foo'},
                     coverages: [
                         {
                             'scheduled': '2018-10-15T04:00:00+0000',
