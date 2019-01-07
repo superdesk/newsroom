@@ -18,18 +18,23 @@ import ArticleBody from 'ui/components/ArticleBody';
 import ArticleSidebar from 'ui/components/ArticleSidebar';
 import ArticleSidebarBox from 'ui/components/ArticleSidebarBox';
 
-import {hasCoverages, hasAttachments, getInternalNotes} from '../utils';
+import {
+    hasCoverages,
+    hasAttachments,
+    getInternalNote,
+    getCoveragesForDisplay,
+} from '../utils';
 
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
-import AgendaCoverages from './AgendaCoverages';
+import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
 
-export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group}) {
+export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group, plan}) {
     const locations = getLocations(item);
     let map = null;
 
@@ -43,6 +48,8 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
         map = <StaticMap locations={locations} scale={2} />;
     }
 
+    const displayCoverages = getCoveragesForDisplay(item, plan, group);
+
     return (
         <Content type="item-detail">
             <ContentHeader>
@@ -54,21 +61,25 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
             <Article image={map} item={item} group={group}>
                 <ArticleBody>
                     <AgendaMeta item={item} />
-                    <AgendaLongDescription item={item} />
+                    <AgendaLongDescription item={item} plan={plan || {}}/>
                 </ArticleBody>
                 <ArticleSidebar>
-                    <ArticleSidebarBox label={gettext('Coverages')}>
-                        {hasCoverages(item) && <AgendaCoverages item={item} />}
+                    <div>
+                        {hasCoverages(item) &&
+                        <AgendaPreviewCoverages
+                            item={item}
+                            currentCoverage={displayCoverages.current}
+                            previousCoverage={displayCoverages.previous}/>}
                         <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
-                    </ArticleSidebarBox>
+                    </div>
                     {hasAttachments(item) && (
                         <ArticleSidebarBox label={gettext('Attachments')}>
                             <AgendaAttachments item={item} />
                         </ArticleSidebarBox>
                     )}
-                    <AgendaTags item={item} isItemDetail={true} />
-                    <AgendaEdNote item={item} />
-                    <AgendaInternalNote internalNotes={getInternalNotes(item)} />
+                    <AgendaTags item={item} plan={plan || {}} isItemDetail={true} />
+                    <AgendaEdNote item={item} plan={plan || {}}/>
+                    <AgendaInternalNote internalNotes={getInternalNote(item, plan || {})} />
                 </ArticleSidebar>
             </Article>
         </Content>
@@ -86,4 +97,5 @@ AgendaItemDetails.propTypes = {
     onClose: PropTypes.func,
     requestCoverage: PropTypes.func,
     group: PropTypes.string,
+    plan: PropTypes.object,
 };

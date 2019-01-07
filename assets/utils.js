@@ -7,13 +7,14 @@ import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment';
+import {hasCoverages, isCoverageForExtraDay} from './agenda/utils';
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
 const CLIENT_CONFIG = 'client_config';
 
 const TIME_FORMAT = getConfig('time_format');
-const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
+export const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
 const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
 export const DAY_IN_MINUTES = 24 * 60 - 1;
@@ -198,11 +199,35 @@ export function formatDate(dateString) {
  * @param {String} group: date of the selected event group
  * @return {Array} [time string, date string]
  */
-export function formatAgendaDate(agendaDate, group) {
-    const start = parseDate(agendaDate.start);
-    const end = parseDate(agendaDate.end);
-    const duration = end.diff(start, 'minutes');
-    const dateGroup = group ? moment(group, DATE_FORMAT) : null;
+export function formatAgendaDate(item, group) {
+    let start = parseDate(item.dates.start);
+    let end = parseDate(item.dates.end);
+    let duration = end.diff(start, 'minutes');
+    let dateGroup = group ? moment(group, DATE_FORMAT) : null;
+
+    let isGroupBetweenEventDates = dateGroup ?
+        start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
+
+    if (!isGroupBetweenEventDates && hasCoverages(item)) {
+        // we rendering for extra days
+        const scheduleDates = item.coverages
+            .map((coverage) => {
+                if (isCoverageForExtraDay(coverage, group)) {
+                    return coverage.scheduled;
+                }
+                return null;
+            })
+            .filter((d) => d)
+            .sort((a, b) => {
+                if (a < b) return -1;
+                if (a > b) return 1;
+                return 0;
+            });
+        if (scheduleDates.length > 0) {
+            duration = 0;
+            start = scheduleDates[0];
+        }
+    }
 
     if (duration > DAY_IN_MINUTES) {
         // Multi day event

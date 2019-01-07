@@ -39,29 +39,29 @@ export function setActive(item) {
     return {type: SET_ACTIVE, item};
 }
 
+
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item, group) {
-    return {type: PREVIEW_ITEM, item, group};
+export function preview(item, group, plan) {
+    return {type: PREVIEW_ITEM, item, group, plan};
 }
 
 export function previewAndCopy(item) {
     return (dispatch) => {
-        dispatch(previewItem(item));
         dispatch(copyPreviewContents(item));
     };
 }
 
-export function previewItem(item, group) {
+export function previewItem(item, group, plan) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(preview(item, group));
+        dispatch(preview(item, group, plan));
         item && analytics.itemEvent('preview', item);
     };
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item, group) {
-    return {type: OPEN_ITEM, item, group};
+export function openItemDetails(item, group, plan) {
+    return {type: OPEN_ITEM, item, group, plan};
 }
 
 export function requestCoverage(item, message) {
@@ -74,12 +74,14 @@ export function requestCoverage(item, message) {
     };
 }
 
-export function openItem(item, group) {
+export function openItem(item, group, plan) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(openItemDetails(item, group));
+        dispatch(openItemDetails(item, group, plan));
         updateRouteParams({
-            item: item ? item._id : null
+            item: item ? item._id : null,
+            group: group || null,
+            plan: get(plan, 'guid', null),
         }, getState());
         item && analytics.itemEvent('open', item);
         analytics.itemView(item);
@@ -562,7 +564,9 @@ export function initParams(params) {
             dispatch(fetchItem(params.get('item')))
                 .then(() => {
                     const item = getState().itemsById[params.get('item')];
-                    dispatch(openItem(item));
+                    const plan = (get(item, 'planning_items') || []).find((p) => p.guid === params.get('plan'));
+
+                    dispatch(openItem(item, params.get('group'), plan || {}));
                 });
         }
     };

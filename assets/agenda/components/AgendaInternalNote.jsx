@@ -1,20 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function AgendaInternalNote({internalNotes}) {
+export default function AgendaInternalNote({internalNote}) {
 
-    if (!internalNotes || !internalNotes.length) {
+    if (!internalNote) {
         return null;
     }
 
     return (
-        internalNotes.map((note, index) => (<div key={index} className="wire-column__preview__internal-note">
+        <div className="wire-column__preview__internal-note">
             <i className="icon-small--info icon--gray" />
-            <span >{note}</span>
-        </div>))
+            <span >{internalNote}</span>
+        </div>
     );
 }
 
 AgendaInternalNote.propTypes = {
-    internalNotes: PropTypes.array,
+    internalNote: PropTypes.string,
 };

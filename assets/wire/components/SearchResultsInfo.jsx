@@ -41,9 +41,9 @@ class SearchResultsInfo extends React.Component {
         const displayFollowTopic = this.props.topicType && this.props.user &&
             !this.props.bookmarks && (this.props.resultsFiltered || this.props.query);
 
-        const displayTotalItems = this.props.bookmarks ||
+        const displayTotalItems = this.props.hideTotalItems && (this.props.bookmarks ||
           !isEmpty(this.props.activeTopic) ||
-          this.props.resultsFiltered || this.props.query;
+          this.props.resultsFiltered || this.props.query);
 
         const displayHeader = !isEmpty(this.props.newItems) || displayTotalItems || displayFollowTopic || this.props.query;
         return (
@@ -112,6 +112,11 @@ SearchResultsInfo.propTypes = {
     searchCriteria: PropTypes.object,
     resultsFiltered: PropTypes.bool,
     followTopic: PropTypes.func.isRequired,
+    hideTotalItems: PropTypes.bool,
+};
+
+SearchResultsInfo.defaultProps = {
+    hideTotalItems: true
 };
 
 const mapStateToProps = (state) => ({

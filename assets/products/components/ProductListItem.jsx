@@ -12,6 +12,7 @@ function ProductListItem({product, isActive, onClick}) {
             <td>{(product.is_enabled ? gettext('Enabled') : gettext('Disabled'))}</td>
             <td>{gettext(product.sd_product_id)}</td>
             <td>{gettext(product.query)}</td>
+            {product.product_type === 'agenda' && <td>{gettext(product.planning_item_query)}</td>}
             <td>{shortDate(product._created)}</td>
         </tr>
     );

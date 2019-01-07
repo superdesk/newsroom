@@ -104,6 +104,8 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
                     raise FeaturedQuery
             else:
                 query['bool']['should'].append(query_string(product['query']))
+                if product.get('planning_item_query'):
+                    query['bool']['should'].append(planning_items_query_string(product.get('planning_item_query')))
 
     query['bool']['minimum_should_match'] = 1
 
@@ -123,6 +125,24 @@ def query_string(query):
             'query': query,
             'default_operator': 'AND',
             'lenient': True,
+        }
+    }
+
+
+def planning_items_query_string(query, fields=None):
+    query_string_syntax = query_string(query)
+
+    if fields:
+        query_string_syntax['query_string']['fields'] = fields
+    else:
+        query_string_syntax['query_string']['fields'] = ['planning_items.*']
+
+    return {
+        'nested': {
+            'path': 'planning_items',
+            'inner_hits': {
+            },
+            'query': query_string_syntax
         }
     }
 
