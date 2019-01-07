@@ -58,7 +58,7 @@
     "karma-jasmine": "^1.1.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.4",
-    "react-gettext-parser": "^1.6.0",
+    "react-gettext-parser": "1.7.0",
     "react-test-renderer": "^16.0.0",
     "sinon": "^4.0.0"
   }
