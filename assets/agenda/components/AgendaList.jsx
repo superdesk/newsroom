@@ -232,7 +232,7 @@ class AgendaList extends React.Component {
                                             isExtended={isExtended}
                                             user={this.props.user}
                                             actioningItem={this.state.actioningItem}
-                                            planningItem={plan}
+                                            planningId={plan.guid}
                                             resetActioningItem={this.resetActioningItem}/>
                                     )
                                 }

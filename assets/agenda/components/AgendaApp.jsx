@@ -97,7 +97,7 @@ class AgendaApp extends BaseApp {
                 onClose={onDetailClose}
                 requestCoverage={this.props.requestCoverage}
                 group={this.props.previewGroup}
-                plan={this.props.previewPlan}
+                planningId={this.props.previewPlan}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar

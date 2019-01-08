@@ -54,7 +54,8 @@ class AgendaPreview extends React.PureComponent {
             'wire-column__preview--watched': isWatching,
         });
 
-        const displayCoverages = getCoveragesForDisplay(item, previewPlan, previewGroup);
+        const plan = (get(item, 'planning_items') || []).find((p) => p.guid === previewPlan) || {};
+        const displayCoverages = getCoveragesForDisplay(item, plan, previewGroup);
 
         return (
             <div className={previewClassName}>
@@ -69,16 +70,16 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaTime item={item} group={previewGroup} />
                             <AgendaPreviewImage item={item} onClick={openItemDetails} />
                             <AgendaMeta item={item} />
-                            <AgendaLongDescription item={item} plan={previewPlan}/>
+                            <AgendaLongDescription item={item} plan={plan}/>
                             <AgendaPreviewCoverages item={item}
                                 currentCoverage={displayCoverages.current}
                                 previousCoverage={displayCoverages.previous}
                             />
                             <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                             <AgendaPreviewAttachments item={item} />
-                            <AgendaTags item={item} plan={previewPlan || {}} isItemDetail={false} />
-                            <AgendaEdNote item={item} plan={previewPlan || {}}/>
-                            <AgendaInternalNote internalNote={getInternalNote(item, previewPlan || {})} />
+                            <AgendaTags item={item} plan={plan} isItemDetail={false} />
+                            <AgendaEdNote item={item} plan={plan}/>
+                            <AgendaInternalNote internalNote={getInternalNote(item, plan)} />
                         </div>
                     </Preview>
                 }

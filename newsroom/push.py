@@ -433,10 +433,19 @@ def get_coverages(planning_items, original_coverages=[]):
     def get_existing_coverage(id):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
 
-    def set_text_delivery(coverage, deliveries):
-        if coverage['coverage_type'] == 'text' and deliveries:
-            coverage['delivery_id'] = deliveries[0]['item_id']
-            coverage['delivery_href'] = url_for('wire.item', _id=deliveries[0]['item_id'])
+    def set_delivery(coverage, deliveries):
+        if coverage['coverage_type'] == 'text':
+            if deliveries and coverage.get('workflow_status') == 'completed':
+                coverage['delivery_id'] = deliveries[0]['item_id']
+                coverage['delivery_href'] = url_for('wire.item', _id=deliveries[0]['item_id'])
+            else:
+                coverage['delivery_id'] = None
+                coverage['delivery_href'] = None
+        else:
+            if coverage.get('workflow_status') == 'completed':
+                coverage['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item)
+            else:
+                coverage['delivery_href'] = None
 
     coverages = []
     coverage_changes = {}
@@ -454,9 +463,7 @@ def get_coverages(planning_items, original_coverages=[]):
                 'delivery_id': existing_coverage.get('delivery_id')
             }
 
-            new_coverage['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item) \
-                or existing_coverage.get('delivery_href')
-            set_text_delivery(new_coverage, coverage.get('deliveries'))
+            set_delivery(new_coverage, coverage.get('deliveries'))
             coverages.append(new_coverage)
 
             if original_coverages and not existing_coverage:
