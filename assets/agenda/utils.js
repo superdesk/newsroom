@@ -495,8 +495,9 @@ export function groupItems (items, activeDate, activeGrouping) {
 
             const isBetween = day.isBetween(itemStartDate, itemEndDate, 'day', '[]');
             const containsExtra = containsExtraDate(item, day);
+            const addGroupItem = (item.event && (isBetween || containsExtra)) || containsExtra;
 
-            if (grouper(day) !== key && (isBetween || containsExtra)) {
+            if (grouper(day) !== key && addGroupItem) {
                 key = grouper(day);
                 const groupList = groupedItems[key] || [];
                 groupList.push(item._id);
@@ -555,7 +556,7 @@ export function getCoveragesForDisplay(item, plan, group) {
     const currentCoverage = [];
     const previousCoverage = [];
     // get current and preview coverages
-    get(item, 'coverages', [])
+    (get(item, 'coverages') || [])
         .forEach((coverage) => {
             if (coverage.planning_id === get(plan, 'guid')) {
                 if (isCoverageForExtraDay(coverage, group)) {
