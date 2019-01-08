@@ -81,7 +81,7 @@ export function openItem(item, group, plan) {
         updateRouteParams({
             item: item ? item._id : null,
             group: group || null,
-            plan: get(plan, 'guid', null),
+            plan: plan || null,
         }, getState());
         item && analytics.itemEvent('open', item);
         analytics.itemView(item);
@@ -564,9 +564,8 @@ export function initParams(params) {
             dispatch(fetchItem(params.get('item')))
                 .then(() => {
                     const item = getState().itemsById[params.get('item')];
-                    const plan = (get(item, 'planning_items') || []).find((p) => p.guid === params.get('plan'));
 
-                    dispatch(openItem(item, params.get('group'), plan || {}));
+                    dispatch(openItem(item, params.get('group'), params.get('plan')));
                 });
         }
     };

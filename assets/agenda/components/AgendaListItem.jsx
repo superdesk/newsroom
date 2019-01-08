@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import {get} from 'lodash';
+
 import ActionButton from 'components/ActionButton';
 
 import AgendaListItemIcons from './AgendaListItemIcons';
@@ -48,7 +50,7 @@ class AgendaListItem extends React.Component {
     }
 
     render() {
-        const {item, onClick, onDoubleClick, isExtended, group, planningItem} = this.props;
+        const {item, onClick, onDoubleClick, isExtended, group, planningId} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--covering': hasCoverages(this.props.item),
@@ -67,16 +69,16 @@ class AgendaListItem extends React.Component {
         const articleClassName = classNames('wire-articles__item-text', {
             'flex-column align-items-start': !isExtended
         });
-
-        const description = getDescription(item, planningItem || {});
+        const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
+        const description = getDescription(item, planningItem);
 
         return (
             <article key={item._id}
                 className={cardClassName}
                 tabIndex='0'
                 ref={(elem) => this.articleElem = elem}
-                onClick={() => onClick(item, group, planningItem || {})}
-                onDoubleClick={() => onDoubleClick(item, group, planningItem || {})}
+                onClick={() => onClick(item, group, planningId)}
+                onDoubleClick={() => onDoubleClick(item, group, planningId)}
                 onMouseEnter={() => {
                     this.setState({isHover: true});
                     if (this.props.actioningItem && this.props.actioningItem._id !== item._id) {
@@ -115,7 +117,7 @@ class AgendaListItem extends React.Component {
                         <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
                             <ActionMenu
                                 item={this.props.item}
-                                plan={this.props.planningItem}
+                                plan={planningItem}
                                 user={this.props.user}
                                 group={this.props.group}
                                 actions={this.props.actions}
@@ -160,7 +162,7 @@ AgendaListItem.propTypes = {
     user: PropTypes.string,
     actioningItem: PropTypes.object,
     resetActioningItem: PropTypes.func,
-    planningItem: PropTypes.object,
+    planningId: PropTypes.object,
 };
 
 export default AgendaListItem;

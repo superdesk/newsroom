@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {isEmpty} from 'lodash';
+import {isEmpty, get} from 'lodash';
 
 import { gettext } from 'utils';
 
@@ -34,7 +34,7 @@ import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
 
-export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group, plan}) {
+export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group, planningId}) {
     const locations = getLocations(item);
     let map = null;
 
@@ -43,6 +43,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
     // if (mapsLoaded() && !isEmpty(geoLocations)) {
     //     map = <Map locations={geoLocations} />;
     // }
+    const plan = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
 
     if (!map && mapsKey() && !isEmpty(locations)) {
         map = <StaticMap locations={locations} scale={2} />;
@@ -61,7 +62,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
             <Article image={map} item={item} group={group}>
                 <ArticleBody>
                     <AgendaMeta item={item} />
-                    <AgendaLongDescription item={item} plan={plan || {}}/>
+                    <AgendaLongDescription item={item} plan={plan}/>
                 </ArticleBody>
                 <ArticleSidebar>
                     <div>
@@ -77,9 +78,9 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                             <AgendaAttachments item={item} />
                         </ArticleSidebarBox>
                     )}
-                    <AgendaTags item={item} plan={plan || {}} isItemDetail={true} />
-                    <AgendaEdNote item={item} plan={plan || {}}/>
-                    <AgendaInternalNote internalNotes={getInternalNote(item, plan || {})} />
+                    <AgendaTags item={item} plan={plan} isItemDetail={true} />
+                    <AgendaEdNote item={item} plan={plan}/>
+                    <AgendaInternalNote internalNotes={getInternalNote(item, plan)} />
                 </ArticleSidebar>
             </Article>
         </Content>
@@ -97,5 +98,5 @@ AgendaItemDetails.propTypes = {
     onClose: PropTypes.func,
     requestCoverage: PropTypes.func,
     group: PropTypes.string,
-    plan: PropTypes.object,
+    planningId: PropTypes.string,
 };
