@@ -1017,8 +1017,8 @@ def test_push_coverages_with_linked_stories(client, app):
     client.post('/push', data=json.dumps(planning), content_type='application/json')
     parsed = get_entity_or_404('foo7', 'agenda')
     assert 2 == len(parsed['coverages'])
-    assert parsed['coverages'][0]['delivery_id'] == None
-    assert parsed['coverages'][0]['delivery_href'] == None
+    assert parsed['coverages'][0]['delivery_id'] is None
+    assert parsed['coverages'][0]['delivery_href'] is None
 
 
 def test_push_event_from_planning(client, app):
