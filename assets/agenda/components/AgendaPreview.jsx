@@ -101,7 +101,7 @@ AgendaPreview.propTypes = {
     openItemDetails: PropTypes.func,
     requestCoverage: PropTypes.func,
     previewGroup: PropTypes.string,
-    previewPlan: PropTypes.object,
+    previewPlan: PropTypes.string,
 };
 
 export default AgendaPreview;

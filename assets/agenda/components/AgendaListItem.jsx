@@ -162,7 +162,7 @@ AgendaListItem.propTypes = {
     user: PropTypes.string,
     actioningItem: PropTypes.object,
     resetActioningItem: PropTypes.func,
-    planningId: PropTypes.object,
+    planningId: PropTypes.string,
 };
 
 export default AgendaListItem;
