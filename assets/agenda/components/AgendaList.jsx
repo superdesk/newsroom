@@ -286,7 +286,7 @@ AgendaList.propTypes = {
     activeItem: PropTypes.object,
     previewItem: PropTypes.string,
     previewGroup: PropTypes.string,
-    previewPlan: PropTypes.object,
+    previewPlan: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
     selectedItems: PropTypes.array,
     readItems: PropTypes.object,

@@ -213,7 +213,7 @@ AgendaApp.propTypes = {
     createdFilter: PropTypes.object,
     itemToPreview: PropTypes.object,
     previewGroup: PropTypes.string,
-    previewPlan: PropTypes.object,
+    previewPlan: PropTypes.string,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
     modal: PropTypes.object,
