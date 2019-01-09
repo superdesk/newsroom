@@ -8,7 +8,7 @@ import AgendaCoverages from './AgendaCoverages';
 
 export default function AgendaPreviewCoverages({item, currentCoverage, previousCoverage}) {
     return (
-        !isEmpty(currentCoverage) || !isEmpty(previousCoverage) && <Fragment>
+        <Fragment>
             {get(currentCoverage, 'length', 0) > 0 && <PreviewBox label={gettext('Coverages')}>
                 <AgendaCoverages item={item} coverages={currentCoverage}/>
             </PreviewBox>}

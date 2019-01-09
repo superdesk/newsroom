@@ -97,6 +97,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
                 if company_type.get('wire_must_not'):
                     query['bool']['must_not'].append(company_type['wire_must_not'])
 
+    planning_items_should = []
     for product in products:
         if product.get('query'):
             if product['query'] == '_featured':
@@ -105,7 +106,17 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
             else:
                 query['bool']['should'].append(query_string(product['query']))
                 if product.get('planning_item_query'):
-                    query['bool']['should'].append(planning_items_query_string(product.get('planning_item_query')))
+                    # form the query for the agenda planning items
+                    planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
+                    query['bool']['should'].append(
+                        nested_query(
+                            'planning_items',
+                            {
+                                'bool': {'should': planning_items_should, 'minimum_should_match': 1}
+                            },
+                            name='products'
+                        )
+                    )
 
     query['bool']['minimum_should_match'] = 1
 
@@ -130,21 +141,27 @@ def query_string(query):
 
 
 def planning_items_query_string(query, fields=None):
-    query_string_syntax = query_string(query)
+    plan_query_string = query_string(query)
 
     if fields:
-        query_string_syntax['query_string']['fields'] = fields
+        plan_query_string['query_string']['fields'] = fields
     else:
-        query_string_syntax['query_string']['fields'] = ['planning_items.*']
+        plan_query_string['query_string']['fields'] = ['planning_items.*']
 
-    return {
-        'nested': {
-            'path': 'planning_items',
-            'inner_hits': {
-            },
-            'query': query_string_syntax
-        }
+    return plan_query_string
+
+
+def nested_query(path, query, inner_hits=True, name=None):
+    nested = {
+        'path': path,
+        'query': query
     }
+    if inner_hits:
+        nested['inner_hits'] = {}
+        if name:
+            nested['inner_hits']['name'] = name
+
+    return {'nested': nested}
 
 
 def versioncreated_range(created):

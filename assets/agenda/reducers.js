@@ -52,7 +52,7 @@ const initialState = {
 
 function processAggregations(aggregations) {
     if (!get(aggregations, 'planning_items.doc_count', false)) {
-        return null;
+        return aggregations;
     }
 
     const planningItems = get(aggregations, 'planning_items', {});
