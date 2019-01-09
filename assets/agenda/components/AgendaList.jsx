@@ -196,9 +196,9 @@ class AgendaList extends React.Component {
     }
 
     render() {
-        const {items, itemsById, activeView, selectedItems, readItems} = this.props;
+        const {groupedItems, itemsById, activeView, selectedItems, readItems} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
-        const articleGroups = this.props.groupedItems.map((group) =>
+        const articleGroups = groupedItems.map((group) =>
             [
                 <div className='wire-articles__header' key={`${group.date}header`}>
                     {group.date}
@@ -271,7 +271,7 @@ class AgendaList extends React.Component {
         return (
             <div className={listClassName} onKeyDown={this.onKeyDown} ref={(elem) => this.elem = elem}>
                 {articleGroups}
-                {!items.length &&
+                {!groupedItems.length &&
                     <div className="wire-articles__item-wrap col-12">
                         <div className="alert alert-secondary">{gettext('No items found.')}</div>
                     </div>
@@ -282,7 +282,6 @@ class AgendaList extends React.Component {
 }
 
 AgendaList.propTypes = {
-    items: PropTypes.array.isRequired,
     itemsById: PropTypes.object,
     activeItem: PropTypes.object,
     previewItem: PropTypes.string,
@@ -308,7 +307,6 @@ AgendaList.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    items: state.items,
     itemsById: state.itemsById,
     activeItem: state.activeItem,
     previewItem: state.previewItem,
