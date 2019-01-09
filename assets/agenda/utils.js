@@ -42,6 +42,7 @@ export function getCoverageStatusText(coverage) {
 
 export const DRAFT_STATUS_TEXTS = {
     'coverage not planned': gettext('not planned'),
+    'coverage not intended': gettext('not planned'),
     'coverage intended': gettext('planned'),
     'coverage not decided': gettext('on merit'),
     'coverage not decided yet': gettext('on merit'),
