@@ -6,51 +6,82 @@
 <article>
     <pre>{{ item.slugline }}</pre>
 
-    <h1>{{ item.headline or item.name}}</h1>
+    <h1 class="mt-4">{{ item.headline or item.name}}</h1>
 
-    <h3>{{ _('On:') }} {{ item.dates.start | datetime_long }}</h3>
+    <h3 class="mt-4"><i class="icon--clock icon--gray mr-1"></i> {{ dateString }}</h3>
+
+    {% if location and location != '' %}
+        <h3 class="mt-4"><strong>{{ _('Where') }}:</strong> {{ location }}</h3>
+    {% endif %}
+
+    {% if map and map != '' %}
+        <div class="mt-4 mb-4">
+            <img src={{ map | safe }} >
+        </div>
+    {% endif %}
+
+    {% for contact in contacts %}
+        <h3 class="mt-3">
+            <strong>{{ _('Contact') }}:</strong>
+            {{ contact.name or contact.organisation }}
+            {{ contact.phone }}
+            {{ contact.mobile }}
+            {{ contact.email }}
+        </h3>
+    {% endfor %}
+
+    {% for link in links %}
+        <h3>
+            <strong>{{ _('Web') }}:</strong>
+            <a href={{ link | safe }}>{{ link }}</a>
+        </h3>
+    {% endfor %}
 
 
-    <div class="row">
-        <div class="col-9">
-            <div class="lead">
-                {{ item.definition_long or item.abstract or '' }}
+    {%  for planning_item in item.get('planning_items', []) or [] %}
+
+        <div class="container mt-4 pt-3 border-top">
+            <div class="row lead">
+                <h3>{{ planning_item.get('description_text') or planning_item.get('name') or '' }}</h3>
             </div>
-            <div>
-                <h3>{{ _('Coverages:') }}</h3>
-                <dl>
-                    {% for coverage in item.coverages %}
-                      <dt>{{ _('On') }}</dt>
-                      <dd>{{ coverage.scheduled | datetime_long }}</dd>
-                      <dt>{{ _('Coverage Type') }}</dt>
-                      <dd>{{ coverage.coverage_type }}</dd>
-                        <dt>{{ _('Workflow Status') }}</dt>
-                      <dd>{{ coverage.workflow_status }}</dd>
-                        <dt>{{ _('Coverage Status') }}</dt>
-                      <dd>{{ coverage.coverage_status }}</dd>
+
+            {% if is_admin and planning_item.get('ednote') %}
+                <div class="row">
+                    <strong>{{ _('Editorial Note') }}:</strong>
+                    {{ planning_item.get('ednote') }}
+                </div>
+            {% endif %}
+
+            {% if planning_item.get('coverages', []) %}
+                <div class="row">
+                    <div class="col-12">
+                        <h5>{{ _('Coverages:') }}</h5>
+                    </div>
+
+                    {% for coverage in planning_item.get('coverages', []) or [] %}
+                        <div class="col-6">
+                            {{ _('Coverage Type') }}:{{ coverage.get('planning', {}).get('g2_content_type') }}
+                        </div>
+                        <div class="col-6">
+                            {{ _('Due') }}: {{  coverage.get('planning', {}).get('scheduled') | datetime_long }}
+                        </div>
+                        <div class="col-6">
+                            {{ _('Workflow Status') }}: {{ coverage.get('workflow_status') }}
+                        </div>
+                        <div class="col-6">
+                            {{ _('Coverage Status') }}: {{ coverage.get('news_coverage_status', {}).get('name') }}
+                        </div>
+
+                        {% if is_admin %}
+                            <div class="col-6">
+                                {{ _('Internal Note') }}: {{ coverage.get('planning', {}).get('internal_note', '') or '' }}
+                            </div>
+                        {% endif %}
 
                     {% endfor %}
-                </dl>
-            </div>
+                </div>
+            {% endif %}
         </div>
-        <div class="col">
-            <h3>{{ _('Metadata') }}</h3>
-            <dl>
-                {% if item.subject %}
-                <dt>{{ _('Category') }}</dt>
-                <dd>{{ item.subject|join(', ', attribute='name')}}</dd>
-                {% endif %}
-                {% if item.genre %}
-                <dt>{{ _('Content Type') }}</dt>
-                <dd>{{ item.genre|join(', ', attribute='name')}}</dd>
-                {% endif %}
-                {% if item.place %}
-                <dt>{{ _('Place') }}</dt>
-                <dd>{{ item.place|join(', ', attribute='name')}}</dd>
-                {% endif %}
-
-            </dl>
-        </div>
-    </div>
+    {% endfor %}
 </article>
 {% endblock %}

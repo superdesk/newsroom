@@ -1,7 +1,9 @@
+import pytz
 from flask import json
 from datetime import datetime, timedelta
 from superdesk.utc import utc_to_local, local_to_utc
 from newsroom.wire.utils import get_local_date, get_end_date
+from newsroom.agenda.utils import get_location_string, get_agenda_dates, get_public_contacts
 
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import post_json, delete_json, get_json
@@ -308,3 +310,101 @@ def test_local_time(client, app, mocker):
 
         end_date = get_end_date('now/M', end_local_date)
         assert '2018-12-23T12:59:59' == end_date.strftime(format)
+
+
+def test_get_location_string():
+    agenda = {}
+    assert get_location_string(agenda) == ''
+
+    agenda['location'] = []
+    assert get_location_string(agenda) == ''
+
+    agenda['location'] = [{
+        'name': 'test location',
+        'address': {'locality': 'inner city'}
+    }]
+    assert get_location_string(agenda) == 'test location, inner city'
+
+    agenda['location'] = [{
+        "name": "Sydney Opera House",
+        "address": {
+            "country": "Australia",
+            "type": "arts_centre",
+            "postal_code": "2000",
+            "title": "Opera v Sydney",
+            "line": [
+                "2 Macquarie Street"
+            ],
+            "locality": "Sydney",
+            "area": "Sydney"
+        }
+    }]
+    assert get_location_string(agenda) == 'Sydney Opera House, 2 Macquarie Street, Sydney, Sydney, 2000, Australia'
+
+
+def test_get_public_contacts():
+    agenda = {}
+    assert get_public_contacts(agenda) == []
+
+    agenda['event'] = {}
+    assert get_public_contacts(agenda) == []
+
+    agenda['event']['event_contact_info'] = [
+        {
+            '_created': '2018-05-16T11:24:20+0000',
+            'honorific': 'Professor',
+            '_id': '5afc14e41d41c89668850f67',
+            'first_name': 'Tom',
+            'is_active': True,
+            'organisation': 'AAP',
+            'contact_email': [
+                'jones@foo.com'
+            ],
+            '_updated': '2018-05-16T11:24:20+0000',
+            'mobile': [],
+            'contact_phone': [],
+            'last_name': 'Jones',
+            'public': True
+        }
+    ]
+    assert get_public_contacts(agenda) == [{
+        'name': 'Tom Jones',
+        'organisation': 'AAP',
+        'phone': '',
+        'email': 'jones@foo.com',
+        'mobile': ''
+    }]
+
+
+def test_get_agenda_dates():
+    agenda = {
+        'dates': {
+            'end':  datetime.strptime('2018-05-28T06:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+            'start': datetime.strptime('2018-05-28T05:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+        },
+    }
+    assert get_agenda_dates(agenda) == '07:00 - 08:00, 28/05/2018'
+
+    agenda = {
+        'dates': {
+            'end': datetime.strptime('2018-05-30T06:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+            'start': datetime.strptime('2018-05-28T05:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+        },
+    }
+    assert get_agenda_dates(agenda) == '07:00 28/05/2018 - 08:00 30/05/2018'
+
+    agenda = {
+        'dates': {
+            'end': datetime.strptime('2018-05-28T21:59:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+            'start': datetime.strptime('2018-05-27T22:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+        },
+    }
+    assert get_agenda_dates(agenda) == 'ALL DAY 28/05/2018'
+
+    agenda = {
+        'dates': {
+            'end': datetime.strptime('2018-05-30T06:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+            'start': datetime.strptime('2018-05-30T06:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+        },
+    }
+    assert get_agenda_dates(agenda) == '08:00 30/05/2018'

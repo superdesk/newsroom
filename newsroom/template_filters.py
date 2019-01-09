@@ -36,7 +36,7 @@ def date_header(datetime):
 
 def time_short(datetime):
     if datetime:
-        return format_time(parse_date(datetime), 'hh:mm')
+        return format_time(parse_date(datetime), 'HH:mm')
 
 
 def date_short(datetime):

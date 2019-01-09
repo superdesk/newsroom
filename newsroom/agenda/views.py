@@ -16,6 +16,7 @@ from newsroom.wire.views import update_action_list
 from newsroom.agenda.email import send_coverage_request_email
 from newsroom.companies import section
 from newsroom.notifications import push_user_notification
+from newsroom.agenda.utils import get_agenda_dates, get_location_string, get_public_contacts, get_links
 
 
 @blueprint.route('/agenda')
@@ -51,9 +52,19 @@ def item(_id):
         return flask.jsonify(item)
 
     if 'print' in flask.request.args:
+        map = flask.request.args.get('map')
         template = 'agenda_item_print.html'
         update_action_list([_id], 'prints', force_insert=True)
-        return flask.render_template(template, item=item)
+        return flask.render_template(
+            template,
+            item=item,
+            map=map,
+            dateString=get_agenda_dates(item),
+            location=get_location_string(item),
+            contacts=get_public_contacts(item),
+            links=get_links(item),
+            is_admin=is_admin_or_internal(user)
+        )
 
     data = get_view_data()
     data['item'] = item
