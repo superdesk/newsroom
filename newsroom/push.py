@@ -373,6 +373,7 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
     plan['state'] = planning_item.get('state')
     plan['state_reason'] = planning_item.get('state_reason')
     plan['products'] = planning_item.get('products')
+    plan['agendas'] = planning_item.get('agendas')
 
     if new_plan:
         agenda['planning_items'].append(plan)

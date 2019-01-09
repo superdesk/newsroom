@@ -505,7 +505,14 @@ export function groupItems (items, activeDate, activeGrouping) {
         }
     });
 
-    return sortBy(Object.keys(groupedItems).map((k) => ({date: k, items: groupedItems[k]})), 'date');
+    return sortBy(
+        Object.keys(groupedItems).map((k) => (
+            {
+                date: k,
+                items: groupedItems[k],
+                _sortDate: moment(k, DATE_FORMAT)
+            })),
+        (g) => g._sortDate);
 }
 
 /**
