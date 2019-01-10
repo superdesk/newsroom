@@ -7,6 +7,9 @@ import PreviewBox from 'ui/components/PreviewBox';
 import AgendaCoverages from './AgendaCoverages';
 
 export default function AgendaPreviewCoverages({item, currentCoverage, previousCoverage}) {
+    if (isEmpty(currentCoverage) && isEmpty(previousCoverage)) {
+        return null;
+    }
     return (
         <Fragment>
             {get(currentCoverage, 'length', 0) > 0 && <PreviewBox label={gettext('Coverages')}>

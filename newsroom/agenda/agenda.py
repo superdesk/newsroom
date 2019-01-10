@@ -252,7 +252,22 @@ def _event_date_range(args):
 
     ATM it should display everything not finished by that date, even starting later.
     """
-    return {'range': {'dates.end': _get_date_filters(args)}}
+    date_range = _get_date_filters(args)
+    date_query = []
+    if date_range.get('gt') and date_range.get('lt'):
+        date_query.append({'range': {'dates.end': date_range}})
+        date_query.append({'range': {'dates.start': date_range}})
+        date_query.append({
+            'bool': {
+                'must': [
+                    {'range': {'dates.start': {'lt': date_range.get('gt')}}},
+                    {'range': {'dates.end': {'gt': date_range.get('lt')}}}
+                ]
+            }
+        })
+    else:
+        date_query.append({'range': {'dates.end': _get_date_filters(args)}})
+    return date_query
 
 
 def _display_date_range(args):
@@ -375,6 +390,8 @@ class AgendaService(newsroom.Service):
                 continue
 
             items_by_key = {item.get('guid') for key, items in inner_hits.items() for item in items}
+            if not items_by_key:
+                continue
             doc['planning_items'] = [p for p in doc['planning_items'] or [] if p.get('guid') in items_by_key]
             doc['coverages'] = [c for c in (doc.get('coverages') or []) if c.get('planning_id') in items_by_key]
 
@@ -421,7 +438,7 @@ class AgendaService(newsroom.Service):
             set_saved_items_query(query, req.args['bookmarks'])
 
         if req.args.get('date_from') or req.args.get('date_to'):
-            query['bool']['should'].append(_event_date_range(req.args))
+            query['bool']['should'].extend(_event_date_range(req.args))
             query['bool']['should'].append(_display_date_range(req.args))
 
         source = {'query': query}
@@ -443,7 +460,18 @@ class AgendaService(newsroom.Service):
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
-        return super().get(internal_req, lookup)
+        cursor = super().get(internal_req, lookup)
+
+        if req.args.get('date_from') and req.args.get('date_to'):
+            date_range = _get_date_filters(req.args)
+            for doc in cursor.docs:
+                # make the items display on the featured day,
+                # it's used in ui instead of dates.start and dates.end
+                doc.update({
+                    '_display_from': date_range.get('gt'),
+                    '_display_to': date_range.get('lt'),
+                })
+        return cursor
 
     def featured(self, req, lookup):
         """Return featured items."""
@@ -453,10 +481,18 @@ class AgendaService(newsroom.Service):
 
         query = _agenda_query()
         get_resource_service('section_filters').apply_section_filter(query, self.section)
-        query['bool']['must'].append({'terms': {'_id': featured['items']}})
-
+        planning_items_query = nested_query(
+            'planning_items',
+            {
+                'bool': {'must': [{'terms': {'planning_items.guid': featured['items']}}]}
+            },
+            name='featured'
+        )
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
+            planning_items_query['nested']['query']['bool']['must'].append(planning_items_query_string(req.args['q']))
+
+        query['bool']['must'].append(planning_items_query)
 
         source = {'query': query}
         set_post_filter(source, req)
@@ -471,14 +507,24 @@ class AgendaService(newsroom.Service):
 
         docs_by_id = {}
         for doc in cursor.docs:
-            docs_by_id[doc['_id']] = doc
+            for p in (doc.get('planning_items') or []):
+                docs_by_id[p.get('guid')] = doc
+
             # make the items display on the featured day,
             # it's used in ui instead of dates.start and dates.end
             doc.update({
                 '_display_from': featured['display_from'],
                 '_display_to': featured['display_to'],
             })
-        cursor.docs = [docs_by_id[_id] for _id in featured['items'] if docs_by_id.get(_id)]
+
+        docs = []
+        agenda_ids = set()
+        for _id in featured['items']:
+            if docs_by_id.get(_id) and docs_by_id.get(_id).get('_id') not in agenda_ids:
+                docs.append(docs_by_id.get(_id))
+                agenda_ids.add(docs_by_id.get(_id).get('_id'))
+
+        cursor.docs = docs
         return cursor
 
     def get_items(self, item_ids):

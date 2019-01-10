@@ -108,15 +108,17 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
                 if product.get('planning_item_query'):
                     # form the query for the agenda planning items
                     planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
-                    query['bool']['should'].append(
-                        nested_query(
-                            'planning_items',
-                            {
-                                'bool': {'should': planning_items_should, 'minimum_should_match': 1}
-                            },
-                            name='products'
-                        )
-                    )
+
+    if planning_items_should:
+        query['bool']['should'].append(
+            nested_query(
+                'planning_items',
+                {
+                    'bool': {'should': planning_items_should, 'minimum_should_match': 1}
+                },
+                name='products'
+            )
+        )
 
     query['bool']['minimum_should_match'] = 1
 
