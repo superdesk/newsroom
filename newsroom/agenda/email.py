@@ -2,6 +2,8 @@ from flask import current_app, render_template, url_for
 from flask_babel import gettext
 
 from newsroom.email import send_email
+from newsroom.utils import get_agenda_dates, get_location_string, get_links, get_public_contacts
+from newsroom.template_filters import is_admin_or_internal
 
 
 def send_coverage_notification_email(user, agenda, wire_item):
@@ -16,11 +18,20 @@ def send_coverage_notification_email(user, agenda, wire_item):
 
 def send_agenda_notification_email(user, agenda, message, subject):
     if agenda and user.get('receive_email'):
+        kwargs = dict(
+            message=message,
+            item=agenda,
+            dateString=get_agenda_dates(agenda),
+            location=get_location_string(agenda),
+            contacts=get_public_contacts(agenda),
+            links=get_links(agenda),
+            is_admin=is_admin_or_internal(user),
+        )
         send_email(
             to=[user['email']],
             subject=subject,
-            text_body=render_template('agenda_updated_email.txt', message=message, item=agenda),
-            html_body=render_template('agenda_updated_email.html', message=message, item=agenda)
+            text_body=render_template('agenda_updated_email.txt', **kwargs),
+            html_body=render_template('agenda_updated_email.html', **kwargs)
         )
 
 

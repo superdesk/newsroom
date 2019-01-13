@@ -13,6 +13,7 @@ import {
     toggleNavigationById,
     initParams as initSearchParams,
 } from 'search/actions';
+import {getLocations, getMapSource} from '../maps/utils';
 
 
 export const SET_STATE = 'SET_STATE';
@@ -267,6 +268,11 @@ export function shareItems(items) {
  */
 export function submitShareItem(data) {
     return (dispatch, getState) => {
+        const type = getState().context || data.items[0].topic_type;
+        data.maps = [];
+        if (type === 'agenda') {
+            data.items.map((_id) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
+        }
         return server.post(`/wire_share?type=${getState().context || data.items[0].topic_type}`, data)
             .then(() => {
                 dispatch(closeModal());

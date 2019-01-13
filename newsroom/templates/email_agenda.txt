@@ -1,9 +1,26 @@
-{{ item.name }}
+{{ item.headline or item.name }}
+{{ url_for_agenda(item) }}
+{{ dateString }}
 
-{% if item.definition_short %}{{ item.definition_short }}{% elif item.definition_long %}{{ item.definition_long }}{% endif %}
+{% if location and location != '' %}{{ location }}{% endif %}
+{% for contact in contacts %}
+Contact: {{ contact.name or contact.organisation }} {{ contact.phone }} {{ contact.mobile }} {{ contact.email }}
+{% endfor %}
+{% for link in links %}
+Web: {{ link }}
+{% endfor %}
 
-{% if item.slugline %}Slugline: {{ item.slugline }}{% endif %}
-{% if item.headline %}Headline: {{ item.headline }}{% endif %}
-
-Published: {{ item.versioncreated | datetime_long }}
-Link: {{ url_for_agenda(item) }}
+{%  for planning_item in item.get('planning_items', []) or [] %}
+{{ planning_item.get('description_text') or planning_item.get('name') or '' }}
+{% if is_admin and planning_item.get('ednote') %}Editorial Note: {{ planning_item.get('ednote') }}{% endif %}
+{% if planning_item.get('coverages', []) %}
+    Coverages:
+        {% for coverage in planning_item.get('coverages', []) or [] %}
+            Coverage Type:{{ coverage.get('planning', {}).get('g2_content_type') }}
+            Due:{{  coverage.get('planning', {}).get('scheduled') | datetime_long }}
+            Workflow Status: {{ coverage.get('workflow_status') }}
+            Coverage Status: {{ coverage.get('news_coverage_status', {}).get('name') }}
+            {% if is_admin %}Internal Note: {{ coverage.get('planning', {}).get('internal_note', '') or '' }}{% endif %}
+        {% endfor %}
+{% endif %}
+{% endfor %}

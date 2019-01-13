@@ -3,7 +3,7 @@ from flask import json
 from datetime import datetime, timedelta
 from superdesk.utc import utc_to_local, local_to_utc
 from newsroom.wire.utils import get_local_date, get_end_date
-from newsroom.agenda.utils import get_location_string, get_agenda_dates, get_public_contacts
+from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts
 
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import post_json, delete_json, get_json
