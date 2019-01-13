@@ -171,7 +171,7 @@ class AgendaList extends React.Component {
         }
 
         if (_id && group && plan) {
-            return _id === activeItem._id && group === activeItem.group && plan.guid === activeItem.plan.guid;
+            return _id === activeItem._id && group === activeItem.group && plan.guid === get(activeItem, 'plan.guid');
         }
 
         if (_id && group) {

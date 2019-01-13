@@ -18,7 +18,8 @@ from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
-from newsroom.wire.search import query_string, set_product_query, FeaturedQuery, planning_items_query_string
+from newsroom.wire.search import query_string, set_product_query, FeaturedQuery, \
+    planning_items_query_string, nested_query
 from newsroom.wire.utils import get_local_date, get_end_date
 
 logger = logging.getLogger(__name__)
@@ -251,7 +252,22 @@ def _event_date_range(args):
 
     ATM it should display everything not finished by that date, even starting later.
     """
-    return {'range': {'dates.end': _get_date_filters(args)}}
+    date_range = _get_date_filters(args)
+    date_query = []
+    if date_range.get('gt') and date_range.get('lt'):
+        date_query.append({'range': {'dates.end': date_range}})
+        date_query.append({'range': {'dates.start': date_range}})
+        date_query.append({
+            'bool': {
+                'must': [
+                    {'range': {'dates.start': {'lt': date_range.get('gt')}}},
+                    {'range': {'dates.end': {'gt': date_range.get('lt')}}}
+                ]
+            }
+        })
+    else:
+        date_query.append({'range': {'dates.end': _get_date_filters(args)}})
+    return date_query
 
 
 def _display_date_range(args):
@@ -298,19 +314,17 @@ def _filter_terms(filters):
                 term_filters.append({
                     'or': [
                         {'terms': {get_aggregation_field(key): val}},
-                        {
-                            'nested': {
-                                'path': 'planning_items',
-                                'inner_hits': {},
-                                'query': {
-                                    'bool': {
-                                        'must': [
-                                            {'terms': {'planning_items.{}'.format(get_aggregation_field(key)): val}},
-                                        ]
-                                    }
+                        nested_query(
+                            'planning_items',
+                            {
+                                'bool': {
+                                    'must': [
+                                        {'terms': {'planning_items.{}'.format(get_aggregation_field(key)): val}}
+                                    ]
                                 }
-                            }
-                        }
+                            },
+                            name=key
+                        )
                     ]
                 })
             else:
@@ -351,7 +365,11 @@ def get_agenda_query(query):
     return {
         'or': [
             query_string(query),
-            planning_items_query_string(query)
+            nested_query(
+                'planning_items',
+                planning_items_query_string(query),
+                name='query'
+            )
         ]
     }
 
@@ -368,13 +386,14 @@ class AgendaService(newsroom.Service):
     def _enhance_items(self, docs):
         for doc in docs:
             inner_hits = doc.pop('_inner_hits', None)
-            if not inner_hits or not inner_hits.get('planning_items'):
+            if not inner_hits or not doc.get('planning_items'):
                 continue
 
-            items_by_key = {p.get('guid'): p for p in inner_hits.get('planning_items')}
-            doc['planning_items'] = [p for p in doc['planning_items']
-                                     if items_by_key.get(p.get('guid'))]
-            doc['coverages'] = [c for c in doc['coverages'] if items_by_key.get(c.get('planning_id'))]
+            items_by_key = {item.get('guid') for key, items in inner_hits.items() for item in items}
+            if not items_by_key:
+                continue
+            doc['planning_items'] = [p for p in doc['planning_items'] or [] if p.get('guid') in items_by_key]
+            doc['coverages'] = [c for c in (doc.get('coverages') or []) if c.get('planning_id') in items_by_key]
 
     def get(self, req, lookup):
         query = _agenda_query()
@@ -397,7 +416,13 @@ class AgendaService(newsroom.Service):
                     if q.get('query'):
                         test_query['or'].append(query_string(q.get('query')))
                     if q.get('planning_item_query'):
-                        test_query['or'].append(planning_items_query_string(q.get('planning_item_query')))
+                        test_query['or'].append(
+                            nested_query(
+                                'planning_items',
+                                planning_items_query_string(q.get('planning_item_query')),
+                                name='product_test'
+                            )
+                        )
                     if test_query['or']:
                         query['bool']['must'].append(test_query)
             except Exception:
@@ -413,7 +438,7 @@ class AgendaService(newsroom.Service):
             set_saved_items_query(query, req.args['bookmarks'])
 
         if req.args.get('date_from') or req.args.get('date_to'):
-            query['bool']['should'].append(_event_date_range(req.args))
+            query['bool']['should'].extend(_event_date_range(req.args))
             query['bool']['should'].append(_display_date_range(req.args))
 
         source = {'query': query}
@@ -435,7 +460,18 @@ class AgendaService(newsroom.Service):
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
-        return super().get(internal_req, lookup)
+        cursor = super().get(internal_req, lookup)
+
+        if req.args.get('date_from') and req.args.get('date_to'):
+            date_range = _get_date_filters(req.args)
+            for doc in cursor.docs:
+                # make the items display on the featured day,
+                # it's used in ui instead of dates.start and dates.end
+                doc.update({
+                    '_display_from': date_range.get('gt'),
+                    '_display_to': date_range.get('lt'),
+                })
+        return cursor
 
     def featured(self, req, lookup):
         """Return featured items."""
@@ -445,10 +481,18 @@ class AgendaService(newsroom.Service):
 
         query = _agenda_query()
         get_resource_service('section_filters').apply_section_filter(query, self.section)
-        query['bool']['must'].append({'terms': {'_id': featured['items']}})
-
+        planning_items_query = nested_query(
+            'planning_items',
+            {
+                'bool': {'must': [{'terms': {'planning_items.guid': featured['items']}}]}
+            },
+            name='featured'
+        )
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
+            planning_items_query['nested']['query']['bool']['must'].append(planning_items_query_string(req.args['q']))
+
+        query['bool']['must'].append(planning_items_query)
 
         source = {'query': query}
         set_post_filter(source, req)
@@ -463,14 +507,24 @@ class AgendaService(newsroom.Service):
 
         docs_by_id = {}
         for doc in cursor.docs:
-            docs_by_id[doc['_id']] = doc
+            for p in (doc.get('planning_items') or []):
+                docs_by_id[p.get('guid')] = doc
+
             # make the items display on the featured day,
             # it's used in ui instead of dates.start and dates.end
             doc.update({
                 '_display_from': featured['display_from'],
                 '_display_to': featured['display_to'],
             })
-        cursor.docs = [docs_by_id[_id] for _id in featured['items'] if docs_by_id.get(_id)]
+
+        docs = []
+        agenda_ids = set()
+        for _id in featured['items']:
+            if docs_by_id.get(_id) and docs_by_id.get(_id).get('_id') not in agenda_ids:
+                docs.append(docs_by_id.get(_id))
+                agenda_ids.add(docs_by_id.get(_id).get('_id'))
+
+        cursor.docs = docs
         return cursor
 
     def get_items(self, item_ids):

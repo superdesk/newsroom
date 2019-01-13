@@ -217,6 +217,7 @@ def test_featured(client, app):
         item['slugline'] = 'event slugline'
         item['dates'] = item['dates'].copy()
         item['dates']['start'] += timedelta(hours=1)
+        item['planning_items'] = [{'_id': 'urn:plan:%d' % i, 'guid': 'urn:plan:%d' % i}]
         _items.append(item)
     app.data.insert('agenda', _items)
 
@@ -227,7 +228,7 @@ def test_featured(client, app):
         '_id': _id,
         'type': 'planning_featured',
         'item_id': _id,
-        'items': [item['_id'] for item in _items[:2]],
+        'items': [item['planning_items'][0]['guid'] for item in _items[:2]],
         'tz': 'Australia/Sydney',
     }
     resp = post_json(client, 'push', featured)
@@ -242,6 +243,8 @@ def test_featured(client, app):
     assert 2 == data['_meta']['total']
     assert _items[0]['_id'] == data['_items'][0]['_id']
     assert _items[1]['_id'] == data['_items'][1]['_id']
+    assert _items[0]['planning_items'][0]['guid'] == data['_items'][0]['planning_items'][0]['guid']
+    assert _items[1]['planning_items'][0]['guid'] == data['_items'][1]['planning_items'][0]['guid']
     assert '_aggregations' in data
     assert data['_items'][0]['_display_from'].replace('+0000', '+00:00') == \
         local_to_utc('Australia/Sydney', date.replace(hour=0, minute=0, second=0)).isoformat()
@@ -249,7 +252,7 @@ def test_featured(client, app):
         local_to_utc('Australia/Sydney', date.replace(hour=23, minute=59, second=59)).isoformat()
 
     # post first 3 items in reverse order
-    featured['items'] = [item['_id'] for item in _items[:3]]
+    featured['items'] = [item['planning_items'][0]['guid'] for item in _items[:3]]
     featured['items'].reverse()
     resp = post_json(client, 'push', featured)
     assert 200 == resp.status_code
@@ -259,6 +262,31 @@ def test_featured(client, app):
     assert _items[2]['_id'] == data['_items'][0]['_id']
     assert _items[1]['_id'] == data['_items'][1]['_id']
     assert _items[0]['_id'] == data['_items'][2]['_id']
+    assert _items[2]['planning_items'][0]['guid'] == data['_items'][0]['planning_items'][0]['guid']
+    assert _items[1]['planning_items'][0]['guid'] == data['_items'][1]['planning_items'][0]['guid']
+    assert _items[0]['planning_items'][0]['guid'] == data['_items'][2]['planning_items'][0]['guid']
+
+    # multiple planing items for event
+    app.data.update(
+        'agenda',
+        _items[0].get('_id'),
+        {
+            'planning_items': [
+                {'_id': 'urn:plan:0', 'guid': 'urn:plan:0'},
+                {'_id': 'urn:plan:x', 'guid': 'urn:plan:x'}
+            ]
+        },
+        _items[0]
+    )
+    featured['items'] = ['urn:plan:2', 'urn:plan:x', 'urn:plan:1', 'urn:plan:0']
+    resp = post_json(client, 'push', featured)
+    assert 200 == resp.status_code
+
+    data = get_json(client, '/agenda/search?navigation=51')
+    assert 3 == data['_meta']['total']
+    assert data['_items'][0]['_id'] == _items[2]['_id']
+    assert data['_items'][1]['_id'] == _items[0]['_id']
+    assert data['_items'][2]['_id'] == _items[1]['_id']
 
     data = get_json(client, '/agenda/search?navigation=51&q=slugline:nonsense')
     assert 0 == data['_meta']['total']
