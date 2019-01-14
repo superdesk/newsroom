@@ -1,10 +1,10 @@
 <h1>{{ item.headline or item.name }}</h1>
 <a href="{{ url_for_agenda(item) }}">{{ url_for_agenda(item) }}</a>
 
-<h3>{{ dateString }}</h3>
+<p class="h3">{{ dateString }}</p>
 
 {% if location and location != '' %}
-    <h3><strong>Where:</strong> {{ location }}</h3>
+    <p class="h3"><b>Where:</b> {{ location }}</p>
 {% endif %}
 
 {% if map and map != '' %}
@@ -12,27 +12,27 @@
 {% endif %}
 
 {% for contact in contacts %}
-    <h3>
-        <strong>Contact:</strong>
+    <p class="h3">
+        <b>Contact:</b>
         {{ contact.name or contact.organisation }}
         {{ contact.phone }}
         {{ contact.mobile }}
         {{ contact.email }}
-    </h3>
+    </p>
 {% endfor %}
 
 {% for link in links %}
-    <h3>
-        <strong>Web:</strong>
+    <p class="h3">
+        <b>Web:</b>
         <a href={{ link | safe }}>{{ link }}</a>
-    </h3>
+    </p>
 {% endfor %}
 
 {%  for planning_item in item.get('planning_items', []) or [] %}
 
     <div>
         <div >
-            <h3>{{ planning_item.get('description_text') or planning_item.get('name') or '' }}</h3>
+            <p class="h3">{{ planning_item.get('description_text') or planning_item.get('name') or '' }}</p>
         </div>
 
         {% if is_admin and planning_item.get('ednote') %}

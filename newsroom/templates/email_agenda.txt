@@ -3,12 +3,8 @@
 {{ dateString }}
 
 {% if location and location != '' %}{{ location }}{% endif %}
-{% for contact in contacts %}
-Contact: {{ contact.name or contact.organisation }} {{ contact.phone }} {{ contact.mobile }} {{ contact.email }}
-{% endfor %}
-{% for link in links %}
-Web: {{ link }}
-{% endfor %}
+{% for contact in contacts %}Contact: {{ contact.name or contact.organisation }} {{ contact.phone }} {{ contact.mobile }} {{ contact.email }}{% endfor %}
+{% for link in links %}Web: {{ link }}{% endfor %}
 
 {%  for planning_item in item.get('planning_items', []) or [] %}
 {{ planning_item.get('description_text') or planning_item.get('name') or '' }}

@@ -57,27 +57,29 @@
                     <div class="col-12">
                         <h5>{{ _('Coverages:') }}</h5>
                     </div>
+                </div>
 
                     {% for coverage in planning_item.get('coverages', []) or [] %}
-                        <div class="col-6">
-                            {{ _('Coverage Type') }}:{{ coverage.get('planning', {}).get('g2_content_type') }}
-                        </div>
-                        <div class="col-6">
-                            {{ _('Due') }}: {{  coverage.get('planning', {}).get('scheduled') | datetime_long }}
-                        </div>
-                        <div class="col-6">
-                            {{ _('Workflow Status') }}: {{ coverage.get('workflow_status') }}
-                        </div>
-                        <div class="col-6">
-                            {{ _('Coverage Status') }}: {{ coverage.get('news_coverage_status', {}).get('name') }}
-                        </div>
-
-                        {% if is_admin %}
+                        <div class="row mt-3">
                             <div class="col-6">
-                                {{ _('Internal Note') }}: {{ coverage.get('planning', {}).get('internal_note', '') or '' }}
+                                {{ _('Coverage Type') }}: {{ coverage.get('planning', {}).get('g2_content_type') }}
                             </div>
-                        {% endif %}
+                            <div class="col-6">
+                                {{ _('Due') }}: {{  coverage.get('planning', {}).get('scheduled') | datetime_long }}
+                            </div>
+                            <div class="col-6">
+                                {{ _('Workflow Status') }}: {{ coverage.get('workflow_status') }}
+                            </div>
+                            <div class="col-6">
+                                {{ _('Coverage Status') }}: {{ coverage.get('news_coverage_status', {}).get('name') }}
+                            </div>
 
+                            {% if is_admin %}
+                                <div class="col-6">
+                                    {{ _('Internal Note') }}: {{ coverage.get('planning', {}).get('internal_note', '') or '' }}
+                                </div>
+                            {% endif %}
+                        </div>
                     {% endfor %}
                 </div>
             {% endif %}

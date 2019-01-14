@@ -192,7 +192,7 @@ def get_public_contacts(agenda):
             public_contacts.append({
                 'name': ' '.join([c for c in [contact.get('first_name'), contact.get('last_name')] if c]),
                 'organisation': contact.get('organisation', ''),
-                'email': ', '.join(contact.get('contact_email')),
+                'email': ', '.join(contact.get('contact_email', [])),
                 'phone': ', '.join([c.get('number') for c in contact.get('contact_phone', []) if c.get('public')]),
                 'mobile': ', '.join([c.get('number') for c in contact.get('mobile', []) if c.get('public')])
             })
