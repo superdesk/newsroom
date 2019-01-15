@@ -184,7 +184,7 @@ class AgendaList extends React.Component {
     componentDidUpdate(nextProps) {
         if (!isEqual(nextProps.activeDate, this.props.activeDate) ||
           !isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
-          (this.props.resultsFiltered && isEqual(nextProps.activeFilter, this.props.activeFilter))) {
+          (this.props.resultsFiltered && !isEqual(nextProps.activeFilter, this.props.activeFilter))) {
             this.elem.scrollTop = 0;
         }
     }
