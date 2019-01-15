@@ -4,7 +4,9 @@
 
 {% block content %}
 <article>
-    <pre>{{ item.slugline }}</pre>
+    {% if item.slugline %}
+        <pre>{{ item.slugline }}</pre>
+    {% endif %}
 
     <h1 class="mt-4">{{ item.headline or item.name}}</h1>
 
