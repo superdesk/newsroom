@@ -2,6 +2,10 @@ from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
 
+from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
+    get_public_contacts
+from newsroom.template_filters import is_admin_or_internal
+
 
 def send_email(to, subject, text_body, html_body=None, sender=None, connection=None):
     """
@@ -135,7 +139,12 @@ def _send_new_agenda_notification_email(user, topic_name, item):
         name=user.get('first_name'),
         item=item,
         url=url,
-        type='agenda'
+        type='agenda',
+        dateString=get_agenda_dates(item),
+        location=get_location_string(item),
+        contacts=get_public_contacts(item),
+        links=get_links(item),
+        is_admin=is_admin_or_internal(user),
     )
     text_body = render_template('new_item_notification.txt', **kwargs)
     html_body = render_template('new_item_notification.html', **kwargs)
@@ -179,7 +188,12 @@ def _send_history_match_agenda_notification_email(user, item):
         name=user.get('first_name'),
         item=item,
         url=url,
-        type='agenda'
+        type='agenda',
+        dateString=get_agenda_dates(item),
+        location=get_location_string(item),
+        contacts=get_public_contacts(item),
+        links=get_links(item),
+        is_admin=is_admin_or_internal(user),
     )
 
     send_email(to=recipients, subject=subject, text_body=text_body)

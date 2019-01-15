@@ -11,12 +11,12 @@ from newsroom.template_filters import is_admin_or_internal
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.auth import get_user, login_required
-from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400
-from newsroom.wire.views import update_action_list
+from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, \
+    get_agenda_dates, get_location_string, get_public_contacts, get_links
+from newsroom.wire.utils import update_action_list
 from newsroom.agenda.email import send_coverage_request_email
 from newsroom.companies import section
 from newsroom.notifications import push_user_notification
-from newsroom.agenda.utils import get_agenda_dates, get_location_string, get_public_contacts, get_links
 
 
 @blueprint.route('/agenda')

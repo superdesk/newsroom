@@ -16,13 +16,17 @@ from superdesk import get_resource_service
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
+from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
-from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource
+from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
+    get_agenda_dates, get_location_string, get_public_contacts, get_links
 from newsroom.notifications import push_user_notification
 from newsroom.companies import section
+from newsroom.template_filters import is_admin_or_internal
+
 from .search import get_bookmarks_count
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
@@ -191,6 +195,13 @@ def share():
                 'items': items,
                 'message': data.get('message'),
             }
+            if item_type == 'agenda':
+                template_kwargs['maps'] = data.get('maps')
+                template_kwargs['dateStrings'] = [get_agenda_dates(item) for item in items]
+                template_kwargs['locations'] = [get_location_string(item) for item in items]
+                template_kwargs['contactList'] = [get_public_contacts(item) for item in items]
+                template_kwargs['linkList'] = [get_links(item) for item in items]
+                template_kwargs['is_admin'] = is_admin_or_internal(user)
             send_email(
                 [user['email']],
                 gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
@@ -217,30 +228,6 @@ def bookmark():
     user_id = get_user_id()
     push_user_notification('saved_items', count=get_bookmarks_count(user_id, 'wire'))
     return flask.jsonify(), 200
-
-
-def update_action_list(items, action_list, force_insert=False, item_type='items'):
-    """
-    Stores user id into array of action_list of an item
-    :param items: items to be updated
-    :param action_list: field name of the list
-    :param force_insert: inserts into list regardless of the http method
-    :param item_type: either items or agenda as the collection
-    :return:
-    """
-    user_id = get_user_id()
-    if user_id:
-        db = app.data.get_mongo_collection(item_type)
-        elastic = app.data._search_backend(item_type)
-        if flask.request.method == 'POST' or force_insert:
-            updates = {'$addToSet': {action_list: user_id}}
-        else:
-            updates = {'$pull': {action_list: user_id}}
-        for item_id in items:
-            result = db.update_one({'_id': item_id}, updates)
-            if result.modified_count:
-                modified = db.find_one({'_id': item_id})
-                elastic.update(item_type, item_id, {action_list: modified[action_list]})
 
 
 @blueprint.route('/wire/<_id>/copy', methods=['POST'])
