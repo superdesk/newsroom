@@ -222,7 +222,7 @@ body.print {
         height: 40px !important;
         line-height: 38px;
         position: relative;
-        padding: 0 0 0 1rem;
+        padding: 0;
     }
 
     &_1 {
@@ -240,10 +240,14 @@ body.print {
         display: flex;
         height: 30px;
         justify-content: center;
+        padding-top: 5px;
 
         a {
             color: #969696;
             margin: 0 10px;
+            &:hover {
+                text-decoration: none;
+            }
         }
     }
 
@@ -392,7 +396,6 @@ body.print {
 
     &--small {
         max-width: 75px;
-        padding: 0 0;
     }
 }
 .navbar-brand {
@@ -407,7 +410,6 @@ body.print {
     }
     nav {
         display: flex;
-        flex-direction: column;
         @include sm {
             flex-direction: row;
             align-items: center;
