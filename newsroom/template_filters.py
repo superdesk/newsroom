@@ -87,3 +87,13 @@ def sidenavs(blueprint=None):
         return not nav.get('blueprint') or not blueprint or nav['blueprint'] == blueprint
 
     return [nav for nav in app.sidenavs if blueprint_matches(nav, blueprint)]
+
+
+def sidenavs_by_names(names=[], blueprint=None):
+    blueprint_navs = sidenavs(blueprint)
+    return [nav for nav in blueprint_navs if nav.get('name') in names]
+
+
+def sidenavs_by_group(group=0, blueprint=None):
+    blueprint_navs = sidenavs(blueprint)
+    return [nav for nav in blueprint_navs if nav.get('group') == group]
