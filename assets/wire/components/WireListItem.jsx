@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { gettext, fullDate, wordCount, LIST_ANIMATIONS } from 'utils';
+import { gettext, fullDate, getCount, LIST_ANIMATIONS, getCountLabel } from 'utils';
 import { getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled } from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -15,7 +15,8 @@ import ActionMenu from '../../components/ActionMenu';
 class WireListItem extends React.Component {
     constructor(props) {
         super(props);
-        this.wordCount = wordCount(props.item);
+        this.count = getCount(props.item);
+        this.countText = getCountLabel();
         this.slugline = props.item.slugline && props.item.slugline.trim();
         this.state = {isHover: false, previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
@@ -98,7 +99,7 @@ class WireListItem extends React.Component {
                                 <div className='wire-articles__item__meta-info'>
                                     <span className='bold'>{this.slugline}</span>
                                     <span>{item.source}
-                                        {' // '}<span>{this.wordCount}</span> {gettext('words')}
+                                        {' // '}<span>{this.count}</span> {this.countText}
                                         {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
                                         <WireListItemEmbargoed item={item} />
                                     </span>
@@ -113,7 +114,7 @@ class WireListItem extends React.Component {
                             <div key='meta' className='wire-articles__item__meta'>
                                 <WireListItemIcons item={item} picture={picture}/>
                                 <div className='wire-articles__item__meta-info'>
-                                    <span>{this.wordCount} {gettext('words')}</span>
+                                    <span>{this.count} {this.countText}</span>
                                 </div>
                             </div>]
                         )}

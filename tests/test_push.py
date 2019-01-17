@@ -526,10 +526,20 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
 
 
 def test_push_parsed_item(client, app):
+    app.config['COUNT_FIELD'] = 'wordcount'
     client.post('/push', data=json.dumps(item), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'wire_search')
     assert type(parsed['firstcreated']) == datetime
     assert 2 == parsed['wordcount']
+    assert 'charcount' not in parsed
+
+
+def test_push_parsed_item_sets_char_count(client, app):
+    app.config['COUNT_FIELD'] = 'charcount'
+    client.post('/push', data=json.dumps(item), content_type='application/json')
+    parsed = get_entity_or_404(item['guid'], 'wire_search')
+    assert 7 == parsed['charcount']
+    assert 'wordcount' not in parsed
 
 
 def test_push_parsed_dates(client, app):

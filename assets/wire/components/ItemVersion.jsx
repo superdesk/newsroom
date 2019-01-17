@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { gettext, formatTime, formatDate, wordCount } from 'utils';
+import {formatTime, formatDate, getCount, getCountLabel} from 'utils';
 
 export default function ItemVersion({version, baseClass, showDivider, onClick}) {
     return (
@@ -14,7 +14,7 @@ export default function ItemVersion({version, baseClass, showDivider, onClick}) 
                     <div className={`${baseClass}__item__meta-info`}>
                         <span className="bold">{version.slugline}</span>
                         <span>{formatDate(version.versioncreated)} {' // '}
-                            <span>{wordCount(version)}</span> {gettext('words')}
+                            <span>{getCount(version)}</span> {getCountLabel()}
                         </span>
                     </div>
                 </div>

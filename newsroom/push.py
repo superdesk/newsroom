@@ -11,7 +11,7 @@ from flask import current_app as app, url_for
 from flask_babel import gettext
 
 from superdesk.utc import utcnow
-from superdesk.text_utils import get_word_count
+from newsroom.template_filters import get_count
 from newsroom.notifications import push_notification
 from newsroom.topics.topics import get_wire_notification_topics, get_agenda_notification_topics
 from newsroom.utils import parse_dates, get_user_dict, get_company_dict, parse_date_str
@@ -103,7 +103,7 @@ def set_dates(doc):
 def publish_item(doc):
     """Duplicating the logic from content_api.publish service."""
     set_dates(doc)
-    doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
+    doc.setdefault(app.config.get('COUNT_FIELD', 'wordcount'), get_count(doc.get('body_html', '')))
     service = superdesk.get_resource_service('content_api')
     if 'evolvedfrom' in doc:
         parent_item = service.find_one(req=None, _id=doc['evolvedfrom'])

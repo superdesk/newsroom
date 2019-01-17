@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate } from 'utils';
+import {shortDate, fullDate, getCountLabel} from 'utils';
 
 function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayDivider, slugline}) {
     return (<div className="wire-articles__item__meta">
@@ -17,7 +17,7 @@ function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayD
             {slugline && <span className='bold'>{slugline}</span>}
             <span>
                 {source && `${source} // `}
-                <span>{wordCount}</span> {gettext('words')}
+                <span>{wordCount}</span> {getCountLabel()}
                 {versioncreated && ' // '}
                 {versioncreated &&
                     <time dateTime={fullDate(versioncreated)}>{shortDate(versioncreated)}</time>

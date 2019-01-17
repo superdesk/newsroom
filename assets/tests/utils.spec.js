@@ -13,8 +13,18 @@ describe('gettext', () => {
 describe('wordCount', () => {
     it('can count words in html', () => {
         const html = '<p class="foo" style="color: red">foo bar</p>';
-        expect(utils.wordCount({body_html: html})).toBe(2);
-        expect(utils.wordCount({wordcount: 5, body_html: 'foo'})).toBe(5);
+        const config = {count_field: 'wordcount'};
+        expect(utils.getCount({body_html: html}, config)).toBe(2);
+        expect(utils.getCount({wordcount: 5, body_html: 'foo'}, config)).toBe(5);
+    });
+});
+
+describe('charCount', () => {
+    it('can count characters in html', () => {
+        const html = '<p class="foo" style="color: red">foo bar, baz</p>';
+        const config = {count_field: 'charcount'};
+        expect(utils.getCount({body_html: html}, config)).toBe(12);
+        expect(utils.getCount({charcount: 15, body_html: 'foo, baz'}, config)).toBe(15);
     });
 });
 

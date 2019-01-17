@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import {LIST_ANIMATIONS, wordCount} from 'utils';
+import {LIST_ANIMATIONS} from 'utils';
 import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
 
 import ActionList from 'components/ActionList';
@@ -22,7 +22,6 @@ import {
 class AmNewsListItem extends React.Component {
     constructor(props) {
         super(props);
-        this.wordCount = wordCount(props.item);
         this.slugline = props.item.slugline && props.item.slugline.trim();
         this.state = {isHover: false, previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
