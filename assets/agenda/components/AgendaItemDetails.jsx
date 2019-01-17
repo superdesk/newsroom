@@ -79,7 +79,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                         </ArticleSidebarBox>
                     )}
                     <AgendaTags item={item} plan={plan} isItemDetail={true} />
-                    <AgendaEdNote item={item} plan={plan}/>
+                    <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
                     <AgendaInternalNote internalNotes={getInternalNote(item, plan)} />
                 </ArticleSidebar>
             </Article>

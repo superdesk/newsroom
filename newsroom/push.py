@@ -170,7 +170,8 @@ def publish_event(event, orig):
             updates = {
                 'event': event,
                 'version': event.get('version', event.get(app.config['VERSION'])),
-                'state': event['state']
+                'state': event['state'],
+                'state_reason': event.get('state_reason')
             }
 
             service.patch(event['guid'], updates)
@@ -395,7 +396,7 @@ def set_agenda_planning_items(agenda, planning_item, action='add'):
         agenda['planning_items'] = [p for p in existing_planning_items if p['guid'] != planning_item['guid']] or []
         superdesk.get_resource_service('agenda').notify_agenda_update('planning_cancelled', agenda)
 
-    agenda['coverages'], coverage_changes = get_coverages(agenda['planning_items'], agenda.get('coverages', []))
+    agenda['coverages'], coverage_changes = get_coverages(agenda['planning_items'], (agenda.get('coverages') or []))
 
     if coverage_changes.get('coverage_added'):
         superdesk.get_resource_service('agenda').notify_agenda_update('coverage_added', agenda)
