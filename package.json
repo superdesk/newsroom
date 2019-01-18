@@ -3,6 +3,7 @@
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "build": "webpack --config webpack.config.js --progress --profile --colors",
     "lint": "eslint assets --ext .js --ext .jsx",
+    "fix": "eslint assets --ext .js --ext .jsx --fix",
     "test": "karma start --single-run",
     "extract_messages": "react-gettext-parser --output newsroom-client.pot 'assets/**/{*.js,*.jsx}'",
     "karma": "karma start"
