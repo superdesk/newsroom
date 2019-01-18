@@ -223,12 +223,6 @@ COVERAGE_TYPES = {
     'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'}
 }
 
-# The name of the field to be used for counts
-# It can be either 'wordcount' or 'charcount'
-COUNT_FIELD = 'wordcount'
-
-# Label to be displayed next to count field
-COUNT_LABEL = 'words'
 
 # Client configuration
 CLIENT_CONFIG = {
@@ -238,8 +232,6 @@ CLIENT_CONFIG = {
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes
-    'count_field': COUNT_FIELD,
-    'count_label': COUNT_LABEL,
 }
 
 LANGUAGES = ['en', 'fi', 'cs']

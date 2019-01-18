@@ -59,7 +59,7 @@ function ItemDetails({item, user, actions, onClose, detailsConfig}) {
                                 <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
 
                             {isDisplayed('item_versions', detailsConfig) && showItemVersions(item, true) &&
-                                <ListItemNextVersion item={item} />
+                                <ListItemNextVersion item={item} displayConfig={detailsConfig}  />
                             }
                             {isDisplayed('item_versions', detailsConfig) && showItemVersions(item) &&
                                 <ListItemPreviousVersions item={item} isPreview={true}/>

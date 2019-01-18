@@ -332,50 +332,13 @@ export function getTextFromHtml(html) {
     return text.join('');
 }
 
-
-/**
- * Get label for the count field
- */
-export function getCountLabel(titleCase) {
-    const text = gettext(getConfig('count_label', 'words'));
-
-    if (titleCase) {
-        return text.replace(text[0], text[0].toUpperCase());
-    }
-
-    return text;
-}
-
-/**
- * Get character count for given item
- *
- * @param {Object} item
- * @return {number}
- */
-export function getCount(item, config) {
-    
-    let countField = 'wordcount';
-
-    if (!isEmpty(config)) {
-        countField = get(config, 'count_field', 'wordcount');
-    } else {
-        countField = getConfig('count_field', 'wordcount');
-    }
-
-    if (countField === 'charcount') {
-        return characterCount(item);
-    }
-
-    return wordCount(item);
-}
-
 /**
  * Get word count for given item
  *
  * @param {Object} item
  * @return {number}
  */
-function wordCount(item) {
+export function wordCount(item) {
     if (isInteger(item.wordcount)) {
         return item.wordcount;
     }
@@ -394,7 +357,7 @@ function wordCount(item) {
  * @param {Object} item
  * @return {number}
  */
-function characterCount(item) {
+export function characterCount(item) {
     
     if (isInteger(item.charcount)) {
         return item.charcount;

@@ -201,7 +201,3 @@ def get_public_contacts(agenda):
 
 def get_links(agenda):
     return agenda.get('event', {}).get('links', [])
-
-
-def get_count_label():
-    return gettext(app.config.get('COUNT_TEXT', 'words'))

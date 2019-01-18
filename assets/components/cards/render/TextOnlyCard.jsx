@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getCount } from 'utils';
+import { wordCount } from 'utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
 import {getPicture} from 'wire/utils';
@@ -15,7 +15,7 @@ const getTextOnlyPanel = (item, openItem, picture, cardId) => (
                 </div>
             </div>
             <CardFooter
-                wordCount={getCount(item)}
+                wordCount={wordCount(item)}
                 pictureAvailable={!!picture}
                 source={item.source}
                 versioncreated={item.versioncreated}

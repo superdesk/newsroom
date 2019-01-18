@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getCount } from 'utils';
+import { wordCount } from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import CardBody from './CardBody';
 import CardFooter from './CardFooter';
@@ -18,7 +18,7 @@ const getPictureTextPanel = (item, picture, openItem, withPictures, cardId) => {
             }
             <CardBody item={item} displayMeta={false} />
             <CardFooter
-                wordCount={getCount(item)}
+                wordCount={wordCount(item)}
                 pictureAvailable={!!rendition}
                 source={item.source}
                 versioncreated={item.versioncreated}

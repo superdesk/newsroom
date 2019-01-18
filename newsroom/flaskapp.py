@@ -21,13 +21,13 @@ from flask_mail import Mail
 from flask_cache import Cache
 
 from newsroom.settings import SettingsApp
-from newsroom.utils import is_json_request, get_count_label
+from newsroom.utils import is_json_request
 from newsroom.webpack import NewsroomWebpack
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
-    plain_text, get_count, newsroom_config, is_admin,
+    plain_text, word_count, char_count, newsroom_config, is_admin,
     hash_string, date_header, get_date, sidenavs, sidenavs_by_names, sidenavs_by_group
 )
 
@@ -136,7 +136,8 @@ class Newsroom(eve.Eve):
         self.add_template_filter(plain_text)
         self.add_template_filter(time_short)
         self.add_template_filter(date_short)
-        self.add_template_filter(get_count)
+        self.add_template_filter(word_count)
+        self.add_template_filter(char_count)
         self.add_template_global(sidenavs)
         self.add_template_global(sidenavs_by_names)
         self.add_template_global(sidenavs_by_group)
@@ -146,7 +147,6 @@ class Newsroom(eve.Eve):
         self.add_template_global(hash_string, 'hash')
         self.add_template_global(get_date, 'get_date')
         self.add_template_global(self.settings_apps, 'settings_apps')
-        self.add_template_global(get_count_label, 'get_count_label')
         self.jinja_loader = jinja2.ChoiceLoader([
             jinja2.FileSystemLoader('theme'),
             jinja2.FileSystemLoader(self.template_folder),

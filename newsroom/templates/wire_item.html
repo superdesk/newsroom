@@ -59,7 +59,10 @@
                     </div>
 
                     <div class="wire-articles__item__meta-info">
-                        <span><span class="bold">{{ item.body_html | get_count }}</span> {{ get_count_label() }}</span>
+                        <span><span class="bold">{{ item.body_html | word_count }}</span> {{ _('words') }}</span>
+                        {%  if display_char_count %}
+                            <span><span class="bold">{{ item.body_html | char_count }}</span> {{ _('characters') }}</span>
+                        {% endif %}
                         <span>{{ _('Source:') }} {{ item.source }}</span>
                     </div>
                 </div>
@@ -102,7 +105,11 @@
                                 <div class="wire-column__preview__versions__meta">
                                     <div class="wire-column__preview__item__meta-info">
                                         <span class="bold">{{ prev.located }}</span>
-                                        <span>{{ prev.versioncreated | date_short }} // <span class="bold">{{ prev.body_html | get_count }}</span> {{ get_count_label() }}</span>
+                                        <span>{{ prev.versioncreated | date_short }} // <span class="bold">{{ prev.body_html | word_count }}</span> {{ _('words') }}
+                                            {%  if display_char_count %}
+                                                // <span class="bold">{{ prev.body_html | char_count }}</span> {{ _('characters') }}
+                                            {%  endif %}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

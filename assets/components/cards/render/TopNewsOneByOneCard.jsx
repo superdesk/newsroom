@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getCount } from 'utils';
+import { wordCount } from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import CardRow from './CardRow';
 import CardMeta from './CardMeta';
@@ -18,7 +18,7 @@ const getTopNewsPanel = (item, picture, openItem, cardId) => {
                 <h4 className='card-title'>{item.headline}</h4>
                 <CardMeta
                     pictureAvailable={!!picture}
-                    wordCount={getCount(item)}
+                    wordCount={wordCount(item)}
                     source={item.source}
                     versioncreated={item.versioncreated}
                     displayDivider={false}

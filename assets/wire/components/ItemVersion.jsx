@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {formatTime, formatDate, getCount, getCountLabel} from 'utils';
+import {formatTime, formatDate, wordCount, characterCount, gettext, isDisplayed} from 'utils';
 
-export default function ItemVersion({version, baseClass, showDivider, onClick}) {
+export default function ItemVersion({version, baseClass, showDivider, onClick, displayConfig}) {
     return (
         <div className={`${baseClass}__versions__item`} onClick={(event) => onClick(version, event)}>
             <div className={`${baseClass}__versions__wrap`}>
@@ -14,7 +14,12 @@ export default function ItemVersion({version, baseClass, showDivider, onClick}) 
                     <div className={`${baseClass}__item__meta-info`}>
                         <span className="bold">{version.slugline}</span>
                         <span>{formatDate(version.versioncreated)} {' // '}
-                            <span>{getCount(version)}</span> {getCountLabel()}
+                            <span>{wordCount(version)}</span> {gettext('words')}
+                            {isDisplayed('charcount', displayConfig) && [
+                                '//',
+                                <span key='char-count'>{characterCount(version)}</span>,
+                                gettext('characters')
+                            ]}
                         </span>
                     </div>
                 </div>
@@ -32,4 +37,5 @@ ItemVersion.propTypes = {
     baseClass: PropTypes.string.isRequired,
     showDivider: PropTypes.bool,
     onClick: PropTypes.func.isRequired,
+    displayConfig: PropTypes.object,
 };
