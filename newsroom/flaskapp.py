@@ -243,7 +243,8 @@ class Newsroom(eve.Eve):
             'name': name
         })
 
-    def sidenav(self, name, endpoint=None, icon=None, group=0, section=None, blueprint=None, badge=None, url=None):
+    def sidenav(self, name, endpoint=None, icon=None, group=0, section=None, blueprint=None, badge=None, url=None,
+                secondary_endpoints=[]):
         """Register an item in sidebar menu.
 
         Use in module :meth:`init_app` method::
@@ -259,6 +260,7 @@ class Newsroom(eve.Eve):
         :param blueprint: blueprint name, will be only visible if blueprint is active
         :param badge: badge id - will add badge html markup with given id
         :param url: external url - will add external link badge and use target=_blank for link
+        :param secondary_endpoints: registers other endpoints (internal navigations) of a sidenav's page
         """
         if endpoint is None and url is None:
             raise ValueError('please specify endpoint or url')
@@ -271,6 +273,7 @@ class Newsroom(eve.Eve):
             'blueprint': blueprint,
             'badge': badge,
             'url': url,
+            'secondary_endpoints': secondary_endpoints
         })
 
     def settings_app(self, app, name, weight=1000, data=None):
