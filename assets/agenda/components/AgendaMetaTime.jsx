@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
+import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import {bem} from 'ui/utils';
 import {formatTime, formatDate, gettext, DAY_IN_MINUTES, DATE_FORMAT} from 'utils';
 import {hasCoverages, isCoverageForExtraDay} from '../utils';
@@ -85,7 +86,8 @@ export default function AgendaMetaTime({item, borderRight, isRecurring, group}) 
         </div>,
         <div key="times" className={bem('wire-articles__item', 'meta-time', {'border-right': borderRight})}>
             {format(item, group)}
-        </div>
+        </div>,
+        <AgendaItemTimeUpdater key="timeUpdate" item={item} borderRight={borderRight} />
     ]);
 }
 
