@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
 
+import {gettext} from 'utils';
+
 export default function AgendaEdNote({item, plan, secondaryNoteField}) {
     // We display Secondary Note only from 'item' for now
     const displaySecondaryNote = secondaryNoteField && get(item, secondaryNoteField);
@@ -26,8 +28,9 @@ export default function AgendaEdNote({item, plan, secondaryNoteField}) {
     };
 
     return (
-        <div className="wire-column__preview__editorial-note">
-            <i className="icon-small--info icon--gray" />
+        <div className="wire-column__preview_article-note">
+            <i className="icon-small--info" />
+            <label>{gettext('Ed Note:')}&nbsp;&nbsp;</label>
             {getNoteFields()}
         </div>
     );

@@ -385,7 +385,7 @@ export function getAttachments(item) {
  * @return {Array}
  */
 export function getInternalNote(item, plan) {
-    return get(plan, 'internal_note') || get(item, 'internal_note');
+    return get(plan, 'internal_note') || get(item, 'event.internal_note');
 }
 
 /**
