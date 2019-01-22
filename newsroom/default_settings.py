@@ -223,6 +223,7 @@ COVERAGE_TYPES = {
     'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'}
 }
 
+
 # Client configuration
 CLIENT_CONFIG = {
     'time_format': CLIENT_TIME_FORMAT,

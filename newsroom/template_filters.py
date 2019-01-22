@@ -6,7 +6,7 @@ import hashlib
 from flask import current_app as app
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
-from superdesk.text_utils import get_text, get_word_count
+from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 
 
@@ -50,6 +50,10 @@ def plain_text(html):
 
 def word_count(html):
     return get_word_count(html or '')
+
+
+def char_count(html):
+    return get_char_count(html or '')
 
 
 def is_admin(user=None):

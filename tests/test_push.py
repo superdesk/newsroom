@@ -530,6 +530,7 @@ def test_push_parsed_item(client, app):
     parsed = get_entity_or_404(item['guid'], 'wire_search')
     assert type(parsed['firstcreated']) == datetime
     assert 2 == parsed['wordcount']
+    assert 7 == parsed['charcount']
 
 
 def test_push_parsed_dates(client, app):

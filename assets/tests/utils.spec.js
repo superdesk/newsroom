@@ -18,6 +18,14 @@ describe('wordCount', () => {
     });
 });
 
+describe('charCount', () => {
+    it('can count characters in html', () => {
+        const html = '<p class="foo" style="color: red">foo bar, baz</p>';
+        expect(utils.characterCount({body_html: html})).toBe(12);
+        expect(utils.characterCount({charcount: 15, body_html: 'foo, baz'})).toBe(15);
+    });
+});
+
 describe('toggleValue', () => {
     it('can toggle value', () => {
         const items = ['foo', 'bar'];

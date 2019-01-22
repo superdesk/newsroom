@@ -93,6 +93,7 @@ def versions(_id):
 def item(_id):
     item = get_entity_or_404(_id, 'items')
     set_permissions(item, 'am_news')
+    display_char_count = get_resource_service('ui_config').getSectionConfig('am_news').get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):
@@ -103,4 +104,8 @@ def item(_id):
         update_action_list([_id], 'prints', force_insert=True)
     else:
         template = 'wire_item.html'
-    return flask.render_template(template, item=item, previous_versions=previous_versions)
+    return flask.render_template(
+        template,
+        item=item,
+        previous_versions=previous_versions,
+        display_char_count=display_char_count)
