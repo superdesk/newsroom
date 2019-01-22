@@ -75,11 +75,11 @@ class AgendaPreview extends React.PureComponent {
                                 currentCoverage={displayCoverages.current}
                                 previousCoverage={displayCoverages.previous}
                             />
-                            <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                             <AgendaPreviewAttachments item={item} />
                             <AgendaTags item={item} plan={plan} isItemDetail={false} />
                             <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
                             <AgendaInternalNote internalNote={getInternalNote(item, plan)} />
+                            <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                         </div>
                     </Preview>
                 }
