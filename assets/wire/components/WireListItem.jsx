@@ -98,7 +98,7 @@ class WireListItem extends React.Component {
                                 <div className='wire-articles__item__meta-info'>
                                     <span className='bold'>{this.slugline}</span>
                                     <span>{item.source}
-                                        {' // '}<span>{this.count}</span> {gettext('words')}
+                                        {' // '}<span>{this.wordCount}</span> {gettext('words')}
                                         {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
                                         <WireListItemEmbargoed item={item} />
                                     </span>
@@ -113,7 +113,7 @@ class WireListItem extends React.Component {
                             <div key='meta' className='wire-articles__item__meta'>
                                 <WireListItemIcons item={item} picture={picture}/>
                                 <div className='wire-articles__item__meta-info'>
-                                    <span>{this.count} {gettext('words')}</span>
+                                    <span>{this.wordCount} {gettext('words')}</span>
                                 </div>
                             </div>]
                         )}
