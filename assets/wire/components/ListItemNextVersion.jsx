@@ -48,6 +48,7 @@ class ListItemNextVersion extends React.Component {
                     version={this.state.next}
                     baseClass={baseClass}
                     onClick={this.open}
+                    displayConfig={this.props.displayConfig}
                 />
             </div>
         );
@@ -57,6 +58,7 @@ class ListItemNextVersion extends React.Component {
 ListItemNextVersion.propTypes = {
     item: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
+    displayConfig: PropTypes.object,
 };
 
 export default connect()(ListItemNextVersion);

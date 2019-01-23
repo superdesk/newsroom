@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, wordCount, isDisplayed } from 'utils';
+import {gettext, wordCount, isDisplayed, characterCount} from 'utils';
 import { getPicture } from 'wire/utils';
 
 const DEFAULT_URGENCY = 4;
@@ -31,7 +31,8 @@ function PreviewMeta({item, isItemDetail, inputRef, displayConfig}) {
             <div className='wire-articles__item__meta-info'>
                 {isDisplayed('urgency', displayConfig) &&
                 <span>{gettext('News Value: {{ value }}', {value: item.urgency || DEFAULT_URGENCY})}</span>}
-                {isDisplayed('word_count', displayConfig) && <span>{gettext('Words:')}<span> {wordCount(item)}</span></span>}
+                {isDisplayed('wordcount', displayConfig) && <span>{gettext('Words:')}<span> {wordCount(item)}</span></span>}
+                {isDisplayed('charcount', displayConfig) && <span>{gettext('Characters:')}<span> {characterCount(item)}</span></span>}
                 <span>{isDisplayed('source', displayConfig) && gettext('Source: {{ source }}', {source: item.source})}
                     {!isItemDetail && ' // '}
                     {!isItemDetail && <span className="blue-text" onClick={onClick}>

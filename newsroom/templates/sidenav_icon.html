@@ -7,11 +7,13 @@
         {% if nav.badge %}
         <div id="{{ nav.badge }}" class="badge badge-pill badge-info badge-secondary"></div>
         {% endif %}
+        {% block navurl %}
         {% if nav.url %}
         <div class="badge badge-pill badge-light badge--icon">
             <i class="icon-small--external icon--mid-blue"></i>
         </div>
         {% endif %}
+        {% endblock %}
         <i class="icon--{{ nav.icon }} icon--mid-blue"></i>
     </a>
 </li>

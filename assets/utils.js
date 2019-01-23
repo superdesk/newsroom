@@ -352,6 +352,28 @@ export function wordCount(item) {
 }
 
 /**
+ * Get character count for given item
+ *
+ * @param {Object} item
+ * @return {number}
+ */
+export function characterCount(item) {
+    
+    if (isInteger(item.charcount)) {
+        return item.charcount;
+    }
+
+    if (!item.body_html) {
+        return 0;
+    }
+
+    const text = getTextFromHtml(item.body_html);
+
+    // Ignore the last line break
+    return text.length - 1 ;
+}
+
+/**
  * Toggle value within array
  *
  * returns a new array so can be used with setState

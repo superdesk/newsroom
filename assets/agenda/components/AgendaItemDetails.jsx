@@ -71,7 +71,6 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                             item={item}
                             currentCoverage={displayCoverages.current}
                             previousCoverage={displayCoverages.previous}/>}
-                        <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                     </div>
                     {hasAttachments(item) && (
                         <ArticleSidebarBox label={gettext('Attachments')}>
@@ -81,6 +80,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                     <AgendaTags item={item} plan={plan} isItemDetail={true} />
                     <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
                     <AgendaInternalNote internalNote={getInternalNote(item, plan)} />
+                    <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
                 </ArticleSidebar>
             </Article>
         </Content>
