@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ActionButton from './ActionButton';
 
 
-function PreviewActionButtons({item, user, actions}) {
+function PreviewActionButtons({item, user, actions, plan, group}) {
     const actionButtons = actions.map((action) =>
         <ActionButton
             key={action.name}
@@ -12,6 +12,8 @@ function PreviewActionButtons({item, user, actions}) {
             isVisited={action.visited && action.visited(user, item)}
             displayName={false}
             action={action}
+            plan={plan}
+            group={group}
         />
     );
 
@@ -28,7 +30,9 @@ PreviewActionButtons.propTypes = {
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         action: PropTypes.func,
-    }))
+    })),
+    plan: PropTypes.string,
+    group: PropTypes.string,
 };
 
 export default PreviewActionButtons;
