@@ -383,6 +383,16 @@ export function fetchVersions(item) {
 }
 
 /**
+ * Download video file
+ *
+ * @param {string} id
+ */
+export function downloadVideo(href, id) {
+    window.open(`${href}?filename=${id}`, '_blank');
+    analytics.event('download-video', id);
+}
+
+/**
  * Download items - display modal to pick a format
  *
  * @param {Array} items

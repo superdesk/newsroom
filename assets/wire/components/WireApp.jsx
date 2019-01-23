@@ -12,6 +12,7 @@ import {
     refresh,
     previewItem,
     toggleNews,
+    downloadVideo,
 } from 'wire/actions';
 
 import {
@@ -66,6 +67,7 @@ class WireApp extends BaseApp {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
                 detailsConfig={this.props.detailsConfig}
+                downloadVideo={this.props.downloadVideo}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
                 <section key="contentHeader" className='content-header'>
@@ -147,6 +149,7 @@ class WireApp extends BaseApp {
                                 isFollowing={!!isFollowing}
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
+                                downloadVideo={this.props.downloadVideo}
                             />
                             }
 
@@ -202,6 +205,7 @@ WireApp.propTypes = {
     previewConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
     groups: PropTypes.array,
+    downloadVideo: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -244,6 +248,7 @@ const mapDispatchToProps = (dispatch) => ({
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
+    downloadVideo: (href, id) => dispatch(downloadVideo(href, id))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
