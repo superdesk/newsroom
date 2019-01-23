@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import {LIST_ANIMATIONS, wordCount} from 'utils';
 import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
 
-import ActionList from 'components/ActionList';
+import ActionMenu from 'components/ActionMenu';
 import ActionButton from 'components/ActionButton';
 import MetaTime from 'ui/components/MetaTime';
 import AMNewsIcon from './AmNewsIcon';
@@ -122,16 +122,13 @@ class AmNewsListItem extends React.Component {
                     )}
 
                     <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
-                        <div className='btn-group'>
-                            <span onClick={(event) => this.props.onActionList(event, this.props.item)}>
-                                <i className='icon--more icon--gray-light'></i>
-                            </span>
-                            { this.props.showActions ? <ActionList
-                                item={this.props.item}
-                                user={this.props.user}
-                                actions={this.props.actions}
-                            /> : null }
-                        </div>
+                        <ActionMenu
+                            item={this.props.item}
+                            user={this.props.user}
+                            actions={this.props.actions}
+                            onActionList={this.props.onActionList}
+                            showActions={this.props.showActions}
+                        />
 
                         {this.props.actions.map((action) =>
                             action.shortcut &&
