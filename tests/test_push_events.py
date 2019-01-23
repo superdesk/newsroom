@@ -35,7 +35,7 @@ test_event = {
         'tz': 'Australia/Sydney'
     },
     'guid': 'foo',
-    'item_id': 'foo',
+    'event_id': 'foo',
     'type': 'event',
     'location': [
         {

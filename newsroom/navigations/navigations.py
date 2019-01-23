@@ -49,7 +49,7 @@ class NavigationsService(newsroom.Service):
     pass
 
 
-def get_navigations_by_company(company_id, product_type='wire'):
+def get_navigations_by_company(company_id, product_type='wire', events_only=False):
     """
     Returns list of navigations for given company id
     Navigations will contain the list of product ids
@@ -59,17 +59,24 @@ def get_navigations_by_company(company_id, product_type='wire'):
     # Get the navigation ids used across products
     navigation_ids = []
 
-    if current_app.config.get('AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE') and product_type == 'agenda':
+    if product_type == 'agenda':
         navigations = []
         featured_navigation_ids = []
 
         # fetch navigations for featured products
-        [featured_navigation_ids.extend(p.get('navigations', [])) for p in products if p.get('query') == '_featured']
-        navigations.extend(get_navigations_by_ids(featured_navigation_ids))
+        if current_app.config.get('AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE'):
+            if not events_only:
+                [featured_navigation_ids.extend(p.get('navigations', []))
+                 for p in products if p.get('query') == '_featured']
+                navigations.extend(get_navigations_by_ids(featured_navigation_ids))
 
-        # fetch all other navigations
-        [navigation_ids.extend(p.get('navigations', [])) for p in products if p.get('query') != '_featured']
-        navigations.extend(get_navigations_by_ids(navigation_ids))
+        if current_app.config.get('AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE') or events_only:
+            # fetch all other navigations
+            [navigation_ids.extend(p.get('navigations', [])) for p in products if p.get('query') != '_featured']
+            navigations.extend(get_navigations_by_ids(navigation_ids))
+        else:
+            [navigation_ids.extend(p.get('navigations', [])) for p in products]
+            navigations.extend(get_navigations_by_ids(navigation_ids))
 
         return navigations
     else:

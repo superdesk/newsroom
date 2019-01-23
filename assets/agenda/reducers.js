@@ -44,6 +44,7 @@ const initialState = {
         activeView: EXTENDED_VIEW,
         activeDate: Date.now(),
         activeGrouping: 'day',
+        eventsOnly: false,
     },
     search: searchReducer(),
     detail: false,
@@ -184,6 +185,7 @@ export default function agendaReducer(state = initialState, action) {
         const agenda = {
             ...state.agenda,
             activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : action.activeDate || state.agenda.activeDate,
+            eventsOnly: action.agendaData.events_only,
         };
         
         return {

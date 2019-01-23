@@ -34,7 +34,18 @@ import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
 
-export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group, planningId}) {
+export default function AgendaItemDetails(
+    {
+        item,
+        user,
+        actions,
+        onClose,
+        requestCoverage,
+        group,
+        planningId,
+        eventsOnly
+    })
+{
     const locations = getLocations(item);
     let map = null;
 
@@ -80,7 +91,7 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
                     <AgendaTags item={item} plan={plan} isItemDetail={true} />
                     <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
                     <AgendaInternalNote internalNote={getInternalNote(item, plan)} />
-                    <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
+                    {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                 </ArticleSidebar>
             </Article>
         </Content>
@@ -99,4 +110,5 @@ AgendaItemDetails.propTypes = {
     requestCoverage: PropTypes.func,
     group: PropTypes.string,
     planningId: PropTypes.string,
+    eventsOnly: PropTypes.bool,
 };

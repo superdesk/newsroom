@@ -67,6 +67,7 @@ items = [
 agenda_items = [{
     'type': 'agenda',
     '_id': 'urn:conference',
+    'event_id': 'urn:conference',
     'versioncreated': datetime(2018, 6, 27, 11, 12, 4, tzinfo=utc),
     'name': 'Conference Planning',
     'slugline': 'Prime Conference',
@@ -157,8 +158,7 @@ def init_auth(app, client):
     test_login_succeeds_for_admin(client)
 
 
-@fixture(autouse=True)
-def init_company(app, client):
+def setup_user_company(app):
     app.data.insert('companies', [{
         '_id': 1,
         'name': 'Grain Corp'
@@ -169,5 +169,10 @@ def init_company(app, client):
         'email': 'foo@bar.com',
         'first_name': 'Foo',
         'last_name': 'Bar',
-        'company': 1,
+        'company': 1
     }])
+
+
+@fixture(autouse=True)
+def init_company(app):
+    setup_user_company(app)

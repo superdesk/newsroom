@@ -40,7 +40,16 @@ class AgendaPreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, openItemDetails, requestCoverage, previewGroup, previewPlan} = this.props;
+        const {
+            item,
+            user,
+            actions,
+            openItemDetails,
+            requestCoverage,
+            previewGroup,
+            previewPlan,
+            eventsOnly
+        } = this.props;
 
         const isWatching = get(item, 'watches', []).includes(user);
 
@@ -79,7 +88,7 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaTags item={item} plan={plan} isItemDetail={false} />
                             <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
                             <AgendaInternalNote internalNote={getInternalNote(item, plan)} />
-                            <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
+                            {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                         </div>
                     </Preview>
                 }
@@ -102,6 +111,9 @@ AgendaPreview.propTypes = {
     requestCoverage: PropTypes.func,
     previewGroup: PropTypes.string,
     previewPlan: PropTypes.string,
+    eventsOnly: PropTypes.bool,
 };
+
+AgendaPreview.defaultProps = {eventsOnly: false};
 
 export default AgendaPreview;
