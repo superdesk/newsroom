@@ -62,7 +62,7 @@ class AgendaPreview extends React.PureComponent {
                 {item &&
                     <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
                         <div className='wire-column__preview__top-bar'>
-                            <PreviewActionButtons item={item} user={user} actions={actions} />
+                            <PreviewActionButtons item={item} user={user} actions={actions} plan={previewPlan} group={previewGroup} />
                         </div>
 
                         <div id='preview-article' className='wire-column__preview__content pt-0' ref={(preview) => this.preview = preview}>
