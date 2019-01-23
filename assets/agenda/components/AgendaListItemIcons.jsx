@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {bem} from 'ui/utils';
+import classNames from 'classnames';
 import {
     hasCoverages,
     isCoverageForExtraDay,
@@ -9,6 +10,7 @@ import {
     getLocationString,
     getCoverageIcon,
     isRecurring,
+    getInternalNote,
     WORKFLOW_STATUS_TEXTS,
     WORKFLOW_COLORS,
     DRAFT_STATUS_TEXTS,
@@ -16,6 +18,7 @@ import {
 
 import AgendaListItemLabels from './AgendaListItemLabels';
 import AgendaMetaTime from './AgendaMetaTime';
+import AgendaInternalNote from './AgendaInternalNote';
 import {gettext, formatDate, formatTime} from 'utils';
 
 
@@ -57,7 +60,7 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
         return '';
     };
 
-
+    const internalNote = getInternalNote(item, planningItem);
 
     return (
         <div className={className}>
@@ -89,7 +92,13 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
                 {hasLocation(item) && <span className='mr-2'>
                     <i className='icon-small--location icon--gray'></i>
                 </span>}
-                {hasLocation(item) && <span>{getLocationString(item)}</span>}
+                {hasLocation(item) &&
+                    <span className={classNames({'wire-articles__item__icons--dashed-border' :internalNote})}>
+                        {getLocationString(item)}
+                    </span>}
+                <AgendaInternalNote
+                    internalNote={internalNote}
+                    onlyIcon={true} />
 
                 <AgendaListItemLabels item={item} />
             </div>
