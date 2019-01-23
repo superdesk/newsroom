@@ -1,5 +1,6 @@
 
 import { get, isEmpty } from 'lodash';
+import mime from 'mime-types';
 import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
@@ -387,8 +388,8 @@ export function fetchVersions(item) {
  *
  * @param {string} id
  */
-export function downloadVideo(href, id) {
-    window.open(`${href}?filename=${id}`, '_blank');
+export function downloadVideo(href, id, mimeType) {
+    window.open(`${href}?filename=${id}.${mime.extension(mimeType)}`, '_blank');
     analytics.event('download-video', id);
 }
 

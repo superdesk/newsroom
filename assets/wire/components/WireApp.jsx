@@ -248,7 +248,7 @@ const mapDispatchToProps = (dispatch) => ({
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
-    downloadVideo: (href, id) => dispatch(downloadVideo(href, id))
+    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
