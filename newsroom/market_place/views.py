@@ -126,7 +126,7 @@ def versions(_id):
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
-    set_permissions(item)
+    set_permissions(item, 'aapX')
     display_char_count = get_resource_service('ui_config').getSectionConfig(SECTION_ID).get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
