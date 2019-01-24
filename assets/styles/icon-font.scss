@@ -185,7 +185,8 @@
 .icon--coverage-photo:before, .icon--coverage-picture:before {
     content: "\e621";
 }
-.icon--coverage-video:before {
+.icon--coverage-video:before,
+.icon--video:before {
     content: "\e622";
 }
 .icon--coverage-explainer:before {
