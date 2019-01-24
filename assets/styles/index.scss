@@ -2394,6 +2394,21 @@ a.wire-articles__versions {
     }
 }
 
+.wire-column__preview__video-headline {
+    font-size: 0.8125rem; // 14px
+    font-weight: 300;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.wire-column__preview__video {
+    position: relative;
+    video {
+        width: 100%;
+        height: auto;
+    }
+}
+
 .wire-column__preview__image-icon {
     position: absolute;
     top: 5px;

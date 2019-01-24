@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { gettext, fullDate, wordCount, LIST_ANIMATIONS } from 'utils';
-import { getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled } from 'wire/utils';
+import {getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled, getVideos} from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
 
@@ -63,6 +63,7 @@ class WireListItem extends React.Component {
             'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const picture = getPicture(item);
+        const videos = getVideos(item);
         const isWire = this.props.context === 'wire';
         return (
             <article key={item._id}
@@ -87,14 +88,14 @@ class WireListItem extends React.Component {
                                 </label>
                             </div>
                             {!isExtended && (
-                                <WireListItemIcons item={item} picture={picture} divider={false} />
+                                <WireListItemIcons item={item} picture={picture} videos={videos} divider={false} />
                             )}
                             {item.headline}
                         </h4>
 
                         {isExtended && isWire && (
                             <div className='wire-articles__item__meta'>
-                                <WireListItemIcons item={item} picture={picture} />
+                                <WireListItemIcons item={item} picture={picture} videos={videos} />
                                 <div className='wire-articles__item__meta-info'>
                                     <span className='bold'>{this.slugline}</span>
                                     <span>{item.source}
@@ -111,7 +112,7 @@ class WireListItem extends React.Component {
                                 <img src={`/theme/logo/${item.source}.png`}/>
                             </div>,
                             <div key='meta' className='wire-articles__item__meta'>
-                                <WireListItemIcons item={item} picture={picture}/>
+                                <WireListItemIcons item={item} picture={picture} videos={videos} />
                                 <div className='wire-articles__item__meta-info'>
                                     <span>{this.wordCount} {gettext('words')}</span>
                                 </div>
