@@ -1,6 +1,6 @@
 flake8
 sphinx
 sphinx-autobuild
-pytest
+pytest==3.10.0
 pytest-cov
 pytest-mock
