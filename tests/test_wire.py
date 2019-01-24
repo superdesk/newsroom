@@ -1,6 +1,7 @@
 from flask import json, g
 from bson import ObjectId
 from datetime import datetime, timedelta
+from urllib import parse
 
 from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import get_json
@@ -42,8 +43,8 @@ def test_share_items(client, app):
         assert 'admin admin shared ' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
         assert items[1]['headline'] in outbox[0].body
-        assert 'http://localhost:5050/wire/%s' % items[0]['_id'] in outbox[0].body
-        assert 'http://localhost:5050/wire/%s' % items[1]['_id'] in outbox[0].body
+        assert 'http://localhost:5050/wire?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body
+        assert 'http://localhost:5050/wire?item=%s' % parse.quote(items[1]['_id']) in outbox[0].body
         assert 'Some info message' in outbox[0].body
 
     resp = client.get('/wire/{}?format=json'.format(items[0]['_id']))

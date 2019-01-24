@@ -21,6 +21,7 @@ from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
 from newsroom.wire.search import query_string, set_product_query, FeaturedQuery, \
     planning_items_query_string, nested_query
 from newsroom.wire.utils import get_local_date, get_end_date
+from newsroom.wire import url_for_wire
 
 logger = logging.getLogger(__name__)
 
@@ -606,7 +607,7 @@ class AgendaService(newsroom.Service):
             for coverage in coverages:
                 if coverage['coverage_id'] == wire_item['coverage_id'] and not coverage.get('delivery'):
                     coverage['delivery_id'] = wire_item['guid']
-                    coverage['delivery_href'] = url_for('wire.item', _id=wire_item['guid'])
+                    coverage['delivery_href'] = url_for_wire(wire_item, _external=False)
                     self.system_update(item['_id'], {'coverages': coverages}, item)
                     self.notify_new_coverage(item, wire_item)
                     break

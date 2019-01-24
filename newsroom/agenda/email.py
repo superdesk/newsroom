@@ -8,11 +8,16 @@ from newsroom.template_filters import is_admin_or_internal
 
 def send_coverage_notification_email(user, agenda, wire_item):
     if user.get('receive_email'):
+        kwargs = dict(
+            agenda=agenda,
+            item=wire_item,
+            section='agenda',
+        )
         send_email(
             to=[user['email']],
             subject=gettext('New coverage'),
-            text_body=render_template('agenda_new_coverage_email.txt', agenda=agenda, item=wire_item),
-            html_body=render_template('agenda_new_coverage_email.html', agenda=agenda, item=wire_item)
+            text_body=render_template('agenda_new_coverage_email.txt', **kwargs),
+            html_body=render_template('agenda_new_coverage_email.html', **kwargs)
         )
 
 

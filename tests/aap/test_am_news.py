@@ -4,6 +4,7 @@ from tests.utils import json, get_json
 from flask import g
 from bson import ObjectId
 from datetime import datetime, timedelta
+from urllib import parse
 
 
 def test_blueprint_registration(client):
@@ -351,3 +352,38 @@ def test_company_type_filter(client, app):
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert 'WEATHER' != data['_items'][0]['slugline']
+
+
+def test_share_items(client, app):
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'last_name': 'Bar',
+    }])
+
+    with app.mail.record_messages() as outbox:
+        resp = client.post('/wire_share?type=am_news', data=json.dumps({
+            'items': [item['_id'] for item in items],
+            'users': [str(user_ids[0])],
+            'message': 'Some info message',
+        }), content_type='application/json')
+
+        assert resp.status_code == 201, resp.get_data().decode('utf-8')
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['foo@bar.com']
+        assert outbox[0].sender == 'admin@sourcefabric.org'
+        assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
+        assert 'Hi Foo Bar' in outbox[0].body
+        assert 'admin admin shared ' in outbox[0].body
+        assert items[0]['headline'] in outbox[0].body
+        assert items[1]['headline'] in outbox[0].body
+        assert 'http://localhost:5050/am_news?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body
+        assert 'http://localhost:5050/am_news?item=%s' % parse.quote(items[1]['_id']) in outbox[0].body
+        assert 'Some info message' in outbox[0].body
+
+    resp = client.get('/am_news/{}?format=json'.format(items[0]['_id']))
+    data = json.loads(resp.get_data())
+    assert 'shares' in data
+
+    user_id = app.data.find_all('users')[0]['_id']
+    assert str(user_id) in data['shares']

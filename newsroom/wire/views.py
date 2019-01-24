@@ -5,7 +5,7 @@ import superdesk
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app
+from flask import current_app as app, request
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -194,6 +194,7 @@ def share():
                 'sender': current_user,
                 'items': items,
                 'message': data.get('message'),
+                'section': request.args.get('type', 'wire')
             }
             if item_type == 'agenda':
                 template_kwargs['maps'] = data.get('maps')
