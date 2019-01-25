@@ -135,7 +135,7 @@ export function getMapSource(locations, scale = 1) {
         return '';
     }
 
-    const params = ['size=600x400', 'key=' + mapsKey(), 'scale=' + scale];
+    const params = ['size=600x306', 'key=' + mapsKey(), 'scale=' + scale];
     const geoLocations = getGeoLocations(locations);
     let src;
 
