@@ -52,9 +52,8 @@ def get_setting(setting_key=None):
 
 def get_client_config():
     config = newsroom_config()
-    keys = ['google_maps_styles']
-    for key in keys:
-        value = get_setting(key)
+    for key, setting in (get_setting() or {}).items():
+        value = setting.get('value', setting.get('default'))
         if value:
             config['client_config'][key] = value
     return config

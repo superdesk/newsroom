@@ -34,5 +34,6 @@ def init_app(app):
         description=gettext('Provide styles delimited by &(ampersand). '
                             'For example, feature:poi|element:labels|visibility:off&transit|visibility:off. '
                             'Refer to https://developers.google.com/maps/documentation/maps-static/styling '
-                            'for more details')
+                            'for more details'),
+        client_setting=True
     )
