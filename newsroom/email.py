@@ -103,14 +103,14 @@ def send_reset_password_email(user_name, user_email, token):
     send_email(to=[user_email], subject=subject, text_body=text_body, html_body=html_body)
 
 
-def send_new_item_notification_email(user, topic_name, item):
+def send_new_item_notification_email(user, topic_name, item, section='wire'):
     if item.get('type') == 'text':
-        _send_new_wire_notification_email(user, topic_name, item)
+        _send_new_wire_notification_email(user, topic_name, item, section)
     else:
         _send_new_agenda_notification_email(user, topic_name, item)
 
 
-def _send_new_wire_notification_email(user, topic_name, item):
+def _send_new_wire_notification_email(user, topic_name, item, section):
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
     subject = gettext('New story for followed topic: {}'.format(topic_name))
@@ -121,7 +121,8 @@ def _send_new_wire_notification_email(user, topic_name, item):
         name=user.get('first_name'),
         item=item,
         url=url,
-        type='wire'
+        type='wire',
+        section=section
     )
     text_body = render_template('new_item_notification.txt', **kwargs)
     html_body = render_template('new_item_notification.html', **kwargs)
@@ -145,6 +146,7 @@ def _send_new_agenda_notification_email(user, topic_name, item):
         contacts=get_public_contacts(item),
         links=get_links(item),
         is_admin=is_admin_or_internal(user),
+        section='agenda'
     )
     text_body = render_template('new_item_notification.txt', **kwargs)
     html_body = render_template('new_item_notification.html', **kwargs)
@@ -170,7 +172,8 @@ def _send_history_match_wire_notification_email(user, item):
         name=user.get('first_name'),
         item=item,
         url=url,
-        type='wire'
+        type='wire',
+        section='wire'
     )
 
     send_email(to=recipients, subject=subject, text_body=text_body)
@@ -194,6 +197,7 @@ def _send_history_match_agenda_notification_email(user, item):
         contacts=get_public_contacts(item),
         links=get_links(item),
         is_admin=is_admin_or_internal(user),
+        section='agenda'
     )
 
     send_email(to=recipients, subject=subject, text_body=text_body)

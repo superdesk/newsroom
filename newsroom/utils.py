@@ -68,7 +68,8 @@ def get_type():
     types = {
         'wire': 'items',
         'agenda': 'agenda',
-        'am_news': 'items'
+        'am_news': 'items',
+        'aapX': 'items',
     }
     return types[item_type]
 

@@ -7,5 +7,5 @@
 {% if item.headline %}<dt>Headline:</dt><dd>{{ item.headline }}</dd>{% endif %}
 {% if item.service %}<dt>Category:</dt><dd>{{ item.service.0.name }}</dd>{% endif %}
 <dt>Published:</dt><dd>{{ item.versioncreated | datetime_long }}</dd>
-<dt>Link:</dt><dd><a href="{{ url_for_wire(item) }}">{{ url_for_wire(item) }}</a></dd>
+<dt>Link:</dt><dd><a href="{{ url_for_wire(item, True, section) }}">{{ url_for_wire(item, True, section) }}</a></dd>
 </dl>

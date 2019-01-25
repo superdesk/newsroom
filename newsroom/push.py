@@ -7,7 +7,7 @@ from datetime import datetime
 
 from copy import copy, deepcopy
 from PIL import Image, ImageEnhance
-from flask import current_app as app, url_for
+from flask import current_app as app
 from flask_babel import gettext
 from superdesk.text_utils import get_word_count, get_char_count
 
@@ -19,6 +19,7 @@ from newsroom.email import send_new_item_notification_email, \
     send_history_match_notification_email, send_item_killed_notification_email
 from newsroom.history import get_history_users
 from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
+from newsroom.wire import url_for_wire
 from newsroom.upload import ASSETS_RESOURCE
 from newsroom.signals import publish_item as publish_item_signal
 
@@ -440,7 +441,7 @@ def get_coverages(planning_items, original_coverages=[]):
         if coverage['coverage_type'] == 'text':
             if deliveries and coverage.get('workflow_status') == 'completed':
                 coverage['delivery_id'] = deliveries[0]['item_id']
-                coverage['delivery_href'] = url_for('wire.item', _id=deliveries[0]['item_id'])
+                coverage['delivery_href'] = url_for_wire(deliveries[0], _external=False)
             else:
                 coverage['delivery_id'] = None
                 coverage['delivery_href'] = None
@@ -561,7 +562,12 @@ def send_topic_notification_emails(item, topics, topic_matches, users):
     for topic in topics:
         user = users.get(str(topic['user']))
         if topic['_id'] in topic_matches and user and user.get('receive_email'):
-            send_new_item_notification_email(user, topic['label'], item=item)
+            send_new_item_notification_email(
+                user,
+                topic['label'],
+                item=item,
+                section=topic.get('topic_type') or 'wire'
+            )
 
 
 # keeping this for testing
