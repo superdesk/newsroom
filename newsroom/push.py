@@ -391,17 +391,17 @@ def set_agenda_planning_items(agenda, planning_item, action='add'):
     """
     if action == 'add':
         # planning item is newly added
-        superdesk.get_resource_service('agenda').notify_agenda_update('planning_added', agenda)
+        superdesk.get_resource_service('agenda').notify_agenda_update('planning_added', agenda, True)
 
     if action == 'remove':
         existing_planning_items = deepcopy(agenda.get('planning_items', []))
         agenda['planning_items'] = [p for p in existing_planning_items if p['guid'] != planning_item['guid']] or []
-        superdesk.get_resource_service('agenda').notify_agenda_update('planning_cancelled', agenda)
+        superdesk.get_resource_service('agenda').notify_agenda_update('planning_cancelled', agenda, True)
 
     agenda['coverages'], coverage_changes = get_coverages(agenda['planning_items'], (agenda.get('coverages') or []))
 
     if coverage_changes.get('coverage_added'):
-        superdesk.get_resource_service('agenda').notify_agenda_update('coverage_added', agenda)
+        superdesk.get_resource_service('agenda').notify_agenda_update('coverage_added', agenda, True)
 
     agenda['display_dates'] = get_display_dates(agenda['dates'], agenda['planning_items'])
 

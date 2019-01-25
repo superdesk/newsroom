@@ -57,7 +57,7 @@ def get_aggregation_field(key):
     return get_aggregations()[key]['terms']['field']
 
 
-def set_product_query(query, company, section, user=None, navigation_id=None):
+def set_product_query(query, company, section, user=None, navigation_id=None, events_only=False):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -68,6 +68,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
     :param section: section i.e. wire, agenda, marketplace etc
     :param user: user to check against (used for notification checking)
     :param navigation_id: navigation to filter products
+    :param events_only: From agenda to display events only or not
     If not provided session user will be checked
     """
     products = None
@@ -106,7 +107,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
                     raise FeaturedQuery
             else:
                 query['bool']['should'].append(query_string(product['query']))
-                if product.get('planning_item_query'):
+                if product.get('planning_item_query') and not events_only:
                     # form the query for the agenda planning items
                     planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
 

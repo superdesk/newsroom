@@ -33,8 +33,9 @@ class CompanyPermissions extends React.Component {
         }
 
         const archive_access = !!this.props.company.archive_access;
+        const events_only = !!this.props.company.events_only;
 
-        return {sections, products, archive_access};
+        return {sections, products, archive_access, events_only};
     }
 
     componentDidUpdate(prevProps) {
@@ -66,6 +67,14 @@ class CompanyPermissions extends React.Component {
                                         label={gettext('Archive access')}
                                         value={!!this.state.archive_access}
                                         onChange={() => this.setState({archive_access: !this.state.archive_access})}
+                                    />
+                                </li>
+                                <li>
+                                    <CheckboxInput
+                                        name="events_only"
+                                        label={gettext('Events Only Access')}
+                                        value={!!this.state.events_only}
+                                        onChange={() => this.setState({events_only: !this.state.events_only})}
                                     />
                                 </li>
                             </ul>
@@ -123,6 +132,7 @@ CompanyPermissions.propTypes = {
         _id: PropTypes.string.isRequired,
         sections: PropTypes.object,
         archive_access: PropTypes.bool,
+        events_only: PropTypes.bool,
     }).isRequired,
 
     sections: PropTypes.arrayOf(PropTypes.shape({

@@ -1,5 +1,6 @@
 import logging
 
+from copy import deepcopy
 from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
 from flask import json, abort, url_for, current_app as app
@@ -16,7 +17,7 @@ from newsroom.agenda.email import send_coverage_notification_email, send_agenda_
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
-from newsroom.template_filters import is_admin_or_internal
+from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
 from newsroom.wire.search import query_string, set_product_query, FeaturedQuery, \
     planning_items_query_string, nested_query
@@ -24,6 +25,17 @@ from newsroom.wire.utils import get_local_date, get_end_date
 from newsroom.wire import url_for_wire
 
 logger = logging.getLogger(__name__)
+PRIVATE_FIELDS = [
+    'event.files',
+    'event.internal_note',
+    'planning_items.internal_note',
+    'coverages.planning.internal_note'
+]
+PLANNING_ITEMS_FIELDS = [
+    'planning_items',
+    'coverages',
+    'display_dates'
+]
 
 
 agenda_notifications = {
@@ -301,17 +313,26 @@ aggregations = {
 }
 
 
+def get_agenda_aggregations(events_only=False):
+    aggs = deepcopy(aggregations)
+    if events_only:
+        aggs.pop('coverage', None)
+        aggs.pop('planning_items', None)
+        aggs.pop('urgency', None)
+    return aggs
+
+
 def get_aggregation_field(key):
     if key == 'coverage':
         return aggregations[key]['aggs']['coverage_type']['terms']['field']
     return aggregations[key]['terms']['field']
 
 
-def _filter_terms(filters):
+def _filter_terms(filters, events_only=False):
     term_filters = []
     for key, val in filters.items():
         if val and key != 'coverage':
-            if key in {'service', 'urgency', 'subject', 'place'}:
+            if key in {'service', 'urgency', 'subject', 'place'} and not events_only:
                 term_filters.append({
                     'or': [
                         {'terms': {get_aggregation_field(key): val}},
@@ -330,7 +351,7 @@ def _filter_terms(filters):
                 })
             else:
                 term_filters.append({'terms': {get_aggregation_field(key): val}})
-        if val and key == 'coverage':
+        if val and key == 'coverage' and not events_only:
             term_filters.append(
                 {"nested": {
                     "path": "coverages",
@@ -340,39 +361,52 @@ def _filter_terms(filters):
     return term_filters
 
 
-def _remove_private_fields(source):
-    source['_source'] = {
-        'exclude': [
-            'event.files',
-            'event.internal_note',
-            'planning_items.internal_note',
-            'coverages.planning.internal_note'
-        ]
-    }
+def _remove_fields(source, fields):
+    """Add fields to remove the elastic search
+
+    :param dict source: elasticsearch query object
+    :param fields: list of fields
+    """
+    if not source.get('_source'):
+        source['_source'] = {}
+
+    if not source.get('_source').get('exclude'):
+        source['_source']['exclude'] = []
+
+    source['_source']['exclude'].extend(fields)
 
 
-def set_post_filter(source, req):
+def set_post_filter(source, req, events_only=False):
     filters = None
     if req.args.get('filter'):
         filters = json.loads(req.args['filter'])
     if filters:
         if app.config.get('FILTER_BY_POST_FILTER', False):
-            source['post_filter'] = {'bool': {'must': [_filter_terms(filters)]}}
+            source['post_filter'] = {'bool': {'must': [_filter_terms(filters, events_only)]}}
         else:
-            source['query']['bool']['must'] += _filter_terms(filters)
+            source['query']['bool']['must'] += _filter_terms(filters, events_only)
 
 
-def get_agenda_query(query):
-    return {
-        'or': [
-            query_string(query),
-            nested_query(
-                'planning_items',
-                planning_items_query_string(query),
-                name='query'
-            )
-        ]
-    }
+def get_agenda_query(query, events_only=False):
+    if events_only:
+        return query_string(query)
+    else:
+        return {
+            'or': [
+                query_string(query),
+                nested_query(
+                    'planning_items',
+                    planning_items_query_string(query),
+                    name='query'
+                )
+            ]
+        }
+
+
+def is_events_only_view(user, company):
+    if user and company and not is_admin(user):
+        return company.get('events_only', False)
+    return False
 
 
 class AgendaService(newsroom.Service):
@@ -400,10 +434,17 @@ class AgendaService(newsroom.Service):
         query = _agenda_query()
         user = get_user()
         company = get_user_company(user)
+        is_events_only = is_events_only_view(user, company)
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         product_query = {'bool': {'must': [], 'should': []}}
         try:
-            set_product_query(product_query, company, self.section, navigation_id=req.args.get('navigation'))
+            set_product_query(
+                product_query,
+                company,
+                self.section,
+                navigation_id=req.args.get('navigation'),
+                events_only=is_events_only
+            )
             query['bool']['must'].append(product_query)
         except FeaturedQuery:
             return self.featured(req, lookup)
@@ -430,7 +471,7 @@ class AgendaService(newsroom.Service):
                 pass
 
             if not test_query.get('or'):
-                query['bool']['must'].append(get_agenda_query(req.args['q']))
+                query['bool']['must'].append(get_agenda_query(req.args['q'], is_events_only))
 
         if req.args.get('id'):
             query['bool']['must'].append({'term': {'_id': req.args['id']}})
@@ -440,24 +481,30 @@ class AgendaService(newsroom.Service):
 
         if req.args.get('date_from') or req.args.get('date_to'):
             query['bool']['should'].extend(_event_date_range(req.args))
-            query['bool']['should'].append(_display_date_range(req.args))
+            if not is_events_only:
+                query['bool']['should'].append(_display_date_range(req.args))
 
         source = {'query': query}
         source['sort'] = [{'dates.start': 'asc'}]
         source['size'] = 100  # we should fetch all items for given date
         source['from'] = req.args.get('from', 0, type=int)
 
-        set_post_filter(source, req)
+        set_post_filter(source, req, is_events_only)
 
         if source['from'] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
             return abort(400)
 
         if not source['from'] and not req.args.get('bookmarks'):  # avoid aggregations when handling pagination
-            source['aggs'] = aggregations
+            source['aggs'] = get_agenda_aggregations(is_events_only)
 
         if not is_admin_or_internal(user):
-            _remove_private_fields(source)
+            _remove_fields(source, PRIVATE_FIELDS)
+
+        if is_events_only:
+            # no adhoc planning items and remove planning items and coverages fields
+            query['bool']['must'].append({'exists': {'field': 'event_id'}})
+            _remove_fields(source, PLANNING_ITEMS_FIELDS)
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
@@ -476,6 +523,11 @@ class AgendaService(newsroom.Service):
 
     def featured(self, req, lookup):
         """Return featured items."""
+        user = get_user()
+        company = get_user_company(user)
+        if is_events_only_view(user, company):
+            abort(403)
+
         featured = get_resource_service('agenda_featured').find_one_today()
         if not featured or not featured.get('items'):
             return ListCursor([])
@@ -501,6 +553,11 @@ class AgendaService(newsroom.Service):
         source['from'] = req.args.get('from', 0, type=int)
         if not source['from']:
             source['aggs'] = aggregations
+
+        if company and not is_admin(user) and company.get('events_only', False):
+            # no adhoc planning items and remove planning items and coverages fields
+            query['bool']['must'].append({'exists': {'field': 'event'}})
+            _remove_fields(source, PLANNING_ITEMS_FIELDS)
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
@@ -616,16 +673,16 @@ class AgendaService(newsroom.Service):
     def notify_new_coverage(self, agenda, wire_item):
         user_dict = get_user_dict()
         company_dict = get_company_dict()
-        notify_user_ids = filter_active_users(agenda.get('watches', []), user_dict, company_dict)
+        notify_user_ids = filter_active_users(agenda.get('watches', []), user_dict, company_dict, events_only=True)
         for user_id in notify_user_ids:
             user = user_dict[str(user_id)]
             send_coverage_notification_email(user, agenda, wire_item)
 
-    def notify_agenda_update(self, update, agenda):
+    def notify_agenda_update(self, update, agenda, events_only=False):
         if agenda:
             user_dict = get_user_dict()
             company_dict = get_company_dict()
-            notify_user_ids = filter_active_users(agenda.get('watches', []), user_dict, company_dict)
+            notify_user_ids = filter_active_users(agenda.get('watches', []), user_dict, company_dict, events_only)
             users = [user_dict[str(user_id)] for user_id in notify_user_ids]
             for user in users:
                 app.data.insert('notifications', [{

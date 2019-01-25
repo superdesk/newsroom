@@ -117,11 +117,14 @@ def get_company_dict():
     return g.company_dict
 
 
-def filter_active_users(user_ids, user_dict, company_dict):
+def filter_active_users(user_ids, user_dict, company_dict, events_only=False):
     active = []
     for _id in user_ids:
         user = user_dict.get(str(_id))
         if user and (not user.get('company') or str(user.get('company', '')) in company_dict):
+            if events_only and user.get('company') and \
+                    (company_dict.get(str(user.get('company', ''))) or {}).get('events_only'):
+                continue
             active.append(_id)
     return active
 
