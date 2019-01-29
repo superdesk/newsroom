@@ -98,7 +98,7 @@
 <div id="modal-container"></div>
 
 <script>
-    window.newsroom = {{ newsroom_config() | tojson | safe }};
+    window.newsroom = {{ get_client_config() | tojson | safe }};
     window.notificationData = {{ get_initial_notifications() | tojson | safe }};
     window.profileData = {{ get_user_profile_data() | tojson | safe }};
     window.translations = {{ get_client_translations() | tojson | safe }};

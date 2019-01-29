@@ -285,7 +285,8 @@ class Newsroom(eve.Eve):
             weight=weight
         ))
 
-    def general_setting(self, _id, label, type='text', default=None, weight=0, description=None, min=None):
+    def general_setting(self, _id, label, type='text', default=None,
+                        weight=0, description=None, min=None, client_setting=False):
         self._general_settings[_id] = {
             'type': type,
             'label': label,
@@ -293,6 +294,7 @@ class Newsroom(eve.Eve):
             'default': default,
             'description': description,
             'min': min,
+            'client_setting': client_setting
         }
 
         if flask.g:  # reset settings cache

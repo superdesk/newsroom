@@ -1,4 +1,5 @@
 import {get, isEmpty} from 'lodash';
+import {getConfig} from '../utils';
 
 const MAPS_URL = 'https://maps.googleapis.com/maps/api/staticmap';
 
@@ -135,7 +136,21 @@ export function getMapSource(locations, scale = 1) {
         return '';
     }
 
-    const params = ['size=600x306', 'key=' + mapsKey(), 'scale=' + scale];
+    let params = [
+        'size=600x306',
+        'key=' + mapsKey(),
+        'scale=' + scale
+    ];
+
+    const google_maps_styles = getConfig('google_maps_styles');
+
+    if (google_maps_styles) {
+        const styles = google_maps_styles.split('&').filter((s) => s).map((s) => `style=${s}`);
+        if (get(styles, 'length', 0) > 0) {
+            params = params.concat(styles);
+        }
+    }
+
     const geoLocations = getGeoLocations(locations);
     let src;
 
