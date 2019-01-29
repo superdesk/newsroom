@@ -11,9 +11,9 @@ export default function ArticleVideo({isKilled, video, headline, downloadVideo})
                     <source src={video.href} type={video.mimetype} />
                     {gettext('Your browser does not support HTML5 video')}
                 </video>
-                <button className="btn btn-responsive mb-2"
+                <button className="btn btn-outline-primary btn-with-icon btn-sm mt-3 mb-4"
                     onClick={() => downloadVideo(video.href, video.media, video.mimetype)}>
-                    <i className="fa fa-download"></i>{gettext('Download')}
+                    <i className="icon--download"></i>{gettext('Download')}
                 </button>
             </div>
         ) || null

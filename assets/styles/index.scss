@@ -2403,9 +2403,14 @@ a.wire-articles__versions {
 
 .wire-column__preview__video {
     position: relative;
+    display: flex;
+    flex-direction: column;
     video {
         width: 100%;
         height: auto;
+    }
+    .btn {
+        align-self: flex-end;
     }
 }
 
