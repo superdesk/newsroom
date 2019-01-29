@@ -498,39 +498,90 @@ def notify_new_item(item, check_topics=True):
 
 
 def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids):
+    """Send notification to users who have downloaded or bookmarked the provided item"""
+
     related_items = item.get('ancestors', [])
     related_items.append(item['_id'])
+    is_text = item.get('type') == 'text'
 
-    history_users = get_history_users(related_items, user_ids, company_ids)
+    users_processed = []
 
-    bookmark_users = []
-    if item.get('type') == 'text':
-        bookmark_users = superdesk.get_resource_service('wire_search').\
-            get_matching_bookmarks(related_items, users_dict, companies_dict)
+    def _get_users(section):
+        """Get the list of users who have downloaded or bookmarked the items"""
+        # Get users who have downloaded any of the items
+        user_list = get_history_users(
+            related_items,
+            user_ids,
+            company_ids,
+            section,
+            'download'
+        )
 
-    history_users.extend(bookmark_users)
-    history_users = list(set(history_users))
+        if is_text and section != 'agenda':
+            # Add users who have bookmarked any of the items
+            service = superdesk.get_resource_service('{}_search'.format(section))
+            bookmarked_users = service.get_matching_bookmarks(
+                related_items,
+                users_dict,
+                companies_dict
+            )
 
-    if history_users:
-        for user in history_users:
-            app.data.insert('notifications', [{
-                'item': item['_id'],
-                'user': user
-            }])
-        push_notification('history_matches',
-                          item=item,
-                          users=history_users)
-        send_user_notification_emails(item, history_users, users_dict)
+            user_list.extend(bookmarked_users)
+
+        # Add users if this section is wire
+        # Or if the user is not already in the list of users for wire
+        user_list = [
+            user_id
+            for user_id in user_list
+            if user_id not in users_processed
+        ]
+
+        users_processed.extend(user_list)
+
+        # Remove duplicates and return the list
+        return list(set(user_list))
+
+    def _send_notification(section, users_ids):
+        if not users_ids:
+            return
+
+        app.data.insert('notifications', [
+            {'item': item['_id'], 'user': user}
+            for user in users_ids
+        ])
+
+        push_notification(
+            'history_matches',
+            item=item,
+            users=users_ids,
+            section=section
+        )
+        send_user_notification_emails(
+            item,
+            users_ids,
+            users_dict,
+            section
+        )
+
+    # First add users for the 'wire' section and send the notification
+    # As this takes precedence over all other sections
+    # (in case items appear in multiple sections)
+    _send_notification('wire', _get_users('wire'))
+
+    # Next iterate over the registered sections (excluding wire)
+    for section_id in [section['_id'] for section in app.sections if section['_id'] != 'wire']:
+        # Add the users for those sections and send the notification
+        _send_notification(section_id, _get_users(section_id))
 
 
-def send_user_notification_emails(item, user_matches, users):
+def send_user_notification_emails(item, user_matches, users, section):
     for user_id in user_matches:
         user = users.get(str(user_id))
         if item.get('pubstatus', item.get('state')) in ['canceled', 'cancelled']:
             send_item_killed_notification_email(user, item=item)
         else:
             if user.get('receive_email'):
-                send_history_match_notification_email(user, item=item)
+                send_history_match_notification_email(user, item=item, section=section)
 
 
 def notify_wire_topic_matches(item, users_dict, companies_dict):

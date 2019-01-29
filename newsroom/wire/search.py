@@ -444,7 +444,22 @@ class WireSearchService(newsroom.Service):
         """
         bookmark_users = []
 
-        search_results = self.get_items(item_ids)
+        query = {
+            'bool': {
+                'must_not': [
+                    {'term': {'type': 'composite'}},
+                ],
+                'must': [
+                    {'terms': {'_id': item_ids}}
+                ],
+            }
+        }
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
+
+        source = {'query': query}
+        internal_req = ParsedRequest()
+        internal_req.args = {'source': json.dumps(source)}
+        search_results = super().get(internal_req, None)
 
         if not search_results:
             return bookmark_users

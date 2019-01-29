@@ -170,7 +170,13 @@ def download(_ids):
         _file.seek(0)
 
     update_action_list(_ids.split(','), 'downloads', force_insert=True)
-    app.data.insert('history', items, action='download', user=user)
+    app.data.insert(
+        'history',
+        items,
+        action='download',
+        user=user,
+        section=request.args.get('type', 'wire')
+    )
     return flask.send_file(_file, mimetype=mimetype, attachment_filename=attachment_filename, as_attachment=True)
 
 

@@ -153,14 +153,14 @@ def _send_new_agenda_notification_email(user, topic_name, item):
     send_email(to=recipients, subject=subject, text_body=text_body, html_body=html_body)
 
 
-def send_history_match_notification_email(user, item):
+def send_history_match_notification_email(user, item, section):
     if item.get('type') == 'text':
-        _send_history_match_wire_notification_email(user, item)
+        _send_history_match_wire_notification_email(user, item, section)
     else:
         _send_history_match_agenda_notification_email(user, item)
 
 
-def _send_history_match_wire_notification_email(user, item):
+def _send_history_match_wire_notification_email(user, item, section):
     app_name = current_app.config['SITE_NAME']
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
@@ -173,7 +173,7 @@ def _send_history_match_wire_notification_email(user, item):
         item=item,
         url=url,
         type='wire',
-        section='wire'
+        section=section
     )
 
     send_email(to=recipients, subject=subject, text_body=text_body)
