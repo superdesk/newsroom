@@ -146,11 +146,28 @@ describe('utils', () => {
                             '_id': 'plan1',
                             'guid': 'plan1',
                             'planning_date': '2018-10-15T04:30:00+0000',
+                            'coverages': [
+                                {
+                                    'scheduled': '2018-10-15T04:00:00+0000',
+                                    'planning_id': 'plan1',
+                                    'coverage_id': 'coverage1'
+                                },
+                                {
+                                    'scheduled': '2018-10-14T04:00:00+0000',
+                                    'planning_id': 'plan1',
+                                    'coverage_id': 'coverage2'
+                                }
+                            ],
                         },
                         {
                             '_id': 'plan2',
                             'guid': 'plan2',
                             'planning_date': '2018-10-15T04:30:00+0000',
+                            'coverages': [{
+                                'scheduled': '2018-10-16T04:00:00+0000',
+                                'planning_id': 'plan2',
+                                'coverage_id': 'coverage3'
+                            }],
                         }
                     ]
                 }
@@ -172,6 +189,36 @@ describe('utils', () => {
             expect(listItems['15-10-2018']['plan']['guid']).toBe('plan1');
             expect(listItems['16-10-2018']['_id']).toBe('foo');
             expect(listItems['16-10-2018']['plan']['guid']).toBe('plan2');
+        });
+
+        it('planning items without coverages associated with event are also displayed', () => {
+            const items = [
+                {
+                    _id: 'foo',
+                    dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-15T05:00:00+0000', tz: 'Australia/Sydney'},
+                    display_dates: [{date: '2018-10-14T04:00:00+0000'}],
+                    event: {_id: 'foo'},
+                    coverages: [],
+                    planning_items: [
+                        {
+                            '_id': 'plan1',
+                            'guid': 'plan1',
+                            'planning_date': '2018-10-14T04:30:00+0000',
+                        }
+                    ]
+                }
+            ];
+
+            const groupedItems = utils.groupItems(items, '2018-10-11', 'day');
+            const itemsById = keyBy(items, '_id');
+            const listItems = keyBy(utils.getListItems(groupedItems, itemsById), 'group');
+
+            expect(groupedItems.hasOwnProperty('11-10-2018')).toBe(false);
+            expect(groupedItems.hasOwnProperty('12-10-2018')).toBe(false);
+            expect(groupedItems.hasOwnProperty('13-10-2018')).toBe(false);
+            expect(listItems.hasOwnProperty('14-10-2018')).toBe(true);
+            expect(listItems['14-10-2018']['_id']).toBe('foo');
+            expect(listItems['14-10-2018']['plan']['guid']).toBe('plan1');
         });
     });
 });

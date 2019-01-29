@@ -30,7 +30,7 @@ export default function AgendaEdNote({item, plan, secondaryNoteField}) {
     return (
         <div className="wire-column__preview_article-note">
             <i className="icon-small--info" />
-            <label>{gettext('Ed Note:')}&nbsp;&nbsp;</label>
+            <label>{gettext('Editorial Note:')}&nbsp;&nbsp;</label>
             {getNoteFields()}
         </div>
     );
