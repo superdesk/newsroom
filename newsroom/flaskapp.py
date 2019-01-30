@@ -28,7 +28,8 @@ from newsroom.limiter import limiter
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, char_count, newsroom_config, is_admin,
-    hash_string, date_header, get_date, sidenavs, sidenavs_by_names, sidenavs_by_group
+    hash_string, date_header, get_date,
+    sidenavs_by_names, sidenavs_by_group, get_company_sidenavs
 )
 
 from newsroom.gettext import setup_babel
@@ -138,7 +139,7 @@ class Newsroom(eve.Eve):
         self.add_template_filter(date_short)
         self.add_template_filter(word_count)
         self.add_template_filter(char_count)
-        self.add_template_global(sidenavs)
+        self.add_template_global(get_company_sidenavs, 'sidenavs')
         self.add_template_global(sidenavs_by_names)
         self.add_template_global(sidenavs_by_group)
         self.add_template_global(newsroom_config)

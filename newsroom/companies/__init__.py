@@ -4,8 +4,6 @@ from functools import wraps
 from flask import Blueprint, abort, current_app as newsroom_app
 from flask_babel import gettext
 from newsroom.auth import get_user
-from newsroom.template_filters import sidenavs
-
 from .companies import CompaniesResource, CompaniesService
 
 blueprint = Blueprint('companies', __name__)
@@ -39,19 +37,6 @@ def get_user_company_name(user=None):
     return ''
 
 
-def section_allowed(nav, sections):
-    return not nav.get('section') or sections.get(nav['section'])
-
-
-def get_company_sidenavs(blueprint=None):
-    user = get_user()
-    company = get_user_company(user)
-    navs = sidenavs(blueprint)
-    if company and company.get('sections'):
-        return [nav for nav in navs if section_allowed(nav, company['sections'])]
-    return navs
-
-
 def section(_id):
     def section_decorator(f):
         @wraps(f)
@@ -68,5 +53,4 @@ def section(_id):
 def init_app(app):
     superdesk.register_resource('companies', CompaniesResource, CompaniesService, _app=app)
     app.add_template_global(get_user_company_name)
-    app.add_template_global(get_company_sidenavs, 'sidenavs')
     app.settings_app('companies', gettext('Company Management'), weight=100, data=views.get_settings_data)
