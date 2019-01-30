@@ -329,11 +329,12 @@ def get_aggregation_field(key):
 
 
 def _filter_terms(filters, events_only=False):
-    term_filters = []
+    must_term_filters = []
+    must_not_term_filters = []
     for key, val in filters.items():
-        if val and key != 'coverage':
+        if val and key != 'coverage' and key != 'coverage_status':
             if key in {'service', 'urgency', 'subject', 'place'} and not events_only:
-                term_filters.append({
+                must_term_filters.append({
                     'or': [
                         {'terms': {get_aggregation_field(key): val}},
                         nested_query(
@@ -350,15 +351,31 @@ def _filter_terms(filters, events_only=False):
                     ]
                 })
             else:
-                term_filters.append({'terms': {get_aggregation_field(key): val}})
+                must_term_filters.append({'terms': {get_aggregation_field(key): val}})
         if val and key == 'coverage' and not events_only:
-            term_filters.append(
+            must_term_filters.append(
                 {"nested": {
                     "path": "coverages",
                     "query": {"bool": {"must": [{'terms': {get_aggregation_field(key): val}}]}}
                 }})
+        if val and key == 'coverage_status' and not events_only:
+            if val == ['planned']:
+                must_term_filters.append(
+                    {"nested": {
+                        "path": "coverages",
+                        "query": {"bool": {"must": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}}
+                    }})
+            else:
+                must_not_term_filters.append(
+                    {"nested": {
+                        "path": "coverages",
+                        "query": {"bool": {
+                            "should": [
+                                {'terms': {'coverages.coverage_status': ['coverage intended']}}
+                            ]}}
+                    }})
 
-    return term_filters
+    return {"must_term_filters": must_term_filters, "must_not_term_filters": must_not_term_filters}
 
 
 def _remove_fields(source, fields):
@@ -382,9 +399,13 @@ def set_post_filter(source, req, events_only=False):
         filters = json.loads(req.args['filter'])
     if filters:
         if app.config.get('FILTER_BY_POST_FILTER', False):
-            source['post_filter'] = {'bool': {'must': [_filter_terms(filters, events_only)]}}
+            source['post_filter'] = {'bool': {
+                'must': [_filter_terms(filters, events_only)['must_term_filters']],
+                'must_not': [_filter_terms(filters, events_only)['must_not_term_filters']],
+            }}
         else:
-            source['query']['bool']['must'] += _filter_terms(filters, events_only)
+            source['query']['bool']['must'] += _filter_terms(filters, events_only)['must_term_filters']
+            source['query']['bool']['must_not'] += _filter_terms(filters, events_only)['must_not_term_filters']
 
 
 def get_agenda_query(query, events_only=False):
