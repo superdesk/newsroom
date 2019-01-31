@@ -523,19 +523,20 @@ export function groupItems (items, activeDate, activeGrouping) {
  * @param group: Group Date
  */
 export function getPlanningItemsByGroup(item, group) {
+    // Event item
     if (get(item, 'planning_items.length', 0) === 0) {
         return [];
     }
 
-    if (get(item, 'coverages.length', 0) === 0) {
-        return [];
-    }
+    // Planning item without coverages
+    const plansWithoutCoverages = get(item, 'planning_items', []).filter((p) =>
+        formatDate(p.planning_date) === group && get(p, 'coverages.length', 0) === 0);
 
     const allPlans = keyBy(get(item, 'planning_items'), '_id');
     const processed = {};
 
     // get unique plans for that group based on the coverage.
-    const plans = item.coverages
+    const plansWithCoverages = item.coverages
         .map((coverage) => {
             if (isCoverageForExtraDay(coverage, group)) {
                 if (!processed[coverage.planning_id]) {
@@ -548,11 +549,7 @@ export function getPlanningItemsByGroup(item, group) {
         })
         .filter((p) => p);
 
-    if (plans.length === 0) {
-        return [];
-    }
-
-    return plans;
+    return [...plansWithCoverages, ...plansWithoutCoverages];
 }
 
 export function isCoverageOnPreviousDay(coverage, group) {
