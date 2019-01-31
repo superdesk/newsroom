@@ -48,6 +48,11 @@ class WireApp extends BaseApp {
     constructor(props) {
         super(props);
         this.modals = modals;
+
+        // Show my-topics tab only if WireApp is in 'wire' context (not 'aapX', etc.)
+        if (this.props.context !== 'wire') {
+            this.tabs = this.tabs.filter((t) => t.id !== 'topics');
+        }
     }
 
     render() {
@@ -123,7 +128,7 @@ class WireApp extends BaseApp {
                                 query={this.props.activeQuery}
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
-                                topicType={this.props.context}
+                                topicType={this.props.context === 'wire' ? this.props.context : null}
                                 newItems={this.props.newItems}
                                 refresh={this.props.refresh}
                                 activeTopic={this.props.activeTopic}
