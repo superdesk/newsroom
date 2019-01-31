@@ -262,7 +262,7 @@ body.print {
 .navbar-header_1--small {
     height: 60px;
     font-weight: 200;
-    font-size: 46px;
+    font-size: 40px;
     line-height: 58px;
 }
 
@@ -451,9 +451,10 @@ nav.search {
 }
 
 .header-profile-toggle--small .header-profile {
-    height: 40px !important;
-    width: 40px !important;
+    height: 33px !important;
+    width: 33px !important;
     padding: 0px;
+    background: initial;
 }
 
 .header-profile__avatar {
@@ -1066,7 +1067,7 @@ article.list {
     right: 0;
     top: 56px;
     left: 100%;
-    z-index: 1001;
+    z-index: 1008;
     width: 320px;
     @include lg {
         position: static;
@@ -1075,6 +1076,11 @@ article.list {
         z-index: 101;
     }
 }
+
+.contentWrap--small-header .wire-column__preview {
+    top: 40px;
+}
+
 .wire-column__preview--open {
     width: 100%;    
     right: 0;
@@ -2700,6 +2706,7 @@ a.wire-articles__versions {
     overflow: hidden;
     > span {
         display: block;
+        background-color: $nav-sidebar-bg;
     }
     img {
         display: block;

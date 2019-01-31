@@ -29,4 +29,14 @@
 }
 .breadcrumb-item.active {
   color: #9ba4ad;
+
+  @include xsm {
+    text-overflow: ellipsis;
+    overflow:hidden;
+    max-width: 80px;
+  }
+
+  @include sm {
+    overflow: visible;
+  }
 }
