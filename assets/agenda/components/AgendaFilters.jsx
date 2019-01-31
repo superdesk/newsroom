@@ -4,6 +4,7 @@ import {gettext} from 'utils';
 import AgendaTypeAheadFilter from './AgendaTypeAheadFilter';
 import AgendaDropdownFilter from './AgendaDropdownFilter';
 import {getCoverageDisplayName} from '../utils';
+import AgendaCoverageExistsFilter from './AgendaCoverageExistsFilter';
 
 const filters = [{
     label: gettext('Any calendar'),
@@ -64,6 +65,7 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnly}) {
                 getDropdownItems={getDropdownItems}
             />
         ))}
+        {!eventsOnly && <AgendaCoverageExistsFilter activeFilter={activeFilter} toggleFilter={toggleFilter}/>}
     </div>);
 }
 

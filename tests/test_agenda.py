@@ -436,3 +436,88 @@ def test_get_agenda_dates():
         },
     }
     assert get_agenda_dates(agenda) == '08:00 30/05/2018'
+
+
+def test_filter_agenda_by_coverage_status(client):
+    test_planning = {
+        "description_text": "description here",
+        "abstract": "abstract text",
+        "_current_version": 1,
+        "agendas": [],
+        "anpa_category": [
+            {
+                "name": "Entertainment",
+                "subject": "01000000",
+                "qcode": "e"
+            }
+        ],
+        "item_id": "foo",
+        "ednote": "ed note here",
+        "slugline": "Vivid planning item",
+        "headline": "Planning headline",
+        "planning_date": "2018-05-28T10:51:52+0000",
+        "state": "scheduled",
+        "item_class": "plinat:newscoverage",
+        "coverages": [
+            {
+                "planning": {
+                    "g2_content_type": "text",
+                    "slugline": "Vivid planning item",
+                    "internal_note": "internal note here",
+                    "genre": [
+                        {
+                            "name": "Article (news)",
+                            "qcode": "Article"
+                        }
+                    ],
+                    "ednote": "ed note here",
+                    "scheduled": "2018-05-28T10:51:52+0000"
+                },
+                "news_coverage_status": {
+                    "name": "coverage intended",
+                    "label": "Planned",
+                    "qcode": "ncostat:int"
+                },
+                "workflow_status": "draft",
+                "firstcreated": "2018-05-28T10:55:00+0000",
+                "coverage_id": "213"
+            }
+        ],
+        "_id": "foo",
+        "urgency": 3,
+        "guid": "foo",
+        "name": "This is the name of the vivid planning item",
+        "subject": [
+            {
+                "name": "library and museum",
+                "qcode": "01009000",
+                "parent": "01000000"
+            }
+        ],
+        "pubstatus": "usable",
+        "type": "planning",
+    }
+
+    client.post('/push', data=json.dumps(test_planning), content_type='application/json')
+
+    test_planning['guid'] = 'bar'
+    test_planning['coverages'][0]['news_coverage_status'] = {
+        "name": "coverage not intended",
+        "label": "Not Planned",
+        "qcode": "ncostat:fint"
+    }
+    client.post('/push', data=json.dumps(test_planning), content_type='application/json')
+
+    test_planning['guid'] = 'baz'
+    test_planning['coverages'] = []
+    client.post('/push', data=json.dumps(test_planning), content_type='application/json')
+
+    data = get_json(client, '/agenda/search?filter={"coverage_status":["planned"]}')
+    assert 1 == data['_meta']['total']
+    assert 'foo' == data['_items'][0]['_id']
+
+    data = get_json(client, '/agenda/search?filter={"coverage_status":["not planned"]}')
+    assert 3 == data['_meta']['total']
+    assert 'baz' == data['_items'][0]['_id']
+    assert 'bar' == data['_items'][1]['_id']
+    assert 'urn:conference' == data['_items'][2]['_id']
