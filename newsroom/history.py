@@ -12,13 +12,14 @@ class HistoryResource(newsroom.Resource):
     resource_methods = ['GET']
 
     schema = {
-        '_id': {type: 'string', 'unique': True},
-        'action': {type: 'string'},
+        '_id': {'type': 'string', 'unique': True},
+        'action': {'type': 'string'},
         'created': {'type': 'datetime'},
         'user': newsroom.Resource.rel('users'),
         'company': newsroom.Resource.rel('companies'),
         'item': newsroom.Resource.rel('items'),
         'version': {'type': 'string'},
+        'section': {'type': 'string'},
     }
 
     mongo_indexes = {
@@ -28,7 +29,7 @@ class HistoryResource(newsroom.Resource):
 
 
 class HistoryService(newsroom.Service):
-    def create(self, docs, action, user, **kwargs):
+    def create(self, docs, action, user, section='wire', **kwargs):
         now = utcnow()
 
         def transform(item):
@@ -40,6 +41,7 @@ class HistoryService(newsroom.Service):
                 'company': user.get('company'),
                 'item': item['_id'],
                 'version': item.get('version', item.get('_current_version')),
+                'section': section,
             }
 
         for doc in docs:
@@ -49,12 +51,14 @@ class HistoryService(newsroom.Service):
                 continue
 
 
-def get_history_users(item_ids, active_user_ids, active_company_ids):
+def get_history_users(item_ids, active_user_ids, active_company_ids, section, action):
 
     lookup = {
         'item': {'$in': item_ids},
         'user': {'$in': active_user_ids},
-        'company': {'$in': active_company_ids}
+        'company': {'$in': active_company_ids},
+        'section': section,
+        'action': action
     }
 
     histories = query_resource('history', lookup=lookup)

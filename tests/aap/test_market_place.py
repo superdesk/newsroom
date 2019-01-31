@@ -1,10 +1,16 @@
 from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from tests.utils import json, get_json
+from tests.test_download import wire_formats, download_zip_file, items_ids
+from tests.test_push import get_signature_headers
+
+from superdesk import get_resource_service
+from superdesk.utc import utcnow
 
 from flask import g
 from bson import ObjectId
 from datetime import datetime, timedelta
 from urllib import parse
+import zipfile
 
 
 def test_blueprint_registration(client):
@@ -564,3 +570,147 @@ def test_share_items(client, app):
 
     user_id = app.data.find_all('users')[0]['_id']
     assert str(user_id) in data['shares']
+
+
+def test_download(client, app):
+    for _format in wire_formats:
+        _file = download_zip_file(client, _format['format'], 'aapX')
+        with zipfile.ZipFile(_file) as zf:
+            assert _format['filename'] in zf.namelist()
+            content = zf.open(_format['filename']).read()
+            _format['test_content'](content)
+    history = app.data.find('history', None, None)
+    assert len(items_ids) == history.count()
+    assert 'download' == history[0]['action']
+    assert history[0].get('user')
+    assert history[0].get('created') + timedelta(seconds=2) >= utcnow()
+    assert history[0].get('item') in items_ids
+    assert history[0].get('version')
+    assert history[0].get('company') is None
+    assert history[0].get('section') == 'aapX'
+
+
+def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
+    company_ids = app.data.insert('companies', [{
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
+    user = {
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'company': company_ids[0],
+    }
+
+    user_ids = app.data.insert('users', [user])
+    user['_id'] = user_ids[0]
+
+    app.data.insert('history', docs=[{
+        'version': '1',
+        '_id': 'bar',
+    }], action='download', user=user, section='aapX')
+
+    with app.mail.record_messages() as outbox:
+        key = b'something random'
+        app.config['PUSH_KEY'] = key
+        data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
+        push_mock = mocker.patch('newsroom.push.push_notification')
+        headers = get_signature_headers(data, key)
+        resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+        assert 200 == resp.status_code
+        assert push_mock.call_args[1]['item']['_id'] == 'bar'
+        assert len(push_mock.call_args[1]['users']) == 1
+
+        notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+        assert notification['item'] == 'bar'
+
+    assert len(outbox) == 1
+    assert 'http://localhost:5050/aapX?item=bar' in outbox[0].body
+
+
+def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
+    app.data.insert('section_filters', [{
+        '_id': 'f-1',
+        'name': 'product test 1',
+        'query': 'NOT service.code:a',
+        'is_enabled': True,
+        'filter_type': 'wire'
+    }, {
+        '_id': 'f-2',
+        'name': 'product test 2',
+        'query': 'NOT service.code:a',
+        'is_enabled': True,
+        'filter_type': 'am_news'
+    }, {
+        '_id': 'f-3',
+        'name': 'product test 3',
+        'query': 'service.code:a',
+        'is_enabled': True,
+        'filter_type': 'aapX'
+    }])
+
+    app.data.insert('companies', [{
+        '_id': '2',
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
+    user = {
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'company': '2',
+    }
+
+    user_ids = app.data.insert('users', [user])
+    user['_id'] = user_ids[0]
+
+    app.data.insert('products', [{
+        "_id": 1,
+        "name": "Service A",
+        "query": "service.code: a",
+        "is_enabled": True,
+        "description": "Service A",
+        "companies": ['2'],
+        "sd_product_id": None,
+        "product_type": "aapX",
+    }])
+
+    app.data.insert('items', [{
+        '_id': 'bar',
+        'headline': 'testing',
+        'service': [{'code': 'a', 'name': 'Service A'}],
+        'products': [{'code': 1, 'name': 'product-1'}],
+    }])
+
+    with client.session_transaction() as session:
+        session['user'] = user['_id']
+        session['user_type'] = 'public'
+        session['name'] = 'public'
+
+    resp = client.post('/aapX_bookmark', data=json.dumps({
+        'items': ['bar'],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    with app.mail.record_messages() as outbox:
+        key = b'something random'
+        app.config['PUSH_KEY'] = key
+        data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
+        push_mock = mocker.patch('newsroom.push.push_notification')
+        headers = get_signature_headers(data, key)
+        resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+        assert 200 == resp.status_code
+
+        assert push_mock.call_args_list[0][0][0] == 'new_item'
+        assert push_mock.call_args_list[1][0][0] == 'history_matches'
+        assert push_mock.call_args[1]['item']['_id'] == 'bar'
+
+        notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+        assert notification['item'] == 'bar'
+
+    assert len(outbox) == 1
+    assert 'http://localhost:5050/aapX?item=bar' in outbox[0].body
