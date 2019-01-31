@@ -49,7 +49,7 @@
         </nav>
     {% endblock %}
 
-    <div class="contentWrap flex-column flex-sm-row">
+    <div class="contentWrap flex-column flex-sm-row {% block custom_content_style %}{% endblock %}">
         {% if session.get('name') %}
         <nav class="sidenav">
             <ul class="sidenav-icons">
