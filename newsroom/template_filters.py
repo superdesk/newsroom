@@ -65,10 +65,10 @@ def is_admin(user=None):
 
 
 def is_admin_or_internal(user=None):
+    allowed_user_types = ['administrator', 'internal', 'account_management']
     if user:
-        return user.get('user_type') == 'administrator' or user.get('user_type') == 'internal'
-    return flask.session.get('user_type') == 'administrator' or \
-        flask.session.get('user_type') == 'internal'
+        return user.get('user_type') in allowed_user_types
+    return flask.session.get('user_type') in allowed_user_types
 
 
 def newsroom_config():
@@ -118,3 +118,10 @@ def sidenavs_by_names(names=[], blueprint=None):
 def sidenavs_by_group(group=0, blueprint=None):
     blueprint_navs = get_company_sidenavs(blueprint)
     return [nav for nav in blueprint_navs if nav.get('group') == group]
+
+
+def is_admin_or_account_manager(user=None):
+    allowed_user_types = ['administrator', 'account_management']
+    if user:
+        return user.get('user_type') in allowed_user_types
+    return flask.session.get('user_type') in allowed_user_types

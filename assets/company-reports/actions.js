@@ -1,12 +1,14 @@
 import {errorHandler} from '../utils';
+import {REPORTS_NAMES} from './utils';
 import server from '../server';
 
 
 const REPORTS = {
-    'company-saved-searches': '/reports/company-saved-searches',
-    'user-saved-searches': '/reports/user-saved-searches',
-    'company-products': '/reports/company-products',
-    'product-stories': '/reports/product-stories',
+    [REPORTS_NAMES.COMPANY_SAVED_SEARCHES]: '/reports/company-saved-searches',
+    [REPORTS_NAMES.USER_SAVED_SEARCHES]: '/reports/user-saved-searches',
+    [REPORTS_NAMES.COMPANY_PRODUCTS]: '/reports/company-products',
+    [REPORTS_NAMES.PRODUCT_STORIES]: '/reports/product-stories',
+    [REPORTS_NAMES.COMPANY]: '/reports/company',
 };
 
 
