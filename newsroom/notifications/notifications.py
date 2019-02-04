@@ -17,7 +17,7 @@ class NotificationsResource(newsroom.Resource):
     item_methods = ['GET', 'PATCH', 'DELETE']
 
     schema = {
-        '_id': {type: 'string', 'unique': True},
+        '_id': {'type': 'string', 'unique': True},
         'item': newsroom.Resource.rel('items'),
         'user': newsroom.Resource.rel('users'),
         'created': {'type': 'dict', 'nullable': True},

@@ -1,7 +1,9 @@
+import pytz
 from flask import json
 from datetime import datetime, timedelta
 from superdesk.utc import utc_to_local, local_to_utc
 from newsroom.wire.utils import get_local_date, get_end_date
+from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts
 
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import post_json, delete_json, get_json
@@ -215,6 +217,7 @@ def test_featured(client, app):
         item['slugline'] = 'event slugline'
         item['dates'] = item['dates'].copy()
         item['dates']['start'] += timedelta(hours=1)
+        item['planning_items'] = [{'_id': 'urn:plan:%d' % i, 'guid': 'urn:plan:%d' % i}]
         _items.append(item)
     app.data.insert('agenda', _items)
 
@@ -225,7 +228,7 @@ def test_featured(client, app):
         '_id': _id,
         'type': 'planning_featured',
         'item_id': _id,
-        'items': [item['_id'] for item in _items[:2]],
+        'items': [item['planning_items'][0]['guid'] for item in _items[:2]],
         'tz': 'Australia/Sydney',
     }
     resp = post_json(client, 'push', featured)
@@ -240,6 +243,8 @@ def test_featured(client, app):
     assert 2 == data['_meta']['total']
     assert _items[0]['_id'] == data['_items'][0]['_id']
     assert _items[1]['_id'] == data['_items'][1]['_id']
+    assert _items[0]['planning_items'][0]['guid'] == data['_items'][0]['planning_items'][0]['guid']
+    assert _items[1]['planning_items'][0]['guid'] == data['_items'][1]['planning_items'][0]['guid']
     assert '_aggregations' in data
     assert data['_items'][0]['_display_from'].replace('+0000', '+00:00') == \
         local_to_utc('Australia/Sydney', date.replace(hour=0, minute=0, second=0)).isoformat()
@@ -247,7 +252,7 @@ def test_featured(client, app):
         local_to_utc('Australia/Sydney', date.replace(hour=23, minute=59, second=59)).isoformat()
 
     # post first 3 items in reverse order
-    featured['items'] = [item['_id'] for item in _items[:3]]
+    featured['items'] = [item['planning_items'][0]['guid'] for item in _items[:3]]
     featured['items'].reverse()
     resp = post_json(client, 'push', featured)
     assert 200 == resp.status_code
@@ -257,6 +262,31 @@ def test_featured(client, app):
     assert _items[2]['_id'] == data['_items'][0]['_id']
     assert _items[1]['_id'] == data['_items'][1]['_id']
     assert _items[0]['_id'] == data['_items'][2]['_id']
+    assert _items[2]['planning_items'][0]['guid'] == data['_items'][0]['planning_items'][0]['guid']
+    assert _items[1]['planning_items'][0]['guid'] == data['_items'][1]['planning_items'][0]['guid']
+    assert _items[0]['planning_items'][0]['guid'] == data['_items'][2]['planning_items'][0]['guid']
+
+    # multiple planing items for event
+    app.data.update(
+        'agenda',
+        _items[0].get('_id'),
+        {
+            'planning_items': [
+                {'_id': 'urn:plan:0', 'guid': 'urn:plan:0'},
+                {'_id': 'urn:plan:x', 'guid': 'urn:plan:x'}
+            ]
+        },
+        _items[0]
+    )
+    featured['items'] = ['urn:plan:2', 'urn:plan:x', 'urn:plan:1', 'urn:plan:0']
+    resp = post_json(client, 'push', featured)
+    assert 200 == resp.status_code
+
+    data = get_json(client, '/agenda/search?navigation=51')
+    assert 3 == data['_meta']['total']
+    assert data['_items'][0]['_id'] == _items[2]['_id']
+    assert data['_items'][1]['_id'] == _items[0]['_id']
+    assert data['_items'][2]['_id'] == _items[1]['_id']
 
     data = get_json(client, '/agenda/search?navigation=51&q=slugline:nonsense')
     assert 0 == data['_meta']['total']
@@ -308,3 +338,186 @@ def test_local_time(client, app, mocker):
 
         end_date = get_end_date('now/M', end_local_date)
         assert '2018-12-23T12:59:59' == end_date.strftime(format)
+
+
+def test_get_location_string():
+    agenda = {}
+    assert get_location_string(agenda) == ''
+
+    agenda['location'] = []
+    assert get_location_string(agenda) == ''
+
+    agenda['location'] = [{
+        'name': 'test location',
+        'address': {'locality': 'inner city'}
+    }]
+    assert get_location_string(agenda) == 'test location, inner city'
+
+    agenda['location'] = [{
+        "name": "Sydney Opera House",
+        "address": {
+            "country": "Australia",
+            "type": "arts_centre",
+            "postal_code": "2000",
+            "title": "Opera v Sydney",
+            "line": [
+                "2 Macquarie Street"
+            ],
+            "locality": "Sydney",
+            "area": "Sydney"
+        }
+    }]
+    assert get_location_string(agenda) == 'Sydney Opera House, 2 Macquarie Street, Sydney, Sydney, 2000, Australia'
+
+
+def test_get_public_contacts():
+    agenda = {}
+    assert get_public_contacts(agenda) == []
+
+    agenda['event'] = {}
+    assert get_public_contacts(agenda) == []
+
+    agenda['event']['event_contact_info'] = [
+        {
+            '_created': '2018-05-16T11:24:20+0000',
+            'honorific': 'Professor',
+            '_id': '5afc14e41d41c89668850f67',
+            'first_name': 'Tom',
+            'is_active': True,
+            'organisation': 'AAP',
+            'contact_email': [
+                'jones@foo.com'
+            ],
+            '_updated': '2018-05-16T11:24:20+0000',
+            'mobile': [],
+            'contact_phone': [],
+            'last_name': 'Jones',
+            'public': True
+        }
+    ]
+    assert get_public_contacts(agenda) == [{
+        'name': 'Tom Jones',
+        'organisation': 'AAP',
+        'phone': '',
+        'email': 'jones@foo.com',
+        'mobile': ''
+    }]
+
+
+def test_get_agenda_dates():
+    agenda = {
+        'dates': {
+            'end':  datetime.strptime('2018-05-28T06:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+            'start': datetime.strptime('2018-05-28T05:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+        },
+    }
+    assert get_agenda_dates(agenda) == '07:00 - 08:00, 28/05/2018'
+
+    agenda = {
+        'dates': {
+            'end': datetime.strptime('2018-05-30T06:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+            'start': datetime.strptime('2018-05-28T05:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+        },
+    }
+    assert get_agenda_dates(agenda) == '07:00 28/05/2018 - 08:00 30/05/2018'
+
+    agenda = {
+        'dates': {
+            'end': datetime.strptime('2018-05-28T21:59:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+            'start': datetime.strptime('2018-05-27T22:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+        },
+    }
+    assert get_agenda_dates(agenda) == 'ALL DAY 28/05/2018'
+
+    agenda = {
+        'dates': {
+            'end': datetime.strptime('2018-05-30T06:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+            'start': datetime.strptime('2018-05-30T06:00:00+0000', '%Y-%m-%dT%H:%M:%S+0000').replace(tzinfo=pytz.UTC),
+        },
+    }
+    assert get_agenda_dates(agenda) == '08:00 30/05/2018'
+
+
+def test_filter_agenda_by_coverage_status(client):
+    test_planning = {
+        "description_text": "description here",
+        "abstract": "abstract text",
+        "_current_version": 1,
+        "agendas": [],
+        "anpa_category": [
+            {
+                "name": "Entertainment",
+                "subject": "01000000",
+                "qcode": "e"
+            }
+        ],
+        "item_id": "foo",
+        "ednote": "ed note here",
+        "slugline": "Vivid planning item",
+        "headline": "Planning headline",
+        "planning_date": "2018-05-28T10:51:52+0000",
+        "state": "scheduled",
+        "item_class": "plinat:newscoverage",
+        "coverages": [
+            {
+                "planning": {
+                    "g2_content_type": "text",
+                    "slugline": "Vivid planning item",
+                    "internal_note": "internal note here",
+                    "genre": [
+                        {
+                            "name": "Article (news)",
+                            "qcode": "Article"
+                        }
+                    ],
+                    "ednote": "ed note here",
+                    "scheduled": "2018-05-28T10:51:52+0000"
+                },
+                "news_coverage_status": {
+                    "name": "coverage intended",
+                    "label": "Planned",
+                    "qcode": "ncostat:int"
+                },
+                "workflow_status": "draft",
+                "firstcreated": "2018-05-28T10:55:00+0000",
+                "coverage_id": "213"
+            }
+        ],
+        "_id": "foo",
+        "urgency": 3,
+        "guid": "foo",
+        "name": "This is the name of the vivid planning item",
+        "subject": [
+            {
+                "name": "library and museum",
+                "qcode": "01009000",
+                "parent": "01000000"
+            }
+        ],
+        "pubstatus": "usable",
+        "type": "planning",
+    }
+
+    client.post('/push', data=json.dumps(test_planning), content_type='application/json')
+
+    test_planning['guid'] = 'bar'
+    test_planning['coverages'][0]['news_coverage_status'] = {
+        "name": "coverage not intended",
+        "label": "Not Planned",
+        "qcode": "ncostat:fint"
+    }
+    client.post('/push', data=json.dumps(test_planning), content_type='application/json')
+
+    test_planning['guid'] = 'baz'
+    test_planning['coverages'] = []
+    client.post('/push', data=json.dumps(test_planning), content_type='application/json')
+
+    data = get_json(client, '/agenda/search?filter={"coverage_status":["planned"]}')
+    assert 1 == data['_meta']['total']
+    assert 'foo' == data['_items'][0]['_id']
+
+    data = get_json(client, '/agenda/search?filter={"coverage_status":["not planned"]}')
+    assert 3 == data['_meta']['total']
+    assert 'baz' == data['_items'][0]['_id']
+    assert 'bar' == data['_items'][1]['_id']
+    assert 'urn:conference' == data['_items'][2]['_id']

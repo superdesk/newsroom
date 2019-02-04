@@ -1,20 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {gettext} from 'utils';
 
-export default function AgendaInternalNote({internalNotes}) {
+export default function AgendaInternalNote({internalNote, onlyIcon}) {
 
-    if (!internalNotes || !internalNotes.length) {
+    if (!internalNote) {
         return null;
     }
 
-    return (
-        internalNotes.map((note, index) => (<div key={index} className="wire-column__preview__internal-note">
-            <i className="icon-small--info icon--gray" />
-            <span >{note}</span>
-        </div>))
-    );
+    const labelText = gettext('Internal Note:');
+    if (onlyIcon) {
+        return (<div title={`${labelText} ${internalNote}`}
+            data-toggle="tooltip"
+            data-placement="right">
+            <i className="icon-small--info icon--red"/>
+        </div>);
+    } else {
+        return (
+            <div className="wire-column__preview_article-note">
+                <i className="icon-small--info icon--red" />
+                <label>{labelText}&nbsp;&nbsp;</label>
+                <span >{internalNote}</span>
+            </div>
+        );
+    }
 }
 
 AgendaInternalNote.propTypes = {
-    internalNotes: PropTypes.array,
+    internalNote: PropTypes.string,
+    onlyIcon: PropTypes.bool,
 };

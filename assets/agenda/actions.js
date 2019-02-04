@@ -2,10 +2,16 @@
 import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler} from 'utils';
+import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler, getLocaleDate} from 'utils';
 import { markItemAsRead } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
-import {getCalendars, getDateInputDate, getLocationString, getPublicContacts, hasLocation} from './utils';
+import {
+    getCalendars,
+    getDateInputDate,
+    getLocationString,
+    getPublicContacts,
+    hasLocation,
+} from './utils';
 
 import {
     setQuery,
@@ -18,8 +24,8 @@ import {
     initParams as initSearchParams,
 } from 'search/actions';
 
-import {getLocaleDate} from '../utils';
 import {clearAgendaDropdownFilters} from '../local-store';
+import {getLocations, getMapSource} from '../maps/utils';
 
 
 const WATCH_URL = '/agenda_watch';
@@ -39,29 +45,29 @@ export function setActive(item) {
     return {type: SET_ACTIVE, item};
 }
 
+
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item, group) {
-    return {type: PREVIEW_ITEM, item, group};
+export function preview(item, group, plan) {
+    return {type: PREVIEW_ITEM, item, group, plan};
 }
 
 export function previewAndCopy(item) {
     return (dispatch) => {
-        dispatch(previewItem(item));
         dispatch(copyPreviewContents(item));
     };
 }
 
-export function previewItem(item, group) {
+export function previewItem(item, group, plan) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(preview(item, group));
+        dispatch(preview(item, group, plan));
         item && analytics.itemEvent('preview', item);
     };
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item, group) {
-    return {type: OPEN_ITEM, item, group};
+export function openItemDetails(item, group, plan) {
+    return {type: OPEN_ITEM, item, group, plan};
 }
 
 export function requestCoverage(item, message) {
@@ -74,12 +80,14 @@ export function requestCoverage(item, message) {
     };
 }
 
-export function openItem(item, group) {
+export function openItem(item, group, plan) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(openItemDetails(item, group));
+        dispatch(openItemDetails(item, group, plan));
         updateRouteParams({
-            item: item ? item._id : null
+            item: item ? item._id : null,
+            group: group || null,
+            plan: plan || null,
         }, getState());
         item && analytics.itemEvent('open', item);
         analytics.itemView(item);
@@ -119,7 +127,9 @@ export function selectDate(dateString, grouping) {
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        window.open(`/agenda/${item._id}?print`, '_blank');
+        const map = encodeURIComponent(getMapSource(getLocations(item), 2));
+        window.open(`/agenda/${item._id}?print&map=${map}`, '_blank');
+
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
@@ -562,7 +572,8 @@ export function initParams(params) {
             dispatch(fetchItem(params.get('item')))
                 .then(() => {
                     const item = getState().itemsById[params.get('item')];
-                    dispatch(openItem(item));
+
+                    dispatch(openItem(item, params.get('group'), params.get('plan')));
                 });
         }
     };

@@ -2,6 +2,10 @@ from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
 
+from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
+    get_public_contacts
+from newsroom.template_filters import is_admin_or_internal
+
 
 def send_email(to, subject, text_body, html_body=None, sender=None, connection=None):
     """
@@ -99,14 +103,14 @@ def send_reset_password_email(user_name, user_email, token):
     send_email(to=[user_email], subject=subject, text_body=text_body, html_body=html_body)
 
 
-def send_new_item_notification_email(user, topic_name, item):
+def send_new_item_notification_email(user, topic_name, item, section='wire'):
     if item.get('type') == 'text':
-        _send_new_wire_notification_email(user, topic_name, item)
+        _send_new_wire_notification_email(user, topic_name, item, section)
     else:
         _send_new_agenda_notification_email(user, topic_name, item)
 
 
-def _send_new_wire_notification_email(user, topic_name, item):
+def _send_new_wire_notification_email(user, topic_name, item, section):
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
     subject = gettext('New story for followed topic: {}'.format(topic_name))
@@ -117,7 +121,8 @@ def _send_new_wire_notification_email(user, topic_name, item):
         name=user.get('first_name'),
         item=item,
         url=url,
-        type='wire'
+        type='wire',
+        section=section
     )
     text_body = render_template('new_item_notification.txt', **kwargs)
     html_body = render_template('new_item_notification.html', **kwargs)
@@ -135,21 +140,27 @@ def _send_new_agenda_notification_email(user, topic_name, item):
         name=user.get('first_name'),
         item=item,
         url=url,
-        type='agenda'
+        type='agenda',
+        dateString=get_agenda_dates(item),
+        location=get_location_string(item),
+        contacts=get_public_contacts(item),
+        links=get_links(item),
+        is_admin=is_admin_or_internal(user),
+        section='agenda'
     )
     text_body = render_template('new_item_notification.txt', **kwargs)
     html_body = render_template('new_item_notification.html', **kwargs)
     send_email(to=recipients, subject=subject, text_body=text_body, html_body=html_body)
 
 
-def send_history_match_notification_email(user, item):
+def send_history_match_notification_email(user, item, section):
     if item.get('type') == 'text':
-        _send_history_match_wire_notification_email(user, item)
+        _send_history_match_wire_notification_email(user, item, section)
     else:
         _send_history_match_agenda_notification_email(user, item)
 
 
-def _send_history_match_wire_notification_email(user, item):
+def _send_history_match_wire_notification_email(user, item, section):
     app_name = current_app.config['SITE_NAME']
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
@@ -161,7 +172,8 @@ def _send_history_match_wire_notification_email(user, item):
         name=user.get('first_name'),
         item=item,
         url=url,
-        type='wire'
+        type='wire',
+        section=section
     )
 
     send_email(to=recipients, subject=subject, text_body=text_body)
@@ -179,7 +191,13 @@ def _send_history_match_agenda_notification_email(user, item):
         name=user.get('first_name'),
         item=item,
         url=url,
-        type='agenda'
+        type='agenda',
+        dateString=get_agenda_dates(item),
+        location=get_location_string(item),
+        contacts=get_public_contacts(item),
+        links=get_links(item),
+        is_admin=is_admin_or_internal(user),
+        section='agenda'
     )
 
     send_email(to=recipients, subject=subject, text_body=text_body)

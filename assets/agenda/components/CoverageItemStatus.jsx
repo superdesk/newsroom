@@ -27,7 +27,7 @@ export default class CoverageItemStatus extends React.PureComponent {
     }
 
     componentDidUpdate(prevProps) {
-        if (getDeliveryHref(prevProps) !== getDeliveryHref(this.props)) {
+        if (getDeliveryHref(get(prevProps, 'coverage')) !== getDeliveryHref(get(this.props, 'coverage'))) {
             this.setState({wire: null});
             this.fetchWire();
         }
@@ -57,7 +57,7 @@ export default class CoverageItemStatus extends React.PureComponent {
             );
         }
 
-        if (this.state.wire) {
+        if (coverage.workflow_status === 'completed' && this.state.wire) {
             content.push(
                 this.state.wire._access
                     ? <span key="contentLink" className="label label--available">

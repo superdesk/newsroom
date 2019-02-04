@@ -44,6 +44,7 @@ class WireSearchResource(newsroom.Resource):
             'nextversion': 1,
             'ancestors': 1,
             'wordcount': 1,
+            'charcount': 1,
         },
         'elastic_filter': {'bool': {'must': [{'term': {'_type': 'items'}}]}},
     }
@@ -56,7 +57,7 @@ def get_aggregation_field(key):
     return get_aggregations()[key]['terms']['field']
 
 
-def set_product_query(query, company, section, user=None, navigation_id=None):
+def set_product_query(query, company, section, user=None, navigation_id=None, events_only=False):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -67,6 +68,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
     :param section: section i.e. wire, agenda, marketplace etc
     :param user: user to check against (used for notification checking)
     :param navigation_id: navigation to filter products
+    :param events_only: From agenda to display events only or not
     If not provided session user will be checked
     """
     products = None
@@ -97,6 +99,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
                 if company_type.get('wire_must_not'):
                     query['bool']['must_not'].append(company_type['wire_must_not'])
 
+    planning_items_should = []
     for product in products:
         if product.get('query'):
             if product['query'] == '_featured':
@@ -104,6 +107,20 @@ def set_product_query(query, company, section, user=None, navigation_id=None):
                     raise FeaturedQuery
             else:
                 query['bool']['should'].append(query_string(product['query']))
+                if product.get('planning_item_query') and not events_only:
+                    # form the query for the agenda planning items
+                    planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
+
+    if planning_items_should:
+        query['bool']['should'].append(
+            nested_query(
+                'planning_items',
+                {
+                    'bool': {'should': planning_items_should, 'minimum_should_match': 1}
+                },
+                name='products'
+            )
+        )
 
     query['bool']['minimum_should_match'] = 1
 
@@ -125,6 +142,30 @@ def query_string(query):
             'lenient': True,
         }
     }
+
+
+def planning_items_query_string(query, fields=None):
+    plan_query_string = query_string(query)
+
+    if fields:
+        plan_query_string['query_string']['fields'] = fields
+    else:
+        plan_query_string['query_string']['fields'] = ['planning_items.*']
+
+    return plan_query_string
+
+
+def nested_query(path, query, inner_hits=True, name=None):
+    nested = {
+        'path': path,
+        'query': query
+    }
+    if inner_hits:
+        nested['inner_hits'] = {}
+        if name:
+            nested['inner_hits']['name'] = name
+
+    return {'nested': nested}
 
 
 def versioncreated_range(created):
@@ -403,7 +444,22 @@ class WireSearchService(newsroom.Service):
         """
         bookmark_users = []
 
-        search_results = self.get_items(item_ids)
+        query = {
+            'bool': {
+                'must_not': [
+                    {'term': {'type': 'composite'}},
+                ],
+                'must': [
+                    {'terms': {'_id': item_ids}}
+                ],
+            }
+        }
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
+
+        source = {'query': query}
+        internal_req = ParsedRequest()
+        internal_req.args = {'source': json.dumps(source)}
+        search_results = super().get(internal_req, None)
 
         if not search_results:
             return bookmark_users

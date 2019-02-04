@@ -67,7 +67,8 @@ class AgendaApp extends BaseApp {
             'wire-articles__two-side-panes': panesCount === 2,
         });
 
-        const onDetailClose = this.props.detail ? null : () => this.props.actions.filter(a => a.id == 'open')[0].action(null);
+        const onDetailClose = this.props.detail ? null :
+            () => this.props.actions.filter(a => a.id == 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
 
         const groups = [
             {
@@ -96,6 +97,8 @@ class AgendaApp extends BaseApp {
                 onClose={onDetailClose}
                 requestCoverage={this.props.requestCoverage}
                 group={this.props.previewGroup}
+                planningId={this.props.previewPlan}
+                eventsOnly={this.props.eventsOnly}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar
@@ -153,6 +156,7 @@ class AgendaApp extends BaseApp {
                                     aggregations={this.props.aggregations}
                                     toggleFilter={this.props.toggleDropdownFilter}
                                     activeFilter={this.props.activeFilter}
+                                    eventsOnly={this.props.eventsOnly}
                                 />
                             }
 
@@ -169,6 +173,7 @@ class AgendaApp extends BaseApp {
                                 activeNavigation={this.props.activeNavigation}
                                 newsOnly={this.props.newsOnly}
                                 scrollClass={this.state.scrollClass}
+                                hideTotalItems={false}
                             />
 
                             <AgendaList
@@ -185,6 +190,8 @@ class AgendaApp extends BaseApp {
                             openItemDetails={this.props.openItemDetails}
                             requestCoverage={this.props.requestCoverage}
                             previewGroup={this.props.previewGroup}
+                            previewPlan={this.props.previewPlan}
+                            eventsOnly={this.props.eventsOnly}
                         />
                     </div>
                 </section>
@@ -194,8 +201,7 @@ class AgendaApp extends BaseApp {
                     this.props.navigations,
                     this.props.activeNavigation,
                     this.props.activeTopic
-                ),
-                this.renderSavedItemsCount()
+                )
             ])
         );
     }
@@ -210,6 +216,7 @@ AgendaApp.propTypes = {
     createdFilter: PropTypes.object,
     itemToPreview: PropTypes.object,
     previewGroup: PropTypes.string,
+    previewPlan: PropTypes.string,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
     modal: PropTypes.object,
@@ -241,6 +248,7 @@ AgendaApp.propTypes = {
     detail: PropTypes.bool,
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
+    eventsOnly: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -252,6 +260,7 @@ const mapStateToProps = (state) => ({
     createdFilter: get(state, 'search.createdFilter'),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     previewGroup: state.previewGroup,
+    previewPlan: state.previewPlan,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
     modal: state.modal,
@@ -267,6 +276,7 @@ const mapStateToProps = (state) => ({
     aggregations: state.aggregations,
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
+    eventsOnly: get(state, 'agenda.eventsOnly', false),
     detail: get(state, 'detail', false),
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,

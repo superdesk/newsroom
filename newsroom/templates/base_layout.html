@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>{{ config.SITE_NAME }} - {% block title %}{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/themes/bootstrap.min.css"/>
+
+    <link rel="icon" type="image/x-icon"
+        href="{{ url_for('theme', filename='favicon.ico') }}">
+
+{{ javascript_tag('common') | safe }}
+{{ javascript_tag('newsroom_css') | safe }}
+<link rel="stylesheet" href="{{ url_for('theme', filename='theme.css') }}"/>
+{% block sectioncss %}{% endblock %}
+</head>
+<body>
+
+<div class="newsroomWrap">
+    {% block topnav %}
+        <nav class="main navbar justify-content-start align-items-stretch">
+            {% include 'logo.html' %}
+            <div class="navbar-brand d-flex align-items-center ml-0 ml-sm-1 ml-md-2 mr-0 mr-sm-4">
+                <nav>
+                    {% block breadcrumb %}{% endblock %}
+                </nav>
+            </div>
+
+            {% if session.get('name') %}
+            <div class="form-inline my-lg-0 ml-auto">
+                <div class="mr-2 d-none d-md-block">{{ get_date() | date_header }}</div>
+                <div class="notif" id="header-notification"></div>
+                <div id="header-profile-toggle"></div>
+            </div>
+            {% else %}
+            <div class="form-inline my-lg-0 ml-auto pr-2 pr-sm-3">
+                <div class="mr-3 d-none d-md-block">{{ get_date() | date_header }}</div>
+                <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
+                <a class="nav-link"
+                   href="{{ config.CONTACT_ADDRESS }}"
+                   target="_blank">{{ gettext('Contact Us') }}</a>
+            </div>
+            {% endif %}
+        </nav>
+    {% endblock %}
+
+    <div class="contentWrap flex-column flex-sm-row {% block custom_content_style %}{% endblock %}">
+        {% if session.get('name') %}
+        <nav class="sidenav">
+            <ul class="sidenav-icons">
+                {% if is_admin() %}
+                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first %}
+                <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-sm-block {% if request.blueprint == 'settings' %}active{% endif %}">
+                  <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
+                      <i class="icon--cog icon--mid-blue"></i>
+                  </a>
+                </li>
+                {% endif %}{% endfor %}
+                <li class="sidenav-icons__item sidenav-icons__item--report d-none d-sm-block {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
+                  <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" data-toggle="tooltip" data-placement="right">
+                      <i class="icon--report icon--mid-blue"></i>
+                  </a>
+                </li>
+                {% endif %}
+
+                {% block default_navs %}
+                    {% for group in range(0, 10) %}
+                        {% for nav in sidenavs(request.blueprint)|selectattr("group", "equalto", group) %}
+                        {% if group > 0 and loop.first and loop.length %}
+                        <li class="sidenav-icons__item d-none d-sm-block"><span><i class="icon--more icon--rotate-90 icon--mid-blue"></i></span></li>
+                        {% endif %}
+
+                        {% include "sidenav_icon.html" %}
+                        {% endfor %}
+                    {% endfor %}
+            {%  endblock %}
+            </ul>
+
+            {% block sidenav %}
+            {% endblock %}
+        </nav>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    {% include "footer.html" %}
+
+    <div id="user-profile-app"></div>
+</div>
+
+<div id="modal-container"></div>
+
+<script>
+    window.newsroom = {{ get_client_config() | tojson | safe }};
+    window.notificationData = {{ get_initial_notifications() | tojson | safe }};
+    window.profileData = {{ get_user_profile_data() | tojson | safe }};
+    window.translations = {{ get_client_translations() | tojson | safe }};
+    window.locales = {{ get_client_locales() | tojson | safe }};
+    window.locale = {{ get_locale() | tojson | safe }};
+</script>
+
+{{ javascript_tag('newsroom_js') | safe }}
+
+{% if session.get('name') %}
+    {{ javascript_tag('notifications_js') | safe }}
+    {{ javascript_tag('user_profile_js') | safe }}
+{% endif %}
+
+{% block script %}{% endblock %}
+
+{% if get_setting('google_analytics') %}
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ get_setting('google_analytics') | safe }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', {{ get_setting('google_analytics') | tojson | safe }}, {
+      custom_map: {
+          dimension1: 'company',
+          dimension2: 'user',
+      }
+  });
+
+  {% if session.get('user') %}
+  gtag('set', {'user_id': {{ hash(session['user']) | tojson | safe }} });
+  {% endif %}
+
+  {% with messages = get_flashed_messages(category_filter=['analytics']) %}
+    {% if messages %}
+        analytics.sendEvents({{ messages | tojson | safe }});
+    {% endif %}
+  {% endwith %}
+</script>
+{% endif %}
+
+{% if config.GOOGLE_MAPS_KEY %}
+<script>
+    window.mapsProvider = 'google';
+    window.googleMapsKey = {{ config.GOOGLE_MAPS_KEY | tojson }};
+    function setMapsLoaded() {
+        window.mapsLoaded = true;
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_MAPS_KEY }}&callback=setMapsLoaded" async defer></script>
+<div id="google-map"></div>
+{% endif %}
+
+{% if config.IFRAMELY %}
+<script src="//cdn.iframe.ly/embed.js" async></script>
+{% endif %}
+
+<textarea id="copy-area"></textarea>
+
+</body>
+</html>

@@ -34,7 +34,7 @@
 </div>
 
 <script>
-    window.newsroom = {{ newsroom_config() | tojson | safe }};
+    window.newsroom = {{ get_client_config() | tojson | safe }};
     window.notificationData = {{ get_initial_notifications() | tojson | safe }};
 </script>
 

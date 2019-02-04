@@ -19,6 +19,19 @@ export function getIntVersion(item) {
 }
 
 /**
+ * Get videos for an item
+ *
+ * if item is video return it, otherwise look for featuremedia
+ *
+ * @param {Object} item
+ * @return {Array}
+ */
+export function getVideos(item) {
+    return item.type === 'video' ? [item] : Object.values(get(item, 'associations', {})).filter((assoc) => get(assoc, 'type') === 'video');
+}
+
+
+/**
  * Get picture for an item
  *
  * if item is picture return it, otherwise look for featuremedia
@@ -27,7 +40,7 @@ export function getIntVersion(item) {
  * @return {Object}
  */
 export function getPicture(item) {
-    return item.type === 'picture' ? item : get(item, 'associations.featuremedia', getBodyPicture(item));
+    return item.type === 'picture' ? item : getBodyPicture(item);
 }
 
 function getBodyPicture(item) {
@@ -66,6 +79,16 @@ export function getPreviewRendition(picture) {
  */
 export function getDetailRendition(picture) {
     return get(picture, 'renditions._newsroom_base', get(picture, 'renditions.baseImage'));
+}
+
+/**
+ * Get original video
+ *
+ * @param {Object} video
+ * @return {Object}
+ */
+export function getOriginalVideo(video) {
+    return get(video, 'renditions.original');
 }
 
 /**

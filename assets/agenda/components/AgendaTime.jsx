@@ -8,7 +8,7 @@ import AgendaListItemLabels from './AgendaListItemLabels';
 
 export default function AgendaTime({item, group}) {
     const getDates = () => {
-        const dates = formatAgendaDate(item.dates, group);
+        const dates = formatAgendaDate(item, group);
         if (dates[1]) {
             return [<div key='time' className={bem('wire-column__preview', 'date', 'dashed-border')}>{dates[0]}</div>, dates[1]];
         }

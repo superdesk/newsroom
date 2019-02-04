@@ -5,6 +5,8 @@ import flask
 from flask_babel import gettext
 from newsroom.auth import admin_only
 from newsroom.utils import get_json_or_400
+from newsroom.template_filters import newsroom_config
+
 
 blueprint = flask.Blueprint('settings', __name__)
 
@@ -48,9 +50,19 @@ def get_setting(setting_key=None):
     return flask.g.settings
 
 
+def get_client_config():
+    config = newsroom_config()
+    for key, setting in (get_setting() or {}).items():
+        value = setting.get('value', setting.get('default'))
+        if value:
+            config['client_config'][key] = value
+    return config
+
+
 def init_app(app):
     app.settings_app('general-settings', gettext('General Settings'), weight=800, data=get_setting)
     app.add_template_global(get_setting)
+    app.add_template_global(get_client_config)
 
     # basic settings
     app.general_setting('google_analytics', gettext('Google Analytics ID'), default=app.config['GOOGLE_ANALYTICS'])

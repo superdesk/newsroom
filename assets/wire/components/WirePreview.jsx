@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 import { gettext, isDisplayed } from 'utils';
 import {
     getPicture,
+    getVideos,
+    getOriginalVideo,
     getPreviewRendition,
     showItemVersions,
     getCaption,
@@ -14,6 +16,7 @@ import Preview from 'ui/components/Preview';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
 import ArticleAuthor from  'ui/components/ArticleAuthor';
 import ArticlePicture from  'ui/components/ArticlePicture';
+import ArticleVideo from  'ui/components/ArticleVideo';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
 import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
@@ -39,8 +42,10 @@ class WirePreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, followStory, isFollowing, previewConfig} = this.props;
+        const {item, user, actions, followStory, isFollowing, previewConfig, downloadVideo} = this.props;
         const picture = getPicture(item);
+        const videos = getVideos(item);
+
         const previousVersions = 'preview_versions';
         const canFollowStory = followStory && user && (get(item, 'slugline') || '').trim();
         return (
@@ -69,11 +74,21 @@ class WirePreview extends React.PureComponent {
                         picture={getPreviewRendition(picture)}
                         isKilled={isKilled(item)}
                         caption={getCaption(picture)}/>}
+
                     {isDisplayed('metadata_section', previewConfig) &&
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig}/>}
                     {isDisplayed('abstract', previewConfig) &&
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                     {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
+
+                    {!isEmpty(videos) && videos.map((video) => <ArticleVideo
+                        key={video.guid}
+                        video={getOriginalVideo(video)}
+                        isKilled={isKilled(item)}
+                        headline={video.headline}
+                        downloadVideo={downloadVideo}
+                    />)}
+
                     {isDisplayed('tags_section', previewConfig) &&
                         <PreviewTags item={item} isItemDetail={false} displayConfig={previewConfig}/>}
                     {isDisplayed('item_versions', previewConfig) && showItemVersions(item) &&
@@ -102,6 +117,7 @@ WirePreview.propTypes = {
     isFollowing: PropTypes.bool,
     closePreview: PropTypes.func,
     previewConfig: PropTypes.object,
+    downloadVideo: PropTypes.func,
 };
 
 export default WirePreview;

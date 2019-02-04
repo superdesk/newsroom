@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isEmpty } from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
@@ -7,13 +8,14 @@ import { isDisplayed } from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import PreviewActionButtons from 'components/PreviewActionButtons';
-import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT, isPreformatted } from 'wire/utils';
+import { getPicture, getVideos, getOriginalVideo, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT, isPreformatted } from 'wire/utils';
 import Content from 'ui/components/Content';
 import ContentHeader from 'ui/components/ContentHeader';
 import ContentBar from 'ui/components/ContentBar';
 import ArticleItemDetails from 'ui/components/ArticleItemDetails';
 import ArticleContent from 'ui/components/ArticleContent';
 import ArticlePicture from 'ui/components/ArticlePicture';
+import ArticleVideo from  'ui/components/ArticleVideo';
 import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
 import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
@@ -25,8 +27,10 @@ import ArticleAuthor from 'ui/components/ArticleAuthor';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 
 
-function ItemDetails({item, user, actions, onClose, detailsConfig}) {
+function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo}) {
     const picture = getPicture(item);
+    const videos = getVideos(item);
+
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
     return (
         <Content type="item-detail">
@@ -51,7 +55,17 @@ function ItemDetails({item, user, actions, onClose, detailsConfig}) {
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
+                            {!isEmpty(videos) && videos.map((video) => <ArticleVideo
+                                key={video.guid}
+                                video={getOriginalVideo(video)}
+                                isKilled={isKilled(item)}
+                                headline={video.headline}
+                                downloadVideo={downloadVideo}
+                            />)}
                         </ArticleBody>
+
+
+
                         {isDisplayed('metadata_section', detailsConfig) &&
                             <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
                         <ArticleContentInfoWrapper>
@@ -59,7 +73,7 @@ function ItemDetails({item, user, actions, onClose, detailsConfig}) {
                                 <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
 
                             {isDisplayed('item_versions', detailsConfig) && showItemVersions(item, true) &&
-                                <ListItemNextVersion item={item} />
+                                <ListItemNextVersion item={item} displayConfig={detailsConfig}  />
                             }
                             {isDisplayed('item_versions', detailsConfig) && showItemVersions(item) &&
                                 <ListItemPreviousVersions item={item} isPreview={true}/>
@@ -84,6 +98,7 @@ ItemDetails.propTypes = {
     })),
     onClose: PropTypes.func,
     detailsConfig: PropTypes.object,
+    downloadVideo: PropTypes.func,
 };
 
 export default ItemDetails;

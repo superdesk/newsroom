@@ -12,12 +12,6 @@ export default function Preview(props) {
                     <i className="icon--close-thin icon--gray"></i>
                 </button>
             </div>
-
-            <div className="wire-column__preview__mobile-bar">
-                <button className="icon-button" onClick={props.onCloseClick}>
-                    <i className="icon--close-large"></i>
-                </button>
-            </div>
             {props.children}
         </div>
     );

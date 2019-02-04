@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {get} from 'lodash';
 import {bem} from 'ui/utils';
+import classNames from 'classnames';
 import {
     hasCoverages,
     isCoverageForExtraDay,
@@ -8,6 +10,7 @@ import {
     getLocationString,
     getCoverageIcon,
     isRecurring,
+    getInternalNote,
     WORKFLOW_STATUS_TEXTS,
     WORKFLOW_COLORS,
     DRAFT_STATUS_TEXTS,
@@ -15,10 +18,11 @@ import {
 
 import AgendaListItemLabels from './AgendaListItemLabels';
 import AgendaMetaTime from './AgendaMetaTime';
+import AgendaInternalNote from './AgendaInternalNote';
 import {gettext, formatDate, formatTime} from 'utils';
 
 
-function AgendaListItemIcons({item, group, hideCoverages, row}) {
+function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
     const className = bem('wire-articles', 'item__meta', {
         row,
     });
@@ -56,19 +60,23 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
         return '';
     };
 
+    const internalNote = getInternalNote(item, planningItem);
+
     return (
         <div className={className}>
             <AgendaMetaTime
                 item={item}
                 borderRight={true}
                 isRecurring={isRecurring(item)}
+                group={group}
             />
 
             {hasCoverages(item) && !hideCoverages &&
                 <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
                     {item.coverages.map((coverage) => {
                         const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
-                        return (!group || isCoverageForExtraDay(coverage, group) &&
+                        return (!group || (isCoverageForExtraDay(coverage, group) &&
+                            coverage.planning_id === get(planningItem, 'guid')) &&
                           <span
                               className='wire-articles__item__icon'
                               key={coverage.coverage_id}
@@ -84,7 +92,13 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
                 {hasLocation(item) && <span className='mr-2'>
                     <i className='icon-small--location icon--gray'></i>
                 </span>}
-                {hasLocation(item) && <span>{getLocationString(item)}</span>}
+                {hasLocation(item) &&
+                    <span className={classNames({'wire-articles__item__icons--dashed-border' :internalNote})}>
+                        {getLocationString(item)}
+                    </span>}
+                <AgendaInternalNote
+                    internalNote={internalNote}
+                    onlyIcon={true} />
 
                 <AgendaListItemLabels item={item} />
             </div>
@@ -94,6 +108,7 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
 
 AgendaListItemIcons.propTypes = {
     item: PropTypes.object,
+    planningItem: PropTypes.object,
     group: PropTypes.string,
     hideCoverages: PropTypes.bool,
     row: PropTypes.bool,

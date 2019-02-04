@@ -74,6 +74,7 @@ def edit(id):
         'description': data.get('description'),
         'sd_product_id': data.get('sd_product_id'),
         'query': data.get('query'),
+        'planning_item_query': data.get('planning_item_query'),
         'is_enabled': data.get('is_enabled'),
         'product_type': data.get('product_type', 'wire')
     }

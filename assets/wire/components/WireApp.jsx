@@ -12,6 +12,7 @@ import {
     refresh,
     previewItem,
     toggleNews,
+    downloadVideo,
 } from 'wire/actions';
 
 import {
@@ -47,6 +48,11 @@ class WireApp extends BaseApp {
     constructor(props) {
         super(props);
         this.modals = modals;
+
+        // Show my-topics tab only if WireApp is in 'wire' context (not 'aapX', etc.)
+        if (this.props.context !== 'wire') {
+            this.tabs = this.tabs.filter((t) => t.id !== 'topics');
+        }
     }
 
     render() {
@@ -66,6 +72,7 @@ class WireApp extends BaseApp {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
                 detailsConfig={this.props.detailsConfig}
+                downloadVideo={this.props.downloadVideo}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
                 <section key="contentHeader" className='content-header'>
@@ -121,7 +128,7 @@ class WireApp extends BaseApp {
                                 query={this.props.activeQuery}
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
-                                topicType={this.props.context}
+                                topicType={this.props.context === 'wire' ? this.props.context : null}
                                 newItems={this.props.newItems}
                                 refresh={this.props.refresh}
                                 activeTopic={this.props.activeTopic}
@@ -147,6 +154,7 @@ class WireApp extends BaseApp {
                                 isFollowing={!!isFollowing}
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
+                                downloadVideo={this.props.downloadVideo}
                             />
                             }
 
@@ -202,6 +210,7 @@ WireApp.propTypes = {
     previewConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
     groups: PropTypes.array,
+    downloadVideo: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -244,6 +253,7 @@ const mapDispatchToProps = (dispatch) => ({
     setView: (view) => dispatch(setView(view)),
     refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
+    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

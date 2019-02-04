@@ -42,6 +42,21 @@ class AmNewsApp extends BaseApp {
     constructor(props) {
         super(props);
         this.modals = modals;
+        this.state = { isMobile: false };    // to cater for responsive behaviour during widnow resize
+        this.setIsMobile = this.setIsMobile.bind(this);
+    }
+
+    componentDidMount() {
+        this.setIsMobile();
+        window.addEventListener('resize', this.setIsMobile);
+    }
+
+    setIsMobile() {
+        if (window.innerWidth <= 768 && !this.state.isMobile) {
+            this.setState({ isMobile: true });
+        } else if (window.innerWidth > 768 && this.state.isMobile) {
+            this.setState({ isMobile: false });
+        }
     }
 
     renderItemDetails() {
@@ -57,10 +72,9 @@ class AmNewsApp extends BaseApp {
     }
 
     renderListAndPreview() {
-        const isMobile = window.innerWidth <= 768;
         let mainClassName = '';
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
-        if (isMobile) {
+        if (this.state.isMobile) {
             mainClassName = classNames('wire-column__main', {
                 'wire-articles__one-side-pane': panesCount === 1,
                 'wire-articles__two-side-panes': panesCount === 2,
@@ -78,14 +92,14 @@ class AmNewsApp extends BaseApp {
                         actions={this.props.actions}
                     />
                     <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
-                        {isMobile && this.state.withSidebar && <span
+                        {this.state.isMobile && this.state.withSidebar && <span
                             className='content-bar__menu content-bar__menu--nav--open'
                             ref={(elem) => this.elemOpen = elem}
                             title={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--close-thin icon--white"></i>
                         </span>}
-                        {isMobile && !this.state.withSidebar && !this.props.bookmarks && <span
+                        {this.state.isMobile && !this.state.withSidebar && !this.props.bookmarks && <span
                             className='content-bar__menu content-bar__menu--nav'
                             ref={(elem) => this.elemClose = elem}
                             title={gettext('Open filter panel')}
@@ -104,14 +118,15 @@ class AmNewsApp extends BaseApp {
                 <section key="contentMain" className="content-main">
                     <div className="wire-column--3">
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
-                            {isMobile && <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                            {this.state.isMobile && <div
+                                className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                                 {this.state.withSidebar &&
                                     <SearchSidebar
                                         tabs={this.tabs.filter((t) => t.id === 'nav')}
-                                        props={{...this.props, groups: []}} />
+                                        props={{...this.props, groups: [], addAllOption: false}} />
                                 }
                             </div>}
-                            {!this.props.bookmarks && !isMobile &&
+                            {!this.props.bookmarks && !this.state.isMobile &&
                                 <div className="wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap">
                                     <Navigations
                                         navigations={this.props.navigations}

@@ -45,5 +45,10 @@ module.exports = {
         "react/jsx-no-target-blank": [
             0,
         ],
+    },
+    "settings": {
+        "react": {
+            "version": "16.2"
+        }
     }
 };

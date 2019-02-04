@@ -1,6 +1,6 @@
-import { get, isEmpty, includes } from 'lodash';
+import { get, isEmpty, includes, keyBy, sortBy } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek, getConfig, gettext} from '../utils';
+import {formatDate, formatMonth, formatWeek, getConfig, gettext, DATE_FORMAT} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -42,6 +42,7 @@ export function getCoverageStatusText(coverage) {
 
 export const DRAFT_STATUS_TEXTS = {
     'coverage not planned': gettext('not planned'),
+    'coverage not intended': gettext('not planned'),
     'coverage intended': gettext('planned'),
     'coverage not decided': gettext('on merit'),
     'coverage not decided yet': gettext('on merit'),
@@ -383,11 +384,8 @@ export function getAttachments(item) {
  * @param {Object} item
  * @return {Array}
  */
-export function getInternalNotes(item) {
-    const internalNotes = [];
-    internalNotes.push(get(item, 'event.internal_note'));
-    (get(item, 'planning_items', []) || []).forEach(p => internalNotes.push(p.internal_note));
-    return internalNotes.filter(note => !!note);
+export function getInternalNote(item, plan) {
+    return get(plan, 'internal_note') || get(item, 'event.internal_note');
 }
 
 /**
@@ -412,7 +410,7 @@ export function getInternalNotesFromCoverages(item) {
  * @return {Array}
  */
 export function getSubjects(item) {
-    return get(item, 'subject', []);
+    return get(item, 'subject') || [];
 }
 
 /**
@@ -432,7 +430,18 @@ export function hasAttachments(item) {
  * @return {String}
  */
 export function getName(item) {
-    return item.name || item.headline;
+    return item.name || item.slugline || item.headline;
+}
+
+/**
+ * Get agenda item description
+ *
+ * @param {Object} item
+ * @param {Object} plan
+ * @return {String}
+ */
+export function getDescription(item, plan) {
+    return plan.description_text || item.definition_short;
 }
 
 
@@ -487,8 +496,9 @@ export function groupItems (items, activeDate, activeGrouping) {
 
             const isBetween = day.isBetween(itemStartDate, itemEndDate, 'day', '[]');
             const containsExtra = containsExtraDate(item, day);
+            const addGroupItem = (item.event && (isBetween || containsExtra)) || containsExtra;
 
-            if (grouper(day) !== key && (isBetween || containsExtra)) {
+            if (grouper(day) !== key && addGroupItem) {
                 key = grouper(day);
                 const groupList = groupedItems[key] || [];
                 groupList.push(item._id);
@@ -497,5 +507,89 @@ export function groupItems (items, activeDate, activeGrouping) {
         }
     });
 
-    return groupedItems;
+    return sortBy(
+        Object.keys(groupedItems).map((k) => (
+            {
+                date: k,
+                items: groupedItems[k],
+                _sortDate: moment(k, DATE_FORMAT)
+            })),
+        (g) => g._sortDate);
+}
+
+/**
+ * Get Planning Item for the day
+ * @param item: Agenda item
+ * @param group: Group Date
+ */
+export function getPlanningItemsByGroup(item, group) {
+    // Event item
+    if (get(item, 'planning_items.length', 0) === 0) {
+        return [];
+    }
+
+    // Planning item without coverages
+    const plansWithoutCoverages = get(item, 'planning_items', []).filter((p) =>
+        formatDate(p.planning_date) === group && get(p, 'coverages.length', 0) === 0);
+
+    const allPlans = keyBy(get(item, 'planning_items'), '_id');
+    const processed = {};
+
+    // get unique plans for that group based on the coverage.
+    const plansWithCoverages = item.coverages
+        .map((coverage) => {
+            if (isCoverageForExtraDay(coverage, group)) {
+                if (!processed[coverage.planning_id]) {
+                    processed[coverage.planning_id] = 1;
+                    return allPlans[coverage.planning_id];
+                }
+                return null;
+            }
+            return null;
+        })
+        .filter((p) => p);
+
+    return [...plansWithCoverages, ...plansWithoutCoverages];
+}
+
+export function isCoverageOnPreviousDay(coverage, group) {
+    return moment(coverage.scheduled).isBefore(moment(group, DATE_FORMAT), 'day');
+}
+
+
+export function getCoveragesForDisplay(item, plan, group) {
+    const currentCoverage = [];
+    const previousCoverage = [];
+    // get current and preview coverages
+    (get(item, 'coverages') || [])
+        .forEach((coverage) => {
+            if (coverage.planning_id === get(plan, 'guid')) {
+                if (isCoverageForExtraDay(coverage, group)) {
+                    currentCoverage.push(coverage);
+                } else if (isCoverageOnPreviousDay(coverage, group)) {
+                    previousCoverage.push(coverage);
+                }
+            }
+        });
+
+    return {current: currentCoverage, previous: previousCoverage};
+}
+
+export function getListItems(groups, itemsById) {
+    const listItems = [];
+
+    groups.forEach((group) => {
+        group.items.forEach((_id) => {
+            const plans = getPlanningItemsByGroup(itemsById[_id], group.date);
+            // console.log(plans);
+            if (plans.length > 0) {
+                plans.forEach((plan) => {
+                    listItems.push({_id, group: group.date, plan});
+                });
+            } else {
+                listItems.push({_id, group: group.date, plan: null});
+            }
+        });
+    });
+    return listItems;
 }

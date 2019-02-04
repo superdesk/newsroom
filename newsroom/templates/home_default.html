@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ gettext('Home') }}{% endblock %}
+
+{% block content %}
+<div id="home-app" class="content"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        homeData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('home_js') | safe }}
+{% endblock %}

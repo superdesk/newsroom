@@ -4,26 +4,31 @@ import {gettext} from 'utils';
 import AgendaTypeAheadFilter from './AgendaTypeAheadFilter';
 import AgendaDropdownFilter from './AgendaDropdownFilter';
 import {getCoverageDisplayName} from '../utils';
+import AgendaCoverageExistsFilter from './AgendaCoverageExistsFilter';
 
 const filters = [{
     label: gettext('Any calendar'),
     field: 'calendar',
-    icon: 'icon-small--calendar'
+    icon: 'icon-small--calendar',
+    eventsOnly: true,
 }, {
     label: gettext('Any location'),
     field: 'location',
     typeAhead: true,
-    icon: 'icon-small--location'
+    icon: 'icon-small--location',
+    eventsOnly: true,
 }, {
     label: gettext('Any region'),
     field: 'place',
-    icon: 'icon-small--region'
+    icon: 'icon-small--region',
+    eventsOnly: true,
 }, {
     label: gettext('Any coverage type'),
     field: 'coverage',
     nestedField: 'coverage_type',
     icon: 'icon-small--coverage-text',
     transform: getCoverageDisplayName,
+    eventsOnly: false,
 }];
 
 
@@ -39,9 +44,11 @@ const getDropdownItems = (filter, aggregations, toggleFilter, processBuckets) =>
     return [];
 };
 
-function AgendaFilters({aggregations, toggleFilter, activeFilter}) {
+function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnly}) {
+    const displayFilters = eventsOnly ? filters.filter((f) => f.eventsOnly) : filters;
+
     return (<div className='wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap'>
-        {filters.map((filter) => (
+        {displayFilters.map((filter) => (
             filter.typeAhead ? <AgendaTypeAheadFilter
                 key={filter.label}
                 aggregations={aggregations}
@@ -58,6 +65,7 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter}) {
                 getDropdownItems={getDropdownItems}
             />
         ))}
+        {!eventsOnly && <AgendaCoverageExistsFilter activeFilter={activeFilter} toggleFilter={toggleFilter}/>}
     </div>);
 }
 
@@ -65,6 +73,7 @@ AgendaFilters.propTypes = {
     aggregations: PropTypes.object,
     toggleFilter: PropTypes.func,
     activeFilter: PropTypes.object,
+    eventsOnly: PropTypes.bool,
 };
 
 export default AgendaFilters;

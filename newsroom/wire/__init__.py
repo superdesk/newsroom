@@ -11,8 +11,13 @@ blueprint = Blueprint('wire', __name__)
 from . import views  # noqa
 
 
-def url_for_wire(item, _external=True):
-    return url_for('wire.item', _id=item.get('_id', item.get('guid')), _external=_external)
+def url_for_wire(item, _external=True, section='wire'):
+    route = 'wire' if section == 'wire' else 'index'
+    return url_for(
+        '{}.{}'.format(section, route),
+        item=item.get('_id') or item.get('guid') or item.get('item_id'),
+        _external=_external
+    )
 
 
 def init_app(app):
@@ -54,7 +59,8 @@ def init_app(app):
     app.sidenav('Home', 'wire.index', 'home')
     app.sidenav('Wire', 'wire.wire', 'text', section='wire')
 
-    app.sidenav('Saved Items', 'wire.bookmarks', 'bookmark', group=1, blueprint='wire', badge='saved-items-count')
+    app.sidenav('Saved/Watched Items', 'wire.bookmarks', 'bookmark',
+                group=1, blueprint='wire', badge='saved-items-count')
 
     from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter
     app.download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'])

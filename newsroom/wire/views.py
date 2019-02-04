@@ -5,7 +5,7 @@ import superdesk
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app
+from flask import current_app as app, request
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -16,13 +16,17 @@ from superdesk import get_resource_service
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
+from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
-from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource
+from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
+    get_agenda_dates, get_location_string, get_public_contacts, get_links
 from newsroom.notifications import push_user_notification
 from newsroom.companies import section
+from newsroom.template_filters import is_admin_or_internal
+
 from .search import get_bookmarks_count
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
@@ -166,7 +170,13 @@ def download(_ids):
         _file.seek(0)
 
     update_action_list(_ids.split(','), 'downloads', force_insert=True)
-    app.data.insert('history', items, action='download', user=user)
+    app.data.insert(
+        'history',
+        items,
+        action='download',
+        user=user,
+        section=request.args.get('type', 'wire')
+    )
     return flask.send_file(_file, mimetype=mimetype, attachment_filename=attachment_filename, as_attachment=True)
 
 
@@ -190,7 +200,15 @@ def share():
                 'sender': current_user,
                 'items': items,
                 'message': data.get('message'),
+                'section': request.args.get('type', 'wire')
             }
+            if item_type == 'agenda':
+                template_kwargs['maps'] = data.get('maps')
+                template_kwargs['dateStrings'] = [get_agenda_dates(item) for item in items]
+                template_kwargs['locations'] = [get_location_string(item) for item in items]
+                template_kwargs['contactList'] = [get_public_contacts(item) for item in items]
+                template_kwargs['linkList'] = [get_links(item) for item in items]
+                template_kwargs['is_admin'] = is_admin_or_internal(user)
             send_email(
                 [user['email']],
                 gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
@@ -219,30 +237,6 @@ def bookmark():
     return flask.jsonify(), 200
 
 
-def update_action_list(items, action_list, force_insert=False, item_type='items'):
-    """
-    Stores user id into array of action_list of an item
-    :param items: items to be updated
-    :param action_list: field name of the list
-    :param force_insert: inserts into list regardless of the http method
-    :param item_type: either items or agenda as the collection
-    :return:
-    """
-    user_id = get_user_id()
-    if user_id:
-        db = app.data.get_mongo_collection(item_type)
-        elastic = app.data._search_backend(item_type)
-        if flask.request.method == 'POST' or force_insert:
-            updates = {'$addToSet': {action_list: user_id}}
-        else:
-            updates = {'$pull': {action_list: user_id}}
-        for item_id in items:
-            result = db.update_one({'_id': item_id}, updates)
-            if result.modified_count:
-                modified = db.find_one({'_id': item_id})
-                elastic.update(item_type, item_id, {action_list: modified[action_list]})
-
-
 @blueprint.route('/wire/<_id>/copy', methods=['POST'])
 @login_required
 def copy(_id):
@@ -265,6 +259,7 @@ def versions(_id):
 def item(_id):
     item = get_entity_or_404(_id, 'items')
     set_permissions(item, 'wire')
+    display_char_count = get_resource_service('ui_config').getSectionConfig('wire').get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):
@@ -275,4 +270,8 @@ def item(_id):
         update_action_list([_id], 'prints', force_insert=True)
     else:
         template = 'wire_item.html'
-    return flask.render_template(template, item=item, previous_versions=previous_versions)
+    return flask.render_template(
+        template,
+        item=item,
+        previous_versions=previous_versions,
+        display_char_count=display_char_count)

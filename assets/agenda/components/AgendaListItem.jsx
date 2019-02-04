@@ -1,11 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import {get} from 'lodash';
 
 import ActionButton from 'components/ActionButton';
 
 import AgendaListItemIcons from './AgendaListItemIcons';
-import {hasCoverages, isCanceled, isPostponed, isRescheduled, getName, isWatched} from '../utils';
+import {
+    hasCoverages,
+    isCanceled,
+    isPostponed,
+    isRescheduled,
+    getName,
+    isWatched,
+    getDescription,
+} from '../utils';
 import ActionMenu from '../../components/ActionMenu';
 import { LIST_ANIMATIONS } from 'utils';
 
@@ -41,7 +50,7 @@ class AgendaListItem extends React.Component {
     }
 
     render() {
-        const {item, onClick, onDoubleClick, isExtended, group} = this.props;
+        const {item, onClick, onDoubleClick, isExtended, group, planningId} = this.props;
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--covering': hasCoverages(this.props.item),
@@ -51,6 +60,7 @@ class AgendaListItem extends React.Component {
             'wire-articles__item--canceled': isCanceled(this.props.item),
             'wire-articles__item--rescheduled': isRescheduled(this.props.item),
             'wire-articles__item--selected': this.props.isSelected,
+            'wire-articles__item--open': this.props.isActive,
         });
         const selectClassName = classNames('no-bindable-select', {
             'wire-articles__item-select-visible': !LIST_ANIMATIONS,
@@ -59,14 +69,16 @@ class AgendaListItem extends React.Component {
         const articleClassName = classNames('wire-articles__item-text', {
             'flex-column align-items-start': !isExtended
         });
+        const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
+        const description = getDescription(item, planningItem);
 
         return (
             <article key={item._id}
                 className={cardClassName}
                 tabIndex='0'
                 ref={(elem) => this.articleElem = elem}
-                onClick={() => onClick(item, group)}
-                onDoubleClick={() => onDoubleClick(item, group)}
+                onClick={() => onClick(item, group, planningId)}
+                onDoubleClick={() => onDoubleClick(item, group, planningId)}
                 onMouseEnter={() => {
                     this.setState({isHover: true});
                     if (this.props.actioningItem && this.props.actioningItem._id !== item._id) {
@@ -91,11 +103,11 @@ class AgendaListItem extends React.Component {
                             {getName(item)}
                         </h4>
 
-                        <AgendaListItemIcons item={item} group={group} />
+                        <AgendaListItemIcons item={item} group={group} planningItem={planningItem} />
 
-                        {isExtended && item.definition_short && (
+                        {isExtended && description && (
                             <p className="wire-articles__item__text">
-                                {item.definition_short}
+                                {description}
                             </p>
                         )}
 
@@ -105,6 +117,7 @@ class AgendaListItem extends React.Component {
                         <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
                             <ActionMenu
                                 item={this.props.item}
+                                plan={planningItem}
                                 user={this.props.user}
                                 group={this.props.group}
                                 actions={this.props.actions}
@@ -149,6 +162,7 @@ AgendaListItem.propTypes = {
     user: PropTypes.string,
     actioningItem: PropTypes.object,
     resetActioningItem: PropTypes.func,
+    planningId: PropTypes.string,
 };
 
 export default AgendaListItem;

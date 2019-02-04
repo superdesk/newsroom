@@ -84,6 +84,7 @@ class Products extends React.Component {
                         <ProductList
                             products={this.props.products.filter(sectionFilter)}
                             onClick={this.props.selectProduct}
+                            activeSection={this.props.activeSection}
                             activeProductId={this.props.activeProductId} />
                     </div>
                 )}

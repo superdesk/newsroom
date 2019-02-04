@@ -6,8 +6,10 @@ import hashlib
 from flask import current_app as app
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
-from superdesk.text_utils import get_text, get_word_count
+from superdesk import get_resource_service
+from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
+from newsroom.auth import get_user
 
 
 def parse_date(datetime):
@@ -36,7 +38,7 @@ def date_header(datetime):
 
 def time_short(datetime):
     if datetime:
-        return format_time(parse_date(datetime), 'hh:mm')
+        return format_time(parse_date(datetime), 'HH:mm')
 
 
 def date_short(datetime):
@@ -50,6 +52,10 @@ def plain_text(html):
 
 def word_count(html):
     return get_word_count(html or '')
+
+
+def char_count(html):
+    return get_char_count(html or '')
 
 
 def is_admin(user=None):
@@ -87,3 +93,28 @@ def sidenavs(blueprint=None):
         return not nav.get('blueprint') or not blueprint or nav['blueprint'] == blueprint
 
     return [nav for nav in app.sidenavs if blueprint_matches(nav, blueprint)]
+
+
+def section_allowed(nav, sections):
+    return not nav.get('section') or sections.get(nav['section'])
+
+
+def get_company_sidenavs(blueprint=None):
+    user = get_user()
+    company = None
+    if user and user.get('company'):
+        company = get_resource_service('companies').find_one(req=None, _id=user['company'])
+    navs = sidenavs(blueprint)
+    if company and company.get('sections'):
+        return [nav for nav in navs if section_allowed(nav, company['sections'])]
+    return navs
+
+
+def sidenavs_by_names(names=[], blueprint=None):
+    blueprint_navs = get_company_sidenavs(blueprint)
+    return [nav for nav in blueprint_navs if nav.get('name') in names]
+
+
+def sidenavs_by_group(group=0, blueprint=None):
+    blueprint_navs = get_company_sidenavs(blueprint)
+    return [nav for nav in blueprint_navs if nav.get('group') == group]
