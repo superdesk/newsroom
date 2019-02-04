@@ -5,7 +5,7 @@ import flask
 from flask_babel import gettext
 from newsroom.auth import admin_only
 from newsroom.utils import get_json_or_400
-from .template_filters import newsroom_config
+from newsroom.template_filters import newsroom_config
 
 
 blueprint = flask.Blueprint('settings', __name__)
