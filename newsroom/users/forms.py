@@ -13,7 +13,8 @@ class UserForm(FlaskForm):
 
     user_types = [('administrator', gettext('Administrator')),
                   ('public', gettext('Public')),
-                  ('internal', gettext('Internal'))]
+                  ('internal', gettext('Internal')),
+                  ('account_management', gettext('Account Management'))]
 
     id = HiddenField('Id')
     first_name = StringField(gettext('First Name'), validators=[DataRequired()])

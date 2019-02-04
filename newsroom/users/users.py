@@ -49,7 +49,7 @@ class UsersResource(newsroom.Resource):
         'company': newsroom.Resource.rel('companies', embeddable=True, required=False),
         'user_type': {
             'type': 'string',
-            'allowed': ['administrator', 'internal', 'public'],
+            'allowed': ['administrator', 'internal', 'public', 'account_management'],
             'default': 'public'
         },
         'is_validated': {
