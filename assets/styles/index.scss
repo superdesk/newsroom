@@ -261,7 +261,7 @@ body.print {
 
 .navbar-header_1--small {
     height: 60px;
-    font-weight: 200;
+    font-weight: 400;
     font-size: 40px;
     line-height: 58px;
 }
@@ -387,12 +387,12 @@ body.print {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 0.5rem;
+    padding: 0 0.5rem 0.5rem 0.5rem;
     max-width: 160px;
 
     @include sm {
         max-width: 224px;
-        padding: 0 0.5rem 0 1rem;
+        padding: 0 0.5rem 0.5rem 1rem;
     }
 
     img {
