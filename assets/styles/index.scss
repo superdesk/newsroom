@@ -109,6 +109,16 @@ tr.table--selected {
     outline: 1px solid $main-blue;
 }
 
+.report-thead {
+    position: sticky;
+    top: 0;
+    th {
+        position: sticky;
+        top: 0;
+        border: none;
+    }
+}
+
 // Bootstrap overwrite end
 
 // Wire BEM classes
@@ -674,6 +684,12 @@ article.list {
         background-color: white;
     }
 }
+
+.reports-container {
+    margin: 20px;
+    padding: 0px;
+}
+
 .list-item {
     background-color: #ccc;
 }
