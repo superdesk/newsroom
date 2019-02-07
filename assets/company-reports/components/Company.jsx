@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, formatDate } from 'utils';
 import { get, groupBy } from 'lodash';
+import ReportsTable from './ReportsTable';
 
 
 function getProductDetails(products = []) {
@@ -30,7 +31,7 @@ function getProductDetails(products = []) {
 }
 
 function getContactDetails(company) {
-    const contactInfo = company.contact_email ? '{$company.contact_name} ({$company.contact_email})' : company.contact_name;
+    const contactInfo = company.contact_email ? `${company.contact_name} (${company.contact_email})` : company.contact_name;
     return (
         <div className="d-flex align-items-center m-2">
             <div><span className="font-italic">{gettext('Contact')}: </span>{contactInfo}</div>
@@ -48,7 +49,7 @@ function getUsers(users = []) {
         </div>);
 }
 
-function Company({data}) {
+function Company({data, print}) {
 
     const list = data.results && data.results.map((item) =>
         [<tr key={item._id} className="table-secondary">
@@ -74,27 +75,13 @@ function Company({data}) {
         </tr>]
     );
 
-    return (
-        <section className="content-main">
-            <div className="list-items-container">
-                {data.results && <table className="table table-bordered">
-                    <thead className="thead-dark">
-                        <tr>
-                            <th>{ gettext('Company') }</th>
-                            <th>{ gettext('Is Active') }</th>
-                            <th>{ gettext('Created') }</th>
-                            <th>{ gettext('Expiry Date') }</th>
-                        </tr>
-                    </thead>
-                    <tbody>{list}</tbody>
-                </table>}
-            </div>
-        </section>
-    );
+    const headers = [gettext('Company'), gettext('Is Active'), gettext('Created'), gettext('Expiry Date')];
+    return data.results ? (<ReportsTable headers={headers} rows={list} print={print} />) : null;
 }
 
 Company.propTypes = {
     data: PropTypes.object.isRequired,
+    print: PropTypes.bool,
 };
 
 export default Company;
