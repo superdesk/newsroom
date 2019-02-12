@@ -1,4 +1,3 @@
-import io
 import hmac
 import flask
 import logging
@@ -6,7 +5,6 @@ import superdesk
 from datetime import datetime
 
 from copy import copy, deepcopy
-from PIL import Image, ImageEnhance
 from flask import current_app as app
 from flask_babel import gettext
 from superdesk.text_utils import get_word_count, get_char_count
@@ -29,9 +27,6 @@ logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
 
 KEY = 'PUSH_KEY'
-
-THUMBNAIL_SIZE = (640, 640)
-THUMBNAIL_QUALITY = 80
 
 
 def test_signature(request):
@@ -123,7 +118,7 @@ def publish_item(doc):
         if assoc:
             assoc.setdefault('subscribers', [])
     if doc.get('associations', {}).get('featuremedia'):
-        generate_thumbnails(doc)
+        app.generate_renditions(doc)
     if doc.get('coverage_id'):
         agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
         if agenda_items:
@@ -644,90 +639,6 @@ def push_binary_get(media_id):
         return flask.jsonify({})
     else:
         flask.abort(404)
-
-
-def generate_thumbnails(item):
-    picture = item.get('associations', {}).get('featuremedia', {})
-    if not picture:
-        return
-
-    # use 4-3 rendition for generated thumbs
-    renditions = picture.get('renditions', {})
-    rendition = renditions.get('4-3', renditions.get('viewImage'))
-    if not rendition:
-        return
-
-    # generate thumbnails
-    binary = app.media.get(rendition['media'], resource=ASSETS_RESOURCE)
-    im = Image.open(binary)
-    thumbnail = _get_thumbnail(im)  # 4-3 rendition resized
-    watermark = _get_watermark(im)  # 4-3 rendition with watermark
-    picture['renditions'].update({
-        '_newsroom_thumbnail': _store_image(thumbnail,
-                                            _id='%s%s' % (rendition['media'], '_newsroom_thumbnail')),
-        '_newsroom_thumbnail_large': _store_image(watermark,
-                                                  _id='%s%s' % (rendition['media'], '_newsroom_thumbnail_large')),
-    })
-    # add watermark to base/view images
-    for key in ['base', 'view']:
-        rendition = picture.get('renditions', {}).get('%sImage' % key)
-        if rendition:
-            binary = app.media.get(rendition['media'], resource=ASSETS_RESOURCE)
-            im = Image.open(binary)
-            watermark = _get_watermark(im)
-            picture['renditions'].update({
-                '_newsroom_%s' % key: _store_image(watermark,
-                                                   _id='%s%s' % (rendition['media'], '_newsroom_%s' % key))
-            })
-
-
-def _store_image(image, filename=None, _id=None):
-    binary = io.BytesIO()
-    image.save(binary, 'jpeg', quality=THUMBNAIL_QUALITY)
-    binary.seek(0)
-    media_id = app.media.put(binary, filename=filename, _id=_id, resource=ASSETS_RESOURCE, content_type='image/jpeg')
-    if not media_id:
-        # media with the same id exists
-        media_id = _id
-    binary.seek(0)
-    return {
-        'media': str(media_id),
-        'href': app.upload_url(media_id),
-        'width': image.width,
-        'height': image.height,
-        'mimetype': 'image/jpeg'
-    }
-
-
-def _get_thumbnail(image):
-    image = image.copy()
-    image.thumbnail(THUMBNAIL_SIZE)
-    return image
-
-
-def _get_watermark(image):
-    image = image.copy()
-    if not app.config.get('WATERMARK_IMAGE'):
-        return image
-    if image.mode != 'RGBA':
-        image = image.convert('RGBA')
-    with open(app.config['WATERMARK_IMAGE'], mode='rb') as watermark_binary:
-        watermark_image = Image.open(watermark_binary)
-        set_opacity(watermark_image, 0.3)
-        watermark_layer = Image.new('RGBA', image.size)
-        watermark_layer.paste(watermark_image, (
-            image.size[0] - watermark_image.size[0],
-            int((image.size[1] - watermark_image.size[1]) * 0.66),
-        ))
-
-    watermark = Image.alpha_composite(image, watermark_layer)
-    return watermark.convert('RGB')
-
-
-def set_opacity(image, opacity=1):
-    alpha = image.split()[3]
-    alpha = ImageEnhance.Brightness(alpha).enhance(opacity)
-    image.putalpha(alpha)
 
 
 def publish_planning_featured(item):
