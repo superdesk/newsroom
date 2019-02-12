@@ -64,6 +64,10 @@ class UsersResource(newsroom.Resource):
             'type': 'boolean',
             'default': False
         },
+        'expiry_alert': {
+            'type': 'boolean',
+            'default': False
+        },
         'token': {
             'type': 'string',
         },

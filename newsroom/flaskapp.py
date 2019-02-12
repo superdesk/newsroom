@@ -31,8 +31,10 @@ from newsroom.template_filters import (
     hash_string, date_header, get_date,
     sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager
 )
-
+from newsroom.celery_app import init_celery
 from newsroom.gettext import setup_babel
+import newsroom
+
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -88,6 +90,8 @@ class Newsroom(eve.Eve):
         self._setup_jinja()
         self._setup_limiter()
         self._setup_babel()
+        init_celery(self)
+        newsroom.app = self
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
         self._setup_apps(self.config.get('INSTALLED_APPS', []))
