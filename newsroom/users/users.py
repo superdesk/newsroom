@@ -76,7 +76,7 @@ class UsersResource(newsroom.Resource):
         },
         'receive_email': {
             'type': 'boolean',
-            'default': False
+            'default': True
         },
         'locale': {
             'type': 'string',

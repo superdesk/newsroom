@@ -17,9 +17,17 @@ from flask_babel import gettext
 def update_topic(id):
     """ Updates a followed topic """
     data = get_json_or_400()
+    user_id = session['user']
 
-    if not is_user_topic(id, session['user']):
+    if not is_user_topic(id, user_id):
         abort(403)
+
+    # If notifications are enabled, check to see if user is configured to receive emails
+    if data.get('notifications'):
+        user = get_resource_service('users').find_one(req=None, _id=user_id)
+        if not user.get('receive_email'):
+            return "", gettext('Please enable \'Receive notifications via email\' option in '
+                               'your profile to receive topic notifications')
 
     updates = {
         'label': data.get('label'),
