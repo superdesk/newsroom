@@ -80,7 +80,8 @@ CORE_APPS = [
     'newsroom.public',
     'newsroom.agenda',
     'newsroom.settings',
-    'newsroom.photos'
+    'newsroom.photos',
+    'newsroom.media_utils',
 ]
 
 SITE_NAME = 'AAP Newsroom'

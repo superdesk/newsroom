@@ -509,6 +509,7 @@ def test_filter_agenda_by_coverage_status(client):
     client.post('/push', data=json.dumps(test_planning), content_type='application/json')
 
     test_planning['guid'] = 'baz'
+    test_planning['planning_date'] = '2018-05-28T10:45:52+0000',
     test_planning['coverages'] = []
     client.post('/push', data=json.dumps(test_planning), content_type='application/json')
 

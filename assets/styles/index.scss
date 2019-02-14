@@ -2739,6 +2739,12 @@ a.wire-articles__versions {
         margin-left: -30px;
         margin-right: -30px;
     }
+    &--custom {
+        max-height: none !important;
+        object-fit: fill;
+        margin: 0 !important;
+        width: fit-content !important;
+    }
 }
 
 .content--item-detail .wire-column__preview__caption {

@@ -10,7 +10,11 @@ import {
     getPreviewRendition,
     showItemVersions,
     getCaption,
-    isEqualItem, isKilled, DISPLAY_ABSTRACT } from 'wire/utils';
+    isEqualItem,
+    isKilled,
+    DISPLAY_ABSTRACT,
+    isCustomRendition,
+} from 'wire/utils';
 
 import Preview from 'ui/components/Preview';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
@@ -45,6 +49,7 @@ class WirePreview extends React.PureComponent {
         const {item, user, actions, followStory, isFollowing, previewConfig, downloadVideo} = this.props;
         const picture = getPicture(item);
         const videos = getVideos(item);
+        const isCustom = isCustomRendition(picture);
 
         const previousVersions = 'preview_versions';
         const canFollowStory = followStory && user && (get(item, 'slugline') || '').trim();
@@ -71,8 +76,9 @@ class WirePreview extends React.PureComponent {
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} isPreview={true} displayConfig={previewConfig} />}
                     {picture && <ArticlePicture
-                        picture={getPreviewRendition(picture)}
+                        picture={getPreviewRendition(picture, isCustom)}
                         isKilled={isKilled(item)}
+                        isCustomRendition={isCustom}
                         caption={getCaption(picture)}/>}
 
                     {isDisplayed('metadata_section', previewConfig) &&

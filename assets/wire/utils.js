@@ -3,6 +3,7 @@ import { getTextFromHtml, getConfig } from 'utils';
 
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
+
 const STATUS_KILLED = 'canceled';
 
 
@@ -67,8 +68,12 @@ export function getThumbnailRendition(picture, large) {
  * @param {Object} picture
  * @return {Object}
  */
-export function getPreviewRendition(picture) {
-    return get(picture, 'renditions._newsroom_view', get(picture, 'renditions.viewImage'));
+export function getPreviewRendition(picture, isCustom = false) {
+    return get(
+        picture,
+        isCustom ? 'renditions._newsroom_custom' : 'renditions._newsroom_base',
+        get(picture, 'renditions.viewImage')
+    );
 }
 
 /**
@@ -77,8 +82,22 @@ export function getPreviewRendition(picture) {
  * @param {Object} picture
  * @return {Object}
  */
-export function getDetailRendition(picture) {
-    return get(picture, 'renditions._newsroom_base', get(picture, 'renditions.baseImage'));
+export function getDetailRendition(picture, isCustom = false) {
+    return get(
+        picture,
+        isCustom ? 'renditions._newsroom_custom' : 'renditions._newsroom_base',
+        get(picture, 'renditions.baseImage')
+    );
+}
+
+/**
+ * Get picture detail rendition
+ *
+ * @param {Object} picture
+ * @return {Object}
+ */
+export function isCustomRendition(picture) {
+    return !!get(picture, 'renditions._newsroom_custom');
 }
 
 /**
