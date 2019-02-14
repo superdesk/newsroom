@@ -1,5 +1,4 @@
 
-import os
 import io
 import arrow
 import logging
@@ -122,6 +121,5 @@ class VFSMediaStorage(MediaStorage):
 
 
 def init_app(app):
-    if os.environ.get('ANSA_VFS'):
-        app.config['ANSA_VFS'] = os.environ['ANSA_VFS']
+    if app.config.get('ANSA_VFS'):
         app.media = VFSMediaStorage(app)
