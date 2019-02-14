@@ -188,16 +188,20 @@ def set_bookmarks_query(query, user_id):
     })
 
 
-def _items_query():
-    return {
+def _items_query(ignore_latest=False):
+    query = {
         'bool': {
             'must_not': [
-                {'term': {'type': 'composite'}},
-                {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
+                {'term': {'type': 'composite'}}
             ],
             'must': [{'term': {'_type': 'items'}}],
         }
     }
+
+    if not ignore_latest:
+        query['bool']['must_not'].append({'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}})
+
+    return query
 
 
 class WireSearchService(newsroom.Service):
@@ -218,8 +222,8 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, None).count()
 
-    def get(self, req, lookup, size=25, aggs=True):
-        query = _items_query()
+    def get(self, req, lookup, size=25, aggs=True, ignore_latest=False):
+        query = _items_query(ignore_latest)
         user = get_user()
         company = get_user_company(user)
 
@@ -276,12 +280,12 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
 
-    def has_permissions(self, item):
+    def has_permissions(self, item, ignore_latest=False):
         """Test if current user has permissions to view given item."""
         req = ParsedRequest()
         req.args = {}
         try:
-            results = self.get(req, {'_id': item['_id']}, size=0, aggs=False)
+            results = self.get(req, {'_id': item['_id']}, size=0, aggs=False, ignore_latest=ignore_latest)
             return results.count() > 0
         except Forbidden:
             return False

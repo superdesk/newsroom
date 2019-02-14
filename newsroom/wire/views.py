@@ -43,8 +43,8 @@ def get_services(user):
     return services
 
 
-def set_permissions(item, section='wire'):
-    item['_access'] = superdesk.get_resource_service('{}_search'.format(section)).has_permissions(item)
+def set_permissions(item, section='wire', ignore_latest=False):
+    item['_access'] = superdesk.get_resource_service('{}_search'.format(section)).has_permissions(item, ignore_latest)
     if not item['_access']:
         item.pop('body_text', None)
         item.pop('body_html', None)
@@ -258,7 +258,7 @@ def versions(_id):
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
-    set_permissions(item, 'wire')
+    set_permissions(item, 'wire', flask.request.args.get('ignoreLatest') == 'true')
     display_char_count = get_resource_service('ui_config').getSectionConfig('wire').get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
