@@ -117,7 +117,7 @@ class AmNewsApp extends BaseApp {
                 </section>,
                 <section key="contentMain" className="content-main">
                     <div className="wire-column--3">
-                        <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
+                        <div className={mainClassName}>
                             {this.state.isMobile && <div
                                 className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                                 {this.state.withSidebar &&
@@ -149,6 +149,8 @@ class AmNewsApp extends BaseApp {
                             <AmNewsList
                                 actions={this.props.actions}
                                 activeView={'list-view'}
+                                onScroll={this.onListScroll}
+                                refNode={(elem) => this.elemList = elem}
                             />
                         </div>
 

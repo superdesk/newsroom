@@ -48,7 +48,8 @@ const initialState = {
     },
     search: searchReducer(),
     detail: false,
-    userSections: {}
+    userSections: {},
+    searchInitiated: false,
 };
 
 function processAggregations(aggregations) {
@@ -116,6 +117,7 @@ function recieveItems(state, data) {
         newItems: [],
         newItemsData: null,
         agenda,
+        searchInitiated: false,
     };
 }
 
