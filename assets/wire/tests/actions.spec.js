@@ -121,7 +121,7 @@ describe('wire actions', () => {
     it('can fetch next item version', () => {
         const item = {nextversion: 'bar'};
         const next = {};
-        fetchMock.get('/wire/bar?format=json', next);
+        fetchMock.get('/wire/bar?format=json&ignoreLatest=true', next);
 
         return store.dispatch(actions.fetchNext(item))
             .then((_next) => {

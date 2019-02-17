@@ -486,7 +486,7 @@ export function fetchNext(item) {
             return Promise.reject();
         }
 
-        return server.get(`/wire/${item.nextversion}?format=json`);
+        return server.get(`/wire/${item.nextversion}?format=json&ignoreLatest=true`);
     };
 }
 
