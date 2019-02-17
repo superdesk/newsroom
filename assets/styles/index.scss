@@ -1474,15 +1474,8 @@ article.list {
     .date-round {
         background: #fee6e6;
     }
-    // strikethrough text
-    .date-round__month, 
-    .date-round__number,
-    .wire-articles__item-headline,
-    .wire-articles__item__meta-info span:not(.label),
-    .wire-articles__item__text,
-    .wire-articles__item__meta-time,
-    .time-label {
-        text-decoration: line-through;
+    .wire-articles__item__meta-time {
+        color: $gray-mid;
     }
 }
 // watched item
