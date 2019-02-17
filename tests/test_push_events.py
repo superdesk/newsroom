@@ -1016,7 +1016,7 @@ def test_push_coverages_with_linked_stories(client, app):
     parsed = get_entity_or_404('foo7', 'agenda')
     assert 2 == len(parsed['coverages'])
     assert parsed['coverages'][0]['delivery_id'] == 'item7'
-    assert parsed['coverages'][0]['delivery_href'] == '/wire?item=item7'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
 
     planning['coverages'][0]['deliveries'] = []
     planning['coverages'][0]['workflow_status'] = 'active'

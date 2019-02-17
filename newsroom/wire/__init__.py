@@ -11,7 +11,10 @@ blueprint = Blueprint('wire', __name__)
 from . import views  # noqa
 
 
-def url_for_wire(item, _external=True, section='wire'):
+def url_for_wire(item, _external=True, section='wire', **kwargs):
+    if kwargs:
+        return url_for(section, _external=_external, **kwargs)
+
     route = 'wire' if section == 'wire' else 'index'
     return url_for(
         '{}.{}'.format(section, route),
