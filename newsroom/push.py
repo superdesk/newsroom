@@ -441,7 +441,8 @@ def get_coverages(planning_items, original_coverages=[]):
         if coverage['coverage_type'] == 'text':
             if deliveries and coverage.get('workflow_status') == 'completed':
                 coverage['delivery_id'] = deliveries[0]['item_id']
-                coverage['delivery_href'] = url_for_wire(deliveries[0], _external=False)
+                coverage['delivery_href'] = url_for_wire(None, _external=False, section='wire.item',
+                                                         _id=deliveries[0]['item_id'])
             else:
                 coverage['delivery_id'] = None
                 coverage['delivery_href'] = None
