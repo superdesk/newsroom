@@ -29,5 +29,6 @@ class UserForm(FlaskForm):
     is_validated = BooleanField(gettext('Email Validated'), validators=[])
     is_enabled = BooleanField(gettext('Account Enabled'), default=True, validators=[])
     is_approved = BooleanField(gettext('Account Approved'), validators=[])
+    expiry_alert = BooleanField(gettext('Company Expiry Alert'), validators=[])
     receive_email = BooleanField(gettext('Receive notifications via email'), validators=[])
     locale = StringField(gettext('Locale'))
