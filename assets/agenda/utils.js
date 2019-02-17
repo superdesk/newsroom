@@ -58,7 +58,7 @@ export const WORKFLOW_STATUS_TEXTS = {
 
 export const WORKFLOW_COLORS = {
     draft: 'icon--gray-light',
-    assigned: 'icon--mid-blue-light',
+    assigned: 'icon--mid-blue',
     active: 'icon--cyan',
     completed: 'icon--green',
     cancelled: 'icon--red',
