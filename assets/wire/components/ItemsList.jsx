@@ -125,7 +125,7 @@ class ItemsList extends React.Component {
 
     componentDidUpdate(nextProps) {
         if (!isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
-          (this.props.resultsFiltered && isEqual(nextProps.activeFilter, this.props.activeFilter))) {
+            (!nextProps.searchInitiated && this.props.searchInitiated)) {
             this.elem.scrollTop = 0;
         }
     }
@@ -187,9 +187,10 @@ ItemsList.propTypes = {
     company: PropTypes.string,
     activeView: PropTypes.string,
     context: PropTypes.string,
-    activeFilter: PropTypes.object,
+    searchInitiated: PropTypes.bool,
     activeNavigation: PropTypes.string,
     resultsFiltered: PropTypes.bool,
+    isLoading: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -203,9 +204,10 @@ const mapStateToProps = (state) => ({
     user: state.user,
     company: state.company,
     context: state.context,
-    activeFilter: get(state, 'search.activeFilter'),
+    searchInitiated: state.searchInitiated,
     activeNavigation: get(state, 'search.activeNavigation', null),
     resultsFiltered: state.resultsFiltered,
+    isLoading: state.isLoading,
 });
 
 export default connect(mapStateToProps)(ItemsList);

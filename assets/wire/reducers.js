@@ -36,6 +36,7 @@ const initialState = {
     userSections: {},
     uiConfig: {},
     groups: [],
+    searchInitiated: false,
 };
 
 function recieveItems(state, data) {
@@ -54,6 +55,7 @@ function recieveItems(state, data) {
         aggregations: data._aggregations || null,
         newItems: [],
         newItemsData: null,
+        searchInitiated: false,
     };
 }
 
