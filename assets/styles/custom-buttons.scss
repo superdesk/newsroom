@@ -56,6 +56,12 @@
       background-color: $color;
       border-color: $color;
     }
+
+    &.active {
+      color: $color-hover;
+      background-color: $color;
+      border-color: $color;
+    }
   
     &:focus,
     &.focus {
