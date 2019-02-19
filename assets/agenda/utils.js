@@ -394,13 +394,18 @@ export function getInternalNote(item, plan) {
  * @param {Object} item
  * @return {Object}
  */
-export function getInternalNotesFromCoverages(item) {
-    const internalNotes = {};
+export function getNotesFromCoverages(item, field = 'internal_note') {
+    const notes = {};
     const planningItems = get(item, 'planning_items', []);
-    planningItems.forEach(p => get(p, 'coverages', []).forEach(c => {
-        internalNotes[c.coverage_id] = get(c, 'planning.internal_note');
-    }));
-    return internalNotes;
+    planningItems.forEach(p => {
+        const planning_note = p[field];
+        get(p, 'coverages', []).forEach((c) => {
+            if (get(c, `planning.${field}`, '') && c.planning[field] !== planning_note) {
+                notes[c.coverage_id] = c.planning[field];
+            }
+        });
+    });
+    return notes;
 }
 
 /**

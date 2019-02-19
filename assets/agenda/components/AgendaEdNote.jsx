@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
+import classNames from 'classnames';
 
 import {gettext} from 'utils';
 
-export default function AgendaEdNote({item, plan, secondaryNoteField}) {
+export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin}) {
     // We display Secondary Note only from 'item' for now
     const displaySecondaryNote = secondaryNoteField && get(item, secondaryNoteField);
     if (!item.ednote && !plan.ednote && !displaySecondaryNote) {
@@ -19,7 +20,7 @@ export default function AgendaEdNote({item, plan, secondaryNoteField}) {
 
         // Display both Ed & Secondary Note
         return (
-            <span>{plan.ednote || item.ednote}
+            <span>{get(plan, 'ednote') || item.ednote}
                 <span className="secondary-note">
                     {item[secondaryNoteField]}
                 </span>
@@ -28,7 +29,7 @@ export default function AgendaEdNote({item, plan, secondaryNoteField}) {
     };
 
     return (
-        <div className="wire-column__preview_article-note">
+        <div className={classNames('wire-column__preview_article-note', {'m-0': noMargin})}>
             <i className="icon-small--info" />
             <label>{gettext('Editorial Note:')}&nbsp;&nbsp;</label>
             {getNoteFields()}
@@ -40,4 +41,5 @@ AgendaEdNote.propTypes = {
     item: PropTypes.object.isRequired,
     plan: PropTypes.object,
     secondaryNoteField: PropTypes.string,
+    noMargin: PropTypes.bool,
 };
