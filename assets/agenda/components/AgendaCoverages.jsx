@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import { gettext, formatCoverageDate, getConfig } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
-import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, getInternalNotesFromCoverages} from '../utils';
+import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, getNotesFromCoverages} from '../utils';
 import AgendaInternalNote from './AgendaInternalNote';
+import AgendaEdNote from './AgendaEdNote';
 
 
 export default function AgendaCoverages({item, coverages}) {
@@ -12,7 +13,8 @@ export default function AgendaCoverages({item, coverages}) {
         return null;
     }
 
-    const internalNotes = getInternalNotesFromCoverages(item);
+    const internalNotes = getNotesFromCoverages(item);
+    const edNotes = getNotesFromCoverages(item, 'ednote');
     const getItemText = (c) => {
         return (getConfig('display_abstract') && c.item_description_text) ||
             c.item_headline || c.item_slugline;
@@ -42,8 +44,12 @@ export default function AgendaCoverages({item, coverages}) {
                 <CoverageItemStatus coverage={coverage} />
             </div>
 
+            {!isEmpty(edNotes) && edNotes[coverage.coverage_id] && <div className='coverage-item__row'>
+                <AgendaEdNote item={{ednote: edNotes[coverage.coverage_id]}} noMargin/>
+            </div>}
+
             {!isEmpty(internalNotes) && internalNotes[coverage.coverage_id] && <div className='coverage-item__row'>
-                <AgendaInternalNote internalNote={internalNotes[coverage.coverage_id]} />
+                <AgendaInternalNote internalNote={internalNotes[coverage.coverage_id]} noMargin />
             </div>}
         </div>
     ));
