@@ -5,7 +5,7 @@ from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
 from flask import json, abort, url_for, current_app as app
 from flask_babel import gettext
-from planning.common import WORKFLOW_STATE_SCHEMA
+from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk import get_resource_service
@@ -441,6 +441,16 @@ class AgendaService(newsroom.Service):
 
     def _enhance_items(self, docs):
         for doc in docs:
+            # Enhance completed coverages in general - add story's abstract/headline/slugline
+            for cov in doc.get('coverages', []):
+                if cov['workflow_status'] == ASSIGNMENT_WORKFLOW_STATE.COMPLETED and cov.get('delivery_id'):
+                    orig = app.data.find_one('wire_search', req=None, _id=cov['delivery_id'])
+                    if orig:
+                        cov['item_description_text'] = orig.get('description_text')
+                        cov['item_headline'] = orig.get('headline')
+                        cov['item_slugline'] = orig.get('slugline')
+
+            # Filter based on _inner_hits
             inner_hits = doc.pop('_inner_hits', None)
             if not inner_hits or not doc.get('planning_items'):
                 continue

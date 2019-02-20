@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
-import { gettext, formatCoverageDate } from 'utils';
+import { gettext, formatCoverageDate, getConfig } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
 import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, getInternalNotesFromCoverages} from '../utils';
 import AgendaInternalNote from './AgendaInternalNote';
@@ -13,6 +13,10 @@ export default function AgendaCoverages({item, coverages}) {
     }
 
     const internalNotes = getInternalNotesFromCoverages(item);
+    const getItemText = (c) => {
+        return (getConfig('display_abstract') && c.item_description_text) ||
+            c.item_headline || c.item_slugline;
+    };
 
     return coverages.map((coverage) => (
         <div className='coverage-item' key={coverage.coverage_id}>
@@ -26,6 +30,10 @@ export default function AgendaCoverages({item, coverages}) {
                     <span className='coverage-item__text-label mr-1'>{gettext('due by')}:</span>
                     <span>{formatCoverageDate(coverage.scheduled)}</span>
                 </span>
+            </div>
+
+            <div className='coverage-item__row'>
+                <p className='wire-articles__item__text m-0'>{getItemText(coverage)}</p>
             </div>
 
             <div className='coverage-item__row'>
