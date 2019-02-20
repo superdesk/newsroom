@@ -442,7 +442,7 @@ class AgendaService(newsroom.Service):
     def _enhance_items(self, docs):
         for doc in docs:
             # Enhance completed coverages in general - add story's abstract/headline/slugline
-            for cov in doc.get('coverages', []):
+            for cov in doc.get('coverages') or []:
                 if cov['workflow_status'] == ASSIGNMENT_WORKFLOW_STATE.COMPLETED and cov.get('delivery_id'):
                     orig = app.data.find_one('wire_search', req=None, _id=cov['delivery_id'])
                     if orig:
