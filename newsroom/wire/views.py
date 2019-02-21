@@ -258,7 +258,7 @@ def versions(_id):
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
-    set_permissions(item, 'wire', flask.request.args.get('ignoreLatest') == 'true')
+    set_permissions(item, 'wire', False if flask.request.args.get('ignoreLatest') == 'false' else True)
     display_char_count = get_resource_service('ui_config').getSectionConfig('wire').get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
