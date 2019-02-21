@@ -13,7 +13,7 @@ export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
 const CLIENT_CONFIG = 'client_config';
 
-const TIME_FORMAT = getConfig('time_format');
+export const TIME_FORMAT = getConfig('time_format');
 export const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
 const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
@@ -397,7 +397,7 @@ export function updateRouteParams(updates, state) {
 
     Object.keys(updates).forEach((key) => {
         let updatedValue = updates[key];
-        if (!isEmpty(updatedValue)) {
+        if (!isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
             if (typeof updatedValue === 'object') {
                 updatedValue = JSON.stringify(updatedValue);
             }

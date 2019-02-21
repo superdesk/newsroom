@@ -19,10 +19,11 @@ from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
-from newsroom.wire.search import query_string, set_product_query, FeaturedQuery, \
+from newsroom.wire.search import query_string, set_product_query, \
     planning_items_query_string, nested_query
 from newsroom.wire.utils import get_local_date, get_end_date
 from newsroom.wire import url_for_wire
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 PRIVATE_FIELDS = [
@@ -462,23 +463,24 @@ class AgendaService(newsroom.Service):
             doc['coverages'] = [c for c in (doc.get('coverages') or []) if c.get('planning_id') in items_by_key]
 
     def get(self, req, lookup):
+        if req.args.get('featured'):
+            return self.get_featured_stories(req, lookup)
+
         query = _agenda_query()
         user = get_user()
         company = get_user_company(user)
         is_events_only = is_events_only_view(user, company)
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         product_query = {'bool': {'must': [], 'should': []}}
-        try:
-            set_product_query(
-                product_query,
-                company,
-                self.section,
-                navigation_id=req.args.get('navigation'),
-                events_only=is_events_only
-            )
-            query['bool']['must'].append(product_query)
-        except FeaturedQuery:
-            return self.featured(req, lookup)
+
+        set_product_query(
+            product_query,
+            company,
+            self.section,
+            navigation_id=req.args.get('navigation'),
+            events_only=is_events_only
+        )
+        query['bool']['must'].append(product_query)
 
         if req.args.get('q'):
             test_query = {'or': []}
@@ -552,14 +554,13 @@ class AgendaService(newsroom.Service):
                 })
         return cursor
 
-    def featured(self, req, lookup):
+    def featured(self, req, lookup, featured):
         """Return featured items."""
         user = get_user()
         company = get_user_company(user)
         if is_events_only_view(user, company):
             abort(403)
 
-        featured = get_resource_service('agenda_featured').find_one_today()
         if not featured or not featured.get('items'):
             return ListCursor([])
 
@@ -739,3 +740,10 @@ class AgendaService(newsroom.Service):
         set_saved_items_query(query, str(user['_id']))
         cursor = self.get_items_by_query(query, size=0)
         return cursor.count()
+
+    def get_featured_stories(self, req, lookup):
+        for_date = datetime.strptime(req.args.get('date_from'), '%d/%m/%Y %H:%M')
+        offset = int(req.args.get('timezone_offset', '0'))
+        local_date = get_local_date(for_date.strftime('%Y-%m-%d'), datetime.strftime(for_date, '%H:%M:%S'), offset)
+        featured_doc = get_resource_service('agenda_featured').find_one_for_date(local_date)
+        return self.featured(req, lookup, featured_doc)
