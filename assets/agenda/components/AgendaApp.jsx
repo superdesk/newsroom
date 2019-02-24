@@ -14,6 +14,7 @@ import {
     toggleDropdownFilter,
     openItemDetails,
     requestCoverage,
+    toggleFeaturedFilter,
 } from 'agenda/actions';
 
 import {
@@ -139,7 +140,9 @@ class AgendaApp extends BaseApp {
                         <AgendaListViewControls
                             activeView={this.props.activeView}
                             setView={this.props.setView}
-                            activeNavigation={this.props.activeNavigation}
+                            hideFeaturedToggle={this.props.activeNavigation || this.props.bookmarks || this.props.activeTopic}
+                            toggleFeaturedFilter={this.props.toggleFeaturedFilter}
+                            featuredFilter={this.props.featuredOnly}
                         />
                     </nav>
                 </section>,
@@ -147,7 +150,7 @@ class AgendaApp extends BaseApp {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar tabs={this.tabs} props={{...this.props, groups}} />
+                                <SearchSidebar tabs={this.tabs} props={{...this.props, groups, hideDateFilters: this.props.featuredOnly}} />
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
@@ -280,6 +283,7 @@ const mapStateToProps = (state) => ({
     detail: get(state, 'detail', false),
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
+    featuredOnly: get(state, 'agenda.featuredOnly'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -300,6 +304,7 @@ const mapDispatchToProps = (dispatch) => ({
     },
     openItemDetails: (item) => dispatch(openItemDetails(item)),
     requestCoverage: (item, message) => dispatch(requestCoverage(item, message)),
+    toggleFeaturedFilter: () => dispatch(toggleFeaturedFilter()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

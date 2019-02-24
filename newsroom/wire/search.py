@@ -18,11 +18,6 @@ from newsroom.wire.utils import get_local_date, get_end_date
 logger = logging.getLogger(__name__)
 
 
-class FeaturedQuery(Exception):
-    """Raise when query is for featured items."""
-    pass
-
-
 def get_bookmarks_count(user_id, product_type):
     return get_resource_service('{}_search'.format(product_type)).get_bookmarks_count(user_id)
 
@@ -102,14 +97,10 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
     planning_items_should = []
     for product in products:
         if product.get('query'):
-            if product['query'] == '_featured':
-                if navigation_id:  # only return featured when nav item is selected
-                    raise FeaturedQuery
-            else:
-                query['bool']['should'].append(query_string(product['query']))
-                if product.get('planning_item_query') and not events_only:
-                    # form the query for the agenda planning items
-                    planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
+            query['bool']['should'].append(query_string(product['query']))
+            if product.get('planning_item_query') and not events_only:
+                # form the query for the agenda planning items
+                planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
 
     if planning_items_should:
         query['bool']['should'].append(

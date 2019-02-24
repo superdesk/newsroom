@@ -94,34 +94,6 @@ def test_search(client, app):
     assert 'coverages' not in data['_items'][0]
 
 
-def test_featured(client, app):
-    app.data.insert('products', [{
-        '_id': 12,
-        'name': 'product test',
-        'query': '_featured',
-        'companies': ['1'],
-        'navigations': ['51'],
-        'is_enabled': True,
-        'product_type': 'agenda'
-    }, {
-        '_id': 13,
-        'name': 'all items',
-        'query': '*:*',
-        'companies': ['1'],
-        'navigations': ['51'],
-        'is_enabled': True,
-        'product_type': 'agenda'
-    }])
-
-    # public user
-    with client.session_transaction() as session:
-        session['user'] = PUBLIC_USER_ID
-        session['user_type'] = 'public'
-
-    resp = client.get('/agenda/search?navigation=51')
-    assert 403 == resp.status_code
-
-
 def set_watch_products(app):
     app.data.insert('navigations', [{
         '_id': 51,

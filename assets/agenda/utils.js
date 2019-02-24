@@ -284,6 +284,20 @@ export function getDateInputDate(dateString) {
 }
 
 /**
+ * Return moment date
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function getMomentDate(dateString) {
+    if (dateString) {
+        return moment(parseInt(dateString));
+    }
+
+    return '';
+}
+
+/**
  * Gets the next day
  *
  * @param {String} dateString
