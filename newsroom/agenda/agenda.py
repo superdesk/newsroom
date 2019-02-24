@@ -442,13 +442,15 @@ class AgendaService(newsroom.Service):
     def _enhance_items(self, docs):
         for doc in docs:
             # Enhance completed coverages in general - add story's abstract/headline/slugline
-            for cov in doc.get('coverages') or []:
-                if cov['workflow_status'] == ASSIGNMENT_WORKFLOW_STATE.COMPLETED and cov.get('delivery_id'):
-                    orig = app.data.find_one('wire_search', req=None, _id=cov['delivery_id'])
-                    if orig:
-                        cov['item_description_text'] = orig.get('description_text')
-                        cov['item_headline'] = orig.get('headline')
-                        cov['item_slugline'] = orig.get('slugline')
+            delivery_ids = [c.get('delivery_id') for c in (doc.get('coverages') or [])
+                            if c['workflow_status'] == ASSIGNMENT_WORKFLOW_STATE.COMPLETED]
+            wire_items = get_resource_service('wire_search').get_items(delivery_ids)
+            if wire_items.count() > 0:
+                for item in wire_items:
+                    c = [c for c in doc.get('coverages') if c.get('delivery_id') == item.get('_id')][0]
+                    c['item_description_text'] = item.get('description_text')
+                    c['item_headline'] = item.get('headline')
+                    c['item_slugline'] = item.get('slugline')
 
             # Filter based on _inner_hits
             inner_hits = doc.pop('_inner_hits', None)
