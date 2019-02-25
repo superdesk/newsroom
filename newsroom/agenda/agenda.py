@@ -444,13 +444,15 @@ class AgendaService(newsroom.Service):
             # Enhance completed coverages in general - add story's abstract/headline/slugline
             delivery_ids = [c.get('delivery_id') for c in (doc.get('coverages') or [])
                             if c['workflow_status'] == ASSIGNMENT_WORKFLOW_STATE.COMPLETED]
-            wire_items = get_resource_service('wire_search').get_items(delivery_ids)
+            wire_search_service = get_resource_service('wire_search')
+            wire_items = wire_search_service.get_items(delivery_ids)
             if wire_items.count() > 0:
                 for item in wire_items:
                     c = [c for c in doc.get('coverages') if c.get('delivery_id') == item.get('_id')][0]
                     c['item_description_text'] = item.get('description_text')
                     c['item_headline'] = item.get('headline')
                     c['item_slugline'] = item.get('slugline')
+                    c['publish_time'] = item.get('firstpublished')
 
             # Filter based on _inner_hits
             inner_hits = doc.pop('_inner_hits', None)

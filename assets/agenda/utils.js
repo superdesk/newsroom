@@ -1,6 +1,6 @@
 import { get, isEmpty, includes, keyBy, sortBy } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek, getConfig, gettext, DATE_FORMAT} from '../utils';
+import {formatDate, formatMonth, formatWeek, getConfig, gettext, DATE_FORMAT, COVERAGE_DATE_FORMAT} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -33,12 +33,24 @@ const Groupers = {
 };
 
 export function getCoverageStatusText(coverage) {
-    if (coverage.workflow_status === 'draft') {
+    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
         return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
+    }
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
+        return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
     }
 
     return get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '');
 }
+
+export const WORKFLOW_STATUS = {
+    DRAFT: 'draft',
+    ASSIGNED: 'assigned',
+    ACTIVE: 'active',
+    COMPLETED: 'completed',
+    CANCELLED: 'cancelled',
+};
 
 export const DRAFT_STATUS_TEXTS = {
     'coverage not planned': gettext('not planned'),
@@ -50,18 +62,18 @@ export const DRAFT_STATUS_TEXTS = {
 };
 
 export const WORKFLOW_STATUS_TEXTS = {
-    assigned: gettext('planned'),
-    active: gettext('in progress'),
-    completed: gettext('available'),
-    cancelled: gettext('cancelled'),
+    [WORKFLOW_STATUS.ASSIGNED]: gettext('planned'),
+    [WORKFLOW_STATUS.ACTIVE]: gettext('in progress'),
+    [WORKFLOW_STATUS.COMPLETED]: gettext('available'),
+    [WORKFLOW_STATUS.CANCELLED]: gettext('cancelled'),
 };
 
 export const WORKFLOW_COLORS = {
-    draft: 'icon--gray-light',
-    assigned: 'icon--mid-blue',
-    active: 'icon--cyan',
-    completed: 'icon--green',
-    cancelled: 'icon--red',
+    [WORKFLOW_STATUS.DRAFT]: 'icon--gray-light',
+    [WORKFLOW_STATUS.ASSIGNED]: 'icon--mid-blue',
+    [WORKFLOW_STATUS.ACTIVE]: 'icon--cyan',
+    [WORKFLOW_STATUS.COMPLETED]: 'icon--green',
+    [WORKFLOW_STATUS.CANCELLED]: 'icon--red',
 };
 
 
