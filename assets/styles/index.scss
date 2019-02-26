@@ -2526,10 +2526,18 @@ a.wire-articles__versions {
 .wire-column__preview_article-note {
     font-size: 0.815rem;
     margin-top: 30px;
+    display: flex;
+    flex-direction: row;
 
     .secondary-note {
-        margin-left: 16px;
         display: flex
+    }
+}
+
+.icon--info {
+    &--smaller {
+        font-size: medium !important;
+        padding-top: 1px !important;
     }
 }
 

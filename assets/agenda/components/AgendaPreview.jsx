@@ -85,7 +85,7 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaPreviewAttachments item={item} />
                             <AgendaTags item={item} plan={plan} isItemDetail={false} />
                             <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
-                            <AgendaInternalNote internalNote={getInternalNote(item, plan)} />
+                            <AgendaInternalNote internalNote={getInternalNote(item, plan)} mt2={item.ednote || plan.ednote || item.state_reason} />
                             {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                         </div>
                     </Preview>
