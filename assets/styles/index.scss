@@ -1649,6 +1649,12 @@ article.list {
     }
 }
 
+.time-text {
+    color: $gray-mid;
+    font-weight: bold;
+
+}
+
 // one pane open (filter or preview), responsive
 .wire-articles__one-side-pane {
     .wire-articles__item--list {

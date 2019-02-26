@@ -4,7 +4,7 @@ import moment from 'moment';
 
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import {bem} from 'ui/utils';
-import {formatTime, formatDate, gettext, DAY_IN_MINUTES, DATE_FORMAT} from 'utils';
+import {formatTime, formatDate, DAY_IN_MINUTES, DATE_FORMAT} from 'utils';
 import {hasCoverages, isCoverageForExtraDay} from '../utils';
 
 function format(item, group) {
@@ -40,24 +40,24 @@ function format(item, group) {
     if (duration > DAY_IN_MINUTES) {
         // Multi day event
         return ([
-            <span key="start">{formatTime(start)} <u>{formatDate(start)}</u></span>,
+            <span key="start"><span className='time-text'>{formatTime(start)}</span> {formatDate(start)}</span>,
             <span key="dash">{' - '}</span>,
-            <span key="end">{formatTime(end)} <u>{formatDate(end)}</u></span>
+            <span key="end"><span className='time-text'>{formatTime(end)}</span> {formatDate(end)}</span>
         ]);
     }
 
     if (duration == DAY_IN_MINUTES) {
         // All day event
-        return gettext('ALL DAY');
+        return (<span>{formatDate(start)}</span>);
     }
 
     if (duration == 0) {
         // start and end times are the same
-        return `${formatTime(start)}`;
+        return ([<span key="start" className='time-text'>{formatTime(start)}</span>,` ${formatDate(start)}`]);
     }
 
     // single day event
-    return `${formatTime(start)} - ${formatTime(end)}`;
+    return ([<span key="times" className='time-text'>{formatTime(start)} - {formatTime(end)}</span>,` ${formatDate(start)}`]);
 }
 
 function getCalendarClass(item) {
