@@ -156,7 +156,7 @@ def publish_event(event, orig):
         agenda = {}
         set_agenda_metadata_from_event(agenda, event)
         agenda['dates'] = get_event_dates(event)
-        _id = service.create([agenda])[0]
+        _id = service.post([agenda])[0]
     else:
         # replace the original document
         if event.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
@@ -254,7 +254,7 @@ def publish_planning(planning):
         # setting _id of agenda to be equal to planning if there's no event id
         agenda.setdefault('_id', planning.get('event_item', planning['guid']) or planning['guid'])
         agenda.setdefault('guid', planning.get('event_item', planning['guid']) or planning['guid'])
-        service.create([agenda])[0]
+        service.post([agenda])[0]
     else:
         # replace the original document
         service.patch(agenda['_id'], agenda)

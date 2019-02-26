@@ -441,9 +441,7 @@ export function pushNotification(push) {
             return dispatch(setNewItemsByTopic(push.extra));
 
         case 'new_item':
-            return new Promise((resolve, reject) => {
-                dispatch(fetchNewItems()).then(resolve).catch(reject);
-            });
+            return dispatch(setNewItems(push.extra));
 
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
@@ -472,7 +470,14 @@ function setTopics(topics) {
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
 export function setNewItems(data) {
-    return {type: SET_NEW_ITEMS, data};
+    return function (dispatch) {
+        if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'text') {
+            return Promise.resolve();
+        }
+
+        dispatch({type: SET_NEW_ITEMS, data});
+        return Promise.resolve();
+    };
 }
 
 export function fetchNewItems() {
@@ -562,8 +567,4 @@ export function setTopicQuery(topic) {
         dispatch(setCreatedFilter(topic.created));
         return dispatch(fetchItems());
     };
-}
-
-export function refresh() {
-    return (dispatch, getState) => dispatch(recieveItems(getState().newItemsData));
 }

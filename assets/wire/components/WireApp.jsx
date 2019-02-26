@@ -9,7 +9,6 @@ import {
     fetchItems,
     setQuery,
     fetchMoreItems,
-    refresh,
     previewItem,
     toggleNews,
     downloadVideo,
@@ -130,7 +129,7 @@ class WireApp extends BaseApp {
                                 totalItems={this.props.totalItems}
                                 topicType={this.props.context === 'wire' ? this.props.context : null}
                                 newItems={this.props.newItems}
-                                refresh={this.props.refresh}
+                                refresh={this.props.fetchItems}
                                 activeTopic={this.props.activeTopic}
                                 toggleNews={this.props.toggleNews}
                                 activeNavigation={this.props.activeNavigation}
@@ -197,7 +196,6 @@ WireApp.propTypes = {
     setView: PropTypes.func,
     followStory: PropTypes.func,
     newItems: PropTypes.array,
-    refresh: PropTypes.func,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
@@ -251,7 +249,6 @@ const mapDispatchToProps = (dispatch) => ({
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
-    refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
     downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType))
 });

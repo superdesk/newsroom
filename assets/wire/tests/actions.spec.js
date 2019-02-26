@@ -85,7 +85,7 @@ describe('wire actions', () => {
 
     it('can populate new items on update', () => {
         expect(store.getState().newItems).toEqual([]);
-        return store.dispatch(actions.pushNotification({event: 'new_item'}))
+        return store.dispatch(actions.pushNotification({event: 'new_item', extra: { _items: [ {'_id': 'foo', 'type': 'text'} ]}}))
             .then(() => {
                 expect(store.getState().newItems).toEqual(['foo']);
             });
@@ -94,9 +94,9 @@ describe('wire actions', () => {
     it('can filter out updated items from newItems', () => {
         store.dispatch(actions.setNewItems({
             _items: [
-                {_id: 'foo'},
-                {_id: 'bar', 'nextversion': 'x'},
-                {_id: 'baz'}
+                {_id: 'foo', 'type': 'text'},
+                {_id: 'bar', 'nextversion': 'x', 'type': 'text'},
+                {_id: 'baz', 'type': 'text'}
             ]
         }));
         expect(store.getState().newItems).toEqual(['foo', 'baz']);
