@@ -14,6 +14,7 @@ from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock, remove_locks
 from flask import render_template, current_app as app
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
+from superdesk import config
 import datetime
 import logging
 
@@ -45,20 +46,38 @@ class CompanyExpiryAlerts():
 
         # Check if there are any recipients
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
-        if not (general_settings.get('values') or {}).get('company_expiry_alert_recipients'):
-            return  # No one to send
-
         recipients = general_settings['values']['company_expiry_alert_recipients'].split(',')
         expiry_time = (utcnow() + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
         companies_service = get_resource_service('companies')
-        cursor = companies_service.find({'expiry_date': {'$lte': expiry_time}})
-        if cursor.count() > 0:
-            logger.info('{} Sending to following recipients: {}'.format(self.log_msg, recipients))
+        companies = list(companies_service.find({'expiry_date': {'$lte': expiry_time}}))
+
+        if len(companies) > 0:
+            # Send notifications to users who are nominated to receive expiry alerts
+            for company in companies:
+                users = get_resource_service('users').find({'company': company.get(config.ID_FIELD),
+                                                            'expiry_alert': True})
+                if users.count() > 0:
+                    template_kwargs = {'expiry_date': company.get('expiry_date')}
+                    logger.info('{} Sending to following users of company {}: {}'
+                                .format(self.log_msg, company.get('name'), recipients))
+                    with app.mail.connect() as connection:
+                        send_email(
+                            [u['email'] for u in users],
+                            'Your Company\'s account is expiring on ({})'.format(company.get('expiry_date')
+                                                                                 .strftime('%Y-%m-%d')),
+                            text_body=render_template('company_expiry_alert_user.txt', **template_kwargs),
+                            html_body=render_template('company_expiry_alert_user.html', **template_kwargs),
+                            connection=connection
+                        )
+
+            if not (general_settings.get('values') or {}).get('company_expiry_alert_recipients'):
+                return  # No one else to send
+
             template_kwargs = {
-                'companies': list(cursor),
+                'companies': companies,
                 'expiry_date': expiry_time
             }
-
+            logger.info('{} Sending to following expiry administrators: {}'.format(self.log_msg, recipients))
             with app.mail.connect() as connection:
                 send_email(
                     recipients,
