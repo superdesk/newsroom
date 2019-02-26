@@ -698,7 +698,8 @@ class AgendaService(newsroom.Service):
             for coverage in coverages:
                 if coverage['coverage_id'] == wire_item['coverage_id'] and not coverage.get('delivery'):
                     coverage['delivery_id'] = wire_item['guid']
-                    coverage['delivery_href'] = url_for_wire(wire_item, _external=False)
+                    coverage['delivery_href'] = url_for_wire(None, _external=False, section='wire.item',
+                                                             _id=wire_item['guid'])
                     self.system_update(item['_id'], {'coverages': coverages}, item)
                     self.notify_new_coverage(item, wire_item)
                     break
