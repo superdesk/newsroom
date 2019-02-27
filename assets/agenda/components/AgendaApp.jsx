@@ -9,7 +9,6 @@ import {
     fetchItems,
     selectDate,
     fetchMoreItems,
-    refresh,
     previewItem,
     toggleDropdownFilter,
     openItemDetails,
@@ -170,7 +169,7 @@ class AgendaApp extends BaseApp {
                                 totalItems={this.props.totalItems}
                                 topicType='agenda'
                                 newItems={this.props.newItems}
-                                refresh={this.props.refresh}
+                                refresh={this.props.fetchItems}
                                 activeTopic={this.props.activeTopic}
                                 toggleNews={this.props.toggleNews}
                                 activeNavigation={this.props.activeNavigation}
@@ -236,7 +235,6 @@ AgendaApp.propTypes = {
     activeView: PropTypes.string,
     setView: PropTypes.func,
     newItems: PropTypes.array,
-    refresh: PropTypes.func,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
@@ -291,7 +289,6 @@ const mapDispatchToProps = (dispatch) => ({
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
-    refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
     toggleDropdownFilter: (field, value) => {
         setAgendaDropdownFilter(field, value);

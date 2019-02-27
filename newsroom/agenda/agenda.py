@@ -82,6 +82,11 @@ class AgendaResource(newsroom.Resource):
 
     # identifiers
     schema['guid'] = events_schema['guid']
+    schema['type'] = {
+        'type': 'string',
+        'mapping': not_analyzed,
+        'default': 'agenda',
+    }
     schema['event_id'] = events_schema['guid']
     schema['recurrence_id'] = {
         'type': 'string',

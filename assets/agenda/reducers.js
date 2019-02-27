@@ -38,7 +38,6 @@ const initialState = {
     context: null,
     formats: [],
     newItems: [],
-    newItemsData: null,
     newItemsByTopic: {},
     readItems: {},
     agenda: {
@@ -117,7 +116,6 @@ function recieveItems(state, data) {
         totalItems: data._meta.total,
         aggregations: processAggregations(data._aggregations) || null,
         newItems: [],
-        newItemsData: null,
         agenda,
         searchInitiated: false,
     };
