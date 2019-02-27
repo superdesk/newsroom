@@ -15,7 +15,7 @@ const CLIENT_CONFIG = 'client_config';
 
 export const TIME_FORMAT = getConfig('time_format');
 export const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
-const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
+export const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
 export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
