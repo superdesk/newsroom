@@ -61,6 +61,7 @@ export default function AgendaItemDetails(
     }
 
     const displayCoverages = getCoveragesForDisplay(item, plan, group);
+    const internalNotes = getInternalNote(item, plan);
 
     return (
         <Content type="item-detail">
@@ -89,8 +90,8 @@ export default function AgendaItemDetails(
                         </ArticleSidebarBox>
                     )}
                     <AgendaTags item={item} plan={plan} isItemDetail={true} />
-                    <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
-                    <AgendaInternalNote internalNote={getInternalNote(item, plan)} />
+                    <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' mb2={internalNotes}/>
+                    <AgendaInternalNote internalNote={internalNotes} mt2={item.ednote || plan.ednote || item.state_reason}/>
                     {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                 </ArticleSidebar>
             </Article>
