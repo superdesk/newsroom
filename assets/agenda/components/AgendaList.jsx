@@ -196,7 +196,7 @@ class AgendaList extends React.Component {
     }
 
     render() {
-        const {groupedItems, itemsById, activeView, selectedItems, readItems} = this.props;
+        const {groupedItems, itemsById, activeView, selectedItems, readItems, refNode, onScroll} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
         const articleGroups = groupedItems.map((group) =>
             [
@@ -269,7 +269,15 @@ class AgendaList extends React.Component {
         });
 
         return (
-            <div className={listClassName} onKeyDown={this.onKeyDown} ref={(elem) => this.elem = elem}>
+            <div className={listClassName}
+                onKeyDown={this.onKeyDown}
+                ref={(elem) => {
+                    if (elem) {
+                        refNode(elem);
+                        this.elem = elem;
+                    }
+                }}
+                onScroll={onScroll} >
                 {articleGroups}
                 {!groupedItems.length &&
                     <div className="wire-articles__item-wrap col-12">
@@ -305,6 +313,8 @@ AgendaList.propTypes = {
     resultsFiltered: PropTypes.bool,
     listItems: PropTypes.array,
     isLoading: PropTypes.bool,
+    onScroll: PropTypes.func,
+    refNode: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({

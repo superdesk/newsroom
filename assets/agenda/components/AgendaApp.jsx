@@ -152,7 +152,7 @@ class AgendaApp extends BaseApp {
                                 <SearchSidebar tabs={this.tabs} props={{...this.props, groups, hideDateFilters: this.props.featuredOnly}} />
                             }
                         </div>
-                        <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
+                        <div className={mainClassName}>
                             {!this.props.bookmarks &&
                                 <AgendaFilters
                                     aggregations={this.props.aggregations}
@@ -181,6 +181,8 @@ class AgendaApp extends BaseApp {
                             <AgendaList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
+                                onScroll={this.onListScroll}
+                                refNode={(node) => this.elemList = node}
                             />
                         </div>
 
