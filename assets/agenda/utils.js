@@ -76,6 +76,13 @@ export const WORKFLOW_COLORS = {
     [WORKFLOW_STATUS.CANCELLED]: 'icon--red',
 };
 
+export const SCHEDULE_TYPE = {
+    REGULAR: 'REGULAR',
+    ALL_DAY: 'ALL_DAY',
+    MULTI_DAY: 'MULTI_DAY',
+    NO_DURATION: 'NO_DURATION',
+};
+
 
 /**
  * Early enough date to use in querying all agenda items

@@ -4,8 +4,8 @@ import moment from 'moment';
 
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import {bem} from 'ui/utils';
-import {formatTime, formatDate, DAY_IN_MINUTES, DATE_FORMAT, gettext} from 'utils';
-import {hasCoverages, isCoverageForExtraDay} from '../utils';
+import {formatTime, formatDate, DATE_FORMAT, gettext, getScheduleType} from 'utils';
+import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE} from '../utils';
 
 function format(item, group) {
     let start = moment(item.dates.start);
@@ -45,31 +45,30 @@ function format(item, group) {
         ;
         if (scheduleDates.length > 0) {
             duration = 0;
-            start = scheduleDates[0];
+            start = moment(scheduleDates[0]);
         }
     }
 
-    if (duration > DAY_IN_MINUTES) {
-        // Multi day event
-        return ([
-            <span key="start">{timeElement(start)}{dateElement(start)}</span>,
-            <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
-            <span key="end">{timeElement(end)}{dateElement(end)}</span>
-        ]);
-    }
+    const scheduleType = getScheduleType(start, end);
 
-    if (duration == DAY_IN_MINUTES && start.isSame(end, 'day')) {
-        // All day event
-        return dateElement(start);
-    }
-
-    if (duration == 0) {
-        // start and end times are the same
+    if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
         return ([timeElement(start, null, 'start'), dateElement(start)]);
-    }
+    } else {
+        switch(scheduleType) {
+        case SCHEDULE_TYPE.MULTI_DAY:
+            return ([
+                <span key="start">{timeElement(start)}{dateElement(start)}</span>,
+                <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
+                <span key="end">{timeElement(end)}{dateElement(end)}</span>
+            ]);
 
-    // single day event
-    return ([timeElement(start, end, 'times'), dateElement(start)]);
+        case SCHEDULE_TYPE.ALL_DAY:
+            return dateElement(start);
+
+        case SCHEDULE_TYPE.REGULAR:
+            return ([timeElement(start, end, 'times'), dateElement(start)]);
+        }
+    }
 }
 
 function getCalendarClass(item) {

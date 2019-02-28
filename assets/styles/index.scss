@@ -2053,7 +2053,7 @@ article.list {
         @include lg {
             margin-right: 16px;
             padding-right: 20px;
-            font-size: 0.875rem;
+            font-size: 0.97rem;
         }
 
     }
@@ -2345,7 +2345,6 @@ a.wire-articles__versions {
         margin-right: 8px;
         padding-right: 8px;
         border-right: 1px dotted #c4c4c4;
-        float: left;
 
         @include xl {
             padding-right: 10px;
@@ -2379,6 +2378,10 @@ a.wire-articles__versions {
     display: flex;
     align-items: baseline;
     margin: 20px 0;
+    
+    &--block {
+        display: block !important;
+    }
 }
 
 .wire-column__preview__slug {
@@ -3093,6 +3096,10 @@ a.wire-articles__versions {
     @include md {
         padding: 10px 25px 16px 25px;
     }
+}
+
+.pull-right {
+    float: right;
 }
 
 .simple-card__header {

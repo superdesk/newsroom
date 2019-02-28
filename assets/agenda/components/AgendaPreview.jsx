@@ -26,6 +26,7 @@ import AgendaLongDescription from './AgendaLongDescription';
 import AgendaPreviewAttachments from './AgendaPreviewAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
+import AgendaListItemLabels from './AgendaListItemLabels';
 
 class AgendaPreview extends React.PureComponent {
     constructor(props) {
@@ -73,6 +74,7 @@ class AgendaPreview extends React.PureComponent {
                         </div>
 
                         <div id='preview-article' className='wire-column__preview__content pt-0' ref={(preview) => this.preview = preview}>
+                            <AgendaListItemLabels item={item} group={previewGroup} withDate right/>
                             <AgendaName item={item} />
                             <AgendaTime item={item} group={previewGroup} />
                             <AgendaPreviewImage item={item} onClick={openItemDetails} />
@@ -85,7 +87,8 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaPreviewAttachments item={item} />
                             <AgendaTags item={item} plan={plan} isItemDetail={false} />
                             <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
-                            <AgendaInternalNote internalNote={getInternalNote(item, plan)} mt2={item.ednote || plan.ednote || item.state_reason} />
+                            <AgendaInternalNote internalNote={getInternalNote(item, plan)}
+                                mt2={!!(item.ednote || plan.ednote || item.state_reason)} />
                             {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                         </div>
                     </Preview>
