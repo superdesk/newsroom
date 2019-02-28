@@ -4,7 +4,7 @@ import moment from 'moment';
 
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import {bem} from 'ui/utils';
-import {formatTime, formatDate, gettext, DAY_IN_MINUTES, DATE_FORMAT} from 'utils';
+import {formatTime, formatDate, DAY_IN_MINUTES, DATE_FORMAT, gettext} from 'utils';
 import {hasCoverages, isCoverageForExtraDay} from '../utils';
 
 function format(item, group) {
@@ -14,6 +14,18 @@ function format(item, group) {
     let groupDate = moment(group, DATE_FORMAT);
 
     const isGroupBetweenEventDates = start.isSameOrBefore(groupDate, 'day') && end.isSameOrAfter(groupDate, 'day');
+
+    function timeElement(start, end, key) {
+        if (!end) {
+            return (<span className='time-text mr-2' key={key}>{formatTime(start)}</span>);
+        }
+
+        return <span key={key} className='time-text mr-2'>{formatTime(start)} - {formatTime(end)}</span>;
+    }
+
+    function dateElement(date) {
+        return (<span key='date'>{formatDate(date)}</span>);
+    }
 
     if (!isGroupBetweenEventDates && hasCoverages(item)) {
         // we rendering for extra days
@@ -40,24 +52,24 @@ function format(item, group) {
     if (duration > DAY_IN_MINUTES) {
         // Multi day event
         return ([
-            <span key="start">{formatTime(start)} <u>{formatDate(start)}</u></span>,
-            <span key="dash">{' - '}</span>,
-            <span key="end">{formatTime(end)} <u>{formatDate(end)}</u></span>
+            <span key="start">{timeElement(start)}{dateElement(start)}</span>,
+            <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
+            <span key="end">{timeElement(end)}{dateElement(end)}</span>
         ]);
     }
 
-    if (duration == DAY_IN_MINUTES) {
+    if (duration == DAY_IN_MINUTES && start.isSame(end, 'day')) {
         // All day event
-        return gettext('ALL DAY');
+        return dateElement(start);
     }
 
     if (duration == 0) {
         // start and end times are the same
-        return `${formatTime(start)}`;
+        return ([timeElement(start, null, 'start'), dateElement(start)]);
     }
 
     // single day event
-    return `${formatTime(start)} - ${formatTime(end)}`;
+    return ([timeElement(start, end, 'times'), dateElement(start)]);
 }
 
 function getCalendarClass(item) {

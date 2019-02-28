@@ -1476,6 +1476,11 @@ article.list {
     }
     .wire-articles__item__meta-time {
         color: $gray-mid;
+
+        .time-text {
+            color: $gray-mid;
+            font-weight: bold;
+        }
     }
 }
 // watched item
@@ -1647,6 +1652,11 @@ article.list {
     .wire-articles__item__meta-info {
         margin-bottom: 5px;
     }
+}
+
+.time-text {
+    color: #696565;
+    font-weight: bold;
 }
 
 // one pane open (filter or preview), responsive

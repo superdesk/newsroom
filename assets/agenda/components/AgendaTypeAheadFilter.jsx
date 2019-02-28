@@ -10,7 +10,6 @@ import AgendaFilterButton from './AgendaFilterButton';
 const getActiveTypeahead = (filter, activeFilter) => {
     return activeFilter[filter.field] ? activeFilter[filter.field][0] : [];
 };
-
 const processBuckets = (buckets) => buckets.map((bucket) => bucket.key).sort();
 
 function AgendaTypeAheadFilter({aggregations, filter, toggleFilter, activeFilter, getDropdownItems}) {
@@ -33,6 +32,7 @@ function AgendaTypeAheadFilter({aggregations, filter, toggleFilter, activeFilter
                 placeholder={gettext('Choose a location...')}
                 selected={getActiveTypeahead(filter, activeFilter)}
                 className='p-2'
+                paginate={false}
             />
         </div>
     </div>);
