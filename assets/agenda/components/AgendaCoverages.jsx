@@ -28,7 +28,7 @@ export default function AgendaCoverages({item, coverages}) {
                 </span>
                 {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && <span className='d-flex'>
                     <i className='icon-small--clock icon--gray mr-1'></i>
-                    <span className='coverage-item__text-label mr-1'>{gettext('expected by')}:</span>
+                    <span className='coverage-item__text-label mr-1'>{gettext('expected')}:</span>
                     <span>{formatCoverageDate(coverage.scheduled)}</span>
                 </span>}
             </div>
