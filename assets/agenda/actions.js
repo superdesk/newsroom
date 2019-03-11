@@ -624,10 +624,14 @@ function multiItemEvent(event, items, state) {
 }
 
 export const TOGGLE_FEATURED_FILTER = 'TOGGLE_FEATURED_FILTER';
-export function toggleFeaturedFilter() {
+export function toggleFeaturedFilter(fetch = true) {
     return (dispatch) => {
         toggleFeaturedOnlyParam();
         dispatch({type: TOGGLE_FEATURED_FILTER});
+        if (!fetch) {
+            return Promise.resolve;
+        }
+
         return dispatch(fetchItems());
     };   
 }
