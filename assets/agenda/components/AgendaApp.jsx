@@ -55,6 +55,24 @@ class AgendaApp extends BaseApp {
         this.modals = modals;
         this.tabs[0].label = gettext('Events');
         this.tabs[1].label = gettext('My Events');
+
+        this.fetchItemsOnNavigation = this.fetchItemsOnNavigation.bind(this);
+    }
+
+    getTabs() {
+        return this.props.featuredOnly ?  this.tabs.filter((t) => t.id !== 'filters') : this.tabs;
+    }
+
+
+    fetchItemsOnNavigation() {
+        // Toggle featured filter to 'false'
+        if (this.props.featuredOnly) {
+            this.props.toggleFeaturedFilter(false);
+        }
+
+
+        this.props.fetchItems();
+
     }
 
     render() {
@@ -149,7 +167,12 @@ class AgendaApp extends BaseApp {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar tabs={this.tabs} props={{...this.props, groups, hideDateFilters: this.props.featuredOnly}} />
+                                <SearchSidebar
+                                    tabs={this.getTabs()}
+                                    props={{ 
+                                        ...this.props,
+                                        groups,
+                                        fetchItems: this.fetchItemsOnNavigation }} />
                             }
                         </div>
                         <div className={mainClassName}>
@@ -176,6 +199,7 @@ class AgendaApp extends BaseApp {
                                 newsOnly={this.props.newsOnly}
                                 scrollClass={this.state.scrollClass}
                                 hideTotalItems={false}
+                                featuredOnly={this.props.featuredOnly}
                             />
 
                             <AgendaList
@@ -303,7 +327,7 @@ const mapDispatchToProps = (dispatch) => ({
     },
     openItemDetails: (item) => dispatch(openItemDetails(item)),
     requestCoverage: (item, message) => dispatch(requestCoverage(item, message)),
-    toggleFeaturedFilter: () => dispatch(toggleFeaturedFilter()),
+    toggleFeaturedFilter: (fetch) => dispatch(toggleFeaturedFilter(fetch)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

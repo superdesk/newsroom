@@ -74,16 +74,16 @@ class FiltersTab extends React.Component {
     }
 
     render() {
-        const {activeFilter, createdFilter, hideDateFilters} = this.props;
+        const {activeFilter, createdFilter} = this.props;
         const isResetActive = Object.keys(activeFilter).find((key) => !isEmpty(activeFilter[key]))
             || Object.keys(createdFilter).find((key) => !isEmpty(createdFilter[key]));
 
         return this.getFilterGroups().filter((group) => !!group).concat([
-            !hideDateFilters ? (<NavCreatedPicker
+            (<NavCreatedPicker
                 key="created"
                 createdFilter={createdFilter}
                 setCreatedFilter={this.setCreatedFilterAndSearch}
-            />) : null,
+            />),
             isResetActive || this.props.resultsFiltered ? (
                 [<div key="reset-buffer" id="reset-filter-buffer"></div>,
                     <FilterButton
@@ -117,7 +117,6 @@ FiltersTab.propTypes = {
     fetchItems: PropTypes.func.isRequired,
     groups: PropTypes.array,
     selectDate: PropTypes.func,
-    hideDateFilters: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({

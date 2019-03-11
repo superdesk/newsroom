@@ -10,7 +10,7 @@ function AgendaFeaturedStoriesToogle ({featuredFilter, onChange}) {
                 <label htmlFor='featured-stories' className="mr-2">{gettext('Top/Featured Stories')}</label>
                 <Toggle
                     id="featured-stories"
-                    defaultChecked={featuredFilter}
+                    checked={featuredFilter}
                     className='toggle-background'
                     icons={false}
                     onChange={onChange}/>
