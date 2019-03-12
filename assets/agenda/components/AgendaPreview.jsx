@@ -64,17 +64,17 @@ class AgendaPreview extends React.PureComponent {
 
         const plan = (get(item, 'planning_items') || []).find((p) => p.guid === previewPlan) || {};
         const displayCoverages = getCoveragesForDisplay(item, plan, previewGroup);
+        const previewInnerElement = (<AgendaListItemLabels item={item} />);
 
         return (
             <div className={previewClassName}>
                 {item &&
-                    <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
+                    <Preview onCloseClick={this.props.closePreview} published={item.versioncreated} innerElements={previewInnerElement}>
                         <div className='wire-column__preview__top-bar'>
                             <PreviewActionButtons item={item} user={user} actions={actions} plan={previewPlan} group={previewGroup} />
                         </div>
 
                         <div id='preview-article' className='wire-column__preview__content pt-0' ref={(preview) => this.preview = preview}>
-                            <AgendaListItemLabels item={item} group={previewGroup} withDate right/>
                             <AgendaName item={item} />
                             <AgendaTime item={item} group={previewGroup} />
                             <AgendaPreviewImage item={item} onClick={openItemDetails} />
