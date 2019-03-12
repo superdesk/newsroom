@@ -2333,12 +2333,18 @@ a.wire-articles__versions {
 
     &.wire-column__preview__date--event {
         padding: 0 10px 10px 0px;
+        display: flex;
         
         @include xl {
             padding: 0 10px 20px 0px;
             font-size: 1rem;
             line-height: 1.5rem;
         }
+    }
+
+    &--remote {
+        color: #b2acac;
+        font-size: 0.9rem !important;
     }
 
     &.wire-column__preview__date--dashed-border {

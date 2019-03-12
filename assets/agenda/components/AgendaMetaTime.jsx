@@ -49,7 +49,7 @@ function format(item, group) {
         }
     }
 
-    const scheduleType = getScheduleType(start, end);
+    const scheduleType = getScheduleType(item);
 
     if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
         return ([timeElement(start, null, 'start'), dateElement(start)]);

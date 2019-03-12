@@ -26,7 +26,7 @@ function AgendaListItemLabels({item, withDate, group, right}) {
             return null;
         }
 
-        return (<span className={classNames('label label--orange ml-4', {'pull-right': right})}>{labelText}</span>);
+        return (<div><span className={classNames('label label--orange ml-4', {'pull-right': right})}>{labelText}</span></div>);
         
     };
     const dateGroup = group && moment(group, DATE_FORMAT);
