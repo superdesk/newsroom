@@ -43,7 +43,7 @@ export default class CoverageItemStatus extends React.PureComponent {
             </span>
         ];
 
-        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.coverage_type === 'picture' && getDeliveryHref(coverage)) {
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && ['video', 'video_explainer', 'picture'].includes(coverage.coverage_type) && getDeliveryHref(coverage)) {
             content.push(
                 <span key="contentLink" className="label label--available">
                     <a  href={coverage.delivery_href}
