@@ -186,7 +186,7 @@ function search(state, next) {
         q: state.query,
         bookmarks: state.bookmarks && state.user,
         navigation: activeNavigation,
-        filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
+        filter: !isEmpty(activeFilter) && encodeURIComponent(JSON.stringify(activeFilter)),
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to,
