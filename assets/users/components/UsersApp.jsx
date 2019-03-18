@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { gettext } from 'utils';
 import {
     newUser,
     setQuery,
@@ -22,7 +23,7 @@ class UsersApp extends React.Component {
                 onNewItem={this.props.newUser}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchUsers}
-                buttonName={'User'}
+                buttonName={gettext('User')}
             />,
             <Users key="Users" />
             ]

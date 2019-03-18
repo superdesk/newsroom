@@ -62,7 +62,7 @@ def init_app(app):
     app.sidenav('Home', 'wire.index', 'home')
     app.sidenav('Wire', 'wire.wire', 'text', section='wire')
 
-    app.sidenav('Saved/Watched Items', 'wire.bookmarks', 'bookmark',
+    app.sidenav(gettext('Saved/Watched Items'), 'wire.bookmarks', 'bookmark',
                 group=1, blueprint='wire', badge='saved-items-count')
 
     from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter

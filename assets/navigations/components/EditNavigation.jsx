@@ -98,13 +98,13 @@ class EditNavigation extends React.Component {
                                         onChange={this.props.onChange}/>
 
                                     <div className="card mt-3 d-block">
-                                        <div className="card-header">Tile Images</div>
+                                        <div className="card-header">{gettext('Tile Images')}</div>
                                         <div className="card-body">
                                             {[...Array(MAX_TILE_IMAGES)].map((_, index) => (
                                                 <FileInput key={index}
                                                     name={`tile_images_file_${index}`}
                                                     label={get(tile_images, `[${index}.file]`) ||
-                                                    gettext(`Upload Image ${index + 1}`)}
+                                                    `${gettext('Upload Image')} ${index + 1}`}
                                                     onChange={this.props.onChange}
                                                     error={this.props.errors ? this.props.errors.tile_images : null}/>
                                             ))}

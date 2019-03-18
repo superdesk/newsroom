@@ -9,7 +9,7 @@ function CompanyListItem({company, type, isActive, onClick}) {
             className={isActive?'table--selected':null}
             onClick={() => onClick(company._id)}>
             <td className="name">{company.name}</td>
-            <td className="type">{type ? type.name : ''}</td>
+            <td className="type">{type ? gettext(type.name) : ''}</td>
             <td>{company.sd_subscriber_id}</td>
             <td className={isInPast(company.expiry_date) ? 'text-danger' : null}>
                 {(company.is_enabled ? gettext('Enabled') : gettext('Disabled'))}
