@@ -1,6 +1,5 @@
 import newsroom
 import superdesk
-from flask import current_app
 
 from newsroom.products.products import get_products_by_company
 
@@ -58,30 +57,8 @@ def get_navigations_by_company(company_id, product_type='wire', events_only=Fals
 
     # Get the navigation ids used across products
     navigation_ids = []
-
-    if product_type == 'agenda':
-        navigations = []
-        featured_navigation_ids = []
-
-        # fetch navigations for featured products
-        if current_app.config.get('AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE'):
-            if not events_only:
-                [featured_navigation_ids.extend(p.get('navigations', []))
-                 for p in products if p.get('query') == '_featured']
-                navigations.extend(get_navigations_by_ids(featured_navigation_ids))
-
-        if current_app.config.get('AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE') or events_only:
-            # fetch all other navigations
-            [navigation_ids.extend(p.get('navigations', [])) for p in products if p.get('query') != '_featured']
-            navigations.extend(get_navigations_by_ids(navigation_ids))
-        else:
-            [navigation_ids.extend(p.get('navigations', [])) for p in products]
-            navigations.extend(get_navigations_by_ids(navigation_ids))
-
-        return navigations
-    else:
-        [navigation_ids.extend(p.get('navigations', [])) for p in products]
-        return get_navigations_by_ids(navigation_ids)
+    [navigation_ids.extend(p.get('navigations', [])) for p in products]
+    return get_navigations_by_ids(navigation_ids)
 
 
 def get_navigations_by_ids(navigation_ids):

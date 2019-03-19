@@ -180,7 +180,8 @@ class AmNewsList extends React.Component {
         });
 
         return (
-            <div className="wire-articles wire-articles--list" onKeyDown={this.onKeyDown}>
+            <div className="wire-articles wire-articles--list" onKeyDown={this.onKeyDown} onScroll={this.props.onScroll}
+                ref={this.props.refNode} >
                 {groups}
                 {!groups.length &&
                     <div className="wire-articles__item-wrap col-12">
@@ -208,6 +209,8 @@ AmNewsList.propTypes = {
     user: PropTypes.string,
     company: PropTypes.string,
     groupedItems: PropTypes.object,
+    refNode: PropTypes.func,
+    onScroll: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({

@@ -711,7 +711,7 @@ def test_push_item_with_coverage(client, app, mocker):
 
     assert coverages[0]['coverage_id'] == test_item['coverage_id']
     assert coverages[0]['delivery_id'] == test_item['guid']
-    assert coverages[0]['delivery_href'] == '/wire?item=%s' % test_item['guid']
+    assert coverages[0]['delivery_href'] == '/wire/%s' % test_item['guid']
 
     wire_item = get_json(client, '/wire/item')
     assert wire_item['_id'] == 'item'
@@ -973,7 +973,7 @@ def test_push_update_for_an_item_with_coverage(client, app, mocker):
 
     assert coverages[0]['coverage_id'] == test_item['coverage_id']
     assert coverages[0]['delivery_id'] == test_item['guid']
-    assert coverages[0]['delivery_href'] == '/wire?item=%s' % test_item['guid']
+    assert coverages[0]['delivery_href'] == '/wire/%s' % test_item['guid']
 
     wire_item = get_json(client, '/wire/item')
     assert wire_item['_id'] == 'item'
@@ -993,7 +993,7 @@ def test_push_update_for_an_item_with_coverage(client, app, mocker):
 
     assert coverages[0]['coverage_id'] == test_item['coverage_id']
     assert coverages[0]['delivery_id'] == updated_item['guid']
-    assert coverages[0]['delivery_href'] == '/wire?item=%s' % updated_item['guid']
+    assert coverages[0]['delivery_href'] == '/wire/%s' % updated_item['guid']
 
     wire_item = get_json(client, '/wire/update')
     assert wire_item['_id'] == 'update'
@@ -1016,7 +1016,7 @@ def test_push_coverages_with_linked_stories(client, app):
     parsed = get_entity_or_404('foo7', 'agenda')
     assert 2 == len(parsed['coverages'])
     assert parsed['coverages'][0]['delivery_id'] == 'item7'
-    assert parsed['coverages'][0]['delivery_href'] == '/wire?item=item7'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
 
     planning['coverages'][0]['deliveries'] = []
     planning['coverages'][0]['workflow_status'] = 'active'

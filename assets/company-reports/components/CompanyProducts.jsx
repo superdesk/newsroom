@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReportsTable from './ReportsTable';
+
 import { gettext } from 'utils';
 
 
@@ -12,7 +14,7 @@ function getProductDetails(products) {
     </div>)));
 }
 
-function CompanyProducts({data}) {
+function CompanyProducts({data, print}) {
 
     const list = data.results && data.results.map((item) =>
         [<tr key={item._id} className="table-secondary">
@@ -27,26 +29,13 @@ function CompanyProducts({data}) {
         </tr>]
     );
 
-    return (
-        <section className="content-main">
-            <div className="list-items-container">
-                {data.results && <table className="table table-bordered">
-                    <thead className="thead-dark">
-                        <tr>
-                            <th>{ gettext('Company') }</th>
-                            <th>{ gettext('Is Enabled') }</th>
-                            <th>{ gettext('Number Of Products') }</th>
-                        </tr>
-                    </thead>
-                    <tbody>{list}</tbody>
-                </table>}
-            </div>
-        </section>
-    );
+    const headers = [gettext('Company'), gettext('Is Enabled'), gettext('Number Of Products')];
+    return data.results ? (<ReportsTable headers={headers} rows={list} print={print} />) : null;
 }
 
 CompanyProducts.propTypes = {
     data: PropTypes.object.isRequired,
+    print: PropTypes.bool,
 };
 
 export default CompanyProducts;

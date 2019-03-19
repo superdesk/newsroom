@@ -4,8 +4,8 @@ import moment from 'moment';
 
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import {bem} from 'ui/utils';
-import {formatTime, formatDate, gettext, DAY_IN_MINUTES, DATE_FORMAT} from 'utils';
-import {hasCoverages, isCoverageForExtraDay} from '../utils';
+import {formatTime, formatDate, DATE_FORMAT, gettext, getScheduleType} from 'utils';
+import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE} from '../utils';
 
 function format(item, group) {
     let start = moment(item.dates.start);
@@ -14,6 +14,18 @@ function format(item, group) {
     let groupDate = moment(group, DATE_FORMAT);
 
     const isGroupBetweenEventDates = start.isSameOrBefore(groupDate, 'day') && end.isSameOrAfter(groupDate, 'day');
+
+    function timeElement(start, end, key) {
+        if (!end) {
+            return (<span className='time-text mr-2' key={key}>{formatTime(start)}</span>);
+        }
+
+        return <span key={key} className='time-text mr-2'>{formatTime(start)} - {formatTime(end)}</span>;
+    }
+
+    function dateElement(date) {
+        return (<span key='date'>{formatDate(date)}</span>);
+    }
 
     if (!isGroupBetweenEventDates && hasCoverages(item)) {
         // we rendering for extra days
@@ -33,31 +45,30 @@ function format(item, group) {
         ;
         if (scheduleDates.length > 0) {
             duration = 0;
-            start = scheduleDates[0];
+            start = moment(scheduleDates[0]);
         }
     }
 
-    if (duration > DAY_IN_MINUTES) {
-        // Multi day event
-        return ([
-            <span key="start">{formatTime(start)} <u>{formatDate(start)}</u></span>,
-            <span key="dash">{' - '}</span>,
-            <span key="end">{formatTime(end)} <u>{formatDate(end)}</u></span>
-        ]);
-    }
+    const scheduleType = getScheduleType(item);
 
-    if (duration == DAY_IN_MINUTES) {
-        // All day event
-        return gettext('ALL DAY');
-    }
+    if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
+        return ([timeElement(start, null, 'start'), dateElement(start)]);
+    } else {
+        switch(scheduleType) {
+        case SCHEDULE_TYPE.MULTI_DAY:
+            return ([
+                <span key="start">{timeElement(start)}{dateElement(start)}</span>,
+                <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
+                <span key="end">{timeElement(end)}{dateElement(end)}</span>
+            ]);
 
-    if (duration == 0) {
-        // start and end times are the same
-        return `${formatTime(start)}`;
-    }
+        case SCHEDULE_TYPE.ALL_DAY:
+            return dateElement(start);
 
-    // single day event
-    return `${formatTime(start)} - ${formatTime(end)}`;
+        case SCHEDULE_TYPE.REGULAR:
+            return ([timeElement(start, end, 'times'), dateElement(start)]);
+        }
+    }
 }
 
 function getCalendarClass(item) {

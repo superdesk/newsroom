@@ -184,7 +184,7 @@ class AgendaList extends React.Component {
     componentDidUpdate(nextProps) {
         if (!isEqual(nextProps.activeDate, this.props.activeDate) ||
           !isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
-          (this.props.resultsFiltered && !isEqual(nextProps.activeFilter, this.props.activeFilter))) {
+          (!nextProps.searchInitiated && this.props.searchInitiated)) {
             this.elem.scrollTop = 0;
         }
     }
@@ -196,7 +196,7 @@ class AgendaList extends React.Component {
     }
 
     render() {
-        const {groupedItems, itemsById, activeView, selectedItems, readItems} = this.props;
+        const {groupedItems, itemsById, activeView, selectedItems, readItems, refNode, onScroll} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
         const articleGroups = groupedItems.map((group) =>
             [
@@ -269,7 +269,15 @@ class AgendaList extends React.Component {
         });
 
         return (
-            <div className={listClassName} onKeyDown={this.onKeyDown} ref={(elem) => this.elem = elem}>
+            <div className={listClassName}
+                onKeyDown={this.onKeyDown}
+                ref={(elem) => {
+                    if (elem) {
+                        refNode(elem);
+                        this.elem = elem;
+                    }
+                }}
+                onScroll={onScroll} >
                 {articleGroups}
                 {!groupedItems.length &&
                     <div className="wire-articles__item-wrap col-12">
@@ -300,10 +308,13 @@ AgendaList.propTypes = {
     activeView: PropTypes.string,
     groupedItems: PropTypes.array,
     activeDate: PropTypes.number,
-    activeFilter: PropTypes.object,
+    searchInitiated: PropTypes.bool,
     activeNavigation: PropTypes.string,
     resultsFiltered: PropTypes.bool,
     listItems: PropTypes.array,
+    isLoading: PropTypes.bool,
+    onScroll: PropTypes.func,
+    refNode: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -319,10 +330,11 @@ const mapStateToProps = (state) => ({
     company: state.company,
     groupedItems: groupedItemsSelector(state),
     activeDate: get(state, 'agenda.activeDate'),
-    activeFilter: get(state, 'search.activeFilter'),
+    searchInitiated: state.searchInitiated,
     activeNavigation: get(state, 'search.activeNavigation', null),
     resultsFiltered: state.resultsFiltered,
     listItems: listItemsSelector(state),
+    isLoading: state.isLoading,
 });
 
 export default connect(mapStateToProps)(AgendaList);

@@ -10,7 +10,6 @@ import Preview from 'ui/components/Preview';
 
 import {
     hasCoverages,
-    isCanceled,
     isPostponed,
     isRescheduled,
     getInternalNote,
@@ -27,6 +26,7 @@ import AgendaLongDescription from './AgendaLongDescription';
 import AgendaPreviewAttachments from './AgendaPreviewAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
+import AgendaListItemLabels from './AgendaListItemLabels';
 
 class AgendaPreview extends React.PureComponent {
     constructor(props) {
@@ -57,7 +57,6 @@ class AgendaPreview extends React.PureComponent {
             'wire-column__preview--covering': hasCoverages(item),
             'wire-column__preview--not-covering': !hasCoverages(item),
             'wire-column__preview--postponed': isPostponed(item),
-            'wire-column__preview--canceled': isCanceled(item),
             'wire-column__preview--rescheduled': isRescheduled(item),
             'wire-column__preview--open': !!item,
             'wire-column__preview--watched': isWatching,
@@ -65,11 +64,12 @@ class AgendaPreview extends React.PureComponent {
 
         const plan = (get(item, 'planning_items') || []).find((p) => p.guid === previewPlan) || {};
         const displayCoverages = getCoveragesForDisplay(item, plan, previewGroup);
+        const previewInnerElement = (<AgendaListItemLabels item={item} />);
 
         return (
             <div className={previewClassName}>
                 {item &&
-                    <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
+                    <Preview onCloseClick={this.props.closePreview} published={item.versioncreated} innerElements={previewInnerElement}>
                         <div className='wire-column__preview__top-bar'>
                             <PreviewActionButtons item={item} user={user} actions={actions} plan={previewPlan} group={previewGroup} />
                         </div>
@@ -87,7 +87,8 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaPreviewAttachments item={item} />
                             <AgendaTags item={item} plan={plan} isItemDetail={false} />
                             <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
-                            <AgendaInternalNote internalNote={getInternalNote(item, plan)} />
+                            <AgendaInternalNote internalNote={getInternalNote(item, plan)}
+                                mt2={!!(item.ednote || plan.ednote || item.state_reason)} />
                             {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                         </div>
                     </Preview>

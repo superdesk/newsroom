@@ -22,7 +22,6 @@ import {gettext} from 'utils';
 import {
     fetchItems,
     fetchMoreItems,
-    refresh,
     previewItem,
 } from '../../wire/actions';
 import {
@@ -117,7 +116,7 @@ class AmNewsApp extends BaseApp {
                 </section>,
                 <section key="contentMain" className="content-main">
                     <div className="wire-column--3">
-                        <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
+                        <div className={mainClassName}>
                             {this.state.isMobile && <div
                                 className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                                 {this.state.withSidebar &&
@@ -141,7 +140,7 @@ class AmNewsApp extends BaseApp {
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
                                 newItems={this.props.newItems}
-                                refresh={this.props.refresh}
+                                refresh={this.props.fetchItems}
                                 activeNavigation={this.props.activeNavigation}
                                 scrollClass={this.state.scrollClass}
                             />
@@ -149,6 +148,8 @@ class AmNewsApp extends BaseApp {
                             <AmNewsList
                                 actions={this.props.actions}
                                 activeView={'list-view'}
+                                onScroll={this.onListScroll}
+                                refNode={(elem) => this.elemList = elem}
                             />
                         </div>
 
@@ -209,7 +210,6 @@ AmNewsApp.propTypes = {
     bookmarks: PropTypes.bool,
     fetchMoreItems: PropTypes.func,
     newItems: PropTypes.array,
-    refresh: PropTypes.func,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
@@ -246,7 +246,6 @@ const mapDispatchToProps = (dispatch) => ({
     setQuery: (query) => dispatch(setQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
-    refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
     toggleNavigation: (navigation) => dispatch(toggleNavigation(navigation))
 });

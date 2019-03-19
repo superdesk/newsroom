@@ -13,7 +13,8 @@ class UserForm(FlaskForm):
 
     user_types = [('administrator', gettext('Administrator')),
                   ('public', gettext('Public')),
-                  ('internal', gettext('Internal'))]
+                  ('internal', gettext('Internal')),
+                  ('account_management', gettext('Account Management'))]
 
     id = HiddenField('Id')
     first_name = StringField(gettext('First Name'), validators=[DataRequired()])
@@ -28,5 +29,6 @@ class UserForm(FlaskForm):
     is_validated = BooleanField(gettext('Email Validated'), validators=[])
     is_enabled = BooleanField(gettext('Account Enabled'), default=True, validators=[])
     is_approved = BooleanField(gettext('Account Approved'), validators=[])
-    receive_email = BooleanField(gettext('Receive notifications via email'), validators=[])
+    expiry_alert = BooleanField(gettext('Company Expiry Alert'), validators=[])
+    receive_email = BooleanField(gettext('Receive notifications via email'), default=True, validators=[])
     locale = StringField(gettext('Locale'))

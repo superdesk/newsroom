@@ -6,6 +6,8 @@ from superdesk import get_resource_service
 from newsroom.elastic_utils import rebuild_elastic_index
 from newsroom.mongo_utils import index_elastic_from_mongo
 from newsroom.auth import get_user_by_email
+from newsroom.company_expiry_alerts import CompanyExpiryAlerts
+
 
 app = Newsroom()
 manager = Manager(app)
@@ -61,6 +63,11 @@ def index_from_mongo(hours, collection):
 def content_reset():
     app.data.remove('items')
     app.data.remove('items_versions')
+
+
+@manager.command
+def send_company_expiry_alerts():
+    CompanyExpiryAlerts().send_alerts()
 
 
 if __name__ == "__main__":

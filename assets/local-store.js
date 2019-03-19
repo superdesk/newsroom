@@ -8,6 +8,7 @@ import { get } from 'lodash';
 
 const READ_ITEMS_STORE = 'read_items';
 const NEWS_ONLY_STORE = 'news_only';
+const FEATURED_ONLY_STORE = 'featured-only';
 const FILTER_TAB = 'filter_tab';
 const ACTIVE_DATE = 'active_date';
 const DROPDOWN_FILTERS = 'dropdown_filters';
@@ -53,6 +54,24 @@ export function getNewsOnlyParam() {
  */
 export function toggleNewsOnlyParam() {
     store.assign(NEWS_ONLY_STORE, {value: !getNewsOnlyParam()});
+}
+
+/**
+ * Get featured stories only value
+ *
+ * @returns {boolean}
+ */
+export function getFeaturedOnlyParam() {
+    return !!((store.get(FEATURED_ONLY_STORE) || {}).value);
+}
+
+
+/**
+ * Featured stories only value
+ *
+ */
+export function toggleFeaturedOnlyParam() {
+    store.assign(FEATURED_ONLY_STORE, {value: !getFeaturedOnlyParam()});
 }
 
 /**

@@ -109,6 +109,16 @@ tr.table--selected {
     outline: 1px solid $main-blue;
 }
 
+.report-thead {
+    position: sticky;
+    top: 0;
+    th {
+        position: sticky;
+        top: 0;
+        border: none;
+    }
+}
+
 // Bootstrap overwrite end
 
 // Wire BEM classes
@@ -261,7 +271,7 @@ body.print {
 
 .navbar-header_1--small {
     height: 60px;
-    font-weight: 200;
+    font-weight: 400;
     font-size: 40px;
     line-height: 58px;
 }
@@ -387,12 +397,12 @@ body.print {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 0.5rem;
+    padding: 0 0.5rem 0.5rem 0.5rem;
     max-width: 160px;
 
     @include sm {
         max-width: 224px;
-        padding: 0 0.5rem 0 1rem;
+        padding: 0 0.5rem 0.5rem 1rem;
     }
 
     img {
@@ -674,6 +684,12 @@ article.list {
         background-color: white;
     }
 }
+
+.reports-container {
+    margin: 20px;
+    padding: 0px;
+}
+
 .list-item {
     background-color: #ccc;
 }
@@ -1458,15 +1474,13 @@ article.list {
     .date-round {
         background: #fee6e6;
     }
-    // strikethrough text
-    .date-round__month, 
-    .date-round__number,
-    .wire-articles__item-headline,
-    .wire-articles__item__meta-info span:not(.label),
-    .wire-articles__item__text,
-    .wire-articles__item__meta-time,
-    .time-label {
-        text-decoration: line-through;
+    .wire-articles__item__meta-time {
+        color: $gray-mid;
+
+        .time-text {
+            color: $gray-mid;
+            font-weight: bold;
+        }
     }
 }
 // watched item
@@ -1638,6 +1652,11 @@ article.list {
     .wire-articles__item__meta-info {
         margin-bottom: 5px;
     }
+}
+
+.time-text {
+    color: #696565;
+    font-weight: bold;
 }
 
 // one pane open (filter or preview), responsive
@@ -2034,7 +2053,7 @@ article.list {
         @include lg {
             margin-right: 16px;
             padding-right: 20px;
-            font-size: 0.875rem;
+            font-size: 0.97rem;
         }
 
     }
@@ -2314,6 +2333,7 @@ a.wire-articles__versions {
 
     &.wire-column__preview__date--event {
         padding: 0 10px 10px 0px;
+        display: flex;
         
         @include xl {
             padding: 0 10px 20px 0px;
@@ -2322,11 +2342,15 @@ a.wire-articles__versions {
         }
     }
 
+    &--remote {
+        color: #b2acac;
+        font-size: 0.95rem !important;
+    }
+
     &.wire-column__preview__date--dashed-border {
         margin-right: 8px;
         padding-right: 8px;
         border-right: 1px dotted #c4c4c4;
-        float: left;
 
         @include xl {
             padding-right: 10px;
@@ -2360,6 +2384,10 @@ a.wire-articles__versions {
     display: flex;
     align-items: baseline;
     margin: 20px 0;
+    
+    &--block {
+        display: block !important;
+    }
 }
 
 .wire-column__preview__slug {
@@ -2517,10 +2545,18 @@ a.wire-articles__versions {
 .wire-column__preview_article-note {
     font-size: 0.815rem;
     margin-top: 30px;
+    display: flex;
+    flex-direction: row;
 
     .secondary-note {
-        margin-left: 16px;
         display: flex
+    }
+}
+
+.icon--info {
+    &--smaller {
+        font-size: medium !important;
+        padding-top: 1px !important;
     }
 }
 
@@ -2548,6 +2584,9 @@ a.wire-articles__versions {
     }
     a:hover {
         text-decoration: none;
+    }
+    p {
+        font-size: 0.75rem
     }
 }
 .coverage-item__column {
@@ -2722,6 +2761,12 @@ a.wire-articles__versions {
     @include lg {
         margin-left: -30px;
         margin-right: -30px;
+    }
+    &--custom {
+        max-height: none !important;
+        object-fit: fill;
+        margin: 0 !important;
+        width: fit-content !important;
     }
 }
 
@@ -3057,6 +3102,10 @@ a.wire-articles__versions {
     @include md {
         padding: 10px 25px 16px 25px;
     }
+}
+
+.pull-right {
+    float: right;
 }
 
 .simple-card__header {

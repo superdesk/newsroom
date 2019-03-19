@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import { gettext, formatCoverageDate } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
-import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, getInternalNotesFromCoverages} from '../utils';
+import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, getNotesFromCoverages, WORKFLOW_STATUS} from '../utils';
 import AgendaInternalNote from './AgendaInternalNote';
+import AgendaEdNote from './AgendaEdNote';
 
 
 export default function AgendaCoverages({item, coverages}) {
@@ -12,7 +13,11 @@ export default function AgendaCoverages({item, coverages}) {
         return null;
     }
 
-    const internalNotes = getInternalNotesFromCoverages(item);
+    const internalNotes = getNotesFromCoverages(item);
+    const edNotes = getNotesFromCoverages(item, 'ednote');
+    const getItemText = (c) => {
+        return c.item_description_text || c.item_headline || c.item_slugline;
+    };
 
     return coverages.map((coverage) => (
         <div className='coverage-item' key={coverage.coverage_id}>
@@ -21,11 +26,15 @@ export default function AgendaCoverages({item, coverages}) {
                     <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} ${WORKFLOW_COLORS[coverage.workflow_status]} mr-2`}></i>
                     <span className='text-overflow-ellipsis'>{getCoverageDisplayName(coverage.coverage_type)}</span>
                 </span>
-                <span className='d-flex'>
+                {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && <span className='d-flex'>
                     <i className='icon-small--clock icon--gray mr-1'></i>
-                    <span className='coverage-item__text-label mr-1'>{gettext('due by')}:</span>
+                    <span className='coverage-item__text-label mr-1'>{gettext('expected')}:</span>
                     <span>{formatCoverageDate(coverage.scheduled)}</span>
-                </span>
+                </span>}
+            </div>
+
+            <div className='coverage-item__row'>
+                <p className='wire-articles__item__text m-0'>{getItemText(coverage)}</p>
             </div>
 
             <div className='coverage-item__row'>
@@ -34,8 +43,12 @@ export default function AgendaCoverages({item, coverages}) {
                 <CoverageItemStatus coverage={coverage} />
             </div>
 
+            {!isEmpty(edNotes) && edNotes[coverage.coverage_id] && <div className='coverage-item__row'>
+                <AgendaEdNote item={{ednote: edNotes[coverage.coverage_id]}} noMargin/>
+            </div>}
+
             {!isEmpty(internalNotes) && internalNotes[coverage.coverage_id] && <div className='coverage-item__row'>
-                <AgendaInternalNote internalNote={internalNotes[coverage.coverage_id]} />
+                <AgendaInternalNote internalNote={internalNotes[coverage.coverage_id]} noMargin />
             </div>}
         </div>
     ));

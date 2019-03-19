@@ -141,7 +141,7 @@ export function defaultReducer(state, action) {
 
     case QUERY_ITEMS: {
         const resultsFiltered = !isEmpty(get(state, 'search.activeFilter')) || !isEmpty(get(state, 'search.createdFilter.from')) || !isEmpty(get(state, 'search.createdFilter.to'));
-        return {...state, isLoading: true, totalItems: null, activeQuery: state.query, resultsFiltered};
+        return {...state, searchInitiated: true, isLoading: true, totalItems: null, activeQuery: state.query, resultsFiltered};
     }
 
     case RECIEVE_ITEM: {
@@ -292,12 +292,9 @@ export function defaultReducer(state, action) {
     }
 
     case SET_NEW_ITEMS: {
-        const newItems = action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id);
-        const newItemsData = action.data;
         return {
             ...state,
-            newItems,
-            newItemsData,
+            newItems: action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id),
         };
     }
 

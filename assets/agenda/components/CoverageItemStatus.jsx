@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import server from 'server';
 import { get } from 'lodash';
 import { gettext } from 'utils';
-import { getCoverageStatusText } from '../utils';
+import { getCoverageStatusText, WORKFLOW_STATUS  } from '../utils';
 
 function getDeliveryHref(coverage) {
     return get(coverage, 'delivery_href');
@@ -35,7 +35,6 @@ export default class CoverageItemStatus extends React.PureComponent {
 
     render() {
         const {coverage} = this.props;
-
         const content = [
             <span className="coverage-item--element-grow" key="topRow">
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>
@@ -44,7 +43,7 @@ export default class CoverageItemStatus extends React.PureComponent {
             </span>
         ];
 
-        if (coverage.workflow_status === 'completed' && coverage.coverage_type === 'picture' && getDeliveryHref(coverage)) {
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && ['video', 'video_explainer', 'picture'].includes(coverage.coverage_type) && getDeliveryHref(coverage)) {
             content.push(
                 <span key="contentLink" className="label label--available">
                     <a  href={coverage.delivery_href}
@@ -57,13 +56,13 @@ export default class CoverageItemStatus extends React.PureComponent {
             );
         }
 
-        if (coverage.workflow_status === 'completed' && this.state.wire) {
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && this.state.wire) {
             content.push(
                 this.state.wire._access
                     ? <span key="contentLink" className="label label--available">
                         <a className="wire-column__preview__coverage__available-story"
                             key="value"
-                            href={'/wire?item='+ this.state.wire._id}
+                            href={'/wire?item='+ get(coverage, 'delivery_id')}
                             target="_blank"
                             title={gettext('Open in new tab')}>
                             {gettext('View Content')}

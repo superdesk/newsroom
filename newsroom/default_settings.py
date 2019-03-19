@@ -1,9 +1,13 @@
 import os
 import tzlocal
 
+from kombu import Queue, Exchange
+from celery.schedules import crontab
+
 from superdesk.default_settings import (   # noqa
     VERSION,
     MONGO_URI,
+    REDIS_URL,
     CONTENTAPI_MONGO_URI,
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,
@@ -17,7 +21,21 @@ from superdesk.default_settings import (   # noqa
     AMAZON_CONTAINER_NAME,
     AMAZON_OBJECT_ACL,
     AMAZON_S3_SUBFOLDER,
-    AMAZON_REGION
+    AMAZON_REGION,
+    CELERY_TASK_ALWAYS_EAGER,
+    CELERY_TASK_SERIALIZER,
+    CELERY_TASK_PROTOCOL,
+    CELERY_TASK_IGNORE_RESULT,
+    CELERY_TASK_SEND_EVENTS,
+    CELERY_WORKER_DISABLE_RATE_LIMITS,
+    CELERY_WORKER_TASK_SOFT_TIME_LIMIT,
+    CELERY_WORKER_LOG_FORMAT,
+    CELERY_WORKER_TASK_LOG_FORMAT,
+    CELERY_WORKER_CONCURRENCY,
+    CELERY_TASK_DEFAULT_QUEUE,
+    CELERY_TASK_DEFAULT_EXCHANGE,
+    CELERY_TASK_DEFAULT_ROUTING_KEY,
+    CELERY_BEAT_SCHEDULE_FILENAME
 )
 
 XML = False
@@ -80,7 +98,8 @@ CORE_APPS = [
     'newsroom.public',
     'newsroom.agenda',
     'newsroom.settings',
-    'newsroom.photos'
+    'newsroom.photos',
+    'newsroom.media_utils',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -165,9 +184,6 @@ NEWS_ONLY_FILTERS = [
    {'match': {'source': 'PMF'}},
 ]
 
-# Places navigation item(s) for featured story products to the top of the list under All
-AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE = True
-
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 
@@ -220,7 +236,8 @@ COVERAGE_TYPES = {
     'explainer': {'name': 'Explainer', 'icon': 'explainer'},
     'infographics': {'name': 'Infographics', 'icon': 'infographics'},
     'live_video': {'name': 'Live Video', 'icon': 'live-video'},
-    'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'}
+    'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'},
+    'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
 }
 
 
@@ -241,3 +258,20 @@ DEFAULT_LANGUAGE = 'en'
 IFRAMELY = True
 
 COMPANY_TYPES = []
+
+#: celery config
+CELERY_TASK_QUEUES = (Queue(celery_queue('newsroom'), Exchange(celery_queue('newsroom')), routing_key='newsroom.#'),)
+CELERY_TASK_ROUTES = {
+    'newsroom.company_expiry': {
+        'queue': celery_queue('newsroom'),
+        'routing_key': 'newsroom.company_expiry'
+    }
+}
+
+#: celery beat config
+CELERY_BEAT_SCHEDULE = {
+    'newsroom:company_expiry': {
+        'task': 'newsroom.company_expiry',
+        'schedule': crontab(hour=0, minute=0),  # Runs every day at midnight
+    }
+}

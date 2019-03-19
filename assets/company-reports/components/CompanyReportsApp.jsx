@@ -6,14 +6,15 @@ import {
     runReport,
 } from '../actions';
 import { gettext } from 'utils';
-import { panels } from '../utils';
+import { panels, REPORTS_NAMES } from '../utils';
 
 const options = [
     {value: '', text: ''},
-    {value: 'company-saved-searches', text: gettext('Saved searches per company')},
-    {value: 'user-saved-searches', text: gettext('Saved searches per user')},
-    {value: 'company-products', text: gettext('Products per company')},
-    {value: 'product-stories', text: gettext('Stories per product')},
+    {value: REPORTS_NAMES.COMPANY_SAVED_SEARCHES, text: gettext('Saved searches per company')},
+    {value: REPORTS_NAMES.USER_SAVED_SEARCHES, text: gettext('Saved searches per user')},
+    {value: REPORTS_NAMES.COMPANY_PRODUCTS, text: gettext('Products per company')},
+    {value: REPORTS_NAMES.PRODUCT_STORIES, text: gettext('Stories per product')},
+    {value: REPORTS_NAMES.COMPANY, text: gettext('Company')},
 ];
 
 

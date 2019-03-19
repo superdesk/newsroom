@@ -18,11 +18,6 @@ from newsroom.wire.utils import get_local_date, get_end_date
 logger = logging.getLogger(__name__)
 
 
-class FeaturedQuery(Exception):
-    """Raise when query is for featured items."""
-    pass
-
-
 def get_bookmarks_count(user_id, product_type):
     return get_resource_service('{}_search'.format(product_type)).get_bookmarks_count(user_id)
 
@@ -102,14 +97,10 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
     planning_items_should = []
     for product in products:
         if product.get('query'):
-            if product['query'] == '_featured':
-                if navigation_id:  # only return featured when nav item is selected
-                    raise FeaturedQuery
-            else:
-                query['bool']['should'].append(query_string(product['query']))
-                if product.get('planning_item_query') and not events_only:
-                    # form the query for the agenda planning items
-                    planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
+            query['bool']['should'].append(query_string(product['query']))
+            if product.get('planning_item_query') and not events_only:
+                # form the query for the agenda planning items
+                planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
 
     if planning_items_should:
         query['bool']['should'].append(
@@ -188,16 +179,20 @@ def set_bookmarks_query(query, user_id):
     })
 
 
-def _items_query():
-    return {
+def _items_query(ignore_latest=False):
+    query = {
         'bool': {
             'must_not': [
-                {'term': {'type': 'composite'}},
-                {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
+                {'term': {'type': 'composite'}}
             ],
             'must': [{'term': {'_type': 'items'}}],
         }
     }
+
+    if not ignore_latest:
+        query['bool']['must_not'].append({'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}})
+
+    return query
 
 
 class WireSearchService(newsroom.Service):
@@ -218,8 +213,8 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, None).count()
 
-    def get(self, req, lookup, size=25, aggs=True):
-        query = _items_query()
+    def get(self, req, lookup, size=25, aggs=True, ignore_latest=False):
+        query = _items_query(ignore_latest)
         user = get_user()
         company = get_user_company(user)
 
@@ -276,12 +271,12 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
 
-    def has_permissions(self, item):
+    def has_permissions(self, item, ignore_latest=False):
         """Test if current user has permissions to view given item."""
         req = ParsedRequest()
         req.args = {}
         try:
-            results = self.get(req, {'_id': item['_id']}, size=0, aggs=False)
+            results = self.get(req, {'_id': item['_id']}, size=0, aggs=False, ignore_latest=ignore_latest)
             return results.count() > 0
         except Forbidden:
             return False

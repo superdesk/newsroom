@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { gettext } from 'utils';
 import {
     newNavigation,
     setQuery,
@@ -24,7 +25,7 @@ class NavigationsApp extends React.Component {
                 onNewItem={this.props.newNavigation}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchNavigations}
-                buttonName={'Navigation'}
+                buttonName={gettext('Navigation')}
             >
                 <SectionSwitch
                     sections={this.props.sections}

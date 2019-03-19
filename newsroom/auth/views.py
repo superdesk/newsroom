@@ -47,7 +47,6 @@ def login():
                 flask.session['name'] = '{} {}'.format(user.get('first_name'), user.get('last_name'))
                 flask.session['user_type'] = user['user_type']
                 flask.session.permanent = form.remember_me.data
-                flask.flash('login', 'analytics')
 
                 if flask.session.get('locale') and flask.session['locale'] != user.get('locale'):
                     get_resource_service('users').system_update(user['_id'], {'locale': flask.session['locale']}, user)

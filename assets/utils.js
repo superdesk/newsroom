@@ -7,15 +7,15 @@ import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment';
-import {hasCoverages, isCoverageForExtraDay} from './agenda/utils';
+import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE} from './agenda/utils';
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
 const CLIENT_CONFIG = 'client_config';
 
-const TIME_FORMAT = getConfig('time_format');
+export const TIME_FORMAT = getConfig('time_format');
 export const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
-const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
+export const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
 export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
@@ -192,6 +192,25 @@ export function formatDate(dateString) {
     return parseDate(dateString).format(DATE_FORMAT);
 }
 
+export function getScheduleType(item) {
+    const start = moment(item.dates.start);
+    const end = moment(item.dates.end);
+    const duration = end.diff(start, 'minutes');
+    if (duration > DAY_IN_MINUTES || !start.isSame(end, 'day')) {
+        return SCHEDULE_TYPE.MULTI_DAY;
+    }
+
+    if (duration === DAY_IN_MINUTES && start.isSame(end, 'day')) {
+        return SCHEDULE_TYPE.ALL_DAY;
+    }
+
+    if (duration === 0) {
+        return SCHEDULE_TYPE.NO_DURATION;
+    }
+
+    return SCHEDULE_TYPE.REGULAR;
+}
+
 /**
  * Format agenda item start and end dates
  *
@@ -199,11 +218,26 @@ export function formatDate(dateString) {
  * @param {String} group: date of the selected event group
  * @return {Array} [time string, date string]
  */
-export function formatAgendaDate(item, group) {
+export function formatAgendaDate(item, group, localTimeZone = true) {
+
+    const getFormattedTimezone = (date) => {
+        let tzStr = date.format('z');
+        if (tzStr.indexOf('+0') >= 0) {
+            return tzStr.replace('+0', 'GMT+');
+        }
+
+        if (tzStr.indexOf('+') >= 0) {
+            return tzStr.replace('+', 'GMT+');
+        }
+
+        return tzStr;
+    };
+
     let start = parseDate(item.dates.start);
     let end = parseDate(item.dates.end);
     let duration = end.diff(start, 'minutes');
     let dateGroup = group ? moment(group, DATE_FORMAT) : null;
+    let dateTimeString = localTimeZone ? [] : [`(${getFormattedTimezone(start)} `];
 
     let isGroupBetweenEventDates = dateGroup ?
         start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
@@ -225,28 +259,38 @@ export function formatAgendaDate(item, group) {
             });
         if (scheduleDates.length > 0) {
             duration = 0;
-            start = scheduleDates[0];
+            start = moment(scheduleDates[0]);
         }
     }
 
-    if (duration > DAY_IN_MINUTES) {
-        // Multi day event
-        return [`(${formatTime(start)} ${formatDate(start)} - ${formatTime(end)} ${formatDate(end)})`,
-            dateGroup ? formatDate(dateGroup) : ''];
+    const scheduleType = getScheduleType(item);
+    if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
+        dateTimeString.push(`${formatTime(start)}`);
+    } else {
+        switch(scheduleType) {
+        case SCHEDULE_TYPE.MULTI_DAY:
+            dateTimeString.push(`${formatTime(start)} ${formatDate(start)} to ${formatTime(end)} ${formatDate(end)}`);
+            break;
+
+        case SCHEDULE_TYPE.ALL_DAY:
+            dateTimeString.push(formatDate(start));
+            break;
+
+        case SCHEDULE_TYPE.REGULAR:
+            if (localTimeZone) {
+                dateTimeString.push(`${formatTime(start)} - ${formatTime(end)}`);
+            } else {
+                dateTimeString.push(`${formatTime(start)} - ${formatTime(end)} ${formatDate(start)}`);
+            }
+            break;        
+        }
     }
 
-    if (duration == DAY_IN_MINUTES) {
-        // All day event
-        return [gettext('ALL DAY'), formatDate(start)];
+    if (!localTimeZone) {
+        dateTimeString[dateTimeString.length - 1] = dateTimeString[dateTimeString.length - 1] + ')';
     }
 
-    if (duration == 0) {
-        // start and end times are the same
-        return [`${formatTime(start)} ${formatDate(start)}`, ''];
-    }
-
-    // single day event
-    return [`${formatTime(start)} - ${formatTime(end)}`, formatDate(start)];
+    return dateTimeString;
 }
 
 
@@ -397,7 +441,7 @@ export function updateRouteParams(updates, state) {
 
     Object.keys(updates).forEach((key) => {
         let updatedValue = updates[key];
-        if (!isEmpty(updatedValue)) {
+        if (!isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
             if (typeof updatedValue === 'object') {
                 updatedValue = JSON.stringify(updatedValue);
             }

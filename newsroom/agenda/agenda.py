@@ -5,7 +5,7 @@ from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
 from flask import json, abort, url_for, current_app as app
 from flask_babel import gettext
-from planning.common import WORKFLOW_STATE_SCHEMA
+from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk import get_resource_service
@@ -19,10 +19,11 @@ from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
-from newsroom.wire.search import query_string, set_product_query, FeaturedQuery, \
+from newsroom.wire.search import query_string, set_product_query, \
     planning_items_query_string, nested_query
 from newsroom.wire.utils import get_local_date, get_end_date
 from newsroom.wire import url_for_wire
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 PRIVATE_FIELDS = [
@@ -81,6 +82,11 @@ class AgendaResource(newsroom.Resource):
 
     # identifiers
     schema['guid'] = events_schema['guid']
+    schema['type'] = {
+        'type': 'string',
+        'mapping': not_analyzed,
+        'default': 'agenda',
+    }
     schema['event_id'] = events_schema['guid']
     schema['recurrence_id'] = {
         'type': 'string',
@@ -441,6 +447,21 @@ class AgendaService(newsroom.Service):
 
     def _enhance_items(self, docs):
         for doc in docs:
+            # Enhance completed coverages in general - add story's abstract/headline/slugline
+            delivery_ids = [c.get('delivery_id') for c in (doc.get('coverages') or [])
+                            if c.get('delivery_id') and c['workflow_status'] == ASSIGNMENT_WORKFLOW_STATE.COMPLETED]
+            wire_search_service = get_resource_service('wire_search')
+            if delivery_ids:
+                wire_items = wire_search_service.get_items(delivery_ids)
+                if wire_items.count() > 0:
+                    for item in wire_items:
+                        c = [c for c in doc.get('coverages') if c.get('delivery_id') == item.get('_id')][0]
+                        c['item_description_text'] = item.get('description_text')
+                        c['item_headline'] = item.get('headline')
+                        c['item_slugline'] = item.get('slugline')
+                        c['publish_time'] = item.get('firstpublished')
+
+            # Filter based on _inner_hits
             inner_hits = doc.pop('_inner_hits', None)
             if not inner_hits or not doc.get('planning_items'):
                 continue
@@ -452,23 +473,24 @@ class AgendaService(newsroom.Service):
             doc['coverages'] = [c for c in (doc.get('coverages') or []) if c.get('planning_id') in items_by_key]
 
     def get(self, req, lookup):
+        if req.args.get('featured'):
+            return self.get_featured_stories(req, lookup)
+
         query = _agenda_query()
         user = get_user()
         company = get_user_company(user)
         is_events_only = is_events_only_view(user, company)
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         product_query = {'bool': {'must': [], 'should': []}}
-        try:
-            set_product_query(
-                product_query,
-                company,
-                self.section,
-                navigation_id=req.args.get('navigation'),
-                events_only=is_events_only
-            )
-            query['bool']['must'].append(product_query)
-        except FeaturedQuery:
-            return self.featured(req, lookup)
+
+        set_product_query(
+            product_query,
+            company,
+            self.section,
+            navigation_id=req.args.get('navigation'),
+            events_only=is_events_only
+        )
+        query['bool']['must'].append(product_query)
 
         if req.args.get('q'):
             test_query = {'or': []}
@@ -542,14 +564,13 @@ class AgendaService(newsroom.Service):
                 })
         return cursor
 
-    def featured(self, req, lookup):
+    def featured(self, req, lookup, featured):
         """Return featured items."""
         user = get_user()
         company = get_user_company(user)
         if is_events_only_view(user, company):
             abort(403)
 
-        featured = get_resource_service('agenda_featured').find_one_today()
         if not featured or not featured.get('items'):
             return ListCursor([])
 
@@ -685,7 +706,8 @@ class AgendaService(newsroom.Service):
             for coverage in coverages:
                 if coverage['coverage_id'] == wire_item['coverage_id'] and not coverage.get('delivery'):
                     coverage['delivery_id'] = wire_item['guid']
-                    coverage['delivery_href'] = url_for_wire(wire_item, _external=False)
+                    coverage['delivery_href'] = url_for_wire(None, _external=False, section='wire.item',
+                                                             _id=wire_item['guid'])
                     self.system_update(item['_id'], {'coverages': coverages}, item)
                     self.notify_new_coverage(item, wire_item)
                     break
@@ -729,3 +751,10 @@ class AgendaService(newsroom.Service):
         set_saved_items_query(query, str(user['_id']))
         cursor = self.get_items_by_query(query, size=0)
         return cursor.count()
+
+    def get_featured_stories(self, req, lookup):
+        for_date = datetime.strptime(req.args.get('date_from'), '%d/%m/%Y %H:%M')
+        offset = int(req.args.get('timezone_offset', '0'))
+        local_date = get_local_date(for_date.strftime('%Y-%m-%d'), datetime.strftime(for_date, '%H:%M:%S'), offset)
+        featured_doc = get_resource_service('agenda_featured').find_one_for_date(local_date)
+        return self.featured(req, lookup, featured_doc)

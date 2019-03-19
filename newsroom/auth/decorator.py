@@ -18,3 +18,12 @@ def admin_only(f):
             return abort(403)
         return f(*args, **kwargs)
     return decorated_function
+
+
+def account_manager_only(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('user_type') not in ['administrator', 'account_management']:
+            return abort(403)
+        return f(*args, **kwargs)
+    return decorated_function

@@ -76,6 +76,7 @@ target/
 
 # celery beat schedule file
 celerybeat-schedule
+celerybeatschedule.db*
 
 # SageMath parsed files
 *.sage.py

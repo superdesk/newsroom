@@ -26,7 +26,6 @@ const initialState = {
     bookmarks: false,
     formats: [],
     newItems: [],
-    newItemsData: null,
     newItemsByTopic: {},
     readItems: {},
     wire: {
@@ -36,6 +35,7 @@ const initialState = {
     userSections: {},
     uiConfig: {},
     groups: [],
+    searchInitiated: false,
 };
 
 function recieveItems(state, data) {
@@ -53,7 +53,7 @@ function recieveItems(state, data) {
         totalItems: data._meta.total,
         aggregations: data._aggregations || null,
         newItems: [],
-        newItemsData: null,
+        searchInitiated: false,
     };
 }
 

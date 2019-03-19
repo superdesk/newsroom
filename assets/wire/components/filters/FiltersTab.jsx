@@ -79,11 +79,11 @@ class FiltersTab extends React.Component {
             || Object.keys(createdFilter).find((key) => !isEmpty(createdFilter[key]));
 
         return this.getFilterGroups().filter((group) => !!group).concat([
-            <NavCreatedPicker
+            (<NavCreatedPicker
                 key="created"
                 createdFilter={createdFilter}
                 setCreatedFilter={this.setCreatedFilterAndSearch}
-            />,
+            />),
             isResetActive || this.props.resultsFiltered ? (
                 [<div key="reset-buffer" id="reset-filter-buffer"></div>,
                     <FilterButton

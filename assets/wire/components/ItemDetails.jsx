@@ -8,7 +8,18 @@ import { isDisplayed } from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import PreviewActionButtons from 'components/PreviewActionButtons';
-import { getPicture, getVideos, getOriginalVideo, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT, isPreformatted } from 'wire/utils';
+import {
+    getPicture,
+    getVideos,
+    getOriginalVideo,
+    getDetailRendition,
+    showItemVersions,
+    getCaption,
+    isKilled,
+    DISPLAY_ABSTRACT,
+    isPreformatted,
+    isCustomRendition,
+} from 'wire/utils';
 import Content from 'ui/components/Content';
 import ContentHeader from 'ui/components/ContentHeader';
 import ContentBar from 'ui/components/ContentBar';
@@ -30,6 +41,7 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo}) {
     const picture = getPicture(item);
     const videos = getVideos(item);
+    const isCustom = isCustomRendition(picture);
 
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
     return (
@@ -42,9 +54,10 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
             <ArticleItemDetails>
                 <ArticleContent>
                     {picture && <ArticlePicture
-                        picture={getDetailRendition(picture)}
+                        picture={getDetailRendition(picture, isCustomRendition)}
                         isKilled={isKilled(item)}
                         caption={getCaption(picture)}
+                        isCustomRendition={isCustom}
                         isItemDetails/>}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>

@@ -39,6 +39,20 @@ class AgendaListItem extends React.Component {
         event.preventDefault();
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        const {props, state} = this;
+
+        return props.item._etag !== nextProps.item._etag || state.hover !== nextState.hover ||
+            props.isActive !== nextProps.isActive || props.isSelected !== nextProps.isSelected ||
+            props.isExtended !== nextProps.isExtended ||
+            get(props.actioningItem, '_id') === props.item._id ||
+            get(nextProps.actioningItem, '_id') === props.item._id ||
+            props.isRead !== nextProps.isRead ||
+            (get(props, 'item.bookmarks') || []).includes(props.user) !==
+            (get(nextProps, 'item.bookmarks') || []).includes(nextProps.user) ||
+            isWatched(props.item, props.user) !== isWatched(nextProps.item, nextProps.user);
+    }
+
     componentDidMount() {
         if (this.props.isActive) {
             this.articleElem.focus();
@@ -58,6 +72,7 @@ class AgendaListItem extends React.Component {
             'wire-articles__item--not-covering': !hasCoverages(this.props.item),
             'wire-articles__item--postponed': isPostponed(this.props.item),
             'wire-articles__item--canceled': isCanceled(this.props.item),
+            'wire-articles__item--visited': isCanceled(this.props.item),
             'wire-articles__item--rescheduled': isRescheduled(this.props.item),
             'wire-articles__item--selected': this.props.isSelected,
             'wire-articles__item--open': this.props.isActive,

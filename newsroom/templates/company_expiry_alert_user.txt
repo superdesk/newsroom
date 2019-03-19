@@ -1,0 +1,2 @@
+Your company's account is expiring on {{expiry_date.strftime('%Y-%m-%d')}}
+Please contact AAP for further details.

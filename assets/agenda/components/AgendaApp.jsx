@@ -9,11 +9,11 @@ import {
     fetchItems,
     selectDate,
     fetchMoreItems,
-    refresh,
     previewItem,
     toggleDropdownFilter,
     openItemDetails,
     requestCoverage,
+    toggleFeaturedFilter,
 } from 'agenda/actions';
 
 import {
@@ -55,6 +55,24 @@ class AgendaApp extends BaseApp {
         this.modals = modals;
         this.tabs[0].label = gettext('Events');
         this.tabs[1].label = gettext('My Events');
+
+        this.fetchItemsOnNavigation = this.fetchItemsOnNavigation.bind(this);
+    }
+
+    getTabs() {
+        return this.props.featuredOnly ?  this.tabs.filter((t) => t.id !== 'filters') : this.tabs;
+    }
+
+
+    fetchItemsOnNavigation() {
+        // Toggle featured filter to 'false'
+        if (this.props.featuredOnly) {
+            this.props.toggleFeaturedFilter(false);
+        }
+
+
+        this.props.fetchItems();
+
     }
 
     render() {
@@ -139,7 +157,9 @@ class AgendaApp extends BaseApp {
                         <AgendaListViewControls
                             activeView={this.props.activeView}
                             setView={this.props.setView}
-                            activeNavigation={this.props.activeNavigation}
+                            hideFeaturedToggle={this.props.activeNavigation || this.props.bookmarks || this.props.activeTopic}
+                            toggleFeaturedFilter={this.props.toggleFeaturedFilter}
+                            featuredFilter={this.props.featuredOnly}
                         />
                     </nav>
                 </section>,
@@ -147,10 +167,15 @@ class AgendaApp extends BaseApp {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar tabs={this.tabs} props={{...this.props, groups}} />
+                                <SearchSidebar
+                                    tabs={this.getTabs()}
+                                    props={{ 
+                                        ...this.props,
+                                        groups,
+                                        fetchItems: this.fetchItemsOnNavigation }} />
                             }
                         </div>
-                        <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
+                        <div className={mainClassName}>
                             {!this.props.bookmarks &&
                                 <AgendaFilters
                                     aggregations={this.props.aggregations}
@@ -167,18 +192,21 @@ class AgendaApp extends BaseApp {
                                 totalItems={this.props.totalItems}
                                 topicType='agenda'
                                 newItems={this.props.newItems}
-                                refresh={this.props.refresh}
+                                refresh={this.props.fetchItems}
                                 activeTopic={this.props.activeTopic}
                                 toggleNews={this.props.toggleNews}
                                 activeNavigation={this.props.activeNavigation}
                                 newsOnly={this.props.newsOnly}
                                 scrollClass={this.state.scrollClass}
                                 hideTotalItems={false}
+                                featuredOnly={this.props.featuredOnly}
                             />
 
                             <AgendaList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
+                                onScroll={this.onListScroll}
+                                refNode={(node) => this.elemList = node}
                             />
                         </div>
 
@@ -233,7 +261,6 @@ AgendaApp.propTypes = {
     activeView: PropTypes.string,
     setView: PropTypes.func,
     newItems: PropTypes.array,
-    refresh: PropTypes.func,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
@@ -280,6 +307,7 @@ const mapStateToProps = (state) => ({
     detail: get(state, 'detail', false),
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
+    featuredOnly: get(state, 'agenda.featuredOnly'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -287,7 +315,6 @@ const mapDispatchToProps = (dispatch) => ({
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
-    refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
     toggleDropdownFilter: (field, value) => {
         setAgendaDropdownFilter(field, value);
@@ -300,6 +327,7 @@ const mapDispatchToProps = (dispatch) => ({
     },
     openItemDetails: (item) => dispatch(openItemDetails(item)),
     requestCoverage: (item, message) => dispatch(requestCoverage(item, message)),
+    toggleFeaturedFilter: (fetch) => dispatch(toggleFeaturedFilter(fetch)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

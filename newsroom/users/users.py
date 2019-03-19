@@ -49,7 +49,7 @@ class UsersResource(newsroom.Resource):
         'company': newsroom.Resource.rel('companies', embeddable=True, required=False),
         'user_type': {
             'type': 'string',
-            'allowed': ['administrator', 'internal', 'public'],
+            'allowed': ['administrator', 'internal', 'public', 'account_management'],
             'default': 'public'
         },
         'is_validated': {
@@ -64,6 +64,10 @@ class UsersResource(newsroom.Resource):
             'type': 'boolean',
             'default': False
         },
+        'expiry_alert': {
+            'type': 'boolean',
+            'default': False
+        },
         'token': {
             'type': 'string',
         },
@@ -72,7 +76,7 @@ class UsersResource(newsroom.Resource):
         },
         'receive_email': {
             'type': 'boolean',
-            'default': False
+            'default': True
         },
         'locale': {
             'type': 'string',

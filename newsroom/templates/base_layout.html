@@ -53,14 +53,14 @@
         {% if session.get('name') %}
         <nav class="sidenav">
             <ul class="sidenav-icons">
-                {% if is_admin() %}
-                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first %}
+                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin()%}
                 <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-sm-block {% if request.blueprint == 'settings' %}active{% endif %}">
                   <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
                       <i class="icon--cog icon--mid-blue"></i>
                   </a>
                 </li>
                 {% endif %}{% endfor %}
+                {% if is_admin_or_account_manager() %}
                 <li class="sidenav-icons__item sidenav-icons__item--report d-none d-sm-block {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
                   <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" data-toggle="tooltip" data-placement="right">
                       <i class="icon--report icon--mid-blue"></i>

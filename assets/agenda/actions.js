@@ -2,8 +2,8 @@
 import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler, getLocaleDate} from 'utils';
-import { markItemAsRead } from 'local-store';
+import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler, getLocaleDate, DATE_FORMAT, TIME_FORMAT} from 'utils';
+import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 import {
     getCalendars,
@@ -11,6 +11,7 @@ import {
     getLocationString,
     getPublicContacts,
     hasLocation,
+    getMomentDate,
 } from './utils';
 
 import {
@@ -26,6 +27,7 @@ import {
 
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
+import moment from 'moment';
 
 
 const WATCH_URL = '/agenda_watch';
@@ -110,8 +112,8 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(agendaData, readData, activeDate) {
-    return {type: INIT_DATA, agendaData, readData, activeDate};
+export function initData(agendaData, readData, activeDate, featuredOnly) {
+    return {type: INIT_DATA, agendaData, readData, activeDate, featuredOnly};
 }
 
 export const ADD_TOPIC = 'ADD_TOPIC';
@@ -216,10 +218,21 @@ export function copyPreviewContents(item) {
  * @return {Promise}
  */
 function search(state, next) {
+    const currentMoment = moment();
     const activeFilter = get(state, 'search.activeFilter', {});
     const activeNavigation = get(state, 'search.activeNavigation');
     const createdFilter = get(state, 'search.createdFilter', {});
-    const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
+    const featuredFilter = !activeNavigation && !state.bookmarks && get(state, 'agenda.featuredOnly');
+    let fromDateFilter;
+
+    if (featuredFilter) {
+        fromDateFilter = getMomentDate(get(state, 'agenda.activeDate'))
+            .set({hour: currentMoment.hour(), minute: currentMoment.minute()}).format(`${DATE_FORMAT} ${TIME_FORMAT}`);
+    } else {
+        const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
+        fromDateFilter = isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : createdFilter.from;
+    }
+
 
     let dateTo = createdFilter.to;
     if (createdFilter.from && createdFilter.from.indexOf('now') >= 0) {
@@ -233,9 +246,10 @@ function search(state, next) {
         navigation: activeNavigation,
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
-        date_from: isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : createdFilter.from,
+        date_from: fromDateFilter,
         date_to: dateTo,
         timezone_offset: getTimezoneOffset(),
+        featured: featuredFilter,
     };
 
     const queryString = Object.keys(params)
@@ -262,6 +276,7 @@ export function fetchItems(updateRoute = true) {
                     filter: get(state, 'search.activeFilter'),
                     navigation: get(state, 'search.activeNavigation'),
                     created: get(state, 'search.createdFilter'),
+                    featured: get(state, 'agenda.featuredOnly', false) ? true : null,
                 }, state);
                 analytics.timingComplete('search', Date.now() - start);
             })
@@ -476,10 +491,7 @@ export function pushNotification(push) {
             return dispatch(setNewItemsByTopic(push.extra));
 
         case 'new_item':
-            return new Promise((resolve, reject) => {
-                dispatch(updateItems(push.extra));
-                dispatch(fetchNewItems()).then(resolve).catch(reject);
-            });
+            return dispatch(setAndUpdateNewItems(push.extra));
 
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
@@ -507,18 +519,21 @@ function setTopics(topics) {
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
-export function setNewItems(data) {
-    return {type: SET_NEW_ITEMS, data};
+export function setAndUpdateNewItems(data) {
+    return function(dispatch) {
+        if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'agenda') {
+            return Promise.resolve();
+        }
+
+        dispatch(updateItems(data));
+        dispatch({type: SET_NEW_ITEMS, data});
+        return Promise.resolve();
+    };
 }
 
 export const UPDATE_ITEMS = 'UPDATE_ITEMS';
 export function updateItems(data) {
     return {type: UPDATE_ITEMS, data};
-}
-
-export function fetchNewItems() {
-    return (dispatch, getState) => search(getState())
-        .then((response) => dispatch(setNewItems(response)));
 }
 
 export function toggleDropdownFilter(key, val) {
@@ -586,7 +601,12 @@ export function initParams(params) {
  * @return {Promise}
  */
 export function setEventQuery(topic) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
+        // Set featured query option to false when using navigations
+        if (get(getState(), 'agenda.featuredOnly')) {
+            dispatch({type: TOGGLE_FEATURED_FILTER});
+        }
+
         topic.navigation ? dispatch(toggleNavigationById(topic.navigation)) : dispatch(toggleNavigation());
         dispatch(toggleTopic(topic));
         dispatch(setQuery(topic.query));
@@ -596,13 +616,22 @@ export function setEventQuery(topic) {
     };
 }
 
-export function refresh() {
-    return (dispatch, getState) => dispatch(recieveItems(getState().newItemsData));
-}
-
 function multiItemEvent(event, items, state) {
     items.forEach((itemId) => {
         const item = state.itemsById[itemId];
         item && analytics.itemEvent(event, item);
     });
+}
+
+export const TOGGLE_FEATURED_FILTER = 'TOGGLE_FEATURED_FILTER';
+export function toggleFeaturedFilter(fetch = true) {
+    return (dispatch) => {
+        toggleFeaturedOnlyParam();
+        dispatch({type: TOGGLE_FEATURED_FILTER});
+        if (!fetch) {
+            return Promise.resolve;
+        }
+
+        return dispatch(fetchItems());
+    };   
 }

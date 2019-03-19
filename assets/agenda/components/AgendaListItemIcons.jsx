@@ -14,6 +14,8 @@ import {
     WORKFLOW_STATUS_TEXTS,
     WORKFLOW_COLORS,
     DRAFT_STATUS_TEXTS,
+    WORKFLOW_STATUS,
+    getCoverageDisplayName,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -29,31 +31,31 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
 
     const getCoverageTootip = (coverage) => {
 
-        if (coverage.workflow_status === 'draft') {
+        if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
             return gettext('{{ type }} coverage {{ status }}', {
-                type: coverage.coverage_type,
+                type: getCoverageDisplayName(coverage.coverage_type),
                 status: DRAFT_STATUS_TEXTS[coverage.coverage_status]
             });
         }
 
         if (['assigned', 'active'].includes(coverage.workflow_status)) {
-            return gettext('{{ type }} coverage {{ status }}, due {{date}} at {{time}}', {
-                type: coverage.coverage_type,
+            return gettext('{{ type }} coverage {{ status }}, expected {{date}} at {{time}}', {
+                type: getCoverageDisplayName(coverage.coverage_type),
                 status: WORKFLOW_STATUS_TEXTS[coverage.workflow_status],
                 date: formatDate(coverage.scheduled),
                 time: formatTime(coverage.scheduled)
             });
         }
 
-        if (coverage.workflow_status === 'cancelled') {
+        if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
             return gettext('{{ type }} coverage cancelled', {
-                type: coverage.coverage_type
+                type: getCoverageDisplayName(coverage.coverage_type)
             });
         }
 
-        if (coverage.workflow_status === 'completed') {
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
             return gettext('{{ type }} coverage available', {
-                type: coverage.coverage_type
+                type: getCoverageDisplayName(coverage.coverage_type)
             });
         }
 

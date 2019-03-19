@@ -1,4 +1,5 @@
 import server from 'server';
+import {errorHandler} from '../utils';
 import { gettext, notify } from 'utils';
 
 export const UPDATE_VALUES = 'UPDATE_VALUES';
@@ -12,10 +13,7 @@ export function save(values) {
             .then(() => {
                 notify.success(gettext('Settings were updated successfully.'));
                 dispatch(updateValues(values));
-            }, (reason) => {
-                console.error('error', reason);
-                notify.error(gettext('Oops, there was an error when updating settings.'));
-            });
+            }, (reason) => errorHandler(reason));
     };
 }
 

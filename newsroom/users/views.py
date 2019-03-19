@@ -66,6 +66,11 @@ def create():
         add_token_data(new_user)
         if form.company.data:
             new_user['company'] = ObjectId(form.company.data)
+
+        # Flask form won't accept default value if any form data was passed in the request.
+        # So, we need to set this explicitly here.
+        new_user['receive_email'] = True
+
         get_resource_service('users').post([new_user])
         send_token(new_user, token_type='new_account')
         return jsonify({'success': True}), 201

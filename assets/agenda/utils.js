@@ -1,6 +1,6 @@
 import { get, isEmpty, includes, keyBy, sortBy } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek, getConfig, gettext, DATE_FORMAT} from '../utils';
+import {formatDate, formatMonth, formatWeek, getConfig, gettext, DATE_FORMAT, COVERAGE_DATE_FORMAT} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -33,12 +33,24 @@ const Groupers = {
 };
 
 export function getCoverageStatusText(coverage) {
-    if (coverage.workflow_status === 'draft') {
+    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
         return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
+    }
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
+        return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
     }
 
     return get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '');
 }
+
+export const WORKFLOW_STATUS = {
+    DRAFT: 'draft',
+    ASSIGNED: 'assigned',
+    ACTIVE: 'active',
+    COMPLETED: 'completed',
+    CANCELLED: 'cancelled',
+};
 
 export const DRAFT_STATUS_TEXTS = {
     'coverage not planned': gettext('not planned'),
@@ -50,18 +62,25 @@ export const DRAFT_STATUS_TEXTS = {
 };
 
 export const WORKFLOW_STATUS_TEXTS = {
-    assigned: gettext('planned'),
-    active: gettext('in progress'),
-    completed: gettext('available'),
-    cancelled: gettext('cancelled'),
+    [WORKFLOW_STATUS.ASSIGNED]: gettext('planned'),
+    [WORKFLOW_STATUS.ACTIVE]: gettext('in progress'),
+    [WORKFLOW_STATUS.COMPLETED]: gettext('available'),
+    [WORKFLOW_STATUS.CANCELLED]: gettext('cancelled'),
 };
 
 export const WORKFLOW_COLORS = {
-    draft: 'icon--gray-light',
-    assigned: 'icon--mid-blue-light',
-    active: 'icon--cyan',
-    completed: 'icon--green',
-    cancelled: 'icon--red',
+    [WORKFLOW_STATUS.DRAFT]: 'icon--gray-light',
+    [WORKFLOW_STATUS.ASSIGNED]: 'icon--mid-blue',
+    [WORKFLOW_STATUS.ACTIVE]: 'icon--cyan',
+    [WORKFLOW_STATUS.COMPLETED]: 'icon--green',
+    [WORKFLOW_STATUS.CANCELLED]: 'icon--red',
+};
+
+export const SCHEDULE_TYPE = {
+    REGULAR: 'REGULAR',
+    ALL_DAY: 'ALL_DAY',
+    MULTI_DAY: 'MULTI_DAY',
+    NO_DURATION: 'NO_DURATION',
 };
 
 
@@ -284,6 +303,20 @@ export function getDateInputDate(dateString) {
 }
 
 /**
+ * Return moment date
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function getMomentDate(dateString) {
+    if (dateString) {
+        return moment(parseInt(dateString));
+    }
+
+    return '';
+}
+
+/**
  * Gets the next day
  *
  * @param {String} dateString
@@ -394,13 +427,18 @@ export function getInternalNote(item, plan) {
  * @param {Object} item
  * @return {Object}
  */
-export function getInternalNotesFromCoverages(item) {
-    const internalNotes = {};
+export function getNotesFromCoverages(item, field = 'internal_note') {
+    const notes = {};
     const planningItems = get(item, 'planning_items', []);
-    planningItems.forEach(p => get(p, 'coverages', []).forEach(c => {
-        internalNotes[c.coverage_id] = get(c, 'planning.internal_note');
-    }));
-    return internalNotes;
+    planningItems.forEach(p => {
+        const planning_note = p[field];
+        get(p, 'coverages', []).forEach((c) => {
+            if (get(c, `planning.${field}`, '') && c.planning[field] !== planning_note) {
+                notes[c.coverage_id] = c.planning[field];
+            }
+        });
+    });
+    return notes;
 }
 
 /**
