@@ -99,7 +99,7 @@ class EditCompany extends React.Component {
                                         name='company_type'
                                         label={gettext('Company Type')}
                                         value={this.props.company.company_type}
-                                        options={this.props.companyTypes.map((ctype) => ({text: ctype.name, value: ctype.id}))}
+                                        options={this.props.companyTypes.map((ctype) => ({text: gettext(ctype.name), value: ctype.id}))}
                                         defaultOption=""
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.company_type : null}/>

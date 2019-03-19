@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { gettext } from 'utils';
 import {
     newCard,
     setQuery,
@@ -23,7 +24,7 @@ class CardsApp extends React.Component {
                 onNewItem={this.props.newCard}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchCards}
-                buttonName={'Card'}
+                buttonName={gettext('Card')}
             >
                 <DashboardSwitch
                     dashboards={this.props.dashboards}

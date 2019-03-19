@@ -43,11 +43,11 @@ class GeneralSettingsApp extends React.Component {
                         key={_id}
                         type={field.type}
                         name={_id}
-                        label={field.label}
+                        label={gettext(field.label)}
                         value={this.state.values[_id]}
                         placeholder={field.default}
                         onChange={(event) => this.onChange(_id, event.target.value)}
-                        description={field.description}
+                        description={gettext(field.description)}
                         min={field.min}
                     />
                 );
