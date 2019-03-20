@@ -13,7 +13,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
     return (
         <div className='list-item__preview'>
             <div className='list-item__preview-header'>
-                <h3>Add/Edit User</h3>
+                <h3>{ gettext('Add/Edit User') }</h3>
                 <button
                     id='hide-sidebar'
                     type='button'
@@ -104,7 +104,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={user.expiry_alert}
                         onChange={onChange} />
 
-                </div>                        
+                </div>
 
                 <div className='list-item__preview-footer'>
                     {user._id ?

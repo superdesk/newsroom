@@ -79,11 +79,7 @@ def init_app(app):
         'news_only_filter',
         gettext('News only filter'),
         weight=200,
-        description=gettext('''
-This query defines what is NOT considered "news" content.
-It is used by the News only switch to filter the view.
-When switched on, stories matching this filter will not be displayed.
-        ''')
+        description=gettext("This query defines what is NOT considered 'news' content. It is used by the News only switch to filter the view. When switched on, stories matching this filter will not be displayed.")  # noqa
     )
 
     app.general_setting(
@@ -92,10 +88,7 @@ When switched on, stories matching this filter will not be displayed.
         type='number',
         min=0,
         weight=300,
-        description=gettext('''
-You can create an additional filter on top of the product definition.
-The time limit can be enabled for each company in the Permissions.
-        '''),
+        description=gettext("You can create an additional filter on top of the product definition. The time limit can be enabled for each company in the Permissions."),  # noqa
         default=app.config.get('WIRE_TIME_LIMIT_DAYS', 0),
     )
 
