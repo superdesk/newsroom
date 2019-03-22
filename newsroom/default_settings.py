@@ -1,5 +1,6 @@
 import os
 import tzlocal
+from distutils.util import strtobool as _strtobool
 
 from superdesk.default_settings import (   # noqa
     VERSION,
@@ -19,6 +20,16 @@ from superdesk.default_settings import (   # noqa
     AMAZON_S3_SUBFOLDER,
     AMAZON_REGION
 )
+
+
+def strtobool(value):
+    if value is None:
+        return False
+    try:
+        return bool(_strtobool(value))
+    except ValueError:
+        return False
+
 
 XML = False
 IF_MATCH = True
@@ -117,7 +128,8 @@ WTF_CSRF_ENABLED = True
 # Email settings
 MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'localhost'
 MAIL_PORT = os.environ.get('MAIL_PORT') or 25
-MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL') or False
+MAIL_USE_SSL = strtobool(os.environ.get('MAIL_USE_SSL')) or False
+MAIL_USE_TLS = strtobool(os.environ.get('MAIL_USE_TLS')) or False
 MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
