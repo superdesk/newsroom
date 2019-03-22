@@ -19,7 +19,7 @@ function AgendaListItemLabels({item, withDate, group, right}) {
         }
 
         if (isRescheduled(item)) {
-            ('rescheduled');
+            labelText = gettext('rescheduled');
         }
 
         if (!labelText) {

@@ -16,6 +16,7 @@ import {
     DRAFT_STATUS_TEXTS,
     WORKFLOW_STATUS,
     getCoverageDisplayName,
+    getAttachments,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -63,6 +64,9 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
     };
 
     const internalNote = getInternalNote(item, planningItem);
+    const coveragesToDisplay = !hasCoverages(item) || hideCoverages ? [] :
+        item.coverages.filter((c) =>!group || (isCoverageForExtraDay(c, group) && c.planning_id === get(planningItem, 'guid')));
+    const attachments = (getAttachments(item)).length;
 
     return (
         <div className={className}>
@@ -73,9 +77,9 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
                 group={group}
             />
 
-            {hasCoverages(item) && !hideCoverages &&
+            {coveragesToDisplay.length > 0 &&
                 <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
-                    {item.coverages.map((coverage) => {
+                    {coveragesToDisplay.map((coverage) => {
                         const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
                         return (!group || (isCoverageForExtraDay(coverage, group) &&
                             coverage.planning_id === get(planningItem, 'guid')) &&
@@ -89,7 +93,9 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
                     }
                 </div>
             }
-
+            {attachments > 0 && <div className='wire-articles__item__icons--dashed-border align-self-start'>
+                <i className='icon-small--attachment' title={gettext('{{ attachments }} file(s) attached', {attachments: attachments})} />
+            </div>}
             <div className='wire-articles__item__meta-info flex-row align-items-start'>
                 {hasLocation(item) && <span className='mr-2'>
                     <i className='icon-small--location icon--gray'></i>
