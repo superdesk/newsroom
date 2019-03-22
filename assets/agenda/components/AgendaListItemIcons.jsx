@@ -93,7 +93,7 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
                     }
                 </div>
             }
-            {attachments > 0 && <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
+            {attachments > 0 && <div className='wire-articles__item__icons--dashed-border align-self-start'>
                 <i className='icon-small--attachment' title={gettext('{{ attachments }} file(s) attached', {attachments: attachments})} />
             </div>}
             <div className='wire-articles__item__meta-info flex-row align-items-start'>
