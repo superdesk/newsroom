@@ -3,51 +3,56 @@
 # This file is distributed under the same license as the Newsroom project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
 #
-#, fuzzy
+# Translators:
+# Olli Vesala <olli.vesala@stt.fi>, 2019
+# Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2019
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2019-03-18 20:51+1100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2018-09-24 11:22+0000\n"
+"Last-Translator: Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2019\n"
+"Language-Team: Finnish (https://www.transifex.com/sourcefabric/teams/6584/fi/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.5.3\n"
+"Language: fi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: newsroom/email.py:35
 msgid "A new newsroom signup request"
-msgstr ""
+msgstr "Uusi rekisteröitymispyyntö Mediapankkiin"
 
 #: newsroom/email.py:57 newsroom/email.py:78
 msgid "{} account created"
-msgstr ""
+msgstr "{} tili luotu"
 
 #: newsroom/email.py:97
 msgid "{} password reset"
-msgstr ""
+msgstr "{} salasanan uusiminen"
 
 #: newsroom/email.py:116
 msgid "New story for followed topic: {}"
-msgstr ""
+msgstr "Uusi juttu seuratusta aiheesta: {}"
 
 #: newsroom/email.py:135
 msgid "New update for followed agenda: {}"
-msgstr ""
+msgstr "Uusi päivitys seurattuun tapahtumaan {}"
 
 #: newsroom/email.py:167
 msgid "New update for your previously accessed story: {}"
-msgstr ""
+msgstr "Aiemmin avaamasi juttu on päivitetty: {}"
 
 #: newsroom/email.py:186
 msgid "New update for your previously accessed agenda: {}"
-msgstr ""
+msgstr "Aiemmin avaamasi tapahtuma on päivitetty: {}"
 
 #: newsroom/email.py:216
 msgid "Kill/Takedown notice"
-msgstr ""
+msgstr "Ilmoitus poistosta"
 
 #: newsroom/email.py:225
 msgid "Agenda cancelled notice"
@@ -55,15 +60,15 @@ msgstr ""
 
 #: newsroom/push.py:84
 msgid "Unknown type {}"
-msgstr ""
+msgstr "Tuntematon tyyppi {}"
 
 #: newsroom/settings.py:73
 msgid "Company expiry alert recipients: Email IDs not in proper format"
-msgstr ""
+msgstr "Sopimuksen vanhenemisvaroituksen vastaanottajat: Sähköpostitunnukset eivät ole asianmukaisessa muodossa"
 
 #: newsroom/settings.py:77
 msgid "General Settings"
-msgstr ""
+msgstr "Yleiset asetukset"
 
 #: newsroom/settings.py:82
 msgid "Google Analytics ID"
@@ -71,27 +76,27 @@ msgstr ""
 
 #: newsroom/settings.py:83
 msgid "Company expiry alert recipients"
-msgstr ""
+msgstr "Yhtiön sopimuksen vanhentumisilmoitusten vastaanottajat"
 
 #: newsroom/settings.py:84
 msgid "Comma separated list of email addresses to which the expiration alerts of companies will be sent to."
-msgstr ""
+msgstr "Pilkulla erotettu luettelo sähköpostiosoitteista, joihin lähetetään ilmoitus siitä, että yhtiön sopimus on päättymässä"
 
 #: newsroom/agenda/utils.py:28 newsroom/utils.py:164
 msgid "ALL DAY"
-msgstr ""
+msgstr "Koko päivä"
 
 #: newsroom/agenda/__init__.py:24 newsroom/templates/agenda_index.html:3
 #: newsroom/templates/agenda_index.html:6
 msgid "Agenda"
-msgstr ""
+msgstr "Agenda"
 
 #: newsroom/agenda/__init__.py:25 newsroom/am_news/__init__.py:17
 #: newsroom/market_place/__init__.py:27
 #: newsroom/templates/bookmark_layout.html:3
 #: newsroom/templates/bookmark_layout.html:6 newsroom/wire/__init__.py:65
 msgid "Saved/Watched Items"
-msgstr ""
+msgstr "Tallennetut jutut"
 
 #: newsroom/agenda/__init__.py:32
 msgid "Google Maps Styles"
@@ -103,51 +108,51 @@ msgstr ""
 
 #: newsroom/agenda/agenda.py:44
 msgid "An event you have been watching has been updated"
-msgstr ""
+msgstr "Seuraamasi tapahtuma on päivitetty"
 
 #: newsroom/agenda/agenda.py:45
 msgid "Event updated"
-msgstr ""
+msgstr "Tapahtuma päivitetty"
 
 #: newsroom/agenda/agenda.py:48
 msgid "An event you have been watching has been cancelled"
-msgstr ""
+msgstr "Seuraamasi tapahtuma on peruttu"
 
 #: newsroom/agenda/agenda.py:49
 msgid "Event cancelled"
-msgstr ""
+msgstr "Tapahtuma peruttu"
 
 #: newsroom/agenda/agenda.py:52
 msgid "An event you have been watching has a new planning"
-msgstr ""
+msgstr "Seuraamassasi tapahtumassa on uusia uutissuunnitelmia"
 
 #: newsroom/agenda/agenda.py:53
 msgid "Planning added"
-msgstr ""
+msgstr "Suunnitelmia lisätty"
 
 #: newsroom/agenda/agenda.py:56
 msgid "An event you have been watching has a planning cancelled"
-msgstr ""
+msgstr "Seuraamasi tapahtuma on peruttu"
 
 #: newsroom/agenda/agenda.py:57
 msgid "Planning cancelled"
-msgstr ""
+msgstr "Suunnittelu peruttu"
 
 #: newsroom/agenda/agenda.py:60
 msgid "An event you have been watching has a new coverage added"
-msgstr ""
+msgstr "Seuraamassasi tapahtumassa on uutta sisältöä"
 
 #: newsroom/agenda/agenda.py:61
 msgid "Coverage added"
-msgstr ""
+msgstr "Seuranta lisätty"
 
 #: newsroom/agenda/email.py:18
 msgid "New coverage"
-msgstr ""
+msgstr "Uusi seuranta"
 
 #: newsroom/agenda/email.py:58
 msgid "A new coverage request"
-msgstr ""
+msgstr "Uusi seurantapyyntö"
 
 #: newsroom/auth/forms.py:9
 msgid "Editor"
@@ -191,7 +196,7 @@ msgstr ""
 
 #: newsroom/auth/forms.py:20
 msgid "Your company"
-msgstr ""
+msgstr "Yhtiö"
 
 #: newsroom/auth/forms.py:21
 msgid "Your country"
@@ -203,36 +208,36 @@ msgstr ""
 
 #: newsroom/auth/forms.py:23
 msgid "Size of your company"
-msgstr ""
+msgstr "Yhtiön koko"
 
 #: newsroom/auth/forms.py:28 newsroom/auth/forms.py:34
 #: newsroom/users/forms.py:22
 msgid "Email"
-msgstr ""
+msgstr "Sähköposti"
 
 #: newsroom/auth/forms.py:29
 msgid "Password"
-msgstr ""
+msgstr "Salasana"
 
 #: newsroom/auth/forms.py:30
 msgid "Remember Me"
-msgstr ""
+msgstr "Muista minut"
 
 #: newsroom/auth/forms.py:41
 msgid "Passwords must match."
-msgstr ""
+msgstr "Salasanojen on oltava yhteneväiset."
 
 #: newsroom/auth/forms.py:42
 msgid "Old password"
-msgstr ""
+msgstr "Vanha salasana"
 
 #: newsroom/auth/forms.py:43
 msgid "New password"
-msgstr ""
+msgstr "Uusi salasana"
 
 #: newsroom/auth/forms.py:44
 msgid "Confirm new password"
-msgstr ""
+msgstr "Vahvista salasana"
 
 #: newsroom/auth/views.py:38
 msgid "Insufficient Permissions. Access denied."
@@ -240,80 +245,80 @@ msgstr ""
 
 #: newsroom/auth/views.py:42 newsroom/auth/views.py:190
 msgid "Company account has been disabled."
-msgstr ""
+msgstr "Yhtiön tili on suljettu."
 
 #: newsroom/auth/views.py:56 newsroom/auth/views.py:198
 msgid "Account is disabled."
-msgstr ""
+msgstr "Tili on suljettu."
 
 #: newsroom/auth/views.py:58 newsroom/auth/views.py:200
 msgid "Invalid username or password."
-msgstr ""
+msgstr "Väärä käyttäjänimi tai salasana"
 
 #: newsroom/auth/views.py:148
 msgid "Account is disabled"
-msgstr ""
+msgstr "Tili on suljettu."
 
 #: newsroom/auth/views.py:155
 msgid "Account has not been approved"
-msgstr ""
+msgstr "Tiliä ei ole hyväksytty"
 
 #: newsroom/auth/views.py:182
 msgid "Exceeded number of allowed login attempts"
-msgstr ""
+msgstr "Kirjautumiskertojen määrä on ylitetty."
 
 #: newsroom/auth/views.py:206 newsroom/auth/views.py:210
 msgid "Invalid token"
-msgstr ""
+msgstr "Väärä suojaustunnus"
 
 #: newsroom/auth/views.py:250
 msgid "Your account has been validated."
-msgstr ""
+msgstr "Tilisi on vahvistettu"
 
 #: newsroom/auth/views.py:253
 msgid "Token has expired. Please create a new token"
-msgstr ""
+msgstr "Linkki on vanhentunut. Ole hyvä ja luo uusi."
 
 #: newsroom/auth/views.py:267
 msgid "Your password has been changed. Please login again."
-msgstr ""
+msgstr "Salasanasi on vaihdettu. Ole hyvä ja kirjaudu sisään uudelleen."
 
 #: newsroom/auth/views.py:283
 msgid "A reset password token has been sent to your email address."
-msgstr ""
+msgstr "Salasanan uusimislinkki on lähetetty sähköpostiisi."
 
 #: newsroom/cards/__init__.py:14
 msgid "Dashboards"
-msgstr ""
+msgstr "Etusivun näkymät"
 
 #: newsroom/cards/views.py:55
 msgid "Label not found"
-msgstr ""
+msgstr "Nimeä ei löytynyt"
 
 #: newsroom/cards/views.py:58
 msgid "Type not found"
-msgstr ""
+msgstr "Tyyppiä ei löytynyt"
 
 #: newsroom/cards/views.py:61
 msgid "Dashboard type not found"
-msgstr ""
+msgstr "Näkymätyyppiä ei löytynyt"
 
 #: newsroom/companies/__init__.py:56
 msgid "Company Management"
-msgstr ""
+msgstr "Yhtiöiden hallinta"
 
 #: newsroom/companies/views.py:56 newsroom/navigations/views.py:52
 #: newsroom/products/views.py:47 newsroom/section_filters/views.py:50
 msgid "Name not found"
-msgstr ""
+msgstr "Nimeä ei löytynyt"
 
 #: newsroom/companies/views.py:62
 msgid "Wrong date format"
-msgstr ""
+msgstr "Väärä formaatti"
 
 #: newsroom/companies/views.py:92
 msgid "Company not found"
-msgstr ""
+msgstr "Yhtiötä ei löytynyt"
 
 #: newsroom/market_place/__init__.py:6
 msgid "aapX"
@@ -321,74 +326,76 @@ msgstr ""
 
 #: newsroom/navigations/__init__.py:14
 msgid "Navigation"
-msgstr ""
+msgstr "Navigaatio"
 
 #: newsroom/products/__init__.py:14
 msgid "Products"
-msgstr ""
+msgstr "Tuotteet"
 
 #: newsroom/reports/reports.py:32
 msgid "Saved searches per company"
-msgstr ""
+msgstr "Yhtiöiden tallentamat haut"
 
 #: newsroom/reports/reports.py:58
 msgid "Saved searches per user"
-msgstr ""
+msgstr "Käyttäjän tallentamat haut"
 
 #: newsroom/reports/reports.py:86
 msgid "Products per company"
-msgstr ""
+msgstr "Yhtiön tuotteet"
 
 #: newsroom/reports/reports.py:109
 msgid "Stories per product"
-msgstr ""
+msgstr "Tuotteen jutut"
 
 #: newsroom/reports/reports.py:140 newsroom/users/forms.py:27
 msgid "Company"
-msgstr ""
+msgstr "Yhtiö"
 
 #: newsroom/reports/views.py:15 newsroom/reports/views.py:36
 msgid "Unknown report {}"
-msgstr ""
+msgstr "Tuntematon raportti {}"
 
 #: newsroom/section_filters/__init__.py:16
 msgid "Section Filters"
-msgstr ""
+msgstr "Lisäsuodattimet"
 
 #: newsroom/templates/403.html:6
 msgid "403. Forbidden"
-msgstr ""
+msgstr "403. Pääsy evätty."
 
 #: newsroom/templates/403.html:7
 msgid "The requested resource is not available for your subscription."
-msgstr ""
+msgstr "Hakemasi tieto ei ole saatavilla sopimusehdoillasi"
 
 #: newsroom/templates/404.html:6
 msgid "404. That's an error."
-msgstr ""
+msgstr "404. Virhe tapahtui."
 
 #: newsroom/templates/404.html:7
 #, python-format
 msgid "The requested url <code>%(url)s</code> was not found on the server."
 msgstr ""
+"Etsimääsi verkko-osoitetta <code>%(url)s</code>ei löytynyt serveriltä."
 
 #: newsroom/templates/account_locked.html:12
 msgid "Your account has been locked"
-msgstr ""
+msgstr "Tilisi on lukittu"
 
 #: newsroom/templates/account_locked.html:15
-msgid "We have detected suspicious activity on your account and have locked it."
-msgstr ""
+msgid ""
+"We have detected suspicious activity on your account and have locked it."
+msgstr "Olemme huomanneet tililläsi epäilyttävää toimintaa ja lukinneet sen."
 
 #: newsroom/templates/account_locked.html:16
 msgid "Please contact Newsroom administrator to unlock your account"
-msgstr ""
+msgstr "Ota yhteyttä Mediapankin ylläpitäjään, joka voi avata tilisi"
 
 #: newsroom/templates/account_locked.html:17 newsroom/templates/home.html:4
 #: newsroom/templates/home_default.html:3
 #: newsroom/templates/signup_success.html:18
 msgid "Home"
-msgstr ""
+msgstr "Etusivu"
 
 #: newsroom/templates/agenda_item_print.html:16
 msgid "Where"
@@ -420,11 +427,11 @@ msgstr ""
 
 #: newsroom/templates/agenda_item_print.html:73
 msgid "Workflow Status"
-msgstr ""
+msgstr "Työtila"
 
 #: newsroom/templates/agenda_item_print.html:76
 msgid "Coverage Status"
-msgstr ""
+msgstr "Seurannan tila"
 
 #: newsroom/templates/agenda_item_print.html:81
 msgid "Internal Note"
@@ -438,22 +445,22 @@ msgstr ""
 #: newsroom/templates/base_layout.html:43 newsroom/templates/login.html:13
 #: newsroom/templates/login.html:36
 msgid "Login"
-msgstr ""
+msgstr "Kirjaudu sisään"
 
 #: newsroom/templates/base_layout.html:46 newsroom/templates/footer.html:4
 msgid "Contact Us"
-msgstr ""
+msgstr "Ota yhteyttä"
 
 #: newsroom/templates/base_layout.html:58 newsroom/templates/settings.html:3
 #: newsroom/templates/settings.html:6
 msgid "Settings"
-msgstr ""
+msgstr "Asetukset"
 
 #: newsroom/templates/base_layout.html:65
 #: newsroom/templates/company_reports.html:3
 #: newsroom/templates/company_reports.html:6
 msgid "Reports"
-msgstr ""
+msgstr "Tilastot"
 
 #: newsroom/templates/copyright.html:3 newsroom/templates/footer.html:5
 msgid "Copyright"
@@ -461,88 +468,88 @@ msgstr ""
 
 #: newsroom/templates/footer.html:2
 msgid "Privacy Policy"
-msgstr ""
+msgstr "Tietosuojakäytännöt"
 
 #: newsroom/templates/footer.html:3
 msgid "Terms and Conditions"
-msgstr ""
+msgstr "Käyttöehdot"
 
 #: newsroom/templates/login.html:41
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Unohditko salasanasi?"
 
 #: newsroom/templates/login.html:41
 msgid "Click here to reset."
-msgstr ""
+msgstr "Paina tästä uusiaksesi salasanasi."
 
 #: newsroom/templates/login.html:48
 msgid "Language"
-msgstr ""
+msgstr "Kieli"
 
 #: newsroom/templates/request_token.html:12
 msgid "Password Reset"
-msgstr ""
+msgstr "Salasanan uusiminen"
 
 #: newsroom/templates/request_token.html:27
 msgid "Validate"
-msgstr ""
+msgstr "Vahvista"
 
 #: newsroom/templates/request_token.html:29
 msgid "Reset Password"
-msgstr ""
+msgstr "Uusi salasanasi"
 
 #: newsroom/templates/reset_password.html:12
 msgid "Reset password"
-msgstr ""
+msgstr "Uusi salasanasi"
 
 #: newsroom/templates/reset_password.html:30
 msgid "Please use 8 or more characters."
-msgstr ""
+msgstr "Käytä vähintään 8 merkkiä"
 
 #: newsroom/templates/reset_password.html:37
 msgid "Change Password"
-msgstr ""
+msgstr "Vaihda salasana"
 
 #: newsroom/templates/reset_password.html:38
 msgid "Cancel"
-msgstr ""
+msgstr "Peruuta"
 
 #: newsroom/templates/signup.html:13 newsroom/templates/signup.html:60
 msgid "Sign up"
-msgstr ""
+msgstr "Rekisteröidy"
 
 #: newsroom/templates/signup_success.html:12
 msgid "Newsroom sign up"
-msgstr ""
+msgstr "Rekisteröidy Mediapankkiin"
 
 #: newsroom/templates/signup_success.html:15
 msgid "Thank you for your interest in Newsroom"
-msgstr ""
+msgstr "Kiitos kiinnostuksestasi Mediapankkiin"
 
 #: newsroom/templates/signup_success.html:16
 msgid "Your sign up request has been sent successfully"
-msgstr ""
+msgstr "Rekisteröitymispyyntösi on lähetetty"
 
 #: newsroom/templates/signup_success.html:17
 msgid "One of our team members will be in touch with you shortly"
-msgstr ""
+msgstr "Tiimistämme ollaan yhteydessä sinuun"
 
 #: newsroom/templates/user_profile.html:3
 msgid "User Profile"
-msgstr ""
+msgstr "Oma profiili"
 
 #: newsroom/templates/wire_index.html:3 newsroom/templates/wire_index.html:6
 msgid "Wire"
-msgstr ""
+msgstr "Uusimmat uutiset"
 
 #: newsroom/templates/wire_item.html:40
 #: newsroom/templates/wire_item_print.html:10
 msgid "By:"
-msgstr ""
+msgstr "Kirjoittaja"
 
 #: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:108
 msgid "words"
-msgstr ""
+msgstr "sanoja"
 
 #: newsroom/templates/wire_item.html:64 newsroom/templates/wire_item.html:110
 msgid "characters"
@@ -550,7 +557,7 @@ msgstr ""
 
 #: newsroom/templates/wire_item.html:66
 msgid "Source:"
-msgstr ""
+msgstr "Lähde"
 
 #: newsroom/templates/wire_item.html:73
 #: newsroom/templates/wire_item_print.html:21
@@ -560,7 +567,7 @@ msgstr ""
 #: newsroom/templates/wire_item.html:76
 #: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:113
 msgid "Category"
-msgstr ""
+msgstr "Kategoria"
 
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:121
@@ -569,7 +576,7 @@ msgstr ""
 
 #: newsroom/templates/wire_item.html:98
 msgid "Previous versions"
-msgstr ""
+msgstr "Aiemmat versiot"
 
 #: newsroom/templates/wire_item_print.html:10
 msgid "On:"
@@ -586,19 +593,19 @@ msgstr ""
 
 #: newsroom/users/__init__.py:14
 msgid "User Management"
-msgstr ""
+msgstr "Käyttäjähallinta"
 
 #: newsroom/users/forms.py:14
 msgid "Administrator"
-msgstr ""
+msgstr "Ylläpitäjä"
 
 #: newsroom/users/forms.py:15
 msgid "Public"
-msgstr ""
+msgstr "Julkinen"
 
 #: newsroom/users/forms.py:16
 msgid "Internal"
-msgstr ""
+msgstr "Sisäinen"
 
 #: newsroom/users/forms.py:17
 msgid "Account Management"
@@ -606,63 +613,63 @@ msgstr ""
 
 #: newsroom/users/forms.py:20
 msgid "First Name"
-msgstr ""
+msgstr "Etunimi"
 
 #: newsroom/users/forms.py:21
 msgid "Last Name"
-msgstr ""
+msgstr "Sukunimi"
 
 #: newsroom/users/forms.py:23
 msgid "Telephone"
-msgstr ""
+msgstr "Puhelin"
 
 #: newsroom/users/forms.py:24
 msgid "Mobile"
-msgstr ""
+msgstr "Matkapuhelin"
 
 #: newsroom/users/forms.py:25
 msgid "Role"
-msgstr ""
+msgstr "Rooli"
 
 #: newsroom/users/forms.py:26
 msgid "User Type"
-msgstr ""
+msgstr "Käyttäjätyyppi"
 
 #: newsroom/users/forms.py:28
 msgid "Sign Up Details"
-msgstr ""
+msgstr "Kirjautumistiedot"
 
 #: newsroom/users/forms.py:29
 msgid "Email Validated"
-msgstr ""
+msgstr "Sähköpostiosoite vahvistettu"
 
 #: newsroom/users/forms.py:30
 msgid "Account Enabled"
-msgstr ""
+msgstr "Tili käytössä"
 
 #: newsroom/users/forms.py:31
 msgid "Account Approved"
-msgstr ""
+msgstr "Tili hyväksytty"
 
 #: newsroom/users/forms.py:32
 msgid "Company Expiry Alert"
-msgstr ""
+msgstr "Varoitus sopimuksen päättymisestä"
 
 #: newsroom/users/forms.py:33
 msgid "Receive notifications via email"
-msgstr ""
+msgstr "Ota vastaan ilmoituksia sähköpostitse"
 
 #: newsroom/users/forms.py:34
 msgid "Locale"
-msgstr ""
+msgstr "Kieli"
 
 #: newsroom/users/views.py:94 newsroom/users/views.py:138
 msgid "User not found"
-msgstr ""
+msgstr "Käyttäjää ei löytynyt"
 
 #: newsroom/users/views.py:133
 msgid "User id not provided"
-msgstr ""
+msgstr "Käyttäjä-id:tä ei löytynyt"
 
 #: newsroom/wire/__init__.py:48
 msgid "Newsroom"
@@ -670,41 +677,40 @@ msgstr ""
 
 #: newsroom/wire/__init__.py:69
 msgid "Plain Text"
-msgstr ""
+msgstr "TXT-formaatti"
 
 #: newsroom/wire/__init__.py:80
 msgid "News only filter"
-msgstr ""
+msgstr "Vain uutiset -suodatin"
 
 #: newsroom/wire/__init__.py:82
 msgid "This query defines what is NOT considered 'news' content. It is used by the News only switch to filter the view. When switched on, stories matching this filter will not be displayed."
-msgstr ""
+msgstr "Tämän hakulausekkeen ehdot täyttävät jutut poistetaan näkymästä, kun käyttäjä kytkee päälle \"Vain uutiset\" -suodattimen."
 
 #: newsroom/wire/__init__.py:91
 msgid "Time limit for Wire products (in days)"
-msgstr ""
+msgstr "Uutistuotteiden aikarajoitus (päiviä)"
 
 #: newsroom/wire/__init__.py:95
 msgid "You can create an additional filter on top of the product definition. The time limit can be enabled for each company in the Permissions."
-msgstr ""
+msgstr "Voit luoda lisäsuodattimen tuotteen lisäksi. Aikarajauksen voi kytkeä päälle yhtiöasetuksista."
 
 #: newsroom/wire/__init__.py:117
 msgid "Subject"
-msgstr ""
+msgstr "Aihe"
 
 #: newsroom/wire/__init__.py:125
 msgid "News Value"
-msgstr ""
+msgstr "Uutisarvo"
 
 #: newsroom/wire/__init__.py:129
 msgid "Place"
-msgstr ""
+msgstr "Paikka"
 
 #: newsroom/wire/search.py:81
 msgid "User does not belong to a company."
-msgstr ""
+msgstr "Käyttäjä ei kuulu yhteenkään yhtiöön"
 
 #: newsroom/wire/search.py:125
 msgid "Your company doesn't have any products defined."
-msgstr ""
-
+msgstr "Yhtiölläsi ei ole yhtään määriteltyä tuotetta."
