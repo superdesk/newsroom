@@ -74,9 +74,7 @@ msgid "Company expiry alert recipients"
 msgstr ""
 
 #: newsroom/settings.py:84
-msgid ""
-"Comma separated list of email addresses to which the expiration alerts of"
-" companies will be sent to."
+msgid "Comma separated list of email addresses to which the expiration alerts of companies will be sent to."
 msgstr ""
 
 #: newsroom/agenda/utils.py:28 newsroom/utils.py:164
