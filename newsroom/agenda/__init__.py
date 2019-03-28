@@ -31,9 +31,6 @@ def init_app(app):
         'google_maps_styles',
         gettext('Google Maps Styles'),
         default='',
-        description=gettext('Provide styles delimited by &(ampersand). '
-                            'For example, feature:poi|element:labels|visibility:off&transit|visibility:off. '
-                            'Refer to https://developers.google.com/maps/documentation/maps-static/styling '
-                            'for more details'),
+        description=gettext('Provide styles delimited by &(ampersand). For example, feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to https://developers.google.com/maps/documentation/maps-static/styling for more details'),  # noqa
         client_setting=True
     )

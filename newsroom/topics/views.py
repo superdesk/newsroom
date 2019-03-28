@@ -26,8 +26,7 @@ def update_topic(id):
     if data.get('notifications'):
         user = get_resource_service('users').find_one(req=None, _id=user_id)
         if not user.get('receive_email'):
-            return "", gettext('Please enable \'Receive notifications via email\' option in '
-                               'your profile to receive topic notifications')
+            return "", gettext('Please enable \'Receive notifications via email\' option in your profile to receive topic notifications')  # noqa
 
     updates = {
         'label': data.get('label'),
