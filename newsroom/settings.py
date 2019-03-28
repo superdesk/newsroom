@@ -81,8 +81,7 @@ def init_app(app):
     # basic settings
     app.general_setting('google_analytics', gettext('Google Analytics ID'), default=app.config['GOOGLE_ANALYTICS'])
     app.general_setting('company_expiry_alert_recipients', gettext('Company expiry alert recipients'),
-                        description=gettext('Comma separated list of email addresses to '
-                        'which the expiration alerts of companies will be sent to.'))
+                        description=gettext('Comma separated list of email addresses to which the expiration alerts of companies will be sent to.'))  # noqa
 
 
 class SettingsApp():

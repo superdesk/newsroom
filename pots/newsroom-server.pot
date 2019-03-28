@@ -100,11 +100,7 @@ msgid "Google Maps Styles"
 msgstr ""
 
 #: newsroom/agenda/__init__.py:34
-msgid ""
-"Provide styles delimited by &(ampersand). For example, "
-"feature:poi|element:labels|visibility:off&transit|visibility:off. Refer "
-"to https://developers.google.com/maps/documentation/maps-static/styling "
-"for more details"
+msgid "Provide styles delimited by &(ampersand). For example, feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to https://developers.google.com/maps/documentation/maps-static/styling for more details"
 msgstr ""
 
 #: newsroom/agenda/agenda.py:44
@@ -582,9 +578,7 @@ msgid "On:"
 msgstr ""
 
 #: newsroom/topics/views.py:29
-msgid ""
-"Please enable 'Receive notifications via email' option in your profile to"
-" receive topic notifications"
+msgid "Please enable 'Receive notifications via email' option in your profile to receive topic notifications"
 msgstr ""
 
 #: newsroom/topics/views.py:109 newsroom/wire/views.py:214
@@ -685,12 +679,7 @@ msgid "News only filter"
 msgstr ""
 
 #: newsroom/wire/__init__.py:82
-msgid ""
-"\n"
-"This query defines what is NOT considered \"news\" content.\n"
-"It is used by the News only switch to filter the view.\n"
-"When switched on, stories matching this filter will not be displayed.\n"
-"        "
+msgid "This query defines what is NOT considered 'news' content. It is used by the News only switch to filter the view. When switched on, stories matching this filter will not be displayed."
 msgstr ""
 
 #: newsroom/wire/__init__.py:91
@@ -698,11 +687,7 @@ msgid "Time limit for Wire products (in days)"
 msgstr ""
 
 #: newsroom/wire/__init__.py:95
-msgid ""
-"\n"
-"You can create an additional filter on top of the product definition.\n"
-"The time limit can be enabled for each company in the Permissions.\n"
-"        "
+msgid "You can create an additional filter on top of the product definition. The time limit can be enabled for each company in the Permissions."
 msgstr ""
 
 #: newsroom/wire/__init__.py:117
