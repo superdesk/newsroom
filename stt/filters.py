@@ -1,8 +1,6 @@
-from datetime import timedelta
 from flask_babel import gettext
 from eve_elastic.elastic import parse_date
 
-from superdesk.utc import utcnow
 from superdesk.resource import not_analyzed
 from newsroom.signals import publish_item
 
@@ -10,7 +8,7 @@ from newsroom.signals import publish_item
 STT_FIELDS = ['sttdepartment', 'sttversion', 'sttgenre', 'sttdone1']
 
 
-def on_publish_item(app, item, **kwargs):
+def on_publish_item(app, item, is_new, **kwargs):
     """Populate stt department and version fields."""
     if item.get('subject'):
         for subject in item['subject']:
@@ -19,10 +17,13 @@ def on_publish_item(app, item, **kwargs):
         item['subject'] = [subject for subject in item['subject'] if subject.get('scheme') != 'sttdone1']
 
     # set versioncreated for archive items
-    if item.get('firstpublished'):
-        firstpublished = parse_date(item['firstpublished'])
-        if firstpublished < item['versioncreated'] and firstpublished < utcnow() - timedelta(days=7):
-            item['versioncreated'] = firstpublished
+    if item.get('firstcreated') and is_new:
+        if isinstance(item.get('firstcreated'), str):
+            firstcreated = parse_date(item['firstcreated'])
+        else:
+            firstcreated = item['firstcreated']
+        if firstcreated < item['versioncreated']:
+            item['versioncreated'] = firstcreated
 
 
 def init_app(app):
