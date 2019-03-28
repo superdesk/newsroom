@@ -81,7 +81,7 @@ def push():
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
         orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
-        item['_id'] = publish_item(item)
+        item['_id'] = publish_item(item, is_new=orig is None)
         notify_new_item(item, check_topics=orig is None)
     elif item['type'] == 'planning_featured':
         publish_planning_featured(item)
@@ -108,7 +108,7 @@ def set_dates(doc):
             doc['versioncreated'] = firstpublished
 
 
-def publish_item(doc):
+def publish_item(doc, is_new):
     """Duplicating the logic from content_api.publish service."""
     set_dates(doc)
     doc['firstpublished'] = parse_date_str(doc.get('firstpublished'))
@@ -136,7 +136,7 @@ def publish_item(doc):
         agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
         if agenda_items:
             [notify_new_item(item, check_topics=False) for item in agenda_items]
-    publish_item_signal.send(app._get_current_object(), item=doc)
+    publish_item_signal.send(app._get_current_object(), item=doc, is_new=is_new)
     _id = service.create([doc])[0]
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
