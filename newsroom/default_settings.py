@@ -22,6 +22,12 @@ from superdesk.default_settings import (   # noqa
     AMAZON_OBJECT_ACL,
     AMAZON_S3_SUBFOLDER,
     AMAZON_REGION,
+    MAIL_SERVER,
+    MAIL_PORT,
+    MAIL_USE_TLS,
+    MAIL_USE_SSL,
+    MAIL_USERNAME,
+    MAIL_PASSWORD,
     CELERY_TASK_ALWAYS_EAGER,
     CELERY_TASK_SERIALIZER,
     CELERY_TASK_PROTOCOL,
@@ -134,13 +140,6 @@ NEW_ACCOUNT_ACTIVE_DAYS = 14
 
 # Enable CSRF protection for forms
 WTF_CSRF_ENABLED = True
-
-# Email settings
-MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'localhost'
-MAIL_PORT = os.environ.get('MAIL_PORT') or 25
-MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL') or False
-MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
 #: The number of days a token is valid
 RESET_PASSWORD_TOKEN_TIME_TO_LIVE = 1
