@@ -15,6 +15,7 @@ install_requires = [
     'gunicorn>=19.7.1',
     'superdesk-core>=1.26,<1.27',
     'icalendar>=4.0.3,<4.1',
+    'newrelic>=4.4.1,<4.5.0',
 ]
 
 setup(

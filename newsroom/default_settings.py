@@ -1,4 +1,5 @@
 import os
+
 import tzlocal
 
 from kombu import Queue, Exchange
@@ -43,6 +44,7 @@ from superdesk.default_settings import (   # noqa
     CELERY_TASK_DEFAULT_ROUTING_KEY,
     CELERY_BEAT_SCHEDULE_FILENAME
 )
+
 
 XML = False
 IF_MATCH = True
@@ -140,6 +142,7 @@ NEW_ACCOUNT_ACTIVE_DAYS = 14
 
 # Enable CSRF protection for forms
 WTF_CSRF_ENABLED = True
+
 
 #: The number of days a token is valid
 RESET_PASSWORD_TOKEN_TIME_TO_LIVE = 1
