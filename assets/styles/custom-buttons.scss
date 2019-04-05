@@ -39,7 +39,7 @@
     margin-right: 8px;
   }
   &:hover {
-    [class^="icon--"], [class*=" icon--"] {
+    [class^="icon--"], [class*=" icon--"], [class^="icon-"] {
       color: $white;
     }
   }
