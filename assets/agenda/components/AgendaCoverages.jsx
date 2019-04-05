@@ -15,8 +15,14 @@ export default function AgendaCoverages({item, coverages}) {
 
     const internalNotes = getNotesFromCoverages(item);
     const edNotes = getNotesFromCoverages(item, 'ednote');
-    const getItemText = (c) => {
-        return c.item_description_text || c.item_headline || c.item_slugline;
+    const getItemText = (coverage) => {
+        return coverage.item_description_text || coverage.item_headline || coverage.item_slugline;
+    };
+
+    const getSlugline = (coverage) => {
+        const slugline = coverage.item_slugline || coverage.slugline;
+
+        return slugline ? ` | ${slugline}` : '';
     };
 
     return coverages.map((coverage) => (
@@ -24,9 +30,11 @@ export default function AgendaCoverages({item, coverages}) {
             <div className='coverage-item__row'>
                 <span className='d-flex coverage-item--element-grow text-overflow-ellipsis'>
                     <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} ${WORKFLOW_COLORS[coverage.workflow_status]} mr-2`}></i>
-                    <span className='text-overflow-ellipsis'>{getCoverageDisplayName(coverage.coverage_type)}</span>
+                    <span className='text-overflow-ellipsis'>
+                        {`${getCoverageDisplayName(coverage.coverage_type)}${getSlugline(coverage)}`}
+                    </span>
                 </span>
-                {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && <span className='d-flex'>
+                {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && <span className='d-flex text-nowrap'>
                     <i className='icon-small--clock icon--gray mr-1'></i>
                     <span className='coverage-item__text-label mr-1'>{gettext('expected')}:</span>
                     <span>{formatCoverageDate(coverage.scheduled)}</span>

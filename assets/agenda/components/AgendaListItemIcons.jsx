@@ -11,9 +11,7 @@ import {
     getCoverageIcon,
     isRecurring,
     getInternalNote,
-    WORKFLOW_STATUS_TEXTS,
     WORKFLOW_COLORS,
-    DRAFT_STATUS_TEXTS,
     WORKFLOW_STATUS,
     getCoverageDisplayName,
     getAttachments,
@@ -31,32 +29,45 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
     });
 
     const getCoverageTootip = (coverage) => {
+        let slugline = coverage.item_slugline || coverage.slugline;
 
+        slugline = slugline ? ` '${slugline}'` : '';
         if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
-            return gettext('{{ type }} coverage {{ status }}', {
+            return gettext('Planned {{ type }} coverage{{ slugline }}', {
                 type: getCoverageDisplayName(coverage.coverage_type),
-                status: DRAFT_STATUS_TEXTS[coverage.coverage_status]
+                slugline: slugline,
             });
         }
 
-        if (['assigned', 'active'].includes(coverage.workflow_status)) {
-            return gettext('{{ type }} coverage {{ status }}, expected {{date}} at {{time}}', {
+        if (['assigned'].includes(coverage.workflow_status)) {
+            return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}', {
                 type: getCoverageDisplayName(coverage.coverage_type),
-                status: WORKFLOW_STATUS_TEXTS[coverage.workflow_status],
+                slugline: slugline,
+                date: formatDate(coverage.scheduled),
+                time: formatTime(coverage.scheduled)
+            });
+        }
+
+        if (['active'].includes(coverage.workflow_status)) {
+            return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}', {
+                type: getCoverageDisplayName(coverage.coverage_type),
+                slugline: slugline,
                 date: formatDate(coverage.scheduled),
                 time: formatTime(coverage.scheduled)
             });
         }
 
         if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
-            return gettext('{{ type }} coverage cancelled', {
-                type: getCoverageDisplayName(coverage.coverage_type)
+            return gettext('{{ type }} coverage {{slugline}} cancelled', {
+                type: getCoverageDisplayName(coverage.coverage_type),
+                slugline: slugline,
             });
         }
 
         if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
-            return gettext('{{ type }} coverage available', {
-                type: getCoverageDisplayName(coverage.coverage_type)
+            return gettext('{{ type }} coverage{{ slugline }} available', {
+                type: getCoverageDisplayName(coverage.coverage_type),
+                slugline: slugline,
             });
         }
 

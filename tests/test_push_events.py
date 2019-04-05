@@ -118,7 +118,7 @@ test_planning = {
         {
             "planning": {
                 "g2_content_type": "text",
-                "slugline": "Vivid planning item",
+                "slugline": "Vivid Text Explainer",
                 "internal_note": "internal note here",
                 "genre": [
                     {
@@ -141,7 +141,7 @@ test_planning = {
         {
             "planning": {
                 "g2_content_type": "picture",
-                "slugline": "Vivid planning item",
+                "slugline": "Vivid Photos",
                 "internal_note": "internal note here",
                 "ednote": "ed note here",
                 "scheduled": "2018-05-28T10:51:52+0000"
@@ -263,6 +263,8 @@ def test_push_parsed_planning_for_an_existing_event(client, app):
     assert 'a' == parsed['service'][0]['code']
     assert 1 == len(parsed['subject'])
     assert '06002002' == parsed['subject'][0]['code']
+    assert parsed['coverages'][0]['slugline'] == 'Vivid Text Explainer'
+    assert parsed['coverages'][1]['slugline'] == 'Vivid Photos'
 
     parsed_planning = parsed['planning_items'][0]
     assert 1 == len(parsed_planning['service'])
