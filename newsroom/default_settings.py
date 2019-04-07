@@ -1,5 +1,6 @@
 import os
 import tzlocal
+from flask import json
 
 from kombu import Queue, Exchange
 from celery.schedules import crontab
@@ -250,8 +251,13 @@ CLIENT_CONFIG = {
     'list_animations': True,  # Enables or disables the animations for list item select boxes
 }
 
-LANGUAGES = ['en', 'fi', 'cs']
-DEFAULT_LANGUAGE = 'en'
+# List of languages available in login and profile settings
+# use string representation of a json i.e. '["en", "fi"]'
+try:
+    LANGUAGES = json.loads(os.environ.get('LANGUAGES'))
+except:  # noqa
+    LANGUAGES = ['en', 'fi', 'cs']
+DEFAULT_LANGUAGE = os.environ.get('DEFAULT_LANGUAGE', 'en')
 
 # Enable iframely support for item body_html
 IFRAMELY = True
