@@ -251,7 +251,7 @@ CLIENT_CONFIG = {
 }
 
 LANGUAGES = ['en', 'fi', 'cs']
-DEFAULT_LANGUAGE = 'en'
+DEFAULT_LANGUAGE = 'cs'
 
 # Enable iframely support for item body_html
 IFRAMELY = True
