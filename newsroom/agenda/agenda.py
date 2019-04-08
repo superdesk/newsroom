@@ -149,6 +149,7 @@ class AgendaResource(newsroom.Resource):
                 'coverage_provider': not_analyzed,
                 'delivery_id': not_analyzed,
                 'delivery_href': not_analyzed,
+                'slugline': not_analyzed,
             },
         },
     }

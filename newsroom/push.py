@@ -460,7 +460,8 @@ def get_coverages(planning_items, original_coverages=[]):
                 'workflow_status': coverage['workflow_status'],
                 'coverage_status': coverage.get('news_coverage_status', {}).get('name'),
                 'coverage_provider': coverage['planning'].get('coverage_provider'),
-                'delivery_id': existing_coverage.get('delivery_id')
+                'delivery_id': existing_coverage.get('delivery_id'),
+                'slugline': coverage['planning']['slugline']
             }
 
             set_delivery(new_coverage, coverage.get('deliveries'))
