@@ -1,5 +1,5 @@
 
-from superdesk.utc import utcnow, local_to_utc
+from superdesk.utc import local_to_utc
 from newsroom import Resource, Service
 from datetime import datetime
 
@@ -29,6 +29,5 @@ class FeaturedService(Service):
             item['display_to'] = local_to_utc(item['tz'], date.replace(hour=23, minute=59, second=59))
         super().create(docs)
 
-    def find_one_today(self):
-        now = utcnow()
-        return self.find_one(req=None, display_from={'$lte': now}, display_to={'$gte': now})
+    def find_one_for_date(self, for_date):
+        return self.find_one(req=None, display_from={'$lte': for_date}, display_to={'$gte': for_date})

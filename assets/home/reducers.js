@@ -9,7 +9,6 @@ import {CLOSE_MODAL, RENDER_MODAL} from '../actions';
 import {modalReducer} from '../reducers';
 
 const initialState = {
-    photos: [],
     cards: [],
     itemsByCard: {},
     products: [],
@@ -22,7 +21,6 @@ export default function homeReducer(state = initialState, action) {
     case INIT_DATA:
         return {
             ...state,
-            photos: action.data.photos,
             cards: action.data.cards,
             itemsByCard: action.data.itemsByCard,
             products: action.data.products,
@@ -30,6 +28,7 @@ export default function homeReducer(state = initialState, action) {
             company: action.data.company,
             formats: action.data.formats || [],
             userSections: action.data.userSections,
+            context: 'wire'
         };
 
     case OPEN_ITEM:{

@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {get} from 'lodash';
 import {bem} from 'ui/utils';
+import classNames from 'classnames';
 import {
     hasCoverages,
     isCoverageForExtraDay,
@@ -8,54 +10,79 @@ import {
     getLocationString,
     getCoverageIcon,
     isRecurring,
+    getInternalNote,
     WORKFLOW_STATUS_TEXTS,
     WORKFLOW_COLORS,
+    DRAFT_STATUS_TEXTS,
+    WORKFLOW_STATUS,
+    getCoverageDisplayName,
+    getAttachments,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
+import AgendaMetaTime from './AgendaMetaTime';
+import AgendaInternalNote from './AgendaInternalNote';
 import {gettext, formatDate, formatTime} from 'utils';
-import MetaTime from 'ui/components/MetaTime';
 
 
-function AgendaListItemIcons({item, group, hideCoverages, row}) {
+function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
     const className = bem('wire-articles', 'item__meta', {
         row,
     });
 
     const getCoverageTootip = (coverage) => {
 
-        if (['draft', 'assigned', 'active'].includes(coverage.workflow_status)) {
-            return gettext('{{ type }} coverage {{ status }}, due {{date}} at {{time}}', {
-                type: coverage.coverage_type,
+        if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
+            return gettext('{{ type }} coverage {{ status }}', {
+                type: getCoverageDisplayName(coverage.coverage_type),
+                status: DRAFT_STATUS_TEXTS[coverage.coverage_status]
+            });
+        }
+
+        if (['assigned', 'active'].includes(coverage.workflow_status)) {
+            return gettext('{{ type }} coverage {{ status }}, expected {{date}} at {{time}}', {
+                type: getCoverageDisplayName(coverage.coverage_type),
                 status: WORKFLOW_STATUS_TEXTS[coverage.workflow_status],
                 date: formatDate(coverage.scheduled),
                 time: formatTime(coverage.scheduled)
             });
         }
 
-        if (coverage.workflow_status === 'completed') {
+        if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
+            return gettext('{{ type }} coverage cancelled', {
+                type: getCoverageDisplayName(coverage.coverage_type)
+            });
+        }
+
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
             return gettext('{{ type }} coverage available', {
-                type: coverage.coverage_type
+                type: getCoverageDisplayName(coverage.coverage_type)
             });
         }
 
         return '';
     };
 
+    const internalNote = getInternalNote(item, planningItem);
+    const coveragesToDisplay = !hasCoverages(item) || hideCoverages ? [] :
+        item.coverages.filter((c) =>!group || (isCoverageForExtraDay(c, group) && c.planning_id === get(planningItem, 'guid')));
+    const attachments = (getAttachments(item)).length;
+
     return (
         <div className={className}>
-            <MetaTime
-                date={item.dates.start}
+            <AgendaMetaTime
+                item={item}
                 borderRight={true}
                 isRecurring={isRecurring(item)}
-                cssClass={bem('time-label', null, {covering: hasCoverages(item)})}
+                group={group}
             />
 
-            {hasCoverages(item) && !hideCoverages &&
+            {coveragesToDisplay.length > 0 &&
                 <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
-                    {item.coverages.map((coverage) => {
+                    {coveragesToDisplay.map((coverage) => {
                         const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
-                        return (!group || isCoverageForExtraDay(coverage, group) &&
+                        return (!group || (isCoverageForExtraDay(coverage, group) &&
+                            coverage.planning_id === get(planningItem, 'guid')) &&
                           <span
                               className='wire-articles__item__icon'
                               key={coverage.coverage_id}
@@ -66,12 +93,20 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
                     }
                 </div>
             }
-
+            {attachments > 0 && <div className='wire-articles__item__icons--dashed-border align-self-start'>
+                <i className='icon-small--attachment' title={gettext('{{ attachments }} file(s) attached', {attachments: attachments})} />
+            </div>}
             <div className='wire-articles__item__meta-info flex-row align-items-start'>
                 {hasLocation(item) && <span className='mr-2'>
                     <i className='icon-small--location icon--gray'></i>
                 </span>}
-                {hasLocation(item) && <span>{getLocationString(item)}</span>}
+                {hasLocation(item) &&
+                    <span className={classNames({'wire-articles__item__icons--dashed-border' :internalNote})}>
+                        {getLocationString(item)}
+                    </span>}
+                <AgendaInternalNote
+                    internalNote={internalNote}
+                    onlyIcon={true} />
 
                 <AgendaListItemLabels item={item} />
             </div>
@@ -81,6 +116,7 @@ function AgendaListItemIcons({item, group, hideCoverages, row}) {
 
 AgendaListItemIcons.propTypes = {
     item: PropTypes.object,
+    planningItem: PropTypes.object,
     group: PropTypes.string,
     hideCoverages: PropTypes.bool,
     row: PropTypes.bool,

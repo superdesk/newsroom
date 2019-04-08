@@ -260,20 +260,24 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     app.data.insert('history', docs=[{
         'version': '1',
         '_id': 'bar',
-    }], action='download', user=user)
+    }], action='download', user=user, section='wire')
 
-    key = b'something random'
-    app.config['PUSH_KEY'] = key
-    data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
-    push_mock = mocker.patch('newsroom.push.push_notification')
-    headers = get_signature_headers(data, key)
-    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
-    assert 200 == resp.status_code
-    assert push_mock.call_args[1]['item']['_id'] == 'bar'
-    assert len(push_mock.call_args[1]['users']) == 1
+    with app.mail.record_messages() as outbox:
+        key = b'something random'
+        app.config['PUSH_KEY'] = key
+        data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
+        push_mock = mocker.patch('newsroom.push.push_notification')
+        headers = get_signature_headers(data, key)
+        resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+        assert 200 == resp.status_code
+        assert push_mock.call_args[1]['item']['_id'] == 'bar'
+        assert len(push_mock.call_args[1]['users']) == 1
 
-    notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-    assert notification['item'] == 'bar'
+        notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+        assert notification['item'] == 'bar'
+
+    assert len(outbox) == 1
+    assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
 
 
 def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
@@ -322,7 +326,8 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
 
 
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
-    company_ids = app.data.insert('companies', [{
+    app.data.insert('companies', [{
+        '_id': '2',
         'name': 'Press co.',
         'is_enabled': True,
     }])
@@ -332,24 +337,56 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
-        'company': company_ids[0],
+        'company': '2',
     }
 
     user_ids = app.data.insert('users', [user])
     user['_id'] = user_ids[0]
 
-    app.data.insert('items', [{'_id': 'bar', 'headline': 'testing', 'bookmarks': [user_ids[0]]}])
+    app.data.insert('products', [{
+        "_id": 1,
+        "name": "Service A",
+        "query": "service.code: a",
+        "is_enabled": True,
+        "description": "Service A",
+        "companies": ['2'],
+        "sd_product_id": None,
+        "product_type": "wire",
+    }])
 
-    key = b'something random'
-    app.config['PUSH_KEY'] = key
-    data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
-    push_mock = mocker.patch('newsroom.push.push_notification')
-    headers = get_signature_headers(data, key)
-    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
-    assert 200 == resp.status_code
-    assert push_mock.call_args_list[0][0][0] == 'new_item'
-    assert push_mock.call_args_list[1][0][0] == 'history_matches'
-    assert push_mock.call_args[1]['item']['_id']
+    app.data.insert('items', [{
+        '_id': 'bar',
+        'headline': 'testing',
+        'service': [{'code': 'a', 'name': 'Service A'}],
+        'products': [{'code': 1, 'name': 'product-1'}],
+    }])
+
+    with client.session_transaction() as session:
+        session['user'] = user['_id']
+        session['user_type'] = 'public'
+        session['name'] = 'public'
+
+    resp = client.post('/wire_bookmark', data=json.dumps({
+        'items': ['bar'],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    with app.mail.record_messages() as outbox:
+        key = b'something random'
+        app.config['PUSH_KEY'] = key
+        data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
+        push_mock = mocker.patch('newsroom.push.push_notification')
+        headers = get_signature_headers(data, key)
+        resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+        assert 200 == resp.status_code
+        assert push_mock.call_args_list[0][0][0] == 'new_item'
+        assert push_mock.call_args_list[1][0][0] == 'history_matches'
+        assert push_mock.call_args[1]['item']['_id']
+        notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
+        assert notification['item'] == 'bar'
+
+    assert len(outbox) == 1
+    assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
 
 
 def test_do_not_notify_inactive_user(client, app, mocker):
@@ -374,7 +411,7 @@ def test_do_not_notify_inactive_user(client, app, mocker):
     headers = get_signature_headers(data, key)
     resp = client.post('/push', data=data, content_type='application/json', headers=headers)
     assert 200 == resp.status_code
-    push_mock.assert_called_once_with('new_item', item='foo')
+    assert push_mock.call_args[1]['_items'][0]['_id'] == 'foo'
 
 
 def test_notify_checks_service_subscriptions(client, app, mocker):
@@ -453,6 +490,7 @@ def test_send_notification_emails(client, app):
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
     assert len(outbox) == 1
+    assert 'http://localhost:5050/wire?item=foo' in outbox[0].body
 
 
 def test_matching_topics(client, app):
@@ -468,7 +506,7 @@ def test_matching_topics(client, app):
         {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
     ]
     matching = search.get_matching_topics(item['guid'], topics, users, companies)
-    assert ['query'] == matching
+    assert ['created_from_future', 'query'] == matching
 
 
 def test_matching_topics_for_public_user(client, app):
@@ -495,7 +533,7 @@ def test_matching_topics_for_public_user(client, app):
         {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
     ]
     matching = search.get_matching_topics(item['guid'], topics, users, companies)
-    assert ['query'] == matching
+    assert ['created_from_future', 'query'] == matching
 
 
 def test_matching_topics_for_user_with_inactive_company(client, app):
@@ -522,7 +560,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
     ]
     matching = search.get_matching_topics(item['guid'], topics, users, companies)
-    assert ['query'] == matching
+    assert ['created_from_future', 'query'] == matching
 
 
 def test_push_parsed_item(client, app):
@@ -530,12 +568,17 @@ def test_push_parsed_item(client, app):
     parsed = get_entity_or_404(item['guid'], 'wire_search')
     assert type(parsed['firstcreated']) == datetime
     assert 2 == parsed['wordcount']
+    assert 7 == parsed['charcount']
 
 
 def test_push_parsed_dates(client, app):
-    client.post('/push', data=json.dumps(item), content_type='application/json')
+    payload = item.copy()
+    payload['embargoed'] = '2019-01-31T00:01:00+00:00'
+    client.post('/push', data=json.dumps(payload), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'items')
     assert type(parsed['firstcreated']) == datetime
+    assert type(parsed['versioncreated']) == datetime
+    assert type(parsed['embargoed']) == datetime
 
 
 def test_push_event_coverage_info(client, app):

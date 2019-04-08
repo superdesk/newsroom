@@ -4,9 +4,8 @@ import classNames from 'classnames';
 import 'react-toggle/style.css';
 import { connect } from 'react-redux';
 
-import { isEmpty } from 'lodash';
-import { gettext } from 'utils';
-import {isTouchDevice} from '../../utils';
+import { isEmpty, get } from 'lodash';
+import { gettext, isTouchDevice, isWireContext } from 'utils';
 
 import {
     followTopic,
@@ -40,13 +39,14 @@ class SearchResultsInfo extends React.Component {
     render() {
         const isFollowing = this.props.user && this.props.activeTopic;
         const displayFollowTopic = this.props.topicType && this.props.user &&
-            !this.props.bookmarks && (this.props.resultsFiltered || this.props.query);
-
-        const displayTotalItems = this.props.bookmarks ||
+            !this.props.bookmarks && !this.props.featuredOnly && (this.props.resultsFiltered || this.props.query);
+        const displayTotalItems = this.props.hideTotalItems && (this.props.bookmarks ||
           !isEmpty(this.props.activeTopic) ||
-          this.props.resultsFiltered || this.props.query;
-
+          this.props.resultsFiltered || this.props.query);
         const displayHeader = !isEmpty(this.props.newItems) || displayTotalItems || displayFollowTopic || this.props.query;
+        const newItemsLength = get(this.props, 'newItems.length', 0) > 25 ? '25+' : get(this.props, 'newItems.length');
+        const newItemsTooltip = !isWireContext() ? gettext('New events to load') : gettext('New stories available to load');
+
         return (
             displayHeader ? <div className={classNames(
                 'wire-column__main-header d-flex mt-0 px-3 align-items-center flex-wrap flex-sm-nowrap',
@@ -67,15 +67,15 @@ class SearchResultsInfo extends React.Component {
                     <button
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-none d-sm-block"
-                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType)}
-                    >{gettext('Save as topic')}</button>
+                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType, this.props.activeNavigation)}
+                    >{isWireContext() ? gettext('Save as topic') : gettext('Save search to my events')}</button>
                 )}
 
                 {displayFollowTopic && (
                     <button
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-block d-sm-none"
-                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType)}
+                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType, this.props.activeNavigation)}
                     >{gettext('S')}</button>
                 )}
 
@@ -84,11 +84,11 @@ class SearchResultsInfo extends React.Component {
                       <button
                           type="button"
                           ref={(elem) => this.elem = elem}
-                          title={gettext('New stories available to load')}
+                          title={newItemsTooltip}
                           className="button__reset-styles d-flex align-items-center ml-3"
                           onClick={this.props.refresh}>
                           <i className="icon--refresh icon--pink"/>
-                          <span className="badge badge-pill badge-info badge-secondary ml-2">{this.props.newItems.length}</span>
+                          <span className="badge badge-pill badge-info badge-secondary ml-2">{newItemsLength}</span>
                       </button>
                     }
                 </div>
@@ -113,6 +113,12 @@ SearchResultsInfo.propTypes = {
     searchCriteria: PropTypes.object,
     resultsFiltered: PropTypes.bool,
     followTopic: PropTypes.func.isRequired,
+    hideTotalItems: PropTypes.bool,
+    featuredOnly: PropTypes.bool,
+};
+
+SearchResultsInfo.defaultProps = {
+    hideTotalItems: true
 };
 
 const mapStateToProps = (state) => ({

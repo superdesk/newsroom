@@ -107,3 +107,34 @@ def get_product_stories():
 
     sorted_results = sorted(results, key=lambda k: k['name'])
     return {'results': sorted_results, 'name': gettext('Stories per product')}
+
+
+def get_company_report():
+    """ Returns products by company """
+    results = []
+    company_products = {}
+    companies = get_entity_dict(query_resource('companies'))
+    products = query_resource('products')
+
+    for product in products:
+        for company in product.get('companies', []):
+            company_product = company_products.get(company, {})
+            products = company_product.get('products', [])
+            products.append(product)
+            company_product['products'] = products
+            company_products[company] = company_product
+
+    for _id, details in company_products.items():
+        users = list(query_resource('users', lookup={'company': ObjectId(_id)}))
+        if companies.get(ObjectId(_id)):
+            results.append({
+                '_id': _id,
+                'name': companies[ObjectId(_id)]['name'],
+                'is_enabled': companies[ObjectId(_id)]['is_enabled'],
+                'products': details.get('products', []),
+                'users': users,
+                'company': companies[ObjectId(_id)],
+            })
+
+    sorted_results = sorted(results, key=lambda k: k['name'])
+    return {'results': sorted_results, 'name': gettext('Company')}

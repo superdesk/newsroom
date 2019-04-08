@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { wordCount } from 'utils';
+import {LIST_ANIMATIONS, wordCount} from 'utils';
 import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
 
-import ActionList from 'components/ActionList';
+import ActionMenu from 'components/ActionMenu';
 import ActionButton from 'components/ActionButton';
 import MetaTime from 'ui/components/MetaTime';
 import AMNewsIcon from './AmNewsIcon';
@@ -67,6 +67,10 @@ class AmNewsListItem extends React.Component {
             'wire-articles__item--alert': isAlert(item),
             'wire-articles__item--not-alert': !isAlert(item),
         });
+        const selectClassName = classNames('no-bindable-select', {
+            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
+        });
         const metaTimeClassName = classNames('', {
             'time-label--data': isDataItem(item),
             'time-label--stories': !isDataItem(item),
@@ -89,7 +93,7 @@ class AmNewsListItem extends React.Component {
                 <div className={wrapClassName}>
                     <div className='wire-articles__item-text'>
                         <h4 className='wire-articles__item-headline'>
-                            <div className='no-bindable-select wire-articles__item-select' onClick={this.stopPropagation}>
+                            <div className={selectClassName} onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
                                     <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
                                     <i></i>
@@ -118,16 +122,13 @@ class AmNewsListItem extends React.Component {
                     )}
 
                     <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
-                        <div className='btn-group'>
-                            <span onClick={(event) => this.props.onActionList(event, this.props.item)}>
-                                <i className='icon--more icon--gray-light'></i>
-                            </span>
-                            { this.props.showActions ? <ActionList
-                                item={this.props.item}
-                                user={this.props.user}
-                                actions={this.props.actions}
-                            /> : null }
-                        </div>
+                        <ActionMenu
+                            item={this.props.item}
+                            user={this.props.user}
+                            actions={this.props.actions}
+                            onActionList={this.props.onActionList}
+                            showActions={this.props.showActions}
+                        />
 
                         {this.props.actions.map((action) =>
                             action.shortcut &&

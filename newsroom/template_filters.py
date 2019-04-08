@@ -6,8 +6,10 @@ import hashlib
 from flask import current_app as app
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
-from superdesk.text_utils import get_text, get_word_count
+from superdesk import get_resource_service
+from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
+from newsroom.auth import get_user
 
 
 def parse_date(datetime):
@@ -36,7 +38,7 @@ def date_header(datetime):
 
 def time_short(datetime):
     if datetime:
-        return format_time(parse_date(datetime), 'hh:mm')
+        return format_time(parse_date(datetime), 'HH:mm')
 
 
 def date_short(datetime):
@@ -52,6 +54,10 @@ def word_count(html):
     return get_word_count(html or '')
 
 
+def char_count(html):
+    return get_char_count(html or '')
+
+
 def is_admin(user=None):
     if user:
         return user.get('user_type') == 'administrator'
@@ -59,20 +65,17 @@ def is_admin(user=None):
 
 
 def is_admin_or_internal(user=None):
+    allowed_user_types = ['administrator', 'internal', 'account_management']
     if user:
-        return user.get('user_type') == 'administrator' or user.get('user_type') == 'internal'
-    return flask.session.get('user_type') == 'administrator' or \
-        flask.session.get('user_type') == 'internal'
+        return user.get('user_type') in allowed_user_types
+    return flask.session.get('user_type') in allowed_user_types
 
 
 def newsroom_config():
     port = int(os.environ.get('PORT', '5000'))
     return {
         'websocket': os.environ.get('NEWSROOM_WEBSOCKET_URL', 'ws://localhost:%d' % (port + 100, )),
-        'time_format': flask.current_app.config['CLIENT_TIME_FORMAT'],
-        'date_format': flask.current_app.config['CLIENT_DATE_FORMAT'],
-        'coverage_date_format': flask.current_app.config['CLIENT_COVERAGE_DATE_FORMAT'],
-        'display_abstract': flask.current_app.config['DISPLAY_ABSTRACT'],
+        'client_config': flask.current_app.config['CLIENT_CONFIG'],
     }
 
 
@@ -90,3 +93,35 @@ def sidenavs(blueprint=None):
         return not nav.get('blueprint') or not blueprint or nav['blueprint'] == blueprint
 
     return [nav for nav in app.sidenavs if blueprint_matches(nav, blueprint)]
+
+
+def section_allowed(nav, sections):
+    return not nav.get('section') or sections.get(nav['section'])
+
+
+def get_company_sidenavs(blueprint=None):
+    user = get_user()
+    company = None
+    if user and user.get('company'):
+        company = get_resource_service('companies').find_one(req=None, _id=user['company'])
+    navs = sidenavs(blueprint)
+    if company and company.get('sections'):
+        return [nav for nav in navs if section_allowed(nav, company['sections'])]
+    return navs
+
+
+def sidenavs_by_names(names=[], blueprint=None):
+    blueprint_navs = get_company_sidenavs(blueprint)
+    return [nav for nav in blueprint_navs if nav.get('name') in names]
+
+
+def sidenavs_by_group(group=0, blueprint=None):
+    blueprint_navs = get_company_sidenavs(blueprint)
+    return [nav for nav in blueprint_navs if nav.get('group') == group]
+
+
+def is_admin_or_account_manager(user=None):
+    allowed_user_types = ['administrator', 'account_management']
+    if user:
+        return user.get('user_type') in allowed_user_types
+    return flask.session.get('user_type') in allowed_user_types

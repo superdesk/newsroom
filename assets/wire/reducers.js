@@ -26,7 +26,6 @@ const initialState = {
     bookmarks: false,
     formats: [],
     newItems: [],
-    newItemsData: null,
     newItemsByTopic: {},
     readItems: {},
     wire: {
@@ -34,6 +33,9 @@ const initialState = {
     },
     search: searchReducer(),
     userSections: {},
+    uiConfig: {},
+    groups: [],
+    searchInitiated: false,
 };
 
 function recieveItems(state, data) {
@@ -51,7 +53,7 @@ function recieveItems(state, data) {
         totalItems: data._meta.total,
         aggregations: data._aggregations || null,
         newItems: [],
-        newItemsData: null,
+        searchInitiated: false,
     };
 }
 
@@ -92,6 +94,8 @@ export default function wireReducer(state = initialState, action) {
             context: action.wireData.context || 'wire',
             savedItemsCount: action.wireData.saved_items || null,
             userSections: action.wireData.userSections || {},
+            uiConfig: action.wireData.ui_config || {},
+            groups: action.wireData.groups || [],
         };
     }
 

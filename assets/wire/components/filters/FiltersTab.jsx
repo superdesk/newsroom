@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import { isEmpty } from 'lodash';
 import { gettext } from 'utils';
+import { getActiveDate } from 'local-store';
 
 import NavCreatedPicker from './NavCreatedPicker';
 import FilterGroup from './FilterGroup';
@@ -15,44 +16,29 @@ import {
     setCreatedFilter,
 } from 'search/actions';
 
+import {
+    selectDate
+} from '../../../agenda/actions';
+
 import { resultsFilteredSelector } from 'search/selectors';
 
 class FiltersTab extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {groups: [
-            {
-                field: 'service',
-                label: gettext('Category'),
-            },
-            {
-                field: 'subject',
-                label: gettext('Subject'),
-            },
-            {
-                field: 'genre',
-                label: gettext('Content Type'),
-            },
-            {
-                field: 'urgency',
-                label: gettext('News Value'),
-            },
-            {
-                field: 'place',
-                label: gettext('Place'),
-            },
-        ]};
-
         this.toggleGroup = this.toggleGroup.bind(this);
         this.getFilterGroups = this.getFilterGroups.bind(this);
         this.toggleFilterAndSearch = this.toggleFilterAndSearch.bind(this);
         this.setCreatedFilterAndSearch = this.setCreatedFilterAndSearch.bind(this);
+        this.reset = this.reset.bind(this);
+        this.state = {
+            groups: this.props.groups
+        };
     }
 
     toggleGroup(event, group) {
         event.preventDefault();
-        this.setState({groups: this.state.groups.map((_group) =>
+        this.setState({groups: this.props.groups.map((_group) =>
             _group === group ? Object.assign({}, _group, {isOpen: !_group.isOpen}) : _group
         )});
     }
@@ -78,17 +64,26 @@ class FiltersTab extends React.Component {
         />);
     }
 
+    reset(event) {
+        event.preventDefault();
+        this.props.resetFilter();
+        this.props.fetchItems();
+        if ('function' === typeof this.props.selectDate) {
+            this.props.selectDate(getActiveDate() || Date.now().valueOf(), 'day');
+        }
+    }
+
     render() {
         const {activeFilter, createdFilter} = this.props;
         const isResetActive = Object.keys(activeFilter).find((key) => !isEmpty(activeFilter[key]))
             || Object.keys(createdFilter).find((key) => !isEmpty(createdFilter[key]));
 
         return this.getFilterGroups().filter((group) => !!group).concat([
-            <NavCreatedPicker
+            (<NavCreatedPicker
                 key="created"
                 createdFilter={createdFilter}
                 setCreatedFilter={this.setCreatedFilterAndSearch}
-            />,
+            />),
             isResetActive || this.props.resultsFiltered ? (
                 [<div key="reset-buffer" id="reset-filter-buffer"></div>,
                     <FilterButton
@@ -102,11 +97,7 @@ class FiltersTab extends React.Component {
                     <FilterButton
                         key='reset'
                         label={gettext('Clear filters')}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            this.props.resetFilter();
-                            this.props.fetchItems();
-                        }}
+                        onClick={this.reset}
                         className='reset'/>,
                 ]
             ) : null,
@@ -124,6 +115,8 @@ FiltersTab.propTypes = {
     toggleFilter: PropTypes.func.isRequired,
     setCreatedFilter: PropTypes.func.isRequired,
     fetchItems: PropTypes.func.isRequired,
+    groups: PropTypes.array,
+    selectDate: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -137,6 +130,7 @@ const mapDispatchToProps = {
     resetFilter,
     toggleFilter,
     setCreatedFilter,
+    selectDate,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(FiltersTab);

@@ -22,6 +22,10 @@ def init(app):
         'name': 'Company co.',
         'is_enabled': True,
         'expiry_date': datetime.datetime.now() - datetime.timedelta(days=5),
+    }, {
+        '_id': 3,
+        'name': 'Foo bar co.',
+        'is_enabled': True
     }])
 
 
@@ -89,6 +93,7 @@ def test_login_fails_for_disabled_user(app, client):
         'is_validated': True,
         'is_enabled': False,
         'is_approved': True,
+        'company': 3,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
     }])
 
@@ -182,6 +187,7 @@ def test_login_fails_for_not_approved_user(app, client):
         'user_type': 'public',
         'is_validated': True,
         'is_enabled': True,
+        'company': 3,
         'is_approved': False,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
     }])
@@ -388,3 +394,47 @@ def test_is_user_valid_empty_password(client):
     assert not _is_password_valid(password, {'_id': 'foo', 'email': 'foo@example.com', 'password': None})
     assert not _is_password_valid(password, {'_id': 'foo', 'email': 'foo@example.com', 'password': ''})
     assert _is_password_valid(password, {'_id': 'foo', 'email': 'foo@example.com', 'password': get_hash('foo', 10)})
+
+
+def test_login_for_public_user_if_company_not_assigned(client, app):
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'test',
+        'last_name': 'test',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'is_validated': True,
+        'is_enabled': True,
+        'is_approved': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+
+    response = client.post(
+        url_for('auth.login'),
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+    assert 'Insufficient Permissions. Access denied.' in response.get_data(as_text=True)
+
+
+def test_login_for_internal_user_if_company_not_assigned(client, app):
+    app.data.insert('users', [{
+        '_id': ObjectId(),
+        'first_name': 'test',
+        'last_name': 'test',
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'internal',
+        'is_validated': True,
+        'is_enabled': True,
+        'is_approved': True,
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
+    }])
+
+    response = client.post(
+        url_for('auth.login'),
+        data={'email': 'test@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+    assert 'Insufficient Permissions. Access denied.' in response.get_data(as_text=True)

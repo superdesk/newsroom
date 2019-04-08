@@ -23,7 +23,7 @@ const Navigations = ({navigations=[], activeNavigation, toggleNavigation, fetchI
 
     return (
         <ul
-            className="nav nav-tabs px-3 justify-content-around flex-nowrap flex-sm-wrap am-news__nav-tabs">
+            className="nav nav-tabs nav-fill flex-grow-1 px-3 am-news__nav-tabs">
             {tabs}
         </ul>
     );

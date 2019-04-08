@@ -14,9 +14,9 @@ from newsroom.utils import query_resource
 
 def get_settings_data():
     return {
-        'products': list(query_resource('products', max_results=200)),
-        'navigations': list(query_resource('navigations', max_results=200)),
-        'companies': list(query_resource('companies', max_results=200)),
+        'products': list(query_resource('products')),
+        'navigations': list(query_resource('navigations')),
+        'companies': list(query_resource('companies')),
         'sections': current_app.sections,
     }
 
@@ -74,6 +74,7 @@ def edit(id):
         'description': data.get('description'),
         'sd_product_id': data.get('sd_product_id'),
         'query': data.get('query'),
+        'planning_item_query': data.get('planning_item_query'),
         'is_enabled': data.get('is_enabled'),
         'product_type': data.get('product_type', 'wire')
     }

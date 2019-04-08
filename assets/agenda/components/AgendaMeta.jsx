@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {hasLocation, getEventLinks, getLocationString, getPublicContacts} from 'agenda/utils';
+import {hasLocation, getEventLinks, getLocationString, getPublicContacts, getCalendars} from 'agenda/utils';
 
 
 function AgendaPreviewMeta({item}) {
@@ -16,13 +16,17 @@ function AgendaPreviewMeta({item}) {
                     key={`${contact.name}-${index}`}>
                     <i className='icon-small--user icon--gray'></i>
                     <span>{`${contact.name}${(contact.name && contact.organisation) ? ', ' : ''}${contact.organisation} ${contact.phone} ${contact.mobile} `}
-                        {contact.email && <a href={`mailto:${contact.email}`}>{contact.email}</a>}
+                        {contact.email && <a href={`mailto:${contact.email}`} target="_blank">{contact.email}</a>}
                     </span>
                 </div>)}
                 {getEventLinks(item).map((link) => <div className='wire-articles__item__meta-row' key={link}>
                     <i className='icon-small--globe icon--gray'></i>
-                    <span><a href={link}>{link}</a></span>
+                    <span><a href={link} target="_blank">{link}</a></span>
                 </div>)}
+                {getCalendars(item) && <div className='wire-articles__item__meta-row'>
+                    <i className='icon-small--calendar icon--gray'></i>
+                    <span>{getCalendars(item)}</span>
+                </div>}
             </div>
         </div>
     );

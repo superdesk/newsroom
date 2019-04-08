@@ -13,8 +13,8 @@ items_ids = [item['_id'] for item in items[:2]]
 item = items[:2][0]
 
 
-def download_zip_file(client, _format):
-    resp = client.get('/download/%s?format=%s&type=wire' % (','.join(items_ids), _format))
+def download_zip_file(client, _format, section):
+    resp = client.get('/download/%s?format=%s&type=%s' % (','.join(items_ids), _format, section))
     assert resp.status_code == 200
     assert resp.mimetype == 'application/zip'
     assert resp.headers.get('Content-Disposition') == 'attachment; filename={}-newsroom.zip'.format(
@@ -121,7 +121,7 @@ def test_download_single(client, app):
 
 def test_wire_download(client, app):
     for _format in wire_formats:
-        _file = download_zip_file(client, _format['format'])
+        _file = download_zip_file(client, _format['format'], 'wire')
         with zipfile.ZipFile(_file) as zf:
             assert _format['filename'] in zf.namelist()
             content = zf.open(_format['filename']).read()
@@ -134,6 +134,7 @@ def test_wire_download(client, app):
     assert history[0].get('item') in items_ids
     assert history[0].get('version')
     assert history[0].get('company') is None
+    assert history[0].get('section') == 'wire'
 
 
 def test_agenda_download(client, app):

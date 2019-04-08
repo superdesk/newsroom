@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {isEmpty} from 'lodash';
+import {isEmpty, get} from 'lodash';
 
 import { gettext } from 'utils';
 
@@ -18,16 +18,35 @@ import ArticleBody from 'ui/components/ArticleBody';
 import ArticleSidebar from 'ui/components/ArticleSidebar';
 import ArticleSidebarBox from 'ui/components/ArticleSidebarBox';
 
-import { hasCoverages, hasAttachments } from '../utils';
+import {
+    hasCoverages,
+    hasAttachments,
+    getInternalNote,
+    getCoveragesForDisplay,
+} from '../utils';
 
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
-import AgendaCoverages from './AgendaCoverages';
+import AgendaInternalNote from './AgendaInternalNote';
+import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
+import AgendaTags from './AgendaTags';
 
-export default function AgendaItemDetails({item, user, actions, onClose, requestCoverage, group}) {
+
+export default function AgendaItemDetails(
+    {
+        item,
+        user,
+        actions,
+        onClose,
+        requestCoverage,
+        group,
+        planningId,
+        eventsOnly
+    })
+{
     const locations = getLocations(item);
     let map = null;
 
@@ -36,10 +55,14 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
     // if (mapsLoaded() && !isEmpty(geoLocations)) {
     //     map = <Map locations={geoLocations} />;
     // }
+    const plan = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
 
     if (!map && mapsKey() && !isEmpty(locations)) {
         map = <StaticMap locations={locations} scale={2} />;
     }
+
+    const displayCoverages = getCoveragesForDisplay(item, plan, group);
+    const internalNotes = getInternalNote(item, plan);
 
     return (
         <Content type="item-detail">
@@ -52,19 +75,26 @@ export default function AgendaItemDetails({item, user, actions, onClose, request
             <Article image={map} item={item} group={group}>
                 <ArticleBody>
                     <AgendaMeta item={item} />
-                    <AgendaLongDescription item={item} />
+                    <AgendaLongDescription item={item} plan={plan}/>
                 </ArticleBody>
                 <ArticleSidebar>
-                    <ArticleSidebarBox label={gettext('Coverages')}>
-                        {hasCoverages(item) && <AgendaCoverages coverages={item.coverages} />}
-                        <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>
-                    </ArticleSidebarBox>
+                    <div>
+                        {hasCoverages(item) &&
+                        <AgendaPreviewCoverages
+                            item={item}
+                            currentCoverage={displayCoverages.current}
+                            previousCoverage={displayCoverages.previous}/>}
+                    </div>
                     {hasAttachments(item) && (
                         <ArticleSidebarBox label={gettext('Attachments')}>
                             <AgendaAttachments item={item} />
                         </ArticleSidebarBox>
                     )}
-                    <AgendaEdNote item={item} />
+                    <AgendaTags item={item} plan={plan} isItemDetail={true} />
+                    <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason'/>
+                    <AgendaInternalNote internalNote={internalNotes}
+                        mt2={!!(item.ednote || plan.ednote || item.state_reason)}/>
+                    {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                 </ArticleSidebar>
             </Article>
         </Content>
@@ -82,4 +112,6 @@ AgendaItemDetails.propTypes = {
     onClose: PropTypes.func,
     requestCoverage: PropTypes.func,
     group: PropTypes.string,
+    planningId: PropTypes.string,
+    eventsOnly: PropTypes.bool,
 };

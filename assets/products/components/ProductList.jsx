@@ -4,7 +4,7 @@ import ProductListItem from './ProductListItem';
 import { gettext } from 'utils';
 
 
-function ProductList({products, onClick, activeProductId}) {
+function ProductList({products, onClick, activeProductId, activeSection}) {
     const list = products.map((product) =>
         <ProductListItem
             key={product._id}
@@ -23,6 +23,7 @@ function ProductList({products, onClick, activeProductId}) {
                             <th>{ gettext('Status') }</th>
                             <th>{ gettext('Superdesk Product Id') }</th>
                             <th>{ gettext('Query') }</th>
+                            {activeSection === 'agenda' && <th>{ gettext('Planning Item Query')}</th>}
                             <th>{ gettext('Created On') }</th>
                         </tr>
                     </thead>
@@ -36,7 +37,8 @@ function ProductList({products, onClick, activeProductId}) {
 ProductList.propTypes = {
     products: PropTypes.array.isRequired,
     onClick: PropTypes.func.isRequired,
-    activeProductId: PropTypes.string
+    activeProductId: PropTypes.string,
+    activeSection: PropTypes.string
 };
 
 export default ProductList;

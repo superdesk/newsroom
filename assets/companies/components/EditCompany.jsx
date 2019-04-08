@@ -8,12 +8,7 @@ import DateInput from 'components/DateInput';
 import { isEmpty } from 'lodash';
 import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
 import CompanyPermissions from './CompanyPermissions';
-
-const countries = [
-    {value: 'au', text: gettext('Australia')},
-    {value: 'nz', text: gettext('New Zealand')},
-    {value: 'other', text: gettext('Other')},
-];
+import { countries } from '../utils';
 
 class EditCompany extends React.Component {
     constructor(props) {
@@ -99,6 +94,15 @@ class EditCompany extends React.Component {
                                         value={this.props.company.name}
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.name : null}/>
+
+                                    <SelectInput
+                                        name='company_type'
+                                        label={gettext('Company Type')}
+                                        value={this.props.company.company_type}
+                                        options={this.props.companyTypes.map((ctype) => ({text: gettext(ctype.name), value: ctype.id}))}
+                                        defaultOption=""
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.company_type : null}/>
 
                                     <TextInput
                                         name='url'
@@ -200,6 +204,7 @@ EditCompany.propTypes = {
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     fetchCompanyUsers: PropTypes.func.isRequired,
+    companyTypes: PropTypes.array,
 };
 
 export default EditCompany;

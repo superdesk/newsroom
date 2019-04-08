@@ -1,7 +1,7 @@
 import { createStore, render, initWebSocket, getInitData } from 'utils';
 
 import agendaReducer from './reducers';
-import {getReadItems} from 'wire/utils';
+import {getActiveDate, getReadItems, getFeaturedOnlyParam} from 'local-store';
 import AgendaApp from './components/AgendaApp';
 import { fetchItems, setState, initData, initParams, pushNotification } from './actions';
 import { setView } from 'search/actions';
@@ -9,7 +9,8 @@ import { setView } from 'search/actions';
 const store = createStore(agendaReducer);
 
 // init data
-store.dispatch(initData(getInitData(window.agendaData), getReadItems()));
+store.dispatch(initData(getInitData(window.agendaData), getReadItems(), getActiveDate(), getFeaturedOnlyParam()));
+
 
 // init query
 const params = new URLSearchParams(window.location.search);
@@ -24,8 +25,10 @@ if (localStorage.getItem('view')) {
 window.onpopstate = function(event) {
     if (event.state) {
         store.dispatch(setState(event.state));
+        store.dispatch(fetchItems(false));
     }
 };
+
 
 // fetch items & render
 store.dispatch(fetchItems()).then(() =>

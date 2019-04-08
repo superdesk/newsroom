@@ -13,7 +13,7 @@ export default function AgendaDetailCoverages({item}) {
     return [
         <span key="label" className="column__preview__tags__box-headline">{gettext('Coverages')}</span>,
         <div key="content" className="column__preview__tags__column pt-4 pb-2">
-            <AgendaCoverages coverages={item.coverages} />
+            <AgendaCoverages item={item} />
         </div>,
     ];
 }

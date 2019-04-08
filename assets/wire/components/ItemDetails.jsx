@@ -1,18 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isEmpty } from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
+import { isDisplayed } from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import PreviewActionButtons from 'components/PreviewActionButtons';
-import { getPicture, getDetailRendition, showItemVersions, getCaption, isKilled, DISPLAY_ABSTRACT, isPreformatted } from 'wire/utils';
+import {
+    getPicture,
+    getVideos,
+    getOriginalVideo,
+    getDetailRendition,
+    showItemVersions,
+    getCaption,
+    isKilled,
+    DISPLAY_ABSTRACT,
+    isPreformatted,
+    isCustomRendition,
+} from 'wire/utils';
 import Content from 'ui/components/Content';
 import ContentHeader from 'ui/components/ContentHeader';
 import ContentBar from 'ui/components/ContentBar';
 import ArticleItemDetails from 'ui/components/ArticleItemDetails';
 import ArticleContent from 'ui/components/ArticleContent';
 import ArticlePicture from 'ui/components/ArticlePicture';
+import ArticleVideo from  'ui/components/ArticleVideo';
 import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
 import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
@@ -20,10 +34,15 @@ import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
 import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
 import ArticleBody from 'ui/components/ArticleBody';
+import ArticleAuthor from 'ui/components/ArticleAuthor';
+import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 
 
-function ItemDetails({item, user, actions, onClose}) {
+function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo}) {
     const picture = getPicture(item);
+    const videos = getVideos(item);
+    const isCustom = isCustomRendition(picture);
+
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
     return (
         <Content type="item-detail">
@@ -35,29 +54,45 @@ function ItemDetails({item, user, actions, onClose}) {
             <ArticleItemDetails>
                 <ArticleContent>
                     {picture && <ArticlePicture
-                        picture={getDetailRendition(picture)}
+                        picture={getDetailRendition(picture, isCustomRendition)}
                         isKilled={isKilled(item)}
                         caption={getCaption(picture)}
+                        isCustomRendition={isCustom}
                         isItemDetails/>}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
-                            <ArticleSlugline item={item}/>
-                            <ArticleHeadline item={item}/>
-                            <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>
-                            <ArticleBodyHtml item={item}/>
+                            <ArticleEmbargoed item={item} />
+                            {isDisplayed('slugline', detailsConfig) && <ArticleSlugline item={item}/>}
+                            {isDisplayed('headline', detailsConfig) && <ArticleHeadline item={item}/>}
+                            <ArticleAuthor item={item} isPreview={false} displayConfig={detailsConfig} />
+                            {isDisplayed('abstract', detailsConfig) &&
+                            <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
+                            {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
+                            {!isEmpty(videos) && videos.map((video) => <ArticleVideo
+                                key={video.guid}
+                                video={getOriginalVideo(video)}
+                                isKilled={isKilled(item)}
+                                headline={video.headline}
+                                downloadVideo={downloadVideo}
+                            />)}
                         </ArticleBody>
-                        <PreviewMeta item={item} isItemDetail={true}/>
-                        <ArticleContentInfoWrapper>
-                            <PreviewTags item={item} isItemDetail={true}/>
 
-                            {showItemVersions(item, true) &&
-                                <ListItemNextVersion item={item} />
+
+
+                        {isDisplayed('metadata_section', detailsConfig) &&
+                            <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
+                        <ArticleContentInfoWrapper>
+                            {isDisplayed('tags_section', detailsConfig) &&
+                                <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
+
+                            {isDisplayed('item_versions', detailsConfig) && showItemVersions(item, true) &&
+                                <ListItemNextVersion item={item} displayConfig={detailsConfig}  />
                             }
-                            {showItemVersions(item) &&
+                            {isDisplayed('item_versions', detailsConfig) && showItemVersions(item) &&
                                 <ListItemPreviousVersions item={item} isPreview={true}/>
                             }
 
-                            <AgendaLinks item={item} />
+                            {isDisplayed('agenda_links', detailsConfig) && <AgendaLinks item={item} />}
                         </ArticleContentInfoWrapper>
                     </ArticleContentWrapper>
                 </ArticleContent>
@@ -75,6 +110,8 @@ ItemDetails.propTypes = {
         url: PropTypes.func,
     })),
     onClose: PropTypes.func,
+    detailsConfig: PropTypes.object,
+    downloadVideo: PropTypes.func,
 };
 
 export default ItemDetails;

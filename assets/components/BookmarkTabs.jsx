@@ -1,34 +1,16 @@
 import React from 'react';
 import PropTypes from  'prop-types';
-import {gettext} from 'utils';
+import {gettext} from '../utils';
+
 
 export default function BookmarkTabs(props) {
-    const buttons = [
-        {
-            id: 'wire',
-            href: '/bookmarks',
-            label: gettext('Wire'),
-        },
-        {
-            id: 'agenda',
-            href: '/bookmarks_agenda',
-            label: gettext('Agenda'),
-        },
-        {
-            id: 'am_news',
-            href: '/bookmarks_am_news',
-            label: gettext('AM News'),
-        },
-    ];
+    const sections = Object.keys(props.sections).map((id) => {
+        const section = props.sections[id];
 
-    const sections = buttons.map((btn) =>
-        (
-            props.sections[btn.id] ?
-                <a key={btn.id}
-                    className={'btn btn-outline-primary' + (btn.id === props.active ? ' active' : '')}
-                    href={btn.href}>{btn.label}</a> : null
-        )
-    ).filter((btn) => btn);
+        return <a key={section._id}
+            className={'btn btn-outline-primary' + (section._id === props.active ? ' active' : '')}
+            href={`/bookmarks_${section._id}`}>{gettext(section.name)}</a>;
+    });
 
     if (sections.length < 2) {
         return null;

@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 install_requires = [
     'Babel>=2.5.3,<3.0',
     'eve==0.7.8',
+    'eve-elastic==2.5.0',
     'flask>=0.12,<1.0',
     'flask-babel>=0.11.2,<0.12',
     'flask-webpack>=0.1.0,<0.2',
@@ -12,7 +13,7 @@ install_requires = [
     'flask_pymongo>=0.5.2,<1.0',
     'honcho>=1.0.1',
     'gunicorn>=19.7.1',
-    'superdesk-core>=1.24,<1.25',
+    'superdesk-core>=1.26,<1.27',
     'icalendar>=4.0.3,<4.1',
     'newrelic>=4.4.1,<4.5.0',
 ]

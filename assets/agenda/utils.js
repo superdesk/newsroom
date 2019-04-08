@@ -1,6 +1,6 @@
-import { get, isEmpty, includes } from 'lodash';
+import { get, isEmpty, includes, keyBy, sortBy } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek, getConfig, gettext} from '../utils';
+import {formatDate, formatMonth, formatWeek, getConfig, gettext, DATE_FORMAT, COVERAGE_DATE_FORMAT} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -32,20 +32,55 @@ const Groupers = {
     'month': formatMonth,
 };
 
+export function getCoverageStatusText(coverage) {
+    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
+        return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
+    }
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
+        return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
+    }
+
+    return get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '');
+}
+
+export const WORKFLOW_STATUS = {
+    DRAFT: 'draft',
+    ASSIGNED: 'assigned',
+    ACTIVE: 'active',
+    COMPLETED: 'completed',
+    CANCELLED: 'cancelled',
+};
+
+export const DRAFT_STATUS_TEXTS = {
+    'coverage not planned': gettext('not planned'),
+    'coverage not intended': gettext('not planned'),
+    'coverage intended': gettext('planned'),
+    'coverage not decided': gettext('on merit'),
+    'coverage not decided yet': gettext('on merit'),
+    'coverage upon request': gettext('on request'),
+};
+
 export const WORKFLOW_STATUS_TEXTS = {
-    draft: gettext('planned'),
-    assigned: gettext('planned'),
-    active: gettext('in progress'),
-    completed: gettext('available'),
-    cancelled: gettext('cancelled'),
+    [WORKFLOW_STATUS.ASSIGNED]: gettext('planned'),
+    [WORKFLOW_STATUS.ACTIVE]: gettext('in progress'),
+    [WORKFLOW_STATUS.COMPLETED]: gettext('available'),
+    [WORKFLOW_STATUS.CANCELLED]: gettext('cancelled'),
 };
 
 export const WORKFLOW_COLORS = {
-    draft: 'icon--mid-blue-light',
-    assigned: 'icon--mid-blue-light',
-    active: 'icon--cyan',
-    completed: 'icon--green',
-    cancelled: 'icon--red',
+    [WORKFLOW_STATUS.DRAFT]: 'icon--gray-light',
+    [WORKFLOW_STATUS.ASSIGNED]: 'icon--mid-blue',
+    [WORKFLOW_STATUS.ACTIVE]: 'icon--cyan',
+    [WORKFLOW_STATUS.COMPLETED]: 'icon--green',
+    [WORKFLOW_STATUS.CANCELLED]: 'icon--red',
+};
+
+export const SCHEDULE_TYPE = {
+    REGULAR: 'REGULAR',
+    ALL_DAY: 'ALL_DAY',
+    MULTI_DAY: 'MULTI_DAY',
+    NO_DURATION: 'NO_DURATION',
 };
 
 
@@ -102,7 +137,7 @@ export function hasCoverages(item) {
  * @returns {*}
  */
 export function getCoverageIcon(coverageType) {
-    const coverageTypes = getConfig('coverage_types', {}, 'agendaData');
+    const coverageTypes = getConfig('coverage_types', {});
     return get(coverageTypes, `${coverageType}.icon`, 'unrecognized');
 }
 
@@ -113,7 +148,7 @@ export function getCoverageIcon(coverageType) {
  * @returns {*}
  */
 export function getCoverageDisplayName(coverageType) {
-    const coverageTypes = getConfig('coverage_types', {}, 'agendaData');
+    const coverageTypes = getConfig('coverage_types', {});
     return get(coverageTypes, `${coverageType}.name`, coverageType);
 }
 
@@ -182,7 +217,7 @@ export function getGeoLocation(item) {
  */
 export function getLocationString(item) {
     return [
-        get(item, 'location.0.address.title'),
+        get(item, 'location.0.name', get(item, 'location.0.address.title')),
         get(item, 'location.0.address.line.0'),
         get(item, 'location.0.address.area'),
         get(item, 'location.0.address.locality'),
@@ -218,6 +253,17 @@ export function getPublicContacts(item) {
     }));
 }
 
+/**
+ * Returns item calendars
+ *
+ * @param {Object} item
+ * @return {String}
+ */
+export function getCalendars(item) {
+    return get(item, 'calendars', []).map(cal => cal.name).join(', ');
+}
+
+
 
 /**
  * Returns item event link
@@ -251,6 +297,20 @@ export function getDateInputDate(dateString) {
     if (dateString) {
         const parsed = moment(parseInt(dateString));
         return parsed.format('YYYY-MM-DD');
+    }
+
+    return '';
+}
+
+/**
+ * Return moment date
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function getMomentDate(dateString) {
+    if (dateString) {
+        return moment(parseInt(dateString));
     }
 
     return '';
@@ -315,7 +375,7 @@ function getNextMonth(dateString) {
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
  */
-function getPreviousMonth(dateString) {
+export function getPreviousMonth(dateString) {
     return moment(dateString).add(-1, 'months').startOf('month').valueOf();
 }
 
@@ -352,6 +412,46 @@ export function getAttachments(item) {
 }
 
 /**
+ * Get list of internal notes
+ *
+ * @param {Object} item
+ * @return {Array}
+ */
+export function getInternalNote(item, plan) {
+    return get(plan, 'internal_note') || get(item, 'event.internal_note');
+}
+
+/**
+ * Get internal notes per coverage
+ *
+ * @param {Object} item
+ * @return {Object}
+ */
+export function getNotesFromCoverages(item, field = 'internal_note') {
+    const notes = {};
+    const planningItems = get(item, 'planning_items', []);
+    planningItems.forEach(p => {
+        const planning_note = p[field];
+        get(p, 'coverages', []).forEach((c) => {
+            if (get(c, `planning.${field}`, '') && c.planning[field] !== planning_note) {
+                notes[c.coverage_id] = c.planning[field];
+            }
+        });
+    });
+    return notes;
+}
+
+/**
+ * Get list of subjects
+ *
+ * @param {Object} item
+ * @return {Array}
+ */
+export function getSubjects(item) {
+    return get(item, 'subject') || [];
+}
+
+/**
  * Test if item has any attachments
  * 
  * @param {Object} item
@@ -368,7 +468,18 @@ export function hasAttachments(item) {
  * @return {String}
  */
 export function getName(item) {
-    return item.name || item.headline;
+    return item.name || item.slugline || item.headline;
+}
+
+/**
+ * Get agenda item description
+ *
+ * @param {Object} item
+ * @param {Object} plan
+ * @return {String}
+ */
+export function getDescription(item, plan) {
+    return plan.description_text || item.definition_short;
 }
 
 
@@ -423,8 +534,9 @@ export function groupItems (items, activeDate, activeGrouping) {
 
             const isBetween = day.isBetween(itemStartDate, itemEndDate, 'day', '[]');
             const containsExtra = containsExtraDate(item, day);
+            const addGroupItem = (item.event && (isBetween || containsExtra)) || containsExtra;
 
-            if (grouper(day) !== key && (isBetween || containsExtra)) {
+            if (grouper(day) !== key && addGroupItem) {
                 key = grouper(day);
                 const groupList = groupedItems[key] || [];
                 groupList.push(item._id);
@@ -433,5 +545,89 @@ export function groupItems (items, activeDate, activeGrouping) {
         }
     });
 
-    return groupedItems;
+    return sortBy(
+        Object.keys(groupedItems).map((k) => (
+            {
+                date: k,
+                items: groupedItems[k],
+                _sortDate: moment(k, DATE_FORMAT)
+            })),
+        (g) => g._sortDate);
+}
+
+/**
+ * Get Planning Item for the day
+ * @param item: Agenda item
+ * @param group: Group Date
+ */
+export function getPlanningItemsByGroup(item, group) {
+    // Event item
+    if (get(item, 'planning_items.length', 0) === 0) {
+        return [];
+    }
+
+    // Planning item without coverages
+    const plansWithoutCoverages = get(item, 'planning_items', []).filter((p) =>
+        formatDate(p.planning_date) === group && get(p, 'coverages.length', 0) === 0);
+
+    const allPlans = keyBy(get(item, 'planning_items'), '_id');
+    const processed = {};
+
+    // get unique plans for that group based on the coverage.
+    const plansWithCoverages = item.coverages
+        .map((coverage) => {
+            if (isCoverageForExtraDay(coverage, group)) {
+                if (!processed[coverage.planning_id]) {
+                    processed[coverage.planning_id] = 1;
+                    return allPlans[coverage.planning_id];
+                }
+                return null;
+            }
+            return null;
+        })
+        .filter((p) => p);
+
+    return [...plansWithCoverages, ...plansWithoutCoverages];
+}
+
+export function isCoverageOnPreviousDay(coverage, group) {
+    return moment(coverage.scheduled).isBefore(moment(group, DATE_FORMAT), 'day');
+}
+
+
+export function getCoveragesForDisplay(item, plan, group) {
+    const currentCoverage = [];
+    const previousCoverage = [];
+    // get current and preview coverages
+    (get(item, 'coverages') || [])
+        .forEach((coverage) => {
+            if (coverage.planning_id === get(plan, 'guid')) {
+                if (isCoverageForExtraDay(coverage, group)) {
+                    currentCoverage.push(coverage);
+                } else if (isCoverageOnPreviousDay(coverage, group)) {
+                    previousCoverage.push(coverage);
+                }
+            }
+        });
+
+    return {current: currentCoverage, previous: previousCoverage};
+}
+
+export function getListItems(groups, itemsById) {
+    const listItems = [];
+
+    groups.forEach((group) => {
+        group.items.forEach((_id) => {
+            const plans = getPlanningItemsByGroup(itemsById[_id], group.date);
+            // console.log(plans);
+            if (plans.length > 0) {
+                plans.forEach((plan) => {
+                    listItems.push({_id, group: group.date, plan});
+                });
+            } else {
+                listItems.push({_id, group: group.date, plan: null});
+            }
+        });
+    });
+    return listItems;
 }

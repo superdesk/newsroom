@@ -2,10 +2,17 @@
 import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import { gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler } from 'utils';
-import { markItemAsRead } from 'wire/utils';
+import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler, getLocaleDate, DATE_FORMAT, TIME_FORMAT} from 'utils';
+import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
-import {getDateInputDate} from './utils';
+import {
+    getCalendars,
+    getDateInputDate,
+    getLocationString,
+    getPublicContacts,
+    hasLocation,
+    getMomentDate,
+} from './utils';
 
 import {
     setQuery,
@@ -14,7 +21,14 @@ import {
     toggleFilter,
     toggleNavigation,
     setCreatedFilter,
+    toggleNavigationById,
+    initParams as initSearchParams,
 } from 'search/actions';
+
+import {clearAgendaDropdownFilters} from '../local-store';
+import {getLocations, getMapSource} from '../maps/utils';
+import moment from 'moment';
+
 
 const WATCH_URL = '/agenda_watch';
 
@@ -33,23 +47,29 @@ export function setActive(item) {
     return {type: SET_ACTIVE, item};
 }
 
+
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item, group) {
-    return {type: PREVIEW_ITEM, item, group};
+export function preview(item, group, plan) {
+    return {type: PREVIEW_ITEM, item, group, plan};
 }
 
+export function previewAndCopy(item) {
+    return (dispatch) => {
+        dispatch(copyPreviewContents(item));
+    };
+}
 
-export function previewItem(item, group) {
+export function previewItem(item, group, plan) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(preview(item, group));
+        dispatch(preview(item, group, plan));
         item && analytics.itemEvent('preview', item);
     };
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item, group) {
-    return {type: OPEN_ITEM, item, group};
+export function openItemDetails(item, group, plan) {
+    return {type: OPEN_ITEM, item, group, plan};
 }
 
 export function requestCoverage(item, message) {
@@ -62,12 +82,14 @@ export function requestCoverage(item, message) {
     };
 }
 
-export function openItem(item, group) {
+export function openItem(item, group, plan) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
-        dispatch(openItemDetails(item, group));
+        dispatch(openItemDetails(item, group, plan));
         updateRouteParams({
-            item: item ? item._id : null
+            item: item ? item._id : null,
+            group: group || null,
+            plan: plan || null,
         }, getState());
         item && analytics.itemEvent('open', item);
         analytics.itemView(item);
@@ -90,8 +112,8 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(agendaData, readData) {
-    return {type: INIT_DATA, agendaData, readData};
+export function initData(agendaData, readData, activeDate, featuredOnly) {
+    return {type: INIT_DATA, agendaData, readData, activeDate, featuredOnly};
 }
 
 export const ADD_TOPIC = 'ADD_TOPIC';
@@ -107,10 +129,83 @@ export function selectDate(dateString, grouping) {
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        window.open(`/agenda/${item._id}?print`, '_blank');
+        const map = encodeURIComponent(getMapSource(getLocations(item), 2));
+        window.open(`/agenda/${item._id}?print&map=${map}`, '_blank');
+
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
+        }
+    };
+}
+
+
+/**
+ * Copy contents of agenda preview.
+ *
+ * This is an initial version, should be updated with preview markup changes.
+ */
+export function copyPreviewContents(item) {
+    return (dispatch, getState) => {
+        const textarea = document.getElementById('copy-area');
+        const contents = [];
+
+        item.name && contents.push(item.name);
+        item.name && contents.push(gettext('Dates: {{ dates }}', {dates: `${getLocaleDate(item.dates.start)} - ${getLocaleDate(item.dates.end)}`}));
+        hasLocation(item) && contents.push(gettext('Location: {{ location }}', {location: getLocationString(item)}));
+        item.ednote && contents.push(gettext('Ednote: {{ ednote }}', {ednote: item.ednote}));
+
+        if (item.definition_short) {
+            contents.push(gettext('Description: {{ description }}', {description: item.definition_short}));
+        }
+
+        const contacts = getPublicContacts(item);
+        if (!isEmpty(contacts)) {
+            contents.push(gettext(''));
+            contents.push(gettext('Contacts'));
+            contacts.map(contact => {
+                contents.push(gettext('Name: {{ contact }}', {contact: contact.name}));
+                contact.organisation && contents.push(gettext('Organisation: {{ organisation }}', {organisation: contact.organisation}));
+                contact.contact_email && contents.push(gettext('Email: {{ email }}', {email: contact.contact_email}));
+                contact.phone && contents.push(gettext('Phone: {{ phone }}', {phone: contact.phone}));
+                contact.mobile && contents.push(gettext('Mobile: {{ mobile }}', {mobile: contact.mobile}));
+                contents.push('');
+            });
+        }
+
+        const calendars = getCalendars(item);
+        calendars && contents.push(gettext('Calendars: {{ calendars }}', {calendars}));
+
+        contents.push('');
+
+        if (!isEmpty(item.planning_items)) {
+            item.planning_items.map(pi => {
+                contents.push(gettext('Planning item'));
+                contents.push(gettext('Description: {{ description }}', {description: pi.description_text}));
+                pi.coverages &&  pi.coverages.map(coverage => {
+                    contents.push(gettext('Coverage type: {{ type }}', {type: coverage.planning.g2_content_type}));
+                    contents.push(gettext('Scheduled: {{ schedule }}', {schedule: getLocaleDate(coverage.planning.scheduled)}));
+                    contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
+                    coverage.planning.description_text && contents.push(gettext('Description: {{ description }}', {description: coverage.planning.description_text}));
+                    contents.push('');
+                });
+            });
+        }
+
+        textarea.value = contents.join('\n');
+        textarea.select();
+
+        if (document.execCommand('copy')) {
+            notify.success(gettext('Item copied successfully.'));
+            item && analytics.itemEvent('copy', item);
+        } else {
+            notify.error(gettext('Sorry, Copy is not supported.'));
+        }
+
+        if (getState().user) {
+            server.post(`/wire/${item._id}/copy?type=${getState().context}`)
+                .then(dispatch(setCopyItem(item._id)))
+                .catch(errorHandler);
         }
     };
 }
@@ -123,10 +218,21 @@ export function printItem(item) {
  * @return {Promise}
  */
 function search(state, next) {
+    const currentMoment = moment();
     const activeFilter = get(state, 'search.activeFilter', {});
     const activeNavigation = get(state, 'search.activeNavigation');
     const createdFilter = get(state, 'search.createdFilter', {});
-    const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
+    const featuredFilter = !activeNavigation && !state.bookmarks && get(state, 'agenda.featuredOnly');
+    let fromDateFilter;
+
+    if (featuredFilter) {
+        fromDateFilter = getMomentDate(get(state, 'agenda.activeDate'))
+            .set({hour: currentMoment.hour(), minute: currentMoment.minute()}).format(`${DATE_FORMAT} ${TIME_FORMAT}`);
+    } else {
+        const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
+        fromDateFilter = isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : createdFilter.from;
+    }
+
 
     let dateTo = createdFilter.to;
     if (createdFilter.from && createdFilter.from.indexOf('now') >= 0) {
@@ -140,9 +246,10 @@ function search(state, next) {
         navigation: activeNavigation,
         filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
         from: next ? state.items.length : 0,
-        date_from: isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : createdFilter.from,
+        date_from: fromDateFilter,
         date_to: dateTo,
         timezone_offset: getTimezoneOffset(),
+        featured: featuredFilter,
     };
 
     const queryString = Object.keys(params)
@@ -156,7 +263,7 @@ function search(state, next) {
 /**
  * Fetch items for current query
  */
-export function fetchItems() {
+export function fetchItems(updateRoute = true) {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
@@ -164,8 +271,12 @@ export function fetchItems() {
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
                 const state = getState();
-                updateRouteParams({
+                updateRoute && updateRouteParams({
                     q: state.query,
+                    filter: get(state, 'search.activeFilter'),
+                    navigation: get(state, 'search.activeNavigation'),
+                    created: get(state, 'search.createdFilter'),
+                    featured: get(state, 'agenda.featuredOnly', false) ? true : null,
                 }, state);
                 analytics.timingComplete('search', Date.now() - start);
             })
@@ -263,6 +374,49 @@ export function submitShareItem(data) {
     };
 }
 
+
+export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
+export function setBookmarkItems(items) {
+    return {type: BOOKMARK_ITEMS, items};
+}
+
+export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
+export function removeBookmarkItems(items) {
+    return {type: REMOVE_BOOKMARK, items};
+}
+
+export function bookmarkItems(items) {
+    return (dispatch, getState) =>
+        server.post('/agenda_bookmark', {items})
+            .then(() => {
+                if (items.length > 1) {
+                    notify.success(gettext('Items were bookmarked successfully.'));
+                } else {
+                    notify.success(gettext('Item was bookmarked successfully.'));
+                }
+            })
+            .then(() => {
+                analytics.multiItemEvent('bookmark', items.map((_id) => getState().itemsById[_id]));
+            })
+            .then(() => dispatch(setBookmarkItems(items)))
+            .catch(errorHandler);
+}
+
+export function removeBookmarks(items) {
+    return (dispatch, getState) =>
+        server.del('/agenda_bookmark', {items})
+            .then(() => {
+                if (items.length > 1) {
+                    notify.success(gettext('Items were removed from bookmarks successfully.'));
+                } else {
+                    notify.success(gettext('Item was removed from bookmarks successfully.'));
+                }
+            })
+            .then(() => dispatch(removeBookmarkItems(items)))
+            .then(() => getState().bookmarks && dispatch(fetchItems()))
+            .catch(errorHandler);
+}
+
 export const TOGGLE_SELECTED = 'TOGGLE_SELECTED';
 export function toggleSelected(item) {
     return {type: TOGGLE_SELECTED, item};
@@ -337,9 +491,7 @@ export function pushNotification(push) {
             return dispatch(setNewItemsByTopic(push.extra));
 
         case 'new_item':
-            return new Promise((resolve, reject) => {
-                dispatch(fetchNewItems()).then(resolve).catch(reject);
-            });
+            return dispatch(setAndUpdateNewItems(push.extra));
 
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
@@ -367,17 +519,27 @@ function setTopics(topics) {
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
-export function setNewItems(data) {
-    return {type: SET_NEW_ITEMS, data};
+export function setAndUpdateNewItems(data) {
+    return function(dispatch) {
+        if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'agenda') {
+            return Promise.resolve();
+        }
+
+        dispatch(updateItems(data));
+        dispatch({type: SET_NEW_ITEMS, data});
+        return Promise.resolve();
+    };
 }
 
-export function fetchNewItems() {
-    return (dispatch, getState) => search(getState())
-        .then((response) => dispatch(setNewItems(response)));
+export const UPDATE_ITEMS = 'UPDATE_ITEMS';
+export function updateItems(data) {
+    return {type: UPDATE_ITEMS, data};
 }
 
 export function toggleDropdownFilter(key, val) {
     return (dispatch) => {
+        dispatch(setActive(null));
+        dispatch(preview(null));
         dispatch(toggleFilter(key, val, true));
         dispatch(fetchItems());
     };
@@ -416,15 +578,17 @@ export function fetchMoreItems() {
  * @param {URLSearchParams} params
  */
 export function initParams(params) {
+    if (params.get('filter') || params.get('created')) {
+        clearAgendaDropdownFilters();
+    }
     return (dispatch, getState) => {
-        if (params.get('q')) {
-            dispatch(setQuery(params.get('q')));
-        }
+        dispatch(initSearchParams(params));
         if (params.get('item')) {
             dispatch(fetchItem(params.get('item')))
                 .then(() => {
                     const item = getState().itemsById[params.get('item')];
-                    dispatch(openItem(item));
+
+                    dispatch(openItem(item, params.get('group'), params.get('plan')));
                 });
         }
     };
@@ -437,8 +601,13 @@ export function initParams(params) {
  * @return {Promise}
  */
 export function setEventQuery(topic) {
-    return (dispatch) => {
-        dispatch(toggleNavigation());
+    return (dispatch, getState) => {
+        // Set featured query option to false when using navigations
+        if (get(getState(), 'agenda.featuredOnly')) {
+            dispatch({type: TOGGLE_FEATURED_FILTER});
+        }
+
+        topic.navigation ? dispatch(toggleNavigationById(topic.navigation)) : dispatch(toggleNavigation());
         dispatch(toggleTopic(topic));
         dispatch(setQuery(topic.query));
         dispatch(resetFilter(topic.filter));
@@ -447,13 +616,22 @@ export function setEventQuery(topic) {
     };
 }
 
-export function refresh() {
-    return (dispatch, getState) => dispatch(recieveItems(getState().newItemsData));
-}
-
 function multiItemEvent(event, items, state) {
     items.forEach((itemId) => {
         const item = state.itemsById[itemId];
         item && analytics.itemEvent(event, item);
     });
+}
+
+export const TOGGLE_FEATURED_FILTER = 'TOGGLE_FEATURED_FILTER';
+export function toggleFeaturedFilter(fetch = true) {
+    return (dispatch) => {
+        toggleFeaturedOnlyParam();
+        dispatch({type: TOGGLE_FEATURED_FILTER});
+        if (!fetch) {
+            return Promise.resolve;
+        }
+
+        return dispatch(fetchItems());
+    };   
 }

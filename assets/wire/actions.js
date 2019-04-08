@@ -1,20 +1,21 @@
 
 import { get, isEmpty } from 'lodash';
+import mime from 'mime-types';
 import server from 'server';
 import analytics from 'analytics';
 import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
-import { markItemAsRead, toggleNewsOnlyParam } from './utils';
+import { markItemAsRead, toggleNewsOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 
 import {
     setQuery,
     toggleNavigation,
     setCreatedFilter,
+    toggleNavigationById,
+    initParams as initSearchParams,
 } from 'search/actions';
+import {getLocations, getMapSource} from '../maps/utils';
 
-import {
-    fetchItems as fetchAgendaItems
-} from '../agenda/actions';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -175,14 +176,20 @@ function search(state, next) {
     const newsOnly = !!get(state, 'wire.newsOnly');
     const context = get(state, 'context', 'wire');
 
+    let created_to = createdFilter.to;
+    if (createdFilter.from && createdFilter.from.indexOf('now') >= 0) {
+        created_to = createdFilter.from;
+    }
+
+
     const params = {
         q: state.query,
         bookmarks: state.bookmarks && state.user,
         navigation: activeNavigation,
-        filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
+        filter: !isEmpty(activeFilter) && encodeURIComponent(JSON.stringify(activeFilter)),
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
-        created_to: createdFilter.to,
+        created_to,
         timezone_offset: getTimezoneOffset(),
         newsOnly
     };
@@ -198,7 +205,7 @@ function search(state, next) {
 /**
  * Fetch items for current query
  */
-export function fetchItems() {
+export function fetchItems(updateRoute = true) {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
@@ -206,8 +213,11 @@ export function fetchItems() {
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
                 const state = getState();
-                updateRouteParams({
+                updateRoute && updateRouteParams({
                     q: state.query,
+                    filter: get(state, 'search.activeFilter'),
+                    navigation: get(state, 'search.activeNavigation'),
+                    created: get(state, 'search.createdFilter'),
                 }, state);
                 analytics.timingComplete('search', Date.now() - start);
             })
@@ -259,7 +269,12 @@ export function shareItems(items) {
  */
 export function submitShareItem(data) {
     return (dispatch, getState) => {
-        return server.post(`/wire_share?type=${getState().context}`, data)
+        const type = getState().context || data.items[0].topic_type;
+        data.maps = [];
+        if (type === 'agenda') {
+            data.items.map((_id) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
+        }
+        return server.post(`/wire_share?type=${getState().context || data.items[0].topic_type}`, data)
             .then(() => {
                 dispatch(closeModal());
                 dispatch(setShareItems(data.items));
@@ -347,7 +362,7 @@ export function removeBookmarks(items) {
                 }
             })
             .then(() => dispatch(removeBookmarkItems(items)))
-            .then(() => getState().bookmarks && (getState().context === 'agenda' ? dispatch(fetchAgendaItems()) : dispatch(fetchItems())))
+            .then(() => getState().bookmarks &&  dispatch(fetchItems()))
             .catch(errorHandler);
 }
 
@@ -366,6 +381,16 @@ export function fetchVersions(item) {
         .then((data) => {
             return data._items;
         });
+}
+
+/**
+ * Download video file
+ *
+ * @param {string} id
+ */
+export function downloadVideo(href, id, mimeType) {
+    window.open(`${href}?filename=${id}.${mime.extension(mimeType)}`, '_blank');
+    analytics.event('download-video', id);
 }
 
 /**
@@ -416,9 +441,7 @@ export function pushNotification(push) {
             return dispatch(setNewItemsByTopic(push.extra));
 
         case 'new_item':
-            return new Promise((resolve, reject) => {
-                dispatch(fetchNewItems()).then(resolve).catch(reject);
-            });
+            return dispatch(setNewItems(push.extra));
 
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
@@ -447,7 +470,14 @@ function setTopics(topics) {
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
 export function setNewItems(data) {
-    return {type: SET_NEW_ITEMS, data};
+    return function (dispatch) {
+        if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'text') {
+            return Promise.resolve();
+        }
+
+        dispatch({type: SET_NEW_ITEMS, data});
+        return Promise.resolve();
+    };
 }
 
 export function fetchNewItems() {
@@ -506,9 +536,7 @@ export function fetchMoreItems() {
  */
 export function initParams(params) {
     return (dispatch, getState) => {
-        if (params.get('q')) {
-            dispatch(setQuery(params.get('q')));
-        }
+        dispatch(initSearchParams(params));
         if (params.get('item')) {
             dispatch(fetchItem(params.get('item')))
                 .then(() => {
@@ -518,6 +546,7 @@ export function initParams(params) {
         }
     };
 }
+
 
 export const RESET_FILTER = 'RESET_FILTER';
 export function resetFilter(filter) {
@@ -532,14 +561,10 @@ export function resetFilter(filter) {
  */
 export function setTopicQuery(topic) {
     return (dispatch) => {
-        dispatch(toggleNavigation());
+        topic.navigation ?  dispatch(toggleNavigationById(topic.navigation)) : dispatch(toggleNavigation());
         dispatch(setQuery(topic.query || ''));
         dispatch(resetFilter(topic.filter));
         dispatch(setCreatedFilter(topic.created));
         return dispatch(fetchItems());
     };
-}
-
-export function refresh() {
-    return (dispatch, getState) => dispatch(recieveItems(getState().newItemsData));
 }

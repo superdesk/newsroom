@@ -1,11 +1,71 @@
-<h1>{{ item.name }}</h1>
+<h1>{{ item.headline or item.name }}</h1>
+<a href="{{ url_for_agenda(item) }}">{{ url_for_agenda(item) }}</a>
 
-{% if item.definition_short %}{{ item.definition_short }}{% elif item.definition_long %}<pre>{{ item.definition_long }}</pre>{% endif %}
+<p class="h3">{{ dateString }}</p>
 
-<dl>
-{% if item.slugline %}<dt>Slugline:</dt><dd>{{ item.slugline }}</dd>{% endif %}
-{% if item.headline %}<dt>Headline:</dt><dd>{{ item.headline }}</dd>{% endif %}
+{% if location and location != '' %}
+    <p class="h3"><b>Where:</b> {{ location }}</p>
+{% endif %}
 
-<dt>Published:</dt><dd>{{ item.versioncreated | datetime_long }}</dd>
-<dt>Link:</dt><dd><a href="url_for_agenda(item)">{{ url_for_agenda(item) }}</a></dd>
-</dl>
+{% if map and map != '' %}
+    <div><img src={{ map | safe }} ></div>
+{% endif %}
+
+{% for contact in contacts %}
+    <p class="h3">
+        <b>Contact:</b>
+        {{ contact.name or contact.organisation }}
+        {{ contact.phone }}
+        {{ contact.mobile }}
+        {{ contact.email }}
+    </p>
+{% endfor %}
+
+{% for link in links %}
+    <p class="h3">
+        <b>Web:</b>
+        <a href={{ link | safe }}>{{ link }}</a>
+    </p>
+{% endfor %}
+
+{%  for planning_item in item.get('planning_items', []) or [] %}
+
+    <div>
+        <div >
+            <p class="h3">{{ planning_item.get('description_text') or planning_item.get('name') or '' }}</p>
+        </div>
+
+        {% if is_admin and planning_item.get('ednote') %}
+            <div>
+                <strong>Editorial Note:</strong>
+                {{ planning_item.get('ednote') }}
+            </div>
+        {% endif %}
+
+        {% if planning_item.get('coverages', []) %}
+            <div>
+                <div>
+                    <h5>Coverages:</h5>
+                </div>
+
+                {% for coverage in planning_item.get('coverages', []) or [] %}
+                    <dl>
+                        <dt>Coverage Type:</dt>
+                        <dd>{{ coverage.get('planning', {}).get('g2_content_type') }}</dd>
+                        <dt>Due:</dt>
+                        <dd>{{  coverage.get('planning', {}).get('scheduled') | datetime_long }}</dd>
+                        <dt>Workflow Status:</dt>
+                        <dd>{{ coverage.get('workflow_status') }}</dd>
+                        <dt>Coverage Status:</dt>
+                        <dd>{{ coverage.get('news_coverage_status', {}).get('name') }}</dd>
+                        {% if is_admin %}
+                            <dt>Internal Note:</dt>
+                            <dd>{{ coverage.get('planning', {}).get('internal_note', '') or '' }}</dd>
+                        {% endif %}
+                    </dl>
+
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}

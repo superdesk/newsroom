@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import server from 'server';
 import { get } from 'lodash';
 import { gettext } from 'utils';
-import { WORKFLOW_STATUS_TEXTS } from '../utils';
+import { getCoverageStatusText, WORKFLOW_STATUS  } from '../utils';
 
 function getDeliveryHref(coverage) {
     return get(coverage, 'delivery_href');
@@ -19,7 +19,7 @@ export default class CoverageItemStatus extends React.PureComponent {
     fetchWire() {
         const url = getDeliveryHref(this.props.coverage);
 
-        if (url) {
+        if (url && this.props.coverage.coverage_type === 'text') {
             server.getJson(url).then((wire) => {
                 this.setState({wire});
             });
@@ -27,7 +27,7 @@ export default class CoverageItemStatus extends React.PureComponent {
     }
 
     componentDidUpdate(prevProps) {
-        if (getDeliveryHref(prevProps) !== getDeliveryHref(this.props)) {
+        if (getDeliveryHref(get(prevProps, 'coverage')) !== getDeliveryHref(get(this.props, 'coverage'))) {
             this.setState({wire: null});
             this.fetchWire();
         }
@@ -35,26 +35,46 @@ export default class CoverageItemStatus extends React.PureComponent {
 
     render() {
         const {coverage} = this.props;
-
-        if (coverage.workflow_status && !this.state.wire) {
-            return [
-                <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>,
+        const content = [
+            <span className="coverage-item--element-grow" key="topRow">
+                <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>
                 <span key="value">{gettext('coverage {{ state }} ',
-                    {state: get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')})}</span>,
-            ];
+                    {state: getCoverageStatusText(coverage)})}</span>
+            </span>
+        ];
+
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && ['video', 'video_explainer', 'picture'].includes(coverage.coverage_type) && getDeliveryHref(coverage)) {
+            content.push(
+                <span key="contentLink" className="label label--available">
+                    <a  href={coverage.delivery_href}
+                        className="wire-column__preview__coverage__available-story"
+                        target="_blank"
+                        title={gettext('Open in new tab')}>
+                        {gettext('View Content')}
+                    </a>
+                </span>
+            );
         }
 
-        if (this.state.wire) {
-            return [
-                <span key="label" className='coverage-item__text-label mr-1'>{gettext('Wire')}:</span>,
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && this.state.wire) {
+            content.push(
                 this.state.wire._access
-                    ? <a key="value" href={'/wire?item='+ this.state.wire._id}>{this.state.wire.headline}</a>
-                    : <a key="value" href={'/wire/' + this.state.wire._id} target="_blank">{this.state.wire.headline}{' '}<i className="icon-small--lock icon--red"></i></a>
-                ,
-            ];
+                    ? <span key="contentLink" className="label label--available">
+                        <a className="wire-column__preview__coverage__available-story"
+                            key="value"
+                            href={'/wire?item='+ get(coverage, 'delivery_id')}
+                            target="_blank"
+                            title={gettext('Open in new tab')}>
+                            {gettext('View Content')}
+                        </a></span>
+                    : <span key="contentLink" className="label label--restricted">
+                        <a className="wire-column__preview__coverage__restricted-story"
+                            key="value" href="#"
+                            target="_blank">{gettext('View Content')}</a></span>
+            );
         }
 
-        return null;
+        return content;
     }
 }
 
@@ -62,5 +82,7 @@ CoverageItemStatus.propTypes = {
     coverage: PropTypes.shape({
         delivery_href: PropTypes.string,
         coverage_status: PropTypes.string,
+        workflow_status: PropTypes.string,
+        coverage_type: PropTypes.string,
     }),
 };

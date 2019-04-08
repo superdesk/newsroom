@@ -2,7 +2,7 @@ import { get } from 'lodash';
 
 import { createStore, render, initWebSocket, getInitData} from '../utils';
 
-import {getReadItems} from '../wire/utils';
+import {getReadItems} from 'local-store';
 import  AmNewsApp from './components/AmNewsApp';
 import wireReducer from '../wire/reducers';
 import {
@@ -13,7 +13,8 @@ import {
     setState
 } from '../wire/actions';
 import {
-    toggleNavigation
+    toggleNavigation,
+    toggleNavigationById,
 } from '../search/actions';
 
 
@@ -29,7 +30,10 @@ store.dispatch(initParams(params));
 
 // init first navigations
 const firstNavigation = get(window.amNewsData, 'navigations[0]');
-if (firstNavigation && !get(window.amNewsData, 'bookmarks', false)) {
+const navigationId = params.get('navigation');
+if (navigationId) {
+    store.dispatch(toggleNavigationById(navigationId));
+} else if (firstNavigation && !get(window.amNewsData, 'bookmarks', false)) {
     store.dispatch(toggleNavigation(firstNavigation));
 }
 

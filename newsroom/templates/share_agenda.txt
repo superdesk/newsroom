@@ -2,12 +2,7 @@
 {% block content %}
 Hi {{ recipient.first_name }} {{ recipient.last_name }},
 {{ sender.first_name }} {{ sender.last_name }} shared the following agenda with you:
-{% for item in items %}
-{% include "email_agenda.txt" %}
-
-{% endfor %}
-
+{% for item in items %}{% set map = maps[loop.index0] %}{% set dateString = dateStrings[loop.index0] %}{% set location = locations[loop.index0] %}{% set contacts = contactList[loop.index0] %}{% set links = linkList[loop.index0] %}{% include "email_agenda.txt" %}{% endfor %}
 {{ message }}
-
 {% endblock %}
 {% block name %}{% endblock %}

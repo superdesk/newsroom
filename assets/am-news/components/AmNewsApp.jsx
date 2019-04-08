@@ -13,11 +13,15 @@ import DownloadItemsModal from '../../wire/components/DownloadItemsModal';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import ShareItemModal from '../../components/ShareItemModal';
 import BookmarkTabs from 'components/BookmarkTabs';
-import {getItemActions} from '../../wire/item-actions';
+import WirePreview from '../../wire/components/WirePreview';
+import ItemDetails from '../../wire/components/ItemDetails';
+import SearchSidebar from '../../wire/components/SearchSidebar';
+import getItemActions from '../../wire/item-actions';
+import {gettext} from 'utils';
+
 import {
     fetchItems,
     fetchMoreItems,
-    refresh,
     previewItem,
 } from '../../wire/actions';
 import {
@@ -26,8 +30,6 @@ import {
 } from '../../search/actions';
 import Navigations from './Navigations';
 import AmNewsList from './AmNewsList';
-import AmPreview from './AmPreview';
-import AmItemDetails from './AmItemDetails';
 
 
 const modals = {
@@ -39,23 +41,48 @@ class AmNewsApp extends BaseApp {
     constructor(props) {
         super(props);
         this.modals = modals;
+        this.state = { isMobile: false };    // to cater for responsive behaviour during widnow resize
+        this.setIsMobile = this.setIsMobile.bind(this);
+    }
+
+    componentDidMount() {
+        this.setIsMobile();
+        window.addEventListener('resize', this.setIsMobile);
+    }
+
+    setIsMobile() {
+        if (window.innerWidth <= 768 && !this.state.isMobile) {
+            this.setState({ isMobile: true });
+        } else if (window.innerWidth > 768 && this.state.isMobile) {
+            this.setState({ isMobile: false });
+        }
     }
 
     renderItemDetails() {
         return ([
-            <AmItemDetails
+            <ItemDetails
                 key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
+                detailsConfig={this.props.detailsConfig}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}/>
         ]);
     }
 
     renderListAndPreview() {
-        const mainClassName = classNames('wire-column__main', {
-            'wire-articles__one-side-pane': this.props.itemToPreview,
-        });
+        let mainClassName = '';
+        const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
+        if (this.state.isMobile) {
+            mainClassName = classNames('wire-column__main', {
+                'wire-articles__one-side-pane': panesCount === 1,
+                'wire-articles__two-side-panes': panesCount === 2,
+            });
+        } else {
+            mainClassName = classNames('wire-column__main', {
+                'wire-articles__one-side-pane': this.props.itemToPreview,
+            });
+        }
 
         return (
             [
@@ -64,6 +91,20 @@ class AmNewsApp extends BaseApp {
                         actions={this.props.actions}
                     />
                     <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
+                        {this.state.isMobile && this.state.withSidebar && <span
+                            className='content-bar__menu content-bar__menu--nav--open'
+                            ref={(elem) => this.elemOpen = elem}
+                            title={gettext('Close filter panel')}
+                            onClick={this.toggleSidebar}>
+                            <i className="icon--close-thin icon--white"></i>
+                        </span>}
+                        {this.state.isMobile && !this.state.withSidebar && !this.props.bookmarks && <span
+                            className='content-bar__menu content-bar__menu--nav'
+                            ref={(elem) => this.elemClose = elem}
+                            title={gettext('Open filter panel')}
+                            onClick={this.toggleSidebar}>
+                            <i className="icon--hamburger"></i>
+                        </span>}
                         {this.props.bookmarks &&
                             <BookmarkTabs active="am_news" sections={this.props.userSections}/>
                         }
@@ -72,24 +113,34 @@ class AmNewsApp extends BaseApp {
                             setQuery={this.props.setQuery}
                         />
                     </nav>
-                    {!this.props.bookmarks &&
-                        <Navigations
-                            navigations={this.props.navigations}
-                            toggleNavigation={this.props.toggleNavigation}
-                            activeNavigation={this.props.activeNavigation}
-                            fetchItems={this.props.fetchItems}/>
-                    }
                 </section>,
                 <section key="contentMain" className="content-main">
                     <div className="wire-column--3">
-                        <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
+                        <div className={mainClassName}>
+                            {this.state.isMobile && <div
+                                className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                                {this.state.withSidebar &&
+                                    <SearchSidebar
+                                        tabs={this.tabs.filter((t) => t.id === 'nav')}
+                                        props={{...this.props, groups: [], addAllOption: false}} />
+                                }
+                            </div>}
+                            {!this.props.bookmarks && !this.state.isMobile &&
+                                <div className="wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap">
+                                    <Navigations
+                                        navigations={this.props.navigations}
+                                        toggleNavigation={this.props.toggleNavigation}
+                                        activeNavigation={this.props.activeNavigation}
+                                        fetchItems={this.props.fetchItems}/>
+                                </div>
+                            }
                             <SearchResultsInfo
                                 user={this.props.user}
                                 query={this.props.activeQuery}
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
                                 newItems={this.props.newItems}
-                                refresh={this.props.refresh}
+                                refresh={this.props.fetchItems}
                                 activeNavigation={this.props.activeNavigation}
                                 scrollClass={this.state.scrollClass}
                             />
@@ -97,16 +148,19 @@ class AmNewsApp extends BaseApp {
                             <AmNewsList
                                 actions={this.props.actions}
                                 activeView={'list-view'}
+                                onScroll={this.onListScroll}
+                                refNode={(elem) => this.elemList = elem}
                             />
                         </div>
 
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
-                                <AmPreview
+                                <WirePreview
                                     item={this.props.itemToPreview}
                                     user={this.props.user}
                                     actions={this.filterActions(this.props.itemToPreview)}
                                     closePreview={this.props.closePreview}
+                                    previewConfig={this.props.previewConfig}
                                 />
                             }
                         </div>
@@ -156,12 +210,13 @@ AmNewsApp.propTypes = {
     bookmarks: PropTypes.bool,
     fetchMoreItems: PropTypes.func,
     newItems: PropTypes.array,
-    refresh: PropTypes.func,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
+    previewConfig: PropTypes.object,
+    detailsConfig: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -182,6 +237,8 @@ const mapStateToProps = (state) => ({
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
+    previewConfig: get(state.uiConfig, 'preview') || {},
+    detailsConfig: get(state.uiConfig, 'details') || {},
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -189,7 +246,6 @@ const mapDispatchToProps = (dispatch) => ({
     setQuery: (query) => dispatch(setQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
-    refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
     toggleNavigation: (navigation) => dispatch(toggleNavigation(navigation))
 });

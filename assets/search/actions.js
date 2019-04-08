@@ -1,5 +1,7 @@
+import { get } from 'lodash';
 import analytics from 'analytics';
 import { renderModal } from 'actions';
+
 
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query) {
@@ -47,7 +49,49 @@ export function setView(view) {
  * @param {String} topic
  * @param {String} type
  */
-export function followTopic(topic, type) {
+export function followTopic(topic, type, navigation) {
     topic.topic_type = type;
+    topic.navigation = navigation;
     return renderModal('followTopic', {topic});
+}
+
+/**
+ * Toggle navigation by id
+ *
+ * @param {String} navigationId
+ */
+export function toggleNavigationById(navigationId) {
+    return (dispatch, getState) => {
+        const navigation = (get(getState().search, 'navigations') || []).find((nav) => navigationId === nav._id);
+        if (navigation) {
+            dispatch(toggleNavigation(navigation));
+        }
+    };
+}
+
+/**
+ * Set state on app init using url params
+ *
+ * @param {URLSearchParams} params
+ */
+export function initParams(params) {
+    return (dispatch) => {
+        if (params.get('navigation')) {
+            dispatch(toggleNavigationById(params.get('navigation')));
+        }
+        if (params.get('q')) {
+            dispatch(setQuery(params.get('q')));
+        }
+        if (params.get('filter')) {
+            const filters = JSON.parse(params.get('filter'));
+            for (const filter in filters) {
+                filters[filter].map(val => dispatch(toggleFilter(filter, val)));
+            }
+        }
+        if (params.get('created')) {
+            const dates = JSON.parse(params.get('created'));
+            dispatch(setCreatedFilter(dates));
+        }
+
+    };
 }

@@ -1,0 +1,12 @@
+{% extends "bookmark_layout.html" %}
+
+{% block content %}
+<div id="market-place-app" class="content market-place"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        marketPlaceData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('market-place_js') | safe }}
+{% endblock %}

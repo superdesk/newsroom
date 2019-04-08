@@ -48,3 +48,11 @@ $enable-shadows:true;
     }
   }
 }
+
+.form-row {
+  &--navigation-card {
+    overflow-y: auto;
+    height: 300px;
+    width: 100%;
+  }
+}

@@ -17,7 +17,7 @@ def test_item_notification_template(client, app, mocker):
         'type': 'text',
     }
 
-    item_url = url_for('wire.item', _id=item['_id'], _external=True)
+    item_url = url_for('wire.wire', item=item['_id'], _external=True)
 
     sub = mocker.patch('newsroom.email.send_email')
 

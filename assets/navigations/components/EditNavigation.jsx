@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 import EditPanel from 'components/EditPanel';
+import FileInput from 'components/FileInput';
+import { get } from 'lodash';
 
 import { gettext } from 'utils';
 import { sectionsPropType } from 'features/sections/types';
+import {MAX_TILE_IMAGES} from '../actions';
 
 
 class EditNavigation extends React.Component {
@@ -36,6 +39,11 @@ class EditNavigation extends React.Component {
     }
 
     render() {
+        const tile_images = get(this.props, 'navigation.tile_images') || [];
+        const getActiveSection = () => this.props.sections.filter(
+            s => s._id === get(this.props.navigation, 'product_type')
+        );
+
         return (
             <div className='list-item__preview'>
                 <div className='list-item__preview-header'>
@@ -89,6 +97,19 @@ class EditNavigation extends React.Component {
                                         value={this.props.navigation.is_enabled}
                                         onChange={this.props.onChange}/>
 
+                                    <div className="card mt-3 d-block">
+                                        <div className="card-header">{gettext('Tile Images')}</div>
+                                        <div className="card-body">
+                                            {[...Array(MAX_TILE_IMAGES)].map((_, index) => (
+                                                <FileInput key={index}
+                                                    name={`tile_images_file_${index}`}
+                                                    label={get(tile_images, `[${index}.file]`) ||
+                                                    `${gettext('Upload Image')} ${index + 1}`}
+                                                    onChange={this.props.onChange}
+                                                    error={this.props.errors ? this.props.errors.tile_images : null}/>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className='list-item__preview-footer'>
                                     <input
@@ -111,7 +132,7 @@ class EditNavigation extends React.Component {
                             items={this.props.products}
                             field="products"
                             onSave={this.props.saveProducts}
-                            groups={this.props.sections}
+                            groups={getActiveSection()}
                             groupField={'product_type'}
                             groupDefaultValue={'wire'}
                         />

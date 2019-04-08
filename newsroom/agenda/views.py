@@ -7,14 +7,15 @@ from eve.methods.get import get_internal
 from eve.render import send_response
 from superdesk import get_resource_service
 
-from newsroom.template_filters import is_admin_or_internal
+from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.auth import get_user, login_required
-from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400
-from newsroom.wire.views import update_action_list
+from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, \
+    get_agenda_dates, get_location_string, get_public_contacts, get_links
+from newsroom.wire.utils import update_action_list
 from newsroom.agenda.email import send_coverage_request_email
-from newsroom.companies import section
+from newsroom.companies import section, get_user_company
 from newsroom.notifications import push_user_notification
 
 
@@ -30,7 +31,7 @@ def index():
 def bookmarks():
     data = get_view_data()
     data['bookmarks'] = True
-    return flask.render_template('agenda_index.html', data=data)
+    return flask.render_template('agenda_bookmarks.html', data=data)
 
 
 @blueprint.route('/agenda/<_id>')
@@ -39,16 +40,42 @@ def item(_id):
     item = get_entity_or_404(_id, 'agenda')
 
     user = get_user()
+    company = get_user_company(user)
     if not is_admin_or_internal(user):
         item.get('event', {}).pop('files', None)
+        planning_items = item.get('planning_items', [])
+        [item.pop('internal_note', None) for item in planning_items]
+        coverages = item.get('coverages', [])
+        [c.get('planning', {}).pop('internal_note', None) for c in coverages]
+        item.get('event', {}).pop('internal_note', None)
+
+    if company and not is_admin(user) and company.get('events_only', False):
+        # if the company has permission events only permission then
+        # remove planning items and coverages.
+        if not item.get('event'):
+            # for adhoc planning items abort the request
+            flask.abort(403)
+
+        item.pop('planning_items', None)
+        item.pop('coverages', None)
 
     if is_json_request(flask.request):
         return flask.jsonify(item)
 
     if 'print' in flask.request.args:
+        map = flask.request.args.get('map')
         template = 'agenda_item_print.html'
         update_action_list([_id], 'prints', force_insert=True)
-        return flask.render_template(template, item=item)
+        return flask.render_template(
+            template,
+            item=item,
+            map=map,
+            dateString=get_agenda_dates(item),
+            location=get_location_string(item),
+            contacts=get_public_contacts(item),
+            links=get_links(item),
+            is_admin=is_admin_or_internal(user)
+        )
 
     data = get_view_data()
     data['item'] = item
@@ -65,6 +92,7 @@ def search():
 def get_view_data():
     user = get_user()
     topics = get_user_topics(user['_id']) if user else []
+    company = get_user_company(user) or {}
     return {
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
@@ -72,9 +100,10 @@ def get_view_data():
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
                     if 'agenda' in f['types']],
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
-                                                  product_type='agenda'),
+                                                  product_type='agenda',
+                                                  events_only=company.get('events_only', False)),
         'saved_items': get_resource_service('agenda').get_saved_items_count(),
-        'coverage_types': app.config['COVERAGE_TYPES'],
+        'events_only': company.get('events_only', False)
     }
 
 

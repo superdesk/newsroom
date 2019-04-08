@@ -71,6 +71,7 @@ export default function itemReducer(state = initialState, action) {
             editedUser: action.data.user || null,
             topics: action.data.topics || [],
             company: action.data.company || null,
+            userSections: action.data.userSections || null,
         };
     }
 

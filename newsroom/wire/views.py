@@ -2,32 +2,34 @@ import io
 import flask
 import zipfile
 import superdesk
-import urllib.request
-import json
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app
+from flask import current_app as app, request
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
 from flask_babel import gettext
 from superdesk.utc import utcnow
 
+from superdesk import get_resource_service
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
+from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_user, get_user_id, login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
-from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request
+from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
+    get_agenda_dates, get_location_string, get_public_contacts, get_links
 from newsroom.notifications import push_user_notification
 from newsroom.companies import section
+from newsroom.template_filters import is_admin_or_internal
+
 from .search import get_bookmarks_count
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
-AAP_PHOTOS_TOKEN = 'AAPPHOTOS_TOKEN'
 
 
 def get_services(user):
@@ -41,8 +43,8 @@ def get_services(user):
     return services
 
 
-def set_permissions(item, section='wire'):
-    item['_access'] = superdesk.get_resource_service('{}_search'.format(section)).has_permissions(item)
+def set_permissions(item, section='wire', ignore_latest=False):
+    item['_access'] = superdesk.get_resource_service('{}_search'.format(section)).has_permissions(item, ignore_latest)
     if not item['_access']:
         item.pop('body_text', None)
         item.pop('body_html', None)
@@ -56,43 +58,16 @@ def get_view_data():
     return {
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
-        'topics': [t for t in topics if t.get('topic_type') != 'agenda'],
+        'topics': [t for t in topics if t.get('topic_type') == 'wire'],
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
                     if 'wire' in f['types']],
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='wire'),
         'saved_items': get_bookmarks_count(user['_id'], 'wire'),
-        'context': 'wire'
+        'context': 'wire',
+        'ui_config': get_resource_service('ui_config').getSectionConfig('wire'),
+        'groups': app.config.get('WIRE_GROUPS', []),
     }
-
-
-def _fetch_photos(url, count):
-    headers = {'Authorization': 'Basic {}'.format(app.config.get(AAP_PHOTOS_TOKEN))}
-    request = urllib.request.Request(url, headers=headers)
-
-    try:
-        with urllib.request.urlopen(request, timeout=10) as response:
-            data = response.read()
-            json_data = json.loads(data.decode("utf-8"))
-            return json_data['GalleryContainers'][:count]
-    except Exception:
-        return []
-
-
-def get_photos():
-    if not app.config.get(AAP_PHOTOS_TOKEN):
-        return []
-
-    if app.cache.get('home_photos'):
-        return app.cache.get('home_photos')
-
-    photos = []
-    for item in app.config.get('HOMEPAGE_CAROUSEL', []):
-        if item.get('source'):
-            photos.extend(_fetch_photos(item.get('source'), item.get('count', 2)))
-
-    app.cache.set('home_photos', photos, timeout=300)
-    return photos
 
 
 def get_items_by_card(cards):
@@ -104,6 +79,8 @@ def get_items_by_card(cards):
         if card['config'].get('product'):
             items_by_card[card['label']] = superdesk.get_resource_service('wire_search').\
                 get_product_items(ObjectId(card['config']['product']), card['config']['size'])
+        elif card['type'] == '4-photo-gallery':
+            items_by_card[card['label']] = app.get_media_cards_external(card)
 
     app.cache.set(HOME_ITEMS_CACHE_KEY, items_by_card, timeout=300)
     return items_by_card
@@ -111,25 +88,26 @@ def get_items_by_card(cards):
 
 def get_home_data():
     user = get_user()
-    cards = list(superdesk.get_resource_service('cards').get(None, None))
+    cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
     company_id = str(user['company']) if user and user.get('company') else None
     items_by_card = get_items_by_card(cards)
 
     return {
-        'photos': get_photos(),
         'cards': cards,
         'itemsByCard': items_by_card,
         'products': get_products_by_company(company_id),
         'user': str(user['_id']) if user else None,
         'company': company_id,
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()],
+        'context': 'wire',
     }
 
 
 def get_previous_versions(item):
     if item.get('ancestors'):
+        ancestors = superdesk.get_resource_service('wire_search').get_items(item['ancestors'])
         return sorted(
-            list(app.data.find_list_of_ids('wire_search', item['ancestors'])),
+            ancestors,
             key=itemgetter('versioncreated'),
             reverse=True
         )
@@ -149,7 +127,7 @@ def wire():
     return flask.render_template('wire_index.html', data=get_view_data())
 
 
-@blueprint.route('/bookmarks')
+@blueprint.route('/bookmarks_wire')
 @login_required
 def bookmarks():
     data = get_view_data()
@@ -192,7 +170,13 @@ def download(_ids):
         _file.seek(0)
 
     update_action_list(_ids.split(','), 'downloads', force_insert=True)
-    app.data.insert('history', items, action='download', user=user)
+    app.data.insert(
+        'history',
+        items,
+        action='download',
+        user=user,
+        section=request.args.get('type', 'wire')
+    )
     return flask.send_file(_file, mimetype=mimetype, attachment_filename=attachment_filename, as_attachment=True)
 
 
@@ -216,7 +200,15 @@ def share():
                 'sender': current_user,
                 'items': items,
                 'message': data.get('message'),
+                'section': request.args.get('type', 'wire')
             }
+            if item_type == 'agenda':
+                template_kwargs['maps'] = data.get('maps')
+                template_kwargs['dateStrings'] = [get_agenda_dates(item) for item in items]
+                template_kwargs['locations'] = [get_location_string(item) for item in items]
+                template_kwargs['contactList'] = [get_public_contacts(item) for item in items]
+                template_kwargs['linkList'] = [get_links(item) for item in items]
+                template_kwargs['is_admin'] = is_admin_or_internal(user)
             send_email(
                 [user['email']],
                 gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
@@ -245,30 +237,6 @@ def bookmark():
     return flask.jsonify(), 200
 
 
-def update_action_list(items, action_list, force_insert=False, item_type='items'):
-    """
-    Stores user id into array of action_list of an item
-    :param items: items to be updated
-    :param action_list: field name of the list
-    :param force_insert: inserts into list regardless of the http method
-    :param item_type: either items or agenda as the collection
-    :return:
-    """
-    user_id = get_user_id()
-    if user_id:
-        db = app.data.get_mongo_collection(item_type)
-        elastic = app.data._search_backend(item_type)
-        if flask.request.method == 'POST' or force_insert:
-            updates = {'$addToSet': {action_list: user_id}}
-        else:
-            updates = {'$pull': {action_list: user_id}}
-        for item_id in items:
-            result = db.update_one({'_id': item_id}, updates)
-            if result.modified_count:
-                modified = db.find_one({'_id': item_id})
-                elastic.update(item_type, item_id, {action_list: modified[action_list]})
-
-
 @blueprint.route('/wire/<_id>/copy', methods=['POST'])
 @login_required
 def copy(_id):
@@ -290,7 +258,8 @@ def versions(_id):
 @login_required
 def item(_id):
     item = get_entity_or_404(_id, 'items')
-    set_permissions(item, 'wire')
+    set_permissions(item, 'wire', False if flask.request.args.get('ignoreLatest') == 'false' else True)
+    display_char_count = get_resource_service('ui_config').getSectionConfig('wire').get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):
@@ -301,4 +270,8 @@ def item(_id):
         update_action_list([_id], 'prints', force_insert=True)
     else:
         template = 'wire_item.html'
-    return flask.render_template(template, item=item, previous_versions=previous_versions)
+    return flask.render_template(
+        template,
+        item=item,
+        previous_versions=previous_versions,
+        display_char_count=display_char_count)

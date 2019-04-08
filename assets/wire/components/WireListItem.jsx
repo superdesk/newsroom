@@ -2,13 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { gettext, shortDate, fullDate, wordCount } from 'utils';
-import { getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled } from 'wire/utils';
+import { gettext, fullDate, wordCount, LIST_ANIMATIONS } from 'utils';
+import {getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled, getVideos} from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import WireListItemIcons from './WireListItemIcons';
+import WireListItemEmbargoed from './WireListItemEmbargoed';
 import ActionMenu from '../../components/ActionMenu';
 
 class WireListItem extends React.Component {
@@ -57,7 +58,13 @@ class WireListItem extends React.Component {
             'wire-articles__item--open': this.props.isActive,
             'wire-articles__item--selected': this.props.isSelected,
         });
+        const selectClassName = classNames('no-bindable-select', {
+            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
+        });
         const picture = getPicture(item);
+        const videos = getVideos(item);
+        const isWire = this.props.context === 'wire';
         return (
             <article key={item._id}
                 className={cardClassName}
@@ -74,35 +81,47 @@ class WireListItem extends React.Component {
                     <div className='wire-articles__item-text'>
 
                         <h4 className='wire-articles__item-headline'>
-                            <div className='no-bindable-select wire-articles__item-select' onClick={this.stopPropagation}>
+                            <div className={selectClassName} onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
                                     <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
                                     <i></i>
                                 </label>
                             </div>
                             {!isExtended && (
-                                <WireListItemIcons item={item} picture={picture} divider={false} />
+                                <WireListItemIcons item={item} picture={picture} videos={videos} divider={false} />
                             )}
                             {item.headline}
                         </h4>
 
-                        {isExtended && (
+                        {isExtended && isWire && (
                             <div className='wire-articles__item__meta'>
-                                <WireListItemIcons item={item} picture={picture} />
+                                <WireListItemIcons item={item} picture={picture} videos={videos} />
                                 <div className='wire-articles__item__meta-info'>
                                     <span className='bold'>{this.slugline}</span>
-                                    <span>{gettext('{{ source }}', {source: item.source})}
+                                    <span>{item.source}
                                         {' // '}<span>{this.wordCount}</span> {gettext('words')}
-                                        {' // '}<time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                                        {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
+                                        <WireListItemEmbargoed item={item} />
                                     </span>
                                 </div>
                             </div>
                         )}
 
+                        {isExtended && !isWire && (
+                            [<div key='mage' className='wire-articles__item__meta'>
+                                <img src={`/theme/logo/${item.source}.png`}/>
+                            </div>,
+                            <div key='meta' className='wire-articles__item__meta'>
+                                <WireListItemIcons item={item} picture={picture} videos={videos} />
+                                <div className='wire-articles__item__meta-info'>
+                                    <span>{this.wordCount} {gettext('words')}</span>
+                                </div>
+                            </div>]
+                        )}
                         {!isExtended && (
                             <div className='wire-articles__item__meta'>
                                 <div className='wire-articles__item__meta-info'>
-                                    <time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
+                                    <time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
                                 </div>
                             </div>
                         )}
@@ -173,6 +192,7 @@ WireListItem.propTypes = {
     })),
     isExtended: PropTypes.bool.isRequired,
     user: PropTypes.string,
+    context: PropTypes.string,
 };
 
 export default WireListItem;

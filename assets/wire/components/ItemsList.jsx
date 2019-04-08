@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
+import { get, isEqual } from 'lodash';
+
 
 import { gettext } from 'utils';
 import WireListItem from './WireListItem';
@@ -121,6 +123,13 @@ class ItemsList extends React.Component {
         return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
     }
 
+    componentDidUpdate(nextProps) {
+        if (!isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
+            (!nextProps.searchInitiated && this.props.searchInitiated)) {
+            this.elem.scrollTop = 0;
+        }
+    }
+
     render() {
         const {items, itemsById, activeItem, activeView, selectedItems, readItems} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
@@ -140,6 +149,7 @@ class ItemsList extends React.Component {
                 actions={this.filterActions(itemsById[_id])}
                 isExtended={isExtended}
                 user={this.props.user}
+                context={this.props.context}
             />
         );
 
@@ -148,7 +158,7 @@ class ItemsList extends React.Component {
         });
 
         return (
-            <div className={listClassName} onKeyDown={this.onKeyDown}>
+            <div className={listClassName} onKeyDown={this.onKeyDown} ref={(elem) => this.elem = elem}>
                 {articles}
                 {!articles.length &&
                     <div className="wire-articles__item-wrap col-12">
@@ -176,6 +186,11 @@ ItemsList.propTypes = {
     user: PropTypes.string,
     company: PropTypes.string,
     activeView: PropTypes.string,
+    context: PropTypes.string,
+    searchInitiated: PropTypes.bool,
+    activeNavigation: PropTypes.string,
+    resultsFiltered: PropTypes.bool,
+    isLoading: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -188,6 +203,11 @@ const mapStateToProps = (state) => ({
     bookmarks: state.bookmarks,
     user: state.user,
     company: state.company,
+    context: state.context,
+    searchInitiated: state.searchInitiated,
+    activeNavigation: get(state, 'search.activeNavigation', null),
+    resultsFiltered: state.resultsFiltered,
+    isLoading: state.isLoading,
 });
 
 export default connect(mapStateToProps)(ItemsList);

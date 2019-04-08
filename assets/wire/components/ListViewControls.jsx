@@ -4,14 +4,14 @@ import PropTypes from 'prop-types';
 import NewsOnlyControl from './NewsOnlyControl';
 import ListViewOptions from '../../components/ListViewOptions';
 
-function ListViewControls({activeView, setView, newsOnly, toggleNews, activeNavigation}) {
+function ListViewControls({activeView, setView, newsOnly, toggleNews, activeNavigation, hideNewsOnly}) {
     return(
         <div className='content-bar__right'>
-            <NewsOnlyControl
+            {!hideNewsOnly && <NewsOnlyControl
                 activeNavigation={activeNavigation}
                 newsOnly={newsOnly}
                 toggleNews={toggleNews}
-            />
+            />}
             <ListViewOptions setView={setView} activeView={activeView} />
         </div>
     );
@@ -24,6 +24,7 @@ ListViewControls.propTypes = {
     newsOnly: PropTypes.bool,
     toggleNews: PropTypes.func,
     activeNavigation: PropTypes.string,
+    hideNewsOnly: PropTypes.bool,
 };
 
 export default ListViewControls;

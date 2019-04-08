@@ -46,7 +46,9 @@ export default class BaseApp extends React.Component {
 
         let name = get(navigations.find((nav) => nav._id === activeNavigation), 'name', '');
         if (!name && activeTopic) {
-            name = activeTopic.label;
+            name = `/ ${activeTopic.label}`;
+        } else if (name) {
+            name = `/ ${name}`;
         }
 
         return createPortal(name , dest);
@@ -69,6 +71,12 @@ export default class BaseApp extends React.Component {
     onListScroll(event) {
         const BUFFER = 10;
         const container = event.target;
+
+        if (container !== this.elemList && !this.elemList.contains(container)) {
+            // Not scrolled on the actual list
+            return;
+        }
+
         if (container.scrollTop + container.offsetHeight + BUFFER >= container.scrollHeight) {
             this.props.fetchMoreItems()
                 .catch(() => null); // ignore

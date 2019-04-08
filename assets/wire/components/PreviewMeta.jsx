@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, wordCount } from 'utils';
+import {gettext, wordCount, isDisplayed, characterCount} from 'utils';
 import { getPicture } from 'wire/utils';
 
 const DEFAULT_URGENCY = 4;
 
 
 
-function PreviewMeta({item, isItemDetail, inputRef, displayUrgency}) {
+function PreviewMeta({item, isItemDetail, inputRef, displayConfig}) {
     const picture = getPicture(item);
     const onClick = () => {
         const previousVersions = document.getElementById(inputRef);
@@ -29,10 +29,11 @@ function PreviewMeta({item, isItemDetail, inputRef, displayUrgency}) {
                 )}
             </div>
             <div className='wire-articles__item__meta-info'>
-                <span>{displayUrgency &&
-                gettext('News Value: {{ value }}', {value: item.urgency || DEFAULT_URGENCY})}</span>
-                <span>{gettext('Words:')}<span> {wordCount(item)}</span></span>
-                <span>{gettext('Source: {{ source }}', {source: item.source})}
+                {isDisplayed('urgency', displayConfig) &&
+                <span>{gettext('News Value: {{ value }}', {value: item.urgency || DEFAULT_URGENCY})}</span>}
+                {isDisplayed('wordcount', displayConfig) && <span>{gettext('Words:')}<span> {wordCount(item)}</span></span>}
+                {isDisplayed('charcount', displayConfig) && <span>{gettext('Characters:')}<span> {characterCount(item)}</span></span>}
+                <span>{isDisplayed('source', displayConfig) && gettext('Source: {{ source }}', {source: item.source})}
                     {!isItemDetail && ' // '}
                     {!isItemDetail && <span className="blue-text" onClick={onClick}>
                         {gettext('{{ count }} previous versions', {count: item.ancestors ? item.ancestors.length : '0'})}
@@ -47,11 +48,7 @@ PreviewMeta.propTypes = {
     item: PropTypes.object,
     isItemDetail: PropTypes.bool,
     inputRef: PropTypes.string,
-    displayUrgency: PropTypes.bool,
-};
-
-PreviewMeta.defaultProps = {
-    displayUrgency: true
+    displayConfig: PropTypes.object,
 };
 
 export default PreviewMeta;

@@ -15,6 +15,7 @@ from newsroom.email import send_validate_account_email, \
     send_reset_password_email, send_new_signup_email, send_new_account_email
 from newsroom.utils import get_random_string
 from newsroom.limiter import limiter
+from newsroom.template_filters import is_admin
 from .token import generate_auth_token, verify_auth_token
 
 
@@ -33,6 +34,10 @@ def login():
 
             user = get_resource_service('users').find_one(req=None, _id=user['_id'])
 
+            if not is_admin(user) and not user.get('company'):
+                flask.flash(gettext('Insufficient Permissions. Access denied.'), 'danger')
+                return flask.render_template('login.html', form=form)
+
             if not _is_company_enabled(user):
                 flask.flash(gettext('Company account has been disabled.'), 'danger')
                 return flask.render_template('login.html', form=form)
@@ -42,7 +47,10 @@ def login():
                 flask.session['name'] = '{} {}'.format(user.get('first_name'), user.get('last_name'))
                 flask.session['user_type'] = user['user_type']
                 flask.session.permanent = form.remember_me.data
-                flask.flash('login', 'analytics')
+
+                if flask.session.get('locale') and flask.session['locale'] != user.get('locale'):
+                    get_resource_service('users').system_update(user['_id'], {'locale': flask.session['locale']}, user)
+
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
             else:
                 flask.flash(gettext('Account is disabled.'), 'danger')
@@ -115,8 +123,8 @@ def _is_company_enabled(user):
     Checks if the company of the user is enabled
     """
     if not user.get('company'):
-        # there's no company assigned for this user so this check doesn't apply
-        return True
+        # there's no company assigned return true for admin user else false
+        return True if is_admin(user) else False
 
     company = get_resource_service('companies').find_one(req=None, _id=user.get('company'))
     if not company:
@@ -280,6 +288,14 @@ def token(token_type):
             flask.flash(gettext(message), 'danger')
         return flask.redirect(flask.url_for('auth.login'))
     return flask.render_template('request_token.html', form=form, token_type=token_type)
+
+
+@blueprint.route('/login_locale', methods=['POST'])
+def set_locale():
+    locale = flask.request.form.get('locale')
+    if locale and locale in app.config['LANGUAGES']:
+        flask.session['locale'] = locale
+    return flask.redirect(flask.url_for('auth.login'))
 
 
 def send_token(user, token_type='validate'):

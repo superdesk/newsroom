@@ -31,6 +31,19 @@
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, 1.2rem, $btn-border-radius);
   }
 }
+.btn-with-icon {
+  display: flex;
+  align-items: center;
+
+  [class^="icon--"], [class*=" icon--"] {
+    margin-right: 8px;
+  }
+  &:hover {
+    [class^="icon--"], [class*=" icon--"] {
+      color: $white;
+    }
+  }
+}
 
 @mixin button-outline-variant($color, $color-hover: #fff, $border-color: $color) {
     color: $color;
@@ -39,6 +52,12 @@
     border-color: $border-color;
   
     @include hover {
+      color: $color-hover;
+      background-color: $color;
+      border-color: $color;
+    }
+
+    &.active {
       color: $color-hover;
       background-color: $color;
       border-color: $color;

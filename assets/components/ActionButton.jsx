@@ -19,11 +19,21 @@ class ActionButton extends React.Component {
         const classes = classNames(`icon--${this.props.action.icon}`, {
             'icon--gray': this.props.isVisited,
         });
+        const {item, group, plan, action} = this.props;
+
         return (
             <button
                 type='button'
                 className={this.props.className}
-                onClick={() => this.props.action.action(this.props.action.multi ? [this.props.item._id] : this.props.item)}
+                onClick={
+                    () => {
+                        if (action.multi) {
+                            return action.action([item._id]);
+                        } else {
+                            return action.action(item, group, plan);
+                        }
+                    }
+                }
                 ref={(elem) => this.elem = elem}
                 title={!this.props.displayName ? this.props.action.name : ''}>
                 <i className={classes}></i>
@@ -34,6 +44,8 @@ class ActionButton extends React.Component {
 
 ActionButton.propTypes = {
     item: PropTypes.object,
+    group: PropTypes.string,
+    plan: PropTypes.object,
     className: PropTypes.string,
     displayName: PropTypes.bool,
     isVisited: PropTypes.bool,

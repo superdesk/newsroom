@@ -5,7 +5,7 @@ from newsroom.topics import blueprint
 from newsroom.utils import find_one
 from newsroom.auth import get_user
 from newsroom.auth.decorator import login_required
-from flask import jsonify, abort, session, render_template, current_app as app
+from flask import json, jsonify, abort, session, render_template, current_app as app
 from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.email import send_email
 from newsroom.notifications import push_user_notification
@@ -17,9 +17,16 @@ from flask_babel import gettext
 def update_topic(id):
     """ Updates a followed topic """
     data = get_json_or_400()
+    user_id = session['user']
 
-    if not is_user_topic(id, session['user']):
+    if not is_user_topic(id, user_id):
         abort(403)
+
+    # If notifications are enabled, check to see if user is configured to receive emails
+    if data.get('notifications'):
+        user = get_resource_service('users').find_one(req=None, _id=user_id)
+        if not user.get('receive_email'):
+            return "", gettext('Please enable \'Receive notifications via email\' option in your profile to receive topic notifications')  # noqa
 
     updates = {
         'label': data.get('label'),
@@ -54,6 +61,26 @@ def is_user_topic(topic_id, user_id):
     return False
 
 
+def get_topic_url(topic):
+    query_strings = []
+    if topic.get('query'):
+        query_strings.append('q={}'.format(parse.quote(topic.get('query'))))
+    if topic.get('filter'):
+        query_strings.append('filter={}'.format(parse.quote(json.dumps(topic.get('filter')))))
+    if topic.get('navigation'):
+        query_strings.append('navigation={}'.format(topic.get('navigation')))
+    if topic.get('created'):
+        query_strings.append('created={}'.format(parse.quote(json.dumps(topic.get('created')))))
+
+    url = '{}/{}?{}'.format(
+        app.config['CLIENT_URL'],
+        topic.get('topic_type'),
+        '&'.join(query_strings)
+    )
+
+    return url
+
+
 @blueprint.route('/topic_share', methods=['POST'])
 @login_required
 def share():
@@ -67,11 +94,12 @@ def share():
             user = get_resource_service('users').find_one(req=None, _id=user_id)
             if not user or not user.get('email'):
                 continue
+
             template_kwargs = {
                 'recipient': user,
                 'sender': current_user,
                 'topic': topic,
-                'url': '{}/wire?q={}'.format(app.config['CLIENT_URL'], parse.quote(topic['query'])),
+                'url': get_topic_url(topic),
                 'message': data.get('message'),
                 'app_name': app.config['SITE_NAME'],
             }

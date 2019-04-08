@@ -1,4 +1,4 @@
-import { createStore, render } from 'utils';
+import { createStore, render, isWireContext } from 'utils';
 import userReducer from './reducers';
 import UserProfileApp from './components/UserProfileApp';
 import {initData, selectMenu} from './actions';
@@ -19,5 +19,5 @@ render(
 
 
 document.addEventListener('manage_topics', function () {
-    store.dispatch(selectMenu('topics'));
+    isWireContext() ? store.dispatch(selectMenu('topics')) : store.dispatch(selectMenu('events'));
 }, false);

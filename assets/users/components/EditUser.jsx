@@ -5,12 +5,7 @@ import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 
 import { gettext } from 'utils';
-
-const userTypes = [
-    {value: 'administrator', text: gettext('Administrator')},
-    {value: 'internal', text: gettext('Internal')},
-    {value: 'public', text: gettext('Public')},
-];
+import {userTypes} from '../utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
@@ -18,7 +13,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
     return (
         <div className='list-item__preview'>
             <div className='list-item__preview-header'>
-                <h3>Add/Edit User</h3>
+                <h3>{ gettext('Add/Edit User') }</h3>
                 <button
                     id='hide-sidebar'
                     type='button'
@@ -103,7 +98,13 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={user.is_enabled}
                         onChange={onChange} />
 
-                </div>                        
+                    <CheckboxInput
+                        name='expiry_alert'
+                        label={gettext('Company Expiry Alert')}
+                        value={user.expiry_alert}
+                        onChange={onChange} />
+
+                </div>
 
                 <div className='list-item__preview-footer'>
                     {user._id ?

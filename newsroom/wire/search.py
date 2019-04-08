@@ -1,61 +1,29 @@
-import pytz
 import logging
-import newsroom
-
 from datetime import datetime, timedelta
-from werkzeug.exceptions import Forbidden
-from flask import current_app as app, json, abort
+
 from eve.utils import ParsedRequest
+from flask import current_app as app, json, abort
 from flask_babel import gettext
+from superdesk import get_resource_service
+from werkzeug.exceptions import Forbidden
+
+import newsroom
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.products.products import get_products_by_company, get_products_by_navigation
-from newsroom.template_filters import is_admin
 from newsroom.settings import get_setting
-from superdesk import get_resource_service
+from newsroom.template_filters import is_admin
+from newsroom.wire.utils import get_local_date, get_end_date
 
 logger = logging.getLogger(__name__)
 
 
-aggregations = {
-    'genre': {'terms': {'field': 'genre.name', 'size': 50}},
-    'service': {'terms': {'field': 'service.name', 'size': 50}},
-    'subject': {'terms': {'field': 'subject.name', 'size': 20}},
-    'urgency': {'terms': {'field': 'urgency'}},
-    'place': {'terms': {'field': 'place.name', 'size': 50}},
-}
-
-
-class FeaturedQuery(Exception):
-    """Raise when query is for featured items."""
-    pass
-
-
-def today(offset):
-    return datetime.utcnow() + timedelta(minutes=offset)
-
-
-def format_date(date, offset):
-    FORMAT = '%Y-%m-%d'
-    if date == 'now/d':
-        return today(offset).strftime(FORMAT)
-    if date == 'now/w':
-        _today = today(offset)
-        monday = _today - timedelta(days=_today.weekday())
-        return monday.strftime(FORMAT)
-    if date == 'now/M':
-        month = today(offset).replace(day=1)
-        return month.strftime(FORMAT)
-    return date
-
-
-def get_local_date(date, time, offset):
-    local_dt = datetime.strptime('%sT%s' % (format_date(date, offset), time), '%Y-%m-%dT%H:%M:%S')
-    return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
-
-
 def get_bookmarks_count(user_id, product_type):
     return get_resource_service('{}_search'.format(product_type)).get_bookmarks_count(user_id)
+
+
+def get_aggregations():
+    return app.config.get('WIRE_AGGS', {})
 
 
 class WireSearchResource(newsroom.Resource):
@@ -71,6 +39,7 @@ class WireSearchResource(newsroom.Resource):
             'nextversion': 1,
             'ancestors': 1,
             'wordcount': 1,
+            'charcount': 1,
         },
         'elastic_filter': {'bool': {'must': [{'term': {'_type': 'items'}}]}},
     }
@@ -80,10 +49,10 @@ class WireSearchResource(newsroom.Resource):
 
 
 def get_aggregation_field(key):
-    return aggregations[key]['terms']['field']
+    return get_aggregations()[key]['terms']['field']
 
 
-def set_product_query(query, company, user=None, navigation_id=None):
+def set_product_query(query, company, section, user=None, navigation_id=None, events_only=False):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -91,8 +60,10 @@ def set_product_query(query, company, user=None, navigation_id=None):
     If user is not administrator and has no company then everything will be filtered
     :param query: search query
     :param company: company
+    :param section: section i.e. wire, agenda, marketplace etc
     :param user: user to check against (used for notification checking)
     :param navigation_id: navigation to filter products
+    :param events_only: From agenda to display events only or not
     If not provided session user will be checked
     """
     products = None
@@ -104,7 +75,7 @@ def set_product_query(query, company, user=None, navigation_id=None):
             return  # admin will see everything by default
 
     if company:
-        products = get_products_by_company(company['_id'], navigation_id)
+        products = get_products_by_company(company['_id'], navigation_id, product_type=section)
     else:
         # user does not belong to a company so blocking all stories
         abort(403, gettext('User does not belong to a company.'))
@@ -114,13 +85,33 @@ def set_product_query(query, company, user=None, navigation_id=None):
     if product_ids:
         query['bool']['should'].append({'terms': {'products.code': product_ids}})
 
+    # add company type filters (if any)
+    if company and company.get('company_type'):
+        for company_type in app.config.get('COMPANY_TYPES', []):
+            if company_type['id'] == company['company_type']:
+                if company_type.get('wire_must'):
+                    query['bool']['must'].append(company_type['wire_must'])
+                if company_type.get('wire_must_not'):
+                    query['bool']['must_not'].append(company_type['wire_must_not'])
+
+    planning_items_should = []
     for product in products:
         if product.get('query'):
-            if product['query'] == '_featured':
-                if navigation_id:  # only return featured when nav item is selected
-                    raise FeaturedQuery
-            else:
-                query['bool']['should'].append(query_string(product['query']))
+            query['bool']['should'].append(query_string(product['query']))
+            if product.get('planning_item_query') and not events_only:
+                # form the query for the agenda planning items
+                planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
+
+    if planning_items_should:
+        query['bool']['should'].append(
+            nested_query(
+                'planning_items',
+                {
+                    'bool': {'should': planning_items_should, 'minimum_should_match': 1}
+                },
+                name='products'
+            )
+        )
 
     query['bool']['minimum_should_match'] = 1
 
@@ -144,13 +135,37 @@ def query_string(query):
     }
 
 
+def planning_items_query_string(query, fields=None):
+    plan_query_string = query_string(query)
+
+    if fields:
+        plan_query_string['query_string']['fields'] = fields
+    else:
+        plan_query_string['query_string']['fields'] = ['planning_items.*']
+
+    return plan_query_string
+
+
+def nested_query(path, query, inner_hits=True, name=None):
+    nested = {
+        'path': path,
+        'query': query
+    }
+    if inner_hits:
+        nested['inner_hits'] = {}
+        if name:
+            nested['inner_hits']['name'] = name
+
+    return {'nested': nested}
+
+
 def versioncreated_range(created):
     _range = {}
     offset = int(created.get('timezone_offset', '0'))
     if created.get('created_from'):
         _range['gte'] = get_local_date(created['created_from'], '00:00:00', offset)
     if created.get('created_to'):
-        _range['lte'] = get_local_date(created['created_to'], '23:59:59', offset)
+        _range['lte'] = get_end_date(created['created_to'], get_local_date(created['created_to'], '23:59:59', offset))
     return {'range': {'versioncreated': _range}}
 
 
@@ -164,16 +179,20 @@ def set_bookmarks_query(query, user_id):
     })
 
 
-def _items_query():
-    return {
+def _items_query(ignore_latest=False):
+    query = {
         'bool': {
             'must_not': [
-                {'term': {'type': 'composite'}},
-                {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}},
+                {'term': {'type': 'composite'}}
             ],
             'must': [{'term': {'_type': 'items'}}],
         }
     }
+
+    if not ignore_latest:
+        query['bool']['must_not'].append({'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}})
+
+    return query
 
 
 class WireSearchService(newsroom.Service):
@@ -185,7 +204,7 @@ class WireSearchService(newsroom.Service):
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         company = get_user_company(user)
         try:
-            set_product_query(query, company)
+            set_product_query(query, company, self.section)
         except Forbidden:
             return 0
         set_bookmarks_query(query, user_id)
@@ -194,13 +213,13 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, None).count()
 
-    def get(self, req, lookup, size=25, aggs=True):
-        query = _items_query()
+    def get(self, req, lookup, size=25, aggs=True, ignore_latest=False):
+        query = _items_query(ignore_latest)
         user = get_user()
         company = get_user_company(user)
 
         get_resource_service('section_filters').apply_section_filter(query, self.section)
-        set_product_query(query, company, navigation_id=req.args.get('navigation'))
+        set_product_query(query, company, self.section, navigation_id=req.args.get('navigation'))
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
@@ -246,18 +265,18 @@ class WireSearchService(newsroom.Service):
             return abort(400)
 
         if not source['from'] and aggs:  # avoid aggregations when handling pagination
-            source['aggs'] = aggregations
+            source['aggs'] = get_aggregations()
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, lookup)
 
-    def has_permissions(self, item):
+    def has_permissions(self, item, ignore_latest=False):
         """Test if current user has permissions to view given item."""
         req = ParsedRequest()
         req.args = {}
         try:
-            results = self.get(req, {'_id': item['_id']}, size=0, aggs=False)
+            results = self.get(req, {'_id': item['_id']}, size=0, aggs=False, ignore_latest=ignore_latest)
             return results.count() > 0
         except Forbidden:
             return False
@@ -355,7 +374,7 @@ class WireSearchService(newsroom.Service):
             # for now even if there's no active company matching for the user
             # continuing with the search
             try:
-                set_product_query(query, company, user)
+                set_product_query(query, company, topic.get('topic_type'), user=user)
             except Forbidden:
                 logger.info('Notification for user:{} and topic:{} is skipped'
                             .format(user.get('_id'), topic.get('_id')))
@@ -420,7 +439,22 @@ class WireSearchService(newsroom.Service):
         """
         bookmark_users = []
 
-        search_results = self.get_items(item_ids)
+        query = {
+            'bool': {
+                'must_not': [
+                    {'term': {'type': 'composite'}},
+                ],
+                'must': [
+                    {'terms': {'_id': item_ids}}
+                ],
+            }
+        }
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
+
+        source = {'query': query}
+        internal_req = ParsedRequest()
+        internal_req.args = {'source': json.dumps(source)}
+        search_results = super().get(internal_req, None)
 
         if not search_results:
             return bookmark_users
@@ -535,3 +569,44 @@ class WireSearchService(newsroom.Service):
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, None)
+
+    def get_navigation_story_count(self, navigations):
+        """Get story count by navigation"""
+        query = _items_query()
+        get_resource_service('section_filters').apply_section_filter(query, self.section)
+
+        aggs = {
+            'navigations': {
+                'filters': {
+                    'filters': {}
+                }
+            }
+        }
+
+        for navigation in navigations:
+            navigation_id = navigation.get('_id')
+            products = get_products_by_navigation(navigation_id) or []
+            navigation_filter = {'bool': {'should': [], 'minimum_should_match': 1}}
+            for product in products:
+                if product.get('query'):
+                    navigation_filter['bool']['should'].append(query_string(product.get('query')))
+
+            if navigation_filter['bool']['should']:
+                aggs['navigations']['filters']['filters'][str(navigation_id)] = navigation_filter
+
+        source = {'query': query, 'aggs': aggs, 'size': 0}
+        req = ParsedRequest()
+        req.args = {'source': json.dumps(source)}
+
+        try:
+            results = super().get(req, None)
+            buckets = results.hits['aggregations']['navigations']['buckets']
+            for navigation in navigations:
+                navigation_id = navigation.get('_id')
+                doc_count = buckets.get(str(navigation_id), {}).get('doc_count', 0)
+                if doc_count > 0:
+                    navigation['story_count'] = doc_count
+
+        except Exception as exc:
+            logger.error('Error in get_navigation_story_count for query: {}'.format(json.dumps(source)),
+                         exc, exc_info=True)

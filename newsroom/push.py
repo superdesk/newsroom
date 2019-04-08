@@ -1,4 +1,3 @@
-import io
 import hmac
 import flask
 import logging
@@ -6,21 +5,21 @@ import superdesk
 from datetime import datetime
 
 from copy import copy, deepcopy
-from PIL import Image, ImageEnhance
 from flask import current_app as app
 from flask_babel import gettext
-from eve_elastic.elastic import parse_date
+from superdesk.text_utils import get_word_count, get_char_count
 
 from superdesk.utc import utcnow
-from superdesk.text_utils import get_word_count
 from newsroom.notifications import push_notification
 from newsroom.topics.topics import get_wire_notification_topics, get_agenda_notification_topics
-from newsroom.utils import parse_dates, get_user_dict, get_company_dict
+from newsroom.utils import parse_dates, get_user_dict, get_company_dict, parse_date_str
 from newsroom.email import send_new_item_notification_email, \
     send_history_match_notification_email, send_item_killed_notification_email
 from newsroom.history import get_history_users
 from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
+from newsroom.wire import url_for_wire
 from newsroom.upload import ASSETS_RESOURCE
+from newsroom.signals import publish_item as publish_item_signal
 
 from planning.common import WORKFLOW_STATE
 
@@ -28,9 +27,6 @@ logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
 
 KEY = 'PUSH_KEY'
-
-THUMBNAIL_SIZE = (640, 640)
-THUMBNAIL_QUALITY = 80
 
 
 def test_signature(request):
@@ -71,14 +67,16 @@ def push():
 
     if item.get('type') == 'event':
         orig = app.data.find_one('agenda', req=None, _id=item['guid'])
-        item['_id'] = publish_event(item, orig)
-        notify_new_item(item, check_topics=True)
+        id = publish_event(item, orig)
+        agenda = app.data.find_one('agenda', req=None, _id=id)
+        notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'planning':
-        agenda = publish_planning(item)
+        published = publish_planning(item)
+        agenda = app.data.find_one('agenda', req=None, _id=published['_id'])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
         orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
-        item['_id'] = publish_item(item)
+        item['_id'] = publish_item(item, is_new=orig is None)
         notify_new_item(item, check_topics=orig is None)
     elif item['type'] == 'planning_featured':
         publish_planning_featured(item)
@@ -98,10 +96,11 @@ def set_dates(doc):
     doc.setdefault(app.config['VERSION'], 1)
 
 
-def publish_item(doc):
+def publish_item(doc, is_new):
     """Duplicating the logic from content_api.publish service."""
     set_dates(doc)
     doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
+    doc.setdefault('charcount', get_char_count(doc.get('body_html', '')))
     service = superdesk.get_resource_service('content_api')
     if 'evolvedfrom' in doc:
         parent_item = service.find_one(req=None, _id=doc['evolvedfrom'])
@@ -119,9 +118,12 @@ def publish_item(doc):
         if assoc:
             assoc.setdefault('subscribers', [])
     if doc.get('associations', {}).get('featuremedia'):
-        generate_thumbnails(doc)
+        app.generate_renditions(doc)
     if doc.get('coverage_id'):
-        superdesk.get_resource_service('agenda').set_delivery(doc)
+        agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
+        if agenda_items:
+            [notify_new_item(item, check_topics=False) for item in agenda_items]
+    publish_item_signal.send(app._get_current_object(), item=doc, is_new=is_new)
     _id = service.create([doc])[0]
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
@@ -140,12 +142,21 @@ def publish_event(event, orig):
     _id = event['guid']
     service = superdesk.get_resource_service('agenda')
 
+    event_created_after_planning = False
+    if not orig and event.get('plans'):
+        # event is created planning item
+        orig = superdesk.get_resource_service('agenda').find_one(req=None, guid=event.get('plans')[0])
+        if orig:
+            event_created_after_planning = True
+
+    event.pop('plans', None)
+
     if not orig:
         # new event
         agenda = {}
         set_agenda_metadata_from_event(agenda, event)
         agenda['dates'] = get_event_dates(event)
-        _id = service.create([agenda])[0]
+        _id = service.post([agenda])[0]
     else:
         # replace the original document
         if event.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
@@ -156,7 +167,8 @@ def publish_event(event, orig):
             updates = {
                 'event': event,
                 'version': event.get('version', event.get(app.config['VERSION'])),
-                'state': event['state']
+                'state': event['state'],
+                'state_reason': event.get('state_reason')
             }
 
             service.patch(event['guid'], updates)
@@ -180,8 +192,9 @@ def publish_event(event, orig):
                 'state': event['state'],
                 'dates': get_event_dates(event),
             }
-            set_agenda_metadata_from_event(updates, event)
-            service.patch(event['guid'], updates)
+
+            set_agenda_metadata_from_event(updates, event, False)
+            service.patch(orig['_id'] if event_created_after_planning else event['guid'], updates)
             superdesk.get_resource_service('agenda').notify_agenda_update('event_updated', orig)
 
     return _id
@@ -206,12 +219,12 @@ def publish_planning(planning):
     agenda = None
 
     # update dates
-    planning['planning_date'] = datetime.strptime(planning['planning_date'], '%Y-%m-%dT%H:%M:%S+0000')
+    planning['planning_date'] = parse_date_str(planning['planning_date'])
 
     if planning.get('event_item'):
         # this is a planning for an event item
         # if there's an event then _id field will have the same value as event_id
-        agenda = app.data.find_one('agenda', req=None, _id=planning['event_item'])
+        agenda = app.data.find_one('agenda', req=None, guid=planning['event_item'])
 
         if not agenda:
             # event id exists in planning item but event is not in the system
@@ -232,16 +245,16 @@ def publish_planning(planning):
         agenda = init_adhoc_agenda(planning)
 
     # update agenda metadata
-    set_agenda_metadata_from_planning(agenda, planning)
+    new_plan = set_agenda_metadata_from_planning(agenda, planning)
 
     # add the planning item to the list
-    set_agenda_planning_items(agenda, planning, action='add')
+    set_agenda_planning_items(agenda, planning, action='add' if new_plan else 'update')
 
     if not agenda.get('_id'):
         # setting _id of agenda to be equal to planning if there's no event id
         agenda.setdefault('_id', planning.get('event_item', planning['guid']) or planning['guid'])
         agenda.setdefault('guid', planning.get('event_item', planning['guid']) or planning['guid'])
-        service.create([agenda])[0]
+        service.post([agenda])[0]
     else:
         # replace the original document
         service.patch(agenda['_id'], agenda)
@@ -267,36 +280,33 @@ def init_adhoc_agenda(planning):
     return agenda
 
 
-def set_agenda_metadata_from_event(agenda, event):
+def set_agenda_metadata_from_event(agenda, event, set_doc_id=True):
     """
     Sets agenda metadata from a given event
     """
     parse_dates(event)
 
     # setting _id of agenda to be equal to event
-    agenda.setdefault('_id', event['guid'])
+    if set_doc_id:
+        agenda.setdefault('_id', event['guid'])
 
     agenda['guid'] = event['guid']
     agenda['event_id'] = event['guid']
     agenda['recurrence_id'] = event.get('recurrence_id')
     agenda['name'] = event.get('name')
-    agenda['slugline'] = event.get('slugline', agenda.get('slugline'))
+    agenda['slugline'] = event.get('slugline')
     agenda['definition_short'] = event.get('definition_short')
     agenda['definition_long'] = event.get('definition_long')
     agenda['version'] = event.get('version')
     agenda['calendars'] = event.get('calendars')
     agenda['location'] = event.get('location')
-    agenda['ednote'] = event.get('ednote', agenda.get('ednote'))
+    agenda['ednote'] = event.get('ednote')
     agenda['state'] = event.get('state')
+    agenda['state_reason'] = event.get('state_reason')
     agenda['place'] = event.get('place')
-    agenda['subject'] = event.get('subject')
+    agenda['subject'] = format_qcode_items(event.get('subject'))
     agenda['products'] = event.get('products')
-
-    # only set service if available
-    service = format_qcode_items(event.get('anpa_category'))
-    if service:
-        agenda['service'] = service
-
+    agenda['service'] = format_qcode_items(event.get('anpa_category'))
     agenda['event'] = event
 
     set_dates(agenda)
@@ -310,43 +320,63 @@ def format_qcode_items(items=None):
 
 
 def set_agenda_metadata_from_planning(agenda, planning_item):
-    """Sets agenda metadata from a given planning.
+    """Sets agenda metadata from a given planning"""
 
-    Event data has priority, so don't override it, only add  planning if it's missing.
-    """
-    event = agenda.get('event', {})
     parse_dates(planning_item)
     set_dates(agenda)
 
-    def get(key):
-        return event.get(key) or planning_item.get(key) or agenda.get(key)
+    if not planning_item.get('event_item'):
+        # adhoc planning item
+        agenda['name'] = planning_item.get('name')
+        agenda['headline'] = planning_item.get('headline')
+        agenda['slugline'] = planning_item.get('slugline')
+        agenda['ednote'] = planning_item.get('ednote')
+        agenda['place'] = planning_item.get('place')
+        agenda['subject'] = format_qcode_items(planning_item.get('subject'))
+        agenda['products'] = planning_item.get('products')
+        agenda['urgency'] = planning_item.get('urgency')
+        agenda['definition_short'] = planning_item.get('description_text') or agenda.get('definition_short')
+        agenda['definition_long'] = planning_item.get('abstract') or agenda.get('definition_long')
+        agenda['service'] = format_qcode_items(planning_item.get('anpa_category'))
+        agenda['state'] = planning_item.get('state')
+        agenda['state_reason'] = planning_item.get('state_reason')
 
-    agenda['name'] = get('name')
-    agenda['headline'] = get('headline')
-    agenda['slugline'] = get('slugline')
-    agenda['abstract'] = get('abstract')
-    agenda['ednote'] = get('ednote')
-    agenda['place'] = get('place')
-    agenda['subject'] = get('subject')
-    agenda['products'] = get('products')
-    agenda['genre'] = planning_item.get('genre') or agenda.get('genre')
-    agenda['priority'] = planning_item.get('priority') or agenda.get('priority')
-    agenda['urgency'] = planning_item.get('urgency') or agenda.get('urgency')
-    agenda['definition_short'] = event.get('definition_short') \
-        or planning_item.get('description_text') \
-        or agenda.get('definition_short')
-    agenda['definition_long'] = event.get('definition_long') \
-        or planning_item.get('abstract') \
-        or agenda.get('definition_long')
+    if not agenda.get('planning_items'):
+        agenda['planning_items'] = []
 
-    service = unique_codes(
-        format_qcode_items(planning_item.get('anpa_category')),
-        format_qcode_items(event.get('anpa_category')),
-        format_qcode_items(agenda.get('service'))
+    new_plan = False
+    plan = next(
+        (p for p in (agenda.get('planning_items')) if p.get('guid') == planning_item.get('guid')), {}
     )
 
-    if service:
-        agenda['service'] = service
+    if not plan:
+        new_plan = True
+
+    plan['_id'] = planning_item.get('_id')
+    plan['guid'] = planning_item.get('guid')
+    plan['slugline'] = planning_item.get('slugline')
+    plan['description_text'] = planning_item.get('description_text')
+    plan['headline'] = planning_item.get('headline')
+    plan['abstract'] = planning_item.get('abstract')
+    plan['place'] = planning_item.get('place')
+    plan['subject'] = format_qcode_items(planning_item.get('subject'))
+    plan['service'] = format_qcode_items(planning_item.get('anpa_category'))
+    plan['urgency'] = planning_item.get('urgency')
+    plan['planning_date'] = planning_item.get('planning_date')
+    plan['coverages'] = planning_item.get('coverages')
+    plan['ednote'] = planning_item.get('ednote')
+    plan['internal_note'] = planning_item.get('internal_note')
+    plan['versioncreated'] = parse_date_str(planning_item.get('versioncreated'))
+    plan['firstcreated'] = parse_date_str(planning_item.get('firstcreated'))
+    plan['state'] = planning_item.get('state')
+    plan['state_reason'] = planning_item.get('state_reason')
+    plan['products'] = planning_item.get('products')
+    plan['agendas'] = planning_item.get('agendas')
+
+    if new_plan:
+        agenda['planning_items'].append(plan)
+
+    return new_plan
 
 
 def set_agenda_planning_items(agenda, planning_item, action='add'):
@@ -354,23 +384,19 @@ def set_agenda_planning_items(agenda, planning_item, action='add'):
     Updates the list of planning items of agenda. If action is 'add' then adds the new one.
     And updates the list of coverages
     """
-    existing_planning_items = deepcopy(agenda.get('planning_items', []))
-    agenda['planning_items'] = [p for p in existing_planning_items if p['guid'] != planning_item['guid']] or []
-
     if action == 'add':
-        if len(existing_planning_items) == len(agenda['planning_items']):
-            # planning item is newly added
-            superdesk.get_resource_service('agenda').notify_agenda_update('planning_added', agenda)
-
-        agenda['planning_items'].append(planning_item)
+        # planning item is newly added
+        superdesk.get_resource_service('agenda').notify_agenda_update('planning_added', agenda, True)
 
     if action == 'remove':
-        superdesk.get_resource_service('agenda').notify_agenda_update('planning_cancelled', agenda)
+        existing_planning_items = deepcopy(agenda.get('planning_items', []))
+        agenda['planning_items'] = [p for p in existing_planning_items if p['guid'] != planning_item['guid']] or []
+        superdesk.get_resource_service('agenda').notify_agenda_update('planning_cancelled', agenda, True)
 
-    agenda['coverages'], coverage_changes = get_coverages(agenda['planning_items'], agenda.get('coverages', []))
+    agenda['coverages'], coverage_changes = get_coverages(agenda['planning_items'], (agenda.get('coverages') or []))
 
     if coverage_changes.get('coverage_added'):
-        superdesk.get_resource_service('agenda').notify_agenda_update('coverage_added', agenda)
+        superdesk.get_resource_service('agenda').notify_agenda_update('coverage_added', agenda, True)
 
     agenda['display_dates'] = get_display_dates(agenda['dates'], agenda['planning_items'])
 
@@ -382,33 +408,18 @@ def get_display_dates(agenda_date, planning_items):
     """
     display_dates = []
 
-    def parse_display_dates(date):
-        if type(date) == datetime:
-            return date
-        if date and type(date) == str:
-            return parse_date(date)
-
-    def should_add(date):
-        try:
-            return not (agenda_date['start'].date() <= date.date() <= agenda_date['end'].date()) and \
-                   not date.date() in [d['date'].date() for d in display_dates]
-        except (AttributeError, TypeError):
-            return False
-
     for planning_item in planning_items:
         if not planning_item.get('coverages'):
-            parsed_date = parse_display_dates(planning_item['planning_date'])
-            if should_add(parsed_date):
-                display_dates.append({
-                    'date': parsed_date
-                })
+            parsed_date = parse_date_str(planning_item['planning_date'])
+            display_dates.append({
+                'date': parsed_date
+            })
 
-        for coverage in planning_item.get('coverages', []):
-            parsed_date = parse_display_dates(coverage['planning']['scheduled'])
-            if should_add(parsed_date):
-                display_dates.append({
-                    'date': parsed_date
-                })
+        for coverage in planning_item.get('coverages') or []:
+            parsed_date = parse_date_str(coverage['planning']['scheduled'])
+            display_dates.append({
+                'date': parsed_date
+            })
 
     return display_dates
 
@@ -417,25 +428,43 @@ def get_coverages(planning_items, original_coverages=[]):
     """
     Returns list of coverages for given planning items
     """
+
     def get_existing_coverage(id):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
+
+    def set_delivery(coverage, deliveries):
+        if coverage['coverage_type'] == 'text':
+            if deliveries and coverage.get('workflow_status') == 'completed':
+                coverage['delivery_id'] = deliveries[0]['item_id']
+                coverage['delivery_href'] = url_for_wire(None, _external=False, section='wire.item',
+                                                         _id=deliveries[0]['item_id'])
+            else:
+                coverage['delivery_id'] = None
+                coverage['delivery_href'] = None
+        else:
+            if coverage.get('workflow_status') == 'completed':
+                coverage['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item)
+            else:
+                coverage['delivery_href'] = None
 
     coverages = []
     coverage_changes = {}
     for planning_item in planning_items:
-        for coverage in planning_item.get('coverages', []):
+        for coverage in planning_item.get('coverages') or []:
             existing_coverage = get_existing_coverage(coverage['coverage_id'])
-            coverages.append({
+            new_coverage = {
                 'planning_id': planning_item['guid'],
                 'coverage_id': coverage['coverage_id'],
                 'scheduled': coverage['planning']['scheduled'],
                 'coverage_type': coverage['planning']['g2_content_type'],
                 'workflow_status': coverage['workflow_status'],
-                'coverage_status': coverage.get('news_coverage_status', {}).get('label'),
+                'coverage_status': coverage.get('news_coverage_status', {}).get('name'),
                 'coverage_provider': coverage['planning'].get('coverage_provider'),
-                'delivery_id': existing_coverage.get('delivery_id'),
-                'delivery_href': existing_coverage.get('delivery_href'),
-            })
+                'delivery_id': existing_coverage.get('delivery_id')
+            }
+
+            set_delivery(new_coverage, coverage.get('deliveries'))
+            coverages.append(new_coverage)
 
             if original_coverages and not existing_coverage:
                 coverage_changes['coverage_added'] = True
@@ -453,7 +482,7 @@ def notify_new_item(item, check_topics=True):
     company_dict = get_company_dict()
     company_ids = [c['_id'] for c in company_dict.values()]
 
-    push_notification('new_item', item=item['_id'])
+    push_notification('new_item', _items=[item])
 
     if check_topics:
         if item.get('type') == 'text':
@@ -465,39 +494,90 @@ def notify_new_item(item, check_topics=True):
 
 
 def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids):
+    """Send notification to users who have downloaded or bookmarked the provided item"""
+
     related_items = item.get('ancestors', [])
     related_items.append(item['_id'])
+    is_text = item.get('type') == 'text'
 
-    history_users = get_history_users(related_items, user_ids, company_ids)
+    users_processed = []
 
-    bookmark_users = []
-    if item.get('type') == 'text':
-        bookmark_users = superdesk.get_resource_service('wire_search').\
-            get_matching_bookmarks(related_items, users_dict, companies_dict)
+    def _get_users(section):
+        """Get the list of users who have downloaded or bookmarked the items"""
+        # Get users who have downloaded any of the items
+        user_list = get_history_users(
+            related_items,
+            user_ids,
+            company_ids,
+            section,
+            'download'
+        )
 
-    history_users.extend(bookmark_users)
-    history_users = list(set(history_users))
+        if is_text and section != 'agenda':
+            # Add users who have bookmarked any of the items
+            service = superdesk.get_resource_service('{}_search'.format(section))
+            bookmarked_users = service.get_matching_bookmarks(
+                related_items,
+                users_dict,
+                companies_dict
+            )
 
-    if history_users:
-        for user in history_users:
-            app.data.insert('notifications', [{
-                'item': item['_id'],
-                'user': user
-            }])
-        push_notification('history_matches',
-                          item=item,
-                          users=history_users)
-        send_user_notification_emails(item, history_users, users_dict)
+            user_list.extend(bookmarked_users)
+
+        # Add users if this section is wire
+        # Or if the user is not already in the list of users for wire
+        user_list = [
+            user_id
+            for user_id in user_list
+            if user_id not in users_processed
+        ]
+
+        users_processed.extend(user_list)
+
+        # Remove duplicates and return the list
+        return list(set(user_list))
+
+    def _send_notification(section, users_ids):
+        if not users_ids:
+            return
+
+        app.data.insert('notifications', [
+            {'item': item['_id'], 'user': user}
+            for user in users_ids
+        ])
+
+        push_notification(
+            'history_matches',
+            item=item,
+            users=users_ids,
+            section=section
+        )
+        send_user_notification_emails(
+            item,
+            users_ids,
+            users_dict,
+            section
+        )
+
+    # First add users for the 'wire' section and send the notification
+    # As this takes precedence over all other sections
+    # (in case items appear in multiple sections)
+    _send_notification('wire', _get_users('wire'))
+
+    # Next iterate over the registered sections (excluding wire)
+    for section_id in [section['_id'] for section in app.sections if section['_id'] != 'wire']:
+        # Add the users for those sections and send the notification
+        _send_notification(section_id, _get_users(section_id))
 
 
-def send_user_notification_emails(item, user_matches, users):
+def send_user_notification_emails(item, user_matches, users, section):
     for user_id in user_matches:
         user = users.get(str(user_id))
-        if item.get('pubstatus') in ['canceled', 'cancelled']:
+        if item.get('pubstatus', item.get('state')) in ['canceled', 'cancelled']:
             send_item_killed_notification_email(user, item=item)
         else:
             if user.get('receive_email'):
-                send_history_match_notification_email(user, item=item)
+                send_history_match_notification_email(user, item=item, section=section)
 
 
 def notify_wire_topic_matches(item, users_dict, companies_dict):
@@ -529,7 +609,12 @@ def send_topic_notification_emails(item, topics, topic_matches, users):
     for topic in topics:
         user = users.get(str(topic['user']))
         if topic['_id'] in topic_matches and user and user.get('receive_email'):
-            send_new_item_notification_email(user, topic['label'], item=item)
+            send_new_item_notification_email(
+                user,
+                topic['label'],
+                item=item,
+                section=topic.get('topic_type') or 'wire'
+            )
 
 
 # keeping this for testing
@@ -555,102 +640,6 @@ def push_binary_get(media_id):
         return flask.jsonify({})
     else:
         flask.abort(404)
-
-
-def generate_thumbnails(item):
-    picture = item.get('associations', {}).get('featuremedia', {})
-    if not picture:
-        return
-
-    # use 4-3 rendition for generated thumbs
-    renditions = picture.get('renditions', {})
-    rendition = renditions.get('4-3', renditions.get('viewImage'))
-    if not rendition:
-        return
-
-    # generate thumbnails
-    binary = app.media.get(rendition['media'], resource=ASSETS_RESOURCE)
-    im = Image.open(binary)
-    thumbnail = _get_thumbnail(im)  # 4-3 rendition resized
-    watermark = _get_watermark(im)  # 4-3 rendition with watermark
-    picture['renditions'].update({
-        '_newsroom_thumbnail': _store_image(thumbnail,
-                                            _id='%s%s' % (rendition['media'], '_newsroom_thumbnail')),
-        '_newsroom_thumbnail_large': _store_image(watermark,
-                                                  _id='%s%s' % (rendition['media'], '_newsroom_thumbnail_large')),
-    })
-    # add watermark to base/view images
-    for key in ['base', 'view']:
-        rendition = picture.get('renditions', {}).get('%sImage' % key)
-        if rendition:
-            binary = app.media.get(rendition['media'], resource=ASSETS_RESOURCE)
-            im = Image.open(binary)
-            watermark = _get_watermark(im)
-            picture['renditions'].update({
-                '_newsroom_%s' % key: _store_image(watermark,
-                                                   _id='%s%s' % (rendition['media'], '_newsroom_%s' % key))
-            })
-
-
-def _store_image(image, filename=None, _id=None):
-    binary = io.BytesIO()
-    image.save(binary, 'jpeg', quality=THUMBNAIL_QUALITY)
-    binary.seek(0)
-    media_id = app.media.put(binary, filename=filename, _id=_id, resource=ASSETS_RESOURCE, content_type='image/jpeg')
-    if not media_id:
-        # media with the same id exists
-        media_id = _id
-    binary.seek(0)
-    return {
-        'media': str(media_id),
-        'href': app.upload_url(media_id),
-        'width': image.width,
-        'height': image.height,
-        'mimetype': 'image/jpeg'
-    }
-
-
-def _get_thumbnail(image):
-    image = image.copy()
-    image.thumbnail(THUMBNAIL_SIZE)
-    return image
-
-
-def _get_watermark(image):
-    image = image.copy()
-    if not app.config.get('WATERMARK_IMAGE'):
-        return image
-    if image.mode != 'RGBA':
-        image = image.convert('RGBA')
-    with open(app.config['WATERMARK_IMAGE'], mode='rb') as watermark_binary:
-        watermark_image = Image.open(watermark_binary)
-        set_opacity(watermark_image, 0.3)
-        watermark_layer = Image.new('RGBA', image.size)
-        watermark_layer.paste(watermark_image, (
-            image.size[0] - watermark_image.size[0],
-            int((image.size[1] - watermark_image.size[1]) * 0.66),
-        ))
-
-    watermark = Image.alpha_composite(image, watermark_layer)
-    return watermark.convert('RGB')
-
-
-def set_opacity(image, opacity=1):
-    alpha = image.split()[3]
-    alpha = ImageEnhance.Brightness(alpha).enhance(opacity)
-    image.putalpha(alpha)
-
-
-def unique_codes(*groups):
-    """Get unique items from all lists using code."""
-    codes = set()
-    items = []
-    for group in groups:
-        for item in group:
-            if item.get('code') and item['code'] not in codes:
-                codes.add(item['code'])
-                items.append(item)
-    return items
 
 
 def publish_planning_featured(item):

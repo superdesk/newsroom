@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { gettext } from 'utils';
 import {
     newCompany,
     fetchCompanies,
@@ -21,7 +22,7 @@ class CompaniesApp extends React.Component {
                 onNewItem={this.props.newCompany}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchCompanies}
-                buttonName={'Company'}
+                buttonName={gettext('Company')}
             />,
             <Companies key="Companies" />
             ]

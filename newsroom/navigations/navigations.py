@@ -1,6 +1,5 @@
 import newsroom
 import superdesk
-from flask import current_app
 
 from newsroom.products.products import get_products_by_company
 
@@ -30,7 +29,13 @@ class NavigationsResource(newsroom.Resource):
             'type': 'string',
             'default': 'wire'
         },
+        # list of images for tile based navigation
+        'tile_images': {
+            'type': 'list',
+            'nullable': 'true'
+        }
     }
+
     datasource = {
         'source': 'navigations',
         'default_sort': [('order', 1), ('name', 1)]
@@ -43,7 +48,7 @@ class NavigationsService(newsroom.Service):
     pass
 
 
-def get_navigations_by_company(company_id, product_type='wire'):
+def get_navigations_by_company(company_id, product_type='wire', events_only=False):
     """
     Returns list of navigations for given company id
     Navigations will contain the list of product ids
@@ -52,23 +57,8 @@ def get_navigations_by_company(company_id, product_type='wire'):
 
     # Get the navigation ids used across products
     navigation_ids = []
-
-    if current_app.config.get('AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE') and product_type == 'agenda':
-        navigations = []
-        featured_navigation_ids = []
-
-        # fetch navigations for featured products
-        [featured_navigation_ids.extend(p.get('navigations', [])) for p in products if p.get('query') == '_featured']
-        navigations.extend(get_navigations_by_ids(featured_navigation_ids))
-
-        # fetch all other navigations
-        [navigation_ids.extend(p.get('navigations', [])) for p in products if p.get('query') != '_featured']
-        navigations.extend(get_navigations_by_ids(navigation_ids))
-
-        return navigations
-    else:
-        [navigation_ids.extend(p.get('navigations', [])) for p in products]
-        return get_navigations_by_ids(navigation_ids)
+    [navigation_ids.extend(p.get('navigations', [])) for p in products]
+    return get_navigations_by_ids(navigation_ids)
 
 
 def get_navigations_by_ids(navigation_ids):

@@ -1,88 +1,11 @@
-import Store from 'store';
-import localStorage from 'store/storages/localStorage';
-import operationsPlugin from 'store/plugins/operations';
-
 import { get, isEmpty, isEqual, pickBy } from 'lodash';
 import { getTextFromHtml, getConfig } from 'utils';
 
-const STATUS_KILLED = 'canceled';
-const READ_ITEMS_STORE = 'read_items';
-const NEWS_ONLY_STORE = 'news_only';
-const FILTER_TAB = 'filter_tab';
-
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
-const store = Store.createStore([localStorage], [operationsPlugin]);
 
-/**
- * Get read items
- *
- * @returns {Object}
- */
-export function getReadItems() {
-    return store.get(READ_ITEMS_STORE);
-}
+const STATUS_KILLED = 'canceled';
 
-/**
- * Marks the given item as read
- *
- * @param {Object} item
- * @param {Object} state
- */
-export function markItemAsRead(item, state) {
-    if (item && item._id && item.version) {
-        const readItems = get(state, 'readItems', getReadItems()) || {};
-
-        store.assign(READ_ITEMS_STORE, {[item._id]: getMaxVersion(readItems[item._id], item.version)});
-    }
-}
-
-/**
- * Get news only value
- *
- * @returns {boolean}
- */
-export function getNewsOnlyParam() {
-    return !!((store.get(NEWS_ONLY_STORE) || {}).value);
-}
-
-
-/**
- * Toggles news only value
- *
- */
-export function toggleNewsOnlyParam() {
-    store.assign(NEWS_ONLY_STORE, {value: !getNewsOnlyParam()});
-}
-
-/**
- * Get active filter tab
- *
- * @returns {boolean}
- */
-export function getActiveFilterTab() {
-    return (store.get(FILTER_TAB) || {}).value;
-}
-
-/**
- * Set active filter tab
- *
- */
-export function setActiveFilterTab(tab) {
-    store.assign(FILTER_TAB, {value: tab});
-}
-
-
-/**
- * Returns the greater version
- *
- * @param versionA
- * @param versionB
- * @returns {number}
- */
-export function getMaxVersion(versionA, versionB) {
-    return Math.max(parseInt(versionA, 10) || 0, parseInt(versionB, 10) || 0);
-}
 
 /**
  * Returns the item version as integer
@@ -97,6 +20,19 @@ export function getIntVersion(item) {
 }
 
 /**
+ * Get videos for an item
+ *
+ * if item is video return it, otherwise look for featuremedia
+ *
+ * @param {Object} item
+ * @return {Array}
+ */
+export function getVideos(item) {
+    return item.type === 'video' ? [item] : Object.values(get(item, 'associations', {})).filter((assoc) => get(assoc, 'type') === 'video');
+}
+
+
+/**
  * Get picture for an item
  *
  * if item is picture return it, otherwise look for featuremedia
@@ -105,7 +41,7 @@ export function getIntVersion(item) {
  * @return {Object}
  */
 export function getPicture(item) {
-    return item.type === 'picture' ? item : get(item, 'associations.featuremedia', getBodyPicture(item));
+    return item.type === 'picture' ? item : getBodyPicture(item);
 }
 
 function getBodyPicture(item) {
@@ -132,8 +68,12 @@ export function getThumbnailRendition(picture, large) {
  * @param {Object} picture
  * @return {Object}
  */
-export function getPreviewRendition(picture) {
-    return get(picture, 'renditions._newsroom_view', get(picture, 'renditions.viewImage'));
+export function getPreviewRendition(picture, isCustom = false) {
+    return get(
+        picture,
+        isCustom ? 'renditions._newsroom_custom' : 'renditions._newsroom_base',
+        get(picture, 'renditions.viewImage')
+    );
 }
 
 /**
@@ -142,8 +82,32 @@ export function getPreviewRendition(picture) {
  * @param {Object} picture
  * @return {Object}
  */
-export function getDetailRendition(picture) {
-    return get(picture, 'renditions._newsroom_base', get(picture, 'renditions.baseImage'));
+export function getDetailRendition(picture, isCustom = false) {
+    return get(
+        picture,
+        isCustom ? 'renditions._newsroom_custom' : 'renditions._newsroom_base',
+        get(picture, 'renditions.baseImage')
+    );
+}
+
+/**
+ * Get picture detail rendition
+ *
+ * @param {Object} picture
+ * @return {Object}
+ */
+export function isCustomRendition(picture) {
+    return !!get(picture, 'renditions._newsroom_custom');
+}
+
+/**
+ * Get original video
+ *
+ * @param {Object} video
+ * @return {Object}
+ */
+export function getOriginalVideo(video) {
+    return get(video, 'renditions.original');
 }
 
 /**

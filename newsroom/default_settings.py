@@ -1,11 +1,14 @@
 import os
 
 import tzlocal
-from distutils.util import strtobool as _strtobool
+
+from kombu import Queue, Exchange
+from celery.schedules import crontab
 
 from superdesk.default_settings import (   # noqa
     VERSION,
     MONGO_URI,
+    REDIS_URL,
     CONTENTAPI_MONGO_URI,
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,
@@ -26,16 +29,21 @@ from superdesk.default_settings import (   # noqa
     MAIL_USE_SSL,
     MAIL_USERNAME,
     MAIL_PASSWORD,
+    CELERY_TASK_ALWAYS_EAGER,
+    CELERY_TASK_SERIALIZER,
+    CELERY_TASK_PROTOCOL,
+    CELERY_TASK_IGNORE_RESULT,
+    CELERY_TASK_SEND_EVENTS,
+    CELERY_WORKER_DISABLE_RATE_LIMITS,
+    CELERY_WORKER_TASK_SOFT_TIME_LIMIT,
+    CELERY_WORKER_LOG_FORMAT,
+    CELERY_WORKER_TASK_LOG_FORMAT,
+    CELERY_WORKER_CONCURRENCY,
+    CELERY_TASK_DEFAULT_QUEUE,
+    CELERY_TASK_DEFAULT_EXCHANGE,
+    CELERY_TASK_DEFAULT_ROUTING_KEY,
+    CELERY_BEAT_SCHEDULE_FILENAME
 )
-
-
-def strtobool(value):
-    if value is None:
-        return False
-    try:
-        return bool(_strtobool(value))
-    except ValueError:
-        return False
 
 
 XML = False
@@ -88,6 +96,7 @@ CORE_APPS = [
     'newsroom.topics',
     'newsroom.upload',
     'newsroom.history',
+    'newsroom.ui_config',
     'newsroom.notifications',
     'newsroom.products',
     'newsroom.section_filters',
@@ -96,7 +105,9 @@ CORE_APPS = [
     'newsroom.reports',
     'newsroom.public',
     'newsroom.agenda',
-    'newsroom.settings'
+    'newsroom.settings',
+    'newsroom.photos',
+    'newsroom.media_utils',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -167,28 +178,13 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 # Filter tab behaviour
 # If true, aggregations will be against all content all the time
 # If false, aggregations will change by filters applied
-FILTER_BY_POST_FILTER = True
-
-# Base64 Encoded Token
-AAPPHOTOS_TOKEN = os.environ.get('AAPPHOTOS_TOKEN')
-
-# Home Page Carousel Sources
-HOMEPAGE_CAROUSEL = [{
-    'source': 'https://photos-api.aap.com.au/api/v3/Galleries/Newsroom/AUSTRALIAN%20NEWS',
-    'count': 2
-}, {
-    'source': 'https://photos-api.aap.com.au/api/v3/Galleries/Newsroom/AUSTRALIAN%20SPORT',
-    'count': 2
-}]
+FILTER_BY_POST_FILTER = False
 
 # List of filters to remove matching stories when news only switch is turned on
 NEWS_ONLY_FILTERS = [
    {'match': {'genre.code': 'Results (sport)'}},
    {'match': {'source': 'PMF'}},
 ]
-
-# Places navigation item(s) for featured story products to the top of the list under All
-AGENDA_FEATURED_STORY_NAVIGATION_POSITION_OVERRIDE = True
 
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
@@ -227,6 +223,7 @@ CLIENT_COVERAGE_DATE_FORMAT = 'HH:mm DD/MM'
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
 
+
 WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')
 
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
@@ -241,11 +238,42 @@ COVERAGE_TYPES = {
     'explainer': {'name': 'Explainer', 'icon': 'explainer'},
     'infographics': {'name': 'Infographics', 'icon': 'infographics'},
     'live_video': {'name': 'Live Video', 'icon': 'live-video'},
-    'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'}
+    'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'},
+    'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
 }
 
-LANGUAGES = ['en']
+
+# Client configuration
+CLIENT_CONFIG = {
+    'time_format': CLIENT_TIME_FORMAT,
+    'date_format': CLIENT_DATE_FORMAT,
+    'coverage_date_format': CLIENT_COVERAGE_DATE_FORMAT,
+    'coverage_types': COVERAGE_TYPES,
+    'display_abstract': DISPLAY_ABSTRACT,
+    'list_animations': True,  # Enables or disables the animations for list item select boxes
+}
+
+LANGUAGES = ['en', 'fi', 'cs']
 DEFAULT_LANGUAGE = 'en'
 
 # Enable iframely support for item body_html
 IFRAMELY = True
+
+COMPANY_TYPES = []
+
+#: celery config
+CELERY_TASK_QUEUES = (Queue(celery_queue('newsroom'), Exchange(celery_queue('newsroom')), routing_key='newsroom.#'),)
+CELERY_TASK_ROUTES = {
+    'newsroom.company_expiry': {
+        'queue': celery_queue('newsroom'),
+        'routing_key': 'newsroom.company_expiry'
+    }
+}
+
+#: celery beat config
+CELERY_BEAT_SCHEDULE = {
+    'newsroom:company_expiry': {
+        'task': 'newsroom.company_expiry',
+        'schedule': crontab(hour=0, minute=0),  # Runs every day at midnight
+    }
+}

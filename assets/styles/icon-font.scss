@@ -185,7 +185,8 @@
 .icon--coverage-photo:before, .icon--coverage-picture:before {
     content: "\e621";
 }
-.icon--coverage-video:before {
+.icon--coverage-video:before,
+.icon--video:before {
     content: "\e622";
 }
 .icon--coverage-explainer:before {
@@ -237,11 +238,38 @@
   content: "\e632";
 }
 .icon--am-alert:before {
-  content: "\e634";
+  content: "\e633";
 }
 .icon--am-weather:before {
-  content: "\e635";
+  content: "\e634";
 }
 .icon--am-headlines:before {
+  content: "\e635";
+}
+.icon--info:before {
   content: "\e636";
+}
+.icon--archive:before {
+  content: "\e637";
+}
+.icon--aapX:before {
+  content: "\e638";
+}
+.icon--clock:before {
+  content: "\e639";
+}
+.icon--explainer:before {
+  content: "\e63a";
+}
+.icon--books:before {
+  content: "\e63b";
+}
+.icon--factory:before {
+  content: "\e63c";
+}
+.icon--fact-check:before {
+  content: "\e63d";
+}
+.icon--attachment:before {
+  content: "\e63e";
 }

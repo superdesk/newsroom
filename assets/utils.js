@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isInteger, keyBy } from 'lodash';
+import { get, isInteger, keyBy, isEmpty, cloneDeep, throttle } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
@@ -7,13 +7,18 @@ import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment';
+import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE} from './agenda/utils';
 
 export const now = moment(); // to enable mocking in tests
-const TIME_FORMAT = getConfig('time_format');
-const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
-const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
+const NEWSROOM = 'newsroom';
+const CLIENT_CONFIG = 'client_config';
+
+export const TIME_FORMAT = getConfig('time_format');
+export const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
+export const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
-const DAY_IN_MINUTES = 24 * 60 - 1;
+export const DAY_IN_MINUTES = 24 * 60 - 1;
+export const LIST_ANIMATIONS = getConfig('list_animations', true);
 
 
 /**
@@ -187,6 +192,25 @@ export function formatDate(dateString) {
     return parseDate(dateString).format(DATE_FORMAT);
 }
 
+export function getScheduleType(item) {
+    const start = moment(item.dates.start);
+    const end = moment(item.dates.end);
+    const duration = end.diff(start, 'minutes');
+    if (duration > DAY_IN_MINUTES || !start.isSame(end, 'day')) {
+        return SCHEDULE_TYPE.MULTI_DAY;
+    }
+
+    if (duration === DAY_IN_MINUTES && start.isSame(end, 'day')) {
+        return SCHEDULE_TYPE.ALL_DAY;
+    }
+
+    if (duration === 0) {
+        return SCHEDULE_TYPE.NO_DURATION;
+    }
+
+    return SCHEDULE_TYPE.REGULAR;
+}
+
 /**
  * Format agenda item start and end dates
  *
@@ -194,31 +218,81 @@ export function formatDate(dateString) {
  * @param {String} group: date of the selected event group
  * @return {Array} [time string, date string]
  */
-export function formatAgendaDate(agendaDate, group) {
-    const start = parseDate(agendaDate.start);
-    const end = parseDate(agendaDate.end);
-    const duration = end.diff(start, 'minutes');
-    const dateGroup = group ? moment(group, DATE_FORMAT) : null;
+export function formatAgendaDate(item, group, localTimeZone = true) {
 
-    if (duration > DAY_IN_MINUTES) {
-        // Multi day event
-        return [`(${formatTime(start)} ${formatDate(start)} - ${formatTime(end)} ${formatDate(end)})`,
-            dateGroup ? formatDate(dateGroup) : ''];
+    const getFormattedTimezone = (date) => {
+        let tzStr = date.format('z');
+        if (tzStr.indexOf('+0') >= 0) {
+            return tzStr.replace('+0', 'GMT+');
+        }
+
+        if (tzStr.indexOf('+') >= 0) {
+            return tzStr.replace('+', 'GMT+');
+        }
+
+        return tzStr;
+    };
+
+    let start = parseDate(item.dates.start);
+    let end = parseDate(item.dates.end);
+    let duration = end.diff(start, 'minutes');
+    let dateGroup = group ? moment(group, DATE_FORMAT) : null;
+    let dateTimeString = localTimeZone ? [] : [`(${getFormattedTimezone(start)} `];
+
+    let isGroupBetweenEventDates = dateGroup ?
+        start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
+
+    if (!isGroupBetweenEventDates && hasCoverages(item)) {
+        // we rendering for extra days
+        const scheduleDates = item.coverages
+            .map((coverage) => {
+                if (isCoverageForExtraDay(coverage, group)) {
+                    return coverage.scheduled;
+                }
+                return null;
+            })
+            .filter((d) => d)
+            .sort((a, b) => {
+                if (a < b) return -1;
+                if (a > b) return 1;
+                return 0;
+            });
+        if (scheduleDates.length > 0) {
+            duration = 0;
+            start = moment(scheduleDates[0]);
+        }
     }
 
-    if (duration == DAY_IN_MINUTES) {
-        // All day event
-        return [gettext('ALL DAY'), formatDate(start)];
+    const scheduleType = getScheduleType(item);
+    if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
+        dateTimeString.push(`${formatTime(start)}`);
+    } else {
+        switch(scheduleType) {
+        case SCHEDULE_TYPE.MULTI_DAY:
+            dateTimeString.push(`${formatTime(start)} ${formatDate(start)} to ${formatTime(end)} ${formatDate(end)}`);
+            break;
+
+        case SCHEDULE_TYPE.ALL_DAY:
+            dateTimeString.push(formatDate(start));
+            break;
+
+        case SCHEDULE_TYPE.REGULAR:
+            if (localTimeZone) {
+                dateTimeString.push(`${formatTime(start)} - ${formatTime(end)}`);
+            } else {
+                dateTimeString.push(`${formatTime(start)} - ${formatTime(end)} ${formatDate(start)}`);
+            }
+            break;        
+        }
     }
 
-    if (duration == 0) {
-        // start and end times are the same
-        return [`${formatTime(start)} ${formatDate(start)}`, ''];
+    if (!localTimeZone) {
+        dateTimeString[dateTimeString.length - 1] = dateTimeString[dateTimeString.length - 1] + ')';
     }
 
-    // single day event
-    return [`${formatTime(start)} - ${formatTime(end)}`, formatDate(start)];
+    return dateTimeString;
 }
+
 
 /**
  * Format coverage date ('HH:mm DD/MM')
@@ -322,6 +396,28 @@ export function wordCount(item) {
 }
 
 /**
+ * Get character count for given item
+ *
+ * @param {Object} item
+ * @return {number}
+ */
+export function characterCount(item) {
+    
+    if (isInteger(item.charcount)) {
+        return item.charcount;
+    }
+
+    if (!item.body_html) {
+        return 0;
+    }
+
+    const text = getTextFromHtml(item.body_html);
+
+    // Ignore the last line break
+    return text.length - 1 ;
+}
+
+/**
  * Toggle value within array
  *
  * returns a new array so can be used with setState
@@ -339,23 +435,27 @@ export function toggleValue(items, value) {
     return without.length === items.length ? without.concat([value]) : without;
 }
 
+
 export function updateRouteParams(updates, state) {
     const params = new URLSearchParams(window.location.search);
-    let dirty = false;
 
     Object.keys(updates).forEach((key) => {
-        if (updates[key]) {
-            dirty = dirty || updates[key] != params.get(key);
-            params.set(key, updates[key]);
+        let updatedValue = updates[key];
+        if (!isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
+            if (typeof updatedValue === 'object') {
+                updatedValue = JSON.stringify(updatedValue);
+            }
+            params.set(key, updatedValue);
         } else {
-            dirty = dirty || params.has(key);
             params.delete(key);
         }
     });
 
-    if (dirty) {
-        history.pushState(state, null, '?' + params.toString());
-    }
+    
+    const stateClone = cloneDeep(state);
+    stateClone.items = [];
+    stateClone.itemsById = {};
+    history.pushState(stateClone, null, `?${params.toString()}`);
 }
 
 const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
@@ -411,11 +511,11 @@ export function errorHandler(error, dispatch, setError) {
  *
  * @param {String} key
  * @param {Mixed} defaultValue
- * @param {String} namespace
  * @return {Mixed}
  */
-export function getConfig(key, defaultValue, namespace='newsroom') {
-    return get(window[namespace], key, defaultValue);
+export function getConfig(key, defaultValue) {
+    const clientConfig = get(window, `${NEWSROOM}.${CLIENT_CONFIG}`, {});
+    return get(clientConfig, key, defaultValue);
 }
 
 export function getTimezoneOffset() {
@@ -442,3 +542,23 @@ export const getInitData = (data) => {
         userSections: keyBy(get(window.profileData, 'userSections', {}), '_id')
     };
 };
+
+export const isDisplayed = (field, config) => get(config, `${field}.displayed`, true);
+
+const getNow = throttle(moment, 500);
+
+/**
+ * Test if item is embargoed, if not returns null, otherwise returns its embargo time
+ * @param {String} embargoed 
+ * @return {Moment}
+ */
+export function getEmbargo(item) {
+    if (!item.embargoed) {
+        return null;
+    }
+
+    const now = getNow();
+    const parsed = moment(item.embargoed);
+
+    return parsed.isAfter(now) ? parsed : null;
+}

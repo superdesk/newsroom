@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReportsTable from './ReportsTable';
+
 import { gettext } from 'utils';
 
 
-function ProductStories({data}) {
+function ProductStories({data, print}) {
     const list = data.results && data.results.map((item) =>
         <tr key={item._id}>
             <td>{item.name}</td>
@@ -18,32 +20,23 @@ function ProductStories({data}) {
         </tr>
     );
 
-    return (
-        <section className="content-main">
-            <div className="list-items-container">
-                {data.results && <table className="table table-bordered">
-                    <thead className="thead-light">
-                        <tr>
-                            <th>{ gettext('Product') }</th>
-                            <th>{ gettext('Is Enabled') }</th>
-                            <th>{ gettext('Today') }</th>
-                            <th>{ gettext('Last 24 hours') }</th>
-                            <th>{ gettext('This week') }</th>
-                            <th>{ gettext('Last 7 days') }</th>
-                            <th>{ gettext('This month') }</th>
-                            <th>{ gettext('Previous month') }</th>
-                            <th>{ gettext('Last 6 months') }</th>
-                        </tr>
-                    </thead>
-                    <tbody>{list}</tbody>
-                </table>}
-            </div>
-        </section>
-    );
+    const headers = [
+        gettext('Product'),
+        gettext('Is Enabled'),
+        gettext('Today'),
+        gettext('Last 24 hours'),
+        gettext('This week'),
+        gettext('Last 7 days'),
+        gettext('This month'),
+        gettext('Previous month'),
+        gettext('Last 6 months'),
+    ];
+    return data.results ? (<ReportsTable headers={headers} rows={list} print={print} />) : null;
 }
 
 ProductStories.propTypes = {
     data: PropTypes.object.isRequired,
+    print: PropTypes.bool,
 };
 
 export default ProductStories;

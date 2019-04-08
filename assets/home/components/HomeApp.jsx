@@ -3,34 +3,17 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {gettext} from 'utils';
 import { get } from 'lodash';
-import TextOnlyCard from './TextOnlyCard';
-import PictureTextCard from './PictureTextCard';
-import MediaGalleryCard from './MediaGalleryCard';
-import TopNewsOneByOneCard from './TopNewsOneByOneCard';
-import TopNewsTwoByTwoCard from './TopNewsTwoByTwoCard';
-import LargeTextOnlyCard from './LargeTextOnlyCard';
-import LargePictureTextCard from './LargePictureTextCard';
-import {getItemActions} from 'wire/item-actions';
+import {
+    getCardDashboardComponent,
+} from 'components/cards/utils';
+
+
+import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
 import {openItemDetails, setActive} from '../actions';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
-import PhotoGalleryCard from './PhotoGalleryCard';
-import EventsTwoByTwoCard from './EventsTwoByTwoCard';
-
-const panels = {
-    '6-text-only': TextOnlyCard,
-    '4-picture-text': PictureTextCard,
-    '4-media-gallery': MediaGalleryCard,
-    '4-photo-gallery': PhotoGalleryCard,
-    '1x1-top-news': TopNewsOneByOneCard,
-    '2x2-top-news': TopNewsTwoByTwoCard,
-    '3-text-only': LargeTextOnlyCard,
-    '3-picture-text': LargePictureTextCard,
-    '4-text-only': PictureTextCard,
-    '2x2-events': EventsTwoByTwoCard,
-};
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -77,12 +60,16 @@ class HomeApp extends React.Component {
     }
 
     getPanels(card) {
-        const Panel = panels[card.type];
+        const Panel = getCardDashboardComponent(card.type);
+        const items = this.props.itemsByCard[card.label] || [];
+
         if (card.type === '4-photo-gallery') {
             return <Panel
                 key={card.label}
-                photos={this.props.photos}
+                photos={items}
                 title={card.label}
+                moreUrl={card.config.more_url}
+                moreUrlLabel={card.config.more_url_label}
             />;
         }
         if (card.type === '2x2-events') {
@@ -93,7 +80,6 @@ class HomeApp extends React.Component {
             />;
         }
 
-        const items = this.props.itemsByCard[card.label] || [];
         return <Panel
             key={card.label}
             type={card.type}
@@ -125,7 +111,8 @@ class HomeApp extends React.Component {
                     ref={(elem) => this.elem = elem}
                 >
                     <div className="container-fluid">
-                        {this.props.cards.length > 0 && this.props.cards.map((card) => this.getPanels(card))}
+                        {this.props.cards.length > 0 &&
+                        this.props.cards.filter((c) => c.dashboard === 'newsroom').map((card) => this.getPanels(card))}
                         {this.props.cards.length === 0 &&
                         <div className="alert alert-warning" role="alert">
                             <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for home page!')}
@@ -138,7 +125,6 @@ class HomeApp extends React.Component {
 }
 
 HomeApp.propTypes = {
-    photos: PropTypes.array,
     cards: PropTypes.arrayOf(PropTypes.object),
     itemsByCard: PropTypes.object,
     products: PropTypes.array,
@@ -156,7 +142,6 @@ HomeApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    photos: state.photos,
     cards: state.cards,
     itemsByCard: state.itemsByCard,
     products: state.products,

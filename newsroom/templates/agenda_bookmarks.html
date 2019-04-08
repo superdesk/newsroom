@@ -1,0 +1,12 @@
+{% extends "bookmark_layout.html" %}
+
+{% block content %}
+<div id="agenda-app" class="content"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        agendaData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('agenda_js') | safe }}
+{% endblock %}

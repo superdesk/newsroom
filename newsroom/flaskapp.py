@@ -27,11 +27,14 @@ from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
-    plain_text, word_count, newsroom_config, is_admin,
-    hash_string, date_header, get_date, sidenavs,
+    plain_text, word_count, char_count, newsroom_config, is_admin,
+    hash_string, date_header, get_date,
+    sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager
 )
-
+from newsroom.celery_app import init_celery
 from newsroom.gettext import setup_babel
+import newsroom
+
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -57,6 +60,7 @@ class Newsroom(eve.Eve):
         self.extensions = {}
         self.theme_folder = 'theme'
         self.sections = []
+        self.dashboards = []
         self._testing = testing
         self._general_settings = {}
 
@@ -86,6 +90,8 @@ class Newsroom(eve.Eve):
         self._setup_jinja()
         self._setup_limiter()
         self._setup_babel()
+        init_celery(self)
+        newsroom.app = self
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
         self._setup_apps(self.config.get('INSTALLED_APPS', []))
@@ -136,7 +142,11 @@ class Newsroom(eve.Eve):
         self.add_template_filter(time_short)
         self.add_template_filter(date_short)
         self.add_template_filter(word_count)
-        self.add_template_global(sidenavs)
+        self.add_template_filter(char_count)
+        self.add_template_global(get_company_sidenavs, 'sidenavs')
+        self.add_template_global(sidenavs_by_names)
+        self.add_template_global(sidenavs_by_group)
+        self.add_template_global(is_admin_or_account_manager)
         self.add_template_global(newsroom_config)
         self.add_template_global(is_admin)
         self.add_template_global(get_initial_notifications)
@@ -237,10 +247,11 @@ class Newsroom(eve.Eve):
         """
         self.sections.append({
             '_id': _id,
-            'name': name,
+            'name': name
         })
 
-    def sidenav(self, name, endpoint, icon=None, group=0, section=None, blueprint=None, badge=None):
+    def sidenav(self, name, endpoint=None, icon=None, group=0, section=None, blueprint=None, badge=None, url=None,
+                secondary_endpoints=[]):
         """Register an item in sidebar menu.
 
         Use in module :meth:`init_app` method::
@@ -251,11 +262,15 @@ class Newsroom(eve.Eve):
         :param name: user readable name
         :param endpoint: endpoint name, used with :meth:`flask.url_for`
         :param icon: css icon class name
-        :param group: group number, ``0`` by default
+        :param group: group number, ``0`` by default, up to ``9``.
         :param section: section ``_id``, will be only visible if user has section enabled.
         :param blueprint: blueprint name, will be only visible if blueprint is active
         :param badge: badge id - will add badge html markup with given id
+        :param url: external url - will add external link badge and use target=_blank for link
+        :param secondary_endpoints: registers other endpoints (internal navigations) of a sidenav's page
         """
+        if endpoint is None and url is None:
+            raise ValueError('please specify endpoint or url')
         self.sidenavs.append({
             'name': name,
             'endpoint': endpoint,
@@ -264,6 +279,8 @@ class Newsroom(eve.Eve):
             'section': section,
             'blueprint': blueprint,
             'badge': badge,
+            'url': url,
+            'secondary_endpoints': secondary_endpoints
         })
 
     def settings_app(self, app, name, weight=1000, data=None):
@@ -274,7 +291,8 @@ class Newsroom(eve.Eve):
             weight=weight
         ))
 
-    def general_setting(self, _id, label, type='text', default=None, weight=0, description=None, min=None):
+    def general_setting(self, _id, label, type='text', default=None,
+                        weight=0, description=None, min=None, client_setting=False):
         self._general_settings[_id] = {
             'type': type,
             'label': label,
@@ -282,7 +300,22 @@ class Newsroom(eve.Eve):
             'default': default,
             'description': description,
             'min': min,
+            'client_setting': client_setting
         }
 
         if flask.g:  # reset settings cache
             flask.g.settings = None
+
+    def dashboard(self, _id, name, cards=[]):
+        """Define new dashboard
+
+        :param _id: id of the dashboard
+        :param name: display name of the dashboard
+        :param cards: list of cards id related to the dashboard to
+        populate the drop down in dashboard config.
+        """
+        self.dashboards.append({
+            '_id': _id,
+            'name': name,
+            'cards': cards
+        })

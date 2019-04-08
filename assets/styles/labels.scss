@@ -6,6 +6,9 @@ $labels-palette: (
   green-dark: $green-dark,
   orange: $orange,
   red: $red,
+  available: #7ed321,
+  restricted: #bfc3c7,
+  yellow2: $yellow2
 );
 
 /// Generates base styles for a label.
@@ -39,5 +42,10 @@ $labels-palette: (
             color: $color;
             text-decoration-color: $color;
         }
+    }
+
+    &.label--big {
+        font-size: 11px;
+        padding: 3px 10px 2px 10px;
     }
 }

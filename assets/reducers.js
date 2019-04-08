@@ -1,3 +1,4 @@
+import {uniq} from 'lodash';
 import {
     CLOSE_MODAL, RENDER_MODAL,
     SAVED_ITEMS_COUNT,
@@ -32,7 +33,7 @@ import {
     SET_QUERY,
 } from 'search/actions';
 
-import {getMaxVersion} from './wire/utils';
+import {getMaxVersion} from 'local-store';
 import {REMOVE_NEW_ITEMS, SET_NEW_ITEMS_BY_TOPIC} from './agenda/actions';
 import {toggleValue} from 'utils';
 import {get, isEmpty} from 'lodash';
@@ -74,6 +75,7 @@ function updateItemActions(state, items, action) {
 }
 
 
+
 export function defaultReducer(state, action) {
     switch (action.type) {
 
@@ -110,6 +112,7 @@ export function defaultReducer(state, action) {
             readItems,
             previewItem: action.item ? action.item._id : null,
             previewGroup: action.group,
+            previewPlan: action.plan,
         };
     }
 
@@ -127,6 +130,7 @@ export function defaultReducer(state, action) {
             itemsById,
             openItem: action.item || null,
             previewGroup: action.group || null,
+            previewPlan: action.plan,
         };
     }
 
@@ -137,7 +141,7 @@ export function defaultReducer(state, action) {
 
     case QUERY_ITEMS: {
         const resultsFiltered = !isEmpty(get(state, 'search.activeFilter')) || !isEmpty(get(state, 'search.createdFilter.from')) || !isEmpty(get(state, 'search.createdFilter.to'));
-        return {...state, isLoading: true, totalItems: null, activeQuery: state.query, resultsFiltered};
+        return {...state, searchInitiated: true, isLoading: true, totalItems: null, activeQuery: state.query, resultsFiltered};
     }
 
     case RECIEVE_ITEM: {
@@ -148,15 +152,13 @@ export function defaultReducer(state, action) {
 
     case RECIEVE_NEXT_ITEMS: {
         const itemsById = Object.assign({}, state.itemsById);
-        const items = state.items.concat(action.data._items.map((item) => {
-            if (itemsById[item._id]) {
-                return;
+        const newItems = action.data._items.map((item) => {
+            if (!itemsById[item._id]) {
+                itemsById[item._id] = item;
             }
-
-            itemsById[item._id] = item;
             return item._id;
-        }).filter((_id) => _id));
-        return {...state, items, itemsById, isLoading: false};
+        });
+        return {...state, items: uniq([...state.items, ...newItems]), itemsById, isLoading: false};
     }
 
     case SET_STATE:
@@ -290,12 +292,9 @@ export function defaultReducer(state, action) {
     }
 
     case SET_NEW_ITEMS: {
-        const newItems = action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id);
-        const newItemsData = action.data;
         return {
             ...state,
-            newItems,
-            newItemsData,
+            newItems: action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id),
         };
     }
 

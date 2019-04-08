@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { get } from 'lodash';
+
 import {
     hideModal,
     toggleDropdown,
@@ -32,25 +34,36 @@ class UserProfileApp extends React.Component {
                 label: gettext('My Profile'),
                 content: UserProfile,
             },
-            {
+        ];
+
+        if (this.isSectionEnabled('wire')) {
+            this.links.push({
                 name: 'topics',
                 label: gettext('My Topics'),
                 content: FollowedTopics,
-            },
-            /**
-            {
-                name: 'history',
-                label: gettext('Download History'),
-            },
-            */
-        ];
+                type: 'wire',
+            });
+        }
+
+        if (this.isSectionEnabled('agenda')) {
+            this.links.push({
+                name: 'events',
+                label: gettext('My Events'),
+                content: FollowedTopics,
+                type: 'agenda',
+            });
+        }
+    }
+
+    isSectionEnabled(name) {
+        return !!get(this.props, 'userSections', []).find((s) => s._id === name);
     }
 
     renderModal(specs) {
         if (specs) {
             const Modal = modals[specs.modal];
             return ReactDOM.createPortal(
-                <Modal data={specs.data} />,
+                <Modal data={{...specs.data, isTopic: true}} />,
                 document.getElementById('modal-container')
             );
         }
@@ -64,6 +77,7 @@ class UserProfileApp extends React.Component {
 
         const modal = this.renderModal(this.props.modal);
         const ActiveContent = links.find((link) => link.active).content;
+        const topicType = links.find((link) => link.active).type;
 
         return (
             <div className="profile-container">
@@ -95,7 +109,7 @@ class UserProfileApp extends React.Component {
                             </nav>
                         </section>
                         <section className="content-main">
-                            <ActiveContent />
+                            <ActiveContent topicType={topicType}/>
                         </section>
                     </div>
                     {modal}
@@ -167,6 +181,7 @@ const mapStateToProps = (state) => ({
     dropdown: state.dropdown,
     selectedMenu: state.selectedMenu,
     displayModal: state.displayModal,
+    userSections: state.userSections,
 });
 
 const mapDispatchToProps = (dispatch) => ({

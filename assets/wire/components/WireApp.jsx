@@ -9,9 +9,9 @@ import {
     fetchItems,
     setQuery,
     fetchMoreItems,
-    refresh,
     previewItem,
     toggleNews,
+    downloadVideo,
 } from 'wire/actions';
 
 import {
@@ -34,7 +34,7 @@ import ItemDetails from './ItemDetails';
 
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
-import { getItemActions } from '../item-actions';
+import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
 
 const modals = {
@@ -47,6 +47,11 @@ class WireApp extends BaseApp {
     constructor(props) {
         super(props);
         this.modals = modals;
+
+        // Show my-topics tab only if WireApp is in 'wire' context (not 'aapX', etc.)
+        if (this.props.context !== 'wire') {
+            this.tabs = this.tabs.filter((t) => t.id !== 'topics');
+        }
     }
 
     render() {
@@ -59,12 +64,14 @@ class WireApp extends BaseApp {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,
         });
-        
+
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
+                detailsConfig={this.props.detailsConfig}
+                downloadVideo={this.props.downloadVideo}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
                 <section key="contentHeader" className='content-header'>
@@ -81,7 +88,7 @@ class WireApp extends BaseApp {
                         </span>}
 
                         {this.props.bookmarks && 
-                            <BookmarkTabs active="wire" sections={this.props.userSections}/>
+                            <BookmarkTabs active={this.props.context} sections={this.props.userSections}/>
                         }
 
                         {!this.state.withSidebar && !this.props.bookmarks && <span
@@ -103,6 +110,7 @@ class WireApp extends BaseApp {
                             activeNavigation={this.props.activeNavigation}
                             newsOnly={this.props.newsOnly}
                             toggleNews={this.props.toggleNews}
+                            hideNewsOnly={this.props.context !== 'wire'}
                         />
                     </nav>
                 </section>,
@@ -110,7 +118,7 @@ class WireApp extends BaseApp {
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
-                                <SearchSidebar tabs={this.tabs} props={this.props} />
+                                <SearchSidebar tabs={this.tabs} props={{...this.props}} />
                             }
                         </div>
                         <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
@@ -119,9 +127,9 @@ class WireApp extends BaseApp {
                                 query={this.props.activeQuery}
                                 bookmarks={this.props.bookmarks}
                                 totalItems={this.props.totalItems}
-                                topicType='wire'
+                                topicType={this.props.context === 'wire' ? this.props.context : null}
                                 newItems={this.props.newItems}
-                                refresh={this.props.refresh}
+                                refresh={this.props.fetchItems}
                                 activeTopic={this.props.activeTopic}
                                 toggleNews={this.props.toggleNews}
                                 activeNavigation={this.props.activeNavigation}
@@ -144,6 +152,8 @@ class WireApp extends BaseApp {
                                 followStory={this.props.followStory}
                                 isFollowing={!!isFollowing}
                                 closePreview={this.props.closePreview}
+                                previewConfig={this.props.previewConfig}
+                                downloadVideo={this.props.downloadVideo}
                             />
                             }
 
@@ -186,7 +196,6 @@ WireApp.propTypes = {
     setView: PropTypes.func,
     followStory: PropTypes.func,
     newItems: PropTypes.array,
-    refresh: PropTypes.func,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.string,
@@ -195,6 +204,11 @@ WireApp.propTypes = {
     activeTopic: PropTypes.object,
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
+    context: PropTypes.string.isRequired,
+    previewConfig: PropTypes.object,
+    detailsConfig: PropTypes.object,
+    groups: PropTypes.array,
+    downloadVideo: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -218,6 +232,10 @@ const mapStateToProps = (state) => ({
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
     activeTopic: activeTopicSelector(state),
+    context: state.context,
+    previewConfig: get(state.uiConfig, 'preview') || {},
+    detailsConfig: get(state.uiConfig, 'details') || {},
+    groups: get(state, 'groups', []),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -231,8 +249,8 @@ const mapDispatchToProps = (dispatch) => ({
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
-    refresh: () => dispatch(refresh()),
     closePreview: () => dispatch(previewItem(null)),
+    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
