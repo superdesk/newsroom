@@ -55,6 +55,9 @@ BLUEPRINTS = [
     'newsroom.settings'
 ]
 
+LANGUAGES = ['fi', 'en']
+DEFAULT_LANGUAGE = 'fi'
+
 COMPANY_TYPES = [
     dict(
         id='premium',
