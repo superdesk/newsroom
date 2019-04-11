@@ -6,7 +6,7 @@ import { setActiveFilterTab, getActiveFilterTab } from 'local-store';
 class SearchSidebar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {active: getActiveFilterTab() || props.tabs[0].id};
+        this.state = {active: getActiveFilterTab(props.props.context) || props.tabs[0].id};
     }
 
     render() {
@@ -20,7 +20,7 @@ class SearchSidebar extends React.Component {
                                 href=''
                                 onClick={(event) => {
                                     event.preventDefault();
-                                    setActiveFilterTab(tab.id);
+                                    setActiveFilterTab(tab.id, this.props.props.context);
                                     this.setState({active: tab.id});
                                 }}>{tab.label}</a>
                         </li>

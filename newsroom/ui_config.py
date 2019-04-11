@@ -28,6 +28,9 @@ class UIConfigResource(newsroom.Resource):
         },
         'list': {
             'type': 'dict'
+        },
+        'advanced_search_tabs': {
+            'type': 'dict'
         }
     }
     datasource = {

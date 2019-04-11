@@ -79,16 +79,18 @@ export function toggleFeaturedOnlyParam() {
  *
  * @returns {boolean}
  */
-export function getActiveFilterTab() {
-    return (store.get(FILTER_TAB) || {}).value;
+export function getActiveFilterTab(context) {
+    return get(store.get(FILTER_TAB), context, '');
 }
 
 /**
  * Set active filter tab
  *
  */
-export function setActiveFilterTab(tab) {
-    store.assign(FILTER_TAB, {value: tab});
+export function setActiveFilterTab(tab, context) {
+    let filterTabs = {...store.get(FILTER_TAB) || {}};
+    filterTabs[context] = tab;
+    store.assign(FILTER_TAB, filterTabs);
 }
 
 
