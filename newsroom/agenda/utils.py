@@ -69,3 +69,7 @@ def get_public_contacts(agenda):
 
 def get_links(agenda):
     return agenda.get('event', {}).get('links', [])
+
+
+def get_latest_available_delivery(coverage):
+    return next((d for d in (coverage.get('deliveries') or []) if d.get('delivery_state') == 'published'), None)
