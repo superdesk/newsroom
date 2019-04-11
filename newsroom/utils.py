@@ -70,6 +70,7 @@ def get_type():
         'agenda': 'agenda',
         'am_news': 'items',
         'aapX': 'items',
+        'media_releases': 'items',
     }
     return types[item_type]
 

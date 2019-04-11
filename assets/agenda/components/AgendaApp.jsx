@@ -276,6 +276,7 @@ AgendaApp.propTypes = {
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
     eventsOnly: PropTypes.bool,
+    context: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -308,6 +309,7 @@ const mapStateToProps = (state) => ({
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
     featuredOnly: get(state, 'agenda.featuredOnly'),
+    context: state.context,
 });
 
 const mapDispatchToProps = (dispatch) => ({
