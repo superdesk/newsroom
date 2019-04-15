@@ -4,8 +4,9 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { get, isEqual } from 'lodash';
 import classNames from 'classnames';
+import moment from 'moment';
 
-import { gettext } from 'utils';
+import { gettext, DATE_FORMAT } from 'utils';
 import AgendaListItem from './AgendaListItem';
 import { setActive, previewItem, toggleSelected, openItem } from '../actions';
 import { EXTENDED_VIEW } from 'wire/defaults';
@@ -195,13 +196,30 @@ class AgendaList extends React.Component {
         }
     }
 
+    getListGroupDate(group) {
+        if (get(group, 'date')) {
+            const groupDate = moment(group.date, DATE_FORMAT);
+            const today = moment();
+            const tomorrow  = moment(today).add(1,'days');
+            if (groupDate.isSame(today, 'day')) {
+                return gettext('Today');
+            }
+
+            if (groupDate.isSame(tomorrow, 'day')) {
+                return gettext('Tomorrow');
+            }
+
+            return groupDate.format(groupDate.year() === today.year() ? 'dddd, MMMM D' : 'dddd, MMMM D, YYYY');
+        }
+    }
+
     render() {
         const {groupedItems, itemsById, activeView, selectedItems, readItems, refNode, onScroll} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
         const articleGroups = groupedItems.map((group) =>
             [
                 <div className='wire-articles__header' key={`${group.date}header`}>
-                    {group.date}
+                    {this.getListGroupDate(group)}
                 </div>,
 
                 <div className = 'wire-articles__group' key={`${group.date}group`}>
