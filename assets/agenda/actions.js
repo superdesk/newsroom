@@ -222,7 +222,8 @@ function search(state, next) {
     const activeFilter = get(state, 'search.activeFilter', {});
     const activeNavigation = get(state, 'search.activeNavigation');
     const createdFilter = get(state, 'search.createdFilter', {});
-    const featuredFilter = !activeNavigation && !state.bookmarks && get(state, 'agenda.featuredOnly');
+    const eventsOnlyFilter = !state.bookmarks && get(state, 'agenda.eventsOnlyView', false);
+    const featuredFilter = !activeNavigation && !state.bookmarks && !eventsOnlyFilter && get(state, 'agenda.featuredOnly');
     let fromDateFilter;
 
     if (featuredFilter) {
@@ -250,6 +251,7 @@ function search(state, next) {
         date_to: dateTo,
         timezone_offset: getTimezoneOffset(),
         featured: featuredFilter,
+        eventsOnlyView: eventsOnlyFilter,
     };
 
     const queryString = Object.keys(params)
@@ -276,6 +278,7 @@ export function fetchItems(updateRoute = true) {
                     filter: get(state, 'search.activeFilter'),
                     navigation: get(state, 'search.activeNavigation'),
                     created: get(state, 'search.createdFilter'),
+                    eventsOnlyView: get(state, 'agenda.eventsOnlyView', false) ? true : null,
                     featured: get(state, 'agenda.featuredOnly', false) ? true : null,
                 }, state);
                 analytics.timingComplete('search', Date.now() - start);
@@ -547,7 +550,7 @@ export function toggleDropdownFilter(key, val) {
     return (dispatch) => {
         dispatch(setActive(null));
         dispatch(preview(null));
-        dispatch(toggleFilter(key, val, true));
+        key === 'eventsOnly' ? dispatch(toggleEventsOnlyFilter(val)) : dispatch(toggleFilter(key, val, true));
         dispatch(fetchItems());
     };
 }
@@ -588,7 +591,9 @@ export function initParams(params) {
     if (params.get('filter') || params.get('created')) {
         clearAgendaDropdownFilters();
     }
+
     return (dispatch, getState) => {
+        dispatch(toggleEventsOnlyFilter(params.get('eventsOnlyView') ? true : false));
         dispatch(initSearchParams(params));
         if (params.get('item')) {
             dispatch(fetchItem(params.get('item')))
@@ -641,4 +646,9 @@ export function toggleFeaturedFilter(fetch = true) {
 
         return dispatch(fetchItems());
     };   
+}
+
+export const TOGGLE_EVENTS_ONLY_FILTER = 'TOGGLE_EVENTS_ONLY_FILTER';
+export function toggleEventsOnlyFilter(value) {
+    return {type: TOGGLE_EVENTS_ONLY_FILTER, value};
 }
