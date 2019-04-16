@@ -36,6 +36,7 @@ import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
 import ArticleBody from 'ui/components/ArticleBody';
 import ArticleAuthor from 'ui/components/ArticleAuthor';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
+import PreviewEdnote from './PreviewEdnote';
 
 
 function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo}) {
@@ -49,7 +50,7 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
             <ContentHeader>
                 <ContentBar onClose={onClose}>
                     <PreviewActionButtons item={item} user={user} actions={actions}/>
-                </ContentBar>                
+                </ContentBar>
             </ContentHeader>
             <ArticleItemDetails>
                 <ArticleContent>
@@ -84,6 +85,9 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
                         <ArticleContentInfoWrapper>
                             {isDisplayed('tags_section', detailsConfig) &&
                                 <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
+
+                            {isDisplayed('ednotes_section', detailsConfig) &&
+                                <PreviewEdnote item={item} />}
 
                             {isDisplayed('item_versions', detailsConfig) && showItemVersions(item, true) &&
                                 <ListItemNextVersion item={item} displayConfig={detailsConfig}  />
