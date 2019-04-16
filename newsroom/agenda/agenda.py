@@ -445,7 +445,7 @@ def get_agenda_query(query, events_only=False):
         }
 
 
-def is_events_only_view(user, company):
+def is_events_only_access(user, company):
     if user and company and not is_admin(user):
         return company.get('events_only', False)
     return False
@@ -497,7 +497,7 @@ class AgendaService(newsroom.Service):
         query = _agenda_query()
         user = get_user()
         company = get_user_company(user)
-        is_events_only = is_events_only_view(user, company)
+        is_events_only = is_events_only_access(user, company) or req.args.get('eventsOnlyView')
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         product_query = {'bool': {'must': [], 'should': []}}
 
@@ -586,7 +586,7 @@ class AgendaService(newsroom.Service):
         """Return featured items."""
         user = get_user()
         company = get_user_company(user)
-        if is_events_only_view(user, company):
+        if is_events_only_access(user, company):
             abort(403)
 
         if not featured or not featured.get('items'):
