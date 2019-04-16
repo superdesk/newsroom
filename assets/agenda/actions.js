@@ -526,7 +526,14 @@ export function setAndUpdateNewItems(data) {
         }
 
         dispatch(updateItems(data));
-        dispatch({type: SET_NEW_ITEMS, data});
+
+        // Do not use 'killed' items for new-item notifications
+        let newItemsData = { ...data };
+        if (get(newItemsData, '_items.length', 0) > 0) {
+            newItemsData._items = newItemsData._items.filter((item) => item.state !== 'killed');
+        }
+
+        dispatch({type: SET_NEW_ITEMS, data: newItemsData});
         return Promise.resolve();
     };
 }
