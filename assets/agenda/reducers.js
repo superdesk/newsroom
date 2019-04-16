@@ -168,16 +168,25 @@ export default function agendaReducer(state = initialState, action) {
     }
 
     case UPDATE_ITEMS: {
-        const itemsById = Object.assign({}, state.itemsById);
-        get(action.data, '_items', []).map(item => {
+        // Update existing items, remove killed items
+
+        let itemsById = Object.assign({}, state.itemsById);
+        let updatedItems = [ ...state.items ];
+        get(action.data, '_items', []).forEach(item => {
             if(itemsById[item._id]) {
-                itemsById[item._id] = item;
+                if (get(item, 'state') === 'killed') {
+                    delete itemsById[item._id];
+                    updatedItems = updatedItems.filter((i) => i !== item._id);
+                } else {
+                    itemsById[item._id] = item;
+                }
             }
         });
 
         return {
             ...state,
-            itemsById,
+            itemsById: itemsById,
+            items: updatedItems,
         };
     }
 
