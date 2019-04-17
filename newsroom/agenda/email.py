@@ -1,9 +1,10 @@
-from flask import current_app, render_template, url_for
+from flask import render_template, url_for
 from flask_babel import gettext
 
 from newsroom.email import send_email
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, get_public_contacts
 from newsroom.template_filters import is_admin_or_internal
+from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 
 
 def send_coverage_notification_email(user, agenda, wire_item):
@@ -48,7 +49,12 @@ def send_coverage_request_email(user, message, item):
     :param item: agenda item that request is made against
     :return:
     """
-    recipients = current_app.config['COVERAGE_REQUEST_RECIPIENTS'].split(',')
+
+    general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
+    if not general_settings:
+        return
+
+    recipients = general_settings.get('values').get('coverage_request_recipients').split(',')
     assert recipients
     assert isinstance(recipients, list)
     url = url_for('agenda.item', _id=item, _external=True)

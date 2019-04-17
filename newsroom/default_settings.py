@@ -117,9 +117,6 @@ PRIVACY_POLICY = 'https://www.aap.com.au/legal/'
 TERMS_AND_CONDITIONS = 'https://www.aap.com.au/legal/'
 SHOW_COPYRIGHT = True
 
-# Email addresses that will receive the coverage request emails (single or comma separated)
-COVERAGE_REQUEST_RECIPIENTS = os.environ.get('COVERAGE_REQUEST_RECIPIENTS')
-
 TEMPLATES_AUTO_RELOAD = True
 
 DEFAULT_TIMEZONE = os.environ.get('DEFAULT_TIMEZONE')
