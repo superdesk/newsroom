@@ -5,7 +5,7 @@ import { createSelector } from 'reselect';
 import { groupBy } from 'lodash';
 import moment from 'moment/moment';
 
-import { gettext, formatDate } from 'utils';
+import { gettext, formatDate, DATE_FORMAT } from 'utils';
 import AmNewsListItem from './AmNewsListItem';
 import { setActive, previewItem, toggleSelected, openItem } from '../../wire/actions';
 import { getIntVersion } from '../../wire/utils';
@@ -140,15 +140,17 @@ class AmNewsList extends React.Component {
 
     render() {
         const {activeItem, selectedItems, readItems, groupedItems} = this.props;
-        const today = formatDate(moment());
+        const todayMoment = moment();
+        const today = formatDate(todayMoment);
 
         const groups = Object.keys(groupedItems).map((keyDate) => {
             const groupItem = [];
 
             if(today !== keyDate) {
+                const keyDateMoment = moment(keyDate, DATE_FORMAT);
                 groupItem.push(
                     <div className='wire-articles__header' key={`${keyDate}header`}>
-                        {keyDate}
+                        {keyDateMoment.format(keyDateMoment.year() === todayMoment.year() ? 'dddd, MMMM D' : 'dddd, MMMM D, YYYY')}
                     </div>
                 );
             }

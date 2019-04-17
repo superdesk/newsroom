@@ -106,6 +106,9 @@ class AgendaApp extends BaseApp {
                 label: gettext('Place'),
             },
         ];
+        const eventsOnly = this.props.eventsOnlyView || this.props.eventsOnlyAccess;
+        const hideFeaturedToggle = this.props.activeNavigation ||
+            this.props.bookmarks || this.props.activeTopic || eventsOnly;
 
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
@@ -116,7 +119,7 @@ class AgendaApp extends BaseApp {
                 requestCoverage={this.props.requestCoverage}
                 group={this.props.previewGroup}
                 planningId={this.props.previewPlan}
-                eventsOnly={this.props.eventsOnly}
+                eventsOnly={eventsOnly}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar
@@ -157,7 +160,7 @@ class AgendaApp extends BaseApp {
                         <AgendaListViewControls
                             activeView={this.props.activeView}
                             setView={this.props.setView}
-                            hideFeaturedToggle={this.props.activeNavigation || this.props.bookmarks || this.props.activeTopic}
+                            hideFeaturedToggle={hideFeaturedToggle}
                             toggleFeaturedFilter={this.props.toggleFeaturedFilter}
                             featuredFilter={this.props.featuredOnly}
                         />
@@ -181,7 +184,8 @@ class AgendaApp extends BaseApp {
                                     aggregations={this.props.aggregations}
                                     toggleFilter={this.props.toggleDropdownFilter}
                                     activeFilter={this.props.activeFilter}
-                                    eventsOnly={this.props.eventsOnly}
+                                    eventsOnlyAccess={this.props.eventsOnlyAccess}
+                                    eventsOnlyView={this.props.eventsOnlyView}
                                 />
                             }
 
@@ -219,7 +223,7 @@ class AgendaApp extends BaseApp {
                             requestCoverage={this.props.requestCoverage}
                             previewGroup={this.props.previewGroup}
                             previewPlan={this.props.previewPlan}
-                            eventsOnly={this.props.eventsOnly}
+                            eventsOnly={eventsOnly}
                         />
                     </div>
                 </section>
@@ -275,7 +279,9 @@ AgendaApp.propTypes = {
     detail: PropTypes.bool,
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
-    eventsOnly: PropTypes.bool,
+    context: PropTypes.string,
+    eventsOnlyAccess: PropTypes.bool,
+    eventsOnlyView: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -303,11 +309,13 @@ const mapStateToProps = (state) => ({
     aggregations: state.aggregations,
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
-    eventsOnly: get(state, 'agenda.eventsOnly', false),
+    eventsOnlyAccess: get(state, 'agenda.eventsOnlyAccess', false),
+    eventsOnlyView: get(state, 'agenda.eventsOnlyView', false),
     detail: get(state, 'detail', false),
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
     featuredOnly: get(state, 'agenda.featuredOnly'),
+    context: state.context,
 });
 
 const mapDispatchToProps = (dispatch) => ({

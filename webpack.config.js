@@ -24,7 +24,8 @@ module.exports = {
         am_news_js: './assets/am-news/index.js',
         am_news_css: './assets/am-news/style.js',
         'general-settings_js': './assets/general-settings/index.js',
-        'market-place_js': './assets/market-place/index.js',
+        market_place_js: './assets/market-place/index.js',
+        media_releases_js: './assets/media-releases/index.js',
         common: [
             'alertifyjs',
             'bootstrap',

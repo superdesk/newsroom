@@ -20,6 +20,7 @@ from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
 from newsroom.wire import url_for_wire
 from newsroom.upload import ASSETS_RESOURCE
 from newsroom.signals import publish_item as publish_item_signal
+from newsroom.agenda.utils import get_latest_available_delivery
 
 from planning.common import WORKFLOW_STATE
 
@@ -64,15 +65,20 @@ def push():
     item = flask.json.loads(flask.request.get_data())
     assert 'guid' in item or '_id' in item, {'guid': 1}
     assert 'type' in item, {'type': 1}
+    agenda_service = superdesk.get_resource_service('agenda')
 
     if item.get('type') == 'event':
         orig = app.data.find_one('agenda', req=None, _id=item['guid'])
         id = publish_event(item, orig)
         agenda = app.data.find_one('agenda', req=None, _id=id)
+        if agenda:
+            agenda_service.enhance_items([agenda])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'planning':
         published = publish_planning(item)
         agenda = app.data.find_one('agenda', req=None, _id=published['_id'])
+        if agenda:
+            agenda_service.enhance_items([agenda])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
         orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
@@ -99,6 +105,7 @@ def set_dates(doc):
 def publish_item(doc, is_new):
     """Duplicating the logic from content_api.publish service."""
     set_dates(doc)
+    doc['firstpublished'] = parse_date_str(doc.get('firstpublished'))
     doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
     doc.setdefault('charcount', get_char_count(doc.get('body_html', '')))
     service = superdesk.get_resource_service('content_api')
@@ -433,19 +440,32 @@ def get_coverages(planning_items, original_coverages=[]):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
 
     def set_delivery(coverage, deliveries):
+        cov_deliveries = []
         if coverage['coverage_type'] == 'text':
-            if deliveries and coverage.get('workflow_status') == 'completed':
-                coverage['delivery_id'] = deliveries[0]['item_id']
-                coverage['delivery_href'] = url_for_wire(None, _external=False, section='wire.item',
-                                                         _id=deliveries[0]['item_id'])
-            else:
-                coverage['delivery_id'] = None
-                coverage['delivery_href'] = None
+            for d in (deliveries or []):
+                cov_deliveries.append({
+                    'delivery_id': d.get('item_id'),
+                    'delivery_href': url_for_wire(None, _external=False, section='wire.item', _id=d.get('item_id')),
+                    'delivery_state': d.get('item_state'),
+                    'sequence_no': d.get('sequence_no', 0),
+                    'publish_time': parse_date_str(d.get('publish_time'))
+                })
         else:
             if coverage.get('workflow_status') == 'completed':
-                coverage['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item)
-            else:
-                coverage['delivery_href'] = None
+                cov_deliveries.append({
+                    'delivery_href': app.set_photo_coverage_href(coverage, planning_item),
+                    'sequence_no': 0
+                })
+
+        coverage['deliveries'] = cov_deliveries
+        # Sort the deliveries in reverse sequence order here, so sorting required anywhere else
+        coverage['deliveries'].sort(key=lambda d: d['sequence_no'], reverse=True)
+
+        # Get latest delivery that was 'published'
+        latest_available_delivery = get_latest_available_delivery(coverage) or {}
+        coverage['delivery_id'] = latest_available_delivery.get('delivery_id')
+        coverage['delivery_href'] = latest_available_delivery.get('delivery_href')
+        coverage['publish_time'] = latest_available_delivery.get('publish_time')
 
     coverages = []
     coverage_changes = {}
@@ -459,8 +479,8 @@ def get_coverages(planning_items, original_coverages=[]):
                 'coverage_type': coverage['planning']['g2_content_type'],
                 'workflow_status': coverage['workflow_status'],
                 'coverage_status': coverage.get('news_coverage_status', {}).get('name'),
-                'coverage_provider': coverage['planning'].get('coverage_provider'),
-                'delivery_id': existing_coverage.get('delivery_id')
+                'slugline': coverage['planning']['slugline'],
+                'coverage_provider': (coverage.get('coverage_provider') or {}).get('name')
             }
 
             set_delivery(new_coverage, coverage.get('deliveries'))

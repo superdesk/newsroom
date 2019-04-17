@@ -49,9 +49,7 @@ class WireApp extends BaseApp {
         this.modals = modals;
 
         // Show my-topics tab only if WireApp is in 'wire' context (not 'aapX', etc.)
-        if (this.props.context !== 'wire') {
-            this.tabs = this.tabs.filter((t) => t.id !== 'topics');
-        }
+        this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
     }
 
     render() {
@@ -209,6 +207,7 @@ WireApp.propTypes = {
     detailsConfig: PropTypes.object,
     groups: PropTypes.array,
     downloadVideo: PropTypes.func,
+    advancedSearchTabConfig: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -235,6 +234,7 @@ const mapStateToProps = (state) => ({
     context: state.context,
     previewConfig: get(state.uiConfig, 'preview') || {},
     detailsConfig: get(state.uiConfig, 'details') || {},
+    advancedSearchTabConfig: get(state.uiConfig, 'advanced_search_tabs') || {},
     groups: get(state, 'groups', []),
 });
 

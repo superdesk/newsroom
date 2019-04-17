@@ -26,8 +26,9 @@ export default class CoverageItemStatus extends React.PureComponent {
         }
     }
 
-    componentDidUpdate(prevProps) {
-        if (getDeliveryHref(get(prevProps, 'coverage')) !== getDeliveryHref(get(this.props, 'coverage'))) {
+    componentDidUpdate() {
+        // Delivery is set but item not obtained yet
+        if (getDeliveryHref(get(this.props, 'coverage')) && !this.state.wire) {
             this.setState({wire: null});
             this.fetchWire();
         }

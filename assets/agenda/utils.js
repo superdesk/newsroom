@@ -38,6 +38,10 @@ export function getCoverageStatusText(coverage) {
     }
 
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
+        if (get(coverage, 'deliveries.length', 0) > 0) {
+            return `updated ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;    
+        }
+
         return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
     }
 
@@ -519,14 +523,17 @@ export function groupItems (items, activeDate, activeGrouping) {
     items.forEach((item) => {
         const itemExtraDates = getExtraDates(item);
         const itemStartDate = moment(item.dates.start);
-
         const start = item._display_from ? moment(item._display_from) :
             moment.max(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
-
         const itemEndDate = moment(get(item, 'dates.end', start));
 
-        const end = item._display_to ? moment(item._display_to) :
-            moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
+        // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
+        // actioned_date is set. In this case, use that as the cut off date.
+        let end = get(item, 'event.actioned_date') ? moment(item.event.actioned_date) : null;
+        if (!end || !moment.isMoment(end)) {
+            end = item._display_to ? moment(item._display_to) :
+                moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
+        }
         let key = null;
 
         // use clone otherwise it would modify start and potentially also maxStart, moments are mutable

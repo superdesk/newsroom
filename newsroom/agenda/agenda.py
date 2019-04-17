@@ -22,8 +22,9 @@ from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
 from newsroom.wire.search import query_string, set_product_query, \
     planning_items_query_string, nested_query
 from newsroom.wire.utils import get_local_date, get_end_date
-from newsroom.wire import url_for_wire
 from datetime import datetime
+from newsroom.wire import url_for_wire
+from .utils import get_latest_available_delivery
 
 logger = logging.getLogger(__name__)
 PRIVATE_FIELDS = [
@@ -147,8 +148,22 @@ class AgendaResource(newsroom.Resource):
                 'workflow_status': not_analyzed,
                 'coverage_status': not_analyzed,
                 'coverage_provider': not_analyzed,
-                'delivery_id': not_analyzed,
-                'delivery_href': not_analyzed,
+                'slugline': not_analyzed,
+                'delivery_id': not_analyzed,  # To point ot the latest published item
+                'delivery_href': not_analyzed,  # To point ot the latest published item
+                'deliveries': {  # All deliveries (incl. updates go here)
+                    'type': 'object',
+                    'properties': {
+                        'planning_id': not_analyzed,
+                        'coverage_id': not_analyzed,
+                        'assignment_id': not_analyzed,
+                        'item_id': not_analyzed,
+                        'item_state': not_analyzed,
+                        'sequence_no': not_analyzed,
+                        'publish_time': {'type': 'date'},
+                    }
+
+                },
             },
         },
     }
@@ -430,7 +445,7 @@ def get_agenda_query(query, events_only=False):
         }
 
 
-def is_events_only_view(user, company):
+def is_events_only_access(user, company):
     if user and company and not is_admin(user):
         return company.get('events_only', False)
     return False
@@ -440,12 +455,12 @@ class AgendaService(newsroom.Service):
     section = 'agenda'
 
     def on_fetched(self, doc):
-        self._enhance_items(doc[config.ITEMS])
+        self.enhance_items(doc[config.ITEMS])
 
     def on_fetched_item(self, doc):
-        self._enhance_items([doc])
+        self.enhance_items([doc])
 
-    def _enhance_items(self, docs):
+    def enhance_items(self, docs):
         for doc in docs:
             # Enhance completed coverages in general - add story's abstract/headline/slugline
             delivery_ids = [c.get('delivery_id') for c in (doc.get('coverages') or [])
@@ -456,10 +471,7 @@ class AgendaService(newsroom.Service):
                 if wire_items.count() > 0:
                     for item in wire_items:
                         c = [c for c in doc.get('coverages') if c.get('delivery_id') == item.get('_id')][0]
-                        c['item_description_text'] = item.get('description_text')
-                        c['item_headline'] = item.get('headline')
-                        c['item_slugline'] = item.get('slugline')
-                        c['publish_time'] = item.get('firstpublished')
+                        self.enhance_coverage_with_wire_details(c, item)
 
             # Filter based on _inner_hits
             inner_hits = doc.pop('_inner_hits', None)
@@ -472,6 +484,12 @@ class AgendaService(newsroom.Service):
             doc['planning_items'] = [p for p in doc['planning_items'] or [] if p.get('guid') in items_by_key]
             doc['coverages'] = [c for c in (doc.get('coverages') or []) if c.get('planning_id') in items_by_key]
 
+    def enhance_coverage_with_wire_details(self, coverage, wire_item):
+        coverage['item_description_text'] = wire_item.get('description_text')
+        coverage['item_headline'] = wire_item.get('headline')
+        coverage['item_slugline'] = wire_item.get('slugline')
+        coverage['publish_time'] = wire_item.get('firstpublished')
+
     def get(self, req, lookup):
         if req.args.get('featured'):
             return self.get_featured_stories(req, lookup)
@@ -479,7 +497,7 @@ class AgendaService(newsroom.Service):
         query = _agenda_query()
         user = get_user()
         company = get_user_company(user)
-        is_events_only = is_events_only_view(user, company)
+        is_events_only = is_events_only_access(user, company) or req.args.get('eventsOnlyView')
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         product_query = {'bool': {'must': [], 'should': []}}
 
@@ -568,7 +586,7 @@ class AgendaService(newsroom.Service):
         """Return featured items."""
         user = get_user()
         company = get_user_company(user)
-        if is_events_only_view(user, company):
+        if is_events_only_access(user, company):
             abort(403)
 
         if not featured or not featured.get('items'):
@@ -681,6 +699,17 @@ class AgendaService(newsroom.Service):
         if not wire_item.get('coverage_id'):
             return
 
+        def is_delivery_validated(coverage, item):
+            latest_delivery = get_latest_available_delivery(coverage)
+            if not latest_delivery or not item.get('rewrite_sequence'):
+                return True
+
+            if item.get('rewrite_sequence', 0) >= latest_delivery.get('sequence_no', 0) \
+                    or item.get('firstpublished') >= latest_delivery.get('publish_time'):
+                return True
+
+            return False
+
         query = {
             'bool': {
                 'must': [
@@ -704,11 +733,16 @@ class AgendaService(newsroom.Service):
             wire_item.setdefault('agenda_href', url_for('agenda.item', _id=item['_id']))
             coverages = item['coverages']
             for coverage in coverages:
-                if coverage['coverage_id'] == wire_item['coverage_id'] and not coverage.get('delivery'):
+                if coverage['coverage_id'] == wire_item['coverage_id'] and is_delivery_validated(coverage, item):
                     coverage['delivery_id'] = wire_item['guid']
                     coverage['delivery_href'] = url_for_wire(None, _external=False, section='wire.item',
                                                              _id=wire_item['guid'])
                     self.system_update(item['_id'], {'coverages': coverages}, item)
+
+                    # Notify agenda to update itself with new details of coverage
+                    self.enhance_coverage_with_wire_details(coverage, wire_item)
+                    push_notification('new_item', _items=[item])
+
                     self.notify_new_coverage(item, wire_item)
                     break
         return agenda_items

@@ -118,7 +118,7 @@ test_planning = {
         {
             "planning": {
                 "g2_content_type": "text",
-                "slugline": "Vivid planning item",
+                "slugline": "Vivid Text Explainer",
                 "internal_note": "internal note here",
                 "genre": [
                     {
@@ -141,7 +141,7 @@ test_planning = {
         {
             "planning": {
                 "g2_content_type": "picture",
-                "slugline": "Vivid planning item",
+                "slugline": "Vivid Photos",
                 "internal_note": "internal note here",
                 "ednote": "ed note here",
                 "scheduled": "2018-05-28T10:51:52+0000"
@@ -263,6 +263,8 @@ def test_push_parsed_planning_for_an_existing_event(client, app):
     assert 'a' == parsed['service'][0]['code']
     assert 1 == len(parsed['subject'])
     assert '06002002' == parsed['subject'][0]['code']
+    assert parsed['coverages'][0]['slugline'] == 'Vivid Text Explainer'
+    assert parsed['coverages'][1]['slugline'] == 'Vivid Photos'
 
     parsed_planning = parsed['planning_items'][0]
     assert 1 == len(parsed_planning['service'])
@@ -1009,7 +1011,10 @@ def test_push_coverages_with_linked_stories(client, app):
     planning = deepcopy(test_planning)
     planning['guid'] = 'bar7'
     planning['event_item'] = 'foo7'
-    planning['coverages'][0]['deliveries'] = [{'item_id': 'item7'}]
+    planning['coverages'][0]['deliveries'] = [{
+        'item_id': 'item7',
+        'item_state': 'published',
+    }]
     planning['coverages'][0]['workflow_status'] = 'completed'
 
     client.post('/push', data=json.dumps(planning), content_type='application/json')
@@ -1025,6 +1030,51 @@ def test_push_coverages_with_linked_stories(client, app):
     assert 2 == len(parsed['coverages'])
     assert parsed['coverages'][0]['delivery_id'] is None
     assert parsed['coverages'][0]['delivery_href'] is None
+
+
+def test_push_coverages_with_updates_to_linked_stories(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo7'
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar7'
+    planning['event_item'] = 'foo7'
+    planning['coverages'][0]['deliveries'] = [{
+        'item_id': 'item7',
+        'item_state': 'published',
+    }]
+    planning['coverages'][0]['workflow_status'] = 'completed'
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    assert parsed['coverages'][0]['delivery_id'] == 'item7'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
+
+    planning['coverages'][0]['deliveries'].append({
+        'item_id': 'item8',
+        'item_state': 'in_progress',
+        'sequence_no': 1,
+    })
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    assert parsed['coverages'][0]['delivery_id'] == 'item7'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
+
+    planning['coverages'][0]['deliveries'].append({
+        'item_id': 'item8',
+        'item_state': 'published',
+        'sequence_no': 2,
+    })
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    assert parsed['coverages'][0]['delivery_id'] == 'item8'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item8'
 
 
 def test_push_event_from_planning(client, app):
