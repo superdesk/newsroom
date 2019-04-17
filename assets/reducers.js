@@ -294,7 +294,10 @@ export function defaultReducer(state, action) {
     case SET_NEW_ITEMS: {
         return {
             ...state,
-            newItems: action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id),
+            newItems: uniq([
+                ...state.newItems,
+                ...(action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id))
+            ]),
         };
     }
 
