@@ -1,0 +1,12 @@
+{% extends "bookmark_layout.html" %}
+
+{% block content %}
+<div id="media-releases-app" class="content media-releases"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        window.mediaReleasesData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('media_releases_js') | safe }}
+{% endblock %}

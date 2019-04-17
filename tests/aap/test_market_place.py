@@ -649,6 +649,12 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         'query': 'service.code:a',
         'is_enabled': True,
         'filter_type': 'aapX'
+    }, {
+        '_id': 'f-4',
+        'name': 'product test 4',
+        'query': 'NOT service.code:a',
+        'is_enabled': True,
+        'filter_type': 'media_releases'
     }])
 
     app.data.insert('companies', [{
