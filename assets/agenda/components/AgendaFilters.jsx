@@ -5,6 +5,8 @@ import AgendaTypeAheadFilter from './AgendaTypeAheadFilter';
 import AgendaDropdownFilter from './AgendaDropdownFilter';
 import {getCoverageDisplayName} from '../utils';
 import AgendaCoverageExistsFilter from './AgendaCoverageExistsFilter';
+import AgendaEventsOnlyFilter from './AgendaEventsOnlyFilter';
+
 
 const filters = [{
     label: gettext('Any calendar'),
@@ -44,8 +46,8 @@ const getDropdownItems = (filter, aggregations, toggleFilter, processBuckets) =>
     return [];
 };
 
-function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnly}) {
-    const displayFilters = eventsOnly ? filters.filter((f) => f.eventsOnly) : filters;
+function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAccess, eventsOnlyView}) {
+    const displayFilters = eventsOnlyAccess || eventsOnlyView ? filters.filter((f) => f.eventsOnly) : filters;
 
     return (<div className='wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap'>
         {displayFilters.map((filter) => (
@@ -65,7 +67,10 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnly}) {
                 getDropdownItems={getDropdownItems}
             />
         ))}
-        {!eventsOnly && <AgendaCoverageExistsFilter activeFilter={activeFilter} toggleFilter={toggleFilter}/>}
+        {!eventsOnlyAccess && !eventsOnlyView &&
+         <AgendaCoverageExistsFilter activeFilter={activeFilter} toggleFilter={toggleFilter}/>}
+        {!eventsOnlyAccess &&
+         <AgendaEventsOnlyFilter eventsOnlyView={eventsOnlyView} toggleFilter={toggleFilter}/>}
     </div>);
 }
 
@@ -73,7 +78,8 @@ AgendaFilters.propTypes = {
     aggregations: PropTypes.object,
     toggleFilter: PropTypes.func,
     activeFilter: PropTypes.object,
-    eventsOnly: PropTypes.bool,
+    eventsOnlyAccess: PropTypes.bool,
+    eventsOnlyView: PropTypes.bool,
 };
 
 export default AgendaFilters;

@@ -7,6 +7,7 @@ import {
     STOP_WATCHING_EVENTS,
     UPDATE_ITEMS,
     TOGGLE_FEATURED_FILTER,
+    TOGGLE_EVENTS_ONLY_FILTER,
 } from './actions';
 
 import { get, isEmpty, uniqBy } from 'lodash';
@@ -44,7 +45,8 @@ const initialState = {
         activeView: EXTENDED_VIEW,
         activeDate: Date.now(),
         activeGrouping: 'day',
-        eventsOnly: false,
+        eventsOnlyAccess: false,
+        eventsOnlyView: false,
         featuredOnly: false,
     },
     search: searchReducer(),
@@ -196,7 +198,7 @@ export default function agendaReducer(state = initialState, action) {
         const agenda = {
             ...state.agenda,
             activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : action.activeDate || state.agenda.activeDate,
-            eventsOnly: action.agendaData.events_only,
+            eventsOnlyAccess: action.agendaData.events_only,
             featuredOnly: action.featuredOnly,
         };
         
@@ -234,7 +236,14 @@ export default function agendaReducer(state = initialState, action) {
                 featuredOnly: !state.agenda.featuredOnly,
             }
         };
-
+    case TOGGLE_EVENTS_ONLY_FILTER:
+        return {
+            ...state,
+            agenda: {
+                ...state.agenda,
+                eventsOnlyView: action.value,
+            }
+        };
     default:
         return defaultReducer(state || initialState, action);
     }
