@@ -65,20 +65,19 @@ def push():
     item = flask.json.loads(flask.request.get_data())
     assert 'guid' in item or '_id' in item, {'guid': 1}
     assert 'type' in item, {'type': 1}
-    agenda_service = superdesk.get_resource_service('agenda')
 
     if item.get('type') == 'event':
         orig = app.data.find_one('agenda', req=None, _id=item['guid'])
         id = publish_event(item, orig)
         agenda = app.data.find_one('agenda', req=None, _id=id)
         if agenda:
-            agenda_service.enhance_items([agenda])
+            superdesk.get_resource_service('agenda').enhance_items([agenda])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'planning':
         published = publish_planning(item)
         agenda = app.data.find_one('agenda', req=None, _id=published['_id'])
         if agenda:
-            agenda_service.enhance_items([agenda])
+            superdesk.get_resource_service('agenda').enhance_items([agenda])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
         orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
