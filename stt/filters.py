@@ -25,6 +25,13 @@ def on_publish_item(app, item, is_new, **kwargs):
         if firstcreated < item['versioncreated']:
             item['versioncreated'] = firstcreated
 
+    # add private note to ednote
+    if item.get('extra', {}).get('sttnote_private'):
+        if item.get('ednote'):
+            item['ednote'] = '{} {}'.format(item['ednote'], item['extra']['sttnote_private'])
+        else:
+            item['ednote'] = item['extra']['sttnote_private']
+
 
 def init_app(app):
     publish_item.connect(on_publish_item)
