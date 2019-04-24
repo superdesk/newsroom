@@ -604,3 +604,26 @@ def test_push_firstcreated_is_older_copies_to_versioncreated(client, app):
     parsed = get_entity_or_404(item['guid'], 'items')
     assert parsed['firstcreated'].strftime('%Y%m%d%H%M') == '201711260800'
     assert parsed['versioncreated'].strftime('%Y%m%d%H%M') == '201711280800'
+
+
+def test_push_updates_ednote(client, app):
+    from stt.filters import init_app
+    init_app(app)
+    payload = item.copy()
+    payload['ednote'] = 'foo'
+    client.post('/push', data=json.dumps(payload), content_type='application/json')
+    parsed = get_entity_or_404(item['guid'], 'items')
+    assert parsed['ednote'] == 'foo'
+
+    payload['guid'] = 'bar'
+    payload['extra'] = {'sttnote_private': 'private message'}
+    client.post('/push', data=json.dumps(payload), content_type='application/json')
+    parsed = get_entity_or_404(payload['guid'], 'items')
+    assert parsed['ednote'] == 'foo private message'
+
+    payload['guid'] = 'baz'
+    payload.pop('ednote')
+    payload['extra'] = {'sttnote_private': 'private message'}
+    client.post('/push', data=json.dumps(payload), content_type='application/json')
+    parsed = get_entity_or_404(payload['guid'], 'items')
+    assert parsed['ednote'] == 'private message'
