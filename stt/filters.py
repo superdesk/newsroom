@@ -28,7 +28,7 @@ def on_publish_item(app, item, is_new, **kwargs):
     # add private note to ednote
     if item.get('extra', {}).get('sttnote_private'):
         if item.get('ednote'):
-            item['ednote'] = '{} {}'.format(item['ednote'], item['extra']['sttnote_private'])
+            item['ednote'] = '{}\n{}'.format(item['ednote'], item['extra']['sttnote_private'])
         else:
             item['ednote'] = item['extra']['sttnote_private']
 

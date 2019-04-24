@@ -619,7 +619,7 @@ def test_push_updates_ednote(client, app):
     payload['extra'] = {'sttnote_private': 'private message'}
     client.post('/push', data=json.dumps(payload), content_type='application/json')
     parsed = get_entity_or_404(payload['guid'], 'items')
-    assert parsed['ednote'] == 'foo private message'
+    assert parsed['ednote'] == 'foo\nprivate message'
 
     payload['guid'] = 'baz'
     payload.pop('ednote')
