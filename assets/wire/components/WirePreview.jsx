@@ -32,7 +32,7 @@ import PreviewActionButtons from 'components/PreviewActionButtons';
 import PreviewTags from './PreviewTags';
 import PreviewMeta from './PreviewMeta';
 import AgendaLinks from './AgendaLinks';
-import PreviewEdnote from "./PreviewEdnote";
+import PreviewEdnote from './PreviewEdnote';
 
 
 class WirePreview extends React.PureComponent {
