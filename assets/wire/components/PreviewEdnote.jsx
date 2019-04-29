@@ -4,17 +4,16 @@ import { gettext } from 'utils';
 import InfoBox from './InfoBox';
 
 
-function PreviewEdnote({item, isItemDetail}) {
+function PreviewEdnote({item}) {
     return (
-        item.ednote ? <InfoBox label={gettext('Note')} top={!isItemDetail}>
-            {item.ednote}
+        item.ednote ? <InfoBox label={gettext('Note')}>
+            <div>{item.ednote}</div>
         </InfoBox> : null
     );
 }
 
 PreviewEdnote.propTypes = {
     item: PropTypes.object,
-    isItemDetail: PropTypes.bool,
 };
 
 export default PreviewEdnote;
