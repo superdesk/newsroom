@@ -32,6 +32,7 @@ import PreviewActionButtons from 'components/PreviewActionButtons';
 import PreviewTags from './PreviewTags';
 import PreviewMeta from './PreviewMeta';
 import AgendaLinks from './AgendaLinks';
+import PreviewEdnote from './PreviewEdnote';
 
 
 class WirePreview extends React.PureComponent {
@@ -97,6 +98,10 @@ class WirePreview extends React.PureComponent {
 
                     {isDisplayed('tags_section', previewConfig) &&
                         <PreviewTags item={item} isItemDetail={false} displayConfig={previewConfig}/>}
+
+                    {isDisplayed('ednotes_section', previewConfig) &&
+                                <PreviewEdnote item={item} />}
+
                     {isDisplayed('item_versions', previewConfig) && showItemVersions(item) &&
                         <ListItemPreviousVersions
                             item={item}
