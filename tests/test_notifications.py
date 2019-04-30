@@ -4,8 +4,9 @@ import datetime
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
 from newsroom.notifications import get_user_notifications
+from .fixtures import init_company, PUBLIC_USER_ID, TEST_USER_ID  # noqa
 
-user = str(ObjectId())
+user = str(PUBLIC_USER_ID)
 
 notification = {
     'item': 'Foo',
@@ -44,12 +45,13 @@ def test_notification_updates_with_unique_id(client, app):
 
 def test_delete_notification_fails_for_different_user(client):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = user
 
     get_resource_service('notifications').post([notification])
     id = '{}_Foo'.format(user)
 
     with client.session_transaction() as session:
+        session['user'] = str(TEST_USER_ID)
         session['name'] = 'tester'
 
     resp = client.delete('/users/{}/notifications/{}'.format(user, id))

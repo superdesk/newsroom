@@ -131,3 +131,6 @@ class UsersService(newsroom.Service):
             return hashed_password == bcrypt.hashpw(password, hashed_password)
         except Exception:
             return False
+
+    def on_deleted(self, doc):
+        app.cache.delete(str(doc.get('_id')))

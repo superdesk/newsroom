@@ -8,7 +8,7 @@ from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound
 
-from newsroom.auth.decorator import admin_only, login_required
+from newsroom.decorator import admin_only, login_required
 from newsroom.companies import blueprint
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400
 
@@ -83,10 +83,10 @@ def get_company_updates(company):
     return updates
 
 
-@blueprint.route('/companies/<id>', methods=['GET', 'POST'])
+@blueprint.route('/companies/<_id>', methods=['GET', 'POST'])
 @admin_only
-def edit(id):
-    company = find_one('companies', _id=ObjectId(id))
+def edit(_id):
+    company = find_one('companies', _id=ObjectId(_id))
 
     if not company:
         return NotFound(gettext('Company not found'))
@@ -96,27 +96,30 @@ def edit(id):
         validate_company(company)
         updates = get_company_updates(company)
 
-        get_resource_service('companies').patch(id=ObjectId(id), updates=updates)
+        get_resource_service('companies').patch(ObjectId(_id), updates=updates)
+        app.cache.delete(_id)
         return jsonify({'success': True}), 200
     return jsonify(company), 200
 
 
-@blueprint.route('/companies/<id>', methods=['DELETE'])
+@blueprint.route('/companies/<_id>', methods=['DELETE'])
 @admin_only
-def delete(id):
+def delete(_id):
     """
     Deletes the company and users of the company with given company id
     """
-    get_resource_service('users').delete(lookup={'company': ObjectId(id)})
-    get_resource_service('companies').delete({'_id': ObjectId(id)})
+    get_resource_service('users').delete_action(lookup={'company': ObjectId(_id)})
+    get_resource_service('companies').delete_action(lookup={'_id': ObjectId(_id)})
+
+    app.cache.delete(_id)
     return jsonify({'success': True}), 200
 
 
-@blueprint.route('/companies/<id>/users', methods=['GET'])
+@blueprint.route('/companies/<_id>/users', methods=['GET'])
 @login_required
-def company_users(id):
+def company_users(_id):
     """TODO(petr): use projection to hide fields like token/email."""
-    users = list(query_resource('users', lookup={'company': ObjectId(id)}))
+    users = list(query_resource('users', lookup={'company': ObjectId(_id)}))
     return jsonify(users), 200
 
 
@@ -135,11 +138,11 @@ def update_company(data, _id):
     get_resource_service('companies').patch(_id, updates=updates)
 
 
-@blueprint.route('/companies/<id>/permissions', methods=['POST'])
+@blueprint.route('/companies/<_id>/permissions', methods=['POST'])
 @admin_only
-def save_company_permissions(id):
-    orig = get_entity_or_404(id, 'companies')
+def save_company_permissions(_id):
+    orig = get_entity_or_404(_id, 'companies')
     data = get_json_or_400()
-    update_products(data['products'], id)
+    update_products(data['products'], _id)
     update_company(data, orig['_id'])
     return jsonify(), 200

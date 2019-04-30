@@ -4,13 +4,23 @@ import newsroom
 import bson.errors
 
 from werkzeug.wsgi import wrap_file
+from werkzeug.utils import secure_filename
+from flask import request, url_for, current_app as newsroom_app
 from superdesk.upload import upload_url as _upload_url
-from newsroom.auth import login_required
+from newsroom.decorator import login_required
 
 
 cache_for = 3600 * 24 * 7  # 7 days cache
 ASSETS_RESOURCE = 'upload'
 blueprint = flask.Blueprint(ASSETS_RESOURCE, __name__)
+
+
+def get_file(key):
+    file = request.files.get(key)
+    if file:
+        filename = secure_filename(file.filename)
+        newsroom_app.media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
+        return url_for('upload.get_upload', media_id=filename)
 
 
 @blueprint.route('/assets/<path:media_id>', methods=['GET'])

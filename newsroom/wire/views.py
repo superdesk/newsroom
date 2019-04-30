@@ -17,7 +17,8 @@ from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
-from newsroom.auth import get_user, get_user_id, login_required
+from newsroom.auth import get_user, get_user_id
+from newsroom.decorator import login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company

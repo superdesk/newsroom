@@ -2,11 +2,11 @@ from pytz import utc
 from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
-
+from superdesk.utc import utcnow
 from tests.test_users import test_login_succeeds_for_admin, init as users_init
 
 PUBLIC_USER_ID = ObjectId('59b4c5c61d41c8d736852fbf')
-
+TEST_USER_ID = ObjectId('5cc94454bc43165c045ffec9')
 
 items = [
     {
@@ -161,7 +161,8 @@ def init_auth(app, client):
 def setup_user_company(app):
     app.data.insert('companies', [{
         '_id': 1,
-        'name': 'Grain Corp'
+        'name': 'Grain Corp',
+        'is_enabled': True
     }])
 
     app.data.insert('users', [{
@@ -169,7 +170,19 @@ def setup_user_company(app):
         'email': 'foo@bar.com',
         'first_name': 'Foo',
         'last_name': 'Bar',
-        'company': 1
+        'company': 1,
+        'is_enabled': True,
+        'is_approved': True,
+        '_created': utcnow()
+    }, {
+        '_id': TEST_USER_ID,
+        'email': 'test@bar.com',
+        'first_name': 'Test',
+        'last_name': 'Bar',
+        'company': 1,
+        'is_enabled': True,
+        'is_approved': True,
+        '_created': utcnow()
     }])
 
 
