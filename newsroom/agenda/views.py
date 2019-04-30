@@ -10,7 +10,8 @@ from superdesk import get_resource_service
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
-from newsroom.auth import get_user, login_required
+from newsroom.auth import get_user
+from newsroom.decorator import login_required
 from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, \
     get_agenda_dates, get_location_string, get_public_contacts, get_links
 from newsroom.wire.utils import update_action_list

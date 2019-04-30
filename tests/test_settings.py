@@ -1,7 +1,6 @@
 
 from newsroom.settings import get_setting
 
-from .test_users import init as admin_init  # noqa
 from .fixtures import items, init_items, init_auth, init_company  # noqa
 from .utils import post_json, get_json
 

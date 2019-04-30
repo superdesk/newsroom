@@ -5,10 +5,10 @@ from flask import jsonify, json, current_app
 from flask_babel import gettext
 from superdesk import get_resource_service
 
-from newsroom.auth.decorator import admin_only, login_required
+from newsroom.decorator import admin_only, login_required
 from newsroom.cards import blueprint
-from newsroom.utils import get_entity_or_404, get_file
-from newsroom.utils import query_resource
+from newsroom.utils import get_entity_or_404, query_resource
+from newsroom.upload import get_file
 
 
 def get_settings_data():

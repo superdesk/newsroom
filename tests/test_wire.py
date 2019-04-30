@@ -1,10 +1,10 @@
 from flask import json, g
-from bson import ObjectId
 from datetime import datetime, timedelta
 from urllib import parse
 
 from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import get_json
+from tests.test_users import ADMIN_USER_ID
 
 
 def test_item_detail(client):
@@ -184,7 +184,7 @@ def test_filter_by_product_anonymous_user_gets_all(client, app):
 
 def test_logged_in_user_no_product_gets_no_results(client, app):
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
     resp = client.get('/wire/search')
     assert 403 == resp.status_code
@@ -192,7 +192,7 @@ def test_logged_in_user_no_product_gets_no_results(client, app):
 
 def test_logged_in_user_no_company_gets_no_results(client, app):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -201,7 +201,7 @@ def test_logged_in_user_no_company_gets_no_results(client, app):
 
 def test_administrator_gets_all_results(client, app):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     resp = client.get('/wire/search')
@@ -220,7 +220,7 @@ def test_search_filtered_by_users_products(client, app):
     }])
 
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -260,7 +260,7 @@ def test_search_filter_by_individual_navigation(client, app):
         'is_enabled': True
     }])
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -317,7 +317,7 @@ def test_search_filtered_by_query_product(client, app):
     }])
 
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -377,7 +377,7 @@ def test_item_detail_access(client, app):
 
     # public user
     with client.session_transaction() as session:
-        session['user'] = PUBLIC_USER_ID
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     # no access by default
@@ -433,7 +433,7 @@ def test_search_using_section_filter_for_public_user(client, app):
     }])
 
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -468,7 +468,7 @@ def test_search_using_section_filter_for_public_user(client, app):
 
 def test_administrator_gets_results_based_on_section_filter(client, app):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     app.data.insert('section_filters', [{
@@ -532,7 +532,7 @@ def test_company_type_filter(client, app):
     }])
 
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')

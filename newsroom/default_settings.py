@@ -260,14 +260,14 @@ CELERY_TASK_QUEUES = (Queue(celery_queue('newsroom'), Exchange(celery_queue('new
 CELERY_TASK_ROUTES = {
     'newsroom.company_expiry': {
         'queue': celery_queue('newsroom'),
-        'routing_key': 'newsroom.company_expiry'
+        'routing_key': 'newsroom.company_expiry_alerts.company_expiry'
     }
 }
 
 #: celery beat config
 CELERY_BEAT_SCHEDULE = {
     'newsroom:company_expiry': {
-        'task': 'newsroom.company_expiry',
+        'task': 'newsroom.company_expiry_alerts.company_expiry',
         'schedule': crontab(hour=0, minute=0),  # Runs every day at midnight
     }
 }

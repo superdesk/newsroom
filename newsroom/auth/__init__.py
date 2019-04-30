@@ -5,8 +5,6 @@ from bson import ObjectId
 from eve.auth import BasicAuth
 from flask import Blueprint, session, abort
 
-from .decorator import login_required, admin_only  # noqa
-
 blueprint = Blueprint('auth', __name__)
 
 
