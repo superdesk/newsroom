@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 import { gettext, formatCoverageDate } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
-import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, getNotesFromCoverages, WORKFLOW_STATUS} from '../utils';
+import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, getNotesFromCoverages, WORKFLOW_STATUS, isCoverageBeingUpdated} from '../utils';
 import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
 
@@ -45,7 +45,7 @@ export default function AgendaCoverages({item, coverages}) {
                 <p className='wire-articles__item__text m-0'>{getItemText(coverage)}</p>
             </div>
 
-            {get(coverage, 'deliveries[0]', null) && coverage.deliveries[0].delivery_state !== 'published' && (
+            {isCoverageBeingUpdated(coverage) && (
                 <div className='coverage-item__row'>
                     <span className='label label--blue'>{gettext('Update coming')}</span>
                 </div>                
