@@ -4,9 +4,9 @@ import { gettext } from 'utils';
 import AgendaFilterButton from './AgendaFilterButton';
 
 function AgendaEventsOnlyFilter ({toggleFilter, eventsOnlyView}) {
-    const eventOnlyLabel = gettext('Events Only');
+    const eventOnlyLabel = gettext('Show Events Only');
     const filter = {
-        label: gettext('All Events & Coverages'),
+        label: gettext('Events & Coverages'),
         field: 'eventsOnly',
         icon: 'icon-small--calendar',
     };
