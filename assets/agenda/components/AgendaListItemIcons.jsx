@@ -15,6 +15,7 @@ import {
     WORKFLOW_STATUS,
     getCoverageDisplayName,
     getAttachments,
+    isCoverageBeingUpdated,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -66,9 +67,15 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
         }
 
         if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
-            return gettext('{{ type }} {{ slugline }} available', {
+            let deliveryState;
+            if (get(coverage, 'deliveries.length', 0) > 1) {
+                deliveryState = isCoverageBeingUpdated(coverage) ? gettext(' (update to come)') : gettext(' (updated)');
+            }
+
+            return gettext('{{ type }} {{ slugline }} available{{deliveryState}}', {
                 type: getCoverageDisplayName(coverage.coverage_type),
                 slugline: slugline,
+                deliveryState: deliveryState
             });
         }
 
