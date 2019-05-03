@@ -1,7 +1,7 @@
 from flask import jsonify, render_template, abort
 from flask_babel import gettext
 
-from newsroom.auth.decorator import account_manager_only
+from newsroom.decorator import account_manager_only
 from newsroom.reports import blueprint
 from newsroom.reports import reports
 

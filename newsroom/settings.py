@@ -4,9 +4,9 @@ import re
 import copy
 import flask
 from flask_babel import gettext
-from newsroom.auth import admin_only
 from newsroom.utils import get_json_or_400
 from newsroom.template_filters import newsroom_config
+from newsroom.decorator import admin_only
 
 
 blueprint = flask.Blueprint('settings', __name__)

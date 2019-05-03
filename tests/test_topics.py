@@ -1,7 +1,6 @@
 from flask import json
-from bson import ObjectId
 from newsroom.topics.views import get_topic_url
-
+from .fixtures import init_company, PUBLIC_USER_ID, TEST_USER_ID  # noqa
 
 topic = {
     'label': 'Foo',
@@ -19,8 +18,9 @@ agenda_topic = {
     'navigation': 'abc',
 }
 
-user = str(ObjectId())
-topics_url = 'api/users/%s/topics' % user
+user_id = str(PUBLIC_USER_ID)
+test_user_id = str(TEST_USER_ID)
+topics_url = 'api/users/%s/topics' % user_id
 
 
 def test_topics_no_session(client):
@@ -33,7 +33,7 @@ def test_topics_no_session(client):
 def test_post_topic_user(client):
     with client as app:
         with client.session_transaction() as session:
-            session['user'] = str(ObjectId())
+            session['user'] = user_id
         resp = app.post(topics_url, data=topic)
         assert 201 == resp.status_code
         resp = app.get(topics_url)
@@ -45,34 +45,35 @@ def test_post_topic_user(client):
 def test_update_topic_fails_for_different_user(client):
     with client as app:
         with client.session_transaction() as session:
-            session['user'] = str(ObjectId())
+            session['user'] = user_id
         resp = app.post(topics_url, data=topic)
         assert 201 == resp.status_code
 
         resp = app.get(topics_url)
         data = json.loads(resp.get_data())
-        id = data['_items'][0]['_id']
+        _id = data['_items'][0]['_id']
 
         with client.session_transaction() as session:
-            session['name'] = 'tester'
-        resp = app.post('topics/{}'.format(id), data=json.dumps({'label': 'test123'}), content_type='application/json')
+            session['name'] = test_user_id
+            session['user'] = test_user_id
+        resp = app.post('topics/{}'.format(_id), data=json.dumps({'label': 'test123'}), content_type='application/json')
         assert 403 == resp.status_code
 
 
 def test_update_topic(client):
     with client as app:
         with client.session_transaction() as session:
-            session['user'] = user
+            session['user'] = user_id
         resp = app.post(topics_url, data=topic)
         assert 201 == resp.status_code
 
         resp = app.get(topics_url)
         data = json.loads(resp.get_data())
-        id = data['_items'][0]['_id']
+        _id = data['_items'][0]['_id']
 
         with client.session_transaction() as session:
-            session['name'] = 'tester'
-        resp = app.post('topics/{}'.format(id), data=json.dumps({'label': 'test123'}), content_type='application/json')
+            session['name'] = user_id
+        resp = app.post('topics/{}'.format(_id), data=json.dumps({'label': 'test123'}), content_type='application/json')
         assert 200 == resp.status_code
 
         resp = app.get(topics_url)
@@ -83,17 +84,17 @@ def test_update_topic(client):
 def test_delete_topic(client):
     with client as app:
         with client.session_transaction() as session:
-            session['user'] = user
+            session['user'] = user_id
         resp = app.post(topics_url, data=topic)
         assert 201 == resp.status_code
 
         resp = app.get(topics_url)
         data = json.loads(resp.get_data())
-        id = data['_items'][0]['_id']
+        _id = data['_items'][0]['_id']
 
         with client.session_transaction() as session:
-            session['name'] = 'tester'
-        resp = app.delete('topics/{}'.format(id))
+            session['name'] = user_id
+        resp = app.delete('topics/{}'.format(_id))
         assert 200 == resp.status_code
 
         resp = app.get(topics_url)
@@ -104,33 +105,24 @@ def test_delete_topic(client):
 def test_share_wire_topics(client, app):
     topic_ids = app.data.insert('topics', [topic])
     topic['_id'] = topic_ids[0]
-    user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
-        'first_name': 'Foo',
-        'last_name': 'Bar',
-    }, {
-        'email': 'admin@bar.com',
-        'first_name': 'System',
-        'last_name': 'Admin',
-    }])
 
     with app.mail.record_messages() as outbox:
         with client.session_transaction() as session:
-            session['user'] = user_ids[1]
+            session['user'] = user_id
             session['name'] = 'tester'
         resp = client.post('/topic_share', data=json.dumps({
             'items': [topic],
-            'users': [str(user_ids[0])],
+            'users': [test_user_id],
             'message': 'Some info message',
         }), content_type='application/json')
 
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@bar.com'
+        assert outbox[0].recipients == ['test@bar.com']
+        assert outbox[0].sender == 'foo@bar.com'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % topic['label']
-        assert 'Hi Foo Bar' in outbox[0].body
-        assert 'System Admin shared ' in outbox[0].body
+        assert 'Hi Test Bar' in outbox[0].body
+        assert 'Foo Bar shared ' in outbox[0].body
         assert topic['query'] in outbox[0].body
         assert 'Some info message' in outbox[0].body
         assert '/wire' in outbox[0].body
@@ -139,33 +131,24 @@ def test_share_wire_topics(client, app):
 def test_share_agenda_topics(client, app):
     topic_ids = app.data.insert('topics', [agenda_topic])
     agenda_topic['_id'] = topic_ids[0]
-    user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
-        'first_name': 'Foo',
-        'last_name': 'Bar',
-    }, {
-        'email': 'admin@bar.com',
-        'first_name': 'System',
-        'last_name': 'Admin',
-    }])
 
     with app.mail.record_messages() as outbox:
         with client.session_transaction() as session:
-            session['user'] = user_ids[1]
+            session['user'] = user_id
             session['name'] = 'tester'
         resp = client.post('/topic_share', data=json.dumps({
             'items': [agenda_topic],
-            'users': [str(user_ids[0])],
+            'users': [test_user_id],
             'message': 'Some info message',
         }), content_type='application/json')
 
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@bar.com'
+        assert outbox[0].recipients == ['test@bar.com']
+        assert outbox[0].sender == 'foo@bar.com'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % agenda_topic['label']
-        assert 'Hi Foo Bar' in outbox[0].body
-        assert 'System Admin shared ' in outbox[0].body
+        assert 'Hi Test Bar' in outbox[0].body
+        assert 'Foo Bar shared ' in outbox[0].body
         assert agenda_topic['query'] in outbox[0].body
         assert 'Some info message' in outbox[0].body
         assert '/agenda' in outbox[0].body

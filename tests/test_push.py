@@ -8,7 +8,7 @@ from flask import json
 from datetime import datetime
 from superdesk import get_resource_service
 from newsroom.utils import get_entity_or_404
-from .fixtures import init_auth
+from .fixtures import init_auth  # noqa
 
 
 def get_signature_headers(data, key):
@@ -50,7 +50,6 @@ def test_push_item_inserts_missing(client, app):
     resp = client.post('/push', data=json.dumps(item), content_type='application/json')
     assert 200 == resp.status_code
 
-    init_auth(app, client)
     resp = client.get('wire/foo?format=json')
     assert 200 == resp.status_code
     data = json.loads(resp.get_data())
@@ -336,6 +335,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         'email': 'foo@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
+        'is_approved': True,
         'receive_email': True,
         'company': '2',
     }

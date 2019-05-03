@@ -9,7 +9,7 @@ from copy import deepcopy
 from superdesk import get_resource_service
 from newsroom.utils import get_entity_or_404
 from newsroom.notifications import get_user_notifications
-from .fixtures import init_auth
+from .fixtures import init_auth  # noqa
 
 
 test_event = {
@@ -187,7 +187,6 @@ def test_push_parsed_event(client, app):
     assert 1 == len(parsed['subject'])
     assert 'a' == parsed['service'][0]['code']
 
-    init_auth(app, client)
     resp = client.get('/agenda/search?date_to=now/d')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])

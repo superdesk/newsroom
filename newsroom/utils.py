@@ -2,14 +2,15 @@ import superdesk
 from datetime import datetime, timedelta
 from uuid import uuid4
 
+from superdesk.utc import utcnow
+from superdesk.json_utils import try_cast
 from bson import ObjectId
 from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date
-from flask import current_app as app, json, abort, request, g, url_for
+from flask import current_app as app, json, abort, request, g, flash, session
 from flask_babel import gettext
-from werkzeug.utils import secure_filename
-from newsroom.upload import ASSETS_RESOURCE
-from newsroom.template_filters import time_short, parse_date as parse_short_date, format_datetime
+from newsroom.template_filters import time_short, parse_date as parse_short_date, format_datetime, is_admin
+
 
 DAY_IN_MINUTES = 24 * 60 - 1
 
@@ -41,19 +42,43 @@ def json_serialize_datetime_objectId(obj):
         return str(obj)
 
 
+def cast_item(o):
+    if isinstance(o, (int, float, bool)):
+        return o
+    elif isinstance(o, str):
+        return try_cast(o)
+    elif isinstance(o, list):
+        for i, v in enumerate(o):
+            o[i] = cast_item(v)
+        return o
+    elif isinstance(o, dict):
+        for k, v in o.items():
+            o[k] = cast_item(v)
+        return o
+    else:
+        return o
+
+
+def loads(s):
+    o = json.loads(s)
+
+    if isinstance(o, list):
+        for i, v in enumerate(o):
+            o[i] = cast_item(v)
+        return o
+    elif isinstance(o, dict):
+        for k, v in o.items():
+            o[k] = cast_item(v)
+        return o
+    else:
+        return cast_item(o)
+
+
 def get_entity_or_404(_id, resource):
     item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
     if not item:
         abort(404)
     return item
-
-
-def get_file(key):
-    file = request.files.get(key)
-    if file:
-        filename = secure_filename(file.filename)
-        app.media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
-        return url_for('upload.get_upload', media_id=filename)
 
 
 def get_json_or_400():
@@ -95,39 +120,6 @@ def is_json_request(request):
     """Test if request is for json content."""
     return request.args.get('format') == 'json' or \
         request.accept_mimetypes.best_match(['application/json', 'text/html']) == 'application/json'
-
-
-def get_user_dict():
-    """Get all active users indexed by _id."""
-    if 'user_dict' not in g or app.testing:
-        lookup = {'is_enabled': True}
-        all_users = list(query_resource('users', lookup=lookup))
-        g.user_dict = {str(user['_id']): user for user in all_users}
-    return g.user_dict
-
-
-def get_company_dict():
-    """Get all active companies indexed by _id.
-
-    Must reload when testing because there it's using single context.
-    """
-    if 'company_dict' not in g or app.testing:
-        lookup = {'is_enabled': True}
-        all_companies = list(query_resource('companies', lookup=lookup))
-        g.company_dict = {str(company['_id']): company for company in all_companies}
-    return g.company_dict
-
-
-def filter_active_users(user_ids, user_dict, company_dict, events_only=False):
-    active = []
-    for _id in user_ids:
-        user = user_dict.get(str(_id))
-        if user and (not user.get('company') or str(user.get('company', '')) in company_dict):
-            if events_only and user.get('company') and \
-                    (company_dict.get(str(user.get('company', ''))) or {}).get('events_only'):
-                continue
-            active.append(_id)
-    return active
 
 
 def unique_codes(key, *groups):
@@ -206,3 +198,109 @@ def get_public_contacts(agenda):
 
 def get_links(agenda):
     return agenda.get('event', {}).get('links', [])
+
+
+def is_company_enabled(user, company=None):
+    """
+    Checks if the company of the user is enabled
+    """
+    if not user.get('company'):
+        # there's no company assigned return true for admin user else false
+        return True if is_admin(user) else False
+
+    user_company = get_cached_resource_by_id('companies', user.get('company')) if not company else company
+    if not user_company:
+        return False
+
+    return user_company.get('is_enabled', False) and not is_company_expired(user_company)
+
+
+def is_company_expired(company):
+    expiry_date = company.get('expiry_date')
+    if not expiry_date:
+        return False
+    return expiry_date.replace(tzinfo=None) <= datetime.utcnow().replace(tzinfo=None)
+
+
+def is_account_enabled(user):
+    """
+    Checks if user account is active and approved
+    """
+    if not user.get('is_enabled'):
+        flash(gettext('Account is disabled'), 'danger')
+        return False
+
+    if not user.get('is_approved'):
+        account_created = user.get('_created')
+
+        if account_created < utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14)):
+            flash(gettext('Account has not been approved'), 'danger')
+            return False
+
+    return True
+
+
+def get_user_dict():
+    """Get all active users indexed by _id."""
+    if 'user_dict' not in g or app.testing:
+        lookup = {'is_enabled': True}
+        all_users = query_resource('users', lookup=lookup)
+        companies = get_company_dict()
+        user_dict = {str(user['_id']): user for user in all_users
+                     if is_company_enabled(user, companies.get(user.get('company')))}
+        g.user_dict = user_dict
+    return g.user_dict
+
+
+def get_company_dict():
+    """Get all active companies indexed by _id.
+
+    Must reload when testing because there it's using single context.
+    """
+    if 'company_dict' not in g or app.testing:
+        lookup = {'is_enabled': True}
+        all_companies = list(query_resource('companies', lookup=lookup))
+        g.company_dict = {str(company['_id']): company for company in all_companies
+                          if is_company_enabled({'company': company['_id']}, company)}
+    return g.company_dict
+
+
+def get_cached_resource_by_id(resource, _id, black_list_keys=None):
+    """If the document exist in cache then return the document form cache
+    else fetch the document from the database store in the cache and return the document.
+
+
+    :param str resource: Name of the resource
+    :param _id: id
+    :param set black_list_keys: black list of keys to exclude from the document.
+    """
+    item = app.cache.get(str(_id))
+    if item:
+        return loads(item)
+
+    # item is not stored in cache
+    item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    if item:
+        if not black_list_keys:
+            black_list_keys = {'password', 'token', 'token_expiry'}
+        item = {key: item[key] for key in item.keys() if key not in black_list_keys and not key.startswith('_')}
+        app.cache.set(str(_id), json.dumps(item, default=json_serialize_datetime_objectId))
+        return item
+    return None
+
+
+def is_valid_login(user_id):
+    """Validates if the login for user.
+    :param str user_id: id of the user
+    """
+    user = get_cached_resource_by_id('users', user_id)
+    if not (is_account_enabled(user)):
+        session.pop('_flashes', None)  # remove old messages and just show one message
+        flash(gettext('Account is disabled'), 'danger')
+        return False
+    company = get_cached_resource_by_id('companies', user.get('company')) if user.get('company') else None
+    if not is_company_enabled(user, company):
+        session.pop('_flashes', None)  # remove old messages and just show one message
+        flash(gettext('Company account has been disabled.'), 'danger')
+        return False
+    return True

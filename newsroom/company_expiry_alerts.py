@@ -13,6 +13,7 @@ from superdesk.utc import utcnow
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock, remove_locks
 from flask import render_template, current_app as app
+from newsroom.celery_app import celery
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from superdesk import config
 import datetime
@@ -86,3 +87,8 @@ class CompanyExpiryAlerts():
                     html_body=render_template('company_expiry_email.html', **template_kwargs),
                     connection=connection
                 )
+
+
+@celery.task(soft_time_limit=600)
+def company_expiry():
+    CompanyExpiryAlerts().send_alerts()

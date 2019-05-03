@@ -6,10 +6,11 @@ from flask import jsonify, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
 
-from newsroom.auth.decorator import admin_only
+from newsroom.decorator import admin_only
 from newsroom.navigations import blueprint
 from newsroom.products.products import get_products_by_navigation
-from newsroom.utils import get_json_or_400, get_entity_or_404, get_file, query_resource
+from newsroom.utils import get_json_or_400, get_entity_or_404, query_resource
+from newsroom.upload import get_file
 
 
 def get_settings_data():
@@ -91,7 +92,7 @@ def delete(_id):
     for product in products:
         db.update_one({'_id': product['_id']}, {'$pull': {'navigations': _id}})
 
-    get_resource_service('navigations').delete({'_id': ObjectId(_id)})
+    get_resource_service('navigations').delete_action({'_id': ObjectId(_id)})
     return jsonify({'success': True}), 200
 
 
