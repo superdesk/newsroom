@@ -405,6 +405,7 @@ def set_agenda_planning_items(agenda, planning_item, action='add'):
         superdesk.get_resource_service('agenda').notify_agenda_update('coverage_added', agenda, True)
 
     agenda['display_dates'] = get_display_dates(agenda['dates'], agenda['planning_items'])
+    agenda.pop('_updated', None)
 
 
 def get_display_dates(agenda_date, planning_items):
