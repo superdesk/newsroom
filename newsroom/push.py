@@ -453,7 +453,8 @@ def get_coverages(planning_items, original_coverages=[]):
             if coverage.get('workflow_status') == 'completed':
                 cov_deliveries.append({
                     'delivery_href': app.set_photo_coverage_href(coverage, planning_item),
-                    'sequence_no': 0
+                    'sequence_no': 0,
+                    'delivery_state': 'published'
                 })
 
         coverage['deliveries'] = cov_deliveries
