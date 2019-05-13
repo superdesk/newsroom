@@ -26,7 +26,7 @@ from superdesk.default_settings import (   # noqa
     MAIL_PORT,
     MAIL_USE_TLS,
     MAIL_USE_SSL,
-    MAIL_USERNAME,
+    _MAIL_FROM,
     MAIL_PASSWORD,
     CELERY_TASK_ALWAYS_EAGER,
     CELERY_TASK_SERIALIZER,
@@ -145,7 +145,7 @@ VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 1
 #: The number login attempts allowed before account is locked
 MAXIMUM_FAILED_LOGIN_ATTEMPTS = 5
 #: default sender for superdesk emails
-MAIL_DEFAULT_SENDER = MAIL_USERNAME or 'newsroom@localhost'
+MAIL_DEFAULT_SENDER = _MAIL_FROM or 'newsroom@localhost'
 # Recipients for the sign up form filled by new users (single or comma separated)
 SIGNUP_EMAIL_RECIPIENTS = os.environ.get('SIGNUP_EMAIL_RECIPIENTS')
 
