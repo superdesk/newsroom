@@ -53,6 +53,10 @@ export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
+export const SET_COMPANY = 'SET_COMPANY';
+export function setCompany(company) {
+    return {type: SET_COMPANY, company};
+}
 
 /**
  * Fetches users
@@ -62,8 +66,10 @@ export function fetchUsers() {
     return function (dispatch, getState) {
         dispatch(queryUsers());
         const query = getState().query || '';
+        const filter = getState().company &&
+            getState().company !== '' ? '&where={"company":"' + getState().company + '"}' : '';
 
-        return server.get(`/users/search?q=${query}`)
+        return server.get(`/users/search?q=${query}${filter}`)
             .then((data) => dispatch(getUsers(data)))
             .catch((error) => errorHandler(error, dispatch, setError));
     };
