@@ -2,12 +2,11 @@ from bson import ObjectId
 from flask import json
 from pytest import fixture
 
-from .test_users import test_login_succeeds_for_admin, init as user_init
+from .test_users import test_login_succeeds_for_admin, init as user_init  # noqa
 
 
 @fixture(autouse=True)
 def init(app):
-    user_init(app)
     app.data.insert('cards', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
         'label': 'Sport',

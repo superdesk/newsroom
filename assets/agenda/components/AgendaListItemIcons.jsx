@@ -15,6 +15,7 @@ import {
     WORKFLOW_STATUS,
     getCoverageDisplayName,
     getAttachments,
+    isCoverageBeingUpdated,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -28,7 +29,7 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
         row,
     });
 
-    const getCoverageTootip = (coverage) => {
+    const getCoverageTootip = (coverage, beingUpdated) => {
         let slugline = coverage.item_slugline || coverage.slugline;
 
         slugline =  gettext('coverage{{slugline}}', {slugline: slugline ? ` '${slugline}'` : ''}) ;
@@ -66,9 +67,15 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
         }
 
         if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
-            return gettext('{{ type }} {{ slugline }} available', {
+            let deliveryState;
+            if (get(coverage, 'deliveries.length', 0) > 1) {
+                deliveryState = beingUpdated ? gettext(' (update to come)') : gettext(' (updated)');
+            }
+
+            return gettext('{{ type }} {{ slugline }} available{{deliveryState}}', {
                 type: getCoverageDisplayName(coverage.coverage_type),
                 slugline: slugline,
+                deliveryState: deliveryState
             });
         }
 
@@ -93,13 +100,17 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
                 <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
                     {coveragesToDisplay.map((coverage) => {
                         const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
+                        const beingUpdated = isCoverageBeingUpdated(coverage);
+
                         return (!group || (isCoverageForExtraDay(coverage, group) &&
                             coverage.planning_id === get(planningItem, 'guid')) &&
                           <span
                               className='wire-articles__item__icon'
                               key={coverage.coverage_id}
-                              title={getCoverageTootip(coverage)}>
-                              <i className={`${coverageClass} ${WORKFLOW_COLORS[coverage.workflow_status]}`}></i>
+                              title={getCoverageTootip(coverage, beingUpdated)}>
+                              <i className={`${coverageClass} ${WORKFLOW_COLORS[coverage.workflow_status]}`}>
+                                  {beingUpdated && <i className="blue-circle" />}
+                              </i>
                           </span>);
                     })
                     }

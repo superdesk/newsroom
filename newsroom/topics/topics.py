@@ -49,4 +49,4 @@ def get_agenda_notification_topics(item, users):
     topics = list(superdesk.get_resource_service('topics').get(req=None, lookup=lookup))
 
     # filter out the topics those belong to inactive users
-    return [t for t in topics if users.get(str(t['user']), None) is not None]
+    return [t for t in topics if users.get(str(t['user']))]

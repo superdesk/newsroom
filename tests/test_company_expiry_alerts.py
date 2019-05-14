@@ -3,7 +3,6 @@ import datetime
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 from .utils import post_json
 from superdesk import get_resource_service
-from .test_users import init as admin_init  # noqa
 from .fixtures import items, init_items, init_auth # noqa
 
 

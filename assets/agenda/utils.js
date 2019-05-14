@@ -38,7 +38,7 @@ export function getCoverageStatusText(coverage) {
     }
 
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
-        if (get(coverage, 'deliveries.length', 0) > 0) {
+        if (get(coverage, 'deliveries.length', 0) > 1) {
             return `updated ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;    
         }
 
@@ -637,4 +637,8 @@ export function getListItems(groups, itemsById) {
         });
     });
     return listItems;
+}
+
+export function isCoverageBeingUpdated(coverage) {
+    return get(coverage, 'deliveries[0].delivery_state', null) && coverage.deliveries[0].delivery_state !== 'published';
 }

@@ -6,7 +6,8 @@ from eve.methods.get import get_internal
 
 from superdesk import get_resource_service
 from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
-from newsroom.auth import get_user, login_required, get_user_id
+from newsroom.auth import get_user, get_user_id
+from newsroom.decorator import login_required
 from newsroom.topics import get_user_topics
 from newsroom.companies import section
 from newsroom.navigations.navigations import get_navigations_by_company

@@ -18,13 +18,14 @@ from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
 from newsroom.template_filters import is_admin_or_internal, is_admin
-from newsroom.utils import get_user_dict, get_company_dict, filter_active_users
+from newsroom.utils import get_user_dict, get_company_dict
 from newsroom.wire.search import query_string, set_product_query, \
     planning_items_query_string, nested_query
 from newsroom.wire.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
 from .utils import get_latest_available_delivery
+
 
 logger = logging.getLogger(__name__)
 PRIVATE_FIELDS = [
@@ -449,6 +450,18 @@ def is_events_only_access(user, company):
     if user and company and not is_admin(user):
         return company.get('events_only', False)
     return False
+
+
+def filter_active_users(user_ids, user_dict, company_dict, events_only=False):
+    active = []
+    for _id in user_ids:
+        user = user_dict.get(str(_id))
+        if user and (not user.get('company') or str(user.get('company', '')) in company_dict):
+            if events_only and user.get('company') and \
+                    (company_dict.get(str(user.get('company', ''))) or {}).get('events_only'):
+                continue
+            active.append(_id)
+    return active
 
 
 class AgendaService(newsroom.Service):

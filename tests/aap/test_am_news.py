@@ -2,12 +2,12 @@ from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_US
 from tests.utils import json, get_json
 from tests.test_download import wire_formats, download_zip_file, items_ids
 from tests.test_push import get_signature_headers
+from tests.test_users import ADMIN_USER_ID
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
 from flask import g
-from bson import ObjectId
 from datetime import datetime, timedelta
 from urllib import parse
 import zipfile
@@ -158,7 +158,7 @@ def test_logged_in_user_no_product_gets_no_results(client):
 
 def test_logged_in_user_no_company_gets_no_results(client):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/am_news/search')
@@ -167,7 +167,7 @@ def test_logged_in_user_no_company_gets_no_results(client):
 
 def test_administrator_gets_all_results(client):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     resp = client.get('/am_news/search')
@@ -268,7 +268,7 @@ def test_item_detail_access(client, app):
 
 def test_administrator_gets_results_based_on_section_filter(client, app):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     app.data.insert('section_filters', [{
@@ -423,6 +423,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         'email': 'foo@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
+        'is_approved': True,
         'receive_email': True,
         'company': company_ids[0],
     }
@@ -490,6 +491,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         'email': 'foo@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
+        'is_approved': True,
         'receive_email': True,
         'company': '2',
     }
