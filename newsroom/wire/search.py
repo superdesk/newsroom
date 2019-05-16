@@ -289,7 +289,11 @@ class WireSearchService(newsroom.Service):
         if not product:
             return
 
-        query['bool']['should'] = []
+        query['bool']['should'] = [
+            {'range': {'embargoed': {'lt': 'now'}}},
+            {'bool': {'must_not': {'exists': {'field': 'embargoed'}}}}
+        ]
+
         get_resource_service('section_filters').apply_section_filter(query, product.get('product_type'))
 
         if product.get('sd_product_id'):
