@@ -2,7 +2,7 @@ from newsroom.agenda import blueprint
 
 import flask
 
-from flask import current_app as app
+from flask import current_app as app, request
 from eve.methods.get import get_internal
 from eve.render import send_response
 from superdesk import get_resource_service
@@ -67,6 +67,8 @@ def item(_id):
         map = flask.request.args.get('map')
         template = 'agenda_item_print.html'
         update_action_list([_id], 'prints', force_insert=True)
+        get_resource_service('history').create_history_record([item], 'print', get_user(),
+                                                              request.args.get('type', 'agenda'))
         return flask.render_template(
             template,
             item=item,

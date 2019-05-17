@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import AgendaDateButtons from './AgendaDateButtons';
-import AgendaCalendarButton from './AgendaCalendarButton';
+import CalendarButton from '../../components/CalendarButton';
 
 
 function AgendaDateNavigation({selectDate, activeDate, activeGrouping, displayCalendar}) {
     return (<div className='d-none d-lg-flex align-items-center mr-3'>
-        {displayCalendar && <AgendaCalendarButton selectDate={selectDate} activeDate={activeDate} />}
+        {displayCalendar && <CalendarButton selectDate={selectDate} activeDate={activeDate} />}
 
         {!displayCalendar && <AgendaDateButtons
             selectDate={selectDate} activeDate={activeDate} activeGrouping={activeGrouping}/>}

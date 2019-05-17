@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
-import CalendarButtonWrapper from '../../components/CalendarButtonWrapper';
+import CalendarButtonWrapper from './CalendarButtonWrapper';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import {EARLIEST_DATE} from '../utils';
 
-class AgendaCalendarButton extends React.Component {
+class CalendarButton extends React.Component {
     constructor (props) {
         super(props);
 
@@ -27,7 +27,7 @@ class AgendaCalendarButton extends React.Component {
 
     render() {
         const isStartDateToday = moment.isMoment(this.state.startDate) && !this.state.startDate.isSame(moment(), 'day');
-        return (<DatePicker
+        const datePicker = (<DatePicker
             customInput={<CalendarButtonWrapper active={isStartDateToday}/>}
             dateFormat='dddd, MMMM D'
             todayButton={gettext('Today')}
@@ -47,13 +47,25 @@ class AgendaCalendarButton extends React.Component {
                 }
             }}
         />);
+
+        if (!this.props.label) {
+            return datePicker;
+        } else {
+            return (<div className={this.props.labelClass}>
+                <label className='pr-1'>{this.props.label}</label>
+                {datePicker}
+            </div>);
+
+        }
     }
 }
 
 
-AgendaCalendarButton.propTypes = {
+CalendarButton.propTypes = {
     selectDate: PropTypes.func,
     activeDate: PropTypes.number,
+    label: PropTypes.string,
+    labelClass: PropTypes.string,
 };
 
-export default AgendaCalendarButton;
+export default CalendarButton;

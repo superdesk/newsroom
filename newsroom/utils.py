@@ -112,7 +112,10 @@ def parse_dates(item):
             item[field] = parse_date_str(item[field])
 
 
-def get_entity_dict(items):
+def get_entity_dict(items, str_id=False):
+    if (str_id):
+        return {str(item['_id']): item for item in items}
+
     return {item['_id']: item for item in items}
 
 
@@ -304,3 +307,7 @@ def is_valid_login(user_id):
         flash(gettext('Company account has been disabled.'), 'danger')
         return False
     return True
+
+
+def get_items_by_id(ids, resource):
+    return list(superdesk.get_resource_service(resource).find(where={'_id': {'$in': ids}}))

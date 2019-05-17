@@ -171,13 +171,7 @@ def download(_ids):
         _file.seek(0)
 
     update_action_list(_ids.split(','), 'downloads', force_insert=True)
-    app.data.insert(
-        'history',
-        items,
-        action='download',
-        user=user,
-        section=request.args.get('type', 'wire')
-    )
+    get_resource_service('history').create_history_record(items, 'download', user, request.args.get('type', 'wire'))
     return flask.send_file(_file, mimetype=mimetype, attachment_filename=attachment_filename, as_attachment=True)
 
 
@@ -219,6 +213,8 @@ def share():
                 connection=connection
             )
     update_action_list(data.get('items'), 'shares', item_type=item_type)
+    get_resource_service('history').create_history_record(items, 'share', current_user,
+                                                          request.args.get('type', 'wire'))
     return flask.jsonify(), 201
 
 
@@ -242,8 +238,9 @@ def bookmark():
 @login_required
 def copy(_id):
     item_type = get_type()
-    get_entity_or_404(_id, item_type)
+    item = get_entity_or_404(_id, item_type)
     update_action_list([_id], 'copies', item_type=item_type)
+    get_resource_service('history').create_history_record([item], 'copy', get_user(), request.args.get('type', 'wire'))
     return flask.jsonify(), 200
 
 
@@ -269,6 +266,8 @@ def item(_id):
     if 'print' in flask.request.args:
         template = 'wire_item_print.html'
         update_action_list([_id], 'prints', force_insert=True)
+        get_resource_service('history').create_history_record([item], 'print', get_user(),
+                                                              request.args.get('type', 'wire'))
     else:
         template = 'wire_item.html'
     return flask.render_template(

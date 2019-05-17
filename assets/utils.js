@@ -562,3 +562,11 @@ export function getEmbargo(item) {
 
     return parsed.isAfter(now) ? parsed : null;
 }
+
+export function getItemFromArray(value, items = [], field = '_id') {
+    return items.find((i) => i[field] === value);
+}
+
+export function upperCaseFirstCharacter(text) {
+    return (text && text.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase()));
+}

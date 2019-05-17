@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import AgendaTypeAheadFilter from './AgendaTypeAheadFilter';
-import AgendaDropdownFilter from './AgendaDropdownFilter';
+import DropdownFilter from '../../components/DropdownFilter';
 import {getCoverageDisplayName} from '../utils';
 import AgendaCoverageExistsFilter from './AgendaCoverageExistsFilter';
 import AgendaEventsOnlyFilter from './AgendaEventsOnlyFilter';
@@ -58,7 +58,7 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAcce
                 toggleFilter={toggleFilter}
                 activeFilter={activeFilter}
                 getDropdownItems={getDropdownItems}
-            /> : <AgendaDropdownFilter
+            /> : <DropdownFilter
                 key={filter.label}
                 aggregations={aggregations}
                 filter={filter}
