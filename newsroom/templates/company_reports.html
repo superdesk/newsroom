@@ -15,7 +15,9 @@
 {% endblock %}
 
 {% block script %}
-
+    <script>
+        companyReportsData = {{ data | tojson | safe }};
+    </script>
     {{ javascript_tag('%s_js' % setting_type) | safe }}
 
 {% endblock %}

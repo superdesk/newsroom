@@ -272,7 +272,7 @@ def _agenda_query():
     }
 
 
-def _get_date_filters(args):
+def get_date_filters(args):
     range = {}
     offset = int(args.get('timezone_offset', '0'))
     if args.get('date_from'):
@@ -287,7 +287,7 @@ def _event_date_range(args):
 
     ATM it should display everything not finished by that date, even starting later.
     """
-    date_range = _get_date_filters(args)
+    date_range = get_date_filters(args)
     date_query = []
     if date_range.get('gt') and date_range.get('lt'):
         date_query.append({'range': {'dates.end': date_range}})
@@ -301,14 +301,14 @@ def _event_date_range(args):
             }
         })
     else:
-        date_query.append({'range': {'dates.end': _get_date_filters(args)}})
+        date_query.append({'range': {'dates.end': get_date_filters(args)}})
     return date_query
 
 
 def _display_date_range(args):
     """Get events for extra dates for coverages and planning.
     """
-    return {'range': {'display_dates.date': _get_date_filters(args)}}
+    return {'range': {'display_dates.date': get_date_filters(args)}}
 
 
 aggregations = {
@@ -585,7 +585,7 @@ class AgendaService(newsroom.Service):
         cursor = super().get(internal_req, lookup)
 
         if req.args.get('date_from') and req.args.get('date_to'):
-            date_range = _get_date_filters(req.args)
+            date_range = get_date_filters(req.args)
             for doc in cursor.docs:
                 # make the items display on the featured day,
                 # it's used in ui instead of dates.start and dates.end

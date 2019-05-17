@@ -15,6 +15,7 @@ const options = [
     {value: REPORTS_NAMES.COMPANY_PRODUCTS, text: gettext('Products per company')},
     {value: REPORTS_NAMES.PRODUCT_STORIES, text: gettext('Stories per product')},
     {value: REPORTS_NAMES.COMPANY, text: gettext('Company')},
+    {value: REPORTS_NAMES.SUBSCRIBER_ACTIVITY, text: gettext('Subscriber activity')},
 ];
 
 
@@ -27,7 +28,7 @@ class CompanyReportsApp extends React.Component {
 
     getPanel() {
         const Panel = panels[this.props.activeReport];
-        return Panel && this.props.activeReportData && <Panel key="panel" data={this.props.activeReportData} />;
+        return Panel && this.props.results && <Panel key="panel" results={this.props.results} companies={this.props.companies} />;
     }
 
     render() {
@@ -70,14 +71,16 @@ class CompanyReportsApp extends React.Component {
 
 CompanyReportsApp.propTypes = {
     activeReport: PropTypes.string,
-    activeReportData: PropTypes.object,
+    results: PropTypes.array,
     setActiveReport: PropTypes.func,
     runReport: PropTypes.func,
+    companies: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
     activeReport: state.activeReport,
-    activeReportData: state.activeReportData,
+    results: state.results,
+    companies: state.companies,
 });
 
 const mapDispatchToProps = {

@@ -61,6 +61,15 @@ URL_PREFIX = 'api'
 SECRET_KEY = os.environ.get('SECRET_KEY', '').encode() or os.urandom(32)
 PUSH_KEY = os.environ.get('PUSH_KEY', '').encode()
 
+#: Default TimeZone, will try to guess from server settings if not set
+DEFAULT_TIMEZONE = os.environ.get('DEFAULT_TIMEZONE')
+
+if DEFAULT_TIMEZONE is None:
+    DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
+
+if not DEFAULT_TIMEZONE:
+    raise ValueError("DEFAULT_TIMEZONE is empty")
+
 BLUEPRINTS = [
     'newsroom.wire',
     'newsroom.auth',
