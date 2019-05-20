@@ -51,7 +51,7 @@ def get_setting(setting_key=None):
                     settings[key]['value'] = val
         flask.g.settings = settings
     if setting_key:
-        setting_dict = flask.g.settings[setting_key]
+        setting_dict = flask.g.settings.get(setting_key) or {}
         return setting_dict.get('value', setting_dict.get('default'))
     return flask.g.settings
 

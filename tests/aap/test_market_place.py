@@ -479,17 +479,17 @@ def test_time_limited_access(client, app):
     assert 2 == len(data['_items'])
     print(data['_items'][0]['versioncreated'])
 
-    g.settings['wire_time_limit_days']['value'] = 1
+    g.settings['aapx_time_limit_days']['value'] = 1
     resp = client.get('/aapX/search')
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 100
+    g.settings['aapx_time_limit_days']['value'] = 100
     resp = client.get('/aapX/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 1
+    g.settings['aapx_time_limit_days']['value'] = 1
     company = app.data.find_one('companies', req=None, _id=1)
     app.data.update('companies', 1, {'archive_access': True}, company)
     resp = client.get('/aapX/search')
