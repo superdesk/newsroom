@@ -114,15 +114,18 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
         )
 
     query['bool']['minimum_should_match'] = 1
-
-    wire_time_limit_days = get_setting('wire_time_limit_days')
-    if company and not is_admin(user) and not company.get('archive_access', False) and wire_time_limit_days:
-        query['bool']['must'].append({'range': {'versioncreated': {
-            'gte': 'now-%dd/d' % int(wire_time_limit_days),
-        }}})
+    _add_limit_days(query, section, company, user)
 
     if not query['bool']['should']:
         abort(403, gettext('Your company doesn\'t have any products defined.'))
+
+
+def _add_limit_days(query, section, company, user):
+    limit_days = get_setting('aapx_time_limit_days') if section == 'aapX' else get_setting('wire_time_limit_days')
+    if company and not is_admin(user) and not company.get('archive_access', False) and limit_days:
+        query['bool']['must'].append({'range': {'versioncreated': {
+            'gte': 'now-%dd/d' % int(limit_days),
+        }}})
 
 
 def query_string(query):
@@ -570,9 +573,10 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, None)
 
-    def get_navigation_story_count(self, navigations):
+    def get_navigation_story_count(self, navigations, section, company, user):
         """Get story count by navigation"""
         query = _items_query()
+        _add_limit_days(query, section, company, user)
         get_resource_service('section_filters').apply_section_filter(query, self.section)
 
         aggs = {
