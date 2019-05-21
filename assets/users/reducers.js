@@ -8,7 +8,8 @@ import {
     CANCEL_EDIT,
     NEW_USER,
     SET_ERROR,
-    GET_COMPANIES
+    GET_COMPANIES,
+    SET_COMPANY,
 } from './actions';
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
     totalUsers: null,
     activeQuery: null,
     companies: [],
+    company: null,
 };
 
 export default function userReducer(state = initialState, action) {
@@ -105,6 +107,9 @@ export default function userReducer(state = initialState, action) {
 
     }
 
+    case SET_COMPANY: {
+        return {...state, company: action.company};
+    }
 
     default:
         return state;

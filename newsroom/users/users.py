@@ -81,6 +81,11 @@ class UsersResource(newsroom.Resource):
         'locale': {
             'type': 'string',
         },
+        'last_active': {
+            'type': 'datetime',
+            'required': False,
+            'nullable': True
+        }
     }
 
     item_methods = ['GET', 'PATCH', 'PUT']

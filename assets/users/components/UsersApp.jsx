@@ -6,14 +6,19 @@ import {
     newUser,
     setQuery,
     fetchUsers,
+    fetchCompanies,
+    setCompany,
 } from '../actions';
 import Users from './Users';
 import ListBar from 'components/ListBar';
+import SelectInput from 'components/SelectInput';
 
 
 class UsersApp extends React.Component {
     constructor(props, context) {
         super(props, context);
+
+        this.onChange = this.onChange.bind(this);
     }
 
     render() {
@@ -24,12 +29,30 @@ class UsersApp extends React.Component {
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchUsers}
                 buttonName={gettext('User')}
-            />,
+            >
+                <SelectInput
+                    name={gettext('Company')}
+                    label={''}
+                    options={this.props.companies.map(company => ({value: company._id, text: company.name}))}
+                    onChange={this.onChange}
+                    defaultOption={'All Companies'}
+                />
+            </ListBar>,
             <Users key="Users" />
             ]
         );
     }
+
+    onChange(selected)
+    {
+        this.props.setCompany(selected.target.value);
+        this.props.fetchUsers();
+    }
 }
+
+const mapStateToProps = (state) => ({
+    companies: state.companies,
+});
 
 UsersApp.propTypes = {
     users: PropTypes.arrayOf(PropTypes.object),
@@ -52,12 +75,16 @@ UsersApp.propTypes = {
     setQuery: PropTypes.func,
     errors: PropTypes.object,
     dispatch: PropTypes.func,
+    fetchCompanies: PropTypes.func,
+    setCompany: PropTypes.func,
 };
 
 const mapDispatchToProps = {
     newUser,
     fetchUsers,
     setQuery,
+    fetchCompanies,
+    setCompany,
 };
 
-export default connect(null, mapDispatchToProps)(UsersApp);
+export default connect(mapStateToProps, mapDispatchToProps)(UsersApp);

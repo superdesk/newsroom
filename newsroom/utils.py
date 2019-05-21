@@ -303,4 +303,14 @@ def is_valid_login(user_id):
         session.pop('_flashes', None)  # remove old messages and just show one message
         flash(gettext('Company account has been disabled.'), 'danger')
         return False
+
+    # Updated the active time for the user if required
+    if not user.get('last_active') or user.get('last_active') < utcnow() + timedelta(minutes=-10):
+        current_time = utcnow()
+        # Set the cached version of the user
+        user['last_active'] = current_time
+        app.cache.set(str(user_id), json.dumps(user, default=json_serialize_datetime_objectId))
+        # Set the db version of the user
+        superdesk.get_resource_service('users').system_update(ObjectId(user_id), {'last_active': current_time}, user)
+
     return True

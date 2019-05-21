@@ -265,6 +265,14 @@ def test_return_search_for_all_users(client, app):
     assert 250 == len(data)
 
 
+def test_active_user(client, app):
+    test_login_succeeds_for_admin(client)
+
+    resp = client.get('/users/search?q=admin')
+    data = json.loads(resp.get_data())
+    assert data[0].get('last_active')
+
+
 def test_active_users_and_active_companies(client, app):
     app.data.insert('users', [
         {
@@ -335,7 +343,7 @@ def test_active_users_and_active_companies(client, app):
 def test_is_valid_login(client, app):
     app.data.insert('users', [
         {
-            '_id': '1',
+            '_id': '5cc94b99bc4316684dc7dc07',
             'email': 'foo1@bar.com',
             'last_name': 'bar1',
             'first_name': 'foo1',
@@ -388,6 +396,6 @@ def test_is_valid_login(client, app):
 
     with app.test_request_context():
 
-        assert is_valid_login('1') is True
+        assert is_valid_login('5cc94b99bc4316684dc7dc07') is True
         assert is_valid_login('2') is False
         assert is_valid_login('3') is False
