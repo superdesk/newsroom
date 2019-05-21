@@ -26,3 +26,14 @@ def init_app(app):
 
     app.sidenav(gettext('Saved/Watched Items'), '{}.bookmarks'.format(SECTION_ID), 'bookmark',
                 group=1, blueprint=SECTION_ID, badge='saved-items-count')
+
+    app.general_setting(
+        'aapx_time_limit_days',
+        gettext('Time limit for aapX items (in days)'),
+        type='number',
+        min=0,
+        weight=300,
+        description=gettext(
+            "You can create an additional filter on top of the product definition. The time limit can be enabled for each company in the Permissions."),  # noqa
+        default=app.config.get('AAPX_TIME_LIMIT_DAYS', 0),
+    )
