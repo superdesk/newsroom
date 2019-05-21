@@ -29,6 +29,7 @@ function UsersList({users, onClick, activeUserId, companiesById}) {
                             <th>{ gettext('Company') }</th>
                             <th>{ gettext('Status') }</th>
                             <th>{ gettext('Created On') }</th>
+                            <th>{ gettext('Last Active') }</th>
                         </tr>
                     </thead>
                     <tbody>{list}</tbody>

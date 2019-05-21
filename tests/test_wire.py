@@ -1,3 +1,4 @@
+import pytz
 from flask import json, g
 from datetime import datetime, timedelta
 from urllib import parse
@@ -5,6 +6,7 @@ from urllib import parse
 from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import get_json
 from tests.test_users import ADMIN_USER_ID
+from superdesk import get_resource_service
 
 
 def test_item_detail(client):
@@ -559,3 +561,35 @@ def test_company_type_filter(client, app):
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert 'WEATHER' != data['_items'][0]['slugline']
+
+
+def test_search_by_products_and_filtered_by_embargoe(client, app):
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'product test',
+        'query': 'headline:china',
+        'companies': ['1'],
+        'is_enabled': True,
+        'product_type': 'wire'
+    }])
+
+    # embargoed item is not fetched
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'china',
+        'embargoed': (datetime.now() + timedelta(days=10)).replace(tzinfo=pytz.UTC),
+        'products': [{'code': '10'}]
+    }])
+    items = get_resource_service('wire_search').get_product_items(10, 20)
+    assert 0 == len(items)
+
+    # ex-embargoed item is fetched
+    app.data.insert('items', [{
+        '_id': 'bar',
+        'headline': 'china story',
+        'embargoed': (datetime.now() - timedelta(days=10)).replace(tzinfo=pytz.UTC),
+        'products': [{'code': '10'}]
+    }])
+    items = get_resource_service('wire_search').get_product_items(10, 20)
+    assert 1 == len(items)
+    assert items[0]['headline'] == 'china story'
