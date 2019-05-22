@@ -36,6 +36,7 @@ class UsersApp extends React.Component {
                     options={this.props.companies.map(company => ({value: company._id, text: company.name}))}
                     onChange={this.onChange}
                     defaultOption={'All Companies'}
+                    className={'form-inline'}
                 />
             </ListBar>,
             <Users key="Users" />
