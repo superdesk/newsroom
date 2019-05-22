@@ -3,8 +3,11 @@ import newsroom
 import pymongo.errors
 import werkzeug.exceptions
 
+from superdesk import get_resource_service
+from superdesk.resource import not_analyzed
 from superdesk.utc import utcnow
-from newsroom.utils import query_resource
+from flask import json, abort
+from eve.utils import ParsedRequest
 
 
 class HistoryResource(newsroom.Resource):
@@ -19,12 +22,20 @@ class HistoryResource(newsroom.Resource):
         'company': newsroom.Resource.rel('companies'),
         'item': newsroom.Resource.rel('items'),
         'version': {'type': 'string'},
-        'section': {'type': 'string'},
+        'section': {
+            'type': 'string',
+            'mapping': not_analyzed
+        }
     }
 
     mongo_indexes = {
         'item': ([('item', 1)], ),
         'company_user': ([('company', 1), ('user', 1)], ),
+    }
+
+    datasource = {
+        'source': 'history',
+        'search_backend': 'elastic'
     }
 
 
@@ -34,7 +45,6 @@ class HistoryService(newsroom.Service):
 
         def transform(item):
             return {
-                '_id': '_'.join(map(str, [user['_id'], item['_id'], action])),
                 'action': action,
                 'created': now,
                 'user': user['_id'],
@@ -50,18 +60,48 @@ class HistoryService(newsroom.Service):
             except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
                 continue
 
+    def create_history_record(self, items, action, user, section):
+        self.create(items, action, user, section)
+
+    def query_items(self, query):
+        if query['from'] >= 1000:
+            # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
+            return abort(400)
+
+        req = ParsedRequest()
+        req.args = {'source': json.dumps(query)}
+        return super().get(req, None)
+
+    def fetch_history(self, query, all=False):
+        results = self.query_items(query)
+        docs = results.docs
+        if all:
+            while results.hits['hits']['total'] > len(docs):
+                query['from'] = len(docs)
+                results = self.query_items(query)
+                docs.extend(results.docs)
+
+        return {
+            'items': docs,
+            'hits': results.hits
+        }
+
 
 def get_history_users(item_ids, active_user_ids, active_company_ids, section, action):
+    source = {}
+    source['query'] = {'bool': {'must': [
+        {'terms': {'company': [str(a) for a in active_company_ids]}},
+        {'terms': {'item': [str(i) for i in item_ids]}},
+        {'terms': {'user': [str(u) for u in active_user_ids]}},
+        {'term': {'section': section}},
+        {'term': {'action': action}},
 
-    lookup = {
-        'item': {'$in': item_ids},
-        'user': {'$in': active_user_ids},
-        'company': {'$in': active_company_ids},
-        'section': section,
-        'action': action
-    }
+    ]}}
+    source['size'] = 25
+    source['from'] = 0
 
-    histories = query_resource('history', lookup=lookup)
+    # Get the results
+    histories = get_resource_service('history').fetch_history(source, all=True).get('items')
     user_matches = [str(h['user']) for h in histories]
 
     return user_matches

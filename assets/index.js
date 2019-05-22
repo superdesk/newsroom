@@ -81,15 +81,16 @@ function responsiveWireItem() {
 }
 
 // Toggle left bar navigation
-
-document.getElementsByClassName('content-bar__menu--nav')[0].onclick = function(){
-    document.getElementsByClassName('wire-column__nav')[0].classList.toggle('wire-column__nav--open');
-    document.getElementsByClassName('content-bar__menu--nav')[0].classList.toggle('content-bar__menu--nav--open');
-    
-    // responsive wire item
-    filterOpen = !filterOpen;
-    responsiveWireItem();
-};
+if (document.getElementsByClassName('content-bar__menu--nav')[0]) {
+    document.getElementsByClassName('content-bar__menu--nav')[0].onclick = function(){
+        document.getElementsByClassName('wire-column__nav')[0].classList.toggle('wire-column__nav--open');
+        document.getElementsByClassName('content-bar__menu--nav')[0].classList.toggle('content-bar__menu--nav--open');
+        
+        // responsive wire item
+        filterOpen = !filterOpen;
+        responsiveWireItem();
+    };
+}
 
 
 // Open article from wire list
@@ -134,14 +135,19 @@ $('.multi-action-bar .btn').click(function(){
 
 var searchForm = document.getElementsByClassName('search__form')[0];
 var searchInput = document.getElementsByClassName('search__input')[0];
+var searchClear = document.getElementsByClassName('search__clear')[0];
 
-searchInput.onfocus = function() {
-    searchForm.classList.add('searchForm--active');
-};
+if (searchInput) {
+    searchInput.onfocus = function() {
+        searchForm.classList.add('searchForm--active');
+    };
+}
 
-document.getElementsByClassName('search__clear')[0].onclick = function() {
-    searchInput.value = '';
-};
+if (searchClear) {
+    searchClear.onclick = function() {
+        searchInput.value = '';
+    };
+}
 
 // close preview on mobile
 $('.wire-column__preview__mobile-bar button').click(function(){

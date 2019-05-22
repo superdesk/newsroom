@@ -5,8 +5,8 @@ import ReportsTable from './ReportsTable';
 import { gettext } from 'utils';
 
 
-function UserSavedSearches({data, print}) {
-    const list = data.results && data.results.map((item) =>
+function UserSavedSearches({results, print}) {
+    const list = results && results.map((item) =>
         <tr key={item._id}>
             <td>{item.name}</td>
             <td>{item.is_enabled.toString()}</td>
@@ -21,11 +21,11 @@ function UserSavedSearches({data, print}) {
         gettext('Company'),
         gettext('Number Of Saved Searches'),
     ];
-    return data.results ? (<ReportsTable headers={headers} rows={list} print={print} />) : null;
+    return results ? (<ReportsTable headers={headers} rows={list} print={print} />) : null;
 }
 
 UserSavedSearches.propTypes = {
-    data: PropTypes.object.isRequired,
+    results: PropTypes.array,
     print: PropTypes.bool,
 };
 

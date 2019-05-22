@@ -127,7 +127,7 @@ def test_wire_download(client, app):
             content = zf.open(_format['filename']).read()
             _format['test_content'](content)
     history = app.data.find('history', None, None)
-    assert len(items_ids) == history.count()
+    assert (len(wire_formats) * len(items_ids)) == history.count()
     assert 'download' == history[0]['action']
     assert history[0].get('user')
     assert history[0].get('created') + timedelta(seconds=2) >= utcnow()
@@ -146,7 +146,7 @@ def test_agenda_download(client, app):
         assert resp.headers.get('content-disposition') == 'attachment; filename=%s' % filename(
             _format['filename'], agenda_items[0])
     history = app.data.find('history', None, None)
-    assert 1 == history.count()
+    assert (len(wire_formats) * 1) == history.count()
     assert 'download' == history[0]['action']
     assert history[0].get('user')
     assert history[0].get('created') + timedelta(seconds=2) >= utcnow()
