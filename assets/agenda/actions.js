@@ -593,6 +593,11 @@ export function initParams(params) {
     }
 
     return (dispatch, getState) => {
+        const featuredParam = params.get('featured');
+        if (featuredParam && featuredParam !== get(getState(), 'agenda.featuredOnly', false).toString()) {
+            dispatch(toggleFeaturedFilter(false));
+        }
+
         dispatch(toggleEventsOnlyFilter(params.get('eventsOnlyView') ? true : false));
         dispatch(initSearchParams(params));
         if (params.get('item')) {

@@ -57,7 +57,7 @@ def send_coverage_request_email(user, message, item):
     recipients = general_settings.get('values').get('coverage_request_recipients').split(',')
     assert recipients
     assert isinstance(recipients, list)
-    url = url_for('agenda.item', _id=item, _external=True)
+    url = url_for('agenda.item', _id=item, _external=True, featured='false')
     name = '{} {}'.format(user.get('first_name'), user.get('last_name'))
     email = user.get('email')
 
