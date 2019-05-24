@@ -473,14 +473,16 @@ def get_coverages(planning_items, original_coverages=[]):
     for planning_item in planning_items:
         for coverage in planning_item.get('coverages') or []:
             existing_coverage = get_existing_coverage(coverage['coverage_id'])
+            coverage_planning = coverage.get('planning') or {}
+
             new_coverage = {
-                'planning_id': planning_item['guid'],
-                'coverage_id': coverage['coverage_id'],
-                'scheduled': coverage['planning']['scheduled'],
-                'coverage_type': coverage['planning']['g2_content_type'],
-                'workflow_status': coverage['workflow_status'],
+                'planning_id': planning_item.get('guid'),
+                'coverage_id': coverage.get('coverage_id'),
+                'scheduled': coverage_planning.get('scheduled'),
+                'coverage_type': coverage_planning.get('g2_content_type'),
+                'workflow_status': coverage.get('workflow_status'),
                 'coverage_status': coverage.get('news_coverage_status', {}).get('name'),
-                'slugline': coverage['planning']['slugline'],
+                'slugline': coverage_planning.get('slugline'),
                 'coverage_provider': (coverage.get('coverage_provider') or {}).get('name')
             }
 

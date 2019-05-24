@@ -47,7 +47,7 @@ def get_setting(setting_key=None):
         settings = copy.deepcopy(flask.current_app._general_settings)
         if values:
             for key, val in values.get('values', {}).items():
-                if val:
+                if val and settings.get(key):
                     settings[key]['value'] = val
         flask.g.settings = settings
     if setting_key:
