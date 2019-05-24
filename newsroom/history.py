@@ -88,23 +88,31 @@ class HistoryService(newsroom.Service):
 
 
 def get_history_users(item_ids, active_user_ids, active_company_ids, section, action):
-    source = {}
-    source['query'] = {'bool': {'must': [
-        {'terms': {'company': [str(a) for a in active_company_ids]}},
-        {'terms': {'item': [str(i) for i in item_ids]}},
-        {'terms': {'user': [str(u) for u in active_user_ids]}},
-        {'term': {'section': section}},
-        {'term': {'action': action}},
-
-    ]}}
-    source['size'] = 25
-    source['from'] = 0
+    source = {
+        'query': {
+            'bool': {
+                'must': [
+                    {'terms': {'company': [str(a) for a in active_company_ids]}},
+                    {'terms': {'item': [str(i) for i in item_ids]}},
+                    {'term': {'section': section}},
+                    {'term': {'action': action}},
+                ]
+            }
+        },
+        'size': 25,
+        'from': 0
+    }
 
     # Get the results
-    histories = get_resource_service('history').fetch_history(source, all=True).get('items')
-    user_matches = [str(h['user']) for h in histories]
+    histories = get_resource_service('history').fetch_history(source, all=True).get('items') or []
 
-    return user_matches
+    # Filter out the users
+    user_ids = [str(uid) for uid in active_user_ids]
+    return [
+        str(h['user'])
+        for h in histories
+        if h.get('user') in user_ids
+    ]
 
 
 def init_app(app):
