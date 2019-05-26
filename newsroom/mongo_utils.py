@@ -14,7 +14,7 @@ default_page_size = 500
 
 
 def index_elastic_from_mongo(hours=None, collection=None):
-    print('Starting indexing from mongodb for "items" collection hours={}'.format(hours))
+    print('Starting indexing from mongodb for "{}" collection hours={}'.format(collection, hours))
 
     resources = app.data.get_elastic_resources()
     if collection:
@@ -47,6 +47,48 @@ def index_elastic_from_mongo(hours=None, collection=None):
         print('Finished indexing collection {}'.format(resource))
 
 
+def index_elastic_from_mongo_from_id(collection, item_id, direction):
+    if not collection:
+        raise SystemExit('Collection not provided')
+    elif not item_id:
+        raise SystemExit('Item ID not provided')
+    elif direction not in ['older', 'newer']:
+        raise SystemExit('Direction can only be "older" or "newer", not {}'.format(direction))
+
+    print('Starting indexing from mongodb for "{}" collection, item={}, direction={}'.format(
+        collection,
+        item_id,
+        direction
+    ))
+
+    resources = app.data.get_elastic_resources()
+    if collection not in resources:
+        raise SystemExit('Cannot find collection: {}'.format(collection))
+
+    print('Starting indexing collection {}'.format(collection))
+
+    for items in _get_mongo_items_from_id(collection, item_id, direction):
+        print('{} Inserting {} items'.format(time.strftime('%X %x %Z'), len(items)))
+        s = time.time()
+
+        for i in range(1, 4):
+            try:
+                success, failed = superdesk.app.data._search_backend(collection).bulk_insert(collection, items)
+            except Exception as ex:
+                print('Exception thrown on insert to elastic {}', ex)
+                time.sleep(10)
+                continue
+            else:
+                break
+
+        print('{} Inserted {} items in {:.3f} seconds'.format(time.strftime('%X %x %Z'), success, time.time() - s))
+        if failed:
+            print('Failed to do bulk insert of items {}. Errors: {}'.format(len(failed), failed))
+            raise BulkIndexError(resource=collection, errors=failed)
+
+    print('Finished indexing collection {}'.format(collection))
+
+
 def _get_mongo_items(mongo_collection_name, hours=None):
     """Generate list of items from given mongo collection per default page size.
 
@@ -75,4 +117,72 @@ def _get_mongo_items(mongo_collection_name, hours=None):
             break
         items = list(cursor)
         last_id = items[-1][config.ID_FIELD]
+        yield items
+
+
+def _get_mongo_items_from_id(collection, item_id, direction):
+    """Generate list of items from given mongo collection per default page size.
+
+    :param mongo_collection_name: Name of the collection to get the items
+    :return: list of items
+    """
+    print('Indexing data {} than {} from mongo/{} to elastic/{}'.format(
+        direction,
+        item_id,
+        collection,
+        collection
+    ))
+
+    db = app.data.get_mongo_collection(collection)
+
+    # First get the key item so that we can get it's creation time
+    item = list(db.find({'_id': item_id}))[0]
+
+    args = {
+        'limit': default_page_size,
+        'sort': [('_created', pymongo.ASCENDING)]
+    }
+
+    # Filter based on the creation time of the provided item
+    if direction == 'older':
+        # Filter out anything created after the provided item
+        item_filter = {'_created': {'$lte': item.get('_created')}}
+    else:
+        # Filter out anything created on or before the provided item
+        item_filter = {'_created': {'$gt': item.get('_created')}}
+
+    # Keep the time for the last iteration
+    last_created = None
+
+    # Keep the list of processed IDs from last iteration
+    last_ids = []
+    while True:
+        if not last_created:
+            args['filter'] = item_filter
+        else:
+            args['filter'] = {'$and': [
+                item_filter,
+                {'_created': {'$gte': last_created}}
+            ]}
+
+        cursor = db.find(**args)
+
+        # Filter out the items that were processed last iteration
+        # As we're filtering based on creation time, there may be an overlap
+        # If multiple items were created on the same second
+        items = [
+            item for item in cursor
+            if item.get(config.ID_FIELD) not in last_ids
+        ]
+
+        if not len(items):
+            break
+
+        # Store the last created time and ids
+        last_created = items[-1].get('_created')
+        last_ids = [
+            item.get(config.ID_FIELD)
+            for item in items
+        ]
+
         yield items

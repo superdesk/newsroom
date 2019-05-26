@@ -4,7 +4,7 @@ from flask_script import Manager
 from newsroom import Newsroom
 from superdesk import get_resource_service
 from newsroom.elastic_utils import rebuild_elastic_index
-from newsroom.mongo_utils import index_elastic_from_mongo
+from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_id
 from newsroom.auth import get_user_by_email
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 
@@ -52,11 +52,17 @@ def elastic_init():
 
 @manager.option('-h', '--hours', dest='hours', default=None)
 @manager.option('-c', '--collection', dest='collection', default=None)
-def index_from_mongo(hours, collection):
+@manager.option('-i', '--id', dest='item_id', default=None)
+@manager.option('-d', '--direction', dest='direction', choices=['older', 'newer'], default='older')
+def index_from_mongo(hours, collection, item_id, direction):
     print('Checking if elastic index exists, a new one will be created if not')
     app.data.init_elastic(app)
     print('Elastic index check has been completed')
-    index_elastic_from_mongo(hours=hours, collection=collection)
+
+    if item_id:
+        index_elastic_from_mongo_from_id(collection, item_id, direction)
+    else:
+        index_elastic_from_mongo(hours=hours, collection=collection)
 
 
 @manager.command
