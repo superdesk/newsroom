@@ -33,6 +33,10 @@ function getReportQueryString(currentState, next, exportReport, notify) {
             params.date_to = getDateInputDate(params.date_to);
         }
 
+        if (params.section) {
+            params.section = get(getItemFromArray(params.section, currentState.sections, 'name'), '_id');
+        }
+
         if (exportReport) {
             params.export = true;
         }

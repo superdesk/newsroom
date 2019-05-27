@@ -18,12 +18,14 @@ const initialState = {
     results: [],
     aggregations: null,
     companies: [],
+    sections: [],
     reportParams: {
         date_from: Date.now(),
         date_to: Date.now(),
         timezone_offset: getTimezoneOffset(),
         company: null,
         action: null,
+        section: null,
     }
 };
 
@@ -32,7 +34,11 @@ export default function companyReportReducer(state = initialState, action) {
     switch (action.type) {
 
     case INIT_DATA:
-        return {...state, companies: action.data.companies};
+        return {
+            ...state,
+            companies: action.data.companies,
+            sections: action.data.sections,
+        };
 
     case QUERY_REPORT: {
         return {
