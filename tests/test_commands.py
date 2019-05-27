@@ -3,7 +3,7 @@ from time import sleep
 from datetime import datetime, timedelta
 from eve.utils import ParsedRequest
 
-from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_id
+from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_timestamp
 
 from .fixtures import items, init_items, init_auth, init_company  # noqa
 
@@ -74,27 +74,27 @@ def test_index_from_mongo_collection(app, client):
     assert 3 == len(data['_items'])
 
 
-def test_index_from_mongo_from_id(app, client):
+def test_index_from_mongo_from_timestamp(app, client):
     app.data.remove('items')
     sorted_items = [{
         '_id': 'tag:foo-1',
-        '_created': datetime.now() - timedelta(days=5),
+        '_created': datetime.now() - timedelta(hours=5),
 
     }, {
         '_id': 'urn:bar-1',
-        '_created': datetime.now() - timedelta(days=5)
+        '_created': datetime.now() - timedelta(hours=5)
     }, {
         '_id': 'tag:foo-2',
-        '_created': datetime.now() - timedelta(days=4)
+        '_created': datetime.now() - timedelta(hours=4)
     }, {
         '_id': 'urn:bar-2',
-        '_created': datetime.now() - timedelta(days=4)
+        '_created': datetime.now() - timedelta(hours=4)
     }, {
         '_id': 'tag:foo-3',
-        '_created': datetime.now() - timedelta(days=3)
+        '_created': datetime.now() - timedelta(hours=3)
     }, {
         '_id': 'urn:bar-3',
-        '_created': datetime.now() - timedelta(days=3)
+        '_created': datetime.now() - timedelta(hours=3)
     }]
 
     app.data.insert('items', sorted_items)
@@ -102,12 +102,12 @@ def test_index_from_mongo_from_id(app, client):
     app.data.init_elastic(app)
     sleep(1)
     assert 0 == app.data.elastic.find('items', ParsedRequest(), {}).count()
-    sleep(1)
 
-    index_elastic_from_mongo_from_id('items', 'tag:foo-2', 'older')
+    timestamp = (datetime.now() - timedelta(hours=3)).strftime('%Y-%m-%dT%H:%M')
+    index_elastic_from_mongo_from_timestamp('items', timestamp, 'older')
     sleep(1)
     assert 4 == app.data.elastic.find('items', ParsedRequest(), {}).count()
 
-    index_elastic_from_mongo_from_id('items', 'tag:foo-2', 'newer')
+    index_elastic_from_mongo_from_timestamp('items', timestamp, 'newer')
     sleep(1)
     assert 6 == app.data.elastic.find('items', ParsedRequest(), {}).count()
