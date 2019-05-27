@@ -2,7 +2,7 @@
 import time
 import pymongo
 import superdesk
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from flask import current_app as app
 from superdesk.errors import BulkIndexError
@@ -47,17 +47,22 @@ def index_elastic_from_mongo(hours=None, collection=None):
         print('Finished indexing collection {}'.format(resource))
 
 
-def index_elastic_from_mongo_from_id(collection, item_id, direction):
+def index_elastic_from_mongo_from_timestamp(collection, timestamp_str, direction):
     if not collection:
         raise SystemExit('Collection not provided')
-    elif not item_id:
-        raise SystemExit('Item ID not provided')
+    elif not timestamp_str:
+        raise SystemExit('Timestamp not provided')
     elif direction not in ['older', 'newer']:
         raise SystemExit('Direction can only be "older" or "newer", not {}'.format(direction))
 
-    print('Starting indexing from mongodb for "{}" collection, item={}, direction={}'.format(
+    try:
+        timestamp = datetime.strptime(timestamp_str, '%Y-%m-%dT%H:%M')
+    except ValueError as e:
+        raise SystemExit('Timestamp in incorrect format (e.g. 2019-05-20T05:00). {}'.format(e))
+
+    print('Starting indexing from mongodb for "{}" collection, timestamp={}, direction={}'.format(
         collection,
-        item_id,
+        timestamp,
         direction
     ))
 
@@ -67,7 +72,7 @@ def index_elastic_from_mongo_from_id(collection, item_id, direction):
 
     print('Starting indexing collection {}'.format(collection))
 
-    for items in _get_mongo_items_from_id(collection, item_id, direction):
+    for items in _get_mongo_items_from_timestamp(collection, timestamp, direction):
         print('{} Inserting {} items'.format(time.strftime('%X %x %Z'), len(items)))
         s = time.time()
 
@@ -120,36 +125,35 @@ def _get_mongo_items(mongo_collection_name, hours=None):
         yield items
 
 
-def _get_mongo_items_from_id(collection, item_id, direction):
+def _get_mongo_items_from_timestamp(collection, timestamp, direction):
     """Generate list of items from given mongo collection per default page size.
 
-    :param mongo_collection_name: Name of the collection to get the items
+    :param collection: Name of the collection to get the items
+    :param timestamp: Python datetime instance for the timestamp
+    :param direction: String indicating which items to retrieve ('older' or 'newer')
     :return: list of items
     """
     print('Indexing data {} than {} from mongo/{} to elastic/{}'.format(
         direction,
-        item_id,
+        timestamp,
         collection,
         collection
     ))
 
     db = app.data.get_mongo_collection(collection)
 
-    # First get the key item so that we can get it's creation time
-    item = list(db.find({'_id': item_id}))[0]
-
     args = {
         'limit': default_page_size,
         'sort': [('_created', pymongo.ASCENDING)]
     }
 
-    # Filter based on the creation time of the provided item
+    # Filter based on the creation time from the timestamp
     if direction == 'older':
-        # Filter out anything created after the provided item
-        item_filter = {'_created': {'$lte': item.get('_created')}}
+        # Filter out anything created after the provided timestamp
+        item_filter = {'_created': {'$lte': timestamp}}
     else:
-        # Filter out anything created on or before the provided item
-        item_filter = {'_created': {'$gt': item.get('_created')}}
+        # Filter out anything created on or before the provided timestamp
+        item_filter = {'_created': {'$gt': timestamp}}
 
     # Keep the time for the last iteration
     last_created = None
