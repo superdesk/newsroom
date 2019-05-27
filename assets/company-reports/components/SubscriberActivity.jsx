@@ -23,6 +23,10 @@ class SubscriberActivity extends React.Component {
         {
             label: gettext('All Actions'),
             field: 'action'
+        },
+        {
+            label: gettext('All Sections'),
+            field: 'section'
         }];
         this.getDropdownItems = this.getDropdownItems.bind(this);
         this.onScroll = this.onScroll.bind(this);
@@ -37,29 +41,42 @@ class SubscriberActivity extends React.Component {
     }
 
     getDropdownItems(filter) {
-        const { toggleFilterAndQuery } = this.props;
+        const { toggleFilterAndQuery, sections } = this.props;
+        let getName = (text) => (text);
+        let itemsArray = [];
         // Company is not filtered, always show full list
-        if (filter.field === 'company') {
-            return this.companies.map((c) => {
-                return (<button
-                    key={c._id}
-                    className='dropdown-item'
-                    onClick={() => toggleFilterAndQuery(filter.field, c.name)}
-                >{c.name}</button>);
-            });
+        switch(filter.field) {
+        case 'company':
+            itemsArray= this.companies;
+            break;
+
+        case 'action':
+            itemsArray = [{
+                'name': 'download'
+            },
+            {
+                'name': 'copy'
+            },
+            {
+                'name': 'share'
+            },
+            {
+                'name': 'print'
+            }];
+            getName = upperCaseFirstCharacter;
+            break;
+
+        case 'section':
+            itemsArray = sections;
+            break;
         }
 
-        if (filter.field === 'action') {
-            return ['download', 'copy', 'share', 'print'].map((c, i) => {
-                return (<button
-                    key={i}
-                    className='dropdown-item'
-                    onClick={() => toggleFilterAndQuery(filter.field, c)}
-                >{upperCaseFirstCharacter(c)}</button>);
-            });
-        }
 
-        return [];
+        return itemsArray.map((item, i) => (<button
+            key={i}
+            className='dropdown-item'
+            onClick={() => toggleFilterAndQuery(filter.field, item.name)}
+        >{getName(item.name)}</button>));
     }
 
     getFilterLabel(filter, activeFilter) {
@@ -129,19 +146,21 @@ class SubscriberActivity extends React.Component {
                 toggleFilter={toggleFilterAndQuery}
             />
         ));
-
-        filterNodes.push((<CalendarButton
-            key='subscriver_activity_from'
-            labelClass='ml-3 mt-1'
-            label={gettext('FROM:')}
-            selectDate={this.onFromDateChange}
-            activeDate={get(reportParams, 'date_from') || moment()} />));
-        filterNodes.push((<CalendarButton
-            key='subscriver_activity_to'
-            labelClass='mt-1'
-            label={gettext('TO:')}
-            selectDate={this.onEndDateChange}
-            activeDate={get(reportParams, 'date_to') || moment()} />));
+        filterNodes = [
+            ...filterNodes,
+            (<CalendarButton
+                key='subscriver_activity_from'
+                labelClass='ml-3 mt-1'
+                label={gettext('FROM:')}
+                selectDate={this.onFromDateChange}
+                activeDate={get(reportParams, 'date_from') || moment()} />),
+            (<CalendarButton
+                key='subscriver_activity_to'
+                labelClass='mt-1'
+                label={gettext('TO:')}
+                selectDate={this.onEndDateChange}
+                activeDate={get(reportParams, 'date_to') || moment()} />)
+        ];
         /* filterNodes.push(<span
             key='subscriver_activity_export'
             className="btn btn-outline-secondary ml-2"
@@ -164,12 +183,14 @@ SubscriberActivity.propTypes = {
     isLoading: PropTypes.bool,
     fetchReport: PropTypes.func,
     reportParams: PropTypes.object,
+    sections: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
     companies: state.companies,
     reportParams: state.reportParams,
     isLoading: state.isLoading,
+    sections: state.sections,
 });
 
 const mapDispatchToProps = { toggleFilterAndQuery, fetchReport, runReport };

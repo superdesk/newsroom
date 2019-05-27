@@ -27,6 +27,7 @@ class HistoryResource(newsroom.Resource):
             'mapping': not_analyzed
         }
     }
+    schema['item']['mapping'] = not_analyzed
 
     mongo_indexes = {
         'item': ([('item', 1)], ),
