@@ -1,4 +1,6 @@
 from flask import json
+from .test_users import ADMIN_USER_ID
+from superdesk import get_resource_service
 
 
 def post_json(client, url, data):
@@ -21,3 +23,7 @@ def get_json(client, url):
     assert resp.status_code == 200, \
         'error %d on get to %s:\n%s' % (resp.status_code, url, resp.get_data().decode('utf-8'))
     return json.loads(resp.get_data())
+
+
+def get_admin_user_id(app):
+    return (get_resource_service('users').find_one(req=None, _id=ADMIN_USER_ID) or {}).get('_id')
