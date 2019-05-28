@@ -5,7 +5,7 @@ from newsroom.wire.utils import get_local_date, get_end_date
 from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts
 
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import post_json, delete_json, get_json
+from .utils import post_json, delete_json, get_json, get_admin_user_id
 
 
 def test_item_detail(client):
@@ -47,7 +47,7 @@ def get_bookmarks_count(client, user):
 
 
 def test_bookmarks(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert user_id
 
     assert 0 == get_bookmarks_count(client, user_id)
@@ -75,7 +75,7 @@ def test_item_copy(client, app):
     data = json.loads(resp.get_data())
     assert 'copies' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['copies']
 
 
@@ -108,7 +108,7 @@ def test_share_items(client, app):
     data = json.loads(resp.get_data())
     assert 'shares' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['shares']
 
 
@@ -180,7 +180,7 @@ def test_coverage_request(client, app):
 
 
 def test_watch_event(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert 0 == get_bookmarks_count(client, user_id)
 
     post_json(client, '/agenda_watch', {'items': ['urn:conference']})

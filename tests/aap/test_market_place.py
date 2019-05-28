@@ -1,5 +1,5 @@
 from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from tests.utils import json, get_json
+from tests.utils import json, get_json, get_admin_user_id
 from tests.test_download import wire_formats, download_zip_file, items_ids
 from tests.test_push import get_signature_headers
 from tests.test_users import ADMIN_USER_ID
@@ -39,7 +39,7 @@ def get_bookmarks_count(client, user):
 
 
 def test_bookmarks(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert user_id
 
     assert 0 == get_bookmarks_count(client, user_id)
@@ -106,7 +106,7 @@ def test_item_copy(client, app):
     data = json.loads(resp.get_data())
     assert 'copies' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['copies']
 
 
@@ -568,7 +568,7 @@ def test_share_items(client, app):
     data = json.loads(resp.get_data())
     assert 'shares' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['shares']
 
 
