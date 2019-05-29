@@ -87,6 +87,9 @@ class AgendaListItem extends React.Component {
         const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
         const description = getDescription(item, planningItem);
 
+        // Show headline for adhoc planning items
+        const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
+
         return (
             <article key={item._id}
                 className={cardClassName}
@@ -115,7 +118,10 @@ class AgendaListItem extends React.Component {
                                 </label>
                             </div>
 
-                            {getName(item)}
+                            <span className={
+                                classNames({'wire-articles__item__meta-time wire-articles__item__meta-time--border-right': showHeadline})}>
+                                {getName(item)}</span>
+                            {showHeadline && <span className='wire-articles__item__text'>{item.headline}</span>}
                         </h4>
 
                         <AgendaListItemIcons item={item} group={group} planningItem={planningItem} />
