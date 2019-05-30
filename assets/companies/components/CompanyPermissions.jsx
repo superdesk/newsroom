@@ -64,7 +64,7 @@ class CompanyPermissions extends React.Component {
                                 <li>
                                     <CheckboxInput
                                         name="archive_access"
-                                        label={gettext('Archive access')}
+                                        label={gettext('Grant Access To Archived Wire')}
                                         value={!!this.state.archive_access}
                                         onChange={() => this.setState({archive_access: !this.state.archive_access})}
                                     />
