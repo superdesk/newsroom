@@ -36,6 +36,13 @@ class SubscriberActivity extends React.Component {
         this.props.runReport();
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (this.props.reportParams !== nextProps.reportParams) {
+            // Filtering done
+            this.previousScrollTop = 0;
+        }
+    }
+
     getDropdownItems(filter) {
         const { toggleFilterAndQuery } = this.props;
         // Company is not filtered, always show full list
