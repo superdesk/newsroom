@@ -1,4 +1,4 @@
-from flask import jsonify, render_template, abort
+from flask import jsonify, render_template, abort, current_app as newsroom_app
 from flask_babel import gettext
 
 from newsroom.decorator import account_manager_only
@@ -26,7 +26,10 @@ def print_reports(report):
 @account_manager_only
 def company_reports():
     companies = list(query_resource('companies'))
-    data = {'companies': companies}
+    data = {
+        'companies': companies,
+        'sections': newsroom_app.sections
+    }
     return render_template('company_reports.html', setting_type="company_reports", data=data)
 
 

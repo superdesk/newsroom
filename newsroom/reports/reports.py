@@ -3,7 +3,7 @@ from collections import defaultdict
 import superdesk
 from bson import ObjectId
 from flask_babel import gettext
-from flask import request, send_file
+from flask import request, send_file, current_app as newsroom_app
 import io
 import csv
 from superdesk.utc import utcnow
@@ -161,6 +161,9 @@ def get_subscriber_activity_report():
     if args.get('action'):
         must_terms.append({'term': {'action': args.get('action')}})
 
+    if args.get('section'):
+        must_terms.append({'term': {'section': args.get('section')}})
+
     date_range = get_date_filters(args)
     if date_range.get('gt') or date_range.get('lt'):
         must_terms.append({"range": {"created": date_range}})
@@ -201,6 +204,9 @@ def get_subscriber_activity_report():
     company_items = get_entity_dict(get_items_by_id(company_ids, 'companies'), True)
     user_items = get_entity_dict(get_items_by_id(user_ids, 'users'), True)
 
+    def get_section_name(s):
+        return next((sec for sec in newsroom_app.sections if sec.get('_id') == s), {}).get('name')
+
     for doc in docs:
         if doc.get('item') in wire_items:
             doc['item'] = {
@@ -222,7 +228,7 @@ def get_subscriber_activity_report():
             user = user_items[doc.get('user')]
             doc['user'] = "{0} {1}".format(user.get('first_name'), user.get('last_name'))
 
-        doc['section'] = doc['section'].capitalize()
+        doc['section'] = get_section_name(doc['section'])
         doc['action'] = doc['action'].capitalize()
 
     if not request.args.get('export'):
