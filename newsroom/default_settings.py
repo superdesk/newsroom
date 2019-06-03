@@ -240,6 +240,7 @@ COVERAGE_TYPES = {
     'video': {'name': 'Video', 'icon': 'video'},
     'explainer': {'name': 'Explainer', 'icon': 'explainer'},
     'infographics': {'name': 'Infographics', 'icon': 'infographics'},
+    'graphic': {'name': 'Graphic', 'icon': 'infographics'},
     'live_video': {'name': 'Live Video', 'icon': 'live-video'},
     'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'},
     'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
