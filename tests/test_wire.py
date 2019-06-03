@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from urllib import parse
 
 from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import get_json
+from .utils import get_json, get_admin_user_id
 from tests.test_users import ADMIN_USER_ID
 from superdesk import get_resource_service
 
@@ -53,7 +53,7 @@ def test_share_items(client, app):
     data = json.loads(resp.get_data())
     assert 'shares' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['shares']
 
 
@@ -65,7 +65,7 @@ def get_bookmarks_count(client, user):
 
 
 def test_bookmarks(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert user_id
 
     assert 0 == get_bookmarks_count(client, user_id)
@@ -132,7 +132,7 @@ def test_item_copy(client, app):
     data = json.loads(resp.get_data())
     assert 'copies' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['copies']
 
 

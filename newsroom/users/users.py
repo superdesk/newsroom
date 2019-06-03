@@ -94,7 +94,7 @@ class UsersResource(newsroom.Resource):
     datasource = {
         'source': 'users',
         'projection': {'password': 0},
-        'default_sort': [('name', 1)]
+        'default_sort': [('last_name', 1)]
     }
     mongo_indexes = {
         'email': ([('email', 1)], {'unique': True})
