@@ -67,7 +67,7 @@ def push():
     assert 'type' in item, {'type': 1}
 
     if item.get('type') == 'event':
-        orig = app.data.find_one('agenda', req=None, _id=item['guid'])
+        orig = app.data.find_one('agenda', req=None, guid=item['guid'])
         id = publish_event(item, orig)
         agenda = app.data.find_one('agenda', req=None, _id=id)
         if agenda:
@@ -149,10 +149,14 @@ def publish_event(event, orig):
     service = superdesk.get_resource_service('agenda')
 
     event_created_after_planning = False
-    if not orig and event.get('plans'):
-        # event is created planning item
-        orig = superdesk.get_resource_service('agenda').find_one(req=None, guid=event.get('plans')[0])
-        if orig:
+    if event.get('plans'):
+        if not orig:
+            # event is created planning item
+            orig = superdesk.get_resource_service('agenda').find_one(req=None, guid=event.get('plans')[0])
+            if orig:
+                event_created_after_planning = True
+        if orig.get('_id') != _id and orig.get('_id') in event.get('plans'):
+            # Document's '_id' not equal to event's 'guid' - so, event was created from planning
             event_created_after_planning = True
 
     event.pop('plans', None)
