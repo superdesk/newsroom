@@ -105,6 +105,7 @@ def publish_item(doc, is_new):
     """Duplicating the logic from content_api.publish service."""
     set_dates(doc)
     doc['firstpublished'] = parse_date_str(doc.get('firstpublished'))
+    doc['publish_schedule'] = parse_date_str(doc.get('publish_schedule'))
     doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
     doc.setdefault('charcount', get_char_count(doc.get('body_html', '')))
     service = superdesk.get_resource_service('content_api')
