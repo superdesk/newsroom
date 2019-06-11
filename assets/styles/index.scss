@@ -2156,6 +2156,9 @@ article.list {
     & + .wire-articles__item__icons {
         margin-top: 10px;
     }
+    &--large {
+        font-size: 1rem !important;
+    }
 }
 
 .wire-articles__item__versions-btn {

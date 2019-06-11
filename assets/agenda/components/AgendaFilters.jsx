@@ -3,10 +3,18 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import AgendaTypeAheadFilter from './AgendaTypeAheadFilter';
 import DropdownFilter from '../../components/DropdownFilter';
-import {getCoverageDisplayName} from '../utils';
+import {getCoverageDisplayName, groupRegions, getRegionName} from '../utils';
 import AgendaCoverageExistsFilter from './AgendaCoverageExistsFilter';
 import AgendaEventsOnlyFilter from './AgendaEventsOnlyFilter';
 
+
+const transformFilterBuckets = (filter, aggregations, props) => {
+    if (!filter.transformBuckets) {
+        return aggregations[filter.field].buckets;
+    }
+
+    return filter.transformBuckets(filter, aggregations, props);
+};
 
 const filters = [{
     label: gettext('Any calendar'),
@@ -24,6 +32,9 @@ const filters = [{
     field: 'place',
     icon: 'icon-small--region',
     eventsOnly: true,
+    transformBuckets: groupRegions,
+    notSorted: true,
+    transform: getRegionName,
 }, {
     label: gettext('Any coverage type'),
     field: 'coverage',
@@ -34,9 +45,9 @@ const filters = [{
 }];
 
 
-const getDropdownItems = (filter, aggregations, toggleFilter, processBuckets) => {
+const getDropdownItems = (filter, aggregations, toggleFilter, processBuckets, props) => {
     if (!filter.nestedField && aggregations && aggregations[filter.field]) {
-        return processBuckets(aggregations[filter.field].buckets, filter, toggleFilter);
+        return processBuckets(transformFilterBuckets(filter, aggregations, props), filter, toggleFilter);
     }
 
     if (filter.nestedField && aggregations && aggregations[filter.field] && aggregations[filter.field][filter.nestedField]) {
@@ -46,7 +57,7 @@ const getDropdownItems = (filter, aggregations, toggleFilter, processBuckets) =>
     return [];
 };
 
-function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAccess, eventsOnlyView}) {
+function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAccess, eventsOnlyView, locators}) {
     const displayFilters = eventsOnlyAccess || eventsOnlyView ? filters.filter((f) => f.eventsOnly) : filters;
 
     return (<div className='wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap'>
@@ -65,6 +76,7 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAcce
                 toggleFilter={toggleFilter}
                 activeFilter={activeFilter}
                 getDropdownItems={getDropdownItems}
+                locators={locators}
             />
         ))}
         {!eventsOnlyAccess && !eventsOnlyView &&
@@ -80,6 +92,7 @@ AgendaFilters.propTypes = {
     activeFilter: PropTypes.object,
     eventsOnlyAccess: PropTypes.bool,
     eventsOnlyView: PropTypes.bool,
+    locators: PropTypes.object,
 };
 
 export default AgendaFilters;

@@ -109,6 +109,8 @@ class AgendaApp extends BaseApp {
         const eventsOnly = this.props.eventsOnlyView || this.props.eventsOnlyAccess;
         const hideFeaturedToggle = this.props.activeNavigation ||
             this.props.bookmarks || this.props.activeTopic || eventsOnly;
+        let locators = {};
+        this.props.locators.forEach((l) => {locators[l.name] = l;});
 
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
@@ -186,6 +188,7 @@ class AgendaApp extends BaseApp {
                                     activeFilter={this.props.activeFilter}
                                     eventsOnlyAccess={this.props.eventsOnlyAccess}
                                     eventsOnlyView={this.props.eventsOnlyView}
+                                    locators={locators}
                                 />
                             }
 
@@ -282,6 +285,7 @@ AgendaApp.propTypes = {
     context: PropTypes.string,
     eventsOnlyAccess: PropTypes.bool,
     eventsOnlyView: PropTypes.bool,
+    locators: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -316,6 +320,7 @@ const mapStateToProps = (state) => ({
     userSections: state.userSections,
     featuredOnly: get(state, 'agenda.featuredOnly'),
     context: state.context,
+    locators: get(state, 'locators.items', []),
 });
 
 const mapDispatchToProps = (dispatch) => ({
