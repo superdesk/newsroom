@@ -121,7 +121,9 @@ class AgendaListItem extends React.Component {
                             <span className={
                                 classNames({'wire-articles__item__meta-time wire-articles__item__meta-time--border-right': showHeadline})}>
                                 {getName(item)}</span>
-                            {showHeadline && <span className='wire-articles__item__text'>{item.headline}</span>}
+                            {showHeadline && <span
+                                className='wire-articles__item__text wire-articles__item__text--large'>
+                                {item.headline}</span>}
                         </h4>
 
                         <AgendaListItemIcons item={item} group={group} planningItem={planningItem} />
