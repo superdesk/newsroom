@@ -45,6 +45,7 @@ export default class AgendaLinks extends React.PureComponent {
         return (
             <InfoBox label={gettext('Agenda')}>
                 <a className="wire-articles__versions"
+                    target="_blank"
                     href={'/agenda?item=' + agenda._id} title={gettext('Open agenda item "{{ name }}"', {name: agenda.name})}>
                     <div className="wire-articles__versions__item d-flex flex-column align-items-start">
                         <strong className="wire-articles__item-headline">{agenda.name}</strong>
