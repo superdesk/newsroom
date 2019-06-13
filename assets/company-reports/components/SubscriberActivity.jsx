@@ -122,7 +122,7 @@ class SubscriberActivity extends React.Component {
         const {results, print, reportParams, toggleFilterAndQuery} = this.props;
         const headers = [gettext('Company'), gettext('Section'), gettext('Item'), gettext('Action'), gettext('User'), gettext('Time')];
         let list = get(results, 'length', 0) > 0 ? results.map((item) =>
-            <tr key={item._id} className="table-secondary">
+            <tr key={item._id}>
                 <td>{item.company}</td>
                 <td>{item.section}</td>
                 <td>
@@ -134,7 +134,7 @@ class SubscriberActivity extends React.Component {
                 <td>{item.user}</td>
                 <td>{fullDate(item.created)}</td>
             </tr>
-        ) : ([(<tr key='no_data_row' className="table-secondary">
+        ) : ([(<tr key='no_data_row'>
             <td></td>
             <td></td>
             <td>{gettext('No Data')}</td>
