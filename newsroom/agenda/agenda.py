@@ -502,6 +502,8 @@ class AgendaService(newsroom.Service):
         coverage['item_headline'] = wire_item.get('headline')
         coverage['item_slugline'] = wire_item.get('slugline')
         coverage['publish_time'] = wire_item.get('publish_schedule') or wire_item.get('firstpublished')
+        if wire_item.get('ednote'):
+            coverage['item_ednote'] = wire_item.get('ednote')
 
     def get(self, req, lookup):
         if req.args.get('featured'):

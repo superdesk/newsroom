@@ -57,8 +57,8 @@ export default function AgendaCoverages({item, coverages}) {
                 <CoverageItemStatus coverage={coverage} />
             </div>
 
-            {!isEmpty(edNotes) && edNotes[coverage.coverage_id] && <div className='coverage-item__row'>
-                <AgendaEdNote item={{ednote: edNotes[coverage.coverage_id]}} noMargin/>
+            {(coverage.item_ednote || !isEmpty(edNotes) && edNotes[coverage.coverage_id]) && <div className='coverage-item__row'>
+                <AgendaEdNote item={{ednote: coverage.item_ednote || edNotes[coverage.coverage_id]}} noMargin/>
             </div>}
 
             {!isEmpty(internalNotes) && internalNotes[coverage.coverage_id] && <div className='coverage-item__row'>
