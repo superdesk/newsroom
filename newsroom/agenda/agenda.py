@@ -501,7 +501,7 @@ class AgendaService(newsroom.Service):
         coverage['item_description_text'] = wire_item.get('description_text')
         coverage['item_headline'] = wire_item.get('headline')
         coverage['item_slugline'] = wire_item.get('slugline')
-        coverage['publish_time'] = wire_item.get('firstpublished')
+        coverage['publish_time'] = wire_item.get('publish_schedule') or wire_item.get('firstpublished')
 
     def get(self, req, lookup):
         if req.args.get('featured'):
@@ -717,8 +717,8 @@ class AgendaService(newsroom.Service):
             if not latest_delivery or not item.get('rewrite_sequence'):
                 return True
 
-            if item.get('rewrite_sequence', 0) >= latest_delivery.get('sequence_no', 0) \
-                    or item.get('firstpublished') >= latest_delivery.get('publish_time'):
+            if item.get('rewrite_sequence', 0) >= latest_delivery.get('sequence_no', 0) or \
+                    (item.get('publish_schedule') or item.get('firstpublished')) >= latest_delivery.get('publish_time'):
                 return True
 
             return False
