@@ -58,6 +58,16 @@ export function setCompany(company) {
     return {type: SET_COMPANY, company};
 }
 
+export const SET_SORT = 'SET_SORT';
+export function setSort(param) {
+    return {type: SET_SORT, param};
+}
+
+export const TOGGLE_SORT_DIRECTION = 'TOGGLE_SORT_DIRECTION';
+export function toggleSortDirection() {
+    return {type: TOGGLE_SORT_DIRECTION};
+}
+
 /**
  * Fetches users
  *
@@ -68,8 +78,10 @@ export function fetchUsers() {
         const query = getState().query || '';
         const filter = getState().company &&
             getState().company !== '' ? '&where={"company":"' + getState().company + '"}' : '';
+        const sort = !getState().sort ? '' :
+            `&sort=[("${getState().sort}", ${getState().sortDirection}), ("last_name", 1)]`;
 
-        return server.get(`/users/search?q=${query}${filter}`)
+        return server.get(`/users/search?q=${query}${filter}${sort}`)
             .then((data) => dispatch(getUsers(data)))
             .catch((error) => errorHandler(error, dispatch, setError));
     };
