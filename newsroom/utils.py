@@ -142,7 +142,7 @@ def date_short(datetime):
         return format_datetime(parse_short_date(datetime), "dd/MM/yyyy")
 
 
-def get_agenda_dates(agenda):
+def get_agenda_dates(agenda, date_paranthesis=False):
     start = agenda.get('dates', {}).get('start')
     end = agenda.get('dates', {}).get('end')
 
@@ -163,7 +163,8 @@ def get_agenda_dates(agenda):
         # start and end dates are the same
         return '{} {}'.format(time_short(start), date_short(start))
 
-    return '{} - {}, {}'.format(time_short(start), time_short(end), date_short(start))
+    return '{} - {}, {}'.format(time_short(start), time_short(end),
+                                date_short(start) if not date_paranthesis else '({})'.format(date_short(start)))
 
 
 def get_location_string(agenda):

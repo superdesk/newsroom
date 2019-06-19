@@ -3,6 +3,6 @@
 {% block content %}
 {{ message }}
 
-{% include "email_agenda.txt" %}
+{% include "email_watched_agenda.txt" %}
 
 {% endblock %}

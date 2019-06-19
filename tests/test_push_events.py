@@ -1,6 +1,6 @@
 import io
 import pytz
-from flask import json, render_template_string
+from flask import json
 from .test_push import get_signature_headers
 from .utils import post_json, get_json
 from datetime import datetime
@@ -704,8 +704,8 @@ def test_push_item_with_coverage(client, app, mocker):
 
     post_json(client, '/agenda_watch', {'items': [test_event['guid']]})
 
-    mail = mocker.patch('newsroom.agenda.email.send_email')
-    post_json(client, '/push', test_item)
+    with app.mail.record_messages() as outbox:
+        post_json(client, '/push', test_item)
 
     item = get_json(client, '/agenda/foo')
     coverages = item.get('coverages')
@@ -719,36 +719,10 @@ def test_push_item_with_coverage(client, app, mocker):
     assert wire_item['agenda_id'] == 'foo'
     assert wire_item['agenda_href'] == '/agenda/foo'
 
-    kwargs = dict(
-        agenda=item,
-        item=wire_item,
-        section='agenda'
-    )
-
-    mail.assert_called_with(
-        to=['admin@sourcefabric.org'],
-        subject='New coverage',
-        text_body=render_template_string("""
-{% extends "email_layout.txt" %}
-
-{% block content %}
-New coverage received for agenda item {{ agenda.name }}:
-
-{% include "email_item.txt" %}
-
-{% endblock %}
-        """.strip(), **kwargs),
-        html_body=render_template_string("""
-{% extends "email_layout.html" %}
-
-{% block content %}
-<p>New coverage received for agenda item {{ agenda.name }}:</p>
-
-{% include "email_item.html" %}
-
-{% endblock %}
-        """.strip(), **kwargs)
-    )
+    assert len(outbox) == 1
+    assert 'Subject: Prime minister press conference - updated' in str(outbox[0])
+    assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
+    assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
 
 
 def assign_active_company(app):
@@ -782,7 +756,8 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Event updated' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - updated' in str(outbox[0])
+    assert 'The event you have been following has been rescheduled' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -808,7 +783,8 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Event cancelled' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
+    assert 'The event you have been following has been cancelled' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -831,7 +807,11 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Planning added' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
+    assert 'The event you have been following has new coverage(s)' in str(outbox[0])
+    assert '! Text coverage \'Vivid Text Explainer\' due' in str(outbox[0])
+    assert '! Picture coverage \'Vivid Photos\' due' in str(outbox[0])
+
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -857,7 +837,9 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Planning cancelled' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
+    assert '! Text coverage \'Vivid Text Explainer\' has been cancelled. Note: ed note here' in str(outbox[0])
+    assert '! Picture coverage \'Vivid Photos\' has been cancelled. Note: ed note here' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -904,7 +886,8 @@ def test_watched_event_sends_notification_for_added_coverage(client, app, mocker
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Coverage added' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
+    assert '! Video coverage \'Vivid planning item\' due' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1

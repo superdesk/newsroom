@@ -5,7 +5,7 @@ from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
 from flask import json, abort, url_for, current_app as app
 from flask_babel import gettext
-from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE
+from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE, WORKFLOW_STATE
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk import get_resource_service
@@ -18,7 +18,7 @@ from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
 from newsroom.template_filters import is_admin_or_internal, is_admin
-from newsroom.utils import get_user_dict, get_company_dict
+from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404
 from newsroom.wire.search import query_string, set_product_query, \
     planning_items_query_string, nested_query
 from newsroom.wire.utils import get_local_date, get_end_date
@@ -752,13 +752,15 @@ class AgendaService(newsroom.Service):
                     coverage['delivery_id'] = wire_item['guid']
                     coverage['delivery_href'] = url_for_wire(None, _external=False, section='wire.item',
                                                              _id=wire_item['guid'])
+                    coverage['workflow_status'] = ASSIGNMENT_WORKFLOW_STATE.COMPLETED
                     self.system_update(item['_id'], {'coverages': coverages}, item)
+                    updated_agenda = get_entity_or_404(item.get('_id'), 'agenda')
 
                     # Notify agenda to update itself with new details of coverage
                     self.enhance_coverage_with_wire_details(coverage, wire_item)
                     push_notification('new_item', _items=[item])
 
-                    self.notify_new_coverage(item, wire_item)
+                    self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, coverage)
                     break
         return agenda_items
 
@@ -770,26 +772,155 @@ class AgendaService(newsroom.Service):
             user = user_dict[str(user_id)]
             send_coverage_notification_email(user, agenda, wire_item)
 
-    def notify_agenda_update(self, update, agenda, events_only=False):
-        if agenda:
+    def notify_agenda_update(self, update_agenda, original_agenda, item=None, events_only=False,
+                             related_planning_removed=None, coverage_updated=None):
+        agenda = deepcopy(update_agenda)
+        if agenda and original_agenda.get('state') != WORKFLOW_STATE.KILLED:
             user_dict = get_user_dict()
             company_dict = get_company_dict()
-            notify_user_ids = filter_active_users(agenda.get('watches', []), user_dict, company_dict, events_only)
+            notify_user_ids = filter_active_users(original_agenda.get('watches', []),
+                                                  user_dict,
+                                                  company_dict,
+                                                  events_only)
             users = [user_dict[str(user_id)] for user_id in notify_user_ids]
-            for user in users:
-                app.data.insert('notifications', [{
-                    'item': agenda['_id'],
-                    'user': user['_id']
-                }])
-                send_agenda_notification_email(
-                    user,
-                    agenda,
-                    agenda_notifications[update]['message'],
-                    agenda_notifications[update]['subject'],
-                )
+            # Only one push-notification
             push_notification('agenda_update',
                               item=agenda,
                               users=notify_user_ids)
+
+            if len(notify_user_ids) == 0:
+                return
+
+            def get_detailed_coverage(cov):
+                plan = next((p for p in (agenda.get('planning_items') or []) if p['guid'] == cov.get('planning_id')),
+                            None)
+                if plan and plan.get('state') != WORKFLOW_STATE.KILLED:
+                    return next((c for c in (plan.get('coverages') or [])
+                                 if c.get('coverage_id') == cov.get('coverage_id')), None)
+                return cov
+
+            def fill_all_coverages(skip_coverages=[], cancelled=False, use_original_agenda=False):
+                fill_list = coverage_updates['unaltered_coverages'] if not cancelled else \
+                        coverage_updates['cancelled_coverages']
+                for coverage in (agenda if not use_original_agenda else original_agenda).get('coverages') or []:
+                    if not next((s for s in skip_coverages if s.get('coverage_id') == coverage.get('coverage_id')),
+                                None):
+                        detailed_coverage = get_detailed_coverage(coverage)
+                        if detailed_coverage:
+                            fill_list.append(detailed_coverage)
+
+            coverage_updates = {
+                'modified_coverages': [],
+                'cancelled_coverages': [],
+                'unaltered_coverages': []
+            }
+
+            time_updated = False
+            state_changed = False
+            coverage_modified = False
+
+            # Send notification for only these state changes
+            notify_states = [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED,
+                             WORKFLOW_STATE.KILLED, WORKFLOW_STATE.SCHEDULED]
+
+            if not related_planning_removed:
+                # Send notification if time got updated
+                if original_agenda.get('dates') and agenda.get('dates'):
+                    time_updated = (original_agenda.get('dates') or {}).get('start').replace(tzinfo=None) != \
+                                   (agenda.get('dates') or {}).get('start').replace(tzinfo=None) or \
+                        (original_agenda.get('dates') or {}).get('end').replace(tzinfo=None) != \
+                        (agenda.get('dates') or {}).get('end').replace(tzinfo=None)
+
+                if agenda.get('state') and agenda.get('state') != original_agenda.get('state'):
+                    state_changed = agenda.get('state') in notify_states
+
+                if not state_changed:
+                    if time_updated:
+                        fill_all_coverages()
+                    else:
+                        for coverage in agenda.get('coverages') or []:
+                            existing_coverage = next((c for c in original_agenda.get('coverages') or []
+                                                      if c['coverage_id'] == coverage['coverage_id']), None)
+                            detailed_coverage = get_detailed_coverage(coverage)
+                            if detailed_coverage:
+                                if not existing_coverage:
+                                    if coverage['workflow_status'] != WORKFLOW_STATE.CANCELLED:
+                                        coverage_updates['modified_coverages'].append(detailed_coverage)
+                                elif coverage.get('workflow_status') == WORKFLOW_STATE.CANCELLED and \
+                                        existing_coverage.get('workflow_status') != coverage.get('workflow_status'):
+                                    coverage_updates['cancelled_coverages'].append(detailed_coverage)
+                                elif coverage.get('delivery_state') != existing_coverage.get('delivery_state') and \
+                                        coverage.get('delivery_state') == 'published':
+                                    # Coverage was completed / updated
+                                    coverage_updates['modified_coverages'].append(detailed_coverage)
+                                elif existing_coverage.get('scheduled') != coverage.get('scheduled'):
+                                    coverage_updates['modified_coverages'].append(detailed_coverage)
+                                elif detailed_coverage['coverage_id'] != (coverage_updated or {}).get('coverage_id'):
+                                    coverage_updates['unaltered_coverages'].append(detailed_coverage)
+
+                        # Check for removed coverages - show it as cancelled
+                        if item and item.get('type') == 'planning':
+                            for original_cov in original_agenda.get('coverages') or []:
+                                updated_cov = next((c for c in (agenda.get('coverages') or [])
+                                                    if c.get('coverage_id') == original_cov.get('coverage_id')), None)
+                                if not updated_cov:
+                                    coverage_updates['cancelled_coverages'].append(original_cov)
+                else:
+                    fill_all_coverages(cancelled=False if agenda.get('state') == WORKFLOW_STATE.SCHEDULED else True,
+                                       use_original_agenda=True)
+            else:
+                fill_all_coverages(related_planning_removed.get('coverages') or [])
+                # Add removed coverages:
+                for coverage in related_planning_removed.get('coverages') or []:
+                    detailed_coverage = get_detailed_coverage(coverage)
+                    if detailed_coverage:
+                        coverage_updates['cancelled_coverages'].append(detailed_coverage)
+
+            if len(coverage_updates['modified_coverages']) > 0 or len(coverage_updates['cancelled_coverages']) > 0:
+                coverage_modified = True
+
+            if coverage_updated or related_planning_removed or time_updated or state_changed or coverage_modified:
+                agenda['name'] = agenda.get('name', original_agenda.get('name'))
+                agenda['definition_short'] = agenda.get('definition_short', original_agenda.get('definition_short'))
+                agenda['ednote'] = agenda.get('ednote', original_agenda.get('ednote'))
+                agenda['state_reason'] = agenda.get('state_reason', original_agenda.get('state_reason'))
+                subject = '{} -{} updated'.format(agenda['name'] or agenda['definition_short'],
+                                                  ' Coverage' if coverage_modified else '')
+                action = 'been updated'
+                if state_changed:
+                    action = 'been {}.'.format(agenda.get('state') if agenda.get('state') != WORKFLOW_STATE.KILLED else
+                                               'removed from the Agenda calendar')
+
+                if len(coverage_updates['modified_coverages']) > 0 and \
+                        len(coverage_updates['cancelled_coverages']) == 0:
+                    action = 'new coverage(s)'
+
+                message = 'The {} you have been following has {}'.format(
+                    'event' if agenda.get('event') else 'coverage plan', action
+                )
+                if agenda.get('state_reason'):
+                    reason_prefix = agenda.get('state_reason').find(':')
+                    if reason_prefix > 0:
+                        message = '{}, {}'.format(
+                                message, agenda['state_reason'][(reason_prefix+1):len(agenda['state_reason'])])
+
+                # Send notifications to users
+                for user in users:
+                    app.data.insert('notifications', [{
+                        'item': agenda.get('_id'),
+                        'user': user['_id']
+                    }])
+
+                    send_agenda_notification_email(
+                        user,
+                        agenda,
+                        message,
+                        subject,
+                        original_agenda,
+                        coverage_updates,
+                        related_planning_removed,
+                        coverage_updated,
+                    )
 
     def get_saved_items_count(self):
         query = _agenda_query()
