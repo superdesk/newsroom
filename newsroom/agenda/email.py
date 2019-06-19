@@ -22,16 +22,21 @@ def send_coverage_notification_email(user, agenda, wire_item):
         )
 
 
-def send_agenda_notification_email(user, agenda, message, subject):
+def send_agenda_notification_email(user, agenda, message, subject, original_agenda, coverage_updates,
+                                   related_planning_removed, coverage_updated):
     if agenda and user.get('receive_email'):
         kwargs = dict(
             message=message,
-            item=agenda,
-            dateString=get_agenda_dates(agenda),
+            agenda=agenda,
+            dateString=get_agenda_dates(agenda if agenda.get('dates') else original_agenda, date_paranthesis=True),
             location=get_location_string(agenda),
             contacts=get_public_contacts(agenda),
             links=get_links(agenda),
             is_admin=is_admin_or_internal(user),
+            original_agenda=original_agenda,
+            coverage_updates=coverage_updates,
+            related_planning_removed=related_planning_removed,
+            coverage_updated=coverage_updated,
         )
         send_email(
             to=[user['email']],
