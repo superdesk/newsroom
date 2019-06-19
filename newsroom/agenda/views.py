@@ -13,7 +13,7 @@ from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.auth import get_user
 from newsroom.decorator import login_required
 from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, \
-    get_agenda_dates, get_location_string, get_public_contacts, get_links
+    get_agenda_dates, get_location_string, get_public_contacts, get_links, get_vocabulary
 from newsroom.wire.utils import update_action_list
 from newsroom.agenda.email import send_coverage_request_email
 from newsroom.companies import section, get_user_company
@@ -106,7 +106,8 @@ def get_view_data():
                                                   product_type='agenda',
                                                   events_only=company.get('events_only', False)),
         'saved_items': get_resource_service('agenda').get_saved_items_count(),
-        'events_only': company.get('events_only', False)
+        'events_only': company.get('events_only', False),
+        'locators': get_vocabulary('locators')
     }
 
 

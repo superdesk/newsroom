@@ -642,3 +642,41 @@ export function getListItems(groups, itemsById) {
 export function isCoverageBeingUpdated(coverage) {
     return get(coverage, 'deliveries[0].delivery_state', null) && coverage.deliveries[0].delivery_state !== 'published';
 }
+
+export const groupRegions = (filter, aggregations, props) => {
+    if (props.locators && Object.keys(props.locators).length > 0) {
+        const bucketDetailed = aggregations[filter.field].buckets.map((b) => (
+            props.locators[b.key] ? ({
+                ...b,
+                ...props.locators[b.key]
+            }) : b));
+
+        const withState = bucketDetailed.filter((l) => l.state).map((l) => ({...l, 'label': `${l.name} - ${l.state}`}));
+        const withCountry = bucketDetailed.filter((l) => !l.state && l.country).map(
+            (l) => ({...l, 'label': `${l.name} - ${l.country}`}));
+        const worldRegions = bucketDetailed.filter((l) => !l.state && !l.country && l.world_region).map(
+            (l) => ({...l, 'label': `${l.name} - ${l.world_region}`}));
+        const separator = { 'key': 'divider'};
+        let regions = [...withState];
+
+        if (withCountry.length > 0) {
+            if (regions.length > 0) {
+                regions.push(separator);
+            }
+            regions = [...regions, ...withCountry];
+        }
+
+        if (worldRegions.length > 0) {
+            if (regions.length > 0) {
+                regions.push(separator);
+            }
+            regions = [...regions, ...worldRegions];
+        }
+
+        return sortBy(regions, 'label');
+    }
+
+    return aggregations[filter.field].buckets;
+};
+
+export const getRegionName = (key, locator) => locator.label || key;

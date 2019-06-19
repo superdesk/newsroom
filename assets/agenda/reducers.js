@@ -216,7 +216,8 @@ export default function agendaReducer(state = initialState, action) {
             detail: !!openItem,
             agenda,
             savedItemsCount: action.agendaData.saved_items || null,
-            userSections: action.agendaData.userSections || {}
+            userSections: action.agendaData.userSections || {},
+            locators: action.agendaData.locators || null,
         };
     }
 
