@@ -651,29 +651,29 @@ export const groupRegions = (filter, aggregations, props) => {
                 ...props.locators[b.key]
             }) : b));
 
-        const withState = bucketDetailed.filter((l) => l.state).map((l) => ({...l, 'label': `${l.name} - ${l.state}`}));
+        const withState = bucketDetailed.filter((l) => l.state).map((l) => ({...l, 'label': l.state}));
         const withCountry = bucketDetailed.filter((l) => !l.state && l.country).map(
-            (l) => ({...l, 'label': `${l.name} - ${l.country}`}));
+            (l) => ({...l, 'label': l.country}));
         const worldRegions = bucketDetailed.filter((l) => !l.state && !l.country && l.world_region).map(
-            (l) => ({...l, 'label': `${l.name} - ${l.world_region}`}));
+            (l) => ({...l, 'label': l.world_region}));
         const separator = { 'key': 'divider'};
-        let regions = [...withState];
+        let regions = sortBy(withState, 'label');
 
         if (withCountry.length > 0) {
             if (regions.length > 0) {
                 regions.push(separator);
             }
-            regions = [...regions, ...withCountry];
+            regions = [...regions, ...sortBy(withCountry, 'label')];
         }
 
         if (worldRegions.length > 0) {
             if (regions.length > 0) {
                 regions.push(separator);
             }
-            regions = [...regions, ...worldRegions];
+            regions = [...regions, ...sortBy(worldRegions, 'label')];
         }
 
-        return sortBy(regions, 'label');
+        return regions;
     }
 
     return aggregations[filter.field].buckets;
