@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {get} from 'lodash';
 import {gettext} from 'utils';
 import AgendaTypeAheadFilter from './AgendaTypeAheadFilter';
 import DropdownFilter from '../../components/DropdownFilter';
@@ -35,6 +36,18 @@ const filters = [{
     transformBuckets: groupRegions,
     notSorted: true,
     transform: getRegionName,
+    getFilterLabel: (filter, activeFilter, isActive, props) => {
+        if (!isActive) {
+            return filter.label;
+        }
+
+        let region;
+        if (get(activeFilter, `${filter.field}[0]`) && props.locators) {
+            region = (Object.values(props.locators) || []).find((l) => l.name === get(activeFilter, `${filter.field}[0]`));
+        }
+
+        return region ? (get(region, 'state') || get(region, 'country') || get(region, 'world_region')) : get(activeFilter, `${filter.field}[0]`);
+    }
 }, {
     label: gettext('Any coverage type'),
     field: 'coverage',
@@ -77,6 +90,7 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAcce
                 activeFilter={activeFilter}
                 getDropdownItems={getDropdownItems}
                 locators={locators}
+                getFilterLabel={filter.getFilterLabel}
             />
         ))}
         {!eventsOnlyAccess && !eventsOnlyView &&

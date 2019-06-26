@@ -21,6 +21,7 @@ function DropdownFilter({aggregations, filter, toggleFilter, activeFilter, getDr
             filter={filter}
             activeFilter={activeFilter}
             getFilterLabel={getFilterLabel}
+            {...props}
         />
         <div className='dropdown-menu' aria-labelledby={filter.field}>
             <button
