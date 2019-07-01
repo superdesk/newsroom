@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { gettext, shortDate, isInPast } from 'utils';
 import { getCountryLabel } from '../utils';
 
 function CompanyListItem({company, type, isActive, onClick}) {
     return (
         <tr key={company._id}
-            className={isActive?'table--selected':null}
+            className={classNames({'table--selected': isActive, 'table-secondary': !company.is_enabled})}
             onClick={() => onClick(company._id)}>
             <td className="name">{company.name}</td>
             <td className="type">{type ? gettext(type.name) : ''}</td>
