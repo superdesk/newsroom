@@ -452,7 +452,7 @@ def get_coverages(planning_items, original_coverages=[]):
                     'delivery_id': d.get('item_id'),
                     'delivery_href': url_for_wire(None, _external=False, section='wire.item', _id=d.get('item_id')),
                     'delivery_state': d.get('item_state'),
-                    'sequence_no': d.get('sequence_no', 0),
+                    'sequence_no': d.get('sequence_no') or 0,
                     'publish_time': parse_date_str(d.get('publish_time'))
                 })
         else:
