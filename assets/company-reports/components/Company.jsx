@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import { gettext, formatDate } from 'utils';
 import { get, groupBy } from 'lodash';
 import ReportsTable from './ReportsTable';
@@ -59,17 +58,17 @@ function Company({results, print}) {
             <td>{formatDate(get(item, 'company._created'))}</td>
             <td>{get(item, 'company.expiry_date') ? formatDate(item.company.expiry_date) : gettext('Unspecified')}</td>
         </tr>,
-        <tr key={`${item._id}-contact`} className={classNames({'table-secondary': !item.is_enabled})}>
+        <tr key={`${item._id}-contact`}>
             <td colSpan="4">
                 {getContactDetails(item.company)}
             </td>
         </tr>,
-        <tr key={`${item._id}-users`} className={classNames({'table-secondary': !item.is_enabled})}>
+        <tr key={`${item._id}-users`}>
             <td colSpan="5">
                 {getUsers(item.users)}
             </td>
         </tr>,
-        <tr key={`${item._id}-products`} className={classNames({'table-secondary': !item.is_enabled})}>
+        <tr key={`${item._id}-products`}>
             <td colSpan="5">
                 {getProductDetails(item.products)}
             </td>
