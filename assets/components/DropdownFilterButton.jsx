@@ -7,7 +7,7 @@ const getActiveFilterLabel = (filter, activeFilter, isActive) => {
     return isActive ? activeFilter[filter.field][0] : gettext(filter.label);
 };
 
-function DropdownFilterButton({filter, activeFilter, autoToggle, onClick, getFilterLabel}) {
+function DropdownFilterButton({filter, activeFilter, autoToggle, onClick, getFilterLabel, ...props}) {
     const isActive = activeFilter[filter.field];
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
     return (<button
@@ -20,7 +20,7 @@ function DropdownFilterButton({filter, activeFilter, autoToggle, onClick, getFil
         aria-expanded='false'
         onClick={onClick} >
         <i className={`${filter.icon} d-sm-none`}></i>
-        <span className='d-none d-sm-block'>{filterLabel(filter, activeFilter, isActive)}</span>
+        <span className='d-none d-sm-block'>{filterLabel(filter, activeFilter, isActive, {...props})}</span>
         <i className={classNames('icon-small--arrow-down ml-1', {'icon--white': isActive})}></i>
     </button>);
 }
