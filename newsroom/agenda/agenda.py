@@ -719,7 +719,7 @@ class AgendaService(newsroom.Service):
             if not latest_delivery or not item.get('rewrite_sequence'):
                 return True
 
-            if item.get('rewrite_sequence', 0) >= latest_delivery.get('sequence_no', 0) or \
+            if (item.get('rewrite_sequence') or 0) >= latest_delivery.get('sequence_no', 0) or \
                     (item.get('publish_schedule') or item.get('firstpublished')) >= latest_delivery.get('publish_time'):
                 return True
 
