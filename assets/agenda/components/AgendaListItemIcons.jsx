@@ -16,6 +16,7 @@ import {
     getCoverageDisplayName,
     getAttachments,
     isCoverageBeingUpdated,
+    getCoverageStatusText,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -32,12 +33,13 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
     const getCoverageTootip = (coverage, beingUpdated) => {
         let slugline = coverage.item_slugline || coverage.slugline;
 
-        slugline =  gettext('coverage{{slugline}}', {slugline: slugline ? ` '${slugline}'` : ''}) ;
+        slugline =  gettext(' coverage{{slugline}}', {slugline: slugline ? ` '${slugline}'` : ''}) ;
 
         if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
-            return gettext('Planned {{ type }} {{ slugline }}', {
+            return gettext('{{ type }}{{ slugline }} {{ status_text }}', { 
                 type: getCoverageDisplayName(coverage.coverage_type),
                 slugline: slugline,
+                status_text: getCoverageStatusText(coverage)
             });
         }
 

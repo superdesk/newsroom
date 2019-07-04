@@ -645,32 +645,15 @@ export function isCoverageBeingUpdated(coverage) {
 
 export const groupRegions = (filter, aggregations, props) => {
     if (props.locators && Object.keys(props.locators).length > 0) {
-        const bucketDetailed = aggregations[filter.field].buckets.map((b) => (
-            props.locators[b.key] ? ({
-                ...b,
-                ...props.locators[b.key]
-            }) : b));
-
-        const withState = bucketDetailed.filter((l) => l.state).map((l) => ({...l, 'label': l.state}));
-        const withCountry = bucketDetailed.filter((l) => !l.state && l.country).map(
-            (l) => ({...l, 'label': l.country}));
-        const worldRegions = bucketDetailed.filter((l) => !l.state && !l.country && l.world_region).map(
-            (l) => ({...l, 'label': l.world_region}));
+        let regions = sortBy(props.locators.filter((l) => l.state).map((l) => ({...l, 'key': l.name, 'label': l.state})), 'label');
+        const others = props.locators.filter((l) => !l.state).map((l) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
         const separator = { 'key': 'divider'};
-        let regions = sortBy(withState, 'label');
 
-        if (withCountry.length > 0) {
+        if (others.length > 0) {
             if (regions.length > 0) {
                 regions.push(separator);
             }
-            regions = [...regions, ...sortBy(withCountry, 'label')];
-        }
-
-        if (worldRegions.length > 0) {
-            if (regions.length > 0) {
-                regions.push(separator);
-            }
-            regions = [...regions, ...sortBy(worldRegions, 'label')];
+            regions = [...regions, ...sortBy(others, 'label')];
         }
 
         return regions;
