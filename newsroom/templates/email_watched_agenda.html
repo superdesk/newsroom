@@ -1,4 +1,3 @@
-{% set time_updated = (original_agenda.get('dates') or {}).get('start').replace(tzinfo=None) != (agenda.get('dates') or {}).get('start').replace(tzinfo=None) or (original_agenda.get('dates') or {}).get('end').replace(tzinfo=None) != (agenda.get('dates') or {}).get('end').replace(tzinfo=None) %}
 <h1>{{ agenda.name or agenda.definition_short }}</h1>
 <a href="{{ url_for_agenda(agenda) }}">{{ url_for_agenda(agenda) }}</a>
 <div>

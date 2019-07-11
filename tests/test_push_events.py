@@ -838,8 +838,8 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
 
     assert len(outbox) == 1
     assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
-    assert '! Text coverage \'Vivid Text Explainer\' has been cancelled. Note: ed note here' in str(outbox[0])
-    assert '! Picture coverage \'Vivid Photos\' has been cancelled. Note: ed note here' in str(outbox[0])
+    assert '! Text coverage \'Vivid Text Explainer\' has been cancelled.\r\nNote: ed note here' in str(outbox[0])
+    assert '! Picture coverage \'Vivid Photos\' has been cancelled.\r\nNote: ed note here' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1

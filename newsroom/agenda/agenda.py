@@ -922,6 +922,7 @@ class AgendaService(newsroom.Service):
                         coverage_updates,
                         related_planning_removed,
                         coverage_updated,
+                        time_updated,
                     )
 
     def get_saved_items_count(self):
