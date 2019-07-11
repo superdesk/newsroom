@@ -815,6 +815,7 @@ class AgendaService(newsroom.Service):
                 'unaltered_coverages': []
             }
 
+            only_new_coverages = True
             time_updated = False
             state_changed = False
             coverage_modified = False
@@ -849,12 +850,13 @@ class AgendaService(newsroom.Service):
                                 elif coverage.get('workflow_status') == WORKFLOW_STATE.CANCELLED and \
                                         existing_coverage.get('workflow_status') != coverage.get('workflow_status'):
                                     coverage_updates['cancelled_coverages'].append(detailed_coverage)
-                                elif coverage.get('delivery_state') != existing_coverage.get('delivery_state') and \
-                                        coverage.get('delivery_state') == 'published':
-                                    # Coverage was completed / updated
+                                elif (coverage.get('delivery_state') != existing_coverage.get('delivery_state') and
+                                        coverage.get('delivery_state') == 'published') or \
+                                    (coverage.get('workflow_status') != existing_coverage.get('workflow_status') and
+                                        coverage.get('workflow_status') == 'completed') or \
+                                        (existing_coverage.get('scheduled') != coverage.get('scheduled')):
                                     coverage_updates['modified_coverages'].append(detailed_coverage)
-                                elif existing_coverage.get('scheduled') != coverage.get('scheduled'):
-                                    coverage_updates['modified_coverages'].append(detailed_coverage)
+                                    only_new_coverages = False
                                 elif detailed_coverage['coverage_id'] != (coverage_updated or {}).get('coverage_id'):
                                     coverage_updates['unaltered_coverages'].append(detailed_coverage)
 
@@ -886,14 +888,14 @@ class AgendaService(newsroom.Service):
                 agenda['state_reason'] = agenda.get('state_reason', original_agenda.get('state_reason'))
                 subject = '{} -{} updated'.format(agenda['name'] or agenda['definition_short'],
                                                   ' Coverage' if coverage_modified else '')
-                action = 'been updated'
+                action = 'been updated.'
                 if state_changed:
                     action = 'been {}.'.format(agenda.get('state') if agenda.get('state') != WORKFLOW_STATE.KILLED else
                                                'removed from the Agenda calendar')
 
-                if len(coverage_updates['modified_coverages']) > 0 and \
+                if len(coverage_updates['modified_coverages']) > 0 and only_new_coverages and \
                         len(coverage_updates['cancelled_coverages']) == 0:
-                    action = 'new coverage(s)'
+                    action = 'new coverage(s).'
 
                 message = 'The {} you have been following has {}'.format(
                     'event' if agenda.get('event') else 'coverage plan', action

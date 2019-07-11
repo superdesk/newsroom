@@ -163,8 +163,10 @@ def get_agenda_dates(agenda, date_paranthesis=False):
         # start and end dates are the same
         return '{} {}'.format(time_short(start), date_short(start))
 
-    return '{} - {}, {}'.format(time_short(start), time_short(end),
-                                date_short(start) if not date_paranthesis else '({})'.format(date_short(start)))
+    if date_paranthesis:
+        return '{} - {} ({})'.format(time_short(start), time_short(end), date_short(start))
+
+    return '{} - {}, {}'.format(time_short(start), time_short(end), date_short(start))
 
 
 def get_location_string(agenda):

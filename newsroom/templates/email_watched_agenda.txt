@@ -1,9 +1,19 @@
-{{ agenda.name or agenda.definition_short }}
+{% set time_updated = (original_agenda.get('dates') or {}).get('start').replace(tzinfo=None) != (agenda.get('dates') or {}).get('start').replace(tzinfo=None) or (original_agenda.get('dates') or {}).get('end').replace(tzinfo=None) != (agenda.get('dates') or {}).get('end').replace(tzinfo=None) %}{{ agenda.name or agenda.definition_short }}
+
 {{ url_for_agenda(agenda) }}
-{{ dateString }}{% if agenda.definition_short %} - {{ agenda.definition_short }}{% endif %}
+
+{% if time_updated %}! {% endif %}{{ dateString }}{% if agenda.definition_short %} - {{ agenda.definition_short }}{% endif %}
 {% if agenda.ednote %}Note: {{ agenda.ednote }}{% endif %}
-{% if coverage_updated %}! {{ get_coverage_email_text(coverage_updated) }}{% endif %}
-{% for cov in coverage_updates.cancelled_coverages %}! {{ get_coverage_email_text(cov, 'has been cancelled.') }}{% if is_admin and cov.get('planning', {}).get('ednote') %} Note: {{ cov['planning']['ednote'] }}{% endif %}
-{% endfor %}{% for cov in coverage_updates.modified_coverages %}! {{ get_coverage_email_text(cov) }}{% if is_admin and cov.get('planning', {}).get('ednote') %} Note: {{ cov['planning']['ednote'] }}{% endif %}
-{% endfor %}{% for cov in coverage_updates.unaltered_coverages %}{{ get_coverage_email_text(cov) }}{% if is_admin and cov.get('planning', {}).get('ednote') %} Note: {{ cov['planning']['ednote'] }}{% endif %}
+
+{% if coverage_updated %}! {{ get_coverage_email_text(coverage_updated) }}{% if is_admin and cov.get('planning', {}).get('ednote') %}
+Note: {{ cov['planning']['ednote'] }}{% endif %}{% endif %}
+{% for cov in coverage_updates.cancelled_coverages %}! {{ get_coverage_email_text(cov, 'has been cancelled.') }}{% if is_admin and cov.get('planning', {}).get('ednote') %}
+Note: {{ cov['planning']['ednote'] }}{% endif %}
+
+{% endfor %}{% for cov in coverage_updates.modified_coverages %}! {{ get_coverage_email_text(cov) }}{% if is_admin and cov.get('planning', {}).get('ednote') %}
+Note: {{ cov['planning']['ednote'] }}{% endif %}
+
+{% endfor %}{% for cov in coverage_updates.unaltered_coverages %}{{ get_coverage_email_text(cov) }}{% if is_admin and cov.get('planning', {}).get('ednote') %}
+Note: {{ cov['planning']['ednote'] }}{% endif %}
+
 {% endfor %}

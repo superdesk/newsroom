@@ -84,7 +84,8 @@ def get_coverage_status_text(coverage):
         return 'has been cancelled.'
 
     if coverage.get('workflow_status') == WORKFLOW_STATE.DRAFT:
-        return 'due at {}.'.format(get_date(coverage.get('scheduled')))
+        return 'due at {}.'.format(get_date(coverage.get('scheduled') or
+                                            (coverage.get('planning') or {}).get('scheduled')))
 
     if coverage.get('workflow_status') == ASSIGNMENT_WORKFLOW_STATE.ASSIGNED:
         return 'expected at {}.'.format(get_date(coverage.get('scheduled')))
