@@ -422,7 +422,8 @@ def set_agenda_planning_items(agenda, orig_agenda, planning_item, action='add'):
                                                           orig_agenda.get('coverages') or [],
                                                           planning_item if action == 'add' else None)
 
-    if action != 'remove' and (coverage_changes.get('coverage_added') or coverage_changes.get('coverage_cancelled')):
+    if action != 'remove' and (coverage_changes.get('coverage_added') or coverage_changes.get('coverage_cancelled') or
+                               coverage_changes.get('coverage_modified')):
         superdesk.get_resource_service('agenda').notify_agenda_update(agenda, orig_agenda, planning_item, True)
 
     agenda['display_dates'] = get_display_dates(agenda['dates'], agenda['planning_items'])
@@ -513,10 +514,17 @@ def get_coverages(planning_items, original_coverages, new_plan):
 
                 if ((coverage and not existing_coverage) or ((new_plan or {}).get('_id')) == planning_item.get('_id')):
                     coverage_changes['coverage_added'] = True
+                else:
+                    if coverage['workflow_status'] != existing_coverage['workflow_status']:
+                        if coverage.get('workflow_status') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.DRAFT]:
+                            coverage_changes['coverage_cancelled'] = True
 
-                if existing_coverage and coverage['workflow_status'] != existing_coverage['workflow_status'] and \
-                        coverage.get('workflow_status') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.DRAFT]:
-                    coverage_changes['coverage_cancelled'] = True
+                        if new_coverage.get('workflow_status') == 'completed':
+                            coverage_changes['coverage_modified'] = True
+
+                    if existing_coverage.get('scheduled') != new_coverage.get('scheduled') and \
+                            existing_coverage.get('workflow_status') != 'completed':
+                        coverage_changes['coverage_modified'] = True
 
     if len(original_coverages or []) > len(coverages):
         coverage_changes['coverage_cancelled'] = True

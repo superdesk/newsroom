@@ -23,7 +23,7 @@ def send_coverage_notification_email(user, agenda, wire_item):
 
 
 def send_agenda_notification_email(user, agenda, message, subject, original_agenda, coverage_updates,
-                                   related_planning_removed, coverage_updated):
+                                   related_planning_removed, coverage_updated, time_updated):
     if agenda and user.get('receive_email'):
         kwargs = dict(
             message=message,
@@ -37,6 +37,7 @@ def send_agenda_notification_email(user, agenda, message, subject, original_agen
             coverage_updates=coverage_updates,
             related_planning_removed=related_planning_removed,
             coverage_updated=coverage_updated,
+            time_updated=time_updated,
         )
         send_email(
             to=[user['email']],
