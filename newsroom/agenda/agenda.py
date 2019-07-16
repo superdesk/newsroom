@@ -903,7 +903,7 @@ class AgendaService(newsroom.Service):
                 if agenda.get('state_reason'):
                     reason_prefix = agenda.get('state_reason').find(':')
                     if reason_prefix > 0:
-                        message = '{}, {}'.format(
+                        message = '{} {}'.format(
                                 message, agenda['state_reason'][(reason_prefix+1):len(agenda['state_reason'])])
 
                 # Send notifications to users
