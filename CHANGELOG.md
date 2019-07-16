@@ -1,6 +1,7 @@
 # Newsroom Changelog
 
-## [1.13] 2019-07-15
+## [1.13] 2019-07-16
+- [SDAN-529] Fix incorrect coverage scheduled date in Agenda notification email
 - [SDAN-514] Changes to Watched Agenda Emails (#808)
 - [SDAN-526] Draft coverage tooltip change and display all regions in filter if vocabulary is present (#807)
 - [SDAN-527] null delivery sequence_no in coverage was causing push error
