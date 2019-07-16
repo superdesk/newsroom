@@ -76,6 +76,10 @@ def get_latest_available_delivery(coverage):
     return next((d for d in (coverage.get('deliveries') or []) if d.get('delivery_state') == 'published'), None)
 
 
+def get_coverage_scheduled(coverage):
+    return coverage.get('scheduled') or (coverage.get('planning') or {}).get('scheduled')
+
+
 def get_coverage_status_text(coverage):
     def get_date(datetime_str):
         return format_datetime(parse_date(datetime_str), 'HH:mm (dd/MM/yyyy)')
@@ -84,14 +88,13 @@ def get_coverage_status_text(coverage):
         return 'has been cancelled.'
 
     if coverage.get('workflow_status') == WORKFLOW_STATE.DRAFT:
-        return 'due at {}.'.format(get_date(coverage.get('scheduled') or
-                                            (coverage.get('planning') or {}).get('scheduled')))
+        return 'due at {}.'.format(get_date(get_coverage_scheduled(coverage)))
 
     if coverage.get('workflow_status') == ASSIGNMENT_WORKFLOW_STATE.ASSIGNED:
-        return 'expected at {}.'.format(get_date(coverage.get('scheduled')))
+        return 'expected at {}.'.format(get_date(get_coverage_scheduled(coverage)))
 
     if coverage.get('workflow_status') == WORKFLOW_STATE.ACTIVE:
-        return 'in progress at {}.'.format(get_date(coverage.get('scheduled')))
+        return 'in progress at {}.'.format(get_date(get_coverage_scheduled(coverage)))
 
     if coverage.get('workflow_status') == ASSIGNMENT_WORKFLOW_STATE.COMPLETED:
         return '{}{}.'.format('updated' if len(coverage.get('deliveries') or []) > 1 else 'available',
