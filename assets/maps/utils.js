@@ -167,3 +167,7 @@ export function getMapSource(locations, scale = 1) {
 
     return src;
 }
+
+export function shouldRenderLocation(item) {
+    return !isEmpty(mapsKey()) && !isEmpty(getLocations(item));
+}
