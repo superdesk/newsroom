@@ -1,5 +1,8 @@
 # Newsroom Changelog
 
+## [1.13.1] 2019-07-18
+- [SDAN-532] Fetch card external item details after loading the page (#812)
+
 ## [1.13] 2019-07-16
 - [SDAN-529] Fix incorrect coverage scheduled date in Agenda notification email
 - [SDAN-514] Changes to Watched Agenda Emails (#808)
