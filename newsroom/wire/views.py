@@ -31,6 +31,7 @@ from newsroom.template_filters import is_admin_or_internal
 from .search import get_bookmarks_count
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
+HOME_EXTERNAL_ITEMS_CACHE_KEY = 'home_external_items'
 
 
 def get_services(user):
@@ -81,7 +82,9 @@ def get_items_by_card(cards):
             items_by_card[card['label']] = superdesk.get_resource_service('wire_search').\
                 get_product_items(ObjectId(card['config']['product']), card['config']['size'])
         elif card['type'] == '4-photo-gallery':
-            items_by_card[card['label']] = app.get_media_cards_external(card)
+            # Omit external media, let the client manually request these
+            # using '/media_card_external' endpoint
+            items_by_card[card['label']] = None
 
     app.cache.set(HOME_ITEMS_CACHE_KEY, items_by_card, timeout=300)
     return items_by_card
@@ -119,6 +122,21 @@ def get_previous_versions(item):
 @login_required
 def index():
     return flask.render_template('home.html', data=get_home_data())
+
+
+@blueprint.route('/media_card_external/<card_id>')
+@login_required
+def get_media_card_external(card_id):
+    cache_id = '{}_{}'.format(HOME_EXTERNAL_ITEMS_CACHE_KEY, card_id)
+
+    if app.cache.get(cache_id):
+        card_items = app.cache.get(cache_id)
+    else:
+        card = get_entity_or_404(card_id, 'cards')
+        card_items = app.get_media_cards_external(card)
+        app.cache.set(cache_id, card_items, timeout=300)
+
+    return flask.jsonify({'_items': card_items})
 
 
 @blueprint.route('/wire')
