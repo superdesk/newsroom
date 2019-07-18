@@ -10,7 +10,7 @@ import {
 
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
-import {openItemDetails, setActive} from '../actions';
+import {openItemDetails, setActive, fetchCardExternalItems} from '../actions';
 import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
@@ -34,6 +34,13 @@ class HomeApp extends React.Component {
     componentDidMount() {
         document.getElementById('footer').className = 'footer footer--home';
         this.height = this.elem.offsetHeight;
+
+        // Load any external media items for cards
+        this.props.cards
+            .filter((card) => card.dashboard === 'newsroom' && card.type === '4-photo-gallery')
+            .forEach((card) => {
+                this.props.fetchCardExternalItems(get(card, '_id'), get(card, 'label'));
+            });
     }
 
     renderModal(specs) {
@@ -139,6 +146,7 @@ HomeApp.propTypes = {
         name: PropTypes.string,
         action: PropTypes.func,
     })),
+    fetchCardExternalItems: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -159,6 +167,7 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(setActive(cardId));
     },
     actions: getItemActions(dispatch),
+    fetchCardExternalItems: (cardId, cardLabel) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
 });
 
 
