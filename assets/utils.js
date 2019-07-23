@@ -1,4 +1,6 @@
 import React from 'react';
+import server from 'server';
+import analytics from 'analytics';
 import { get, isInteger, keyBy, isEmpty, cloneDeep, throttle } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
@@ -569,4 +571,20 @@ export function getItemFromArray(value, items = [], field = '_id') {
 
 export function upperCaseFirstCharacter(text) {
     return (text && text.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase()));
+}
+
+export function postHistoryAction(item, action, section='wire') {
+    server.post('/history/new', {
+        item: item,
+        action: action,
+        section: section
+    }).catch((error) => errorHandler(error));
+}
+
+export function recordAction(item, action = 'open', section = 'wire') {
+    if (item) {
+        analytics.itemEvent(action, item);
+        analytics.itemView(item);
+        postHistoryAction(item, action, section);
+    }
 }

@@ -583,7 +583,7 @@ def test_download(client, app):
     assert (len(wire_formats) * len(items_ids)) == history.count()
     assert 'download' == history[0]['action']
     assert history[0].get('user')
-    assert history[0].get('created') + timedelta(seconds=2) >= utcnow()
+    assert history[0].get('versioncreated') + timedelta(seconds=2) >= utcnow()
     assert history[0].get('item') in items_ids
     assert history[0].get('version')
     assert history[0].get('company') is None
