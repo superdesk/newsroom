@@ -281,3 +281,6 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour=0, minute=0),  # Runs every day at midnight
     }
 }
+
+MAX_EXPIRY_QUERY_LIMIT = os.environ.get('MAX_EXPIRY_QUERY_LIMIT', 100)
+CONTENT_API_EXPIRY_DAYS = os.environ.get('CONTENT_API_EXPIRY_DAYS', 180)

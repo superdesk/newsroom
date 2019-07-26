@@ -7,7 +7,7 @@ from newsroom.elastic_utils import rebuild_elastic_index
 from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_timestamp
 from newsroom.auth import get_user_by_email
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
-
+import content_api
 
 app = Newsroom()
 manager = Manager(app)
@@ -74,6 +74,12 @@ def content_reset():
 @manager.command
 def send_company_expiry_alerts():
     CompanyExpiryAlerts().send_alerts()
+
+
+@manager.option('-m', '--expiry', dest='expiry_days', required=False)
+def remove_expired(expiry_days):
+    exp = content_api.RemoveExpiredItems()
+    exp.run(expiry_days)
 
 
 if __name__ == "__main__":
