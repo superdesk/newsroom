@@ -64,7 +64,7 @@ class WireListItem extends React.Component {
         });
         const picture = getPicture(item);
         const videos = getVideos(item);
-        const isMarketPlace = this.props.context === 'market_place';
+        const isMarketPlace = this.props.context === 'aapX';
         return (
             <article key={item._id}
                 className={cardClassName}
