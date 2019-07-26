@@ -1310,7 +1310,7 @@ article.list {
     padding: 0 15px;
     font-size: 1.25rem;
     font-weight: 300;
-    color: #747474;   
+    color: $gray-dark;   
 }
 .wire-articles__group {
     flex: 0 0 100%;
@@ -2002,7 +2002,7 @@ article.list {
 
 .wire-articles__item__meta-info {
     font-size: 0.8125rem;
-    color: #747474;
+    color: $gray-dark;
     line-height: 1.2;
     display: flex;
     flex-direction: column;
@@ -2330,7 +2330,7 @@ a.wire-articles__versions {
 }
 
 .wire-column__preview__date {
-    color: #747474;
+    color: $gray-dark;
     line-height: 1rem;
     font-size: .8125rem;
 
@@ -2685,7 +2685,7 @@ a.wire-articles__versions {
 
 .wire-column__preview__versions__meta {
     font-size: 0.8125rem;
-    color: #747474;
+    color: $gray-dark;
     line-height: 1.4;
     display: flex;
     flex-direction: column;
@@ -3158,7 +3158,7 @@ a.wire-articles__versions {
     font-size: 0.8125rem;
     margin-top: 10px;
     span {
-        color: #747474;
+        color: $gray-dark;
     }
 }
 
@@ -3320,4 +3320,75 @@ a.wire-articles__versions {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+.banner-drop {
+    padding-bottom: 20px;
+    &__toggle {
+        margin-left: -10.5px;
+        line-height: 0;
+        display: flex;
+
+        i {
+            height: 15px;
+            padding-left: 5px;
+        }
+
+        button {
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(123, 123, 123, 0.5);
+            @include border-radius(50%);
+            background: white;
+
+            &:focus {
+                outline:0;
+            }
+            transition: transform 0.5s ease-out;
+        }
+
+        button.active {
+            transform: rotate(180deg);
+        }
+    }
+
+
+    &__line {
+        height: 1px;
+        margin: auto 0.4rem auto 0;
+        background: rgba(123, 123, 123, 0.5);
+        margin-top:11px;
+        width: 50%;
+
+        &--left {
+            margin-right: 2px;
+        }
+
+        &--right {
+            margin-left: 2px;
+        }
+    }
+
+    &__child {
+        max-height: 0px;
+        overflow: hidden;
+        transition: max-height 0.5s ease-out;
+
+        &--active {
+            height: auto;
+            max-height: 500px;
+        }
+    }
+
+    &__text {
+        margin-bottom: -10px;
+        font-size: 0.8125rem;
+        color: $gray-dark;
+        opacity: 1;
+        transition: opacity 0.5s ease-out;
+
+        &--active {
+            opacity: 0;
+        }
+    }
 }
