@@ -5,7 +5,7 @@ import superdesk
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app, request
+from flask import current_app as app, request, jsonify
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -293,3 +293,14 @@ def item(_id):
         item=item,
         previous_versions=previous_versions,
         display_char_count=display_char_count)
+
+
+@blueprint.route('/wire/items/<_ids>')
+@login_required
+def items(_ids):
+    item_ids = _ids.split(',')
+    items = superdesk.get_resource_service('wire_search').get_items(item_ids)
+    for item in items:
+        set_permissions(item, 'wire', False if flask.request.args.get('ignoreLatest') == 'false' else True)
+
+    return jsonify(items.docs), 200
