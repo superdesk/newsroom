@@ -76,6 +76,7 @@ BLUEPRINTS = [
     'newsroom.users',
     'newsroom.companies',
     'newsroom.design',
+    'newsroom.history',
     'newsroom.push',
     'newsroom.topics',
     'newsroom.upload',

@@ -3,7 +3,16 @@ import { get, isEmpty } from 'lodash';
 import mime from 'mime-types';
 import server from 'server';
 import analytics from 'analytics';
-import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
+import {
+    gettext,
+    notify,
+    updateRouteParams,
+    getTimezoneOffset,
+    getTextFromHtml,
+    fullDate,
+    recordAction
+} from 'utils';
+
 import { markItemAsRead, toggleNewsOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 
@@ -48,7 +57,7 @@ export function previewItem(item) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
         dispatch(preview(item));
-        item && analytics.itemEvent('preview', item);
+        recordAction(item, 'preview', getState().context);
     };
 }
 
@@ -59,17 +68,15 @@ export function openItemDetails(item) {
 
 export function openItem(item) {
     return (dispatch, getState) => {
-        markItemAsRead(item, getState());
+        const state = getState();
+        markItemAsRead(item, state);
         dispatch(openItemDetails(item));
         updateRouteParams({
             item: item ? item._id : null
-        }, getState());
-        item && analytics.itemEvent('open', item);
-        analytics.itemView(item);
+        }, state);
+        recordAction(item, 'open', state.context);
     };
 }
-
-
 
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {

@@ -4,10 +4,15 @@ import pymongo.errors
 import werkzeug.exceptions
 
 from superdesk import get_resource_service
-from superdesk.resource import not_analyzed
+from superdesk.resource import not_analyzed, not_enabled
 from superdesk.utc import utcnow
-from flask import json, abort
+from flask import json, abort, Blueprint, jsonify
+from flask_babel import gettext
 from eve.utils import ParsedRequest
+from newsroom.utils import get_json_or_400
+from newsroom.auth import get_user
+
+blueprint = Blueprint('history', __name__)
 
 
 class HistoryResource(newsroom.Resource):
@@ -17,17 +22,23 @@ class HistoryResource(newsroom.Resource):
     schema = {
         '_id': {'type': 'string', 'unique': True},
         'action': {'type': 'string'},
-        'created': {'type': 'datetime'},
+        'versioncreated': {'type': 'datetime'},
         'user': newsroom.Resource.rel('users'),
         'company': newsroom.Resource.rel('companies'),
-        'item': newsroom.Resource.rel('items'),
+        'item': {
+            'type': 'string',
+            'mapping': not_analyzed
+        },
         'version': {'type': 'string'},
         'section': {
             'type': 'string',
             'mapping': not_analyzed
+        },
+        'extra_data': {
+            'type': 'object',
+            'mapping': not_enabled
         }
     }
-    schema['item']['mapping'] = not_analyzed
 
     mongo_indexes = {
         'item': ([('item', 1)], ),
@@ -47,7 +58,7 @@ class HistoryService(newsroom.Service):
         def transform(item):
             return {
                 'action': action,
-                'created': now,
+                'versioncreated': now,
                 'user': user['_id'],
                 'company': user.get('company'),
                 'item': item['_id'],
@@ -114,6 +125,19 @@ def get_history_users(item_ids, active_user_ids, active_company_ids, section, ac
         for h in histories
         if h.get('user') in user_ids
     ]
+
+
+@blueprint.route('/history/new', methods=['POST'])
+def create():
+    params = get_json_or_400()
+    if not params.get('item') or not params.get('action') or not params.get('section'):
+        return "", gettext('Activity History: Inavlid request')
+
+    get_resource_service('history').create_history_record([params['item']],
+                                                          params['action'],
+                                                          get_user(),
+                                                          params['section'])
+    return jsonify({'success': True}), 201
 
 
 def init_app(app):
