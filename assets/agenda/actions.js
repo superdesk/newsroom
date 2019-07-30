@@ -2,7 +2,18 @@
 import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
-import {gettext, notify, updateRouteParams, getTimezoneOffset, errorHandler, getLocaleDate, DATE_FORMAT, TIME_FORMAT} from 'utils';
+import {
+    gettext,
+    notify,
+    updateRouteParams,
+    getTimezoneOffset,
+    errorHandler,
+    getLocaleDate,
+    DATE_FORMAT,
+    TIME_FORMAT,
+    recordAction
+} from 'utils';
+
 import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 import {
@@ -63,7 +74,7 @@ export function previewItem(item, group, plan) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
         dispatch(preview(item, group, plan));
-        item && analytics.itemEvent('preview', item);
+        recordAction(item, 'preview', getState().context);
     };
 }
 
@@ -84,15 +95,15 @@ export function requestCoverage(item, message) {
 
 export function openItem(item, group, plan) {
     return (dispatch, getState) => {
-        markItemAsRead(item, getState());
+        const state = getState();
+        markItemAsRead(item, state);
         dispatch(openItemDetails(item, group, plan));
         updateRouteParams({
             item: item ? item._id : null,
             group: group || null,
             plan: plan || null,
-        }, getState());
-        item && analytics.itemEvent('open', item);
-        analytics.itemView(item);
+        }, state);
+        recordAction(item, 'open', state.context);
     };
 }
 

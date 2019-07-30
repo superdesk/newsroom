@@ -166,9 +166,9 @@ def get_subscriber_activity_report():
 
     date_range = get_date_filters(args)
     if date_range.get('gt') or date_range.get('lt'):
-        must_terms.append({"range": {"created": date_range}})
+        must_terms.append({"range": {"versioncreated": date_range}})
 
-    source['sort'] = [{'created': 'desc'}]
+    source['sort'] = [{'versioncreated': 'desc'}]
     if len(must_terms) > 0:
         source['query'] = {'bool': {'must': must_terms}}
 
@@ -251,7 +251,7 @@ def get_subscriber_activity_report():
                 'Item': (doc.get('item') or {})['item_text'],
                 'Action': doc.get('action'),
                 'User': doc.get('user'),
-                'Created': doc.get('created').strftime('%H:%M %d/%m/%y'),
+                'Created': doc.get('versioncreated').strftime('%H:%M %d/%m/%y'),
             }
 
             writer.writerow(row)

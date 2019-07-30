@@ -132,7 +132,7 @@ class SubscriberActivity extends React.Component {
                 </td>
                 <td>{item.action}</td>
                 <td>{item.user}</td>
-                <td>{fullDate(item.created)}</td>
+                <td>{fullDate(item.versioncreated)}</td>
             </tr>
         ) : ([(<tr key='no_data_row'>
             <td></td>

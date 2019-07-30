@@ -1,6 +1,5 @@
-import analytics from 'analytics';
 import server from '../server';
-import {errorHandler} from 'utils';
+import {errorHandler, recordAction} from 'utils';
 import {get} from 'lodash';
 
 export const INIT_DATA = 'INIT_DATA';
@@ -8,11 +7,16 @@ export function initData(data) {
     return {type: INIT_DATA, data};
 }
 
+function openItem(item) {
+    return {type: OPEN_ITEM, item};
+}
+
 export const OPEN_ITEM = 'OPEN_ITEM';
 export function openItemDetails(item) {
-    analytics.itemEvent('open', item);
-    analytics.itemView(item);
-    return {type: OPEN_ITEM, item};
+    return (dispatch, getState) => {
+        dispatch(openItem(item, get(getState(), 'context')));
+        recordAction(item, 'open');
+    };
 }
 
 export const SET_ACTIVE = 'SET_ACTIVE';
