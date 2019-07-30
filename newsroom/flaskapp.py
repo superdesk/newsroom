@@ -64,13 +64,13 @@ class Newsroom(eve.Eve):
         self._testing = testing
         self._general_settings = {}
 
-        app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
+        app_config = flask.Config(NEWSROOM_DIR)
+        app_config.from_object('content_api.app.settings')
+        app_config.from_pyfile(os.path.join(NEWSROOM_DIR, 'default_settings.py'), silent=True)
 
         # get content api default conf
 
         if config:
-            app_config = flask.Config(app_config)
-            app_config.from_object('content_api.app.settings')
             app_config.update(config)
 
         super(Newsroom, self).__init__(
