@@ -72,10 +72,36 @@ export function previewAndCopy(item) {
 
 export function previewItem(item, group, plan) {
     return (dispatch, getState) => {
+        dispatch(fetchWireItemsForAgenda(item));
         markItemAsRead(item, getState());
         dispatch(preview(item, group, plan));
         recordAction(item, 'preview', getState().context);
     };
+}
+
+function fetchWireItemsForAgenda(item) {
+    return (dispatch) => {
+        let wireIds = [];
+        get(item, 'coverages', []).forEach((c) => {
+            if (c.coverage_type === 'text' && c.delivery_id) {
+                wireIds.push(c.delivery_id);
+            }
+        });
+
+        if (wireIds.length > 0){
+            return server.get(`/wire/items/${wireIds.join(',')}`)
+                .then((items) => {
+                    dispatch(agendaWireItems(items));
+                    return Promise.resolve(items);
+                })
+                .catch((error) => errorHandler(error, dispatch));
+        }
+    };
+}
+
+export const AGENDA_WIRE_ITEMS = 'AGENDA_WIRE_ITEMS';
+export function agendaWireItems(items) {
+    return {type: AGENDA_WIRE_ITEMS, items};
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
@@ -97,6 +123,7 @@ export function openItem(item, group, plan) {
     return (dispatch, getState) => {
         const state = getState();
         markItemAsRead(item, state);
+        dispatch(fetchWireItemsForAgenda(item));
         dispatch(openItemDetails(item, group, plan));
         updateRouteParams({
             item: item ? item._id : null,
@@ -534,8 +561,29 @@ function setTopics(topics) {
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
 export function setAndUpdateNewItems(data) {
-    return function(dispatch) {
+    return function(dispatch, getState) {
         if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'agenda') {
+            const state = getState();
+
+            // Check if the item is used in the preview or opened agenda item
+            // If yes, make it available to the preview
+            if (get(data, '_items[0].type') !== 'text' || (!state.previewItem && !state.openItem)) {
+                return Promise.resolve();
+            }
+            
+            const agendaItem = state.openItem ? state.openItem : state.itemsById[state.previewItem];
+            if (!agendaItem || get(agendaItem, 'coverages.length', 0) === 0) {
+                return Promise.resolve();
+            }
+
+            const coveragesToCheck = agendaItem.coverages.map((c) => c.coverage_id);
+            for(let i of data._items) {
+                if (coveragesToCheck.includes(i.coverage_id)) {
+                    dispatch(fetchWireItemsForAgenda(agendaItem));
+                    break;
+                }
+            }
+
             return Promise.resolve();
         }
 

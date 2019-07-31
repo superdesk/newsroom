@@ -8,6 +8,7 @@ import {
     UPDATE_ITEMS,
     TOGGLE_FEATURED_FILTER,
     TOGGLE_EVENTS_ONLY_FILTER,
+    AGENDA_WIRE_ITEMS,
 } from './actions';
 
 import { get, isEmpty, uniqBy } from 'lodash';
@@ -48,6 +49,7 @@ const initialState = {
         eventsOnlyAccess: false,
         eventsOnlyView: false,
         featuredOnly: false,
+        agendaWireItems: [],
     },
     search: searchReducer(),
     detail: false,
@@ -245,6 +247,16 @@ export default function agendaReducer(state = initialState, action) {
                 eventsOnlyView: action.value,
             }
         };
+
+    case AGENDA_WIRE_ITEMS:
+        return {
+            ...state,
+            agenda: {
+                ...state.agenda,
+                agendaWireItems: action.items
+            }
+        };
+
     default:
         return defaultReducer(state || initialState, action);
     }

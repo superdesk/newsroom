@@ -225,6 +225,7 @@ class AgendaApp extends BaseApp {
                             previewGroup={this.props.previewGroup}
                             previewPlan={this.props.previewPlan}
                             eventsOnly={eventsOnly}
+                            wireItems={this.props.wireItems}
                         />
                     </div>
                 </section>
@@ -284,6 +285,7 @@ AgendaApp.propTypes = {
     eventsOnlyAccess: PropTypes.bool,
     eventsOnlyView: PropTypes.bool,
     locators: PropTypes.array,
+    wireItems: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -319,6 +321,7 @@ const mapStateToProps = (state) => ({
     featuredOnly: get(state, 'agenda.featuredOnly'),
     context: state.context,
     locators: get(state, 'locators.items', []),
+    wireItems: get(state, 'agenda.agendaWireItems')
 });
 
 const mapDispatchToProps = (dispatch) => ({
