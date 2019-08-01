@@ -13,7 +13,6 @@ install_requires = [
     'flask_pymongo>=0.5.2,<1.0',
     'honcho>=1.0.1',
     'gunicorn>=19.7.1',
-    'superdesk-core>=1.29,<=1.30',
     'icalendar>=4.0.3,<4.1',
 ]
 
@@ -28,7 +27,10 @@ setup(
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=install_requires,
-    dependency_links=['http://github.com/superdesk/superdesk-planning/tarball/master#egg=superdesk-planning'],
+    dependency_links=[
+        'http://github.com/superdesk/superdesk-core/tarball/master#egg=superdesk-core'
+        'http://github.com/superdesk/superdesk-planning/tarball/master#egg=superdesk-planning'
+    ],
     scripts=['manage.py'],
     classifiers=[
         'Development Status :: 4 - Beta',
