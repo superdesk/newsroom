@@ -3325,13 +3325,11 @@ a.wire-articles__versions {
 .banner-drop {
     padding-bottom: 20px;
     &__toggle {
-        margin-left: -10.5px;
         line-height: 0;
         display: flex;
 
         i {
             height: 15px;
-            padding-left: 5px;
         }
 
         button {
@@ -3345,6 +3343,7 @@ a.wire-articles__versions {
                 outline:0;
             }
             transition: transform 0.5s ease-out;
+            cursor: pointer;
         }
 
         button.active {
@@ -3381,14 +3380,8 @@ a.wire-articles__versions {
     }
 
     &__text {
-        margin-bottom: -10px;
+        margin: -15px auto auto auto;
         font-size: 0.8125rem;
         color: $gray-dark;
-        opacity: 1;
-        transition: opacity 0.5s ease-out;
-
-        &--active {
-            opacity: 0;
-        }
     }
 }
