@@ -10,7 +10,8 @@ class BannerDrop extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.state.open !== nextProps.isOpen) {
+        if (this.props.id !== nextProps.id &&
+                this.state.open !== nextProps.isOpen) {
             this.setState({ open: nextProps.isOpen });
         }
     }
@@ -20,13 +21,12 @@ class BannerDrop extends React.Component {
     }
 
     render() {
+        const label = this.state.open ? this.props.labelOpened : this.props.labelCollapsed;
         return (<div className="banner-drop">
             <div className={classNames('banner-drop__child',
                 {'banner-drop__child--active': this.state.open})}>
                 {this.props.children}
             </div>
-            {this.props.label && <div className={classNames('banner-drop__text', 'pl-5', 'ml-5',
-                {'banner-drop__text--active': this.state.open})}>{this.props.label}</div>}
             <div className="banner-drop__toggle">
                 <div className="banner-drop__line banner-drop__line--left" />
                 <button type="button" className={classNames({'active': this.state.open})}>
@@ -34,14 +34,18 @@ class BannerDrop extends React.Component {
                 </button>
                 <div className="banner-drop__line banner-drop__line--right" />
             </div>
+            <div className={classNames('banner-drop__text',
+                {'banner-drop__text--active': this.state.open})}>{label}</div>
         </div>);
     }
 }
 
 BannerDrop.propTypes = {
+    id: PropTypes.string,
     children: PropTypes.node,
-    label: PropTypes.string,
     isOpen: PropTypes.bool,
+    labelCollapsed: PropTypes.string,
+    labelOpened: PropTypes.string,
 };
 
 export default BannerDrop;

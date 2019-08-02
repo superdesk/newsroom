@@ -19,7 +19,11 @@ export default function AgendaPreviewImage({item, onClick}) {
     const locations = getLocations(item);
 
     return (
-        <BannerDrop label={gettext('Show Map')} isOpen={get(item, 'coverages.length', 0) === 0}>
+        <BannerDrop
+            id={get(item, '_id')}
+            labelCollapsed={gettext('Show Map')}
+            labelOpened={gettext('Hide Map')}
+            isOpen={get(item, 'coverages.length', 0) === 0} >
             <div className="wire-column__preview__image" onClick={() => onClick(item)}>
                 <StaticMap locations={locations} />
             </div>
