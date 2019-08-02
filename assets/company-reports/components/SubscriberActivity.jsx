@@ -69,6 +69,12 @@ class SubscriberActivity extends React.Component {
             },
             {
                 'name': 'print'
+            },
+            {
+                'name': 'open'
+            },
+            {
+                'name': 'preview'
             }];
             getName = upperCaseFirstCharacter;
             break;
