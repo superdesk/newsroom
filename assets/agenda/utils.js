@@ -436,7 +436,7 @@ export function getNotesFromCoverages(item, field = 'internal_note') {
     const planningItems = get(item, 'planning_items', []);
     planningItems.forEach(p => {
         const planning_note = p[field];
-        get(p, 'coverages', []).forEach((c) => {
+        (get(p, 'coverages') || []).forEach((c) => {
             // If the coverage has news item published, use that 'ednote' instead
             if (field === 'ednote' && get(c, 'deliveries.length', 0) > 0) {
                 return;
