@@ -30,9 +30,8 @@ from .utils import get_latest_available_delivery
 logger = logging.getLogger(__name__)
 PRIVATE_FIELDS = [
     'event.files',
-    'event.internal_note',
-    'planning_items.internal_note',
-    'coverages.planning.internal_note'
+    '*.internal_note'
+
 ]
 PLANNING_ITEMS_FIELDS = [
     'planning_items',

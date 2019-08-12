@@ -154,6 +154,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert 'files' not in data['_items'][0]['event']
     assert 'internal_note' not in data['_items'][0]['event']
     assert 'internal_note' not in data['_items'][0]['planning_items'][0]
+    assert 'internal_note' not in data['_items'][0]['planning_items'][0]['coverages'][0]['planning']
     assert 'internal_note' not in data['_items'][0]['coverages'][0]['planning']
     resp = client.get('/agenda/search?navigation=51')
     data = json.loads(resp.get_data())
