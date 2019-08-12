@@ -91,9 +91,36 @@ agenda_items = [{
             'guid': 'urn:planning',
             'agendas': [],
             '_current_version': 1,
-            'coverages': [],
             'type': 'planning',
-            'internal_note': 'Internal message for planning'
+            'internal_note': 'Internal message for planning',
+            'coverages': [
+                {
+                    'firstcreated': '2018-06-27T11:07:17+0000',
+                    'planning': {
+                        'g2_content_type': 'text',
+                        'genre': [
+                            {
+                                'name': 'Article',
+                                'qcode': 'Article'
+                            }
+                        ],
+                        'ednote': 'An editorial Note',
+                        'keyword': [
+                            'Motoring'
+                        ],
+                        'scheduled': '2018-04-09T14:00:53.000Z',
+                        'slugline': 'Raiders',
+                        'internal_note': 'Internal message for coverage'
+                    },
+                    'workflow_status': 'active',
+                    'coverage_id': 'urn:coverage',
+                    'news_coverage_status': {
+                        'label': 'Planned',
+                        'name': 'coverage intended',
+                        'qcode': 'ncostat:int'
+                    }
+                }
+            ],
         }
     ],
     '_created': '2018-06-27T11:12:07+0000',
