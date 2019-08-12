@@ -16,6 +16,7 @@ from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, 
     get_agenda_dates, get_location_string, get_public_contacts, get_links, get_vocabulary
 from newsroom.wire.utils import update_action_list
 from newsroom.agenda.email import send_coverage_request_email
+from newsroom.agenda.utils import remove_fields_for_public_user
 from newsroom.companies import section, get_user_company
 from newsroom.notifications import push_user_notification
 
@@ -43,12 +44,7 @@ def item(_id):
     user = get_user()
     company = get_user_company(user)
     if not is_admin_or_internal(user):
-        item.get('event', {}).pop('files', None)
-        planning_items = item.get('planning_items', [])
-        [item.pop('internal_note', None) for item in planning_items]
-        coverages = item.get('coverages', [])
-        [c.get('planning', {}).pop('internal_note', None) for c in coverages]
-        item.get('event', {}).pop('internal_note', None)
+        remove_fields_for_public_user(item)
 
     if company and not is_admin(user) and company.get('events_only', False):
         # if the company has permission events only permission then

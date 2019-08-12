@@ -35,7 +35,7 @@ export default class CoverageItemStatus extends React.Component {
     }
 
     getInternalNotes() {
-        getNotesFromCoverages(this.props.item);
+        return getNotesFromCoverages(this.props.item);
     }
 
     setWireItem(props) {
