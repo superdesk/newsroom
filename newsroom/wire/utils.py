@@ -19,7 +19,7 @@ def get_body_picture(item):
 
 def get_caption(picture):
     if picture:
-        return picture.get('body_text', picture.get('description_text'))
+        return picture.get('description_text') or picture.get('body_text')
 
 
 def get_utcnow():
