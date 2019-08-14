@@ -82,7 +82,7 @@ export function previewItem(item, group, plan) {
 function fetchWireItemsForAgenda(item) {
     return (dispatch) => {
         let wireIds = [];
-        get(item, 'coverages', []).forEach((c) => {
+        (get(item, 'coverages') || []).forEach((c) => {
             if (c.coverage_type === 'text' && c.delivery_id) {
                 wireIds.push(c.delivery_id);
             }
