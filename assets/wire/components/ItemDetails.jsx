@@ -62,11 +62,11 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
-                            <div className='wire-column__preview__date'>
+                            <div className='wire-column__preview__date pb-2'>
                                 {gettext('Published')}{' '}{fullDate(item.versioncreated)}
                             </div>
                             {isDisplayed('headline', detailsConfig) && <ArticleHeadline item={item}/>}
-                            <ArticleAuthor item={item} isPreview={false} displayConfig={detailsConfig} />
+                            <ArticleAuthor item={item} displayConfig={detailsConfig} />
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
