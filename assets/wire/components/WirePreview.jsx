@@ -75,7 +75,7 @@ class WirePreview extends React.PureComponent {
                     {isDisplayed('slugline', previewConfig) && <ArticleSlugline item={item}/>}
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
-                        <ArticleAuthor item={item} isPreview={true} displayConfig={previewConfig} />}
+                        <ArticleAuthor item={item} displayConfig={previewConfig} />}
                     {picture && <ArticlePicture
                         picture={getPreviewRendition(picture, isCustom)}
                         isKilled={isKilled(item)}

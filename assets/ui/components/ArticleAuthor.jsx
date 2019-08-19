@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, isDisplayed, fullDate } from 'utils';
+import { gettext, isDisplayed } from 'utils';
 
-export default function ArticleAuthor({item, isPreview, displayConfig}) {
+export default function ArticleAuthor({item, displayConfig}) {
     const inStr = item.located && item.byline ? gettext('in ') : '';
     return (
         (item.byline || item.located) && (
@@ -15,9 +15,6 @@ export default function ArticleAuthor({item, isPreview, displayConfig}) {
                 {isDisplayed('located', displayConfig) && item.located && (
                     <span>{gettext('{{inStr}}{{ located}}', {inStr: inStr, located: item.located})}</span>
                 )}
-                {!isPreview && item.versioncreated && (
-                    <span>{`${gettext(' on')} ${fullDate(item.versioncreated)}`}</span>
-                )}
             </p>
         ) || null
     );
@@ -25,6 +22,5 @@ export default function ArticleAuthor({item, isPreview, displayConfig}) {
 
 ArticleAuthor.propTypes = {
     item: PropTypes.object.isRequired,
-    isPreview: PropTypes.bool.isRequired,
     displayConfig: PropTypes.object,
 };
