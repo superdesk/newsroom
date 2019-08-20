@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import classNames from 'classnames';
+import {get} from 'lodash';
 
 import {isPostponed, isRescheduled, isCanceled} from '../utils';
 import {DATE_FORMAT, formatDate} from 'utils';
@@ -20,6 +21,10 @@ function AgendaListItemLabels({item, withDate, group, right}) {
 
         if (isRescheduled(item)) {
             labelText = gettext('rescheduled');
+        }
+
+        if (get(item, 'event.completed')) {
+            labelText = gettext('completed');
         }
 
         if (!labelText) {
