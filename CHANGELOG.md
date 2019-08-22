@@ -1,5 +1,33 @@
 # Newsroom Changelog
 
+## [1.14] 2019-08-22
+# Features
+- [SDAN-538] Add the ability to execute the remove expired command (#817)
+
+# Improvements
+- [SDAN-572] Label completed agenda items as 'Completed' (#829)
+- [SDAN-572][SDAN-567] UI changes in displaying 'byline', 'located' and 'slugline' (#823)
+- [SDAN-565] Reposition the 'show map' text in Agenda Preview (#821)
+- [SDAN-566] Add 'preview' and 'open' to 'actions' filter in subscriber activity report (#822)
+- [SDAN-524][SDAN-530] Record 'open' and 'preview' actions in history collection (#815)
+- [SDAN-519] Toggle map display in Agenda Preview (#811)
+
+# Fixes
+- [SDAN-585] (fix): Corrections showing up as 'Updates Coming' (#830)
+- [SDAN-569] Market Place Bookmarks were not seen (#828)
+- UI fix to add padding after 'published' and remove 'on created_time' in wire ite, detail (#826)
+- fix creating new dashboard card when there is single dashboard type (#827)
+- [SDAN-576] Prefer description_text over body_text for image captions (#825)
+- [SDAN-575] Internal note on coverages is visible for public users in Newsroom (#824)
+- [SDAN-548] ednote from wire item was not displayed in Agenda coverage. (#818)
+- [SDAN-549] Text from wire items were not updating in Agenda preview (#818)
+- [SDAN-531] Push errors when event is created from a planning item (#814)
+- [SDAN-516] Show agency logos for AAPX (#816)
+- [SDAN-535] Add 'located' attribute as 'Location' when a wire item is copied (#813)
+
+## [1.13.1] 2019-07-18
+- [SDAN-532] Fetch card external item details after loading the page (#812)
+
 ## [1.13] 2019-07-16
 - [SDAN-529] Fix incorrect coverage scheduled date in Agenda notification email
 - [SDAN-514] Changes to Watched Agenda Emails (#808)
