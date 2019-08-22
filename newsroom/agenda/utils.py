@@ -2,6 +2,7 @@ from datetime import timedelta
 from newsroom.template_filters import time_short, parse_date, format_datetime
 from flask_babel import gettext
 from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
+from superdesk.metadata.item import CONTENT_STATE
 
 DAY_IN_MINUTES = 24 * 60 - 1
 
@@ -73,7 +74,10 @@ def get_links(agenda):
 
 
 def get_latest_available_delivery(coverage):
-    return next((d for d in (coverage.get('deliveries') or []) if d.get('delivery_state') == 'published'), None)
+    return next((
+        d for d in (coverage.get('deliveries') or [])
+        if d.get('delivery_state') in [CONTENT_STATE.PUBLISHED, CONTENT_STATE.CORRECTED]
+    ), None)
 
 
 def get_coverage_scheduled(coverage):
