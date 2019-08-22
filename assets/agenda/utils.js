@@ -39,7 +39,7 @@ export function getCoverageStatusText(coverage) {
 
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
         if (get(coverage, 'deliveries.length', 0) > 1) {
-            return `updated ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;    
+            return `updated ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
         }
 
         return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
@@ -407,7 +407,7 @@ export function getPrevious(dateString, grouping) {
 
 /**
  * Get agenda item attachments
- * 
+ *
  * @param {Object} item
  * @return {Array}
  */
@@ -462,7 +462,7 @@ export function getSubjects(item) {
 
 /**
  * Test if item has any attachments
- * 
+ *
  * @param {Object} item
  * @return {Boolean}
  */
@@ -645,7 +645,8 @@ export function getListItems(groups, itemsById) {
 }
 
 export function isCoverageBeingUpdated(coverage) {
-    return get(coverage, 'deliveries[0].delivery_state', null) && coverage.deliveries[0].delivery_state !== 'published';
+    return get(coverage, 'deliveries[0].delivery_state', null) &&
+        !['published', 'corrected'].includes(coverage.deliveries[0].delivery_state);
 }
 
 export const groupRegions = (filter, aggregations, props) => {
