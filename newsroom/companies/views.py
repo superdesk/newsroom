@@ -67,6 +67,7 @@ def get_company_updates(company):
         'name': company.get('name'),
         'url': company.get('url'),
         'sd_subscriber_id': company.get('sd_subscriber_id'),
+        'account_manager': company.get('account_manager'),
         'contact_name': company.get('contact_name'),
         'contact_email': company.get('contact_email'),
         'phone': company.get('phone'),
