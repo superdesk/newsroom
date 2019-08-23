@@ -1,4 +1,4 @@
 The following company accounts are due to expire within next 7 days (before {{expiry_date.strftime('%Y-%m-%d')}}):
 {% for company in companies %}
-    {{ '\t - ' + company.get('name') + '(Email: ' + (company.get('contact_email') if company['contact_email'] else '-')  + '), Tel: ('  + (company.get('phone') if company['phone'] else '-') + ') expiring on ' + company['expiry_date'].strftime('%Y-%m-%d') }}
+    {{ '\t - ' + company.get('name') + '(Email: ' + (company.get('contact_email') if company['contact_email'] else '-')  + '), (Account Manager: '  + (company['account_manager'] if company.get('account_manager') else '-') + ') expiring on ' + company['expiry_date'].strftime('%Y-%m-%d') }}
 {% endfor %}

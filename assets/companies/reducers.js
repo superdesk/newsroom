@@ -48,6 +48,7 @@ export default function companyReducer(state = initialState, action) {
             name: '',
             phone: '',
             sd_subscriber_id: '',
+            account_manager: '',
             contact_name: '',
             country: '',
             contact_email: '',
@@ -85,6 +86,7 @@ export default function companyReducer(state = initialState, action) {
         const newCompany = {
             name: '',
             sd_subscriber_id: '',
+            account_manager: '',
             phone: '',
             contact_name: '',
             country: '',
