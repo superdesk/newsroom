@@ -337,7 +337,21 @@ def test_active_users_and_active_companies(client, app):
 
         assert '1' in companies
         assert '2' not in companies
-        assert '3' not in companies
+
+
+def test_expired_company_does_not_restrict_activity(client, app):
+    app.data.insert('companies', [
+        {'_id': '1', 'name': 'Company1', 'is_enabled': True},
+        {'_id': '2', 'name': 'Company2', 'is_enabled': False},
+        {'_id': '3', 'name': 'Company3', 'is_enabled': True, 'expiry_date': datetime.utcnow() - timedelta(days=1)}
+    ])
+
+    with app.test_request_context():
+        companies = get_company_dict()
+
+        assert '1' in companies
+        assert '2' not in companies
+        assert '3' in companies
 
 
 def test_is_valid_login(client, app):
