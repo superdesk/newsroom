@@ -1,0 +1,41 @@
+@import './breakpoints.scss';
+
+@media only screen and (orientation: portrait) and (min-width: 768px) {
+    .d-md-p-block {
+        display: block !important;
+    }
+
+    .flex-md-p-row {
+        flex-direction: row !important;
+    }
+}
+
+@media only screen and (orientation: landscape) and (min-width: 992px) {
+    .d-lg-l-block {
+        display: block !important;
+    }
+
+    .flex-lg-l-row {
+        flex-direction: row !important;
+    }
+}
+
+@include small_phone {
+    .d-small-phone-none {display: none;}
+    .d-small-phone-block {display: block;}
+}
+
+@include phone {
+    .d-phone-none {display: none;}
+    .d-phone-block {display: block;}
+}
+
+@include tablet {
+    .d-tablet-none {display: none;}
+    .d-tablet-block {display: block;}
+}
+
+@include pc {
+    .d-pc-none {display: none;}
+    .d-pc-block {display: block;}
+}

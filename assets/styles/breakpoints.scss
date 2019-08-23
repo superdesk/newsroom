@@ -2,8 +2,14 @@
 
 // Extra small devices (portrait phones, less than 576px)
 
+@mixin xxsm() {
+    @media only screen and (max-width: 374px) {
+        @content;
+    }
+}
+
 @mixin xsm() {
-    @media only screen and (min-width: 320px) {
+    @media only screen and (min-width: 375px) {
         @content;
     }
 }
@@ -39,6 +45,30 @@
 // Extra extra large devices (large desktops, 1440px and up)
 @mixin xxl() {
     @media only screen and (min-width: 1440px) {
+        @content;
+    }
+}
+
+@mixin small_phone {
+    @media only screen and (orientation: portrait) and (max-width: 375px), (orientation: landscape) and (max-width: 576px) {
+        @content;
+    }
+}
+
+@mixin phone {
+    @media only screen and (orientation: portrait) and (max-width: 576px), (orientation: landscape) and (max-width: 992px) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media only screen and (orientation: portrait) and (min-width: 577px) and (max-width: 1440px), (orientation: landscape) and (min-width: 993px) and (max-width: 1440px) {
+        @content;
+    }
+}
+
+@mixin pc {
+    @media only screen and (orientation: landscape) and (min-width: 1441px) {
         @content;
     }
 }
