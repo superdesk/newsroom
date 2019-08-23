@@ -235,8 +235,8 @@ export function fetchItems(updateRoute = true) {
 
 
 export function fetchItem(id) {
-    return (dispatch) => {
-        return server.get(`/wire/${id}?format=json`)
+    return (dispatch, getState) => {
+        return server.get(`/${getState().context}/${id}?format=json`)
             .then((data) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
