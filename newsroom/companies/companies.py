@@ -55,6 +55,9 @@ class CompaniesResource(newsroom.Resource):
             'type': 'string',
             'nullable': True,
         },
+        'account_manager': {
+            'type': 'string'
+        },
     }
     datasource = {
         'source': 'companies',
