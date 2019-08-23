@@ -212,7 +212,7 @@ def get_subscriber_activity_report():
             doc['item'] = {
                 'item_text': wire_items[doc['item']].get('headline'),
                 '_id': wire_items[doc['item']]['_id'],
-                'item_href': '/wire?item={}'.format(doc['item'])
+                'item_href': '/{}?item={}'.format(doc['section'], doc['item'])
             }
         elif doc.get('item') in agenda_items:
             doc['item'] = {

@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, startsWith } from 'lodash';
 
 import { createStore, render, initWebSocket, getInitData} from '../utils';
 
@@ -28,8 +28,9 @@ const params = new URLSearchParams(window.location.search);
 store.dispatch(initParams(params));
 
 
-// init first navigations
-const firstNavigation = get(window.amNewsData, 'navigations[0]');
+// init first navigations - only if not loading a page to preview an item
+const firstNavigation = startsWith(window.location.search, '?item=') ? null :
+    get(window.amNewsData, 'navigations[0]');
 const navigationId = params.get('navigation');
 if (navigationId) {
     store.dispatch(toggleNavigationById(navigationId));
