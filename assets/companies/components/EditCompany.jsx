@@ -119,6 +119,13 @@ class EditCompany extends React.Component {
                                         error={this.props.errors ? this.props.errors.sd_subscriber_id : null}/>
 
                                     <TextInput
+                                        name='account_manager'
+                                        label={gettext('Account Manager')}
+                                        value={this.props.company.account_manager}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.account_manager : null}/>
+
+                                    <TextInput
                                         name='phone'
                                         label={gettext('Telephone')}
                                         value={this.props.company.phone}

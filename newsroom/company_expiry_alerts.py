@@ -50,7 +50,10 @@ class CompanyExpiryAlerts():
         recipients = general_settings['values']['company_expiry_alert_recipients'].split(',')
         expiry_time = (utcnow() + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
         companies_service = get_resource_service('companies')
-        companies = list(companies_service.find({'expiry_date': {'$lte': expiry_time}}))
+        companies = list(companies_service.find({
+                'expiry_date': {'$lte': expiry_time},
+                'is_enabled': True
+                }))
 
         if len(companies) > 0:
             # Send notifications to users who are nominated to receive expiry alerts
