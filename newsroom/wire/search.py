@@ -121,6 +121,12 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
 
 
 def _add_limit_days(query, section, company, user):
+    # This limit is only for wire content, ignore this limit for agenda
+    # If later we require time limit for agenda, this will have to be separate as versioncreated
+    # is not sufficient for calendar based items (i.e. using the event's date or the coverages scheduled date)
+    if section == 'agenda':
+        return
+
     limit_days = get_setting('aapx_time_limit_days') if section == 'aapX' else get_setting('wire_time_limit_days')
     if company and not is_admin(user) and not company.get('archive_access', False) and limit_days:
         query['bool']['must'].append({'range': {'versioncreated': {
