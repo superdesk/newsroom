@@ -19,7 +19,7 @@ def init_app(app):
                                 _app=app)
 
     app.dashboard(SECTION_ID, SECTION_NAME, ['6-navigation-row'])
-    app.section(SECTION_ID, SECTION_NAME)
+    app.section(SECTION_ID, SECTION_NAME, 'wire')
 
     app.sidenav(SECTION_NAME, '{}.home'.format(SECTION_ID),
                 'aapX', section=SECTION_ID, secondary_endpoints=['{}.index'.format(SECTION_ID)])
