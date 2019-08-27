@@ -3,6 +3,8 @@ import tzlocal
 
 from kombu import Queue, Exchange
 from celery.schedules import crontab
+from superdesk.default_settings import strtobool, env
+
 
 from superdesk.default_settings import (   # noqa
     VERSION,
@@ -88,7 +90,8 @@ BLUEPRINTS = [
     'newsroom.reports',
     'newsroom.public',
     'newsroom.agenda',
-    'newsroom.settings'
+    'newsroom.settings',
+    'newsroom.news_api.api_tokens'
 ]
 
 CORE_APPS = [
@@ -116,6 +119,7 @@ CORE_APPS = [
     'newsroom.settings',
     'newsroom.photos',
     'newsroom.media_utils',
+    'newsroom.news_api.api_tokens',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -285,3 +289,5 @@ CELERY_BEAT_SCHEDULE = {
 
 MAX_EXPIRY_QUERY_LIMIT = os.environ.get('MAX_EXPIRY_QUERY_LIMIT', 100)
 CONTENT_API_EXPIRY_DAYS = os.environ.get('CONTENT_API_EXPIRY_DAYS', 180)
+
+NEWS_API_ENABLED = strtobool(env('NEWS_API_ENABLED', 'false'))
