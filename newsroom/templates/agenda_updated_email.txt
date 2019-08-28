@@ -1,6 +1,7 @@
 {% extends "email_layout.txt" %}
 
 {% block content %}
+
 {{ message }}
 
 {% include "email_watched_agenda.txt" %}

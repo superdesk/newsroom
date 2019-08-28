@@ -3,9 +3,9 @@ from flask import json
 from datetime import datetime
 from newsroom.wire.utils import get_local_date, get_end_date
 from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts
-
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import post_json, delete_json, get_json, get_admin_user_id
+from .utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
+from unittest import mock
 
 
 def test_item_detail(client):
@@ -79,7 +79,8 @@ def test_item_copy(client, app):
     assert str(user_id) in data['copies']
 
 
-def test_share_items(client, app):
+@mock.patch('newsroom.wire.views.send_email', mock_send_email)
+def test_share_items(client, app, mocker):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
         'first_name': 'Foo',
@@ -96,10 +97,9 @@ def test_share_items(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@sourcefabric.org'
         assert outbox[0].subject == 'From AAP Newsroom: Conference Planning'
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin shared ' in outbox[0].body
+        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert 'Conference Planning' in outbox[0].body
         assert 'http://localhost:5050/agenda/urn:conference' in outbox[0].body
         assert 'Some info message' in outbox[0].body
@@ -162,6 +162,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert '_aggregations' in data
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_coverage_request(client, app):
     post_json(client, '/settings/general_settings', {'coverage_request_recipients': 'admin@bar.com'})
     with app.mail.record_messages() as outbox:

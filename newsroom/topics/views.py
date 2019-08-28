@@ -89,25 +89,22 @@ def share():
     assert data.get('users')
     assert data.get('items')
     topic = get_entity_or_404(data.get('items')[0]['_id'], 'topics')
-    with app.mail.connect() as connection:
-        for user_id in data['users']:
-            user = get_resource_service('users').find_one(req=None, _id=user_id)
-            if not user or not user.get('email'):
-                continue
+    for user_id in data['users']:
+        user = get_resource_service('users').find_one(req=None, _id=user_id)
+        if not user or not user.get('email'):
+            continue
 
-            template_kwargs = {
-                'recipient': user,
-                'sender': current_user,
-                'topic': topic,
-                'url': get_topic_url(topic),
-                'message': data.get('message'),
-                'app_name': app.config['SITE_NAME'],
-            }
-            send_email(
-                [user['email']],
-                gettext('From %s: %s' % (app.config['SITE_NAME'], topic['label'])),
-                render_template('share_topic.txt', **template_kwargs),
-                sender=current_user['email'],
-                connection=connection
-            )
+        template_kwargs = {
+            'recipient': user,
+            'sender': current_user,
+            'topic': topic,
+            'url': get_topic_url(topic),
+            'message': data.get('message'),
+            'app_name': app.config['SITE_NAME'],
+        }
+        send_email(
+            [user['email']],
+            gettext('From %s: %s' % (app.config['SITE_NAME'], topic['label'])),
+            render_template('share_topic.txt', **template_kwargs),
+        )
     return jsonify(), 201

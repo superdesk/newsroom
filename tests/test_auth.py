@@ -8,6 +8,8 @@ from superdesk.utils import get_hash
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
 from tests.test_users import init as users_init, ADMIN_USER_ID  # noqa
+from .utils import mock_send_email
+from unittest import mock
 
 disabled_company = ObjectId()
 expired_company = ObjectId()
@@ -32,6 +34,7 @@ def init(app):
     }])
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_new_user_signup_sends_email(app, client):
     app.config['SIGNUP_EMAIL_RECIPIENTS'] = 'admin@bar.com'
     with app.mail.record_messages() as outbox:

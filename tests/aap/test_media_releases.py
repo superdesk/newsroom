@@ -1,5 +1,5 @@
 from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from tests.utils import json, get_json, get_admin_user_id
+from tests.utils import json, get_json, get_admin_user_id, mock_send_email
 from tests.test_download import wire_formats, download_zip_file, items_ids
 from tests.test_push import get_signature_headers
 from tests.test_users import ADMIN_USER_ID
@@ -10,6 +10,7 @@ from superdesk.utc import utcnow
 from flask import g
 from datetime import datetime, timedelta
 from urllib import parse
+from unittest import mock
 import zipfile
 
 
@@ -360,6 +361,7 @@ def test_company_type_filter(client, app):
     assert 'WEATHER' != data['_items'][0]['slugline']
 
 
+@mock.patch('newsroom.wire.views.send_email', mock_send_email)
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -377,10 +379,10 @@ def test_share_items(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@sourcefabric.org'
+        assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin shared ' in outbox[0].body
+        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
         assert items[1]['headline'] in outbox[0].body
         assert 'http://localhost:5050/media_releases?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body
@@ -413,6 +415,7 @@ def test_download(client, app):
     assert history[0].get('section') == 'media_releases'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -454,6 +457,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     assert 'http://localhost:5050/media_releases?item=bar' in outbox[0].body
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     app.data.insert('section_filters', [{
         '_id': 'f-1',
