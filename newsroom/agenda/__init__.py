@@ -21,7 +21,7 @@ def init_app(app):
     superdesk.register_resource('agenda', AgendaResource, AgendaService, _app=app)
     superdesk.register_resource('agenda_featured', FeaturedResource, FeaturedService, _app=app)
 
-    app.section('agenda', 'Agenda')
+    app.section('agenda', 'Agenda', 'agenda')
     app.sidenav(gettext('Agenda'), 'agenda.index', 'calendar', section='agenda')
     app.sidenav(gettext('Saved/Watched Items'), 'agenda.bookmarks', 'bookmark',
                 group=1, blueprint='agenda', badge='saved-items-count')

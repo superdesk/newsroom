@@ -16,7 +16,7 @@ def init_app(app):
         _app=app
     )
 
-    app.section('media_releases', 'Media Releases')
+    app.section('media_releases', 'Media Releases', 'wire')
     app.sidenav('Media Releases', 'media_releases.index', 'factory', section='media_releases')
 
     app.sidenav(gettext('Saved/Watched Items'), 'media_releases.bookmarks', 'bookmark',
