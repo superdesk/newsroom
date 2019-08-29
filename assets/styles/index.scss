@@ -504,6 +504,10 @@ article.list {
         position: static;
         z-index: auto;
     }
+    &--large {
+        width: 440px !important;
+    }
+
     form {
         display: flex;
         flex-direction: column;
@@ -1057,7 +1061,6 @@ article.list {
         padding-top: 4px;
     }
 }
-
 
 .flex-grid__item {
     background: #fff;
