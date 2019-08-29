@@ -119,6 +119,7 @@ CORE_APPS = [
     'newsroom.settings',
     'newsroom.photos',
     'newsroom.media_utils',
+    'newsroom.news_api',
     'newsroom.news_api.api_tokens',
 ]
 

@@ -43,7 +43,7 @@ def init_app(app):
 
     superdesk.register_resource('wire_search', WireSearchResource, WireSearchService, _app=app)
 
-    app.section('wire', 'Wire')
+    app.section('wire', 'Wire', 'wire')
     app.dashboard('newsroom',
                   gettext('Newsroom'),
                   [

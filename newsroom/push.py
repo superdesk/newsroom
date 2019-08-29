@@ -622,8 +622,12 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
     # (in case items appear in multiple sections)
     _send_notification('wire', _get_users('wire'))
 
-    # Next iterate over the registered sections (excluding wire)
-    for section_id in [section['_id'] for section in app.sections if section['_id'] != 'wire']:
+    # Next iterate over the registered sections (excluding wire and api)
+    for section_id in [
+        section['_id']
+        for section in app.sections
+        if section['_id'] != 'wire' and section['group'] != 'api'
+    ]:
         # Add the users for those sections and send the notification
         _send_notification(section_id, _get_users(section_id))
 

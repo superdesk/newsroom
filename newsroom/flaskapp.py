@@ -217,7 +217,7 @@ class Newsroom(eve.Eve):
             return flask.send_from_directory(self.theme_folder, filename)
         return self.send_static_file(filename)
 
-    def section(self, _id, name):
+    def section(self, _id, name, group):
         """Define new app section.
 
         App sections are used for permissions in company settings,
@@ -226,7 +226,7 @@ class Newsroom(eve.Eve):
         You can define new sections in module :meth:`init_app` method::
 
             def init_app(app):
-                app.section('foo', 'Foo')
+                app.section('foo', 'Foo', 'wire)
 
         And then you can use it in views as decorator and it will check if user
         has section active::
@@ -247,7 +247,8 @@ class Newsroom(eve.Eve):
         """
         self.sections.append({
             '_id': _id,
-            'name': name
+            'name': name,
+            'group': group
         })
 
     def sidenav(self, name, endpoint=None, icon=None, group=0, section=None, blueprint=None, badge=None, url=None,
@@ -257,7 +258,7 @@ class Newsroom(eve.Eve):
         Use in module :meth:`init_app` method::
 
             def init_app(app):
-                app.section('foo', 'Foo')
+                app.section('foo', 'Foo', 'wire')
 
         :param name: user readable name
         :param endpoint: endpoint name, used with :meth:`flask.url_for`
