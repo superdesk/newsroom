@@ -18,8 +18,8 @@ function AgendaFilterButton({filter, activeFilter, autoToggle, onClick}) {
         aria-haspopup='true'
         aria-expanded='false'
         onClick={onClick} >
-        <i className={`${filter.icon} d-sm-none`}></i>
-        <span className='d-none d-sm-block'>{getActiveFilterLabel(filter, activeFilter, isActive)}</span>
+        <i className={`${filter.icon} d-md-none`}></i>
+        <span className='d-none d-md-block'>{getActiveFilterLabel(filter, activeFilter, isActive)}</span>
         <i className={classNames('icon-small--arrow-down ml-1', {'icon--white': isActive})}></i>
     </button>);
 }
