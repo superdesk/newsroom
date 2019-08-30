@@ -35,7 +35,7 @@ install:
 
 script:
     - flake8
-    - pytest --cov=newsroom
+    - pytest --disable-pytest-warnings --cov=newsroom
     - npm run lint
     - npm run test
     - npm run build

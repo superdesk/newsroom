@@ -4,6 +4,9 @@ import tzlocal
 from kombu import Queue, Exchange
 from celery.schedules import crontab
 
+from superdesk.default_settings import local_to_utc_hour
+from newsroom import company_expiry_alerts  # noqa
+
 from superdesk.default_settings import (   # noqa
     VERSION,
     MONGO_URI,
@@ -57,7 +60,7 @@ X_ALLOW_CREDENTIALS = True
 
 URL_PREFIX = 'api'
 
-# keys for signing, shoudl be binary
+# keys for signing, should be binary
 SECRET_KEY = os.environ.get('SECRET_KEY', '').encode() or os.urandom(32)
 PUSH_KEY = os.environ.get('PUSH_KEY', '').encode()
 
@@ -69,6 +72,8 @@ if DEFAULT_TIMEZONE is None:
 
 if not DEFAULT_TIMEZONE:
     raise ValueError("DEFAULT_TIMEZONE is empty")
+
+BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     'newsroom.wire',
@@ -129,18 +134,11 @@ SHOW_COPYRIGHT = True
 
 TEMPLATES_AUTO_RELOAD = True
 
-DEFAULT_TIMEZONE = os.environ.get('DEFAULT_TIMEZONE')
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S+0000'
-
-if DEFAULT_TIMEZONE is None:
-    DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
-
-BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 WEBPACK_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static', 'dist', 'manifest.json')
 WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL', '/static/dist/')
 WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL', 'http://localhost:8080/')
-
 
 # How many days a new account can stay active before it is approved by admin
 NEW_ACCOUNT_ACTIVE_DAYS = 14
@@ -195,8 +193,6 @@ PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 
 # the time to live value in days for user notifications
 NOTIFICATIONS_TTL = 1
-
-WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
 
 SERVICES = [
     {"name": "Domestic Sport", "code": "t"},
@@ -267,11 +263,15 @@ IFRAMELY = True
 COMPANY_TYPES = []
 
 #: celery config
-CELERY_TASK_QUEUES = (Queue(celery_queue('newsroom'), Exchange(celery_queue('newsroom')), routing_key='newsroom.#'),)
+WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
+CELERY_TASK_QUEUES = (
+    Queue(celery_queue('default'), Exchange(celery_queue('default')), routing_key='default'),
+    Queue(celery_queue('newsroom'), Exchange(celery_queue('newsroom'), type='topic'), routing_key='newsroom.#'),
+)
 CELERY_TASK_ROUTES = {
-    'newsroom.company_expiry': {
+    'newsroom.company_expiry_alerts.company_expiry': {
         'queue': celery_queue('newsroom'),
-        'routing_key': 'newsroom.company_expiry_alerts.company_expiry'
+        'routing_key': 'newsroom.company_expiry_alerts'
     }
 }
 
@@ -279,7 +279,7 @@ CELERY_TASK_ROUTES = {
 CELERY_BEAT_SCHEDULE = {
     'newsroom:company_expiry': {
         'task': 'newsroom.company_expiry_alerts.company_expiry',
-        'schedule': crontab(hour=0, minute=0),  # Runs every day at midnight
+        'schedule': crontab(hour=local_to_utc_hour(0), minute=0),  # Runs every day at midnight
     }
 }
 
