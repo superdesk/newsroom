@@ -6,6 +6,9 @@ from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from newsroom import company_expiry_alerts  # noqa
 
+from superdesk.default_settings import local_to_utc_hour
+from newsroom import company_expiry_alerts  # noqa
+
 from superdesk.default_settings import (   # noqa
     VERSION,
     MONGO_URI,
