@@ -8,7 +8,12 @@
     @include sm {
       font-size: 1rem; // 16px
     }
+
+    @include xxsm {
+      display: none;
+    }
   }
+
   a.breadcrumb-item {
     font-weight: 300;
     &:hover {
@@ -30,13 +35,12 @@
 .breadcrumb-item.active {
   color: #9ba4ad;
 
-  @include xsm {
-    text-overflow: ellipsis;
-    overflow:hidden;
-    max-width: 80px;
-  }
-
   @include sm {
     overflow: visible;
   }
+}
+
+.breadcrumb-sub-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

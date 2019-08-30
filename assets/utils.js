@@ -284,7 +284,7 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
             } else {
                 dateTimeString.push(`${formatTime(start)} - ${formatTime(end)} ${formatDate(start)}`);
             }
-            break;        
+            break;
         }
     }
 
@@ -404,7 +404,7 @@ export function wordCount(item) {
  * @return {number}
  */
 export function characterCount(item) {
-    
+
     if (isInteger(item.charcount)) {
         return item.charcount;
     }
@@ -453,7 +453,7 @@ export function updateRouteParams(updates, state) {
         }
     });
 
-    
+
     const stateClone = cloneDeep(state);
     stateClone.items = [];
     stateClone.itemsById = {};
@@ -529,6 +529,10 @@ export function isTouchDevice() {
     || navigator.maxTouchPoints;       // works on IE10/11 and Surface
 }
 
+export function isMobilePhone() {
+    return isTouchDevice() && screen.width < 768;
+}
+
 /**
  * Checks if wire context
  * @returns {boolean}
@@ -551,7 +555,7 @@ const getNow = throttle(moment, 500);
 
 /**
  * Test if item is embargoed, if not returns null, otherwise returns its embargo time
- * @param {String} embargoed 
+ * @param {String} embargoed
  * @return {Moment}
  */
 export function getEmbargo(item) {

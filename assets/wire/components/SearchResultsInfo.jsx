@@ -76,7 +76,7 @@ class SearchResultsInfo extends React.Component {
                         disabled={isFollowing}
                         className="btn btn-outline-primary btn-sm d-block d-sm-none"
                         onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType, this.props.activeNavigation)}
-                    >{gettext('S')}</button>
+                    >{gettext('Save Search')}</button>
                 )}
 
                 <div className="d-flex align-items-center ml-auto">
