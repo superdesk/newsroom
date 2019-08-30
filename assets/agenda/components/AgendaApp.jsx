@@ -167,12 +167,12 @@ class AgendaApp extends BaseApp {
                     </nav>
                 </section>,
                 <section key="contentMain" className='content-main'>
-                    <div className='wire-column--3'>
+                    <div className={`wire-column--3 ${this.state.withSidebar?'nav--open':''}`}>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                             {this.state.withSidebar &&
                                 <SearchSidebar
                                     tabs={this.getTabs()}
-                                    props={{ 
+                                    props={{
                                         ...this.props,
                                         groups,
                                         fetchItems: this.fetchItemsOnNavigation }} />
