@@ -66,8 +66,9 @@ class CompanyExpiryAlerts():
                                 .format(self.log_msg, company.get('name'), recipients))
                     send_email(
                         [u['email'] for u in users],
-                        'Your Company\'s account is expiring on ({})'.format(company.get('expiry_date')
-                                                                             .strftime('%Y-%m-%d')),
+                        'Your Company\'s account is expiring on {}'.format(
+                            company.get('expiry_date').strftime('%d-%m-%Y')
+                        ),
                         text_body=render_template('company_expiry_alert_user.txt', **template_kwargs),
                         html_body=render_template('company_expiry_alert_user.html', **template_kwargs),
                     )
@@ -76,13 +77,15 @@ class CompanyExpiryAlerts():
                 return  # No one else to send
 
             template_kwargs = {
-                'companies': companies,
+                'companies': sorted(companies, key=lambda k: k['expiry_date']),
                 'expiry_date': expiry_time
             }
             logger.info('{} Sending to following expiry administrators: {}'.format(self.log_msg, recipients))
             send_email(
                 recipients,
-                'Companies expiring within next 7 days ({})'.format(expiry_time.strftime('%Y-%m-%d')),
+                'Companies expired or due to expire within the next 7 days ({})'.format(
+                    expiry_time.strftime('%d-%m-%Y')
+                ),
                 text_body=render_template('company_expiry_email.txt', **template_kwargs),
                 html_body=render_template('company_expiry_email.html', **template_kwargs),
             )
