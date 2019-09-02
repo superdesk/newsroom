@@ -39,7 +39,7 @@ def test_company_expiry_alerts(client, app):
         CompanyExpiryAlerts().send_alerts()
         assert len(outbox) == 1
         assert outbox[0].recipients == ['admin@localhost.com', ' notanadmin@localhost.com']
-        assert outbox[0].subject == 'Companies expiring within next 7 days ({})'\
-            .format(expiry_time.strftime('%Y-%m-%d'))
+        assert outbox[0].subject == 'Companies expired or due to expire within the next 7 days ({})'\
+            .format(expiry_time.strftime('%d-%m-%Y'))
         assert 'Press Co. That Will Expire' in outbox[0].body
         assert 'Press Co. Will Not Expire' not in outbox[0].body
