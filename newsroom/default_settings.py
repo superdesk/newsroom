@@ -272,6 +272,10 @@ CELERY_TASK_ROUTES = {
     'newsroom.company_expiry_alerts.company_expiry': {
         'queue': celery_queue('newsroom'),
         'routing_key': 'newsroom.company_expiry_alerts'
+    },
+    'newsroom.email._send_email': {
+        'queue': celery_queue('newsroom'),
+        'routing_key': 'newsroom._send_email'
     }
 }
 

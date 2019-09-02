@@ -9,6 +9,8 @@ from datetime import datetime
 from superdesk import get_resource_service
 from newsroom.utils import get_entity_or_404
 from .fixtures import init_auth  # noqa
+from .utils import mock_send_email
+from unittest import mock
 
 
 def get_signature_headers(data, key):
@@ -239,6 +241,7 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
     assert len(push_mock.call_args[1]['topics']) == 1
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -279,6 +282,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -324,6 +328,7 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     assert notification['item'] == 'bar'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     app.data.insert('companies', [{
         '_id': '2',
@@ -414,6 +419,7 @@ def test_do_not_notify_inactive_user(client, app, mocker):
     assert push_mock.call_args[1]['_items'][0]['_id'] == 'foo'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_checks_service_subscriptions(client, app, mocker):
     app.data.insert('companies', [{
         '_id': 1,
@@ -458,6 +464,7 @@ def test_notify_checks_service_subscriptions(client, app, mocker):
     assert len(outbox) == 0
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_send_notification_emails(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',

@@ -202,34 +202,37 @@ def share():
     assert data.get('users')
     assert data.get('items')
     items = [get_entity_or_404(_id, item_type) for _id in data.get('items')]
-    with app.mail.connect() as connection:
-        for user_id in data['users']:
-            user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
-            subject = items[0]['headline'] if item_type == 'items' else items[0].get('name')
-            if not user or not user.get('email'):
-                continue
-            template_kwargs = {
-                'recipient': user,
-                'sender': current_user,
-                'items': items,
-                'message': data.get('message'),
-                'section': request.args.get('type', 'wire')
-            }
-            if item_type == 'agenda':
-                template_kwargs['maps'] = data.get('maps')
-                template_kwargs['dateStrings'] = [get_agenda_dates(item) for item in items]
-                template_kwargs['locations'] = [get_location_string(item) for item in items]
-                template_kwargs['contactList'] = [get_public_contacts(item) for item in items]
-                template_kwargs['linkList'] = [get_links(item) for item in items]
-                template_kwargs['is_admin'] = is_admin_or_internal(user)
-            send_email(
-                [user['email']],
-                gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
-                text_body=flask.render_template('share_{}.txt'.format(item_type), **template_kwargs),
-                html_body=flask.render_template('share_{}.html'.format(item_type), **template_kwargs),
-                sender=current_user['email'],
-                connection=connection
-            )
+    for user_id in data['users']:
+        user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
+        subject = items[0].get('headline')
+
+        # If it's an event, 'name' is the subject
+        if items[0].get('event'):
+            subject = items[0]['name']
+
+        if not user or not user.get('email'):
+            continue
+        template_kwargs = {
+            'recipient': user,
+            'sender': current_user,
+            'items': items,
+            'message': data.get('message'),
+            'section': request.args.get('type', 'wire')
+        }
+        if item_type == 'agenda':
+            template_kwargs['maps'] = data.get('maps')
+            template_kwargs['dateStrings'] = [get_agenda_dates(item) for item in items]
+            template_kwargs['locations'] = [get_location_string(item) for item in items]
+            template_kwargs['contactList'] = [get_public_contacts(item) for item in items]
+            template_kwargs['linkList'] = [get_links(item) for item in items]
+            template_kwargs['is_admin'] = is_admin_or_internal(user)
+
+        send_email(
+            [user['email']],
+            gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
+            text_body=flask.render_template('share_{}.txt'.format(item_type), **template_kwargs),
+            html_body=flask.render_template('share_{}.html'.format(item_type), **template_kwargs),
+        )
     update_action_list(data.get('items'), 'shares', item_type=item_type)
     get_resource_service('history').create_history_record(items, 'share', current_user,
                                                           request.args.get('type', 'wire'))
