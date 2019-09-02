@@ -5,13 +5,10 @@ import {
     SET_ERROR,
     GET_USER,
     EDIT_USER,
-    SELECT_MENU, HIDE_MODAL, TOGGLE_DROPDOWN,
+    SELECT_MENU, HIDE_MODAL, TOGGLE_DROPDOWN
 } from './actions';
 
-import {
-    RENDER_MODAL,
-    CLOSE_MODAL,
-} from 'actions';
+import { RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID } from 'actions';
 
 import { modalReducer } from 'reducers';
 
@@ -100,6 +97,8 @@ export default function itemReducer(state = initialState, action) {
 
     case RENDER_MODAL:
     case CLOSE_MODAL:
+    case MODAL_FORM_VALID:
+    case MODAL_FORM_INVALID:
         return {...state, modal: modalReducer(state.modal, action)};
 
     case SET_ERROR:

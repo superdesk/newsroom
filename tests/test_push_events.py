@@ -2,7 +2,7 @@ import io
 import pytz
 from flask import json
 from .test_push import get_signature_headers
-from .utils import post_json, get_json
+from .utils import post_json, get_json, mock_send_email
 from datetime import datetime
 from copy import deepcopy
 
@@ -10,6 +10,7 @@ from superdesk import get_resource_service
 from newsroom.utils import get_entity_or_404
 from newsroom.notifications import get_user_notifications
 from .fixtures import init_auth  # noqa
+from unittest import mock
 
 
 test_event = {
@@ -393,6 +394,7 @@ def test_push_parsed_adhoc_planning_for_an_non_existing_event(client, app):
     assert parsed['definition_long'] == test_planning['abstract']
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_topic_matches_for_new_event_item(client, app, mocker):
     event = deepcopy(test_event)
     client.post('/push', data=json.dumps(event), content_type='application/json')
@@ -426,6 +428,7 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
     assert len(push_mock.call_args[1]['topics']) == 1
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     event = deepcopy(test_event)
     client.post('/push', data=json.dumps(event), content_type='application/json')
@@ -462,6 +465,7 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     assert len(push_mock.call_args[1]['topics']) == 1
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     # remove event link from planning item
     planning = deepcopy(test_planning)
@@ -499,6 +503,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     assert len(push_mock.call_args[1]['topics']) == 1
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -541,6 +546,7 @@ def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, mocker):
     assert notification['item'] == 'bar3'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -578,6 +584,7 @@ def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker):
     assert notification['item'] == 'foo'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_planning_in_history(client, app, mocker):
     event = deepcopy(test_event)
     client.post('/push', data=json.dumps(event), content_type='application/json')
@@ -622,6 +629,7 @@ def test_notify_user_matches_for_new_planning_in_history(client, app, mocker):
     assert notification['item'] == 'foo'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     event = deepcopy(test_event)
     client.post('/push', data=json.dumps(event), content_type='application/json')
@@ -692,6 +700,7 @@ def test_push_event_with_files(client, app):
     assert 'foo' == resp.get_data().decode('utf-8')
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_push_item_with_coverage(client, app, mocker):
     test_item = {
         'type': 'text',
@@ -736,6 +745,7 @@ def assign_active_company(app):
     return current_user['_id']
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
@@ -765,6 +775,7 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -792,6 +803,7 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
@@ -819,6 +831,7 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -847,6 +860,7 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)

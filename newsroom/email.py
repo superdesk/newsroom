@@ -1,13 +1,29 @@
 from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
+from newsroom.celery_app import celery
 
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
     get_public_contacts
 from newsroom.template_filters import is_admin_or_internal
 
 
-def send_email(to, subject, text_body, html_body=None, sender=None, connection=None):
+@celery.task(bind=True, soft_time_limit=120)
+def _send_email(self, to, subject, text_body, html_body=None, sender=None):
+    if sender is None:
+        sender = current_app.config['MAIL_DEFAULT_SENDER']
+    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to)
+    msg.body = text_body
+    msg.html = html_body
+    app = current_app._get_current_object()
+    with app.mail.connect() as connection:
+        if connection:
+            return connection.send(msg)
+
+        return app.mail.send(msg)
+
+
+def send_email(to, subject, text_body, html_body=None, sender=None):
     """
     Sends the email
     :param to: List of recipients
@@ -17,15 +33,8 @@ def send_email(to, subject, text_body, html_body=None, sender=None, connection=N
     :param sender: Sender
     :return:
     """
-    if sender is None:
-        sender = current_app.config['MAIL_DEFAULT_SENDER']
-    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to)
-    msg.body = text_body
-    msg.html = html_body
-    app = current_app._get_current_object()
-    if connection:
-        return connection.send(msg)
-    return app.mail.send(msg)
+    args = {'to': to, 'subject': subject, 'text_body': text_body, 'html_body': html_body, 'sender': sender}
+    _send_email.apply_async(kwargs=args, serializer="eve/json")
 
 
 def send_new_signup_email(user):
