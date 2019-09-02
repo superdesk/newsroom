@@ -1,41 +1,43 @@
 <h1>{{ item.headline or item.name }}</h1>
 <a href="{{ url_for_agenda(item) }}">{{ url_for_agenda(item) }}</a>
 
-<p class="h3">{{ dateString }}</p>
+{%  if item.event %}<p class="h3">{{ dateString }}</p>{% endif %}
 
 {% if location and location != '' %}
     <p class="h3"><b>Where:</b> {{ location }}</p>
 {% endif %}
 
 {% if map and map != '' %}
-    <div><img src={{ map | safe }} ></div>
+    <div><img style="height: auto!important; max-width: 700px!important; width: 100%!important"
+              src={{ map | safe }} ></div>
 {% endif %}
 
-{% for contact in contacts %}
-    <p class="h3">
-        <b>Contact:</b>
-        {{ contact.name or contact.organisation }}
+{% if contacts | length is gt 1 %}
+    <p><b>Contact: </b>
+    {% for contact in contacts %}
+        <div>{{ contact.name or contact.organisation }}
         {{ contact.phone }}
         {{ contact.mobile }}
-        {{ contact.email }}
+        {{ contact.email }}</div>
+    {% endfor %}
     </p>
-{% endfor %}
+{% endif %}
 
-{% for link in links %}
-    <p class="h3">
-        <b>Web:</b>
-        <a href={{ link | safe }}>{{ link }}</a>
+{% if contacts | length is gt 1 %}
+    <p><b>Web: </b>
+    {% for link in links %}
+        <div><a href={{ link | safe }}>{{ link }}</a></div>
+    {% endfor %}
     </p>
-{% endfor %}
+{% endif %}
 
 {%  for planning_item in item.get('planning_items', []) or [] %}
-
     <div>
         <div >
-            <p class="h3">{{ planning_item.get('description_text') or planning_item.get('name') or '' }}</p>
+            <h3>{{ planning_item.get('description_text') or planning_item.get('name') or '' }}</h3>
         </div>
 
-        {% if is_admin and planning_item.get('ednote') %}
+        {% if planning_item.get('ednote') %}
             <div>
                 <strong>Editorial Note:</strong>
                 {{ planning_item.get('ednote') }}
@@ -43,29 +45,15 @@
         {% endif %}
 
         {% if planning_item.get('coverages', []) %}
-            <div>
+            <p>
                 <div>
-                    <h5>Coverages:</h5>
+                    <p><strong>Coverage:</strong></p>
                 </div>
 
-                {% for coverage in planning_item.get('coverages', []) or [] %}
-                    <dl>
-                        <dt>Coverage Type:</dt>
-                        <dd>{{ coverage.get('planning', {}).get('g2_content_type') }}</dd>
-                        <dt>Due:</dt>
-                        <dd>{{  coverage.get('planning', {}).get('scheduled') | datetime_long }}</dd>
-                        <dt>Workflow Status:</dt>
-                        <dd>{{ coverage.get('workflow_status') }}</dd>
-                        <dt>Coverage Status:</dt>
-                        <dd>{{ coverage.get('news_coverage_status', {}).get('name') }}</dd>
-                        {% if is_admin %}
-                            <dt>Internal Note:</dt>
-                            <dd>{{ coverage.get('planning', {}).get('internal_note', '') or '' }}</dd>
-                        {% endif %}
-                    </dl>
-
+                {% for cov in planning_item.get('coverages', []) or [] %}
+                    <div>{{ get_coverage_email_text(cov) }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div>{% if is_admin and cov.get('planning', {}).get('internal_note') %}{{ "\r\n" }}<div><i>Internal Note: {{ cov['planning']['internal_note'] }}</i>{% endif %}<br><br>
                 {% endfor %}
-            </div>
+            </p>
         {% endif %}
     </div>
 {% endfor %}

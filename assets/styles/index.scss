@@ -134,6 +134,7 @@ tr.table--selected {
 body.print {
     color: #000;
     background-color: #fff;
+    overflow: auto;
 }
 
 .sidenav {
@@ -3020,6 +3021,9 @@ a.wire-articles__versions {
 
 .modal, .modal-backdrop {
     position: absolute;
+    position: fixed;
+    top: 0;
+    background: white;
 }
 
 // home event
@@ -3241,5 +3245,26 @@ a.wire-articles__versions {
 
     @include sm {
         display: none;
+    }
+}
+
+.search-user-list {
+    overflow: auto;
+    max-height: 400px;
+
+    @include xxsm {
+        max-height: 300px;
+        margin: 0;
+    }
+
+    @include xsm {
+        max-height: 400px;
+        margin: 0;
+    }
+}
+
+.user-msg {
+    @include phone {
+        margin: 0;
     }
 }
