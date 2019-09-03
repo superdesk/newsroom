@@ -24,6 +24,7 @@ const initialState = {
     services: [],
     sections: [],
     companyTypes: [],
+    apiEnabled: false,
 };
 
 function setupCompanies(companyList, state) {
@@ -131,6 +132,7 @@ export default function companyReducer(state = initialState, action) {
             products: action.data.products,
             sections: action.data.sections,
             companyTypes: action.data.company_types || [],
+            apiEnabled: action.data.api_enabled || false,
         };
 
         return setupCompanies(action.data.companies, nextState);

@@ -15,9 +15,11 @@ function TextInput({type, name, label, onChange, value, error, required, readOnl
 
     return (
         <div className={wrapperClass}>
-            <label htmlFor={name}>{label}</label>
+            {label && (
+                <label htmlFor={name}>{label}</label>
+            )}
             <div className="field">
-                <input 
+                <input
                     type={type || 'text'}
                     id={name}
                     name={name}
@@ -39,7 +41,7 @@ function TextInput({type, name, label, onChange, value, error, required, readOnl
 
 TextInput.propTypes = {
     type: PropTypes.string,
-    label: PropTypes.string.isRequired,
+    label: PropTypes.string,
     name: PropTypes.string,
     value: PropTypes.string,
     error: PropTypes.arrayOf(PropTypes.string),

@@ -34,6 +34,20 @@ def update():
         return jsonify({'error': ex}), 500
 
 
+@blueprint.route('/news_api_tokens', methods=['DELETE'])
+def delete():
+    company = flask.request.args.get('company')
+    try:
+        token = get_resource_service(API_TOKENS).find_one(req=None, company=company)
+        if token and token.get('token'):
+            get_resource_service(API_TOKENS).delete({'_id': token['token']})
+            return jsonify({'success': True}), 200
+        else:
+            return jsonify({'error': 'Not Found'}), 404
+    except Exception as ex:
+        return jsonify({'error': ex}), 500
+
+
 @blueprint.route('/news_api_tokens', methods=['GET'])
 def get():
     company = flask.request.args.get('company')
