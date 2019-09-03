@@ -127,14 +127,15 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row, isM
                     />
                 </div>
             )}
-            <div className='wire-articles__item__meta-info flex-row align-items-start mt-2'>
+            <div className='wire-articles__item__meta-info flex-row align-items-start'>
                 {hasLocation(item) && (
                     <span className='mr-2'>
                         <i className='icon-small--location icon--gray' />
                     </span>
                 )}
                 {hasLocation(item) && !isMobilePhone && (
-                    <span className={classNames({'wire-articles__item__icons--dashed-border' :internalNote})}>
+                    <span className={classNames('mr-2',
+                        {'wire-articles__item__icons--dashed-border' :internalNote})}>
                         {getLocationString(item)}
                     </span>
                 )}
