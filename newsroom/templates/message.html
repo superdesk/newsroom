@@ -1,0 +1,7 @@
+{% set new_message = message.replace('\r', '') %}
+{% set new_message = new_message.split('\n')  %}
+<p>
+    {% for m in new_message %}
+        {{ m }}<br>
+    {% endfor %}
+</p>

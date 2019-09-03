@@ -28,7 +28,7 @@ from newsroom.limiter import limiter
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, char_count, newsroom_config, is_admin,
-    hash_string, date_header, get_date,
+    hash_string, date_header, get_date, get_multi_line_message,
     sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager
 )
 from newsroom.celery_app import init_celery
@@ -153,6 +153,7 @@ class Newsroom(eve.Eve):
         self.add_template_global(hash_string, 'hash')
         self.add_template_global(get_date, 'get_date')
         self.add_template_global(self.settings_apps, 'settings_apps')
+        self.add_template_global(get_multi_line_message)
         self.jinja_loader = jinja2.ChoiceLoader([
             jinja2.FileSystemLoader('theme'),
             jinja2.FileSystemLoader(self.template_folder),
