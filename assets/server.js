@@ -90,6 +90,21 @@ class Server {
             body: data ? JSON.stringify(data) : null,
         })).then(checkStatus);
     }
+
+    /**
+     * Make PATCH request to url
+     *
+     * @param {String} url
+     * @param {Object} data
+     * @return {Promise}
+     */
+    patch(url, data) {
+        return fetch(url, options({
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data),
+        })).then(checkStatus);
+    }
 }
 
 export default new Server();
