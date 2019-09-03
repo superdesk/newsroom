@@ -24,14 +24,14 @@ function AgendaListItemLabels({item, withDate, group, right}) {
         }
 
         if (get(item, 'event.completed')) {
-            labelText = gettext('completed');
+            labelText = gettext('event completed');
         }
 
         if (!labelText) {
             return null;
         }
 
-        return (<div><span className={classNames('label label--orange ml-4', {'pull-right': right})}>{labelText}</span></div>);
+        return (<div><span className={classNames('label label--orange ml-2', {'pull-right': right})}>{labelText}</span></div>);
         
     };
     const dateGroup = group && moment(group, DATE_FORMAT);
