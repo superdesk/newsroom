@@ -2,11 +2,11 @@ from pytz import utc
 from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
-
+from superdesk.utc import utcnow
 from tests.test_users import test_login_succeeds_for_admin, init as users_init
 
 PUBLIC_USER_ID = ObjectId('59b4c5c61d41c8d736852fbf')
-
+TEST_USER_ID = ObjectId('5cc94454bc43165c045ffec9')
 
 items = [
     {
@@ -91,9 +91,36 @@ agenda_items = [{
             'guid': 'urn:planning',
             'agendas': [],
             '_current_version': 1,
-            'coverages': [],
             'type': 'planning',
-            'internal_note': 'Internal message for planning'
+            'internal_note': 'Internal message for planning',
+            'coverages': [
+                {
+                    'firstcreated': '2018-06-27T11:07:17+0000',
+                    'planning': {
+                        'g2_content_type': 'text',
+                        'genre': [
+                            {
+                                'name': 'Article',
+                                'qcode': 'Article'
+                            }
+                        ],
+                        'ednote': 'An editorial Note',
+                        'keyword': [
+                            'Motoring'
+                        ],
+                        'scheduled': '2018-04-09T14:00:53.000Z',
+                        'slugline': 'Raiders',
+                        'internal_note': 'Internal message for coverage'
+                    },
+                    'workflow_status': 'active',
+                    'coverage_id': 'urn:coverage',
+                    'news_coverage_status': {
+                        'label': 'Planned',
+                        'name': 'coverage intended',
+                        'qcode': 'ncostat:int'
+                    }
+                }
+            ],
         }
     ],
     '_created': '2018-06-27T11:12:07+0000',
@@ -161,7 +188,8 @@ def init_auth(app, client):
 def setup_user_company(app):
     app.data.insert('companies', [{
         '_id': 1,
-        'name': 'Grain Corp'
+        'name': 'Grain Corp',
+        'is_enabled': True
     }])
 
     app.data.insert('users', [{
@@ -169,7 +197,19 @@ def setup_user_company(app):
         'email': 'foo@bar.com',
         'first_name': 'Foo',
         'last_name': 'Bar',
-        'company': 1
+        'company': 1,
+        'is_enabled': True,
+        'is_approved': True,
+        '_created': utcnow()
+    }, {
+        '_id': TEST_USER_ID,
+        'email': 'test@bar.com',
+        'first_name': 'Test',
+        'last_name': 'Bar',
+        'company': 1,
+        'is_enabled': True,
+        'is_approved': True,
+        '_created': utcnow()
     }])
 
 

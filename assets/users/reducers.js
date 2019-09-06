@@ -8,7 +8,10 @@ import {
     CANCEL_EDIT,
     NEW_USER,
     SET_ERROR,
-    GET_COMPANIES
+    GET_COMPANIES,
+    SET_COMPANY,
+    SET_SORT,
+    TOGGLE_SORT_DIRECTION,
 } from './actions';
 
 const initialState = {
@@ -20,6 +23,9 @@ const initialState = {
     totalUsers: null,
     activeQuery: null,
     companies: [],
+    company: null,
+    sort: null,
+    sortDirection: 1,
 };
 
 export default function userReducer(state = initialState, action) {
@@ -105,6 +111,21 @@ export default function userReducer(state = initialState, action) {
 
     }
 
+    case SET_COMPANY: {
+        return {...state, company: action.company};
+    }
+
+    case SET_SORT: {
+        return {
+            ...state,
+            sort: action.param,
+            sortDirection: 1
+        };
+    }
+
+    case TOGGLE_SORT_DIRECTION: {
+        return {...state, sortDirection: state.sortDirection === 1 ? -1 : 1};
+    }
 
     default:
         return state;

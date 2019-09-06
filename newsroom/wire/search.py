@@ -114,15 +114,24 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
         )
 
     query['bool']['minimum_should_match'] = 1
-
-    wire_time_limit_days = get_setting('wire_time_limit_days')
-    if company and not is_admin(user) and not company.get('archive_access', False) and wire_time_limit_days:
-        query['bool']['must'].append({'range': {'versioncreated': {
-            'gte': 'now-%dd/d' % int(wire_time_limit_days),
-        }}})
+    _add_limit_days(query, section, company, user)
 
     if not query['bool']['should']:
         abort(403, gettext('Your company doesn\'t have any products defined.'))
+
+
+def _add_limit_days(query, section, company, user):
+    # This limit is only for wire content, ignore this limit for agenda
+    # If later we require time limit for agenda, this will have to be separate as versioncreated
+    # is not sufficient for calendar based items (i.e. using the event's date or the coverages scheduled date)
+    if section == 'agenda':
+        return
+
+    limit_days = get_setting('aapx_time_limit_days') if section == 'aapX' else get_setting('wire_time_limit_days')
+    if company and not is_admin(user) and not company.get('archive_access', False) and limit_days:
+        query['bool']['must'].append({'range': {'versioncreated': {
+            'gte': 'now-%dd/d' % int(limit_days),
+        }}})
 
 
 def query_string(query):
@@ -289,8 +298,18 @@ class WireSearchService(newsroom.Service):
         if not product:
             return
 
-        query['bool']['should'] = []
+        query['bool']['must'].append({
+            "bool": {
+                "should": [
+                    {"range": {"embargoed": {"lt": "now"}}},
+                    {"bool": {"must_not": {"exists": {"field": "embargoed"}}}}
+                ]
+            }
+        })
+
         get_resource_service('section_filters').apply_section_filter(query, product.get('product_type'))
+
+        query['bool']['should'] = []
 
         if product.get('sd_product_id'):
             query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
@@ -570,9 +589,10 @@ class WireSearchService(newsroom.Service):
         internal_req.args = {'source': json.dumps(source)}
         return super().get(internal_req, None)
 
-    def get_navigation_story_count(self, navigations):
+    def get_navigation_story_count(self, navigations, section, company, user):
         """Get story count by navigation"""
         query = _items_query()
+        _add_limit_days(query, section, company, user)
         get_resource_service('section_filters').apply_section_filter(query, self.section)
 
         aggs = {

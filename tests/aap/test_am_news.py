@@ -1,15 +1,16 @@
 from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from tests.utils import json, get_json
+from tests.utils import json, get_json, get_admin_user_id, mock_send_email
 from tests.test_download import wire_formats, download_zip_file, items_ids
 from tests.test_push import get_signature_headers
+from tests.test_users import ADMIN_USER_ID
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
 from flask import g
-from bson import ObjectId
 from datetime import datetime, timedelta
 from urllib import parse
+from unittest import mock
 import zipfile
 
 
@@ -43,7 +44,7 @@ def get_bookmarks_count(client, user):
 
 
 def test_bookmarks(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert user_id
 
     assert 0 == get_bookmarks_count(client, user_id)
@@ -114,7 +115,7 @@ def test_item_copy(client, app):
     data = json.loads(resp.get_data())
     assert 'copies' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['copies']
 
 
@@ -158,7 +159,7 @@ def test_logged_in_user_no_product_gets_no_results(client):
 
 def test_logged_in_user_no_company_gets_no_results(client):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/am_news/search')
@@ -167,7 +168,7 @@ def test_logged_in_user_no_company_gets_no_results(client):
 
 def test_administrator_gets_all_results(client):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     resp = client.get('/am_news/search')
@@ -268,7 +269,7 @@ def test_item_detail_access(client, app):
 
 def test_administrator_gets_results_based_on_section_filter(client, app):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     app.data.insert('section_filters', [{
@@ -360,6 +361,7 @@ def test_company_type_filter(client, app):
     assert 'WEATHER' != data['_items'][0]['slugline']
 
 
+@mock.patch('newsroom.wire.views.send_email', mock_send_email)
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -377,10 +379,10 @@ def test_share_items(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@sourcefabric.org'
+        assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin shared ' in outbox[0].body
+        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
         assert items[1]['headline'] in outbox[0].body
         assert 'http://localhost:5050/am_news?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body
@@ -391,7 +393,7 @@ def test_share_items(client, app):
     data = json.loads(resp.get_data())
     assert 'shares' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['shares']
 
 
@@ -403,16 +405,17 @@ def test_download(client, app):
             content = zf.open(_format['filename']).read()
             _format['test_content'](content)
     history = app.data.find('history', None, None)
-    assert len(items_ids) == history.count()
+    assert (len(wire_formats) * len(items_ids)) == history.count()
     assert 'download' == history[0]['action']
     assert history[0].get('user')
-    assert history[0].get('created') + timedelta(seconds=2) >= utcnow()
+    assert history[0].get('versioncreated') + timedelta(seconds=2) >= utcnow()
     assert history[0].get('item') in items_ids
     assert history[0].get('version')
     assert history[0].get('company') is None
     assert history[0].get('section') == 'am_news'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -423,6 +426,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         'email': 'foo@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
+        'is_approved': True,
         'receive_email': True,
         'company': company_ids[0],
     }
@@ -453,6 +457,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     assert 'http://localhost:5050/am_news?item=bar' in outbox[0].body
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     app.data.insert('section_filters', [{
         '_id': 'f-1',
@@ -472,6 +477,12 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         'query': 'NOT service.code:a',
         'is_enabled': True,
         'filter_type': 'aapX'
+    }, {
+        '_id': 'f-4',
+        'name': 'product test 4',
+        'query': 'NOT service.code:a',
+        'is_enabled': True,
+        'filter_type': 'media_releases'
     }])
 
     app.data.insert('companies', [{
@@ -484,6 +495,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         'email': 'foo@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
+        'is_approved': True,
         'receive_email': True,
         'company': '2',
     }

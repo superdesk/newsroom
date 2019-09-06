@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const SelectInput = ({name, label, onChange, defaultOption, value, error, options}) => {
+const SelectInput = ({name, label, onChange, defaultOption, value, error, options, className}) => {
     return (
-        <div className="form-group">
+        <div className={className ? className : 'form-group'}>
             <label htmlFor={name}>{label}</label>
             <div className="field">
                 <select
@@ -36,6 +36,7 @@ SelectInput.propTypes = {
         text: PropTypes.string.isRequired,
         value: PropTypes.string.isRequired,
     })).isRequired,
+    className: PropTypes.string,
 };
 
 export default SelectInput;

@@ -3,6 +3,7 @@ import {
     INIT_DATA,
     OPEN_ITEM,
     SET_ACTIVE,
+    SET_CARD_ITEMS,
 } from './actions';
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
 import {CLOSE_MODAL, RENDER_MODAL} from '../actions';
@@ -61,6 +62,16 @@ export default function homeReducer(state = initialState, action) {
         return {
             ...state,
             itemToOpen,
+        };
+    }
+
+    case SET_CARD_ITEMS: {
+        return {
+            ...state,
+            itemsByCard: {
+                ...state.itemsByCard,
+                [action.payload.card]: action.payload.items,
+            },
         };
     }
 

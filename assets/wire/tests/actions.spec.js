@@ -5,7 +5,7 @@ import { createStore, applyMiddleware } from 'redux';
 
 import wireApp from '../reducers';
 import * as actions from '../actions';
-import { getTimezoneOffset, now } from 'utils';
+import * as utils from 'utils';
 import {setQuery, toggleNavigation} from 'search/actions';
 
 describe('wire actions', () => {
@@ -16,7 +16,7 @@ describe('wire actions', () => {
     };
 
     beforeEach(() => {
-        spyOn(now, 'utcOffset').and.returnValue('');
+        spyOn(utils.now, 'utcOffset').and.returnValue('');
         fetchMock.get('begin:/wire/search?&tick=', response);
         fetchMock.get('begin:/wire/search?q=foo&tick=', response);
         store = createStore(wireApp, applyMiddleware(thunk));
@@ -27,7 +27,7 @@ describe('wire actions', () => {
     });
 
     it('test getTimezoneOffset mock', () => {
-        expect(getTimezoneOffset()).toBe(0);
+        expect(utils.getTimezoneOffset()).toBe(0);
     });
 
     it('can fetch items', () => {
@@ -103,8 +103,34 @@ describe('wire actions', () => {
     });
 
     it('can open item', () => {
+        fetchMock.post('/history/new', {});
         store.dispatch(actions.openItem({_id: 'foo'}));
         expect(store.getState().openItem._id).toBe('foo');
+        expect(fetchMock.called('/history/new')).toBeTruthy();
+        fetchMock.reset();
+    });
+
+    it('open item records history actions', () => {
+        fetchMock.post('/history/new', {});
+        spyOn(utils, 'postHistoryAction').and.callFake(function(item, action, section) {
+            expect(item).toEqual({_id: 'foo'});
+            expect(action).toEqual('open');
+            expect(section).toEqual('wire');
+        });
+        store.dispatch(actions.openItem({_id: 'foo'}));
+        expect(store.getState().openItem._id).toBe('foo');
+        fetchMock.reset();
+    });
+
+    it('preview item records history actions', () => {
+        fetchMock.post('/history/new', {});
+        spyOn(utils, 'postHistoryAction').and.callFake(function(item, action, section) {
+            expect(item).toEqual({_id: 'foo'});
+            expect(action).toEqual('preview');
+            expect(section).toEqual('wire');
+        });
+        store.dispatch(actions.previewItem({_id: 'foo'}));
+        fetchMock.reset();
     });
 
     it('can fetch item previous versions', () => {

@@ -7,6 +7,10 @@
       opacity: .5;
     }
   }
+
+  @include phone {
+    padding: 0.5rem 1rem 0 1rem;
+  }
 }
 
 // Title text within header
@@ -27,4 +31,8 @@
   // Easily place margin between footer elements
   > :not(:first-child) { margin-left: 10px; }
   > :not(:last-child) { margin-right: 10px; }
+
+  @include phone {
+    padding: 0.5rem 1rem;
+  }
 }

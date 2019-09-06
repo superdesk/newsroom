@@ -24,6 +24,7 @@ function CompanyList({companies, onClick, activeCompanyId, companyTypes}) {
                             <th>{ gettext('Name') }</th>
                             <th>{ gettext('Type') }</th>
                             <th>{ gettext('Superdesk Subscriber Id') }</th>
+                            <th>{ gettext('Account Manager') }</th>
                             <th>{ gettext('Status') }</th>
                             <th>{ gettext('Contact') }</th>
                             <th>{ gettext('Telephone') }</th>

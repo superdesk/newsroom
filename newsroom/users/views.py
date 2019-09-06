@@ -8,9 +8,9 @@ from superdesk import get_resource_service
 from werkzeug.exceptions import BadRequest, NotFound
 
 from newsroom.auth import get_user, get_user_by_email
-from newsroom.auth.decorator import admin_only, login_required
 from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user
+from newsroom.decorator import admin_only, login_required
 from newsroom.companies import get_user_company_name, get_company_sections
 from newsroom.notifications.notifications import get_user_notifications
 from newsroom.topics import get_user_topics
@@ -82,13 +82,13 @@ def _is_email_address_valid(email):
     return not existing_user
 
 
-@blueprint.route('/users/<id>', methods=['GET', 'POST'])
+@blueprint.route('/users/<_id>', methods=['GET', 'POST'])
 @login_required
-def edit(id):
-    if not is_current_user_admin() and not is_current_user(id):
+def edit(_id):
+    if not is_current_user_admin() and not is_current_user(_id):
         flask.abort(401)
 
-    user = find_one('users', _id=ObjectId(id))
+    user = find_one('users', _id=ObjectId(_id))
 
     if not user:
         return NotFound(gettext('User not found'))
@@ -103,23 +103,24 @@ def edit(id):
             if form.company.data:
                 updates['company'] = ObjectId(form.company.data)
 
-            get_resource_service('users').patch(id=ObjectId(id), updates=updates)
+            user = get_resource_service('users').patch(ObjectId(_id), updates=updates)
             app.cache.delete(user.get('email'))
+            app.cache.delete(_id)
             return jsonify({'success': True}), 200
         return jsonify(form.errors), 400
     return jsonify(user), 200
 
 
-@blueprint.route('/users/<id>/validate', methods=['POST'])
+@blueprint.route('/users/<_id>/validate', methods=['POST'])
 @admin_only
-def validate(id):
-    return _resend_token(id, token_type='validate')
+def validate(_id):
+    return _resend_token(_id, token_type='validate')
 
 
-@blueprint.route('/users/<id>/reset_password', methods=['POST'])
+@blueprint.route('/users/<_id>/reset_password', methods=['POST'])
 @admin_only
-def resend_token(id):
-    return _resend_token(id, token_type='reset_password')
+def resend_token(_id):
+    return _resend_token(_id, token_type='reset_password')
 
 
 def _resend_token(user_id, token_type):
@@ -143,21 +144,21 @@ def _resend_token(user_id, token_type):
     return jsonify({'message': 'Token could not be sent'}), 400
 
 
-@blueprint.route('/users/<id>', methods=['DELETE'])
+@blueprint.route('/users/<_id>', methods=['DELETE'])
 @admin_only
-def delete(id):
+def delete(_id):
     """ Deletes the user by given id """
-    get_resource_service('users').delete({'_id': ObjectId(id)})
+    get_resource_service('users').delete_action({'_id': ObjectId(_id)})
     return jsonify({'success': True}), 200
 
 
-@blueprint.route('/users/<id>/topics', methods=['GET'])
+@blueprint.route('/users/<_id>/topics', methods=['GET'])
 @login_required
-def get_topics(id):
+def get_topics(_id):
     """ Returns list of followed topics of given user """
-    if flask.session['user'] != str(id):
+    if flask.session['user'] != str(_id):
         flask.abort(403)
-    return jsonify({'_items': get_user_topics(id)}), 200
+    return jsonify({'_items': get_user_topics(_id)}), 200
 
 
 @blueprint.route('/users/<user_id>/notifications', methods=['GET'])
@@ -175,7 +176,7 @@ def delete_all(user_id):
     if flask.session['user'] != str(user_id):
         flask.abort(403)
 
-    get_resource_service('notifications').delete({'user': ObjectId(user_id)})
+    get_resource_service('notifications').delete_action({'user': ObjectId(user_id)})
     return jsonify({'success': True}), 200
 
 
@@ -186,5 +187,5 @@ def delete_notification(user_id, notification_id):
     if flask.session['user'] != str(user_id):
         flask.abort(403)
 
-    get_resource_service('notifications').delete({'_id': notification_id})
+    get_resource_service('notifications').delete_action({'_id': notification_id})
     return jsonify({'success': True}), 200

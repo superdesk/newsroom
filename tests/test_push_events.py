@@ -1,15 +1,16 @@
 import io
 import pytz
-from flask import json, render_template_string
+from flask import json
 from .test_push import get_signature_headers
-from .utils import post_json, get_json
+from .utils import post_json, get_json, mock_send_email
 from datetime import datetime
 from copy import deepcopy
 
 from superdesk import get_resource_service
 from newsroom.utils import get_entity_or_404
 from newsroom.notifications import get_user_notifications
-from .fixtures import init_auth
+from .fixtures import init_auth  # noqa
+from unittest import mock
 
 
 test_event = {
@@ -118,7 +119,7 @@ test_planning = {
         {
             "planning": {
                 "g2_content_type": "text",
-                "slugline": "Vivid planning item",
+                "slugline": "Vivid Text Explainer",
                 "internal_note": "internal note here",
                 "genre": [
                     {
@@ -141,7 +142,7 @@ test_planning = {
         {
             "planning": {
                 "g2_content_type": "picture",
-                "slugline": "Vivid planning item",
+                "slugline": "Vivid Photos",
                 "internal_note": "internal note here",
                 "ednote": "ed note here",
                 "scheduled": "2018-05-28T10:51:52+0000"
@@ -187,7 +188,6 @@ def test_push_parsed_event(client, app):
     assert 1 == len(parsed['subject'])
     assert 'a' == parsed['service'][0]['code']
 
-    init_auth(app, client)
     resp = client.get('/agenda/search?date_to=now/d')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
@@ -263,6 +263,8 @@ def test_push_parsed_planning_for_an_existing_event(client, app):
     assert 'a' == parsed['service'][0]['code']
     assert 1 == len(parsed['subject'])
     assert '06002002' == parsed['subject'][0]['code']
+    assert parsed['coverages'][0]['slugline'] == 'Vivid Text Explainer'
+    assert parsed['coverages'][1]['slugline'] == 'Vivid Photos'
 
     parsed_planning = parsed['planning_items'][0]
     assert 1 == len(parsed_planning['service'])
@@ -392,6 +394,7 @@ def test_push_parsed_adhoc_planning_for_an_non_existing_event(client, app):
     assert parsed['definition_long'] == test_planning['abstract']
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_topic_matches_for_new_event_item(client, app, mocker):
     event = deepcopy(test_event)
     client.post('/push', data=json.dumps(event), content_type='application/json')
@@ -425,6 +428,7 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
     assert len(push_mock.call_args[1]['topics']) == 1
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     event = deepcopy(test_event)
     client.post('/push', data=json.dumps(event), content_type='application/json')
@@ -461,6 +465,7 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     assert len(push_mock.call_args[1]['topics']) == 1
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     # remove event link from planning item
     planning = deepcopy(test_planning)
@@ -498,6 +503,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     assert len(push_mock.call_args[1]['topics']) == 1
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -540,6 +546,7 @@ def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, mocker):
     assert notification['item'] == 'bar3'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -577,6 +584,7 @@ def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker):
     assert notification['item'] == 'foo'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_planning_in_history(client, app, mocker):
     event = deepcopy(test_event)
     client.post('/push', data=json.dumps(event), content_type='application/json')
@@ -621,6 +629,7 @@ def test_notify_user_matches_for_new_planning_in_history(client, app, mocker):
     assert notification['item'] == 'foo'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     event = deepcopy(test_event)
     client.post('/push', data=json.dumps(event), content_type='application/json')
@@ -691,6 +700,7 @@ def test_push_event_with_files(client, app):
     assert 'foo' == resp.get_data().decode('utf-8')
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_push_item_with_coverage(client, app, mocker):
     test_item = {
         'type': 'text',
@@ -703,8 +713,8 @@ def test_push_item_with_coverage(client, app, mocker):
 
     post_json(client, '/agenda_watch', {'items': [test_event['guid']]})
 
-    mail = mocker.patch('newsroom.agenda.email.send_email')
-    post_json(client, '/push', test_item)
+    with app.mail.record_messages() as outbox:
+        post_json(client, '/push', test_item)
 
     item = get_json(client, '/agenda/foo')
     coverages = item.get('coverages')
@@ -718,36 +728,10 @@ def test_push_item_with_coverage(client, app, mocker):
     assert wire_item['agenda_id'] == 'foo'
     assert wire_item['agenda_href'] == '/agenda/foo'
 
-    kwargs = dict(
-        agenda=item,
-        item=wire_item,
-        section='agenda'
-    )
-
-    mail.assert_called_with(
-        to=['admin@sourcefabric.org'],
-        subject='New coverage',
-        text_body=render_template_string("""
-{% extends "email_layout.txt" %}
-
-{% block content %}
-New coverage received for agenda item {{ agenda.name }}:
-
-{% include "email_item.txt" %}
-
-{% endblock %}
-        """.strip(), **kwargs),
-        html_body=render_template_string("""
-{% extends "email_layout.html" %}
-
-{% block content %}
-<p>New coverage received for agenda item {{ agenda.name }}:</p>
-
-{% include "email_item.html" %}
-
-{% endblock %}
-        """.strip(), **kwargs)
-    )
+    assert len(outbox) == 1
+    assert 'Subject: Prime minister press conference - updated' in str(outbox[0])
+    assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
+    assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
 
 
 def assign_active_company(app):
@@ -761,6 +745,7 @@ def assign_active_company(app):
     return current_user['_id']
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
@@ -781,7 +766,8 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Event updated' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - updated' in str(outbox[0])
+    assert 'The event you have been following has been rescheduled' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -789,6 +775,7 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -807,7 +794,8 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Event cancelled' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
+    assert 'The event you have been following has been cancelled' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -815,6 +803,7 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
@@ -830,7 +819,11 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Planning added' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
+    assert 'The event you have been following has new coverage(s)' in str(outbox[0])
+    assert '! Text coverage \'Vivid Text Explainer\' due' in str(outbox[0])
+    assert '! Picture coverage \'Vivid Photos\' due' in str(outbox[0])
+
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -838,6 +831,7 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -856,7 +850,9 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Planning cancelled' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
+    assert '! Text coverage \'Vivid Text Explainer\' has been cancelled.\r\nNote: ed note here' in str(outbox[0])
+    assert '! Picture coverage \'Vivid Photos\' has been cancelled.\r\nNote: ed note here' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -864,6 +860,7 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -903,7 +900,8 @@ def test_watched_event_sends_notification_for_added_coverage(client, app, mocker
     notifications = get_user_notifications(user_id)
 
     assert len(outbox) == 1
-    assert 'Subject: Coverage added' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
+    assert '! Video coverage \'Vivid planning item\' due' in str(outbox[0])
     assert push_mock.call_args[0][0] == 'agenda_update'
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['users']) == 1
@@ -1009,7 +1007,10 @@ def test_push_coverages_with_linked_stories(client, app):
     planning = deepcopy(test_planning)
     planning['guid'] = 'bar7'
     planning['event_item'] = 'foo7'
-    planning['coverages'][0]['deliveries'] = [{'item_id': 'item7'}]
+    planning['coverages'][0]['deliveries'] = [{
+        'item_id': 'item7',
+        'item_state': 'published',
+    }]
     planning['coverages'][0]['workflow_status'] = 'completed'
 
     client.post('/push', data=json.dumps(planning), content_type='application/json')
@@ -1025,6 +1026,100 @@ def test_push_coverages_with_linked_stories(client, app):
     assert 2 == len(parsed['coverages'])
     assert parsed['coverages'][0]['delivery_id'] is None
     assert parsed['coverages'][0]['delivery_href'] is None
+
+
+def test_push_coverages_with_updates_to_linked_stories(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo7'
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar7'
+    planning['event_item'] = 'foo7'
+    planning['coverages'][0]['deliveries'] = [{
+        'item_id': 'item7',
+        'item_state': 'published',
+    }]
+    planning['coverages'][0]['workflow_status'] = 'completed'
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    assert parsed['coverages'][0]['delivery_id'] == 'item7'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
+
+    planning['coverages'][0]['deliveries'].append({
+        'item_id': 'item8',
+        'item_state': 'in_progress',
+        'sequence_no': 1,
+    })
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    assert parsed['coverages'][0]['delivery_id'] == 'item7'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
+
+    planning['coverages'][0]['deliveries'].append({
+        'item_id': 'item8',
+        'item_state': 'published',
+        'sequence_no': 2,
+    })
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    assert parsed['coverages'][0]['delivery_id'] == 'item8'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item8'
+
+
+def test_push_coverages_with_correction_to_linked_stories(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo7'
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar7'
+    planning['event_item'] = 'foo7'
+    planning['coverages'][0]['deliveries'] = [{
+        'item_id': 'item7',
+        'item_state': 'published',
+    }]
+    planning['coverages'][0]['workflow_status'] = 'completed'
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    assert parsed['coverages'][0]['delivery_id'] == 'item7'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
+
+    # Publish an update to the original story
+    planning['coverages'][0]['deliveries'].append({
+        'item_id': 'item8',
+        'item_state': 'published',
+        'sequence_no': 1,
+    })
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    # Coverage should point to the latest version
+    assert parsed['coverages'][0]['delivery_id'] == 'item8'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item8'
+
+    # Publish a correction to the latest version
+    planning['coverages'][0]['deliveries'].append({
+        'item_id': 'item8',
+        'item_state': 'corrected',
+        'sequence_no': 1,
+    })
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    # Coverage should still point to the latest version
+    assert parsed['coverages'][0]['delivery_id'] == 'item8'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item8'
 
 
 def test_push_event_from_planning(client, app):
@@ -1063,3 +1158,27 @@ def test_push_event_from_planning(client, app):
     assert '06002002' == parsed['subject'][0]['code']
     assert parsed['dates']['start'].isoformat() == event['dates']['start'].replace('0000', '00:00')
     assert parsed['dates']['end'].isoformat() == event['dates']['end'].replace('0000', '00:00')
+
+
+def test_coverages_delivery_sequence_has_default(client, app):
+    event = deepcopy(test_event)
+    event['guid'] = 'foo7'
+    client.post('/push', data=json.dumps(event), content_type='application/json')
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar7'
+    planning['event_item'] = 'foo7'
+    planning['coverages'][0]['deliveries'] = [{
+        'item_id': 'item7',
+        'item_state': 'published',
+        'sequence_no': None
+    }]
+    planning['coverages'][0]['workflow_status'] = 'completed'
+    planning['coverages'][0]['coverage_type'] = 'text'
+
+    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    parsed = get_entity_or_404('foo7', 'agenda')
+    assert 2 == len(parsed['coverages'])
+    assert parsed['coverages'][0]['delivery_id'] == 'item7'
+    assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
+    assert parsed['coverages'][0]['deliveries'][0]['sequence_no'] == 0

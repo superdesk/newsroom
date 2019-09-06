@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import {SCHEDULE_TYPE} from '../utils';
 import {bem} from 'ui/utils';
 import {formatAgendaDate, formatDate, DATE_FORMAT, getScheduleType} from 'utils';
+import {shouldRenderLocation} from'maps/utils';
 
 export default function AgendaTime({item, group, suppliedNodes, withGroupDate}) {
     const getClassNames = (modifier = 'event') => {
@@ -55,7 +56,9 @@ export default function AgendaTime({item, group, suppliedNodes, withGroupDate}) 
         }
     };
 
-    return [(<div key='local-time' className={classNames('wire-column__preview__content-header', {'mb-0': isRemoteTimezone}, {'mb-2': !isRemoteTimezone})}>
+    const margin = !isRemoteTimezone && !shouldRenderLocation(item);
+
+    return [(<div key='local-time' className={classNames('wire-column__preview__content-header', {'mb-0': !margin}, {'mb-2': margin})}>
         <div className={classNames(getClassNames(),
             {'p-0': isRemoteTimezone})}>{getDates()}</div>
         {suppliedNodes}

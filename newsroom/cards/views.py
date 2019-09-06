@@ -1,21 +1,21 @@
 import re
 import flask
 from bson import ObjectId
-from flask import jsonify, json, current_app
+from flask import jsonify, json, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
 
-from newsroom.auth.decorator import admin_only, login_required
+from newsroom.decorator import admin_only, login_required
 from newsroom.cards import blueprint
-from newsroom.utils import get_entity_or_404, get_file
-from newsroom.utils import query_resource
+from newsroom.utils import get_entity_or_404, query_resource
+from newsroom.upload import get_file
 
 
 def get_settings_data():
     return {
         'products': list(query_resource('products', lookup={'is_enabled': True})),
         'cards': list(query_resource('cards')),
-        'dashboards': current_app.dashboards,
+        'dashboards': app.dashboards,
         'navigations': list(query_resource('navigations', lookup={'is_enabled': True}))
     }
 
@@ -52,13 +52,13 @@ def _get_card_data(data):
         flask.abort(400)
 
     if not data.get('label'):
-        return jsonify(gettext('Label not found')), 400
+        raise ValueError(gettext('Label not found'))
 
     if not data.get('type'):
-        return jsonify(gettext('Type not found')), 400
+        raise ValueError(gettext('Type not found'))
 
-    if not data.get('dashboard'):
-        return jsonify(gettext('Dashboard type not found')), 400
+    if data.get('dashboard') and data['dashboard'] not in {d['_id'] for d in app.dashboards}:
+        raise ValueError(gettext('Dashboard type not found'))
 
     card_data = {
         'label': data.get('label'),
@@ -92,7 +92,6 @@ def edit(id):
 
     data = json.loads(flask.request.form['card'])
     card_data = _get_card_data(data)
-
     get_resource_service('cards').patch(id=ObjectId(id), updates=card_data)
     return jsonify({'success': True}), 200
 

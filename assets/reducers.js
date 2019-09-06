@@ -1,6 +1,6 @@
 import {uniq} from 'lodash';
 import {
-    CLOSE_MODAL, RENDER_MODAL,
+    CLOSE_MODAL, RENDER_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID,
     SAVED_ITEMS_COUNT,
 } from 'actions';
 import {searchReducer} from 'search/reducers';
@@ -41,10 +41,26 @@ import {get, isEmpty} from 'lodash';
 export function modalReducer(state, action) {
     switch (action.type) {
     case RENDER_MODAL:
-        return {modal: action.modal, data: action.data};
+        return {
+            modal: action.modal,
+            data: action.data,
+            modalProps: action.modalProps
+        };
 
     case CLOSE_MODAL:
         return null;
+
+    case MODAL_FORM_VALID:
+        return {
+            ...state,
+            formValid: true,
+        };
+
+    case MODAL_FORM_INVALID:
+        return {
+            ...state,
+            formValid: false,
+        };
 
     default:
         return state;
@@ -166,6 +182,8 @@ export function defaultReducer(state, action) {
 
     case RENDER_MODAL:
     case CLOSE_MODAL:
+    case MODAL_FORM_VALID:
+    case MODAL_FORM_INVALID:
         return {...state, modal: modalReducer(state.modal, action)};
 
     case ADD_TOPIC:
@@ -294,7 +312,10 @@ export function defaultReducer(state, action) {
     case SET_NEW_ITEMS: {
         return {
             ...state,
-            newItems: action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id),
+            newItems: uniq([
+                ...state.newItems,
+                ...(action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id))
+            ]),
         };
     }
 

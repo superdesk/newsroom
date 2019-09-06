@@ -6,7 +6,7 @@ from flask import jsonify, current_app
 from flask_babel import gettext
 from superdesk import get_resource_service
 
-from newsroom.auth.decorator import admin_only
+from newsroom.decorator import admin_only
 from newsroom.products import blueprint
 from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.utils import query_resource
@@ -108,5 +108,5 @@ def update_navigations(id):
 def delete(id):
     """ Deletes the products by given id """
     get_entity_or_404(ObjectId(id), 'products')
-    get_resource_service('products').delete({'_id': ObjectId(id)})
+    get_resource_service('products').delete_action({'_id': ObjectId(id)})
     return jsonify({'success': True}), 200

@@ -5,7 +5,7 @@ import superdesk
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app, request
+from flask import current_app as app, request, jsonify
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -17,7 +17,8 @@ from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
-from newsroom.auth import get_user, get_user_id, login_required
+from newsroom.auth import get_user, get_user_id
+from newsroom.decorator import login_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
@@ -30,6 +31,7 @@ from newsroom.template_filters import is_admin_or_internal
 from .search import get_bookmarks_count
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
+HOME_EXTERNAL_ITEMS_CACHE_KEY = 'home_external_items'
 
 
 def get_services(user):
@@ -80,7 +82,9 @@ def get_items_by_card(cards):
             items_by_card[card['label']] = superdesk.get_resource_service('wire_search').\
                 get_product_items(ObjectId(card['config']['product']), card['config']['size'])
         elif card['type'] == '4-photo-gallery':
-            items_by_card[card['label']] = app.get_media_cards_external(card)
+            # Omit external media, let the client manually request these
+            # using '/media_card_external' endpoint
+            items_by_card[card['label']] = None
 
     app.cache.set(HOME_ITEMS_CACHE_KEY, items_by_card, timeout=300)
     return items_by_card
@@ -118,6 +122,21 @@ def get_previous_versions(item):
 @login_required
 def index():
     return flask.render_template('home.html', data=get_home_data())
+
+
+@blueprint.route('/media_card_external/<card_id>')
+@login_required
+def get_media_card_external(card_id):
+    cache_id = '{}_{}'.format(HOME_EXTERNAL_ITEMS_CACHE_KEY, card_id)
+
+    if app.cache.get(cache_id):
+        card_items = app.cache.get(cache_id)
+    else:
+        card = get_entity_or_404(card_id, 'cards')
+        card_items = app.get_media_cards_external(card)
+        app.cache.set(cache_id, card_items, timeout=300)
+
+    return flask.jsonify({'_items': card_items})
 
 
 @blueprint.route('/wire')
@@ -170,13 +189,7 @@ def download(_ids):
         _file.seek(0)
 
     update_action_list(_ids.split(','), 'downloads', force_insert=True)
-    app.data.insert(
-        'history',
-        items,
-        action='download',
-        user=user,
-        section=request.args.get('type', 'wire')
-    )
+    get_resource_service('history').create_history_record(items, 'download', user, request.args.get('type', 'wire'))
     return flask.send_file(_file, mimetype=mimetype, attachment_filename=attachment_filename, as_attachment=True)
 
 
@@ -189,35 +202,40 @@ def share():
     assert data.get('users')
     assert data.get('items')
     items = [get_entity_or_404(_id, item_type) for _id in data.get('items')]
-    with app.mail.connect() as connection:
-        for user_id in data['users']:
-            user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
-            subject = items[0]['headline'] if item_type == 'items' else items[0].get('name')
-            if not user or not user.get('email'):
-                continue
-            template_kwargs = {
-                'recipient': user,
-                'sender': current_user,
-                'items': items,
-                'message': data.get('message'),
-                'section': request.args.get('type', 'wire')
-            }
-            if item_type == 'agenda':
-                template_kwargs['maps'] = data.get('maps')
-                template_kwargs['dateStrings'] = [get_agenda_dates(item) for item in items]
-                template_kwargs['locations'] = [get_location_string(item) for item in items]
-                template_kwargs['contactList'] = [get_public_contacts(item) for item in items]
-                template_kwargs['linkList'] = [get_links(item) for item in items]
-                template_kwargs['is_admin'] = is_admin_or_internal(user)
-            send_email(
-                [user['email']],
-                gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
-                text_body=flask.render_template('share_{}.txt'.format(item_type), **template_kwargs),
-                html_body=flask.render_template('share_{}.html'.format(item_type), **template_kwargs),
-                sender=current_user['email'],
-                connection=connection
-            )
+    for user_id in data['users']:
+        user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
+        subject = items[0].get('headline')
+
+        # If it's an event, 'name' is the subject
+        if items[0].get('event'):
+            subject = items[0]['name']
+
+        if not user or not user.get('email'):
+            continue
+        template_kwargs = {
+            'recipient': user,
+            'sender': current_user,
+            'items': items,
+            'message': data.get('message'),
+            'section': request.args.get('type', 'wire')
+        }
+        if item_type == 'agenda':
+            template_kwargs['maps'] = data.get('maps')
+            template_kwargs['dateStrings'] = [get_agenda_dates(item) for item in items]
+            template_kwargs['locations'] = [get_location_string(item) for item in items]
+            template_kwargs['contactList'] = [get_public_contacts(item) for item in items]
+            template_kwargs['linkList'] = [get_links(item) for item in items]
+            template_kwargs['is_admin'] = is_admin_or_internal(user)
+
+        send_email(
+            [user['email']],
+            gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
+            text_body=flask.render_template('share_{}.txt'.format(item_type), **template_kwargs),
+            html_body=flask.render_template('share_{}.html'.format(item_type), **template_kwargs),
+        )
     update_action_list(data.get('items'), 'shares', item_type=item_type)
+    get_resource_service('history').create_history_record(items, 'share', current_user,
+                                                          request.args.get('type', 'wire'))
     return flask.jsonify(), 201
 
 
@@ -241,8 +259,9 @@ def bookmark():
 @login_required
 def copy(_id):
     item_type = get_type()
-    get_entity_or_404(_id, item_type)
+    item = get_entity_or_404(_id, item_type)
     update_action_list([_id], 'copies', item_type=item_type)
+    get_resource_service('history').create_history_record([item], 'copy', get_user(), request.args.get('type', 'wire'))
     return flask.jsonify(), 200
 
 
@@ -268,6 +287,8 @@ def item(_id):
     if 'print' in flask.request.args:
         template = 'wire_item_print.html'
         update_action_list([_id], 'prints', force_insert=True)
+        get_resource_service('history').create_history_record([item], 'print', get_user(),
+                                                              request.args.get('type', 'wire'))
     else:
         template = 'wire_item.html'
     return flask.render_template(
@@ -275,3 +296,14 @@ def item(_id):
         item=item,
         previous_versions=previous_versions,
         display_char_count=display_char_count)
+
+
+@blueprint.route('/wire/items/<_ids>')
+@login_required
+def items(_ids):
+    item_ids = _ids.split(',')
+    items = superdesk.get_resource_service('wire_search').get_items(item_ids)
+    for item in items:
+        set_permissions(item, 'wire', False if flask.request.args.get('ignoreLatest') == 'false' else True)
+
+    return jsonify(items.docs), 200

@@ -1,9 +1,10 @@
-from flask import current_app, render_template, url_for
+from flask import render_template, url_for
 from flask_babel import gettext
 
 from newsroom.email import send_email
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, get_public_contacts
 from newsroom.template_filters import is_admin_or_internal
+from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 
 
 def send_coverage_notification_email(user, agenda, wire_item):
@@ -21,16 +22,22 @@ def send_coverage_notification_email(user, agenda, wire_item):
         )
 
 
-def send_agenda_notification_email(user, agenda, message, subject):
+def send_agenda_notification_email(user, agenda, message, subject, original_agenda, coverage_updates,
+                                   related_planning_removed, coverage_updated, time_updated):
     if agenda and user.get('receive_email'):
         kwargs = dict(
             message=message,
-            item=agenda,
-            dateString=get_agenda_dates(agenda),
+            agenda=agenda,
+            dateString=get_agenda_dates(agenda if agenda.get('dates') else original_agenda, date_paranthesis=True),
             location=get_location_string(agenda),
             contacts=get_public_contacts(agenda),
             links=get_links(agenda),
             is_admin=is_admin_or_internal(user),
+            original_agenda=original_agenda,
+            coverage_updates=coverage_updates,
+            related_planning_removed=related_planning_removed,
+            coverage_updated=coverage_updated,
+            time_updated=time_updated,
         )
         send_email(
             to=[user['email']],
@@ -48,10 +55,15 @@ def send_coverage_request_email(user, message, item):
     :param item: agenda item that request is made against
     :return:
     """
-    recipients = current_app.config['COVERAGE_REQUEST_RECIPIENTS'].split(',')
+
+    general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
+    if not general_settings:
+        return
+
+    recipients = general_settings.get('values').get('coverage_request_recipients').split(',')
     assert recipients
     assert isinstance(recipients, list)
-    url = url_for('agenda.item', _id=item, _external=True)
+    url = url_for('agenda.item', _id=item, _external=True, featured='false')
     name = '{} {}'.format(user.get('first_name'), user.get('last_name'))
     email = user.get('email')
 

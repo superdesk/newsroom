@@ -32,6 +32,7 @@ import PreviewActionButtons from 'components/PreviewActionButtons';
 import PreviewTags from './PreviewTags';
 import PreviewMeta from './PreviewMeta';
 import AgendaLinks from './AgendaLinks';
+import PreviewEdnote from './PreviewEdnote';
 
 
 class WirePreview extends React.PureComponent {
@@ -69,12 +70,12 @@ class WirePreview extends React.PureComponent {
 
                     <PreviewActionButtons item={item} user={user} actions={actions} />
                 </div>
-                <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
+                <div id='preview-article' className='wire-column__preview__content noselect' ref={(preview) => this.preview = preview}>
                     <ArticleEmbargoed item={item} />
                     {isDisplayed('slugline', previewConfig) && <ArticleSlugline item={item}/>}
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
-                        <ArticleAuthor item={item} isPreview={true} displayConfig={previewConfig} />}
+                        <ArticleAuthor item={item} displayConfig={previewConfig} />}
                     {picture && <ArticlePicture
                         picture={getPreviewRendition(picture, isCustom)}
                         isKilled={isKilled(item)}
@@ -97,6 +98,10 @@ class WirePreview extends React.PureComponent {
 
                     {isDisplayed('tags_section', previewConfig) &&
                         <PreviewTags item={item} isItemDetail={false} displayConfig={previewConfig}/>}
+
+                    {isDisplayed('ednotes_section', previewConfig) &&
+                                <PreviewEdnote item={item} />}
+
                     {isDisplayed('item_versions', previewConfig) && showItemVersions(item) &&
                         <ListItemPreviousVersions
                             item={item}

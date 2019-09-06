@@ -4,7 +4,7 @@
 
 {% block breadcrumb %}
 <span class="breadcrumb-item active">{{ data.title }}</span>
-<span id="nav-breadcrumb" class="breadcrumb-item active"></span>
+<span id="nav-breadcrumb" class="breadcrumb-item active breadcrumb-sub-item"></span>
 {% endblock %}
 
 {% block content %}
@@ -15,5 +15,5 @@
     <script>
         marketPlaceData = {{ data | tojson | safe }};
     </script>
-    {{ javascript_tag('market-place_js') | safe }}
+    {{ javascript_tag('market_place_js') | safe }}
 {% endblock %}

@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
@@ -8,6 +10,7 @@ import DateInput from 'components/DateInput';
 import { isEmpty } from 'lodash';
 import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
 import CompanyPermissions from './CompanyPermissions';
+import EditCompanyAPI from './EditCompanyAPI';
 import { countries } from '../utils';
 
 class EditCompany extends React.Component {
@@ -21,6 +24,10 @@ class EditCompany extends React.Component {
             {label: gettext('Users'), name: 'users'},
             {label: gettext('Permissions'), name: 'permissions'},
         ];
+
+        if (this.props.apiEnabled) {
+            this.tabs.push({label: gettext('API'), name: 'api'});
+        }
     }
 
     handleTabClick(event) {
@@ -56,7 +63,10 @@ class EditCompany extends React.Component {
 
     render() {
         return (
-            <div className='list-item__preview'>
+            <div className={classNames(
+                'list-item__preview',
+                {'list-item__preview--large': this.props.apiEnabled}
+            )}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.company.name}</h3>
                     <button
@@ -117,6 +127,13 @@ class EditCompany extends React.Component {
                                         value={this.props.company.sd_subscriber_id}
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.sd_subscriber_id : null}/>
+
+                                    <TextInput
+                                        name='account_manager'
+                                        label={gettext('Account Manager')}
+                                        value={this.props.company.account_manager}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.account_manager : null}/>
 
                                     <TextInput
                                         name='phone'
@@ -189,6 +206,11 @@ class EditCompany extends React.Component {
                             company={this.props.company}
                         />
                     }
+                    {this.props.apiEnabled && this.state.activeTab === 'api' && this.props.company._id && (
+                        <EditCompanyAPI
+                            companyId={this.props.company._id}
+                        />
+                    )}
                 </div>
             </div>
         );
@@ -205,6 +227,7 @@ EditCompany.propTypes = {
     onDelete: PropTypes.func.isRequired,
     fetchCompanyUsers: PropTypes.func.isRequired,
     companyTypes: PropTypes.array,
+    apiEnabled: PropTypes.bool,
 };
 
 export default EditCompany;

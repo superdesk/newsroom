@@ -5,6 +5,8 @@ import { gettext, isDisplayed } from 'utils';
 import InfoBox from './InfoBox';
 import PreviewTagsBlock from './PreviewTagsBlock';
 import PreviewTagsLink from './PreviewTagsLink';
+import ArticleSlugline from 'ui/components/ArticleSlugline';
+
 
 function formatCV(items, field) {
     return items && uniqBy(items, (item) => item.code).map((item) => (
@@ -21,6 +23,11 @@ function PreviewTags({item, isItemDetail, displayConfig}) {
 
     return (
         <InfoBox label={isItemDetail ? gettext('Metadata') : null} top={!isItemDetail}>
+            {isDisplayed('slugline', displayConfig) && (
+                <PreviewTagsBlock label={gettext('Slugline')}>
+                    <ArticleSlugline item={item}/>
+                </PreviewTagsBlock>)}
+
             {subjects && isDisplayed('subjects', displayConfig) &&
                 <PreviewTagsBlock label={gettext('Category')}>
                     {subjects}

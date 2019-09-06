@@ -1,13 +1,7 @@
 from flask import json, url_for
-from pytest import fixture
 from bson import ObjectId
-from .test_users import test_login_succeeds_for_admin, init as user_init
+from .test_users import test_login_succeeds_for_admin, init as user_init  # noqa
 from superdesk import get_resource_service
-
-
-@fixture(autouse=True)
-def init(app):
-    user_init(app)
 
 
 def test_delete_company_deletes_company_and_users(client):

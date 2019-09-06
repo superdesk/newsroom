@@ -3,7 +3,16 @@ import { get, isEmpty } from 'lodash';
 import mime from 'mime-types';
 import server from 'server';
 import analytics from 'analytics';
-import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
+import {
+    gettext,
+    notify,
+    updateRouteParams,
+    getTimezoneOffset,
+    getTextFromHtml,
+    fullDate,
+    recordAction
+} from 'utils';
+
 import { markItemAsRead, toggleNewsOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 
@@ -48,7 +57,7 @@ export function previewItem(item) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
         dispatch(preview(item));
-        item && analytics.itemEvent('preview', item);
+        recordAction(item, 'preview', getState().context);
     };
 }
 
@@ -59,17 +68,15 @@ export function openItemDetails(item) {
 
 export function openItem(item) {
     return (dispatch, getState) => {
-        markItemAsRead(item, getState());
+        const state = getState();
+        markItemAsRead(item, state);
         dispatch(openItemDetails(item));
         updateRouteParams({
             item: item ? item._id : null
-        }, getState());
-        item && analytics.itemEvent('open', item);
-        analytics.itemView(item);
+        }, state);
+        recordAction(item, 'open', state.context);
     };
 }
-
-
 
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {
@@ -115,7 +122,8 @@ export function copyPreviewContents(item) {
         contents.push(fullDate(item.versioncreated));
         item.slugline && contents.push(item.slugline);
         item.headline && contents.push(item.headline);
-        item.byline && contents.push(gettext('By: {{ byline }}', {byline: get(item, 'byline')}));
+        item.byline && contents.push(gettext('By: {{ byline }}', {byline: item.byline}));
+        item.located && contents.push(gettext('Location: {{ located }}', {located: item.located}));
         item.source && contents.push(gettext('Source: {{ source }}', {source: item.source}));
 
         contents.push('');
@@ -227,8 +235,8 @@ export function fetchItems(updateRoute = true) {
 
 
 export function fetchItem(id) {
-    return (dispatch) => {
-        return server.get(`/wire/${id}?format=json`)
+    return (dispatch, getState) => {
+        return server.get(`/${getState().context}/${id}?format=json`)
             .then((data) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };

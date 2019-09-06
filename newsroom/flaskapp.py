@@ -28,7 +28,7 @@ from newsroom.limiter import limiter
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, char_count, newsroom_config, is_admin,
-    hash_string, date_header, get_date,
+    hash_string, date_header, get_date, get_multi_line_message,
     sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager
 )
 from newsroom.celery_app import init_celery
@@ -64,13 +64,13 @@ class Newsroom(eve.Eve):
         self._testing = testing
         self._general_settings = {}
 
-        app_config = os.path.join(NEWSROOM_DIR, 'default_settings.py')
+        app_config = flask.Config(NEWSROOM_DIR)
+        app_config.from_object('content_api.app.settings')
+        app_config.from_pyfile(os.path.join(NEWSROOM_DIR, 'default_settings.py'), silent=True)
 
         # get content api default conf
 
         if config:
-            app_config = flask.Config(app_config)
-            app_config.from_object('content_api.app.settings')
             app_config.update(config)
 
         super(Newsroom, self).__init__(
@@ -153,6 +153,7 @@ class Newsroom(eve.Eve):
         self.add_template_global(hash_string, 'hash')
         self.add_template_global(get_date, 'get_date')
         self.add_template_global(self.settings_apps, 'settings_apps')
+        self.add_template_global(get_multi_line_message)
         self.jinja_loader = jinja2.ChoiceLoader([
             jinja2.FileSystemLoader('theme'),
             jinja2.FileSystemLoader(self.template_folder),
@@ -217,7 +218,7 @@ class Newsroom(eve.Eve):
             return flask.send_from_directory(self.theme_folder, filename)
         return self.send_static_file(filename)
 
-    def section(self, _id, name):
+    def section(self, _id, name, group):
         """Define new app section.
 
         App sections are used for permissions in company settings,
@@ -226,7 +227,7 @@ class Newsroom(eve.Eve):
         You can define new sections in module :meth:`init_app` method::
 
             def init_app(app):
-                app.section('foo', 'Foo')
+                app.section('foo', 'Foo', 'wire)
 
         And then you can use it in views as decorator and it will check if user
         has section active::
@@ -247,7 +248,8 @@ class Newsroom(eve.Eve):
         """
         self.sections.append({
             '_id': _id,
-            'name': name
+            'name': name,
+            'group': group
         })
 
     def sidenav(self, name, endpoint=None, icon=None, group=0, section=None, blueprint=None, badge=None, url=None,
@@ -257,7 +259,7 @@ class Newsroom(eve.Eve):
         Use in module :meth:`init_app` method::
 
             def init_app(app):
-                app.section('foo', 'Foo')
+                app.section('foo', 'Foo', 'wire')
 
         :param name: user readable name
         :param endpoint: endpoint name, used with :meth:`flask.url_for`

@@ -7,6 +7,8 @@ import {
     STOP_WATCHING_EVENTS,
     UPDATE_ITEMS,
     TOGGLE_FEATURED_FILTER,
+    TOGGLE_EVENTS_ONLY_FILTER,
+    AGENDA_WIRE_ITEMS,
 } from './actions';
 
 import { get, isEmpty, uniqBy } from 'lodash';
@@ -44,8 +46,10 @@ const initialState = {
         activeView: EXTENDED_VIEW,
         activeDate: Date.now(),
         activeGrouping: 'day',
-        eventsOnly: false,
+        eventsOnlyAccess: false,
+        eventsOnlyView: false,
         featuredOnly: false,
+        agendaWireItems: [],
     },
     search: searchReducer(),
     detail: false,
@@ -168,16 +172,25 @@ export default function agendaReducer(state = initialState, action) {
     }
 
     case UPDATE_ITEMS: {
-        const itemsById = Object.assign({}, state.itemsById);
-        get(action.data, '_items', []).map(item => {
+        // Update existing items, remove killed items
+
+        let itemsById = Object.assign({}, state.itemsById);
+        let updatedItems = [ ...state.items ];
+        get(action.data, '_items', []).forEach(item => {
             if(itemsById[item._id]) {
-                itemsById[item._id] = item;
+                if (get(item, 'state') === 'killed') {
+                    delete itemsById[item._id];
+                    updatedItems = updatedItems.filter((i) => i !== item._id);
+                } else {
+                    itemsById[item._id] = item;
+                }
             }
         });
 
         return {
             ...state,
-            itemsById,
+            itemsById: itemsById,
+            items: updatedItems,
         };
     }
 
@@ -187,7 +200,7 @@ export default function agendaReducer(state = initialState, action) {
         const agenda = {
             ...state.agenda,
             activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : action.activeDate || state.agenda.activeDate,
-            eventsOnly: action.agendaData.events_only,
+            eventsOnlyAccess: action.agendaData.events_only,
             featuredOnly: action.featuredOnly,
         };
         
@@ -205,7 +218,8 @@ export default function agendaReducer(state = initialState, action) {
             detail: !!openItem,
             agenda,
             savedItemsCount: action.agendaData.saved_items || null,
-            userSections: action.agendaData.userSections || {}
+            userSections: action.agendaData.userSections || {},
+            locators: action.agendaData.locators || null,
         };
     }
 
@@ -223,6 +237,23 @@ export default function agendaReducer(state = initialState, action) {
             agenda: {
                 ...state.agenda,
                 featuredOnly: !state.agenda.featuredOnly,
+            }
+        };
+    case TOGGLE_EVENTS_ONLY_FILTER:
+        return {
+            ...state,
+            agenda: {
+                ...state.agenda,
+                eventsOnlyView: action.value,
+            }
+        };
+
+    case AGENDA_WIRE_ITEMS:
+        return {
+            ...state,
+            agenda: {
+                ...state.agenda,
+                agendaWireItems: action.items
             }
         };
 

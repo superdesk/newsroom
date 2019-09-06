@@ -38,6 +38,10 @@ export function getCoverageStatusText(coverage) {
     }
 
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
+        if (get(coverage, 'deliveries.length', 0) > 1) {
+            return `updated ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
+        }
+
         return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
     }
 
@@ -403,7 +407,7 @@ export function getPrevious(dateString, grouping) {
 
 /**
  * Get agenda item attachments
- * 
+ *
  * @param {Object} item
  * @return {Array}
  */
@@ -432,7 +436,12 @@ export function getNotesFromCoverages(item, field = 'internal_note') {
     const planningItems = get(item, 'planning_items', []);
     planningItems.forEach(p => {
         const planning_note = p[field];
-        get(p, 'coverages', []).forEach((c) => {
+        (get(p, 'coverages') || []).forEach((c) => {
+            // If the coverage has news item published, use that 'ednote' instead
+            if (field === 'ednote' && get(c, 'deliveries.length', 0) > 0) {
+                return;
+            }
+
             if (get(c, `planning.${field}`, '') && c.planning[field] !== planning_note) {
                 notes[c.coverage_id] = c.planning[field];
             }
@@ -453,7 +462,7 @@ export function getSubjects(item) {
 
 /**
  * Test if item has any attachments
- * 
+ *
  * @param {Object} item
  * @return {Boolean}
  */
@@ -519,14 +528,17 @@ export function groupItems (items, activeDate, activeGrouping) {
     items.forEach((item) => {
         const itemExtraDates = getExtraDates(item);
         const itemStartDate = moment(item.dates.start);
-
         const start = item._display_from ? moment(item._display_from) :
             moment.max(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
-
         const itemEndDate = moment(get(item, 'dates.end', start));
 
-        const end = item._display_to ? moment(item._display_to) :
-            moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
+        // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
+        // actioned_date is set. In this case, use that as the cut off date.
+        let end = get(item, 'event.actioned_date') ? moment(item.event.actioned_date) : null;
+        if (!end || !moment.isMoment(end)) {
+            end = item._display_to ? moment(item._display_to) :
+                moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
+        }
         let key = null;
 
         // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
@@ -631,3 +643,29 @@ export function getListItems(groups, itemsById) {
     });
     return listItems;
 }
+
+export function isCoverageBeingUpdated(coverage) {
+    return get(coverage, 'deliveries[0].delivery_state', null) &&
+        !['published', 'corrected'].includes(coverage.deliveries[0].delivery_state);
+}
+
+export const groupRegions = (filter, aggregations, props) => {
+    if (props.locators && Object.keys(props.locators).length > 0) {
+        let regions = sortBy(props.locators.filter((l) => l.state).map((l) => ({...l, 'key': l.name, 'label': l.state})), 'label');
+        const others = props.locators.filter((l) => !l.state).map((l) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
+        const separator = { 'key': 'divider'};
+
+        if (others.length > 0) {
+            if (regions.length > 0) {
+                regions.push(separator);
+            }
+            regions = [...regions, ...sortBy(others, 'label')];
+        }
+
+        return regions;
+    }
+
+    return aggregations[filter.field].buckets;
+};
+
+export const getRegionName = (key, locator) => locator.label || key;

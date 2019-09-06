@@ -2,15 +2,21 @@ from bson import ObjectId
 from flask import json
 from flask import url_for
 from pytest import fixture
+from datetime import datetime, timedelta
 from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
+from newsroom.utils import get_user_dict, get_company_dict, is_valid_login
+from .utils import mock_send_email
+from unittest import mock
+
+ADMIN_USER_ID = '5cc94b99bc4316684dc7dc07'
 
 
 @fixture(autouse=True)
 def init(app):
     app.data.insert('users', [{
-        '_id': ObjectId(),
+        '_id': ObjectId(ADMIN_USER_ID),
         'first_name': 'admin',
         'last_name': 'admin',
         'email': 'admin@sourcefabric.org',
@@ -149,6 +155,7 @@ def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
     assert 'Email address is already in use' in response.get_data(as_text=True)
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_create_new_user_succeeds(app, client):
     test_login_succeeds_for_admin(client)
     company_ids = app.data.insert('companies', [{
@@ -169,7 +176,8 @@ def test_create_new_user_succeeds(app, client):
             'phone': '1234567',
             'company': company_ids[0],
             'user_type': 'public',
-            'is_enabled': True
+            'is_enabled': True,
+            'is_approved': True
         })
         assert response.status_code == 201
         assert len(outbox) == 1
@@ -259,3 +267,153 @@ def test_return_search_for_all_users(client, app):
     resp = client.get('/users/search?q=fo')
     data = json.loads(resp.get_data())
     assert 250 == len(data)
+
+
+def test_active_user(client, app):
+    test_login_succeeds_for_admin(client)
+
+    resp = client.get('/users/search?q=admin')
+    data = json.loads(resp.get_data())
+    assert data[0].get('last_active')
+
+
+def test_active_users_and_active_companies(client, app):
+    app.data.insert('users', [
+        {
+            '_id': '1',
+            'email': 'foo1@bar.com',
+            'last_name': 'bar1',
+            'first_name': 'foo1',
+            'user_type': 'public',
+            'is_approved': True,
+            'is_enabled': True,
+            'is_validated': True,
+            'company': '1'
+        },
+        {
+            '_id': '2',
+            'email': 'foo2@bar.com',
+            'last_name': 'bar2',
+            'first_name': 'foo2',
+            'user_type': 'public',
+            'is_approved': True,
+            'is_enabled': False,
+            'is_validated': True,
+            'company': '1'
+        },
+        {
+            '_id': '3',
+            'email': 'foo3@bar.com',
+            'last_name': 'bar3',
+            'first_name': 'foo3',
+            'user_type': 'administrator',
+            'is_approved': True,
+            'is_enabled': True,
+            'is_validated': True,
+            'company': '2'
+        },
+        {
+            '_id': '4',
+            'email': 'foo4@bar.com',
+            'last_name': 'bar4',
+            'first_name': 'foo4',
+            'user_type': 'administrator',
+            'is_approved': True,
+            'is_enabled': True,
+            'is_validated': True,
+            'company': '3'
+        },
+    ])
+
+    app.data.insert('companies', [
+        {'_id': '1', 'name': 'Company1', 'is_enabled': True},
+        {'_id': '2', 'name': 'Company2', 'is_enabled': False},
+        {'_id': '3', 'name': 'Company3', 'is_enabled': True, 'expiry_date': datetime.utcnow() - timedelta(days=1)}
+    ])
+
+    with app.test_request_context():
+        users = get_user_dict()
+        companies = get_company_dict()
+
+        assert '1' in users
+        assert '2' not in users
+        assert '3' not in users
+
+        assert '1' in companies
+        assert '2' not in companies
+
+
+def test_expired_company_does_not_restrict_activity(client, app):
+    app.data.insert('companies', [
+        {'_id': '1', 'name': 'Company1', 'is_enabled': True},
+        {'_id': '2', 'name': 'Company2', 'is_enabled': False},
+        {'_id': '3', 'name': 'Company3', 'is_enabled': True, 'expiry_date': datetime.utcnow() - timedelta(days=1)}
+    ])
+
+    with app.test_request_context():
+        companies = get_company_dict()
+
+        assert '1' in companies
+        assert '2' not in companies
+        assert '3' in companies
+
+
+def test_is_valid_login(client, app):
+    app.data.insert('users', [
+        {
+            '_id': '5cc94b99bc4316684dc7dc07',
+            'email': 'foo1@bar.com',
+            'last_name': 'bar1',
+            'first_name': 'foo1',
+            'user_type': 'public',
+            'is_approved': True,
+            'is_enabled': True,
+            'is_validated': True,
+            'company': '1'
+        },
+        {
+            '_id': '2',
+            'email': 'foo2@bar.com',
+            'last_name': 'bar2',
+            'first_name': 'foo2',
+            'user_type': 'public',
+            'is_approved': True,
+            'is_enabled': False,
+            'is_validated': True,
+            'company': '1'
+        },
+        {
+            '_id': '3',
+            'email': 'foo3@bar.com',
+            'last_name': 'bar3',
+            'first_name': 'foo3',
+            'user_type': 'administrator',
+            'is_approved': True,
+            'is_enabled': True,
+            'is_validated': True,
+            'company': '2'
+        },
+        {
+            '_id': '4',
+            'email': 'foo4@bar.com',
+            'last_name': 'bar4',
+            'first_name': 'foo4',
+            'user_type': 'administrator',
+            'is_approved': True,
+            'is_enabled': True,
+            'is_validated': True,
+            'company': '3'
+        },
+    ])
+
+    app.data.insert('companies', [
+        {'_id': '1', 'name': 'Company1', 'is_enabled': True},
+        {'_id': '2', 'name': 'Company2', 'is_enabled': False},
+        {'_id': '3', 'name': 'Company3', 'is_enabled': True, 'expiry_date': datetime.utcnow() - timedelta(days=1)}
+    ])
+
+    with app.test_request_context():
+
+        assert is_valid_login('5cc94b99bc4316684dc7dc07') is True
+        assert is_valid_login('2') is False
+        assert is_valid_login('3') is False

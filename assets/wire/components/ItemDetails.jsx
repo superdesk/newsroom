@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
-import { isDisplayed } from 'utils';
+import { isDisplayed, fullDate, gettext } from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import PreviewActionButtons from 'components/PreviewActionButtons';
@@ -29,13 +29,13 @@ import ArticlePicture from 'ui/components/ArticlePicture';
 import ArticleVideo from  'ui/components/ArticleVideo';
 import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
 import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
-import ArticleSlugline from 'ui/components/ArticleSlugline';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
 import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
 import ArticleBody from 'ui/components/ArticleBody';
 import ArticleAuthor from 'ui/components/ArticleAuthor';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
+import PreviewEdnote from './PreviewEdnote';
 
 
 function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo}) {
@@ -49,7 +49,7 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
             <ContentHeader>
                 <ContentBar onClose={onClose}>
                     <PreviewActionButtons item={item} user={user} actions={actions}/>
-                </ContentBar>                
+                </ContentBar>
             </ContentHeader>
             <ArticleItemDetails>
                 <ArticleContent>
@@ -62,9 +62,11 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
-                            {isDisplayed('slugline', detailsConfig) && <ArticleSlugline item={item}/>}
+                            <div className='wire-column__preview__date pb-2'>
+                                {gettext('Published')}{' '}{fullDate(item.versioncreated)}
+                            </div>
                             {isDisplayed('headline', detailsConfig) && <ArticleHeadline item={item}/>}
-                            <ArticleAuthor item={item} isPreview={false} displayConfig={detailsConfig} />
+                            <ArticleAuthor item={item} displayConfig={detailsConfig} />
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
@@ -84,6 +86,9 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
                         <ArticleContentInfoWrapper>
                             {isDisplayed('tags_section', detailsConfig) &&
                                 <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
+
+                            {isDisplayed('ednotes_section', detailsConfig) &&
+                                <PreviewEdnote item={item} />}
 
                             {isDisplayed('item_versions', detailsConfig) && showItemVersions(item, true) &&
                                 <ListItemNextVersion item={item} displayConfig={detailsConfig}  />

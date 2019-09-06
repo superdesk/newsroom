@@ -5,8 +5,8 @@ import ReportsTable from './ReportsTable';
 import { gettext } from 'utils';
 
 
-function ProductStories({data, print}) {
-    const list = data.results && data.results.map((item) =>
+function ProductStories({results, print}) {
+    const list = results && results.map((item) =>
         <tr key={item._id}>
             <td>{item.name}</td>
             <td>{item.is_enabled.toString()}</td>
@@ -31,11 +31,11 @@ function ProductStories({data, print}) {
         gettext('Previous month'),
         gettext('Last 6 months'),
     ];
-    return data.results ? (<ReportsTable headers={headers} rows={list} print={print} />) : null;
+    return results ? (<ReportsTable headers={headers} rows={list} print={print} />) : null;
 }
 
 ProductStories.propTypes = {
-    data: PropTypes.object.isRequired,
+    results: PropTypes.array,
     print: PropTypes.bool,
 };
 

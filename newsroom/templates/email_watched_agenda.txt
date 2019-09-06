@@ -1,0 +1,19 @@
+{{ agenda.name or agenda.definition_short }}
+
+{{ url_for_agenda(agenda) }}
+
+{% if time_updated %}! {% endif %}{{ dateString }}{% if agenda.definition_short %} - {{ agenda.definition_short }}{% endif %}
+{% if agenda.ednote %}Note: {{ agenda.ednote }}{% endif %}
+
+{% if coverage_updated %}! {{ get_coverage_email_text(coverage_updated) }}{% if coverage_updated.get('planning', {}).get('ednote') %}
+Note: {{ coverage_updated['planning']['ednote'] }}{% endif %}{% endif %}
+{% for cov in coverage_updates.cancelled_coverages %}! {{ get_coverage_email_text(cov, 'has been cancelled.') }}{% if cov.get('planning', {}).get('ednote') %}
+Note: {{ cov['planning']['ednote'] }}{% endif %}
+
+{% endfor %}{% for cov in coverage_updates.modified_coverages %}! {{ get_coverage_email_text(cov) }}{% if cov.get('planning', {}).get('ednote') %}
+Note: {{ cov['planning']['ednote'] }}{% endif %}
+
+{% endfor %}{% for cov in coverage_updates.unaltered_coverages %}{{ get_coverage_email_text(cov) }}{% if cov.get('planning', {}).get('ednote') %}
+Note: {{ cov['planning']['ednote'] }}{% endif %}
+
+{% endfor %}

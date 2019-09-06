@@ -6,9 +6,6 @@ Superdesk Newsroom
 """
 
 import superdesk
-from newsroom.company_expiry_alerts import CompanyExpiryAlerts
-from newsroom.celery_app import celery
-
 from superdesk import register_resource  # noqa
 
 # reuse content api dbs
@@ -26,8 +23,3 @@ class Service(superdesk.Service):
 
 
 from newsroom.flaskapp import Newsroom  # noqa
-
-
-@celery.task(soft_time_limit=600)
-def company_expiry():
-    CompanyExpiryAlerts().send_alerts()

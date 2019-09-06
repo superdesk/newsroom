@@ -17,6 +17,7 @@ import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import UserProfile from './profile/UserProfile';
 import ProfileToggle from './ProfileToggle';
+import '../style';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -124,12 +125,20 @@ class UserProfileApp extends React.Component {
             document.getElementById('user-profile-app')
         );
 
+        const overlay = this.props.dropdown && (
+            <div
+                key="overlay"
+                className="user-profile__app--overlay"
+                onClick={this.props.toggleDropdown}
+            />
+        );
+
         const dropdown = this.props.dropdown && (
             <div key="dropdown" className="dropdown-menu dropdown-menu-right show">
                 <div className="card card--inside-dropdown">
                     <div className="card-header">
                         {`${this.props.user.first_name} ${this.props.user.last_name}`}
-                    </div>               
+                    </div>
                     <ul className="list-group list-group-flush">
                         {this.links.map((link) => (
                             <li key={link.name} className="list-group-item list-group-item--link">
@@ -154,6 +163,7 @@ class UserProfileApp extends React.Component {
         }
 
         return [
+            overlay,
             <ProfileToggle key="toggle"
                 user={this.props.user}
                 onClick={this.props.toggleDropdown}

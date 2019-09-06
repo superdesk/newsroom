@@ -81,6 +81,11 @@ class UsersResource(newsroom.Resource):
         'locale': {
             'type': 'string',
         },
+        'last_active': {
+            'type': 'datetime',
+            'required': False,
+            'nullable': True
+        }
     }
 
     item_methods = ['GET', 'PATCH', 'PUT']
@@ -89,7 +94,7 @@ class UsersResource(newsroom.Resource):
     datasource = {
         'source': 'users',
         'projection': {'password': 0},
-        'default_sort': [('name', 1)]
+        'default_sort': [('last_name', 1)]
     }
     mongo_indexes = {
         'email': ([('email', 1)], {'unique': True})
@@ -131,3 +136,6 @@ class UsersService(newsroom.Service):
             return hashed_password == bcrypt.hashpw(password, hashed_password)
         except Exception:
             return False
+
+    def on_deleted(self, doc):
+        app.cache.delete(str(doc.get('_id')))

@@ -26,12 +26,11 @@ class JsonFormatter(BaseFormatter):
     formatter = JsonEventFormatter()
 
     def format_coverages(self, item):
+        fields = ['coverages', 'delivery_id', 'delivery_href', 'deliveries', 'coverage_id', 'coverage_provider',
+                  'planning_id']
         for coverage in item.get('coverages', []):
-            coverage.pop('delivery_id', None)
-            coverage.pop('delivery_href', None)
-            coverage.pop('coverage_id', None)
-            coverage.pop('coverage_provider', None)
-            coverage.pop('planning_id', None)
+            for field in fields:
+                coverage.pop(field, None)
 
     def format_item(self, item, item_type='items'):
         if item_type == 'wire':

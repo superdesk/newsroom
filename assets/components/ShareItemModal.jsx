@@ -2,24 +2,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { omit, get, sortBy } from 'lodash';
 import { gettext, toggleValue } from 'utils';
 import { submitShareItem } from 'wire/actions';
 import { submitShareTopic } from 'user-profile/actions';
+import { modalFormInvalid, modalFormValid } from 'actions';
 
 import Modal from 'components/Modal';
+import SearchBar from 'components/SearchBar';
 
 class ShareItemModal extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {message: '', users: [], items: this.props.data.items};
+        this.state = {
+            message: '',
+            users: [],
+            displayUsers: this.props.data.users,
+            items: this.props.data.items
+        };
         this.onSubmit = this.onSubmit.bind(this);
-        this.users = this.props.data.users;
+        this.getUsers = this.getUsers.bind(this);
     }
 
     onSubmit(event) {
         event.preventDefault();
         if (this.state.users.length) {
-            this.props.submit(!!this.props.data.isTopic, this.state);
+            return this.props.submit(!!this.props.data.isTopic, omit(this.state, 'displayUsers'));
         }
     }
 
@@ -31,57 +39,85 @@ class ShareItemModal extends React.Component {
         };
     }
 
-    toggleUser(userId) {
-        this.setState({
-            users: toggleValue(this.state.users, userId),
-        });
+    toggleUser(userId, all) {
+        let newValue;
+        if (all) {
+            newValue = this.props.data.users.length === this.state.users.length ? [] :
+                this.props.data.users.map((u) => u._id);
+        } else {
+            newValue = toggleValue(this.state.users, userId);
+        }
+
+        this.setState({ users: newValue });
+
+        if (newValue.length === 0) {
+            this.props.modalFormInvalid();
+        } else {
+            this.props.modalFormValid();
+        }
     }
 
     toggleAllUsers() {
+        this.toggleUser(null, true);
+    }
+
+    getUsers(q) {
         this.setState({
-            users: this.users.length === this.state.users.length ? [] : this.users.map((u) => u._id),
+            displayUsers: q ? this.props.data.users.filter((u) =>
+                (this.getUserName(u).toLowerCase()).includes(q.toLowerCase())) : this.props.data.users
         });
     }
 
+    getUserName(user) {
+        return `${user.first_name} ${user.last_name}`;
+    }
+
     render() {
-        const usersList = this.users.map((user) => (
-            <tr key={user._id}>
+        const selectAllText = this.props.data.users.length === this.state.users.length ? gettext('Deselect All') :
+            gettext('Select All');
+        const usersList = sortBy(this.state.displayUsers, 'first_name').map((user, index) => (
+            <tr key={index}>
                 <td>
                     <input id={user._id} type="checkbox"
                         checked={this.state.users.indexOf(user._id) > -1}
                         onChange={() => this.toggleUser(user._id)} />
                 </td>
                 <td>
-                    <label htmlFor={user._id}>{user.first_name} {' '} {user.last_name}</label>
+                    <label htmlFor={user._id}>{this.getUserName(user)}</label>
                 </td>
             </tr>
         ));
 
         return (
-            <Modal onSubmit={this.onSubmit} title={gettext('Share Item')} onSubmitLabel={gettext('Share')}>
+            <Modal
+                onSubmit={this.onSubmit}
+                title={gettext('Share Item')}
+                onSubmitLabel={gettext('Share')}
+                disableButtonOnSubmit >
+                <SearchBar fetchItems={this.getUsers} enableQueryAction={false} />
                 <form onSubmit={this.onSubmit}>
-                    <div className="form-group">
+                    <div className="form-group search-user-list">
                         <label htmlFor="users">{gettext('People')}</label>
                         <table className="table">
                             <thead>
-                                <tr>
+                                {usersList.length > 0 && <tr>
                                     <th>
                                         <input id="check-all" type="checkbox"
                                             onChange={() => this.toggleAllUsers()}
-                                            checked={this.state.users.length === this.users.length}
+                                            checked={this.state.users.length === this.props.data.users.length}
                                         />
                                     </th>
                                     <th>
-                                        <label htmlFor="check-all">{gettext('Select All')}</label>
+                                        <label htmlFor="check-all">{selectAllText}</label>
                                     </th>
-                                </tr>
+                                </tr>}
                             </thead>
                             <tbody>
                                 {usersList}
                             </tbody>
                         </table>
                     </div>
-                    <div className="form-group">
+                    <div className="form-group user-msg">
                         <label htmlFor="message">{gettext('Message')}</label>
                         <textarea className="form-control"
                             id="message"
@@ -97,6 +133,8 @@ class ShareItemModal extends React.Component {
 
 ShareItemModal.propTypes = {
     submit: PropTypes.func.isRequired,
+    modalFormInvalid: PropTypes.func,
+    modalFormValid: PropTypes.func,
     data: PropTypes.shape({
         items: PropTypes.arrayOf(PropTypes.string).isRequired,
         users: PropTypes.arrayOf(PropTypes.shape({
@@ -108,8 +146,12 @@ ShareItemModal.propTypes = {
     }),
 };
 
+const mapStateToProps = (state) => ({ formValid: get(state, 'modal.formValid') });
+
 const mapDispatchToProps = (dispatch) => ({
     submit: (isFolllowedTopic, data) => isFolllowedTopic ? dispatch(submitShareTopic(data)) : dispatch(submitShareItem(data)),
+    modalFormInvalid: () => dispatch(modalFormInvalid()),
+    modalFormValid: () => dispatch(modalFormValid()),
 });
 
-export default connect(null, mapDispatchToProps)(ShareItemModal);
+export default connect(mapStateToProps, mapDispatchToProps)(ShareItemModal);

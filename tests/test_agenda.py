@@ -3,9 +3,9 @@ from flask import json
 from datetime import datetime
 from newsroom.wire.utils import get_local_date, get_end_date
 from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts
-
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import post_json, delete_json, get_json
+from .utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
+from unittest import mock
 
 
 def test_item_detail(client):
@@ -47,7 +47,7 @@ def get_bookmarks_count(client, user):
 
 
 def test_bookmarks(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert user_id
 
     assert 0 == get_bookmarks_count(client, user_id)
@@ -75,11 +75,12 @@ def test_item_copy(client, app):
     data = json.loads(resp.get_data())
     assert 'copies' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['copies']
 
 
-def test_share_items(client, app):
+@mock.patch('newsroom.wire.views.send_email', mock_send_email)
+def test_share_items(client, app, mocker):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
         'first_name': 'Foo',
@@ -96,10 +97,9 @@ def test_share_items(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@sourcefabric.org'
         assert outbox[0].subject == 'From AAP Newsroom: Conference Planning'
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin shared ' in outbox[0].body
+        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert 'Conference Planning' in outbox[0].body
         assert 'http://localhost:5050/agenda/urn:conference' in outbox[0].body
         assert 'Some info message' in outbox[0].body
@@ -108,7 +108,7 @@ def test_share_items(client, app):
     data = json.loads(resp.get_data())
     assert 'shares' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['shares']
 
 
@@ -154,6 +154,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert 'files' not in data['_items'][0]['event']
     assert 'internal_note' not in data['_items'][0]['event']
     assert 'internal_note' not in data['_items'][0]['planning_items'][0]
+    assert 'internal_note' not in data['_items'][0]['planning_items'][0]['coverages'][0]['planning']
     assert 'internal_note' not in data['_items'][0]['coverages'][0]['planning']
     resp = client.get('/agenda/search?navigation=51')
     data = json.loads(resp.get_data())
@@ -161,8 +162,9 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert '_aggregations' in data
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_coverage_request(client, app):
-    app.config['COVERAGE_REQUEST_RECIPIENTS'] = 'admin@bar.com'
+    post_json(client, '/settings/general_settings', {'coverage_request_recipients': 'admin@bar.com'})
     with app.mail.record_messages() as outbox:
         resp = client.post('/agenda/request_coverage', data=json.dumps({
             'item': ['urn:conference'],
@@ -180,7 +182,7 @@ def test_coverage_request(client, app):
 
 
 def test_watch_event(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert 0 == get_bookmarks_count(client, user_id)
 
     post_json(client, '/agenda_watch', {'items': ['urn:conference']})
@@ -402,3 +404,78 @@ def test_filter_agenda_by_coverage_status(client):
     assert 'baz' == data['_items'][0]['_id']
     assert 'bar' == data['_items'][1]['_id']
     assert 'urn:conference' == data['_items'][2]['_id']
+
+
+def test_filter_events_only(client):
+    test_planning = {
+        "description_text": "description here",
+        "abstract": "abstract text",
+        "_current_version": 1,
+        "agendas": [],
+        "anpa_category": [
+            {
+                "name": "Entertainment",
+                "subject": "01000000",
+                "qcode": "e"
+            }
+        ],
+        "item_id": "foo",
+        "ednote": "ed note here",
+        "slugline": "Vivid planning item",
+        "headline": "Planning headline",
+        "planning_date": "2018-05-28T10:51:52+0000",
+        "state": "scheduled",
+        "item_class": "plinat:newscoverage",
+        "coverages": [
+            {
+                "planning": {
+                    "g2_content_type": "text",
+                    "slugline": "Vivid planning item",
+                    "internal_note": "internal note here",
+                    "genre": [
+                        {
+                            "name": "Article (news)",
+                            "qcode": "Article"
+                        }
+                    ],
+                    "ednote": "ed note here",
+                    "scheduled": "2018-05-28T10:51:52+0000"
+                },
+                "news_coverage_status": {
+                    "name": "coverage intended",
+                    "label": "Planned",
+                    "qcode": "ncostat:int"
+                },
+                "workflow_status": "draft",
+                "firstcreated": "2018-05-28T10:55:00+0000",
+                "coverage_id": "213"
+            }
+        ],
+        "_id": "foo",
+        "urgency": 3,
+        "guid": "foo",
+        "name": "This is the name of the vivid planning item",
+        "subject": [
+            {
+                "name": "library and museum",
+                "qcode": "01009000",
+                "parent": "01000000"
+            }
+        ],
+        "pubstatus": "usable",
+        "type": "planning",
+    }
+
+    client.post('/push', data=json.dumps(test_planning), content_type='application/json')
+    data = get_json(client, '/agenda/search')
+    assert 2 == data['_meta']['total']
+    assert 'urn:conference' == data['_items'][1]['_id']
+    assert 'foo' == data['_items'][0]['_id']
+    assert 1 == len(data['_items'][1]['planning_items'])
+    assert 1 == len(data['_items'][1]['coverages'])
+    data = get_json(client, '/agenda/search?eventsOnlyView=true')
+
+    assert 1 == data['_meta']['total']
+    assert 'urn:conference' == data['_items'][0]['_id']
+    assert 'planning_items' not in data['_items'][0]
+    assert 'coverages' not in data['_items'][0]

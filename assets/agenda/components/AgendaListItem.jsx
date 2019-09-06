@@ -6,6 +6,9 @@ import {get} from 'lodash';
 import ActionButton from 'components/ActionButton';
 
 import AgendaListItemIcons from './AgendaListItemIcons';
+import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
+import AgendaInternalNote from './AgendaInternalNote';
+
 import {
     hasCoverages,
     isCanceled,
@@ -14,9 +17,10 @@ import {
     getName,
     isWatched,
     getDescription,
+    getInternalNote,
 } from '../utils';
 import ActionMenu from '../../components/ActionMenu';
-import { LIST_ANIMATIONS } from 'utils';
+import {LIST_ANIMATIONS, isMobilePhone} from 'utils';
 
 class AgendaListItem extends React.Component {
     constructor(props) {
@@ -63,33 +67,42 @@ class AgendaListItem extends React.Component {
         event.stopPropagation();
     }
 
-    render() {
+    getClassNames(isExtended) {
+        return {
+            card: classNames('wire-articles__item-wrap col-12'),
+            wrap: classNames('wire-articles__item wire-articles__item--list', {
+                'wire-articles__item--covering': hasCoverages(this.props.item),
+                'wire-articles__item--watched': isWatched(this.props.item, this.props.user),
+                'wire-articles__item--not-covering': !hasCoverages(this.props.item),
+                'wire-articles__item--postponed': isPostponed(this.props.item),
+                'wire-articles__item--canceled': isCanceled(this.props.item),
+                'wire-articles__item--visited': isCanceled(this.props.item),
+                'wire-articles__item--rescheduled': isRescheduled(this.props.item),
+                'wire-articles__item--selected': this.props.isSelected,
+                'wire-articles__item--open': this.props.isActive,
+            }),
+            select: classNames('no-bindable-select', {
+                'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+                'wire-articles__item-select': LIST_ANIMATIONS,
+            }),
+            article: classNames('wire-articles__item-text', {
+                'flex-column align-items-start': !isExtended
+            }),
+        };
+    }
+
+    renderListItem(isMobile, children) {
         const {item, onClick, onDoubleClick, isExtended, group, planningId} = this.props;
-        const cardClassName = classNames('wire-articles__item-wrap col-12');
-        const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
-            'wire-articles__item--covering': hasCoverages(this.props.item),
-            'wire-articles__item--watched': isWatched(this.props.item, this.props.user),
-            'wire-articles__item--not-covering': !hasCoverages(this.props.item),
-            'wire-articles__item--postponed': isPostponed(this.props.item),
-            'wire-articles__item--canceled': isCanceled(this.props.item),
-            'wire-articles__item--visited': isCanceled(this.props.item),
-            'wire-articles__item--rescheduled': isRescheduled(this.props.item),
-            'wire-articles__item--selected': this.props.isSelected,
-            'wire-articles__item--open': this.props.isActive,
-        });
-        const selectClassName = classNames('no-bindable-select', {
-            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
-            'wire-articles__item-select': LIST_ANIMATIONS,
-        });
-        const articleClassName = classNames('wire-articles__item-text', {
-            'flex-column align-items-start': !isExtended
-        });
+        const classes = this.getClassNames(isExtended);
         const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
         const description = getDescription(item, planningItem);
 
+        // Show headline for adhoc planning items
+        const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
+
         return (
             <article key={item._id}
-                className={cardClassName}
+                className={classes.card}
                 tabIndex='0'
                 ref={(elem) => this.articleElem = elem}
                 onClick={() => onClick(item, group, planningId)}
@@ -103,58 +116,118 @@ class AgendaListItem extends React.Component {
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
             >
-
-                <div className={wrapClassName}>
-                    <div className={articleClassName}>
-
+                <div className={classes.wrap}>
+                    <div className={classes.article} key="article">
                         <h4 className='wire-articles__item-headline'>
-                            <div className={selectClassName} onClick={this.stopPropagation}>
+                            <div className={classes.select} onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
                                     <input type="checkbox" className="css-checkbox" checked={this.props.isSelected} onChange={this.props.toggleSelected} />
                                     <i></i>
                                 </label>
                             </div>
 
-                            {getName(item)}
+                            <span className={
+                                classNames({'wire-articles__item__meta-time wire-articles__item__meta-time--border-right': showHeadline})}>
+                                {getName(item)}</span>
+                            {showHeadline && <span
+                                className='wire-articles__item__text wire-articles__item__text--large'>
+                                {item.headline}</span>}
                         </h4>
 
-                        <AgendaListItemIcons item={item} group={group} planningItem={planningItem} />
+                        <AgendaListItemIcons item={item} group={group} planningItem={planningItem} isMobilePhone={isMobile} />
 
-                        {isExtended && description && (
+                        {(isMobile || isExtended) && description && (
                             <p className="wire-articles__item__text">
                                 {description}
                             </p>
                         )}
-
                     </div>
-
-                    {this.props.actions.length && (
-                        <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
-                            <ActionMenu
-                                item={this.props.item}
-                                plan={planningItem}
-                                user={this.props.user}
-                                group={this.props.group}
-                                actions={this.props.actions}
-                                onActionList={this.props.onActionList}
-                                showActions={this.props.showActions}
-                            />
-
-                            {this.props.actions.map((action) =>
-                                action.shortcut &&
-                            <ActionButton
-                                key={action.name}
-                                className="icon-button"
-                                action={action}
-                                isVisited={action.visited && action.visited(this.props.user, this.props.item)}
-                                item={this.props.item} />
-                            )}
-                        </div>
-                    )}
+                    {children}
                 </div>
-
             </article>
         );
+    }
+
+    renderNonMobile() {
+        const {item, planningId} = this.props;
+        const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
+
+        return this.renderListItem(false, !this.props.actions.length ? null : (
+            <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
+                <ActionMenu
+                    item={this.props.item}
+                    plan={planningItem}
+                    user={this.props.user}
+                    group={this.props.group}
+                    actions={this.props.actions}
+                    onActionList={this.props.onActionList}
+                    showActions={this.props.showActions}
+                />
+
+                {this.props.actions.map((action) => action.shortcut && (
+                    <ActionButton
+                        key={action.name}
+                        className="icon-button"
+                        action={action}
+                        isVisited={action.visited && action.visited(this.props.user, this.props.item)}
+                        item={this.props.item}
+                    />
+                ))}
+            </div>
+        ));
+    }
+
+    renderMobile() {
+        const {item, planningId} = this.props;
+        const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
+
+        const internalNote = getInternalNote(item, planningItem);
+
+        return this.renderListItem(true, (
+            <div className='wire-articles__item-actions ml-0' onClick={this.stopPropagation}>
+                <AgendaItemTimeUpdater
+                    item={item}
+                    borderRight={true}
+                    alignCenter={true}
+                />
+                <AgendaInternalNote
+                    internalNote={internalNote}
+                    onlyIcon={true}
+                    alignCenter={true}
+                    noMargin={true}
+                    marginRightAuto={true}
+                    borderRight={true}
+                    noPaddingRight={true}
+                />
+
+                {this.props.actions.map((action) => action.shortcut && (
+                    <ActionButton
+                        key={action.name}
+                        className="icon-button"
+                        action={action}
+                        isVisited={action.visited && action.visited(this.props.user, this.props.item)}
+                        item={this.props.item} />
+                ))}
+
+                {this.props.actions.length && (
+                    <ActionMenu
+                        item={this.props.item}
+                        plan={planningItem}
+                        user={this.props.user}
+                        group={this.props.group}
+                        actions={this.props.actions}
+                        onActionList={this.props.onActionList}
+                        showActions={this.props.showActions}
+                    />
+                )}
+            </div>
+        ));
+    }
+
+    render() {
+        return isMobilePhone() ?
+            this.renderMobile() :
+            this.renderNonMobile();
     }
 }
 

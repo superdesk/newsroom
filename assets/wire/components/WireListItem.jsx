@@ -64,7 +64,7 @@ class WireListItem extends React.Component {
         });
         const picture = getPicture(item);
         const videos = getVideos(item);
-        const isWire = this.props.context === 'wire';
+        const isMarketPlace = this.props.context === 'aapX';
         return (
             <article key={item._id}
                 className={cardClassName}
@@ -93,7 +93,7 @@ class WireListItem extends React.Component {
                             {item.headline}
                         </h4>
 
-                        {isExtended && isWire && (
+                        {isExtended && !isMarketPlace && (
                             <div className='wire-articles__item__meta'>
                                 <WireListItemIcons item={item} picture={picture} videos={videos} />
                                 <div className='wire-articles__item__meta-info'>
@@ -107,7 +107,7 @@ class WireListItem extends React.Component {
                             </div>
                         )}
 
-                        {isExtended && !isWire && (
+                        {isExtended && isMarketPlace && (
                             [<div key='mage' className='wire-articles__item__meta'>
                                 <img src={`/theme/logo/${item.source}.png`}/>
                             </div>,

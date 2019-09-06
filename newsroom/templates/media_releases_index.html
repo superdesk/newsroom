@@ -1,0 +1,19 @@
+{% extends "products_layout.html" %}
+
+{% block title %}{{ gettext('Media Releases') }}{% endblock %}
+
+{% block breadcrumb %}
+<span class="breadcrumb-item active">{{ gettext('Media Releases') }}</span>
+<span id="nav-breadcrumb" class="breadcrumb-item active breadcrumb-sub-item"></span>
+{% endblock %}
+
+{% block content %}
+<div id="media-releases-app" class="content media-releases"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        window.mediaReleasesData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('media_releases_js') | safe }}
+{% endblock %}

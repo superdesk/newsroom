@@ -4,7 +4,7 @@ from superdesk import get_resource_service
 from newsroom.topics import blueprint
 from newsroom.utils import find_one
 from newsroom.auth import get_user
-from newsroom.auth.decorator import login_required
+from newsroom.decorator import login_required
 from flask import json, jsonify, abort, session, render_template, current_app as app
 from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.email import send_email
@@ -46,7 +46,7 @@ def delete(id):
     if not is_user_topic(id, session['user']):
         abort(403)
 
-    get_resource_service('topics').delete({'_id': ObjectId(id)})
+    get_resource_service('topics').delete_action({'_id': ObjectId(id)})
     push_user_notification('topics')
     return jsonify({'success': True}), 200
 
@@ -89,25 +89,22 @@ def share():
     assert data.get('users')
     assert data.get('items')
     topic = get_entity_or_404(data.get('items')[0]['_id'], 'topics')
-    with app.mail.connect() as connection:
-        for user_id in data['users']:
-            user = get_resource_service('users').find_one(req=None, _id=user_id)
-            if not user or not user.get('email'):
-                continue
+    for user_id in data['users']:
+        user = get_resource_service('users').find_one(req=None, _id=user_id)
+        if not user or not user.get('email'):
+            continue
 
-            template_kwargs = {
-                'recipient': user,
-                'sender': current_user,
-                'topic': topic,
-                'url': get_topic_url(topic),
-                'message': data.get('message'),
-                'app_name': app.config['SITE_NAME'],
-            }
-            send_email(
-                [user['email']],
-                gettext('From %s: %s' % (app.config['SITE_NAME'], topic['label'])),
-                render_template('share_topic.txt', **template_kwargs),
-                sender=current_user['email'],
-                connection=connection
-            )
+        template_kwargs = {
+            'recipient': user,
+            'sender': current_user,
+            'topic': topic,
+            'url': get_topic_url(topic),
+            'message': data.get('message'),
+            'app_name': app.config['SITE_NAME'],
+        }
+        send_email(
+            [user['email']],
+            gettext('From %s: %s' % (app.config['SITE_NAME'], topic['label'])),
+            render_template('share_topic.txt', **template_kwargs),
+        )
     return jsonify(), 201

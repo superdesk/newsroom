@@ -24,6 +24,7 @@ const initialState = {
     services: [],
     sections: [],
     companyTypes: [],
+    apiEnabled: false,
 };
 
 function setupCompanies(companyList, state) {
@@ -48,6 +49,7 @@ export default function companyReducer(state = initialState, action) {
             name: '',
             phone: '',
             sd_subscriber_id: '',
+            account_manager: '',
             contact_name: '',
             country: '',
             contact_email: '',
@@ -85,6 +87,7 @@ export default function companyReducer(state = initialState, action) {
         const newCompany = {
             name: '',
             sd_subscriber_id: '',
+            account_manager: '',
             phone: '',
             contact_name: '',
             country: '',
@@ -129,6 +132,7 @@ export default function companyReducer(state = initialState, action) {
             products: action.data.products,
             sections: action.data.sections,
             companyTypes: action.data.company_types || [],
+            apiEnabled: action.data.api_enabled || false,
         };
 
         return setupCompanies(action.data.companies, nextState);

@@ -4,10 +4,10 @@ from flask_script import Manager
 from newsroom import Newsroom
 from superdesk import get_resource_service
 from newsroom.elastic_utils import rebuild_elastic_index
-from newsroom.mongo_utils import index_elastic_from_mongo
+from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_timestamp
 from newsroom.auth import get_user_by_email
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
-
+import content_api
 
 app = Newsroom()
 manager = Manager(app)
@@ -52,11 +52,17 @@ def elastic_init():
 
 @manager.option('-h', '--hours', dest='hours', default=None)
 @manager.option('-c', '--collection', dest='collection', default=None)
-def index_from_mongo(hours, collection):
+@manager.option('-t', '--timestamp', dest='timestamp', default=None)
+@manager.option('-d', '--direction', dest='direction', choices=['older', 'newer'], default='older')
+def index_from_mongo(hours, collection, timestamp, direction):
     print('Checking if elastic index exists, a new one will be created if not')
     app.data.init_elastic(app)
     print('Elastic index check has been completed')
-    index_elastic_from_mongo(hours=hours, collection=collection)
+
+    if timestamp:
+        index_elastic_from_mongo_from_timestamp(collection, timestamp, direction)
+    else:
+        index_elastic_from_mongo(hours=hours, collection=collection)
 
 
 @manager.command
@@ -68,6 +74,12 @@ def content_reset():
 @manager.command
 def send_company_expiry_alerts():
     CompanyExpiryAlerts().send_alerts()
+
+
+@manager.option('-m', '--expiry', dest='expiry_days', required=False)
+def remove_expired(expiry_days):
+    exp = content_api.RemoveExpiredItems()
+    exp.run(expiry_days)
 
 
 if __name__ == "__main__":

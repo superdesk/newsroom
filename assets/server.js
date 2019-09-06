@@ -1,5 +1,6 @@
 const defaultOptions = {
     credentials: 'same-origin',
+    redirect: 'manual',
 };
 
 function options(custom={}) {
@@ -10,9 +11,13 @@ function checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
         return response.json();
     } else {
-        var error = new Error(response.statusText);
-        error.response = response;
-        throw error;
+        if (response.type === 'opaqueredirect') {
+            window.location.reload();
+        } else {
+            var error = new Error(response.statusText);
+            error.response = response;
+            throw error;
+        }
     }
 }
 
@@ -83,6 +88,21 @@ class Server {
             method: 'DELETE',
             headers: {'Content-Type': 'application/json'},
             body: data ? JSON.stringify(data) : null,
+        })).then(checkStatus);
+    }
+
+    /**
+     * Make PATCH request to url
+     *
+     * @param {String} url
+     * @param {Object} data
+     * @return {Promise}
+     */
+    patch(url, data) {
+        return fetch(url, options({
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data),
         })).then(checkStatus);
     }
 }

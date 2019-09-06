@@ -1,4 +1,3 @@
-from datetime import datetime
 from datetime import timedelta
 
 import bcrypt
@@ -11,9 +10,9 @@ from superdesk.utc import utcnow
 
 from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
+from newsroom.utils import get_random_string, is_company_enabled, is_account_enabled
 from newsroom.email import send_validate_account_email, \
     send_reset_password_email, send_new_signup_email, send_new_account_email
-from newsroom.utils import get_random_string
 from newsroom.limiter import limiter
 from newsroom.template_filters import is_admin
 from .token import generate_auth_token, verify_auth_token
@@ -38,11 +37,11 @@ def login():
                 flask.flash(gettext('Insufficient Permissions. Access denied.'), 'danger')
                 return flask.render_template('login.html', form=form)
 
-            if not _is_company_enabled(user):
+            if not is_company_enabled(user):
                 flask.flash(gettext('Company account has been disabled.'), 'danger')
                 return flask.render_template('login.html', form=form)
 
-            if _is_account_enabled(user):
+            if is_account_enabled(user):
                 flask.session['user'] = str(user['_id'])  # str to avoid serialization issues
                 flask.session['name'] = '{} {}'.format(user.get('first_name'), user.get('last_name'))
                 flask.session['user_type'] = user['user_type']
@@ -52,8 +51,6 @@ def login():
                     get_resource_service('users').system_update(user['_id'], {'locale': flask.session['locale']}, user)
 
                 return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
-            else:
-                flask.flash(gettext('Account is disabled.'), 'danger')
         else:
             flask.flash(gettext('Invalid username or password.'), 'danger')
     return flask.render_template('login.html', form=form)
@@ -118,46 +115,6 @@ def _is_password_valid(password, user):
     return True
 
 
-def _is_company_enabled(user):
-    """
-    Checks if the company of the user is enabled
-    """
-    if not user.get('company'):
-        # there's no company assigned return true for admin user else false
-        return True if is_admin(user) else False
-
-    company = get_resource_service('companies').find_one(req=None, _id=user.get('company'))
-    if not company:
-        return False
-
-    return company.get('is_enabled', False) and not _is_company_expired(company)
-
-
-def _is_company_expired(company):
-    expiry_date = company.get('expiry_date')
-    if not expiry_date:
-        return False
-    return expiry_date.replace(tzinfo=None) <= datetime.utcnow().replace(tzinfo=None)
-
-
-def _is_account_enabled(user):
-    """
-    Checks if user account is active and approved
-    """
-    if not user.get('is_enabled'):
-        flask.flash(gettext('Account is disabled'), 'danger')
-        return False
-
-    if not user.get('is_approved'):
-        account_created = user.get('_created')
-
-        if account_created < utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14)):
-            flask.flash(gettext('Account has not been approved'), 'danger')
-            return False
-
-    return True
-
-
 def is_current_user_admin():
     return flask.session['user_type'] == 'administrator'
 
@@ -186,16 +143,14 @@ def get_login_token():
     if user is not None and _is_password_valid(password.encode('UTF-8'), user):
         user = get_resource_service('users').find_one(req=None, _id=user['_id'])
 
-        if not _is_company_enabled(user):
+        if not is_company_enabled(user):
             abort(401, gettext('Company account has been disabled.'))
 
-        if _is_account_enabled(user):
+        if is_account_enabled(user):
             return generate_auth_token(
                 str(user['_id']),
                 '{} {}'.format(user.get('first_name'), user.get('last_name')),
                 user['user_type'])
-        else:
-            abort(401, gettext('Account is disabled.'))
     else:
         abort(401, gettext('Invalid username or password.'))
 

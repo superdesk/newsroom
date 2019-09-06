@@ -43,6 +43,14 @@ class AmNewsApp extends BaseApp {
         this.modals = modals;
         this.state = { isMobile: false };    // to cater for responsive behaviour during widnow resize
         this.setIsMobile = this.setIsMobile.bind(this);
+        this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
+    }
+
+    getSnapshotBeforeUpdate(prevProps) {
+        if (prevProps.itemToOpen && !this.props.itemToOpen && !this.props.activeNavigation) {
+            // enable first navigation
+            this.props.toggleNavigation(get(this.props, 'navigations[0]'));
+        }
     }
 
     componentDidMount() {
@@ -121,7 +129,7 @@ class AmNewsApp extends BaseApp {
                                 className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
                                 {this.state.withSidebar &&
                                     <SearchSidebar
-                                        tabs={this.tabs.filter((t) => t.id === 'nav')}
+                                        tabs={this.tabs}
                                         props={{...this.props, groups: [], addAllOption: false}} />
                                 }
                             </div>}
@@ -217,6 +225,8 @@ AmNewsApp.propTypes = {
     userSections: PropTypes.object,
     previewConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
+    advancedSearchTabConfig: PropTypes.object,
+    context: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -239,6 +249,8 @@ const mapStateToProps = (state) => ({
     userSections: state.userSections,
     previewConfig: get(state.uiConfig, 'preview') || {},
     detailsConfig: get(state.uiConfig, 'details') || {},
+    advancedSearchTabConfig: get(state.uiConfig, 'advanced_search_tabs') || {},
+    context: state.context,
 });
 
 const mapDispatchToProps = (dispatch) => ({

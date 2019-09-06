@@ -2,7 +2,7 @@ from newsroom.agenda import blueprint
 
 import flask
 
-from flask import current_app as app
+from flask import current_app as app, request
 from eve.methods.get import get_internal
 from eve.render import send_response
 from superdesk import get_resource_service
@@ -10,11 +10,13 @@ from superdesk import get_resource_service
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
-from newsroom.auth import get_user, login_required
+from newsroom.auth import get_user
+from newsroom.decorator import login_required
 from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, \
-    get_agenda_dates, get_location_string, get_public_contacts, get_links
+    get_agenda_dates, get_location_string, get_public_contacts, get_links, get_vocabulary
 from newsroom.wire.utils import update_action_list
 from newsroom.agenda.email import send_coverage_request_email
+from newsroom.agenda.utils import remove_fields_for_public_user
 from newsroom.companies import section, get_user_company
 from newsroom.notifications import push_user_notification
 
@@ -42,12 +44,7 @@ def item(_id):
     user = get_user()
     company = get_user_company(user)
     if not is_admin_or_internal(user):
-        item.get('event', {}).pop('files', None)
-        planning_items = item.get('planning_items', [])
-        [item.pop('internal_note', None) for item in planning_items]
-        coverages = item.get('coverages', [])
-        [c.get('planning', {}).pop('internal_note', None) for c in coverages]
-        item.get('event', {}).pop('internal_note', None)
+        remove_fields_for_public_user(item)
 
     if company and not is_admin(user) and company.get('events_only', False):
         # if the company has permission events only permission then
@@ -66,6 +63,8 @@ def item(_id):
         map = flask.request.args.get('map')
         template = 'agenda_item_print.html'
         update_action_list([_id], 'prints', force_insert=True)
+        get_resource_service('history').create_history_record([item], 'print', get_user(),
+                                                              request.args.get('type', 'agenda'))
         return flask.render_template(
             template,
             item=item,
@@ -103,7 +102,8 @@ def get_view_data():
                                                   product_type='agenda',
                                                   events_only=company.get('events_only', False)),
         'saved_items': get_resource_service('agenda').get_saved_items_count(),
-        'events_only': company.get('events_only', False)
+        'events_only': company.get('events_only', False),
+        'locators': get_vocabulary('locators')
     }
 
 

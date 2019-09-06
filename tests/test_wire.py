@@ -1,10 +1,13 @@
+import pytz
 from flask import json, g
-from bson import ObjectId
 from datetime import datetime, timedelta
 from urllib import parse
 
 from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import get_json
+from .utils import get_json, get_admin_user_id, mock_send_email
+from unittest import mock
+from tests.test_users import ADMIN_USER_ID
+from superdesk import get_resource_service
 
 
 def test_item_detail(client):
@@ -20,6 +23,7 @@ def test_item_json(client):
     assert 'headline' in data
 
 
+@mock.patch('newsroom.wire.views.send_email', mock_send_email)
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -37,10 +41,10 @@ def test_share_items(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@sourcefabric.org'
+        assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin shared ' in outbox[0].body
+        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
         assert items[1]['headline'] in outbox[0].body
         assert 'http://localhost:5050/wire?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body
@@ -51,7 +55,7 @@ def test_share_items(client, app):
     data = json.loads(resp.get_data())
     assert 'shares' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['shares']
 
 
@@ -63,7 +67,7 @@ def get_bookmarks_count(client, user):
 
 
 def test_bookmarks(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert user_id
 
     assert 0 == get_bookmarks_count(client, user_id)
@@ -130,7 +134,7 @@ def test_item_copy(client, app):
     data = json.loads(resp.get_data())
     assert 'copies' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['copies']
 
 
@@ -184,7 +188,7 @@ def test_filter_by_product_anonymous_user_gets_all(client, app):
 
 def test_logged_in_user_no_product_gets_no_results(client, app):
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
     resp = client.get('/wire/search')
     assert 403 == resp.status_code
@@ -192,7 +196,7 @@ def test_logged_in_user_no_product_gets_no_results(client, app):
 
 def test_logged_in_user_no_company_gets_no_results(client, app):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -201,7 +205,7 @@ def test_logged_in_user_no_company_gets_no_results(client, app):
 
 def test_administrator_gets_all_results(client, app):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     resp = client.get('/wire/search')
@@ -220,7 +224,7 @@ def test_search_filtered_by_users_products(client, app):
     }])
 
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -260,7 +264,7 @@ def test_search_filter_by_individual_navigation(client, app):
         'is_enabled': True
     }])
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -317,7 +321,7 @@ def test_search_filtered_by_query_product(client, app):
     }])
 
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -377,7 +381,7 @@ def test_item_detail_access(client, app):
 
     # public user
     with client.session_transaction() as session:
-        session['user'] = PUBLIC_USER_ID
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     # no access by default
@@ -433,7 +437,7 @@ def test_search_using_section_filter_for_public_user(client, app):
     }])
 
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -468,7 +472,7 @@ def test_search_using_section_filter_for_public_user(client, app):
 
 def test_administrator_gets_results_based_on_section_filter(client, app):
     with client.session_transaction() as session:
-        session['user'] = str(ObjectId())
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     app.data.insert('section_filters', [{
@@ -532,7 +536,7 @@ def test_company_type_filter(client, app):
     }])
 
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
+        session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
     resp = client.get('/wire/search')
@@ -559,3 +563,35 @@ def test_company_type_filter(client, app):
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert 'WEATHER' != data['_items'][0]['slugline']
+
+
+def test_search_by_products_and_filtered_by_embargoe(client, app):
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'product test',
+        'query': 'headline:china',
+        'companies': ['1'],
+        'is_enabled': True,
+        'product_type': 'wire'
+    }])
+
+    # embargoed item is not fetched
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'china',
+        'embargoed': (datetime.now() + timedelta(days=10)).replace(tzinfo=pytz.UTC),
+        'products': [{'code': '10'}]
+    }])
+    items = get_resource_service('wire_search').get_product_items(10, 20)
+    assert 0 == len(items)
+
+    # ex-embargoed item is fetched
+    app.data.insert('items', [{
+        '_id': 'bar',
+        'headline': 'china story',
+        'embargoed': (datetime.now() - timedelta(days=10)).replace(tzinfo=pytz.UTC),
+        'products': [{'code': '10'}]
+    }])
+    items = get_resource_service('wire_search').get_product_items(10, 20)
+    assert 1 == len(items)
+    assert items[0]['headline'] == 'china story'

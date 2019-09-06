@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import classNames from 'classnames';
+import {get} from 'lodash';
 
 import {isPostponed, isRescheduled, isCanceled} from '../utils';
 import {DATE_FORMAT, formatDate} from 'utils';
@@ -22,11 +23,15 @@ function AgendaListItemLabels({item, withDate, group, right}) {
             labelText = gettext('rescheduled');
         }
 
+        if (get(item, 'event.completed')) {
+            labelText = gettext('event completed');
+        }
+
         if (!labelText) {
             return null;
         }
 
-        return (<div><span className={classNames('label label--orange ml-4', {'pull-right': right})}>{labelText}</span></div>);
+        return (<div><span className={classNames('label label--orange ml-2', {'pull-right': right})}>{labelText}</span></div>);
         
     };
     const dateGroup = group && moment(group, DATE_FORMAT);

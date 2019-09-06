@@ -93,6 +93,7 @@ class Companies extends React.Component {
                         fetchCompanyUsers={this.props.fetchCompanyUsers}
                         products={this.props.products}
                         companyTypes={this.props.companyTypes}
+                        apiEnabled={this.props.apiEnabled}
                     />
                 }
             </div>
@@ -119,6 +120,7 @@ Companies.propTypes = {
     dispatch: PropTypes.func,
     products: PropTypes.array,
     companyTypes: PropTypes.array,
+    apiEnabled: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -134,6 +136,7 @@ const mapStateToProps = (state) => ({
     companyUsers: state.companyUsers,
     errors: state.errors,
     companyTypes: state.companyTypes,
+    apiEnabled: state.apiEnabled,
 });
 
 

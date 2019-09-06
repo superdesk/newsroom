@@ -1,4 +1,6 @@
 import React from 'react';
+import server from 'server';
+import analytics from 'analytics';
 import { get, isInteger, keyBy, isEmpty, cloneDeep, throttle } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
@@ -282,7 +284,7 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
             } else {
                 dateTimeString.push(`${formatTime(start)} - ${formatTime(end)} ${formatDate(start)}`);
             }
-            break;        
+            break;
         }
     }
 
@@ -402,7 +404,7 @@ export function wordCount(item) {
  * @return {number}
  */
 export function characterCount(item) {
-    
+
     if (isInteger(item.charcount)) {
         return item.charcount;
     }
@@ -451,7 +453,7 @@ export function updateRouteParams(updates, state) {
         }
     });
 
-    
+
     const stateClone = cloneDeep(state);
     stateClone.items = [];
     stateClone.itemsById = {};
@@ -527,6 +529,10 @@ export function isTouchDevice() {
     || navigator.maxTouchPoints;       // works on IE10/11 and Surface
 }
 
+export function isMobilePhone() {
+    return isTouchDevice() && screen.width < 768;
+}
+
 /**
  * Checks if wire context
  * @returns {boolean}
@@ -549,7 +555,7 @@ const getNow = throttle(moment, 500);
 
 /**
  * Test if item is embargoed, if not returns null, otherwise returns its embargo time
- * @param {String} embargoed 
+ * @param {String} embargoed
  * @return {Moment}
  */
 export function getEmbargo(item) {
@@ -561,4 +567,28 @@ export function getEmbargo(item) {
     const parsed = moment(item.embargoed);
 
     return parsed.isAfter(now) ? parsed : null;
+}
+
+export function getItemFromArray(value, items = [], field = '_id') {
+    return items.find((i) => i[field] === value);
+}
+
+export function upperCaseFirstCharacter(text) {
+    return (text && text.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase()));
+}
+
+export function postHistoryAction(item, action, section='wire') {
+    server.post('/history/new', {
+        item: item,
+        action: action,
+        section: section
+    }).catch((error) => errorHandler(error));
+}
+
+export function recordAction(item, action = 'open', section = 'wire') {
+    if (item) {
+        analytics.itemEvent(action, item);
+        analytics.itemView(item);
+        postHistoryAction(item, action, section);
+    }
 }
