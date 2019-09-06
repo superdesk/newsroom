@@ -30,3 +30,23 @@
         }
     }
 }
+
+.agenda-item {
+    margin-top: 0;
+
+    @include md {
+        margin-top: 10px;
+    }
+}
+
+.agenda-item {
+    .wire-articles__item__meta-info {
+        margin-top: 10px;
+        margin-bottom: 0;
+
+        @include md {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+    }
+}

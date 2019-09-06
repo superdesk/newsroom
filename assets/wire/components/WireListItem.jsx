@@ -52,7 +52,7 @@ class WireListItem extends React.Component {
 
     render() {
         const {item, onClick, onDoubleClick, isExtended} = this.props;
-        const cardClassName = classNames('wire-articles__item-wrap col-12');
+        const cardClassName = classNames('wire-articles__item-wrap col-12 wire-item');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--visited': this.props.isRead,
             'wire-articles__item--open': this.props.isActive,
