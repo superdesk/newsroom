@@ -1,0 +1,23 @@
+@import './breakpoints';
+
+.wire-item {
+    .wire-articles__item-actions {
+        .btn-group {
+            order: 3;
+        }
+
+        .icon--share {
+            order: 1;
+        }
+
+        .icon--bookmark-add, .icon--bookmark-remove {
+            order: 2;
+        }
+
+        @include md {
+            .btn-group, .icon--share, .icon--bookmark-add, .icon--bookmark-remove {
+                order: unset;
+            }
+        }
+    }
+}
