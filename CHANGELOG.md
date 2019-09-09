@@ -19,6 +19,7 @@
 - [SDAN-587] Ignore agenda when applying time limit to search (#836)
 - [SDAN-590] (fix): Celery beat and queue configs (#840)
 - [SDAN-592] Coverages in the Agenda Share/Print Preview are misaligned (#845)
+- [SDAN-593] Show all event coverages if no planning item selected (#847)
 
 ## [1.14] 2019-08-22
 # Features
