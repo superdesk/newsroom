@@ -1,5 +1,25 @@
 # Newsroom Changelog
 
+## [1.15] 2019-09-09
+# Features
+- None
+
+# Improvements
+- [SDAN-578][SDAN-579] 'Account Manager' field in Company schema and use that in Company Expiry alerts (#832)
+- [SDAN-570] Fixes/Improvements to the 'share' action (#838)
+- [SDAN-591] Improve company expiry email layout and text (#841)
+- [SDAN-570] Changes to 'share' item template (#842)
+- [SDAN-572] Style changes to display 'Event Completed' label (#843)
+- [SDAN-568] Improve responsive behaviour for mobile phones (#834)
+- [SDAN-568] Further response layout improvements (#844)
+
+# Fixes
+- [SDAN-583] Preview for items that aren't wire or agenda in the Subscriber Activity report don't show the body text (#831)
+- [SDAN-580] Remove company expiry check from user login and notifications (#833)
+- [SDAN-587] Ignore agenda when applying time limit to search (#836)
+- [SDAN-590] (fix): Celery beat and queue configs (#840)
+- [SDAN-592] Coverages in the Agenda Share/Print Preview are misaligned (#845)
+
 ## [1.14] 2019-08-22
 # Features
 - [SDAN-538] Add the ability to execute the remove expired command (#817)
