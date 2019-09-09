@@ -21,14 +21,21 @@ class SearchBar extends React.Component {
 
     onSubmit(event) {
         event.preventDefault();
-        this.props.setQuery(this.state.query);
-        this.props.fetchItems();
+        this.setAndFetch(this.state.query);
     }
 
     onClear(){
-        this.props.setQuery('');
-        this.props.fetchItems();
+        this.setAndFetch();
         this.setState({query: ''});
+    }
+
+    setAndFetch(q = '') {
+        if (this.props.enableQueryAction) {
+            this.props.setQuery(q);
+            this.props.fetchItems();
+        } else {
+            this.props.fetchItems(q);
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -70,6 +77,7 @@ SearchBar.propTypes = {
     query: PropTypes.string,
     setQuery: PropTypes.func,
     fetchItems: PropTypes.func,
+    enableQueryAction: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -79,5 +87,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     setQuery: (query) => dispatch(setQuery(query))
 });
+
+SearchBar.defaultProps = { enableQueryAction: true };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);

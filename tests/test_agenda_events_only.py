@@ -3,8 +3,9 @@ from pytest import fixture
 from copy import deepcopy
 from newsroom.notifications import get_user_notifications
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, setup_user_company, PUBLIC_USER_ID  # noqa
-from .utils import post_json
+from .utils import post_json, mock_send_email
 from .test_push_events import test_event, test_planning
+from unittest import mock
 
 
 @fixture(autouse=True)
@@ -113,6 +114,7 @@ def set_watch_products(app):
     }])
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
@@ -146,6 +148,7 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     assert notifications[0]['_id'] == '{}_foo'.format(PUBLIC_USER_ID)
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event = deepcopy(test_event)
     set_watch_products(app)
@@ -175,6 +178,7 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     assert notifications[0]['_id'] == '{}_foo'.format(PUBLIC_USER_ID)
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
@@ -201,6 +205,7 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
     assert len(push_mock.call_args[1]['users']) == 0
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -230,6 +235,7 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
     assert len(push_mock.call_args[1]['users']) == 0
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)

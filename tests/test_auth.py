@@ -8,30 +8,33 @@ from superdesk.utils import get_hash
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
 from tests.test_users import init as users_init, ADMIN_USER_ID  # noqa
+from .utils import mock_send_email
+from unittest import mock
 
-company_1 = ObjectId()
-company_2 = ObjectId()
-company_3 = ObjectId()
+disabled_company = ObjectId()
+expired_company = ObjectId()
+company = ObjectId()
 
 
 @fixture(autouse=True)
 def init(app):
     app.data.insert('companies', [{
-        '_id': company_1,
+        '_id': disabled_company,
         'name': 'Press co.',
         'is_enabled': False,
     }, {
-        '_id': company_2,
+        '_id': expired_company,
         'name': 'Company co.',
         'is_enabled': True,
         'expiry_date': datetime.datetime.now() - datetime.timedelta(days=5),
     }, {
-        '_id': company_3,
+        '_id': company,
         'name': 'Foo bar co.',
         'is_enabled': True
     }])
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_new_user_signup_sends_email(app, client):
     app.config['SIGNUP_EMAIL_RECIPIENTS'] = 'admin@bar.com'
     with app.mail.record_messages() as outbox:
@@ -96,7 +99,7 @@ def test_login_fails_for_disabled_user(app, client):
         'is_validated': True,
         'is_enabled': False,
         'is_approved': True,
-        'company': company_3,
+        'company': company,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
     }])
 
@@ -117,7 +120,7 @@ def test_login_fails_for_user_with_disabled_company(app, client):
         'email': 'test@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',
-        'company': company_1,
+        'company': disabled_company,
         'is_validated': True,
         'is_enabled': True,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
@@ -131,7 +134,7 @@ def test_login_fails_for_user_with_disabled_company(app, client):
     assert 'Company account has been disabled' in response.get_data(as_text=True)
 
 
-def test_login_fails_for_user_with_expired_company(app, client):
+def test_login_succesfull_for_user_with_expired_company(app, client):
     # Register a new account
     app.data.insert('users', [{
         '_id': ObjectId(),
@@ -140,7 +143,7 @@ def test_login_fails_for_user_with_expired_company(app, client):
         'email': 'test@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',
-        'company': company_2,
+        'company': expired_company,
         'is_validated': True,
         'is_enabled': True,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
@@ -151,7 +154,7 @@ def test_login_fails_for_user_with_expired_company(app, client):
         data={'email': 'test@sourcefabric.org', 'password': 'admin'},
         follow_redirects=True
     )
-    assert 'Company account has been disabled' in response.get_data(as_text=True)
+    assert 'test' in response.get_data(as_text=True)
 
 
 def test_login_for_user_with_enabled_company_succeeds(app, client):
@@ -163,14 +166,14 @@ def test_login_for_user_with_enabled_company_succeeds(app, client):
         'email': 'test@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',
-        'company': company_1,
+        'company': disabled_company,
         'is_validated': True,
         'is_approved': True,
         'is_enabled': True,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
     }])
 
-    get_resource_service('companies').patch(id=company_1, updates={'is_enabled': True})
+    get_resource_service('companies').patch(id=disabled_company, updates={'is_enabled': True})
     response = client.post(
         url_for('auth.login'),
         data={'email': 'test@sourcefabric.org', 'password': 'admin'},
@@ -190,7 +193,7 @@ def test_login_fails_for_not_approved_user(app, client):
         'user_type': 'public',
         'is_validated': True,
         'is_enabled': True,
-        'company': company_3,
+        'company': company,
         'is_approved': False,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
     }])
@@ -225,7 +228,7 @@ def test_account_is_locked_after_5_wrong_passwords(app, client):
         'email': 'test@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',
-        'company': company_1,
+        'company': disabled_company,
         'is_validated': True,
         'is_approved': True,
         'is_enabled': True,
@@ -257,7 +260,7 @@ def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
         'email': 'test@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',
-        'company': company_1,
+        'company': disabled_company,
         'is_validated': True,
         'is_approved': True,
         'is_enabled': True,
@@ -319,14 +322,14 @@ def test_login_with_remember_me_selected_creates_permanent_session(app, client):
         'email': 'test@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'user_type': 'public',
-        'company': company_1,
+        'company': disabled_company,
         'is_validated': True,
         'is_approved': True,
         'is_enabled': True,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
     }])
 
-    get_resource_service('companies').patch(id=company_1, updates={'is_enabled': True})
+    get_resource_service('companies').patch(id=disabled_company, updates={'is_enabled': True})
 
     # login with remember_me = None
     client.post(
@@ -457,7 +460,7 @@ def test_access_for_disabled_user(app, client):
         'is_validated': True,
         'is_enabled': True,
         'is_approved': True,
-        'company': company_3,
+        'company': company,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
     }])
 
@@ -484,7 +487,7 @@ def test_access_for_disabled_user(app, client):
         'is_validated': 'true',
         'is_enabled': 'false',
         'is_approved': 'true',
-        'company': company_3,
+        'company': company,
         '_etag': user.get('_etag')
     })
     assert 200 == resp.status_code
@@ -514,7 +517,7 @@ def test_access_for_disabled_company(app, client):
         'is_validated': True,
         'is_enabled': True,
         'is_approved': True,
-        'company': company_1,
+        'company': disabled_company,
         '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
     }])
 

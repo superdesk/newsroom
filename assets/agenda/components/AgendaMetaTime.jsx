@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import classNames from 'classnames';
 
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import {bem} from 'ui/utils';
@@ -87,19 +88,31 @@ function getCalendarClass(item) {
     }
 }
 
-export default function AgendaMetaTime({item, borderRight, isRecurring, group}) {
-    return ([
-        <div key="icon" className={bem('wire-articles__item', 'icons','dashed-border')}>
-            <span className="wire-articles__item__icon">
-                <i className={`icon--calendar ${getCalendarClass(item)}`}></i>
-                {isRecurring && <span className="time-icon"><i className="icon-small--repeat"></i></span>}
-            </span>
-        </div>,
-        <div key="times" className={bem('wire-articles__item', 'meta-time', {'border-right': borderRight})}>
+export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone}) {
+    const times = (
+        <div key="times" className={classNames(
+            bem('wire-articles__item', 'meta-time', {'border-right': borderRight}),
+            {'w-100': isMobilePhone}
+        )}>
             {format(item, group)}
-        </div>,
-        <AgendaItemTimeUpdater key="timeUpdate" item={item} borderRight={borderRight} />
-    ]);
+        </div>
+    );
+
+    const icons = (
+        <div key="icon" className={bem('wire-articles__item', 'icons',{'dashed-border': !isMobilePhone})}>
+            <span className={classNames(
+                'wire-articles__item__icon',
+                {'dashed-border': isMobilePhone}
+            )}>
+                <i className={`icon--calendar ${getCalendarClass(item)}`} />
+                {isRecurring && <span className="time-icon"><i className="icon-small--repeat" /></span>}
+            </span>
+        </div>
+    );
+
+    return isMobilePhone ?
+        [times, icons] :
+        [icons, times, <AgendaItemTimeUpdater key="timeUpdate" item={item} borderRight={borderRight} />];
 }
 
 AgendaMetaTime.propTypes = {
@@ -107,9 +120,12 @@ AgendaMetaTime.propTypes = {
     borderRight: PropTypes.bool,
     isRecurring: PropTypes.bool,
     group: PropTypes.string,
+    isMobilePhone: PropTypes.bool,
 };
 
 AgendaMetaTime.defaultProps = {
     isRecurring: false,
-    hasCoverage: false
+    hasCoverage: false,
+    isMobilePhone: false,
+    borderRight: false,
 };

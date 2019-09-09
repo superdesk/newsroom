@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 from urllib import parse
 
 from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import get_json, get_admin_user_id
+from .utils import get_json, get_admin_user_id, mock_send_email
+from unittest import mock
 from tests.test_users import ADMIN_USER_ID
 from superdesk import get_resource_service
 
@@ -22,6 +23,7 @@ def test_item_json(client):
     assert 'headline' in data
 
 
+@mock.patch('newsroom.wire.views.send_email', mock_send_email)
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -39,10 +41,10 @@ def test_share_items(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@sourcefabric.org'
+        assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin shared ' in outbox[0].body
+        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
         assert items[1]['headline'] in outbox[0].body
         assert 'http://localhost:5050/wire?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body

@@ -7,6 +7,9 @@ from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_login
+from .utils import mock_send_email
+from unittest import mock
+
 ADMIN_USER_ID = '5cc94b99bc4316684dc7dc07'
 
 
@@ -152,6 +155,7 @@ def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
     assert 'Email address is already in use' in response.get_data(as_text=True)
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_create_new_user_succeeds(app, client):
     test_login_succeeds_for_admin(client)
     company_ids = app.data.insert('companies', [{
@@ -337,7 +341,21 @@ def test_active_users_and_active_companies(client, app):
 
         assert '1' in companies
         assert '2' not in companies
-        assert '3' not in companies
+
+
+def test_expired_company_does_not_restrict_activity(client, app):
+    app.data.insert('companies', [
+        {'_id': '1', 'name': 'Company1', 'is_enabled': True},
+        {'_id': '2', 'name': 'Company2', 'is_enabled': False},
+        {'_id': '3', 'name': 'Company3', 'is_enabled': True, 'expiry_date': datetime.utcnow() - timedelta(days=1)}
+    ])
+
+    with app.test_request_context():
+        companies = get_company_dict()
+
+        assert '1' in companies
+        assert '2' not in companies
+        assert '3' in companies
 
 
 def test_is_valid_login(client, app):

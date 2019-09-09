@@ -46,6 +46,13 @@ class AmNewsApp extends BaseApp {
         this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
     }
 
+    getSnapshotBeforeUpdate(prevProps) {
+        if (prevProps.itemToOpen && !this.props.itemToOpen && !this.props.activeNavigation) {
+            // enable first navigation
+            this.props.toggleNavigation(get(this.props, 'navigations[0]'));
+        }
+    }
+
     componentDidMount() {
         this.setIsMobile();
         window.addEventListener('resize', this.setIsMobile);

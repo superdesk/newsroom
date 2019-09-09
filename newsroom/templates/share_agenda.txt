@@ -1,8 +1,14 @@
 {% extends "email_layout.txt" %}
 {% block content %}
 Hi {{ recipient.first_name }} {{ recipient.last_name }},
-{{ sender.first_name }} {{ sender.last_name }} shared the following agenda with you:
-{% for item in items %}{% set map = maps[loop.index0] %}{% set dateString = dateStrings[loop.index0] %}{% set location = locations[loop.index0] %}{% set contacts = contactList[loop.index0] %}{% set links = linkList[loop.index0] %}{% include "email_agenda.txt" %}{% endfor %}
-{{ message }}
+{{ sender.first_name }} {{ sender.last_name }} ({{ sender.email }}) shared the following agenda with you.
+
+{{ get_multi_line_message(message) }}
+
+{% for item in items %}{% set map = maps[loop.index0] %}{% set dateString = dateStrings[loop.index0] %}{% set location = locations[loop.index0] %}{% set contacts = contactList[loop.index0] %}{% set links = linkList[loop.index0] %}{% include "email_agenda.txt" %}
+=================================================================
+
+
+{% endfor %}
 {% endblock %}
 {% block name %}{% endblock %}

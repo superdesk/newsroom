@@ -35,51 +35,63 @@ class SearchResultsInfo extends React.Component {
         this.componentDidMount();
     }
 
-
     render() {
-        const isFollowing = this.props.user && this.props.activeTopic;
-        const displayFollowTopic = this.props.topicType && this.props.user &&
-            !this.props.bookmarks && !this.props.featuredOnly && (this.props.resultsFiltered || this.props.query);
+        if (isEmpty(this.props.newItems) && !displayTotalItems && !displayFollowTopic && !this.props.query) {
+            return null;
+        }
+
         const displayTotalItems = this.props.hideTotalItems && (this.props.bookmarks ||
           !isEmpty(this.props.activeTopic) ||
           this.props.resultsFiltered || this.props.query);
-        const displayHeader = !isEmpty(this.props.newItems) || displayTotalItems || displayFollowTopic || this.props.query;
         const newItemsLength = get(this.props, 'newItems.length', 0) > 25 ? '25+' : get(this.props, 'newItems.length');
         const newItemsTooltip = !isWireContext() ? gettext('New events to load') : gettext('New stories available to load');
 
+        const isFollowing = this.props.user && this.props.activeTopic;
+        const displayFollowTopic = this.props.topicType && this.props.user &&
+            !this.props.bookmarks && !this.props.featuredOnly && (this.props.resultsFiltered || this.props.query);
+
+        const onClick = () => (
+            this.props.followTopic(this.props.searchCriteria, this.props.topicType, this.props.activeNavigation)
+        );
+
         return (
-            displayHeader ? <div className={classNames(
-                'wire-column__main-header d-flex mt-0 px-3 align-items-center flex-wrap flex-sm-nowrap',
+            <div className={classNames(
+                'wire-column__main-header d-flex mt-0 px-3 align-items-center',
                 this.props.scrollClass
             )}>
-                <div className="navbar-text search-results-info">
-                    {displayTotalItems && <span className="search-results-info__num">{this.props.totalItems}</span>}
-                    {this.props.query && (
-                        <span className="search-results-info__text">
-                            {gettext('search results for:')}<br/>
-                            <b>{this.props.query}</b>
-                        </span>
+                <div className="d-flex flex-column flex-md-row h-100">
+                    <div className="navbar-text search-results-info">
+                        {displayTotalItems && <span className="search-results-info__num">{this.props.totalItems}</span>}
+                        {this.props.query && (
+                            <span className="search-results-info__text flex-column">
+                                <span>{gettext('search results for:')}</span>
+                                <span className="text-break"><b>{this.props.query}</b></span>
+                            </span>
+                        )}
+                    </div>
+                    {displayFollowTopic && (
+                        <div className="d-none d-md-flex h-100 align-items-center flex-shrink-0">
+                            <button
+                                key="btnSaveTopic"
+                                disabled={isFollowing}
+                                className="btn btn-outline-primary btn-sm d-none d-sm-block mb-1 mt-1"
+                                onClick={onClick}
+                            >
+                                {isWireContext() ? gettext('Save as topic') : gettext('Save search to my events')}
+                            </button>
+                        </div>
                     )}
                 </div>
 
-
-                {displayFollowTopic && (
-                    <button
-                        disabled={isFollowing}
-                        className="btn btn-outline-primary btn-sm d-none d-sm-block"
-                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType, this.props.activeNavigation)}
-                    >{isWireContext() ? gettext('Save as topic') : gettext('Save search to my events')}</button>
-                )}
-
-                {displayFollowTopic && (
-                    <button
-                        disabled={isFollowing}
-                        className="btn btn-outline-primary btn-sm d-block d-sm-none"
-                        onClick={() => this.props.followTopic(this.props.searchCriteria, this.props.topicType, this.props.activeNavigation)}
-                    >{gettext('S')}</button>
-                )}
-
-                <div className="d-flex align-items-center ml-auto">
+                <div className="d-flex ml-auto align-items-end align-items-md-center h-100 flex-column flex-md-row flex-shrink-0">
+                    {displayFollowTopic && (
+                        <button
+                            key="btnSaveSearch"
+                            disabled={isFollowing}
+                            className="btn btn-outline-primary btn-sm d-block d-sm-none mb-1 mt-1"
+                            onClick={onClick}
+                        >{gettext('Save Search')}</button>
+                    )}
                     {!isEmpty(this.props.newItems) &&
                       <button
                           type="button"
@@ -92,7 +104,7 @@ class SearchResultsInfo extends React.Component {
                       </button>
                     }
                 </div>
-            </div> : null
+            </div>
         );
     }
 }

@@ -218,7 +218,7 @@ def is_company_enabled(user, company=None):
     if not user_company:
         return False
 
-    return user_company.get('is_enabled', False) and not is_company_expired(user_company)
+    return user_company.get('is_enabled', False)
 
 
 def is_company_expired(company):
