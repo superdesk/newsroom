@@ -819,11 +819,16 @@ article.list {
 }
 
 .search-results-info__num {
-    font-size: 2rem; // 32px
-    font-weight: 300;
-    line-height: 1.4;
-    margin-right: 10px;
+    margin-right: 5px;
     transition: all 0.2s ease;
+
+    @include md {
+        font-size: 2rem; // 32px
+        font-weight: 300;
+        line-height: 1.4;
+        margin-right: 10px;
+    }
+
     @include lg {
         margin-bottom: 0;
     }
@@ -831,10 +836,26 @@ article.list {
 
 .search-results-info__text {
     color: #6e6e6e;
-    margin-top: 6px;
+    display: flex;
+
+    .text-break {
+        max-height: 32px;
+        overflow-y: hidden;
+    }
+
+    @include md {
+        margin-top: 6px;
+        flex-direction: column;
+    }
+
     b {
         color: $body-text;
     }
+}
+
+.text-break {
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .wire-column--3 {
@@ -1020,18 +1041,26 @@ article.list {
 }
 .wire-column__main-header {
     flex-shrink: 0;
-    height: 36px;
+    min-height: 40px;
+    padding-top: 4px;
+    padding-bottom: 4px;
     transition: all .2s ease;
     z-index: 9;
 
     @include lg {
-        height: 42px;
+        padding-top: 7px;
+        padding-bottom: 7px;
     }
 
     &--small {
         background: white;
         box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
-        height: 36px;
+
+        padding-top: 0;
+
+        @include md {
+            padding-bottom: 0;
+        }
 
         .btn-sm {
             @include sm {
@@ -1043,14 +1072,18 @@ article.list {
             @include sm {
                 font-size: 1.625rem;
                 transition: all .2s ease;
-                margin-top: 3px;
+                margin-top: 0;
             }
         }
         .search-results-info {
+            min-height: unset;
             @include sm {
                 line-height: 1;
                 transition: all .2s ease;
             }
+        }
+        .search-results-info__text {
+            margin-top: 0;
         }
     }
 
@@ -1919,7 +1952,7 @@ article.list {
     position: absolute;
     content: '';
     bottom: -8px;
-    right: -8px;
+    right: 2px;
     width: 18px;
     height: 18px;
     border-radius: 10px;
