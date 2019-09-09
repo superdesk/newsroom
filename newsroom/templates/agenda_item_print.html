@@ -56,9 +56,7 @@
             </div>
 
             {% if planning_item.get('ednote') %}
-                <div class="row">
-                    <h5>{{ _('Editorial Note') }}: {{ planning_item.get('ednote') }}</h5>
-                </div><br>
+                <h5 class="row"><p>{{ _('Editorial Note') }}: {{ planning_item.get('ednote') }}</p></h5>
             {% endif %}
 
             {% if planning_item.get('coverages', []) %}
@@ -66,9 +64,8 @@
                     <h5>{{ _('Coverages:') }}</h5>
                 </div>
                 {% for cov in planning_item.get('coverages', []) or [] %}
-                    <div>{{ get_coverage_email_text(cov) }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div>{% if is_admin and cov.get('planning', {}).get('internal_note') %}{{ "\r\n" }}<div><i>Internal Note: {{ cov['planning']['internal_note'] }}</i>{% endif %}<br><br>
+                    <p>{{ get_coverage_email_text(cov) }}{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<br><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}{% if is_admin and cov.get('planning', {}).get('internal_note') %}{{ "\r\n" }}<br><i>Internal Note: {{ cov['planning']['internal_note'] }}</i>{% endif %}</p>
                 {% endfor %}
-                </div>
             {% endif %}
         </div>
     {% endfor %}
