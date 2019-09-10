@@ -101,7 +101,7 @@ def test_share_items(client, app, mocker):
         assert 'Hi Foo Bar' in outbox[0].body
         assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert 'Conference Planning' in outbox[0].body
-        assert 'http://localhost:5050/agenda/urn:conference' in outbox[0].body
+        assert 'http://localhost:5050/agenda?item=urn%3Aconference' in outbox[0].body
         assert 'Some info message' in outbox[0].body
 
     resp = client.get('/agenda/{}?format=json'.format('urn:conference'))
