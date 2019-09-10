@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import { submitFollowTopic as submitWireFollowTopic } from 'wire/actions';
 import { submitFollowTopic as submitProfileFollowTopic } from 'user-profile/actions';
+import { modalFormInvalid, modalFormValid } from 'actions';
 
 import Modal from './Modal';
 import TextInput from './TextInput';
@@ -34,6 +35,11 @@ class FollowTopicModal extends React.Component {
         return (event) => {
             const topic = Object.assign({}, this.state.topic, {[field]: event.target.value});
             this.setState({topic});
+            if (topic.label) {
+                this.props.modalFormValid();
+            } else {
+                this.props.modalFormInvalid();
+            }
         };
     }
 
@@ -78,10 +84,14 @@ FollowTopicModal.propTypes = {
     data: PropTypes.shape({
         topic: PropTypes.object.isRequired,
     }),
+    modalFormInvalid: PropTypes.func,
+    modalFormValid: PropTypes.func,
 };
 
 const mapDispatchToProps = (dispatch) => ({
     submit: (isNew, data) => isNew ? dispatch(submitWireFollowTopic(data)) : dispatch(submitProfileFollowTopic(data)),
+    modalFormInvalid: () => dispatch(modalFormInvalid()),
+    modalFormValid: () => dispatch(modalFormValid()),
 });
 
 export default connect(null, mapDispatchToProps)(FollowTopicModal);
