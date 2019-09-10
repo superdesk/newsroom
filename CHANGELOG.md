@@ -1,10 +1,21 @@
 # Newsroom Changelog
 
-## [1.15] 2019-09-09
-# Features
+## [1.15.1] 2019-09-10
+### Features
 - None
 
-# Improvements
+### Improvements
+- None
+
+### Fixes
+- [SDAN-594] Previewing past or future Agenda item from email displays list not the preview (#848)
+- Save Topic and Save Events 'SAVE' button was disabled while saving (#849)
+
+## [1.15] 2019-09-09
+### Features
+- None
+
+### Improvements
 - [SDAN-578][SDAN-579] 'Account Manager' field in Company schema and use that in Company Expiry alerts (#832)
 - [SDAN-570] Fixes/Improvements to the 'share' action (#838)
 - [SDAN-591] Improve company expiry email layout and text (#841)
@@ -13,7 +24,7 @@
 - [SDAN-568] Improve responsive behaviour for mobile phones (#834)
 - [SDAN-568] Further response layout improvements (#844)
 
-# Fixes
+### Fixes
 - [SDAN-583] Preview for items that aren't wire or agenda in the Subscriber Activity report don't show the body text (#831)
 - [SDAN-580] Remove company expiry check from user login and notifications (#833)
 - [SDAN-587] Ignore agenda when applying time limit to search (#836)
@@ -22,10 +33,10 @@
 - [SDAN-593] Show all event coverages if no planning item selected (#847)
 
 ## [1.14] 2019-08-22
-# Features
+### Features
 - [SDAN-538] Add the ability to execute the remove expired command (#817)
 
-# Improvements
+### Improvements
 - [SDAN-572] Label completed agenda items as 'Completed' (#829)
 - [SDAN-572][SDAN-567] UI changes in displaying 'byline', 'located' and 'slugline' (#823)
 - [SDAN-565] Reposition the 'show map' text in Agenda Preview (#821)
@@ -33,7 +44,7 @@
 - [SDAN-524][SDAN-530] Record 'open' and 'preview' actions in history collection (#815)
 - [SDAN-519] Toggle map display in Agenda Preview (#811)
 
-# Fixes
+### Fixes
 - [SDAN-585] (fix): Corrections showing up as 'Updates Coming' (#830)
 - [SDAN-569] Market Place Bookmarks were not seen (#828)
 - UI fix to add padding after 'published' and remove 'on created_time' in wire ite, detail (#826)
