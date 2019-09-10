@@ -14,7 +14,7 @@ from . import views  # noqa
 
 def url_for_agenda(item, _external=True):
     """Get url for agenda item."""
-    return url_for('agenda.item', _id=item['_id'], _external=_external)
+    return url_for('agenda.index', item=item['_id'], _external=_external)
 
 
 def init_app(app):
