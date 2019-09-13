@@ -118,7 +118,7 @@ SearchResultsInfo.propTypes = {
     refresh: PropTypes.func,
     activeTopic: PropTypes.object,
     toggleNews: PropTypes.func,
-    activeNavigation: PropTypes.string,
+    activeNavigation: PropTypes.arrayOf(PropTypes.string),
     newsOnly: PropTypes.bool,
     scrollClass: PropTypes.string,
     topicType: PropTypes.string,

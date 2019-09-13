@@ -1,6 +1,8 @@
 import { get } from 'lodash';
 import analytics from 'analytics';
 import { renderModal } from 'actions';
+import {multiSelectTopicsConfigSelector} from '../ui/selectors';
+import {activeNavigationSelector} from './selectors';
 
 
 export const SET_QUERY = 'SET_QUERY';
@@ -16,9 +18,42 @@ export function toggleTopic(topic) {
 
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
 export function toggleNavigation(navigation) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
+        const currentNavigation = activeNavigationSelector(getState());
+        let newNavigation = [...currentNavigation];
+        const navigationId = get(navigation, '_id');
+
         dispatch(setQuery(''));
-        dispatch({type: TOGGLE_NAVIGATION, navigation});
+
+        if (!navigationId) {
+            // If no id has been provided, then we select all topics
+            newNavigation = [];
+        } else if (multiSelectTopicsConfigSelector(getState())) {
+            // If multi selecting topics is enabled for this section
+            if (currentNavigation.includes(navigationId)) {
+                // The navigation is already selected, so deselect it
+                newNavigation = newNavigation.filter(
+                    (navId) => navId !== navigationId
+                );
+            } else {
+                // The navigation is not selected, so select it now
+                newNavigation.push(navigationId);
+            }
+        } else {
+            // If multi selecting topics is disabled for this section
+            if (get(currentNavigation, '[0]') === navigationId) {
+                // The navigation is already selected, so deselect it
+                newNavigation = [];
+            } else {
+                // The navigation is not selected, so select it now
+                newNavigation = [navigationId];
+            }
+        }
+
+        dispatch({
+            type: TOGGLE_NAVIGATION,
+            navigation: newNavigation
+        });
     };
 }
 

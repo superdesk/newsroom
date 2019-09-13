@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
 from flask_script import Manager
-from newsroom import Newsroom
+
 from superdesk import get_resource_service
+
+from newsroom import Newsroom
 from newsroom.elastic_utils import rebuild_elastic_index
 from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_timestamp
 from newsroom.auth import get_user_by_email
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
+from newsroom.data_updates import GenerateUpdate, Upgrade, get_data_updates_files, Downgrade
+
 import content_api
 
 app = Newsroom()
@@ -20,7 +24,6 @@ def create_user(email, password, first_name, last_name, is_admin):
         'password': password,
         'first_name': first_name,
         'last_name': last_name,
-        'email': email,
         'user_type': 'administrator' if is_admin else 'public',
         'is_enabled': True,
         'is_approved': True
@@ -80,6 +83,52 @@ def send_company_expiry_alerts():
 def remove_expired(expiry_days):
     exp = content_api.RemoveExpiredItems()
     exp.run(expiry_days)
+
+
+@manager.option('-r', '--resource', dest='resource', required=True)
+def data_generate_update(resource):
+    cmd = GenerateUpdate()
+    cmd.run(resource)
+
+
+@manager.option(
+    '-i', '--id', dest='data_update_id',
+    required=False, choices=get_data_updates_files(strip_file_extension=True),
+    help='Data update id to run last'
+)
+@manager.option(
+    '-f', '--fake-init', dest='fake',
+    required=False, action='store_true',
+    help='Mark data updates as run without actually running them'
+)
+@manager.option(
+    '-d', '--dry-run', dest='dry',
+    required=False, action='store_true',
+    help='Does not mark data updates as done. This can be useful for development.'
+)
+def data_upgrade(data_update_id=None, fake=False, dry=False):
+    cmd = Upgrade()
+    cmd.run(data_update_id, fake, dry)
+
+
+@manager.option(
+    '-i', '--id', dest='data_update_id',
+    required=False, choices=get_data_updates_files(strip_file_extension=True),
+    help='Data update id to run last'
+)
+@manager.option(
+    '-f', '--fake-init', dest='fake',
+    required=False, action='store_true',
+    help='Mark data updates as run without actually running them'
+)
+@manager.option(
+    '-d', '--dry-run', dest='dry',
+    required=False, action='store_true',
+    help='Does not mark data updates as done. This can be useful for development.'
+)
+def data_downgrade(data_update_id=None, fake=False, dry=False):
+    cmd = Downgrade()
+    cmd.run(data_update_id, fake, dry)
 
 
 if __name__ == "__main__":

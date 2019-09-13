@@ -44,11 +44,17 @@ export default class BaseApp extends React.Component {
             return null;
         }
 
-        let name = get(navigations.find((nav) => nav._id === activeNavigation), 'name', '');
-        if (!name && activeTopic) {
+        let name;
+        const numNavigations = get(activeNavigation, 'length', 0);
+
+        if (activeTopic) {
             name = `/ ${activeTopic.label}`;
-        } else if (name) {
-            name = `/ ${name}`;
+        } else if (numNavigations > 1) {
+            name = '/ ' + gettext('Custom View');
+        } else if (numNavigations === 1) {
+            name = '/ ' + get(navigations.find((nav) => nav._id === activeNavigation[0]), 'name', '');
+        } else {
+            name = '';
         }
 
         return createPortal(name , dest);
