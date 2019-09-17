@@ -14,8 +14,9 @@ import {
     cancelEdit
 } from '../actions';
 import {gettext} from 'utils';
-import { get } from 'lodash';
+import {get} from 'lodash';
 import {sectionsPropType} from '../../features/sections/types';
+import {sectionsSelector} from '../../features/sections/selectors';
 
 class SectionFilters extends React.Component {
     constructor(props, context) {
@@ -126,7 +127,7 @@ const mapStateToProps = (state) => ({
     activeQuery: state.activeQuery,
     totalSectionFilters: state.totalSectionFilters,
     errors: state.errors,
-    sections: state.sections.list,
+    sections: sectionsSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -11,7 +11,8 @@ import ListBar from 'components/ListBar';
 import { gettext } from 'utils';
 
 import SectionSwitch from 'features/sections/SectionSwitch';
-import { sectionsPropType } from 'features/sections/types';
+import {sectionsPropType} from 'features/sections/types';
+import {sectionsSelector, activeSectionSelector} from 'features/sections/selectors';
 
 class SectionFiltersApp extends React.Component {
     constructor(props, context) {
@@ -50,8 +51,8 @@ SectionFiltersApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    sections: state.sections.list,
-    activeSection: state.sections.active,
+    sections: sectionsSelector(state),
+    activeSection: activeSectionSelector(state),
 });
 
 const mapDispatchToProps = {
