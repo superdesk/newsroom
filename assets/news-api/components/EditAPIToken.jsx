@@ -206,9 +206,12 @@ export default class EditAPIToken extends React.Component {
     }
 
     renderPreview() {
-        const expiry = moment(get(this.state, 'token.expiry'));
+        const expiry = get(this.state, 'token.expiry');
+        const expiryString = !expiry ?
+            gettext('Never') :
+            moment(expiry).format('dddd, DD MMMM YYYY');
         const token = get(this.state, 'token.token', '');
-        const expiresLabel = isInPast(get(this.state, 'token.expiry')) ?
+        const expiresLabel = isInPast(expiry) ?
             gettext('Expired On:') :
             gettext('Expires On:');
 
@@ -234,7 +237,7 @@ export default class EditAPIToken extends React.Component {
                                 <TextInput
                                     name='expiry'
                                     label={expiresLabel}
-                                    value={expiry.format('dddd, DD MMMM YYYY')}
+                                    value={expiryString}
                                     readOnly={true}
                                 />
                                 <TextAreaInput
