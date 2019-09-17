@@ -1,20 +1,16 @@
 import superdesk
 
-from flask import Blueprint, url_for
+from flask import Blueprint
 from flask_babel import gettext
 from .agenda import AgendaResource, AgendaService
 from .featured import FeaturedResource, FeaturedService
 from . import formatters
 from .utils import get_coverage_email_text
+from newsroom.utils import url_for_agenda
 
 blueprint = Blueprint('agenda', __name__)
 
 from . import views  # noqa
-
-
-def url_for_agenda(item, _external=True):
-    """Get url for agenda item."""
-    return url_for('agenda.index', item=item['_id'], _external=_external)
 
 
 def init_app(app):

@@ -1,8 +1,8 @@
-from flask import render_template, url_for
+from flask import render_template
 from flask_babel import gettext
 
 from newsroom.email import send_email
-from newsroom.utils import get_agenda_dates, get_location_string, get_links, get_public_contacts
+from newsroom.utils import get_agenda_dates, get_location_string, get_links, get_public_contacts, url_for_agenda
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 
@@ -63,7 +63,7 @@ def send_coverage_request_email(user, message, item):
     recipients = general_settings.get('values').get('coverage_request_recipients').split(',')
     assert recipients
     assert isinstance(recipients, list)
-    url = url_for('agenda.item', _id=item, _external=True, featured='false')
+    url = url_for_agenda({'_id': item}, _external=True)
     name = '{} {}'.format(user.get('first_name'), user.get('last_name'))
     email = user.get('email')
 

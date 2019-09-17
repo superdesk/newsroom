@@ -6,6 +6,7 @@ from newsroom.celery_app import celery
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
     get_public_contacts
 from newsroom.template_filters import is_admin_or_internal
+from newsroom.utils import url_for_agenda
 
 
 @celery.task(bind=True, soft_time_limit=120)
@@ -139,7 +140,7 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
 
 
 def _send_new_agenda_notification_email(user, topic_name, item):
-    url = url_for('agenda.item', _id=item['guid'], _external=True)
+    url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
     subject = gettext('New update for followed agenda: {}'.format(topic_name))
     kwargs = dict(
@@ -190,7 +191,7 @@ def _send_history_match_wire_notification_email(user, item, section):
 
 def _send_history_match_agenda_notification_email(user, item):
     app_name = current_app.config['SITE_NAME']
-    url = url_for('agenda.item', _id=item['guid'], _external=True)
+    url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
     subject = gettext('New update for your previously accessed agenda: {}'.format(item['name']))
     text_body = render_template(
