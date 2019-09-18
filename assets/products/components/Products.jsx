@@ -20,6 +20,7 @@ import {
 import {gettext} from 'utils';
 import { get } from 'lodash';
 import {sectionsPropType} from '../../features/sections/types';
+import {sectionsSelector} from '../../features/sections/selectors';
 
 class Products extends React.Component {
     constructor(props, context) {
@@ -147,7 +148,7 @@ const mapStateToProps = (state) => ({
     companiesById: state.companiesById,
     navigations: state.navigations,
     errors: state.errors,
-    sections: state.sections.list,
+    sections: sectionsSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
