@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
+
 import { gettext } from 'utils';
 import { submitFollowTopic as submitWireFollowTopic } from 'wire/actions';
 import { submitFollowTopic as submitProfileFollowTopic } from 'user-profile/actions';
@@ -22,6 +24,7 @@ class FollowTopicModal extends React.Component {
         this.onSubmit = this.onSubmit.bind(this);
         this.onChangeHandler = this.onChangeHandler.bind(this);
         this.getTitle = this.getTitle.bind(this);
+        this.toggleNotifications = this.toggleNotifications.bind(this);
     }
 
     onSubmit(event) {
@@ -31,21 +34,33 @@ class FollowTopicModal extends React.Component {
         }
     }
 
+    updateFormValidity(topic) {
+        const original = get(this.props, 'data.topic') || {};
+
+        if (!topic.label) {
+            // The topic must have a label so disable the save button
+            this.props.modalFormInvalid();
+        } else if (original.label !== topic.label || original.notifications !== topic.notifications) {
+            // If the label or notification have changed, then enable the save button
+            this.props.modalFormValid();
+        } else {
+            // Otherwise the form is not dirty
+            this.props.modalFormInvalid();
+        }
+    }
+
     onChangeHandler(field) {
         return (event) => {
             const topic = Object.assign({}, this.state.topic, {[field]: event.target.value});
             this.setState({topic});
-            if (topic.label) {
-                this.props.modalFormValid();
-            } else {
-                this.props.modalFormInvalid();
-            }
+            this.updateFormValidity(topic);
         };
     }
 
     toggleNotifications() {
-        const topic = Object.assign(this.state.topic, {notifications: !this.state.topic.notifications});
+        const topic = Object.assign({}, this.state.topic, {notifications: !this.state.topic.notifications});
         this.setState({topic});
+        this.updateFormValidity(topic);
     }
 
     isNewTopic() {
@@ -71,7 +86,7 @@ class FollowTopicModal extends React.Component {
                     <CheckboxInput
                         label={gettext('Send me notifications')}
                         value={this.state.topic.notifications || false}
-                        onChange={() => this.toggleNotifications()}
+                        onChange={this.toggleNotifications}
                     />
                 </form>
             </Modal>
