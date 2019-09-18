@@ -16,8 +16,9 @@ import {
     saveProducts,
 } from '../actions';
 import {gettext} from 'utils';
-import { sectionsPropType } from 'features/sections/types';
-import { get } from 'lodash';
+import {sectionsPropType} from 'features/sections/types';
+import {uiSectionsSelector} from 'features/sections/selectors';
+import {get} from 'lodash';
 
 class Navigations extends React.Component {
     constructor(props, context) {
@@ -134,7 +135,7 @@ const mapStateToProps = (state) => ({
     totalNavigations: state.totalNavigations,
     errors: state.errors,
     products: state.products,
-    sections: state.sections.list,
+    sections: uiSectionsSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

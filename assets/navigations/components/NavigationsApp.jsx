@@ -11,6 +11,7 @@ import Navigations from './Navigations';
 import ListBar from 'components/ListBar';
 import SectionSwitch from '../../features/sections/SectionSwitch';
 import {sectionsPropType} from '../../features/sections/types';
+import {uiSectionsSelector, activeSectionSelector} from '../../features/sections/selectors';
 
 
 class NavigationsApp extends React.Component {
@@ -50,8 +51,8 @@ NavigationsApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    sections: state.sections.list,
-    activeSection: state.sections.active,
+    sections: uiSectionsSelector(state),
+    activeSection: activeSectionSelector(state),
 });
 
 const mapDispatchToProps = {

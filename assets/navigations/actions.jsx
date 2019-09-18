@@ -1,6 +1,7 @@
 import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
-import { initSections } from 'features/sections/actions';
+import {initSections} from 'features/sections/actions';
+import {activeSectionSelector} from 'features/sections/selectors';
 
 // number of image that a navigation can have
 export const MAX_TILE_IMAGES = 4;
@@ -77,7 +78,7 @@ export function postNavigation() {
         const navigation = getState().navigationToEdit;
         if (!navigation._id) {
             // set the action section for new navigation
-            navigation.product_type = getState().sections.active;
+            navigation.product_type = activeSectionSelector(getState());
         }
 
         const url = `/navigations/${navigation._id ? navigation._id : 'new'}`;
