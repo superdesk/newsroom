@@ -10,7 +10,10 @@ export function getTokenForCompany(companyId) {
 
 export function generateTokenForCompany(token) {
     const newToken = cloneDeep(token);
-    newToken.expiry = moment(token.expiry).format('YYYY-MM-DDTHH:MM:SS+0000');
+
+    newToken.expiry = !token.expiry ?
+        null :
+        moment(token.expiry).format('YYYY-MM-DDTHH:MM:SS+0000');
 
     return server.post('/news_api_tokens', newToken)
         .then((data) => {
@@ -30,8 +33,8 @@ export function updateTokenForCompany(token) {
     const tokenId = encodeURIComponent(token.token);
 
     return server.patch(`/news_api_tokens?token=${tokenId}`, {
-        expiry: token.expiry,
         enabled: token.enabled,
+        expiry: !token.expiry ? null : token.expiry,
     })
         .then(() => {
             notify.success(gettext('API Token updated successfully'));
