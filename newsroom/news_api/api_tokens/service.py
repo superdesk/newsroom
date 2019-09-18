@@ -15,7 +15,7 @@ class NewsApiTokensService(CompanyTokenService):
         if company_tokens.count() >= 1:
             raise BadParameterValueError('A token for the company exists already')
 
-        if 'expiry' in token:
+        if token.get('expiry'):
             if token.get('expiry') < utcnow():
                 raise BadParameterValueError('Token has expired')
 

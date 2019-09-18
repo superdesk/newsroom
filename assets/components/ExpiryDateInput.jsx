@@ -13,7 +13,7 @@ export default class ExpiryDateInput extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {value: this.props.value === '' ? '1 year' : 'on'};
+        this.state = {value: this.props.value === '' ? 'never' : 'on'};
 
         this.options = [
             {text: gettext('on'), value: 'on'},
@@ -27,14 +27,6 @@ export default class ExpiryDateInput extends React.Component {
 
         this.onSelectChange = this.onSelectChange.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
-    }
-
-    componentDidMount() {
-        if (this.props.value === '') {
-            this.props.onChange(
-                moment().add(1, 'year').format('YYYY-MM-DD')
-            );
-        }
     }
 
     onSelectChange(event) {
@@ -61,6 +53,8 @@ export default class ExpiryDateInput extends React.Component {
 
         if (newDate) {
             this.props.onChange(newDate.format('YYYY-MM-DD'));
+        } else {
+            this.props.onChange('');
         }
     }
 
@@ -94,7 +88,7 @@ export default class ExpiryDateInput extends React.Component {
                         customInput={<ExpiryButtonWrapper />}
                         dateFormat="DD MMMM YYYY"
                         todayButton={gettext('Today')}
-                        selected={moment(this.props.value)}
+                        selected={this.props.value ? moment(this.props.value) : moment()}
                         onChange={this.onDateChange}
                         highlightDates={[moment()]}
                         locale={window.locale || 'en'}
