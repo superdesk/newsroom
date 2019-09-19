@@ -133,6 +133,7 @@ CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
 PRIVACY_POLICY = 'https://www.aap.com.au/legal/'
 TERMS_AND_CONDITIONS = 'https://www.aap.com.au/legal/'
 SHOW_COPYRIGHT = True
+SHOW_USER_REGISTER = False
 
 TEMPLATES_AUTO_RELOAD = True
 
