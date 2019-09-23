@@ -3,7 +3,7 @@
 {% block contentMain %}
 
 <div class="container-fluid py-5 overflow-auto">
-    <div class="row">        
+    <div class="row">
         <div class="col-12 col-md-8 col-lg-6 col-xxl-4 mx-auto">
             <div class="card border-0 bg-white box-shadow--z1">
                 <div class="card-header pt-4 border-0 bg-white">
@@ -31,14 +31,16 @@
                             <div class="custom-control custom-checkbox">
                                 {{ form.remember_me(class="custom-control-input", id="remember_me") }}
                                 <label class="custom-control-label" for="remember_me">{{ form.remember_me.label.text }}</label>
-                            </div>                                                   
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">{{ gettext("Login") }}</button>
                     </form>
                 </div>
 
                 <div class="card-footer bg-white border-0 text-muted small">
-                    <p>{{ gettext('Forgot your password?') }} <a href="{{ url_for('auth.token', token_type='reset_password') }}">{{ gettext('Click here to reset.') }}</a></p>
+                    <p>{{ gettext('Forgot your password?') }} <a href="{{ url_for('auth.token', token_type='reset_password') }}">{{ gettext('Click here to reset.') }}</a>
+                        {% if config.SHOW_USER_REGISTER %}{{ gettext("Or you can") }} <a href="{{ url_for('auth.signup') }}">{{ gettext('click here to register.') }}</a>{% endif %}
+                    </p>
                 </div>
 
                 {% if get_client_locales()|length is gt 1 %}
