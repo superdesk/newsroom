@@ -185,10 +185,10 @@ describe('wire actions', () => {
 
     it('can set and reset service filter', () => {
         store.dispatch(toggleNavigation({_id: 'foo'}));
-        expect(store.getState().search.activeNavigation).toEqual('foo');
+        expect(store.getState().search.activeNavigation).toEqual(['foo']);
         store.dispatch(toggleNavigation({_id: 'bar'}));
-        expect(store.getState().search.activeNavigation).toEqual('bar');
+        expect(store.getState().search.activeNavigation).toEqual(['bar']);
         store.dispatch(toggleNavigation());
-        expect(store.getState().search.activeNavigation).toBeUndefined();
+        expect(store.getState().search.activeNavigation).toEqual([]);
     });
 });

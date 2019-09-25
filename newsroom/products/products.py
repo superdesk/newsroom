@@ -54,10 +54,22 @@ class ProductsService(newsroom.Service):
     pass
 
 
+def _get_navigation_query(ids):
+    return {'$in': [str(oid) for oid in ids]} \
+        if type(ids) is list \
+        else str(ids)
+
+
 def get_products_by_navigation(navigation_id):
-    return list(superdesk.get_resource_service('products').
-                get(req=None, lookup={'navigations': str(navigation_id),
-                                      'is_enabled': True}))
+    return list(
+        superdesk.get_resource_service('products').get(
+            req=None,
+            lookup={
+                'navigations': _get_navigation_query(navigation_id),
+                'is_enabled': True
+            }
+        )
+    )
 
 
 def get_products_by_company(company_id, navigation_id=None, product_type=None):
@@ -69,7 +81,7 @@ def get_products_by_company(company_id, navigation_id=None, product_type=None):
     """
     lookup = {'is_enabled': True, 'companies': str(company_id)}
     if navigation_id:
-        lookup['navigations'] = str(navigation_id)
+        lookup['navigations'] = _get_navigation_query(navigation_id)
     if product_type:
         lookup['product_type'] = product_type
 

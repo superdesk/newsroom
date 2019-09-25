@@ -12,6 +12,7 @@ import { setActive, previewItem, toggleSelected, openItem } from '../actions';
 import { EXTENDED_VIEW } from 'wire/defaults';
 import { getIntVersion } from 'wire/utils';
 import { groupItems, getPlanningItemsByGroup, getListItems } from 'agenda/utils';
+import {activeNavigationSelector} from 'search/selectors';
 
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
@@ -349,7 +350,7 @@ const mapStateToProps = (state) => ({
     groupedItems: groupedItemsSelector(state),
     activeDate: get(state, 'agenda.activeDate'),
     searchInitiated: state.searchInitiated,
-    activeNavigation: get(state, 'search.activeNavigation', null),
+    activeNavigation: activeNavigationSelector(state),
     resultsFiltered: state.resultsFiltered,
     listItems: listItemsSelector(state),
     isLoading: state.isLoading,

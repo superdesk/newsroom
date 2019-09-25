@@ -68,7 +68,11 @@ def get_topic_url(topic):
     if topic.get('filter'):
         query_strings.append('filter={}'.format(parse.quote(json.dumps(topic.get('filter')))))
     if topic.get('navigation'):
-        query_strings.append('navigation={}'.format(topic.get('navigation')))
+        query_strings.append(
+            'navigation={}'.format(
+                ','.join(topic.get('navigation'))
+            )
+        )
     if topic.get('created'):
         query_strings.append('created={}'.format(parse.quote(json.dumps(topic.get('created')))))
 

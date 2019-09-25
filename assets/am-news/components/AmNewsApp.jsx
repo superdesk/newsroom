@@ -4,8 +4,6 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 
-
-
 import BaseApp from '../../layout/components/BaseApp';
 import SearchBar from '../../components/SearchBar';
 import SearchResultsInfo from '../../wire/components/SearchResultsInfo';
@@ -30,6 +28,17 @@ import {
 } from '../../search/actions';
 import Navigations from './Navigations';
 import AmNewsList from './AmNewsList';
+
+import {
+    previewConfigSelector,
+    detailsConfigSelector,
+    advancedSearchTabsConfigSelector,
+} from 'ui/selectors';
+import {
+    activeQuerySelector,
+    navigationsSelector,
+    activeNavigationSelector,
+} from 'search/selectors';
 
 
 const modals = {
@@ -233,7 +242,7 @@ const mapStateToProps = (state) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
-    activeQuery: state.activeQuery,
+    activeQuery: activeQuerySelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -242,14 +251,14 @@ const mapStateToProps = (state) => ({
     company: state.company,
     topics: state.topics || [],
     newItems: state.newItems,
-    navigations: get(state, 'search.navigations', []),
-    activeNavigation: get(state, 'search.activeNavigation', null),
+    navigations: navigationsSelector(state),
+    activeNavigation: activeNavigationSelector(state),
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
-    previewConfig: get(state.uiConfig, 'preview') || {},
-    detailsConfig: get(state.uiConfig, 'details') || {},
-    advancedSearchTabConfig: get(state.uiConfig, 'advanced_search_tabs') || {},
+    previewConfig: previewConfigSelector(state),
+    detailsConfig: detailsConfigSelector(state),
+    advancedSearchTabConfig: advancedSearchTabsConfigSelector(state),
     context: state.context,
 });
 

@@ -1,4 +1,3 @@
-
 import { get, isEmpty } from 'lodash';
 import mime from 'mime-types';
 import server from 'server';
@@ -23,6 +22,12 @@ import {
     toggleNavigationById,
     initParams as initSearchParams,
 } from 'search/actions';
+import {
+    activeFilterSelector,
+    activeNavigationSelector,
+    createdFilterSelector,
+} from 'search/selectors';
+import {getNavigationUrlParam} from 'search/utils';
 import {getLocations, getMapSource} from '../maps/utils';
 
 
@@ -178,9 +183,9 @@ export function printItem(item) {
  * @return {Promise}
  */
 function search(state, next) {
-    const activeFilter = get(state, 'search.activeFilter', {});
-    const activeNavigation = get(state, 'search.activeNavigation');
-    const createdFilter = get(state, 'search.createdFilter', {});
+    const activeFilter = activeFilterSelector(state);
+    const activeNavigation = activeNavigationSelector(state);
+    const createdFilter = createdFilterSelector(state);
     const newsOnly = !!get(state, 'wire.newsOnly');
     const context = get(state, 'context', 'wire');
 
@@ -189,11 +194,10 @@ function search(state, next) {
         created_to = createdFilter.from;
     }
 
-
     const params = {
         q: state.query,
         bookmarks: state.bookmarks && state.user,
-        navigation: activeNavigation,
+        navigation: getNavigationUrlParam(activeNavigation),
         filter: !isEmpty(activeFilter) && encodeURIComponent(JSON.stringify(activeFilter)),
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
@@ -223,9 +227,9 @@ export function fetchItems(updateRoute = true) {
                 const state = getState();
                 updateRoute && updateRouteParams({
                     q: state.query,
-                    filter: get(state, 'search.activeFilter'),
-                    navigation: get(state, 'search.activeNavigation'),
-                    created: get(state, 'search.createdFilter'),
+                    filter: activeFilterSelector(state),
+                    navigation: activeNavigationSelector(state),
+                    created: createdFilterSelector(state),
                 }, state);
                 analytics.timingComplete('search', Date.now() - start);
             })

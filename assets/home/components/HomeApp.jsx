@@ -17,6 +17,7 @@ import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import WirePreview from '../../wire/components/WirePreview';
 import {followTopic} from '../../search/actions';
 import {downloadVideo} from '../../wire/actions';
+import {previewConfigSelector} from 'ui/selectors';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -204,7 +205,7 @@ const mapStateToProps = (state) => ({
     itemToOpen: state.itemToOpen,
     modal: state.modal,
     activeCard: state.activeCard,
-    previewConfig: get(state.uiConfig, 'preview') || {},
+    previewConfig: previewConfigSelector(state),
     topics: state.topics || [],
 });
 
