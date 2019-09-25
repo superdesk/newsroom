@@ -19,7 +19,13 @@ import {
     followTopic,
 } from 'search/actions';
 
-import { activeTopicSelector } from 'search/selectors';
+import {
+    activeQuerySelector,
+    activeViewSelector,
+    navigationsSelector,
+    activeNavigationSelector,
+    activeTopicSelector,
+} from 'search/selectors';
 
 import BaseApp from 'layout/components/BaseApp';
 import WirePreview from './WirePreview';
@@ -36,6 +42,12 @@ import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
+
+import {
+    previewConfigSelector,
+    detailsConfigSelector,
+    advancedSearchTabsConfigSelector,
+} from 'ui/selectors';
 
 const modals = {
     followTopic: FollowTopicModal,
@@ -85,7 +97,7 @@ class WireApp extends BaseApp {
                             <i className="icon--close-thin icon--white" />
                         </span>}
 
-                        {this.props.bookmarks && 
+                        {this.props.bookmarks &&
                             <BookmarkTabs active={this.props.context} sections={this.props.userSections}/>
                         }
 
@@ -196,7 +208,7 @@ WireApp.propTypes = {
     newItems: PropTypes.array,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
-    activeNavigation: PropTypes.string,
+    activeNavigation: PropTypes.arrayOf(PropTypes.string),
     toggleNews: PropTypes.func,
     newsOnly: PropTypes.bool,
     activeTopic: PropTypes.object,
@@ -214,7 +226,7 @@ const mapStateToProps = (state) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
-    activeQuery: state.activeQuery,
+    activeQuery: activeQuerySelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -222,19 +234,19 @@ const mapStateToProps = (state) => ({
     user: state.user,
     company: state.company,
     topics: state.topics || [],
-    activeView: get(state, 'search.activeView'),
+    activeView: activeViewSelector(state),
     newItems: state.newItems,
-    navigations: get(state, 'search.navigations', []),
-    activeNavigation: get(state, 'search.activeNavigation', null),
+    navigations: navigationsSelector(state),
+    activeNavigation: activeNavigationSelector(state),
     newsOnly: !!get(state, 'wire.newsOnly'),
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
     activeTopic: activeTopicSelector(state),
     context: state.context,
-    previewConfig: get(state.uiConfig, 'preview') || {},
-    detailsConfig: get(state.uiConfig, 'details') || {},
-    advancedSearchTabConfig: get(state.uiConfig, 'advanced_search_tabs') || {},
+    previewConfig: previewConfigSelector(state),
+    detailsConfig: detailsConfigSelector(state),
+    advancedSearchTabConfig: advancedSearchTabsConfigSelector(state),
     groups: get(state, 'groups', []),
 });
 

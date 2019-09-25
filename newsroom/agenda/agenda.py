@@ -511,11 +511,15 @@ class AgendaService(newsroom.Service):
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         product_query = {'bool': {'must': [], 'should': []}}
 
+        navigation_id = req.args.get('navigation')
+        if navigation_id:
+            navigation_id = list(navigation_id.split(','))
+
         set_product_query(
             product_query,
             company,
             self.section,
-            navigation_id=req.args.get('navigation'),
+            navigation_id=navigation_id,
             events_only=is_events_only
         )
         query['bool']['must'].append(product_query)

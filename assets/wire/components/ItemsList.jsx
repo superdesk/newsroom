@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import { get, isEqual } from 'lodash';
+import {isEqual} from 'lodash';
 
 
 import { gettext } from 'utils';
@@ -10,6 +10,7 @@ import WireListItem from './WireListItem';
 import { setActive, previewItem, toggleSelected, openItem } from '../actions';
 import { EXTENDED_VIEW } from '../defaults';
 import { getIntVersion } from '../utils';
+import {activeNavigationSelector} from 'search/selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
@@ -188,7 +189,7 @@ ItemsList.propTypes = {
     activeView: PropTypes.string,
     context: PropTypes.string,
     searchInitiated: PropTypes.bool,
-    activeNavigation: PropTypes.string,
+    activeNavigation: PropTypes.arrayOf(PropTypes.string),
     resultsFiltered: PropTypes.bool,
     isLoading: PropTypes.bool,
 };
@@ -205,7 +206,7 @@ const mapStateToProps = (state) => ({
     company: state.company,
     context: state.context,
     searchInitiated: state.searchInitiated,
-    activeNavigation: get(state, 'search.activeNavigation', null),
+    activeNavigation: activeNavigationSelector(state),
     resultsFiltered: state.resultsFiltered,
     isLoading: state.isLoading,
 });

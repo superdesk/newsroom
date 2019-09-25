@@ -103,7 +103,8 @@ def get_view_data():
                                                   events_only=company.get('events_only', False)),
         'saved_items': get_resource_service('agenda').get_saved_items_count(),
         'events_only': company.get('events_only', False),
-        'locators': get_vocabulary('locators')
+        'locators': get_vocabulary('locators'),
+        'ui_config': get_resource_service('ui_config').getSectionConfig('agenda')
     }
 
 

@@ -16,8 +16,11 @@ class TopicsResource(newsroom.Resource):
         'user': {'type': 'objectid'},
         'timezone_offset': {'type': 'integer', 'nullable': True},
         'topic_type': {'type': 'string', 'nullable': True},
-        'navigation': {'type': 'string', 'nullable': True},
-
+        'navigation': {
+            'type': 'list',
+            'nullable': True,
+            'schema': {'type': 'string'},
+        }
     }
 
 

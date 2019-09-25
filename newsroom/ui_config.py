@@ -31,6 +31,10 @@ class UIConfigResource(newsroom.Resource):
         },
         'advanced_search_tabs': {
             'type': 'dict'
+        },
+        'multi_select_topics': {
+            'type': 'boolean',
+            'default': False
         }
     }
     datasource = {
