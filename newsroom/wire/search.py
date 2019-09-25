@@ -228,7 +228,12 @@ class WireSearchService(newsroom.Service):
         company = get_user_company(user)
 
         get_resource_service('section_filters').apply_section_filter(query, self.section)
-        set_product_query(query, company, self.section, navigation_id=req.args.get('navigation'))
+
+        navigation_id = req.args.get('navigation')
+        if navigation_id:
+            navigation_id = list(navigation_id.split(','))
+
+        set_product_query(query, company, self.section, navigation_id=navigation_id)
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))

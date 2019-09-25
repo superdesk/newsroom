@@ -15,6 +15,10 @@ import {
     toggleFilter,
     setCreatedFilter,
 } from 'search/actions';
+import {
+    activeFilterSelector,
+    createdFilterSelector,
+} from 'search/selectors';
 
 import {
     selectDate
@@ -121,8 +125,8 @@ FiltersTab.propTypes = {
 
 const mapStateToProps = (state) => ({
     aggregations: state.aggregations,
-    activeFilter: state.search.activeFilter,
-    createdFilter: state.search.createdFilter,
+    activeFilter: activeFilterSelector(state),
+    createdFilter: createdFilterSelector(state),
     resultsFiltered: resultsFilteredSelector(state),
 });
 

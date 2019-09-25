@@ -23,7 +23,7 @@ class NavigationsResource(newsroom.Resource):
         },
         'order': {
             'type': 'integer',
-            'nullable': 'true'
+            'nullable': True
         },
         'product_type': {
             'type': 'string',
@@ -32,7 +32,7 @@ class NavigationsResource(newsroom.Resource):
         # list of images for tile based navigation
         'tile_images': {
             'type': 'list',
-            'nullable': 'true'
+            'nullable': True
         }
     }
 

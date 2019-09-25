@@ -21,6 +21,13 @@ import {
 } from 'search/actions';
 
 import {
+    activeQuerySelector,
+    activeViewSelector,
+    activeFilterSelector,
+    createdFilterSelector,
+    activeNavigationSelector,
+    navigationsSelector,
+    topicsSelector,
     activeTopicSelector,
 } from 'search/selectors';
 
@@ -292,9 +299,9 @@ const mapStateToProps = (state) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
-    activeQuery: state.activeQuery,
-    activeFilter: get(state, 'search.activeFilter'),
-    createdFilter: get(state, 'search.createdFilter'),
+    activeQuery: activeQuerySelector(state),
+    activeFilter: activeFilterSelector(state),
+    createdFilter: createdFilterSelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     previewGroup: state.previewGroup,
     previewPlan: state.previewPlan,
@@ -303,12 +310,12 @@ const mapStateToProps = (state) => ({
     modal: state.modal,
     user: state.user,
     company: state.company,
-    topics: state.topics || [],
-    activeView: get(state, 'search.activeView'),
+    topics: topicsSelector(state),
+    activeView: activeViewSelector(state),
     newItems: state.newItems,
-    navigations: get(state, 'search.navigations', []),
+    navigations: navigationsSelector(state),
     activeTopic: activeTopicSelector(state),
-    activeNavigation: get(state, 'search.activeNavigation', null),
+    activeNavigation: activeNavigationSelector(state),
     bookmarks: state.bookmarks,
     aggregations: state.aggregations,
     activeDate: get(state, 'agenda.activeDate'),

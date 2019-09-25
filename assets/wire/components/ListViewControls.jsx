@@ -23,7 +23,7 @@ ListViewControls.propTypes = {
     setView: PropTypes.func.isRequired,
     newsOnly: PropTypes.bool,
     toggleNews: PropTypes.func,
-    activeNavigation: PropTypes.string,
+    activeNavigation: PropTypes.arrayOf(PropTypes.string),
     hideNewsOnly: PropTypes.bool,
 };
 

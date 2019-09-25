@@ -1,4 +1,3 @@
-
 import { get, isEmpty, includes } from 'lodash';
 import server from 'server';
 import analytics from 'analytics';
@@ -13,6 +12,7 @@ import {
     TIME_FORMAT,
     recordAction
 } from 'utils';
+import {noNavigationSelected} from 'search/utils';
 
 import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
@@ -35,6 +35,11 @@ import {
     toggleNavigationById,
     initParams as initSearchParams,
 } from 'search/actions';
+import {
+    activeFilterSelector,
+    createdFilterSelector,
+    activeNavigationSelector,
+} from 'search/selectors';
 
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
@@ -257,11 +262,11 @@ export function copyPreviewContents(item) {
  */
 function search(state, next) {
     const currentMoment = moment();
-    const activeFilter = get(state, 'search.activeFilter', {});
-    const activeNavigation = get(state, 'search.activeNavigation');
-    const createdFilter = get(state, 'search.createdFilter', {});
+    const activeFilter = activeFilterSelector(state);
+    const activeNavigation = activeNavigationSelector(state);
+    const createdFilter = createdFilterSelector(state);
     const eventsOnlyFilter = !state.bookmarks && get(state, 'agenda.eventsOnlyView', false);
-    const featuredFilter = !activeNavigation && !state.bookmarks && !eventsOnlyFilter && get(state, 'agenda.featuredOnly');
+    const featuredFilter = noNavigationSelected(activeNavigation) && !state.bookmarks && !eventsOnlyFilter && get(state, 'agenda.featuredOnly');
     let fromDateFilter;
 
     if (featuredFilter) {
@@ -313,9 +318,9 @@ export function fetchItems(updateRoute = true) {
                 const state = getState();
                 updateRoute && updateRouteParams({
                     q: state.query,
-                    filter: get(state, 'search.activeFilter'),
-                    navigation: get(state, 'search.activeNavigation'),
-                    created: get(state, 'search.createdFilter'),
+                    filter: activeFilterSelector(state),
+                    navigation: activeNavigationSelector(state),
+                    created: createdFilterSelector(state),
                     eventsOnlyView: get(state, 'agenda.eventsOnlyView', false) ? true : null,
                     featured: get(state, 'agenda.featuredOnly', false) ? true : null,
                 }, state);
@@ -354,7 +359,7 @@ export function stopWatchingEvents(items) {
                 notify.success(gettext('Stopped watching items successfully.'));
                 if (getState().bookmarks) {
                     if (includes(items, getState().previewItem)) { // close preview if it's opened
-                        dispatch(previewItem()); 
+                        dispatch(previewItem());
                     }
 
                     dispatch(fetchItems()); // item should get removed from the list in bookmarks view
@@ -570,7 +575,7 @@ export function setAndUpdateNewItems(data) {
             if (get(data, '_items[0].type') !== 'text' || (!state.previewItem && !state.openItem)) {
                 return Promise.resolve();
             }
-            
+
             const agendaItem = state.openItem ? state.openItem : state.itemsById[state.previewItem];
             if (!agendaItem || get(agendaItem, 'coverages.length', 0) === 0) {
                 return Promise.resolve();
@@ -709,7 +714,7 @@ export function toggleFeaturedFilter(fetch = true) {
         }
 
         return dispatch(fetchItems());
-    };   
+    };
 }
 
 export const TOGGLE_EVENTS_ONLY_FILTER = 'TOGGLE_EVENTS_ONLY_FILTER';

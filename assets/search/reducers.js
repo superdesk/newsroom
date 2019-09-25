@@ -1,4 +1,5 @@
 import { toggleValue } from 'utils';
+import {get} from 'lodash';
 
 import {
     SET_VIEW,
@@ -13,7 +14,7 @@ import { EXTENDED_VIEW } from 'wire/defaults';
 
 const INITIAL_STATE = {
     navigations: [],
-    activeNavigation: null,
+    activeNavigation: [],
     activeFilter: {},
     createdFilter: {},
     activeTopic: null,
@@ -28,13 +29,11 @@ export function searchReducer(state=INITIAL_STATE, action) {
     switch (action.type) {
 
     case TOGGLE_NAVIGATION: {
-        const activeNavigation = action.navigation && action.navigation._id;
-
         return {
             ...state,
             activeFilter: {},
             createdFilter: {},
-            activeNavigation,
+            activeNavigation: get(action, 'navigation') || [],
         };
     }
 

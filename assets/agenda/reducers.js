@@ -55,6 +55,7 @@ const initialState = {
     detail: false,
     userSections: {},
     searchInitiated: false,
+    uiConfig: {},
 };
 
 function processAggregations(aggregations) {
@@ -203,7 +204,7 @@ export default function agendaReducer(state = initialState, action) {
             eventsOnlyAccess: action.agendaData.events_only,
             featuredOnly: action.featuredOnly,
         };
-        
+
         return {
             ...state,
             readItems: action.readData || {},
@@ -220,6 +221,7 @@ export default function agendaReducer(state = initialState, action) {
             savedItemsCount: action.agendaData.saved_items || null,
             userSections: action.agendaData.userSections || {},
             locators: action.agendaData.locators || null,
+            uiConfig: action.agendaData.ui_config || {},
         };
     }
 
