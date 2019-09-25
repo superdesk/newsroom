@@ -67,7 +67,10 @@ class VFSMediaStorage(MediaStorage):
     def get(self, id_or_filename, resource=None):
         resp = self._sess.get(self.url(BINARY_ENDPOINT) % id_or_filename)
         if resp.status_code in [200, 201]:
-            metadata = self.metadata(id_or_filename, resource)
+            try:
+                metadata = self.metadata(id_or_filename, resource)
+            except VFSError:
+                metadata = {}
             return VFSObjectWrapper(id_or_filename, resp.content, metadata)
 
     def exists(self, id_or_filename, resource=None):
