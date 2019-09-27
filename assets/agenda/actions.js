@@ -75,7 +75,7 @@ export function previewItem(item, group, plan) {
         dispatch(fetchWireItemsForAgenda(item));
         markItemAsRead(item, getState());
         dispatch(preview(item, group, plan));
-        recordAction(item, 'preview', getState().context);
+        recordAction(item, 'preview', getState().context, getState());
     };
 }
 
@@ -129,7 +129,10 @@ export function openItem(item, group, plan) {
             item: item ? item._id : null,
             group: group || null,
             plan: plan || null,
-        }, state);
+        }, {
+            ...state,
+            openItem: item,
+        });
         recordAction(item, 'open', state.context);
     };
 }
