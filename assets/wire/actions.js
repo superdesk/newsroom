@@ -62,7 +62,7 @@ export function previewItem(item) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
         dispatch(preview(item));
-        recordAction(item, 'preview', getState().context);
+        recordAction(item, 'preview', getState().context, getState());
     };
 }
 
@@ -78,7 +78,10 @@ export function openItem(item) {
         dispatch(openItemDetails(item));
         updateRouteParams({
             item: item ? item._id : null
-        }, state);
+        },  {
+            ...state,
+            openItem: item,
+        });
         recordAction(item, 'open', state.context);
     };
 }
