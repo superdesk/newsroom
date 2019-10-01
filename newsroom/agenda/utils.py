@@ -5,6 +5,7 @@ from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
 from superdesk.metadata.item import CONTENT_STATE
 
 DAY_IN_MINUTES = 24 * 60 - 1
+TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed'
 
 
 def date_short(datetime):

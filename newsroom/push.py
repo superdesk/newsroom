@@ -20,7 +20,7 @@ from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
 from newsroom.wire import url_for_wire
 from newsroom.upload import ASSETS_RESOURCE
 from newsroom.signals import publish_item as publish_item_signal
-from newsroom.agenda.utils import get_latest_available_delivery
+from newsroom.agenda.utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
 
 from planning.common import WORKFLOW_STATE
 
@@ -394,6 +394,7 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
     plan['state_reason'] = planning_item.get('state_reason')
     plan['products'] = planning_item.get('products')
     plan['agendas'] = planning_item.get('agendas')
+    plan[TO_BE_CONFIRMED_FIELD] = planning_item.get(TO_BE_CONFIRMED_FIELD)
 
     if new_plan:
         agenda['planning_items'].append(plan)
@@ -506,6 +507,9 @@ def get_coverages(planning_items, original_coverages, new_plan):
                     'slugline': coverage_planning.get('slugline'),
                     'coverage_provider': (coverage.get('coverage_provider') or {}).get('name')
                 }
+
+                if TO_BE_CONFIRMED_FIELD in coverage:
+                    new_coverage[TO_BE_CONFIRMED_FIELD] = coverage[TO_BE_CONFIRMED_FIELD]
 
                 set_delivery(new_coverage, coverage.get('deliveries'))
                 coverages.append(new_coverage)

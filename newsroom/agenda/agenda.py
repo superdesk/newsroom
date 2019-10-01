@@ -24,7 +24,7 @@ from newsroom.wire.search import query_string, set_product_query, \
 from newsroom.wire.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
-from .utils import get_latest_available_delivery
+from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
 
 
 logger = logging.getLogger(__name__)
@@ -151,6 +151,7 @@ class AgendaResource(newsroom.Resource):
                 'slugline': not_analyzed,
                 'delivery_id': not_analyzed,  # To point ot the latest published item
                 'delivery_href': not_analyzed,  # To point ot the latest published item
+                TO_BE_CONFIRMED_FIELD: {'type': 'boolean'},
                 'deliveries': {  # All deliveries (incl. updates go here)
                     'type': 'object',
                     'properties': {
