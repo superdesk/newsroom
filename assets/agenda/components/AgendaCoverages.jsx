@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
-import { gettext, formatCoverageDate } from 'utils';
+import { gettext } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
-import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, WORKFLOW_STATUS} from '../utils';
+import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, WORKFLOW_STATUS, formatCoverageDate} from '../utils';
 
 
 export default function AgendaCoverages({item, coverages, wireItems}) {
@@ -29,7 +29,7 @@ export default function AgendaCoverages({item, coverages, wireItems}) {
                 {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && <span className='d-flex text-nowrap'>
                     <i className='icon-small--clock icon--gray mr-1'></i>
                     <span className='coverage-item__text-label mr-1'>{gettext('expected')}:</span>
-                    <span>{formatCoverageDate(coverage.scheduled)}</span>
+                    <span>{formatCoverageDate(coverage)}</span>
                 </span>}
             </div>
             {coverage.coverage_provider && <div className='coverage-item__row'>
