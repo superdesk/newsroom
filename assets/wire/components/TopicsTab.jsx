@@ -12,7 +12,7 @@ import {
     setEventQuery,
 } from 'agenda/actions';
 
-const tabName = isWireContext() ? 'topics' : 'events';
+const tabName = isWireContext() ? 'Wire Topics' : 'Agenda Topics';
 const manageTopics = () => document.dispatchEvent(window.manageTopics);
 
 function TopicsTab({topics, setTopicQuery, newItemsByTopic, activeTopic, removeNewItems}) {

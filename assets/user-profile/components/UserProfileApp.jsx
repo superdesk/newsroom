@@ -40,7 +40,7 @@ class UserProfileApp extends React.Component {
         if (this.isSectionEnabled('wire')) {
             this.links.push({
                 name: 'topics',
-                label: gettext('My Topics'),
+                label: gettext('My Wire Topics'),
                 content: FollowedTopics,
                 type: 'wire',
             });
@@ -49,7 +49,7 @@ class UserProfileApp extends React.Component {
         if (this.isSectionEnabled('agenda')) {
             this.links.push({
                 name: 'events',
-                label: gettext('My Events'),
+                label: gettext('My Agenda Topics'),
                 content: FollowedTopics,
                 type: 'agenda',
             });

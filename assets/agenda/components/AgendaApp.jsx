@@ -60,8 +60,6 @@ class AgendaApp extends BaseApp {
     constructor(props) {
         super(props);
         this.modals = modals;
-        this.tabs[0].label = gettext('Events');
-        this.tabs[1].label = gettext('My Events');
 
         this.fetchItemsOnNavigation = this.fetchItemsOnNavigation.bind(this);
     }
