@@ -704,7 +704,7 @@ export const isItemTBC = (item) => (
  */
 export function formatCoverageDate(coverage) {
     return get(coverage, TO_BE_CONFIRMED_FIELD) ?
-        `${parseDate(coverage.scheduled).format(COVERAGE_DATE_FORMAT)} (${TO_BE_CONFIRMED_TEXT})` :
+        `${parseDate(coverage.scheduled).format(COVERAGE_DATE_FORMAT)} ${TO_BE_CONFIRMED_TEXT}` :
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
 }
 
