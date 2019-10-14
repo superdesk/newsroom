@@ -1,5 +1,23 @@
 # Newsroom Changelog
 
+## [1.15.2-rc1] Not released yet
+### Features
+- None
+
+### Improvements
+- Add ANA logo (#856)
+- [SDCP-25] Allow new users to register their interests (#857)
+- [SDAN-596] Pressing back button on a mobile phone when the preview is open should close the preview (#859)
+- [SDAN-599] 'Time to be confirmed' feature for Agenda Items (#860)
+- [SDAN-588] Use Topic instead of Events in navigation labels (#863)
+- [SDAN-599] Display changes to 'Time to be confirmed' label (#864)
+
+### Fixes
+- Use default Ubuntu in Travis (#853)
+- [SDAN-598] fix: Save button not being enabled when turning off topic notifications (#855)
+- [SDAN-595] fix(agenda-emails) Use correct url_for method (#854)
+- Updating superdesk-core version for newsroom package (#861)
+
 ## [1.15.1] 2019-09-10
 ### Features
 - None
