@@ -273,7 +273,7 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
         regulartTimeStr = localTimeZone ? `${TO_BE_CONFIRMED_TEXT} ` : '';
     }
     if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
-        dateTimeString.push(isTBCItem ? `(${TO_BE_CONFIRMED_TEXT})` : `${formatTime(start)}`);
+        dateTimeString.push(isTBCItem ? `${regulartTimeStr}` : `${formatTime(start)}`);
     } else {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
