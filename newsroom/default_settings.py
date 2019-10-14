@@ -131,6 +131,7 @@ CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
 PRIVACY_POLICY = 'https://www.aap.com.au/legal/'
 TERMS_AND_CONDITIONS = 'https://www.aap.com.au/legal/'
 SHOW_COPYRIGHT = True
+SHOW_USER_REGISTER = False
 
 TEMPLATES_AUTO_RELOAD = True
 
@@ -218,7 +219,9 @@ SERVICES = [
 
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'DD/MM/YYYY'
-CLIENT_COVERAGE_DATE_FORMAT = 'HH:mm DD/MM'
+CLIENT_COVERAGE_DATE_TIME_FORMAT = 'HH:mm DD/MM'
+CLIENT_COVERAGE_DATE_FORMAT = 'DD/MM'
+
 
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
@@ -248,6 +251,7 @@ COVERAGE_TYPES = {
 CLIENT_CONFIG = {
     'time_format': CLIENT_TIME_FORMAT,
     'date_format': CLIENT_DATE_FORMAT,
+    'coverage_date_time_format': CLIENT_COVERAGE_DATE_TIME_FORMAT,
     'coverage_date_format': CLIENT_COVERAGE_DATE_FORMAT,
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,

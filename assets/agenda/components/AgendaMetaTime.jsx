@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import {bem} from 'ui/utils';
 import {formatTime, formatDate, DATE_FORMAT, gettext, getScheduleType} from 'utils';
-import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE} from '../utils';
+import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE, isItemTBC, TO_BE_CONFIRMED_TEXT} from '../utils';
 
 function format(item, group) {
     let start = moment(item.dates.start);
@@ -15,6 +15,8 @@ function format(item, group) {
     let groupDate = moment(group, DATE_FORMAT);
 
     const isGroupBetweenEventDates = start.isSameOrBefore(groupDate, 'day') && end.isSameOrAfter(groupDate, 'day');
+    const isTBCItem = isItemTBC(item);
+    const tbcStr = ` (${TO_BE_CONFIRMED_TEXT})`;
 
     function timeElement(start, end, key) {
         if (!end) {
@@ -53,21 +55,28 @@ function format(item, group) {
     const scheduleType = getScheduleType(item);
 
     if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
-        return ([timeElement(start, null, 'start'), dateElement(start)]);
+        return isTBCItem ? ([dateElement(start), tbcStr]) :
+            ([timeElement(start, null, 'start'), dateElement(start)]);
     } else {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
-            return ([
-                <span key="start">{timeElement(start)}{dateElement(start)}</span>,
+            return isTBCItem ? ([
+                <span key="start">{dateElement(start)}{tbcStr}</span>,
                 <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
-                <span key="end">{timeElement(end)}{dateElement(end)}</span>
-            ]);
+                <span key="end">{dateElement(end)}{tbcStr}</span>
+            ]) :
+                ([
+                    <span key="start">{timeElement(start)}{dateElement(start)}</span>,
+                    <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
+                    <span key="end">{timeElement(end)}{dateElement(end)}</span>
+                ]);
 
         case SCHEDULE_TYPE.ALL_DAY:
             return dateElement(start);
 
         case SCHEDULE_TYPE.REGULAR:
-            return ([timeElement(start, end, 'times'), dateElement(start)]);
+            return isTBCItem ?  ([dateElement(start), tbcStr])
+                : ([timeElement(start, end, 'times'), dateElement(start)]);
         }
     }
 }

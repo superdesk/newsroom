@@ -1,11 +1,13 @@
 import pytz
 from flask import json
 from datetime import datetime
+from urllib import parse
+from unittest import mock
+
 from newsroom.wire.utils import get_local_date, get_end_date
 from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
-from unittest import mock
 
 
 def test_item_detail(client):
@@ -177,7 +179,7 @@ def test_coverage_request(client, app):
         assert outbox[0].subject == 'A new coverage request'
         assert 'admin admin' in outbox[0].body
         assert 'admin@sourcefabric.org' in outbox[0].body
-        assert 'http://localhost:5050/agenda/urn:conference' in outbox[0].body
+        assert 'http://localhost:5050/agenda?item={}'.format(parse.quote('urn:conference')) in outbox[0].body
         assert 'Some info message' in outbox[0].body
 
 

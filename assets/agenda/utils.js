@@ -1,6 +1,16 @@
-import { get, isEmpty, includes, keyBy, sortBy } from 'lodash';
+import { get, isEmpty, includes, keyBy, sortBy, partition } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek, getConfig, gettext, DATE_FORMAT, COVERAGE_DATE_FORMAT} from '../utils';
+import {
+    formatDate,
+    formatMonth,
+    formatWeek,
+    getConfig,
+    gettext,
+    DATE_FORMAT,
+    COVERAGE_DATE_TIME_FORMAT,
+    COVERAGE_DATE_FORMAT,
+    parseDate
+} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -39,15 +49,17 @@ export function getCoverageStatusText(coverage) {
 
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
         if (get(coverage, 'deliveries.length', 0) > 1) {
-            return `updated ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
+            return `updated ${moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)}`;
         }
 
-        return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
+        return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)}`;
     }
 
     return get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '');
 }
 
+export const TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed';
+export const TO_BE_CONFIRMED_TEXT = gettext('Time to be confirmed');
 export const WORKFLOW_STATUS = {
     DRAFT: 'draft',
     ASSIGNED: 'assigned',
@@ -551,10 +563,18 @@ export function groupItems (items, activeDate, activeGrouping) {
             if (grouper(day) !== key && addGroupItem) {
                 key = grouper(day);
                 const groupList = groupedItems[key] || [];
-                groupList.push(item._id);
+                groupList.push(item);
                 groupedItems[key] = groupList;
             }
         }
+    });
+
+    Object.keys(groupedItems).forEach((k) => {
+        const tbcPartitioned = partition(groupedItems[k], (i) => isItemTBC(i));
+        groupedItems[k] = [
+            ...tbcPartitioned[0],
+            ...tbcPartitioned[1],
+        ].map((i) => i._id);
     });
 
     return sortBy(
@@ -633,7 +653,6 @@ export function getListItems(groups, itemsById) {
     groups.forEach((group) => {
         group.items.forEach((_id) => {
             const plans = getPlanningItemsByGroup(itemsById[_id], group.date);
-            // console.log(plans);
             if (plans.length > 0) {
                 plans.forEach((plan) => {
                     listItems.push({_id, group: group.date, plan});
@@ -671,3 +690,21 @@ export const groupRegions = (filter, aggregations, props) => {
 };
 
 export const getRegionName = (key, locator) => locator.label || key;
+
+export const isItemTBC = (item) => (
+    !get(item, 'event') ? get(item, `planning_items[0].${TO_BE_CONFIRMED_FIELD}`) : get(item, `event.${TO_BE_CONFIRMED_FIELD}`)
+);
+
+
+/**
+ * Format coverage date ('HH:mm DD/MM')
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatCoverageDate(coverage) {
+    return get(coverage, TO_BE_CONFIRMED_FIELD) ?
+        `${parseDate(coverage.scheduled).format(COVERAGE_DATE_FORMAT)} ${TO_BE_CONFIRMED_TEXT}` :
+        parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
+}
+

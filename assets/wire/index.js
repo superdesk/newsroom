@@ -1,9 +1,9 @@
-import { createStore, render, initWebSocket, getInitData } from 'utils';
+import { createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone } from 'utils';
 
 import wireReducer from './reducers';
 import {getNewsOnlyParam, getReadItems} from 'local-store';
 import WireApp from './components/WireApp';
-import { fetchItems, setState, initData, pushNotification, initParams } from './actions';
+import { fetchItems, setState, initData, pushNotification, initParams, openItemDetails, previewItem } from './actions';
 import { setView } from 'search/actions';
 
 const store = createStore(wireReducer);
@@ -20,8 +20,11 @@ if (localStorage.getItem('view')) {
 // handle history
 window.onpopstate = function(event) {
     if (event.state) {
-        store.dispatch(setState(event.state));
-        store.dispatch(fetchItems(false));
+        closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
+        if (!isMobilePhone()) {
+            store.dispatch(setState(event.state));
+            store.dispatch(fetchItems(false));
+        }
     }
 };
 

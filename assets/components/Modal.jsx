@@ -79,7 +79,13 @@ class Modal extends React.Component {
     }
 
     componentDidMount() {
-        $(this.elem).modal();
+        const options = {};
+
+        if (!this.props.clickOutsideToClose) {
+            options.backdrop = 'static';
+        }
+
+        $(this.elem).modal(options);
         $(this.elem).on('hidden.bs.modal', () => {
             this.props.closeModal();
         });
@@ -142,11 +148,13 @@ Modal.propTypes = {
     closeModal: PropTypes.func.isRequired,
     disableButtonOnSubmit: PropTypes.bool,
     formValid: PropTypes.bool,
+    clickOutsideToClose: PropTypes.bool,
 };
 
 Modal.defaultProps = {
     onSubmitLabel: gettext('Save'),
     onCancelLabel: gettext('Cancel'),
+    clickOutsideToClose: false,
 };
 
 const mapStateToProps = (state) => ({ formValid: get(state, 'modal.formValid') });

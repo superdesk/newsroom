@@ -7,7 +7,7 @@ from superdesk.json_utils import try_cast
 from bson import ObjectId
 from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date
-from flask import current_app as app, json, abort, request, g, flash, session
+from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
 from newsroom.template_filters import time_short, parse_date as parse_short_date, format_datetime, is_admin
 
@@ -332,3 +332,8 @@ def get_vocabulary(id):
         return vocabularies.find_one({'_id': id})
 
     return None
+
+
+def url_for_agenda(item, _external=True):
+    """Get url for agenda item."""
+    return url_for('agenda.index', item=item['_id'], _external=_external)
