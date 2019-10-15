@@ -66,6 +66,7 @@ class CompaniesResource(newsroom.Resource):
     item_methods = ['GET', 'PATCH', 'DELETE']
     resource_methods = ['GET', 'POST']
     mongo_prefix = MONGO_PREFIX
+    internal_resource = True
 
 
 class CompaniesService(newsroom.Service):
