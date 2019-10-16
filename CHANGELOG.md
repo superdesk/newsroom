@@ -1,6 +1,6 @@
 # Newsroom Changelog
 
-## [1.15.2-rc1] Not released yet
+## [1.15.2] 2019-10-17
 ### Features
 - None
 
