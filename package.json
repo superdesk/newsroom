@@ -1,4 +1,13 @@
 {
+  "name": "newsroom",
+  "version": "1.15.2",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superdesk/newsroom.git"
+  },
+  "main": "assets/index.js",
+  "description": "Newsroom is a secure self-service content store, fed by outputs from Superdesk content management system",
   "scripts": {
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "build": "webpack --config webpack.config.js --progress --profile --colors",
