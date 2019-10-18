@@ -48,8 +48,9 @@ export function getCoverageStatusText(coverage) {
     }
 
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
-        if (get(coverage, 'deliveries.length', 0) > 1) {
-            return `updated ${moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)}`;
+        if ((get(coverage, 'deliveries.length', 0) === 2 && coverage.deliveries[0].publish_time) ||
+            get(coverage, 'deliveries.length', 0) > 2) {
+            return gettext('updated {{ at }}', {at: moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)});
         }
 
         return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)}`;
