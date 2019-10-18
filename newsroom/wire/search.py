@@ -224,7 +224,7 @@ class WireSearchService(newsroom.Service):
 
     def get(self, req, lookup, size=25, aggs=True, ignore_latest=False):
         query = _items_query(ignore_latest)
-        user = get_user()
+        user = get_user(required=False)
         company = get_user_company(user)
 
         get_resource_service('section_filters').apply_section_filter(query, self.section)
