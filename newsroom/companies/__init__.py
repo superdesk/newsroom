@@ -1,7 +1,7 @@
 import superdesk
 from functools import wraps
 
-from flask import Blueprint, abort, current_app as newsroom_app
+from flask import Blueprint, abort, current_app as newsroom_app, g
 from flask_babel import gettext
 from newsroom.auth import get_user
 from .companies import CompaniesResource, CompaniesService
@@ -14,6 +14,9 @@ from . import views   # noqa
 def get_user_company(user):
     if user and user.get('company'):
         return superdesk.get_resource_service('companies').find_one(req=None, _id=user['company'])
+    else:  # if no user passed then try to see if the session belongs to the a company
+        return superdesk.get_resource_service('companies').find_one(req=None, _id=g.user) if hasattr(g,
+                                                                                                     'user') else None
 
 
 def get_company_sections(company_id):

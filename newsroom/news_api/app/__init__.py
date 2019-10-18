@@ -3,6 +3,9 @@ import flask
 import logging
 from eve import Eve
 from eve.io.mongo.mongo import MongoJSONEncoder
+from newsroom.news_api.api_tokens import CompanyTokenAuth
+from superdesk.datalayer import SuperdeskDataLayer
+import importlib
 
 
 logger = logging.getLogger(__name__)
@@ -34,8 +37,20 @@ def get_app(config=None):
         logger.error('News API is not enabled')
         return None
 
-    app = Eve(json_encoder=MongoJSONEncoder,
+    app = Eve(auth=CompanyTokenAuth,
+              json_encoder=MongoJSONEncoder,
+              data=SuperdeskDataLayer,
               settings=app_config)
+
+    app._general_settings = {}
+
+    for module_name in app_config.get('CORE_APPS', []):
+        app_module = importlib.import_module(module_name)
+        try:
+            app_module.init_app(app)
+        except AttributeError:
+            pass
+
     return app
 
 
