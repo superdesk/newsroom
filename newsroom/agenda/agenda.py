@@ -753,10 +753,11 @@ class AgendaService(newsroom.Service):
                                                              _id=wire_item['guid'])
                     coverage['workflow_status'] = ASSIGNMENT_WORKFLOW_STATE.COMPLETED
                     deliveries = coverage['deliveries']
-                    d = next(d for d in deliveries if d.get('delivery_id') == item['_id'])
-                    if d:
+                    d = next((d for d in deliveries if d.get('delivery_id') == wire_item['guid']), None)
+                    if d and d.get('delivery_state') != 'published':
                         d['delivery_state'] = 'published'
-                        d['publish_time'] = parse_date_str(item.get('publish_schedule') or item.get('firstpublished'))
+                        d['publish_time'] = parse_date_str(wire_item.get('publish_schedule') or
+                                                           wire_item.get('firstpublished'))
 
                     self.system_update(item['_id'], {'coverages': coverages}, item)
                     updated_agenda = get_entity_or_404(item.get('_id'), 'agenda')
