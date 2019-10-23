@@ -4,7 +4,7 @@ import UserProfileApp from './components/UserProfileApp';
 import {initData, selectMenu} from './actions';
 
 
-const store = createStore(userReducer);
+export const store = createStore(userReducer, 'UserProfile');
 
 
 if (window.profileData) {

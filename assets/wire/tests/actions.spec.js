@@ -46,7 +46,7 @@ describe('wire actions', () => {
         return store.dispatch(actions.fetchItems())
             .then(() => {
                 const state = store.getState();
-                expect(state.activeQuery).toBe('foo');
+                expect(state.search.activeQuery).toBe('foo');
             });
     });
 

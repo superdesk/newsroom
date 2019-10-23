@@ -66,7 +66,7 @@ export function deleteAllNotifications() {
 /**
  * Handle server push notification
  *
- * @param {Object} data
+ * @param {Object} push
  */
 export function pushNotification(push) {
     return (dispatch, getState) => {

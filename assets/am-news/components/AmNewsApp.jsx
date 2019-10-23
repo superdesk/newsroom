@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { connect } from 'react-redux';
-import { get } from 'lodash';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
 
 import BaseApp from '../../layout/components/BaseApp';
-import SearchBar from '../../components/SearchBar';
-import SearchResultsInfo from '../../wire/components/SearchResultsInfo';
+import SearchBar from 'search/components/SearchBar';
+import SearchResultsInfo from 'search/components/SearchResultsInfo';
 import DownloadItemsModal from '../../wire/components/DownloadItemsModal';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import ShareItemModal from '../../components/ShareItemModal';
@@ -35,9 +35,9 @@ import {
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
 import {
-    activeQuerySelector,
+    searchQuerySelector,
     navigationsSelector,
-    activeNavigationSelector,
+    searchNavigationSelector,
 } from 'search/selectors';
 
 
@@ -60,6 +60,8 @@ class AmNewsApp extends BaseApp {
             // enable first navigation
             this.props.toggleNavigation(get(this.props, 'navigations[0]'));
         }
+
+        return null;
     }
 
     componentDidMount() {
@@ -100,6 +102,10 @@ class AmNewsApp extends BaseApp {
                 'wire-articles__one-side-pane': this.props.itemToPreview,
             });
         }
+
+        const searchResultsLabel = !this.props.activeQuery ?
+            null :
+            this.props.activeQuery;
 
         return (
             [
@@ -151,16 +157,21 @@ class AmNewsApp extends BaseApp {
                                         fetchItems={this.props.fetchItems}/>
                                 </div>
                             }
-                            <SearchResultsInfo
-                                user={this.props.user}
-                                query={this.props.activeQuery}
-                                bookmarks={this.props.bookmarks}
-                                totalItems={this.props.totalItems}
-                                newItems={this.props.newItems}
-                                refresh={this.props.fetchItems}
-                                activeNavigation={this.props.activeNavigation}
-                                scrollClass={this.state.scrollClass}
-                            />
+
+                            {(this.props.activeQuery || get(this.props, 'newItems.length', 0) > 0) && (
+                                <SearchResultsInfo
+                                    user={this.props.user}
+                                    query={this.props.activeQuery}
+                                    bookmarks={this.props.bookmarks}
+                                    totalItems={this.props.totalItems}
+                                    newItems={this.props.newItems}
+                                    refresh={this.props.fetchItems}
+                                    activeNavigation={this.props.activeNavigation}
+                                    scrollClass={this.state.scrollClass}
+                                    displayTotalItems={this.props.activeQuery}
+                                    resultsLabel={searchResultsLabel}
+                                />
+                            )}
 
                             <AmNewsList
                                 actions={this.props.actions}
@@ -215,21 +226,21 @@ AmNewsApp.propTypes = {
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
     modal: PropTypes.object,
-    user: PropTypes.string,
+    user: PropTypes.string, //
     company: PropTypes.string,
     topics: PropTypes.array,
-    fetchItems: PropTypes.func,
+    fetchItems: PropTypes.func, //
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         action: PropTypes.func,
     })),
     setQuery: PropTypes.func.isRequired,
-    bookmarks: PropTypes.bool,
+    bookmarks: PropTypes.bool, //
     fetchMoreItems: PropTypes.func,
     newItems: PropTypes.array,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
-    activeNavigation: PropTypes.string,
+    activeNavigation: PropTypes.arrayOf(PropTypes.string), //
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
     previewConfig: PropTypes.object,
@@ -242,7 +253,7 @@ const mapStateToProps = (state) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
-    activeQuery: activeQuerySelector(state),
+    activeQuery: searchQuerySelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -252,7 +263,7 @@ const mapStateToProps = (state) => ({
     topics: state.topics || [],
     newItems: state.newItems,
     navigations: navigationsSelector(state),
-    activeNavigation: activeNavigationSelector(state),
+    activeNavigation: searchNavigationSelector(state),
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
