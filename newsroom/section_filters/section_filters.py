@@ -30,6 +30,10 @@ class SectionFiltersResource(newsroom.Resource):
             'type': 'string',
             'default': 'wire'
         },
+        'search_type': {
+            'type': 'string',
+            'default': 'wire'
+        }
     }
     datasource = {
         'source': 'section_filters',

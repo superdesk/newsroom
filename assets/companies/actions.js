@@ -82,9 +82,9 @@ export function fetchCompanies() {
  *
  * @param {String} companyId
  */
-export function fetchCompanyUsers(companyId) {
+export function fetchCompanyUsers(companyId, force = false) {
     return function (dispatch, getState) {
-        if (!getState().companiesById[companyId].name) {
+        if (!force && !getState().companiesById[companyId].name) {
             return;
         }
 

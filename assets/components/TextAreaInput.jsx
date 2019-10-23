@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
-function TextAreaInput({name, label, onChange, value, error, required, readOnly, maxLength}) {
+function TextAreaInput({name, label, onChange, value, error, required, readOnly, maxLength, children}) {
     let wrapperClass = 'form-group';
 
     if (error && error.length > 0) {
@@ -28,6 +28,7 @@ function TextAreaInput({name, label, onChange, value, error, required, readOnly,
                     readOnly={readOnly}
                 />
                 {error && <div className="alert alert-danger">{error}</div>}
+                {children}
             </div>
         </div>
     );
@@ -42,6 +43,7 @@ TextAreaInput.propTypes = {
     required: PropTypes.bool,
     readOnly: PropTypes.bool,
     maxLength: PropTypes.number,
+    children: PropTypes.node,
 };
 
 export default TextAreaInput;
