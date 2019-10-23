@@ -48,6 +48,7 @@ class ProductsResource(newsroom.Resource):
     item_methods = ['GET', 'PATCH', 'DELETE']
     resource_methods = ['GET', 'POST']
     query_objectid_as_string = True  # needed for companies/navigations lookup to work
+    internal_resource = True
 
 
 class ProductsService(newsroom.Service):
