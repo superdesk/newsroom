@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
-import { gettext } from 'utils';
-import { setQuery } from 'search/actions';
+import {gettext} from 'utils';
+
+import {searchQuerySelector} from 'search/selectors';
 
 class SearchBar extends React.Component {
     constructor(props) {
@@ -46,7 +47,7 @@ class SearchBar extends React.Component {
         return (
             <div className="search form-inline">
                 <span className="search__icon">
-                    <i className="icon--search icon--gray-light"></i>
+                    <i className="icon--search icon--gray-light" />
                 </span>
                 <div className={classNames('search__form input-group', {
                     'searchForm--active': !!this.state.query,
@@ -64,7 +65,9 @@ class SearchBar extends React.Component {
                             <span className='search__clear' onClick={this.onClear}>
                                 <img src='/static/search_clear.png' width='16' height='16'/>
                             </span>
-                            <button className='btn btn-outline-secondary' type='submit'>{gettext('Search')}</button>
+                            <button className='btn btn-outline-secondary' type='submit'>
+                                {gettext('Search')}
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -81,13 +84,9 @@ SearchBar.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    query: state.activeQuery,
+    query: searchQuerySelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    setQuery: (query) => dispatch(setQuery(query))
-});
+SearchBar.defaultProps = {enableQueryAction: true};
 
-SearchBar.defaultProps = { enableQueryAction: true };
-
-export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);
+export default connect(mapStateToProps, null)(SearchBar);

@@ -1,6 +1,7 @@
-import { gettext, notify, errorHandler } from 'utils';
+import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
-import { initDashboard } from 'features/dashboard/actions';
+import {initDashboard} from 'features/dashboard/actions';
+import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_CARD = 'SELECT_CARD';
@@ -23,10 +24,10 @@ export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
 }
 
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    return {type: SET_QUERY, query};
-}
+// export const SET_QUERY = 'SET_QUERY';
+// export function setQuery(query) {
+//     return {type: SET_QUERY, query};
+// }
 
 export const QUERY_CARDS = 'QUERY_CARDS';
 export function queryCards() {
@@ -60,7 +61,7 @@ export function getNavigations(data) {
 export function fetchCards() {
     return function (dispatch, getState) {
         dispatch(queryCards());
-        const query = getState().query || '';
+        const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/cards/search?q=${query}`)
             .then((data) => dispatch(getCards(data)))

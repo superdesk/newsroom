@@ -10,7 +10,7 @@ import WireListItem from './WireListItem';
 import { setActive, previewItem, toggleSelected, openItem } from '../actions';
 import { EXTENDED_VIEW } from '../defaults';
 import { getIntVersion } from '../utils';
-import {activeNavigationSelector} from 'search/selectors';
+import {searchNavigationSelector} from 'search/selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
@@ -206,7 +206,7 @@ const mapStateToProps = (state) => ({
     company: state.company,
     context: state.context,
     searchInitiated: state.searchInitiated,
-    activeNavigation: activeNavigationSelector(state),
+    activeNavigation: searchNavigationSelector(state),
     resultsFiltered: state.resultsFiltered,
     isLoading: state.isLoading,
 });

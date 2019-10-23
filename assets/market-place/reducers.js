@@ -1,5 +1,7 @@
 import {get, keyBy} from 'lodash';
+
 import {INIT_DATA} from './actions';
+import {getNavigationUrlParam} from 'search/utils';
 
 const initialState = {
     cards: [],
@@ -19,7 +21,11 @@ export default function marketPlaceHomeReducer(state = initialState, action) {
                         // company does not have permission for navigation
                         return null;
                     }
-                    navigation.href = `/${action.data.context}/?navigation=${navigation._id}`;
+
+                    const params = new URLSearchParams();
+                    params.set('navigation', getNavigationUrlParam([navigation._id]));
+                    navigation.href = `/${action.data.context}/?${params.toString()}`;
+
                     return navigation;
                 }).filter((nav) => nav);
         });

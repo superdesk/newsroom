@@ -30,11 +30,22 @@ export const LIST_ANIMATIONS = getConfig('list_animations', true);
  * @param {func} reducer
  * @return {Store}
  */
-export function createStore(reducer) {
+export function createStore(reducer, name = 'default') {
     const logger = createLogger({
         duration: true,
         collapsed: true,
         timestamp: false,
+        titleFormatter: (action, time, took) => (
+            `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)`
+        ),
+        // titleFormatter: (action, time, took) => {
+        //     const parts = ['action'];
+        //
+        //     parts.push(`%c${String(action.type)}`);
+        //     parts.push(`%c(in ${took.toFixed(2)} ms)`);
+        //
+        //     return ` ${name} - ` + parts.join(' ');
+        // }
     });
 
     return _createStore(reducer, applyMiddleware(thunk, logger));
@@ -437,12 +448,12 @@ export function toggleValue(items, value) {
 }
 
 
-export function updateRouteParams(updates, state) {
+export function updateRouteParams(updates, state, deleteEmpty = true) {
     const params = new URLSearchParams(window.location.search);
 
     Object.keys(updates).forEach((key) => {
         let updatedValue = updates[key];
-        if (!isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
+        if (!deleteEmpty || !isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
             if (typeof updatedValue === 'object') {
                 updatedValue = JSON.stringify(updatedValue);
             }

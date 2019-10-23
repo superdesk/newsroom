@@ -3,14 +3,21 @@ import { createStore, render, initWebSocket, getInitData, closeItemOnMobile, isM
 import wireReducer from './reducers';
 import {getNewsOnlyParam, getReadItems} from 'local-store';
 import WireApp from './components/WireApp';
-import { fetchItems, setState, initData, pushNotification, initParams, openItemDetails, previewItem } from './actions';
+import {
+    fetchItems,
+    setState,
+    initData,
+    pushNotification,
+    initParams,
+    openItemDetails,
+    previewItem,
+} from './actions';
 import { setView } from 'search/actions';
 
-const store = createStore(wireReducer);
+const store = createStore(wireReducer, 'Wire');
 
 // init data
 store.dispatch(initData(getInitData(window.wireData), getReadItems(), getNewsOnlyParam()));
-
 
 // init view
 if (localStorage.getItem('view')) {
@@ -23,7 +30,7 @@ window.onpopstate = function(event) {
         closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
         if (!isMobilePhone()) {
             store.dispatch(setState(event.state));
-            store.dispatch(fetchItems(false));
+            store.dispatch(fetchItems());
         }
     }
 };

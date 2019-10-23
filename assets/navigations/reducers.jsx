@@ -4,7 +4,7 @@ import {
     SELECT_NAVIGATION,
     EDIT_NAVIGATION,
     QUERY_NAVIGATIONS,
-    SET_QUERY,
+    // SET_QUERY,
     CANCEL_EDIT,
     NEW_NAVIGATION,
     SET_ERROR,
@@ -12,11 +12,12 @@ import {
 } from './actions';
 
 import {
-    INIT_SECTIONS, 
+    INIT_SECTIONS,
     SELECT_SECTION,
 } from 'features/sections/actions';
 
-import { sectionsReducer } from 'features/sections/reducers';
+import {sectionsReducer} from 'features/sections/reducers';
+import {searchReducer} from 'search/reducers';
 
 const initialState = {
     query: null,
@@ -28,6 +29,7 @@ const initialState = {
     activeQuery: null,
     products: [],
     sections: sectionsReducer(),
+    search: searchReducer(),
 };
 
 export default function navigationReducer(state = initialState, action) {
@@ -78,8 +80,8 @@ export default function navigationReducer(state = initialState, action) {
         return {...state, navigationToEdit: null, errors: null};
     }
 
-    case SET_QUERY:
-        return {...state, query: action.query};
+    // case SET_QUERY:
+    //     return {...state, query: action.query};
 
     case SET_ERROR:
         return {...state, errors: action.errors};
@@ -98,7 +100,13 @@ export default function navigationReducer(state = initialState, action) {
             return navigation._id;
         });
 
-        return {...state, navigations, navigationsById, isLoading: false, totalNavigations: navigations.length};
+        return {
+            ...state,
+            navigations,
+            navigationsById,
+            isLoading: false,
+            totalNavigations: navigations.length,
+        };
     }
 
     case GET_PRODUCTS: {
@@ -109,7 +117,14 @@ export default function navigationReducer(state = initialState, action) {
     case SELECT_SECTION:
         return {...state, sections: sectionsReducer(state.sections, action)};
 
-    default:
+    default: {
+        const search = searchReducer(state.search, action);
+
+        if (search !== state.search) {
+            return {...state, search};
+        }
+
         return state;
+    }
     }
 }

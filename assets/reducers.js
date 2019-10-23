@@ -1,4 +1,4 @@
-import {uniq} from 'lodash';
+import {uniq, get, isEmpty} from 'lodash';
 import {
     CLOSE_MODAL, RENDER_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID,
     SAVED_ITEMS_COUNT,
@@ -6,7 +6,6 @@ import {
 import {searchReducer} from 'search/reducers';
 
 import {
-    ADD_TOPIC,
     BOOKMARK_ITEMS,
     COPY_ITEMS,
     DOWNLOAD_ITEMS,
@@ -23,7 +22,6 @@ import {
     SET_ITEMS,
     SET_NEW_ITEMS,
     SET_STATE,
-    SET_TOPICS,
     SHARE_ITEMS,
     START_LOADING,
     TOGGLE_SELECTED,
@@ -31,12 +29,14 @@ import {
 
 import {
     SET_QUERY,
+    ADD_TOPIC,
+    SET_TOPICS,
+    SET_NEW_ITEMS_BY_TOPIC,
 } from 'search/actions';
 
 import {getMaxVersion} from 'local-store';
-import {REMOVE_NEW_ITEMS, SET_NEW_ITEMS_BY_TOPIC} from './agenda/actions';
+import {REMOVE_NEW_ITEMS} from './agenda/actions';
 import {toggleValue} from 'utils';
-import {get, isEmpty} from 'lodash';
 
 export function modalReducer(state, action) {
     switch (action.type) {
@@ -156,8 +156,17 @@ export function defaultReducer(state, action) {
     }
 
     case QUERY_ITEMS: {
-        const resultsFiltered = !isEmpty(get(state, 'search.activeFilter')) || !isEmpty(get(state, 'search.createdFilter.from')) || !isEmpty(get(state, 'search.createdFilter.to'));
-        return {...state, searchInitiated: true, isLoading: true, totalItems: null, activeQuery: state.query, resultsFiltered};
+        const resultsFiltered = !isEmpty(get(state, 'search.activeFilter')) ||
+            !isEmpty(get(state, 'search.createdFilter.from')) ||
+            !isEmpty(get(state, 'search.createdFilter.to'));
+        return {
+            ...state,
+            searchInitiated: true,
+            isLoading: true,
+            totalItems: null,
+            activeQuery: state.query,
+            resultsFiltered,
+        };
     }
 
     case RECIEVE_ITEM: {
@@ -324,7 +333,7 @@ export function defaultReducer(state, action) {
 
     case SET_TOPICS:
         return {...state, topics: action.topics};
-    
+
     case SAVED_ITEMS_COUNT:
         return {...state, savedItemsCount: action.count};
 

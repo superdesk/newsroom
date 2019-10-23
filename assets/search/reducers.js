@@ -1,4 +1,4 @@
-import { toggleValue } from 'utils';
+import {toggleValue} from 'utils';
 import {get} from 'lodash';
 
 import {
@@ -8,17 +8,27 @@ import {
     TOGGLE_FILTER,
     TOGGLE_NAVIGATION,
     SET_CREATED_FILTER,
+
+    SET_SEARCH_TOPIC_ID,
+    SET_SEARCH_NAVIGATION_IDS,
+    SET_SEARCH_QUERY,
+    SET_SEARCH_FILTERS,
+    SET_SEARCH_CREATED,
+    RESET_SEARCH_PARAMS,
 } from './actions';
 
-import { EXTENDED_VIEW } from 'wire/defaults';
+import {EXTENDED_VIEW} from 'wire/defaults';
 
 const INITIAL_STATE = {
-    navigations: [],
+    activeTopic: null,
     activeNavigation: [],
+    activeQuery: '',
     activeFilter: {},
     createdFilter: {},
-    activeTopic: null,
-    activeView: EXTENDED_VIEW
+
+    navigations: [],
+
+    activeView: EXTENDED_VIEW,
 };
 
 export function searchReducer(state=INITIAL_STATE, action) {
@@ -82,6 +92,46 @@ export function searchReducer(state=INITIAL_STATE, action) {
         return {
             ...state,
             activeView: action.view,
+        };
+
+    case SET_SEARCH_TOPIC_ID:
+        return {
+            ...state,
+            activeTopic: action.payload,
+        };
+
+    case SET_SEARCH_NAVIGATION_IDS:
+        return {
+            ...state,
+            activeNavigation: action.payload,
+        };
+
+    case SET_SEARCH_QUERY:
+        return {
+            ...state,
+            activeQuery: action.payload,
+        };
+
+    case SET_SEARCH_FILTERS:
+        return {
+            ...state,
+            activeFilter: action.payload,
+        };
+
+    case SET_SEARCH_CREATED:
+        return {
+            ...state,
+            createdFilter: action.payload,
+        };
+
+    case RESET_SEARCH_PARAMS:
+        return {
+            ...state,
+            activeTopic: INITIAL_STATE.activeTopic,
+            activeNavigation: INITIAL_STATE.activeNavigation,
+            activeQuery: INITIAL_STATE.activeQuery,
+            activeFilter: INITIAL_STATE.activeFilter,
+            createdFilter: INITIAL_STATE.createdFilter,
         };
 
     default:

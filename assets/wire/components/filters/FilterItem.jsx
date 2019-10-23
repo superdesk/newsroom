@@ -4,6 +4,13 @@ import PropTypes from 'prop-types';
 export default function FilterItem({bucket, group, toggleFilter, groupFilter}) {
     const isActive = groupFilter.indexOf(bucket.key) !== -1;
 
+    /**
+     * bucket.key
+     * bucket.label || bucket.key
+     * group.field
+     * group.single
+     */
+
     return (
         <div className="custom-control custom-checkbox ui-dark">
             <input

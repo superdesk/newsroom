@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { connect } from 'react-redux';
-import { get } from 'lodash';
-import { gettext } from 'utils';
+import {connect} from 'react-redux';
+import {get, isEqual} from 'lodash';
+
+import {gettext, getItemFromArray} from 'utils';
 
 import {
     fetchItems,
-    setQuery,
     fetchMoreItems,
     previewItem,
     toggleNews,
@@ -16,29 +16,32 @@ import {
 
 import {
     setView,
-    followTopic,
+    setQuery,
+    followStory,
+    saveMyTopic,
 } from 'search/actions';
 
 import {
-    activeQuerySelector,
+    searchQuerySelector,
     activeViewSelector,
     navigationsSelector,
-    activeNavigationSelector,
+    searchNavigationSelector,
     activeTopicSelector,
+    searchParamsSelector,
+    showSaveTopicSelector,
 } from 'search/selectors';
 
 import BaseApp from 'layout/components/BaseApp';
 import WirePreview from './WirePreview';
 import ItemsList from './ItemsList';
-import SearchBar from '../../components/SearchBar';
-import SearchResultsInfo from './SearchResultsInfo';
+import SearchBar from 'search/components/SearchBar';
+import SearchResultsInfo from 'search/components/SearchResultsInfo';
 import SearchSidebar from './SearchSidebar';
 import SelectedItemsBar from './SelectedItemsBar';
 import ListViewControls from './ListViewControls';
 import DownloadItemsModal from './DownloadItemsModal';
 import ItemDetails from './ItemDetails';
 
-import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
@@ -50,7 +53,6 @@ import {
 } from 'ui/selectors';
 
 const modals = {
-    followTopic: FollowTopicModal,
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
 };
@@ -74,6 +76,43 @@ class WireApp extends BaseApp {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,
         });
+
+        let showSaveTopic = this.props.context === 'wire' &&
+            this.props.showSaveTopic &&
+            !this.props.bookmarks;
+        let showTotalItems = false;
+        let showTotalLabel = false;
+        let totalItemsLabel;
+
+        if (get(this.props, 'context') === 'wire') {
+            if (get(this.props, 'activeTopic.label')) {
+                totalItemsLabel = this.props.activeTopic.label;
+                showTotalItems = showTotalLabel = true;
+            } else if (get(this.props, 'searchParams.navigation.length', 0) === 1) {
+                totalItemsLabel = get(getItemFromArray(
+                    this.props.searchParams.navigation[0],
+                    this.props.navigations
+                ), 'name') || '';
+                showTotalItems = showTotalLabel = true;
+            } else if (get(this.props, 'searchParams.navigation.length', 0) > 1) {
+                totalItemsLabel = gettext('Custom View');
+                showTotalItems = showTotalLabel = true;
+            } else if (this.props.showSaveTopic) {
+                showTotalItems = showTotalLabel = true;
+                if (this.props.bookmarks && get(this.props, 'searchParams.query.length', 0) > 0) {
+                    totalItemsLabel = this.props.searchParams.query;
+                }
+            }
+        } else {
+            if (get(this.props, 'searchParams.query.length', 0) > 0) {
+                totalItemsLabel = this.props.searchParams.query;
+            }
+
+            showTotalItems = showTotalLabel = !isEqual(
+                this.props.searchParams,
+                {navigation: [get(this.props, 'searchParams.navigation[0]')]}
+            );
+        }
 
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
@@ -131,20 +170,26 @@ class WireApp extends BaseApp {
                                 <SearchSidebar tabs={this.tabs} props={{...this.props}} />
                             }
                         </div>
-                        <div className={mainClassName} onScroll={this.onListScroll} ref={(elem) => this.elemList = elem}>
+                        <div className={mainClassName}
+                            onScroll={this.onListScroll}
+                            ref={(elem) => this.elemList = elem}
+                        >
                             <SearchResultsInfo
-                                user={this.props.user}
-                                query={this.props.activeQuery}
-                                bookmarks={this.props.bookmarks}
+                                scrollClass={this.state.scrollClass}
+
+                                showTotalItems={showTotalItems}
+                                showTotalLabel={showTotalLabel}
+                                showSaveTopic={showSaveTopic}
+
                                 totalItems={this.props.totalItems}
+                                totalItemsLabel={totalItemsLabel}
+
+                                saveMyTopic={saveMyTopic}
+                                activeTopic={this.props.activeTopic}
                                 topicType={this.props.context === 'wire' ? this.props.context : null}
+
                                 newItems={this.props.newItems}
                                 refresh={this.props.fetchItems}
-                                activeTopic={this.props.activeTopic}
-                                toggleNews={this.props.toggleNews}
-                                activeNavigation={this.props.activeNavigation}
-                                newsOnly={this.props.newsOnly}
-                                scrollClass={this.state.scrollClass}
                             />
 
                             <ItemsList
@@ -220,13 +265,15 @@ WireApp.propTypes = {
     groups: PropTypes.array,
     downloadVideo: PropTypes.func,
     advancedSearchTabConfig: PropTypes.object,
+    searchParams: PropTypes.object,
+    showSaveTopic: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
-    activeQuery: activeQuerySelector(state),
+    activeQuery: searchQuerySelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -237,7 +284,7 @@ const mapStateToProps = (state) => ({
     activeView: activeViewSelector(state),
     newItems: state.newItems,
     navigations: navigationsSelector(state),
-    activeNavigation: activeNavigationSelector(state),
+    activeNavigation: searchNavigationSelector(state),
     newsOnly: !!get(state, 'wire.newsOnly'),
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
@@ -248,10 +295,12 @@ const mapStateToProps = (state) => ({
     detailsConfig: detailsConfigSelector(state),
     advancedSearchTabConfig: advancedSearchTabsConfigSelector(state),
     groups: get(state, 'groups', []),
+    searchParams: searchParamsSelector(state),
+    showSaveTopic: showSaveTopicSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    followStory: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`}, 'wire')),
+    followStory: (item) => dispatch(followStory(item, 'wire')),
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {
         dispatch(toggleNews());
@@ -262,7 +311,7 @@ const mapDispatchToProps = (dispatch) => ({
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
-    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType))
+    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

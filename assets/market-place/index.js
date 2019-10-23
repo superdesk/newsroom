@@ -40,13 +40,13 @@ const handleHistory = () => {
 let store;
 
 if (window.marketPlaceData.home_page) {
-    store = createStore(marketPlaceHomeReducer);
+    store = createStore(marketPlaceHomeReducer, 'aapX');
     store.dispatch(homeInitData(getInitData(window.marketPlaceData)));
     handleHistory();
     render(store, MarketPlaceApp, document.getElementById('market-place-app'));
 
 } else {
-    store = createStore(wireReducer);
+    store = createStore(wireReducer, 'MarketPlace');
     // init data
     store.dispatch(initData(getInitData(window.marketPlaceData), getReadItems(), false));
 
