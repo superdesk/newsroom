@@ -59,7 +59,15 @@ export const showSaveTopicSelector = createSelector(
     [searchParamsSelector, activeTopicSelector],
     (current, topic) => {
         if (!topic) {
-            return !isEqual(current, {});
+            if (isEqual(current, {})) {
+                return false;
+            }
+
+            // If there is only a single navigation selected, then don't enable the 'SAVE' button
+            return !(
+                isEqual(Object.keys(current), ['navigation']) &&
+                get(current, 'navigation.length', 0) === 1
+            );
         } else if (!isEqual(get(current, 'query'), get(topic, 'query'))) {
             return true;
         } else if (!isEqual(get(current, 'created'), get(topic, 'created'))) {

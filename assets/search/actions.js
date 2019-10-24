@@ -89,9 +89,16 @@ export function toggleNavigation(navigation) {
             }
         }
 
+        dispatch(resetSearchParams());
         dispatch(setSearchNavigationIds(newNavigation));
         updateRouteParams(
-            {navigation: getNavigationUrlParam(newNavigation)},
+            {
+                topic: null,
+                q: null,
+                created: null,
+                navigation: getNavigationUrlParam(newNavigation, false),
+                filter: null,
+            },
             state
         );
     };

@@ -77,6 +77,7 @@ class WireApp extends BaseApp {
             'wire-articles__two-side-panes': panesCount === 2,
         });
 
+        const numNavigations = get(this.props, 'searchParams.navigation.length', 0);
         let showSaveTopic = this.props.context === 'wire' &&
             this.props.showSaveTopic &&
             !this.props.bookmarks;
@@ -88,13 +89,13 @@ class WireApp extends BaseApp {
             if (get(this.props, 'activeTopic.label')) {
                 totalItemsLabel = this.props.activeTopic.label;
                 showTotalItems = showTotalLabel = true;
-            } else if (get(this.props, 'searchParams.navigation.length', 0) === 1) {
+            } else if (numNavigations === 1) {
                 totalItemsLabel = get(getItemFromArray(
                     this.props.searchParams.navigation[0],
                     this.props.navigations
                 ), 'name') || '';
                 showTotalItems = showTotalLabel = true;
-            } else if (get(this.props, 'searchParams.navigation.length', 0) > 1) {
+            } else if (numNavigations > 1) {
                 totalItemsLabel = gettext('Custom View');
                 showTotalItems = showTotalLabel = true;
             } else if (this.props.showSaveTopic) {

@@ -5,13 +5,13 @@ export const noNavigationSelected = (activeNavigation) => (
 );
 
 export const getNavigationUrlParam = (activeNavigation, ignoreEmpty = true, useJSON = true) => {
-    let navIds = (!ignoreEmpty && noNavigationSelected(activeNavigation)) ?
-        null :
-        activeNavigation;
+    if (!ignoreEmpty && noNavigationSelected(activeNavigation)) {
+        return null;
+    }
 
     return useJSON ?
-        JSON.stringify(navIds) :
-        (navIds || []).join(',');
+        JSON.stringify(activeNavigation) :
+        (activeNavigation || []).join(',');
 };
 
 export const getSearchParams = (custom, topic) => {

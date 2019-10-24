@@ -117,6 +117,7 @@ class AgendaApp extends BaseApp {
         const hideFeaturedToggle = this.props.activeNavigation ||
             this.props.bookmarks || this.props.activeTopic || eventsOnly;
 
+        const numNavigations = get(this.props, 'searchParams.navigation.length', 0);
         let showSaveTopic = this.props.showSaveTopic &&
             !this.props.bookmarks &&
             this.props.featuredOnly;
@@ -127,13 +128,13 @@ class AgendaApp extends BaseApp {
         if (get(this.props, 'activeTopic.label')) {
             totalItemsLabel = this.props.activeTopic.label;
             showTotalItems = showTotalLabel = true;
-        } else if (get(this.props, 'searchParams.navigation.length', 0) === 1) {
+        } else if (numNavigations === 1) {
             totalItemsLabel = get(getItemFromArray(
                 this.props.searchParams.navigation[0],
                 this.props.navigations
             ), 'name') || '';
             showTotalItems = showTotalLabel = true;
-        } else if (get(this.props, 'searchParams.navigation.length', 0) > 1) {
+        } else if (numNavigations > 1) {
             totalItemsLabel = gettext('Custom View');
             showTotalItems = showTotalLabel = true;
         } else if (this.props.showSaveTopic) {
