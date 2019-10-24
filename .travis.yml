@@ -37,3 +37,4 @@ script:
     - npm run lint
     - npm run test
     - npm run build
+    - behave --format progress2 --logging-level=ERROR

@@ -9,7 +9,7 @@ CORE_APPS = [
     'content_api.items',
     'newsroom.wire',
     'newsroom.section_filters',
-    'newsroom.products'
+    'newsroom.news_api.products'
 ]
 
 #: mongo db name, only used when mongo_uri is not set
