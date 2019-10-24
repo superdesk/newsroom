@@ -7,8 +7,8 @@ import {gettext, isWireContext} from 'utils';
 
 import {removeNewItems} from 'wire/actions';
 import FilterButton from 'wire/components/filters/FilterButton';
-import {loadMyTopic} from 'search/actions';
-import {loadMyEventTopic} from 'agenda/actions';
+import {loadMyWireTopic} from 'wire/actions';
+import {loadMyAgendaTopic} from 'agenda/actions';
 
 const tabName = isWireContext() ? 'Wire Topics' : 'Agenda Topics';
 const manageTopics = () => document.dispatchEvent(window.manageTopics);
@@ -77,11 +77,11 @@ const mapStateToProps = (state) => ({
     newItemsByTopic: state.newItemsByTopic,
 });
 
-const mapDispatchToProps = {
-    removeNewItems: removeNewItems,
+const mapDispatchToProps = (dispatch) => ({
+    removeNewItems: (topicId) => dispatch(removeNewItems(topicId)),
     setTopicQuery: (topic) => topic.topic_type === 'agenda' ?
-        loadMyEventTopic(topic) :
-        loadMyTopic(topic._id),
-};
+        dispatch(loadMyAgendaTopic(topic._id)) :
+        dispatch(loadMyWireTopic(topic._id)),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopicsTab);

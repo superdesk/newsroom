@@ -420,7 +420,7 @@ function reloadTopics(user, reloadTopic = false) {
                 if (reloadTopic) {
                     const params = new URLSearchParams(window.location.search);
                     if (params.get('topic')) {
-                        dispatch(loadMyTopic(params.get('topic')));
+                        dispatch(loadMyWireTopic(params.get('topic')));
                     }
                 }
             })
@@ -486,6 +486,13 @@ export function fetchMoreItems() {
         return search(getState(), true)
             .then((data) => dispatch(recieveNextItems(data)))
             .catch(errorHandler);
+    };
+}
+
+export function loadMyWireTopic(topicId) {
+    return (dispatch) => {
+        dispatch(loadMyTopic(topicId));
+        return dispatch(fetchItems());
     };
 }
 

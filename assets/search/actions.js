@@ -295,8 +295,6 @@ export function loadMyTopic(topicId) {
         }, state);
 
         dispatch(updateSearchParams());
-
-        return dispatch(fetchItems());
     };
 }
 

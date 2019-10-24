@@ -515,7 +515,7 @@ function reloadTopics(user, reloadTopic = false) {
                 if (reloadTopic) {
                     const params = new URLSearchParams(window.location.search);
                     if (params.get('topic')) {
-                        dispatch(loadMyTopic(params.get('topic')));
+                        dispatch(loadMyAgendaTopic(params.get('topic')));
                     }
                 }
             })
@@ -637,17 +637,18 @@ export function initParams(params) {
 /**
  * Set query for given topic
  *
- * @param {Object} topic
+ * @param {String} topicId
  * @return {Promise}
  */
-export function loadMyEventTopic(topic) {
+export function loadMyAgendaTopic(topicId) {
     return (dispatch, getState) => {
         // Set featured query option to false when using navigations
         if (get(getState(), 'agenda.featuredOnly')) {
             dispatch({type: TOGGLE_FEATURED_FILTER});
         }
 
-        return dispatch(loadMyTopic(topic._id));
+        dispatch(loadMyTopic(topicId));
+        return dispatch(fetchItems());
     };
 }
 
