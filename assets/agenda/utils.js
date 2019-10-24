@@ -289,7 +289,7 @@ export function getCalendars(item) {
  * @return {String}
  */
 export function getEventLinks(item) {
-    return get(item, 'event.links', []);
+    return get(item, 'event.links') || [];
 }
 
 
