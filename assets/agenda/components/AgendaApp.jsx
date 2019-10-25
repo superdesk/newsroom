@@ -125,6 +125,7 @@ class AgendaApp extends BaseApp {
                 group={this.props.previewGroup}
                 planningId={this.props.previewPlan}
                 eventsOnly={eventsOnly}
+                wireItems={this.props.wireItems}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar
