@@ -93,7 +93,8 @@ BLUEPRINTS = [
     'newsroom.public',
     'newsroom.agenda',
     'newsroom.settings',
-    'newsroom.news_api.api_tokens'
+    'newsroom.news_api.api_tokens',
+    'newsroom.watch_lists',
 ]
 
 CORE_APPS = [
@@ -124,6 +125,7 @@ CORE_APPS = [
     'newsroom.media_utils',
     'newsroom.news_api',
     'newsroom.news_api.api_tokens',
+    'newsroom.watch_lists',
 ]
 
 SITE_NAME = 'AAP Newsroom'

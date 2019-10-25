@@ -26,6 +26,7 @@ module.exports = {
         'general-settings_js': './assets/general-settings/index.js',
         market_place_js: './assets/market-place/index.js',
         media_releases_js: './assets/media-releases/index.js',
+        watch_lists_js: './assets/watch-lists/index.js',
         common: [
             'alertifyjs',
             'bootstrap',
