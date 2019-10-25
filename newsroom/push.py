@@ -460,7 +460,7 @@ def get_coverages(planning_items, original_coverages, new_plan):
     def get_existing_coverage(id):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
 
-    def set_delivery(coverage, deliveries):
+    def set_delivery(coverage, deliveries, orig_coverage=None):
         cov_deliveries = []
         if coverage['coverage_type'] == 'text':
             for d in (deliveries or []):
@@ -478,6 +478,11 @@ def get_coverages(planning_items, original_coverages, new_plan):
                     'sequence_no': 0,
                     'delivery_state': 'published'
                 })
+
+                if not orig_coverage or len(orig_coverage.get('deliveries') or []) == 0 or \
+                        not orig_coverage['deliveries'][0].get('publish_time'):
+                    cov_deliveries[0]['publish_time'] = next((parse_date_str(d.get('publish_time')) for d in
+                                                              deliveries), None) or utcnow()
 
         coverage['deliveries'] = cov_deliveries
         # Sort the deliveries in reverse sequence order here, so sorting required anywhere else
@@ -511,7 +516,7 @@ def get_coverages(planning_items, original_coverages, new_plan):
                 if TO_BE_CONFIRMED_FIELD in coverage:
                     new_coverage[TO_BE_CONFIRMED_FIELD] = coverage[TO_BE_CONFIRMED_FIELD]
 
-                set_delivery(new_coverage, coverage.get('deliveries'))
+                set_delivery(new_coverage, coverage.get('deliveries'), existing_coverage)
                 coverages.append(new_coverage)
 
                 if ((coverage and not existing_coverage) or ((new_plan or {}).get('_id')) == planning_item.get('_id')):
