@@ -218,7 +218,7 @@ class Newsroom(eve.Eve):
             return flask.send_from_directory(self.theme_folder, filename)
         return self.send_static_file(filename)
 
-    def section(self, _id, name, group):
+    def section(self, _id, name, group, search_type=None):
         """Define new app section.
 
         App sections are used for permissions in company settings,
@@ -249,7 +249,8 @@ class Newsroom(eve.Eve):
         self.sections.append({
             '_id': _id,
             'name': name,
-            'group': group
+            'group': group,
+            'search_type': search_type
         })
 
     def sidenav(self, name, endpoint=None, icon=None, group=0, section=None, blueprint=None, badge=None, url=None,

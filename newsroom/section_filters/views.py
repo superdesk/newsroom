@@ -59,6 +59,11 @@ def create():
     if validation:
         return validation
 
+    section = next((s for s in current_app.sections if s['_id'] == section_filter.get('filter_type')),
+                   None)
+    if section and section.get('search_type'):
+        section_filter['search_type'] = section['search_type']
+
     ids = get_resource_service('section_filters').post([section_filter])
     return jsonify({'success': True, '_id': ids[0]}), 201
 
