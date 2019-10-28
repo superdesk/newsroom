@@ -8,7 +8,7 @@ import {getNavigationUrlParam, getSearchParams} from './utils';
 import {getLocations, getMapSource} from 'maps/utils';
 
 import {closeModal} from 'actions';
-import {fetchItems, setShareItems} from 'wire/actions';
+import {setShareItems} from 'wire/actions';
 import {createOrUpdateTopic} from '../user-profile/actions';
 
 import {multiSelectTopicsConfigSelector} from '../ui/selectors';
