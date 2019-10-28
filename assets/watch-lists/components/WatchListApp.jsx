@@ -46,7 +46,7 @@ class WatchListApp extends React.Component {
         this.setState({
             activeSection: sectionName,
             filter: {
-                label: this.isScheduleMode(sectionName) ? gettext('All Companies with Watch Lists') :
+                label: this.isScheduleMode(sectionName) ? gettext('Companies with schedules') :
                     gettext('All Companies'),
                 field: 'company'
             }
