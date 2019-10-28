@@ -1,8 +1,10 @@
 /* CP theme custom css */
 
+.navbar__logo {
+    max-width: none;
+}
 @media only screen and (min-width: 576px) {
     .navbar__logo {
-        max-width: none;
         padding-bottom: 0;
     }
 }
