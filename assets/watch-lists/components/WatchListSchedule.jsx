@@ -91,7 +91,7 @@ class WatchListSchedule extends React.Component {
 
         return (
             <div className='tab-pane active' id='navigations'>
-                <form onSubmit={onsaveWatchListSchedule}>
+                <form>
                     <div className='list-item__preview-form'>
                         <SelectInput
                             name='schedule'
@@ -118,9 +118,10 @@ class WatchListSchedule extends React.Component {
                     </div>
                     <div className='list-item__preview-footer'>
                         <input
-                            type='submit'
+                            type='button'
                             className='btn btn-outline-primary'
                             value={gettext('Save')}
+                            onClick={onsaveWatchListSchedule}
                         />
                     </div>
                 </form>
