@@ -1,11 +1,8 @@
-import { createStore, render, isWireContext } from 'utils';
+import {createStore, render, isWireContext} from 'utils';
 import userReducer from './reducers';
 import UserProfileApp from './components/UserProfileApp';
 import {initData, selectMenu} from './actions';
-
-
-export const store = createStore(userReducer, 'UserProfile');
-
+import {store} from './store';
 
 if (window.profileData) {
     store.dispatch(initData(window.profileData));
@@ -16,7 +13,6 @@ render(
     UserProfileApp,
     document.getElementById('header-profile-toggle')
 );
-
 
 document.addEventListener('manage_topics', function () {
     isWireContext() ? store.dispatch(selectMenu('topics')) : store.dispatch(selectMenu('events'));

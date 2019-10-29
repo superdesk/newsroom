@@ -1,7 +1,7 @@
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {renderModal, closeModal} from 'actions';
-import {store as userProfileStore} from './';
+import {store as userProfileStore} from './store';
 
 export const GET_TOPICS = 'GET_TOPICS';
 export function getTopics(topics) {

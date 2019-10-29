@@ -9,9 +9,9 @@ import {getLocations, getMapSource} from 'maps/utils';
 
 import {closeModal} from 'actions';
 import {setShareItems} from 'wire/actions';
-import {createOrUpdateTopic} from '../user-profile/actions';
+import {createOrUpdateTopic} from 'user-profile/actions';
 
-import {multiSelectTopicsConfigSelector} from '../ui/selectors';
+import {multiSelectTopicsConfigSelector} from 'ui/selectors';
 import {
     searchFilterSelector,
     searchNavigationSelector,

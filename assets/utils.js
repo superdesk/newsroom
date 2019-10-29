@@ -28,6 +28,7 @@ export const LIST_ANIMATIONS = getConfig('list_animations', true);
  * Create redux store with default middleware
  *
  * @param {func} reducer
+ * @param {String} name
  * @return {Store}
  */
 export function createStore(reducer, name = 'default') {
@@ -38,14 +39,6 @@ export function createStore(reducer, name = 'default') {
         titleFormatter: (action, time, took) => (
             `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)`
         ),
-        // titleFormatter: (action, time, took) => {
-        //     const parts = ['action'];
-        //
-        //     parts.push(`%c${String(action.type)}`);
-        //     parts.push(`%c(in ${took.toFixed(2)} ms)`);
-        //
-        //     return ` ${name} - ` + parts.join(' ');
-        // }
     });
 
     return _createStore(reducer, applyMiddleware(thunk, logger));

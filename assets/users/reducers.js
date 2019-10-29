@@ -26,7 +26,7 @@ const initialState = {
     company: null,
     sort: null,
     sortDirection: 1,
-    search: searchReducer(),
+    // search: searchReducer(),
 };
 
 export default function userReducer(state = initialState, action) {
@@ -135,11 +135,11 @@ export default function userReducer(state = initialState, action) {
     }
 
     default: {
-        const search = searchReducer(state.search, action);
-
-        if (search !== state.search) {
-            return {...state, search};
-        }
+        // const search = searchReducer(state.search, action);
+        //
+        // if (search !== state.search) {
+        //     return {...state, search};
+        // }
 
         return state;
     }
