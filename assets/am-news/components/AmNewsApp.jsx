@@ -226,21 +226,17 @@ AmNewsApp.propTypes = {
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
     modal: PropTypes.object,
-    user: PropTypes.string, //
     company: PropTypes.string,
     topics: PropTypes.array,
-    fetchItems: PropTypes.func, //
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         action: PropTypes.func,
     })),
     setQuery: PropTypes.func.isRequired,
-    bookmarks: PropTypes.bool, //
     fetchMoreItems: PropTypes.func,
     newItems: PropTypes.array,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
-    activeNavigation: PropTypes.arrayOf(PropTypes.string), //
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
     previewConfig: PropTypes.object,

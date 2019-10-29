@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import {
     newCard,
-    // setQuery,
     fetchCards,
 } from '../actions';
 import {setSearchQuery} from 'search/actions';

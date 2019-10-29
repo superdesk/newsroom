@@ -28,11 +28,6 @@ export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
 }
 
-// export const SET_QUERY = 'SET_QUERY';
-// export function setQuery(query) {
-//     return {type: SET_QUERY, query};
-// }
-
 export const QUERY_USERS = 'QUERY_USERS';
 export function queryUsers() {
     return {type: QUERY_USERS};

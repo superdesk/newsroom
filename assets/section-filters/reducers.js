@@ -3,7 +3,6 @@ import {
     SELECT_SECTION_FILTER,
     EDIT_SECTION_FILTER,
     QUERY_SECTION_FILTERS,
-    // SET_QUERY,
     CANCEL_EDIT,
     NEW_SECTION_FILTER,
     SET_ERROR,
@@ -65,9 +64,6 @@ export default function sectionFiltersReducer(state = initialState, action) {
     case CANCEL_EDIT: {
         return {...state, sectionFilterToEdit: null, errors: null};
     }
-
-    // case SET_QUERY:
-    //     return {...state, query: action.query};
 
     case SET_ERROR:
         return {...state, errors: action.errors};

@@ -3,7 +3,6 @@ import {
     SELECT_USER,
     EDIT_USER,
     QUERY_USERS,
-    // SET_QUERY,
     CANCEL_EDIT,
     NEW_USER,
     SET_ERROR,
@@ -26,7 +25,7 @@ const initialState = {
     company: null,
     sort: null,
     sortDirection: 1,
-    // search: searchReducer(),
+    search: searchReducer(),
 };
 
 export default function userReducer(state = initialState, action) {
@@ -81,9 +80,6 @@ export default function userReducer(state = initialState, action) {
         return {...state, userToEdit: null, errors: null};
     }
 
-    // case SET_QUERY:
-    //     return {...state, query: action.query};
-
     case SET_ERROR:
         return {...state, errors: action.errors};
 
@@ -135,11 +131,11 @@ export default function userReducer(state = initialState, action) {
     }
 
     default: {
-        // const search = searchReducer(state.search, action);
-        //
-        // if (search !== state.search) {
-        //     return {...state, search};
-        // }
+        const search = searchReducer(state.search, action);
+
+        if (search !== state.search) {
+            return {...state, search};
+        }
 
         return state;
     }

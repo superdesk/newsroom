@@ -5,7 +5,6 @@ import {
     SELECT_CARD,
     EDIT_CARD,
     QUERY_CARDS,
-    // SET_QUERY,
     CANCEL_EDIT,
     NEW_CARD,
     SET_ERROR,
@@ -106,9 +105,6 @@ export default function cardReducer(state = initialState, action) {
     case CANCEL_EDIT: {
         return {...state, cardToEdit: null, errors: null};
     }
-
-    // case SET_QUERY:
-    //     return {...state, query: action.query};
 
     case SET_ERROR:
         return {...state, errors: action.errors};

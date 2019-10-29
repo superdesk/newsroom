@@ -6,7 +6,6 @@ import {gettext} from 'utils';
 
 import {
     newProduct,
-    // setQuery,
     fetchProducts,
 } from '../actions';
 import {setSearchQuery} from 'search/actions';

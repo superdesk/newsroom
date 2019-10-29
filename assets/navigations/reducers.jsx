@@ -1,10 +1,9 @@
-import { startsWith, set } from 'lodash';
+import {startsWith, set} from 'lodash';
 import {
     GET_NAVIGATIONS,
     SELECT_NAVIGATION,
     EDIT_NAVIGATION,
     QUERY_NAVIGATIONS,
-    // SET_QUERY,
     CANCEL_EDIT,
     NEW_NAVIGATION,
     SET_ERROR,
@@ -79,9 +78,6 @@ export default function navigationReducer(state = initialState, action) {
     case CANCEL_EDIT: {
         return {...state, navigationToEdit: null, errors: null};
     }
-
-    // case SET_QUERY:
-    //     return {...state, query: action.query};
 
     case SET_ERROR:
         return {...state, errors: action.errors};

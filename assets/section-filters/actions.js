@@ -24,11 +24,6 @@ export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
 }
 
-// export const SET_QUERY = 'SET_QUERY';
-// export function setQuery(query) {
-//     return {type: SET_QUERY, query};
-// }
-
 export const QUERY_SECTION_FILTERS = 'QUERY_SECTION_FILTERS';
 export function querySectionFilters() {
     return {type: QUERY_SECTION_FILTERS};

@@ -6,7 +6,6 @@ import {gettext} from 'utils';
 
 import {
     newSectionFilter,
-    // setQuery,
     fetchSectionFilters,
 } from '../actions';
 import {setSearchQuery} from 'search/actions';

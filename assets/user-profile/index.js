@@ -1,5 +1,4 @@
-import {createStore, render, isWireContext} from 'utils';
-import userReducer from './reducers';
+import {render, isWireContext} from 'utils';
 import UserProfileApp from './components/UserProfileApp';
 import {initData, selectMenu} from './actions';
 import {store} from './store';

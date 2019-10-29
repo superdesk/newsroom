@@ -3,7 +3,6 @@ import {
     SELECT_PRODUCT,
     EDIT_PRODUCT,
     QUERY_PRODUCTS,
-    // SET_QUERY,
     CANCEL_EDIT,
     NEW_PRODUCT,
     SET_ERROR,
@@ -71,9 +70,6 @@ export default function productReducer(state = initialState, action) {
     case CANCEL_EDIT: {
         return {...state, productToEdit: null, errors: null};
     }
-
-    // case SET_QUERY:
-    //     return {...state, query: action.query};
 
     case SET_ERROR:
         return {...state, errors: action.errors};

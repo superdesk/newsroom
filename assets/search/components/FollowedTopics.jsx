@@ -66,8 +66,7 @@ class FollowedTopics extends React.Component {
 
     deleteTopic(topic) {
         confirm(
-            gettext('Would you like to delete {{topicType}} {{name}}?', {
-                topicType: topic.topic_type === 'wire' ? 'topic' : 'event',
+            gettext('Would you like to delete topic {{name}}?', {
                 name: topic.label,
             })
         ) && this.props.deleteTopic(topic);

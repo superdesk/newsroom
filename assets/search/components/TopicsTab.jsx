@@ -13,11 +13,11 @@ import {loadMyAgendaTopic} from 'agenda/actions';
 const tabName = isWireContext() ? 'Wire Topics' : 'Agenda Topics';
 const manageTopics = () => document.dispatchEvent(window.manageTopics);
 
-function TopicsTab({topics, setTopicQuery, newItemsByTopic, activeTopic, removeNewItems}) {
+function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems}) {
     const clickTopic = (event, topic) => {
         event.preventDefault();
         removeNewItems(topic._id);
-        setTopicQuery(topic);
+        loadMyTopic(topic);
     };
 
     const clickManage = (event) => {
@@ -69,7 +69,7 @@ TopicsTab.propTypes = {
     activeTopic: PropTypes.object,
 
     removeNewItems: PropTypes.func.isRequired,
-    setTopicQuery: PropTypes.func.isRequired,
+    loadMyTopic: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -79,7 +79,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     removeNewItems: (topicId) => dispatch(removeNewItems(topicId)),
-    setTopicQuery: (topic) => topic.topic_type === 'agenda' ?
+    loadMyTopic: (topic) => topic.topic_type === 'agenda' ?
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
 });

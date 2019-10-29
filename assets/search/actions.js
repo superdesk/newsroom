@@ -340,28 +340,6 @@ export function resetSearchParams() {
     return {type: RESET_SEARCH_PARAMS};
 }
 
-/**
- * setTopic
- *  - set URL param
- *  - set redux state
- *
- * setNavigations(ids, updateUrlParams = true)
- *  - set URL param
- *  - set redux state
- *
- * setQuery(query, updateUrlParams = true)
- *  - set URL param
- *  - set redux state
- *
- * setFilters(filters, updateUrlParams = true)
- *  - set URL param
- *  - set redux state
- *
- * setCreated(created, updateUrlParams = true)
- *  - set URL param
- *  - set redux state
- */
-
 export function setParams(params) {
     return function(dispatch) {
         if (get(params, 'created')) {

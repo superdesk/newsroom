@@ -9,9 +9,11 @@ import {gettext, notify} from 'utils';
 import TopicForm from './TopicForm';
 import TopicParameters from './TopicParameters';
 import {fetchNavigations} from 'navigations/actions';
-import {submitFollowTopic as submitWireFollowTopic, loadMyTopic} from 'search/actions';
+import {submitFollowTopic as submitWireFollowTopic} from 'search/actions';
 import {submitFollowTopic as submitProfileFollowTopic, hideModal, setTopicEditorFullscreen} from 'user-profile/actions';
 import {topicEditorFullscreenSelector} from 'user-profile/selectors';
+import {loadMyWireTopic} from 'wire/actions';
+import {loadMyAgendaTopic} from 'agenda/actions';
 
 class TopicEditor extends React.Component {
     constructor(props) {
@@ -104,7 +106,7 @@ class TopicEditor extends React.Component {
                         gettext('Wire Topic created successfully')
                     );
 
-                    this.props.loadMyTopic(savedTopic._id);
+                    this.props.loadMyTopic(savedTopic);
                 }
 
                 if (this.props.editorFullscreen) {
@@ -140,7 +142,6 @@ class TopicEditor extends React.Component {
             return null;
         }
 
-        // const isNewTopic = this.isNewTopic();
         const containerClasses = classNames(
             'list-item__preview',
             {'list-item__preview--new': this.props.editorFullscreen}
@@ -218,10 +219,11 @@ const mapDispatchToProps = (dispatch) => ({
     fetchNavigations: () => dispatch(fetchNavigations()),
     hideModal: () => dispatch(hideModal()),
     saveTopic: (isExisting, topic) => isExisting ?
-        // Is this the correct 'FollowTopic' action (or should it be for Agenda)?
         dispatch(submitProfileFollowTopic(topic)) :
         dispatch(submitWireFollowTopic(topic)),
-    loadMyTopic: (topicId) => dispatch(loadMyTopic(topicId)),
+    loadMyTopic: (topic) => topic.topic_type === 'agenda' ?
+        dispatch(loadMyAgendaTopic(topic._id)) :
+        dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen) => dispatch(setTopicEditorFullscreen(fullscreen)),
 });
 

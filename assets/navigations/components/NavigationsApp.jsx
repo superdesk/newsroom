@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import {
     newNavigation,
-    // setQuery,
     fetchNavigations,
 } from '../actions';
 import {setSearchQuery} from 'search/actions';

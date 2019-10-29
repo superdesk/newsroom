@@ -8,7 +8,6 @@ import {
     GET_COMPANY_USERS,
     INIT_VIEW_DATA,
     SET_ERROR,
-    // SET_QUERY,
     GET_PRODUCTS
 } from './actions';
 
@@ -111,9 +110,6 @@ export default function companyReducer(state = initialState, action) {
     case CANCEL_EDIT: {
         return {...state, companyToEdit: null, errors: null};
     }
-
-    // case SET_QUERY:
-    //     return {...state, query: action.query};
 
     case SET_ERROR:
         return {...state, errors: action.errors};

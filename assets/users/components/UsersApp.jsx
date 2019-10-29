@@ -8,7 +8,6 @@ import {gettext} from 'utils';
 
 import {
     newUser,
-    // setQuery,
     fetchUsers,
     fetchCompanies,
     setCompany,
