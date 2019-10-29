@@ -52,12 +52,12 @@ class EditWatchList extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.item._id !== prevProps.item._id) {
-            if (this.props.scheduleMode) {
-                this.setState({activeTab: 'schedule'});
-                return;
-            }
+            this.setState({activeTab: this.props.scheduleMode ? 'schedule' : 'watch-list'});
+        }
 
-            this.setState({activeTab: 'watch-list'});
+        if (this.props.scheduleMode && prevProps.scheduleMode !== this.props.scheduleMode) {
+            this.setState({activeTab: 'schedule'});
+            return;
         }
     }
 
