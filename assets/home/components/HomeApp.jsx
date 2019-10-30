@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {gettext, isMobilePhone} from 'utils';
-import { get } from 'lodash';
+import {get} from 'lodash';
 import {
     getCardDashboardComponent,
 } from 'components/cards/utils';
@@ -11,16 +11,14 @@ import {
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
 import {openItemDetails, setActive, fetchCardExternalItems} from '../actions';
-import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
-import WirePreview from '../../wire/components/WirePreview';
-import {followTopic} from '../../search/actions';
-import {downloadVideo} from '../../wire/actions';
+import WirePreview from 'wire/components/WirePreview';
+import {followStory} from 'search/actions';
+import {downloadVideo} from 'wire/actions';
 import {previewConfigSelector} from 'ui/selectors';
 
 const modals = {
-    followTopic: FollowTopicModal,
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
 };
@@ -216,7 +214,7 @@ const mapDispatchToProps = (dispatch) => ({
     },
     actions: getItemActions(dispatch),
     fetchCardExternalItems: (cardId, cardLabel) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
-    followStory: (item) => dispatch(followTopic({label: item.slugline, query: `slugline:"${item.slugline}"`}, 'wire')),
+    followStory: (item) => dispatch(followStory(item, 'wire')),
     downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType))
 });
 

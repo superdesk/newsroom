@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { gettext } from 'utils';
+import {get} from 'lodash';
+
+import {gettext} from 'utils';
 
 
 const Navigations = ({navigations=[], activeNavigation, toggleNavigation, fetchItems}) => {
@@ -11,7 +13,7 @@ const Navigations = ({navigations=[], activeNavigation, toggleNavigation, fetchI
             <a href=""
                 className={classNames(
                     'nav-link',
-                    {active: activeNavigation === navigation._id}
+                    {active: get(activeNavigation, '[0]') === navigation._id}
                 )}
                 onClick={(event) => {
                     event.preventDefault();
@@ -31,8 +33,8 @@ const Navigations = ({navigations=[], activeNavigation, toggleNavigation, fetchI
 };
 
 Navigations.propTypes = {
-    navigations: PropTypes.array.isRequired,
-    activeNavigation: PropTypes.string,
+    navigations: PropTypes.arrayOf(PropTypes.object.isRequired),
+    activeNavigation: PropTypes.arrayOf(PropTypes.string),
     toggleNavigation: PropTypes.func.isRequired,
     fetchItems: PropTypes.func.isRequired,
 };

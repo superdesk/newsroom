@@ -13,10 +13,11 @@ from newsroom.auth.views import send_token, add_token_data, \
 from newsroom.decorator import admin_only, login_required
 from newsroom.companies import get_user_company_name, get_company_sections
 from newsroom.notifications.notifications import get_user_notifications
+from newsroom.notifications import push_user_notification
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
-from newsroom.utils import query_resource, find_one
+from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
 
 
 def get_settings_data():
@@ -33,7 +34,8 @@ def get_view_data():
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': get_user_topics(user['_id']) if user else [],
         'companyName': get_user_company_name(user),
-        'userSections': get_company_sections(user['company'] if user and user.get('company') else None)
+        'userSections': get_company_sections(user['company'] if user and user.get('company') else None),
+        'locators': get_vocabulary('locators'),
     }
 
 
@@ -159,6 +161,21 @@ def get_topics(_id):
     if flask.session['user'] != str(_id):
         flask.abort(403)
     return jsonify({'_items': get_user_topics(_id)}), 200
+
+
+@blueprint.route('/users/<_id>/topics', methods=['POST'])
+@login_required
+def post_topic(_id):
+    """Creates a user topic"""
+    if flask.session['user'] != str(_id):
+        flask.abort(403)
+
+    topic = get_json_or_400()
+    topic['user'] = ObjectId(_id)
+
+    ids = get_resource_service('topics').post([topic])
+    push_user_notification('topic_created')
+    return jsonify({'success': True, '_id': ids[0]}), 201
 
 
 @blueprint.route('/users/<user_id>/notifications', methods=['GET'])

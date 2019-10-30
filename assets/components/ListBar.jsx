@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext } from 'utils';
-import SearchBar from 'components/SearchBar';
+import SearchBar from 'search/components/SearchBar';
 
 class ListBar extends React.Component {
     render() {
@@ -9,7 +9,10 @@ class ListBar extends React.Component {
             <section className="content-header">
                 <nav className="content-bar navbar content-bar--side-padding">
                     {this.props.children}
-                    <SearchBar setQuery={this.props.setQuery} fetchItems={()=>this.props.fetch()}/>
+                    <SearchBar
+                        setQuery={this.props.setQuery}
+                        fetchItems={()=>this.props.fetch()}
+                    />
                     <div className="content-bar__right">
                         <button
                             className="btn btn-outline-secondary btn-responsive"
@@ -30,6 +33,5 @@ ListBar.propTypes = {
     onNewItem: PropTypes.func,
     children: PropTypes.node,
 };
-
 
 export default ListBar;

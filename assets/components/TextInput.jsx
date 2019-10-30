@@ -2,7 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
-function TextInput({type, name, label, onChange, value, error, required, readOnly, maxLength, placeholder, description, min}) {
+function TextInput({
+    type,
+    name,
+    label,
+    onChange,
+    value,
+    error,
+    required,
+    readOnly,
+    maxLength,
+    placeholder,
+    description,
+    min,
+    autoFocus
+}) {
     let wrapperClass = 'form-group';
 
     if (error && error.length > 0) {
@@ -29,6 +43,7 @@ function TextInput({type, name, label, onChange, value, error, required, readOnl
                     readOnly={readOnly}
                     placeholder={placeholder}
                     min={min}
+                    autoFocus={autoFocus}
                 />
                 {error && <div className="alert alert-danger">{error}</div>}
                 {description && <small className="form-text text-muted">{description}</small>}
@@ -50,6 +65,9 @@ TextInput.propTypes = {
     placeholder: PropTypes.string,
     description: PropTypes.string,
     min: PropTypes.number,
+    autoFocus: PropTypes.bool,
 };
+
+TextInput.defaultProps = {autoFocus: false};
 
 export default TextInput;

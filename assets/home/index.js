@@ -4,7 +4,7 @@ import HomeApp from './components/HomeApp';
 import {initData} from './actions';
 
 
-const store = createStore(homeReducer);
+const store = createStore(homeReducer, 'Home');
 
 
 if (window.homeData) {

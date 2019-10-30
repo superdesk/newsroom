@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { omit, get, sortBy } from 'lodash';
 import { gettext, toggleValue } from 'utils';
-import { submitShareItem } from 'wire/actions';
+import {submitShareItem} from 'search/actions';
 import { submitShareTopic } from 'user-profile/actions';
 import { modalFormInvalid, modalFormValid } from 'actions';
 
 import Modal from 'components/Modal';
-import SearchBar from 'components/SearchBar';
+import SearchBar from 'search/components/SearchBar';
 
 class ShareItemModal extends React.Component {
     constructor(props) {
@@ -94,7 +94,10 @@ class ShareItemModal extends React.Component {
                 title={gettext('Share Item')}
                 onSubmitLabel={gettext('Share')}
                 disableButtonOnSubmit >
-                <SearchBar fetchItems={this.getUsers} enableQueryAction={false} />
+                <SearchBar
+                    fetchItems={this.getUsers}
+                    enableQueryAction={false}
+                />
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group search-user-list">
                         <label htmlFor="users">{gettext('People')}</label>

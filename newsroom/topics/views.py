@@ -31,7 +31,10 @@ def update_topic(id):
     updates = {
         'label': data.get('label'),
         'notifications': data.get('notifications', False),
-        'query': data.get('query')
+        'query': data.get('query'),
+        'created': data.get('created'),
+        'filter': data.get('filter'),
+        'navigation': data.get('navigation'),
     }
 
     get_resource_service('topics').patch(id=ObjectId(id), updates=updates)

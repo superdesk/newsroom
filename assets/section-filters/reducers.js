@@ -1,17 +1,16 @@
-
 import {
     GET_SECTION_FILTERS,
     SELECT_SECTION_FILTER,
     EDIT_SECTION_FILTER,
     QUERY_SECTION_FILTERS,
-    SET_QUERY,
     CANCEL_EDIT,
     NEW_SECTION_FILTER,
     SET_ERROR,
 } from './actions';
 
-import { INIT_SECTIONS, SELECT_SECTION } from 'features/sections/actions';
-import { sectionsReducer } from 'features/sections/reducers';
+import {INIT_SECTIONS, SELECT_SECTION} from 'features/sections/actions';
+import {sectionsReducer} from 'features/sections/reducers';
+import {searchReducer} from 'search/reducers';
 
 const initialState = {
     query: null,
@@ -22,6 +21,7 @@ const initialState = {
     totalSectionFilters: null,
     activeQuery: null,
     sections: sectionsReducer(),
+    search: searchReducer,
 };
 
 export default function sectionFiltersReducer(state = initialState, action) {
@@ -65,9 +65,6 @@ export default function sectionFiltersReducer(state = initialState, action) {
         return {...state, sectionFilterToEdit: null, errors: null};
     }
 
-    case SET_QUERY:
-        return {...state, query: action.query};
-
     case SET_ERROR:
         return {...state, errors: action.errors};
 
@@ -90,7 +87,7 @@ export default function sectionFiltersReducer(state = initialState, action) {
             sectionFilters,
             sectionFiltersById,
             isLoading: false,
-            totalSectionFilters: sectionFilters.length
+            totalSectionFilters: sectionFilters.length,
         };
     }
 
@@ -98,7 +95,14 @@ export default function sectionFiltersReducer(state = initialState, action) {
     case SELECT_SECTION:
         return {...state, sections: sectionsReducer(state.sections, action)};
 
-    default:
+    default: {
+        const search = searchReducer(state.search, action);
+
+        if (search !== state.search) {
+            return {...state, search};
+        }
+
         return state;
+    }
     }
 }
