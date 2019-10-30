@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { isTouchDevice, gettext } from 'utils';
 
 // tabs
-import TopicsTab from 'wire/components/TopicsTab';
+import TopicsTab from 'search/components/TopicsTab';
 import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
 

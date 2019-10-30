@@ -4,7 +4,7 @@ import UsersApp from './components/UsersApp';
 import { initViewData } from './actions';
 
 
-const store = createStore(userReducer);
+const store = createStore(userReducer, 'Users');
 
 
 if (window.viewData) {

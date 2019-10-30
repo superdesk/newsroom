@@ -1,4 +1,3 @@
-
 import {
     EDIT_COMPANY,
     NEW_COMPANY,
@@ -9,9 +8,10 @@ import {
     GET_COMPANY_USERS,
     INIT_VIEW_DATA,
     SET_ERROR,
-    SET_QUERY,
     GET_PRODUCTS
 } from './actions';
+
+import {searchReducer} from 'search/reducers';
 
 const initialState = {
     query: null,
@@ -25,6 +25,7 @@ const initialState = {
     sections: [],
     companyTypes: [],
     apiEnabled: false,
+    search: searchReducer(),
 };
 
 function setupCompanies(companyList, state) {
@@ -36,7 +37,14 @@ function setupCompanies(companyList, state) {
         return company._id;
     });
 
-    return {...state, companiesById, companyOptions, companies, isLoading: false};
+    return {
+        ...state,
+        companiesById,
+        companyOptions,
+        companies,
+        isLoading: false,
+        totalCompanies: companyList.length,
+    };
 }
 
 export default function companyReducer(state = initialState, action) {
@@ -103,9 +111,6 @@ export default function companyReducer(state = initialState, action) {
         return {...state, companyToEdit: null, errors: null};
     }
 
-    case SET_QUERY:
-        return {...state, query: action.query};
-
     case SET_ERROR:
         return {...state, errors: action.errors};
 
@@ -138,7 +143,14 @@ export default function companyReducer(state = initialState, action) {
         return setupCompanies(action.data.companies, nextState);
     }
 
-    default:
+    default: {
+        const search = searchReducer(state.search, action);
+
+        if (search !== state.search) {
+            return {...state, search};
+        }
+
         return state;
+    }
     }
 }

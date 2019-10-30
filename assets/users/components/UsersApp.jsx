@@ -2,17 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
-import { connect } from 'react-redux';
-import { gettext } from 'utils';
+import {connect} from 'react-redux';
+
+import {gettext} from 'utils';
+
 import {
     newUser,
-    setQuery,
     fetchUsers,
     fetchCompanies,
     setCompany,
     setSort,
     toggleSortDirection,
 } from '../actions';
+import {setSearchQuery} from 'search/actions';
+
 import Users from './Users';
 import ListBar from 'components/ListBar';
 import DropdownFilter from 'components/DropdownFilter';
@@ -52,7 +55,7 @@ class UsersApp extends React.Component {
             key={i}
             className='dropdown-item'
             onClick={() => {this.onChange(filter.field, item._id);}}
-        >{item.name}</button>));        
+        >{item.name}</button>));
     }
 
     getActiveQuery() {
@@ -104,7 +107,7 @@ class UsersApp extends React.Component {
         } else {
             this.props.setSort(value);
         }
-        
+
         this.props.fetchUsers();
     }
 
@@ -155,7 +158,7 @@ UsersApp.propTypes = {
 const mapDispatchToProps = {
     newUser,
     fetchUsers,
-    setQuery,
+    setQuery: setSearchQuery,
     fetchCompanies,
     setCompany,
     setSort,

@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import {
     newNavigation,
-    setQuery,
     fetchNavigations,
 } from '../actions';
+import {setSearchQuery} from 'search/actions';
 import Navigations from './Navigations';
 import ListBar from 'components/ListBar';
 import SectionSwitch from '../../features/sections/SectionSwitch';
@@ -58,7 +58,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
     newNavigation,
     fetchNavigations,
-    setQuery,
+    setQuery: setSearchQuery,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavigationsApp);

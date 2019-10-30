@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
-import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import SearchResults from 'search/components/SearchResults';
+
 import {
     cancelEdit,
     deleteCompany,
@@ -13,6 +14,7 @@ import {
     selectCompany,
     setError,
 } from '../actions';
+import {searchQuerySelector} from 'search/selectors';
 import {gettext} from 'utils';
 
 class Companies extends React.Component {
@@ -68,11 +70,15 @@ class Companies extends React.Component {
                     </div>
                     :
                     <div className="flex-col flex-column">
-                        {this.props.activeQuery &&
-                        <SearchResultsInfo
-                            totalItems={this.props.totalCompanies}
-                            query={this.props.activeQuery} />
-                        }
+                        {this.props.activeQuery && (
+                            <SearchResults
+                                showTotalItems={true}
+                                showTotalLabel={true}
+                                showSaveTopic={false}
+                                totalItems={this.props.totalCompanies}
+                                totalItemsLabel={this.props.activeQuery}
+                            />
+                        )}
                         <CompanyList
                             companies={this.props.companies}
                             onClick={this.props.selectCompany}
@@ -129,7 +135,7 @@ const mapStateToProps = (state) => ({
     activeCompanyId: state.activeCompanyId,
     isLoading: state.isLoading,
     products: state.products,
-    activeQuery: state.activeQuery,
+    activeQuery: searchQuerySelector(state),
     totalCompanies: state.totalCompanies,
     companyOptions: state.companyOptions,
     companiesById: state.companiesById,

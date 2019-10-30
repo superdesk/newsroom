@@ -5,12 +5,16 @@ import {
     SET_ERROR,
     GET_USER,
     EDIT_USER,
-    SELECT_MENU, HIDE_MODAL, TOGGLE_DROPDOWN
+    SELECT_MENU, HIDE_MODAL, TOGGLE_DROPDOWN,
+    SELECT_MENU_ITEM,
+    SELECT_PROFILE_MENU,
+    SET_TOPIC_EDITOR_FULLSCREEN,
 } from './actions';
 
 import { RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID } from 'actions';
 
-import { modalReducer } from 'reducers';
+import {modalReducer} from 'reducers';
+import {GET_NAVIGATIONS} from 'navigations/actions';
 
 const initialState = {
     user: null,
@@ -23,6 +27,10 @@ const initialState = {
     selectedMenu: 'profile',
     dropdown: false,
     displayModal: false,
+    navigations: [],
+    selectedItem: null,
+    editorFullscreen: false,
+    locators: [],
 };
 
 export default function itemReducer(state = initialState, action) {
@@ -52,6 +60,10 @@ export default function itemReducer(state = initialState, action) {
         };
     }
 
+    case GET_NAVIGATIONS: {
+        return {...state, navigations: action.data};
+    }
+
     case EDIT_USER: {
 
         const target = action.event.target;
@@ -69,6 +81,7 @@ export default function itemReducer(state = initialState, action) {
             topics: action.data.topics || [],
             company: action.data.company || null,
             userSections: action.data.userSections || null,
+            locators: action.data.locators || null,
         };
     }
 
@@ -78,6 +91,22 @@ export default function itemReducer(state = initialState, action) {
             selectedMenu: action.data,
             dropdown: false,
             displayModal: true,
+        };
+    }
+
+    case SELECT_MENU_ITEM: {
+        return {
+            ...state,
+            selectedItem: action.item,
+            editorFullscreen: false,
+        };
+    }
+
+    case SELECT_PROFILE_MENU: {
+        return {
+            ...state,
+            selectedMenu: action.menu,
+            selectedItem: action.item || state.selectedItem,
         };
     }
 
@@ -103,6 +132,12 @@ export default function itemReducer(state = initialState, action) {
 
     case SET_ERROR:
         return {...state, errors: action.errors};
+
+    case SET_TOPIC_EDITOR_FULLSCREEN:
+        return {
+            ...state,
+            editorFullscreen: action.payload,
+        };
 
     default:
         return state;

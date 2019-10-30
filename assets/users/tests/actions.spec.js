@@ -19,6 +19,7 @@ describe('fetch actions', () => {
 
     afterEach(() => {
         fetchMock.restore();
+
     });
 
     it('can fetch users', () => {

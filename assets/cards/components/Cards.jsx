@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { get } from 'lodash';
-import EditCard from './EditCard';
-import CardList from './CardList';
-import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
+
+import {gettext} from 'utils';
+
 import {
     cancelEdit,
     deleteCard,
@@ -16,7 +16,11 @@ import {
     fetchProducts,
     saveProducts,
 } from '../actions';
-import {gettext} from 'utils';
+import {searchQuerySelector} from 'search/selectors';
+
+import EditCard from './EditCard';
+import CardList from './CardList';
+import SearchResults from 'search/components/SearchResults';
 
 class Cards extends React.Component {
     constructor(props, context) {
@@ -79,11 +83,15 @@ class Cards extends React.Component {
                     </div>
                     :
                     <div className="flex-col flex-column">
-                        {this.props.activeQuery &&
-                        <SearchResultsInfo
-                            totalItems={this.props.totalCards}
-                            query={this.props.activeQuery} />
-                        }
+                        {this.props.activeQuery && (
+                            <SearchResults
+                                showTotalItems={true}
+                                showTotalLabel={true}
+                                showSaveTopic={false}
+                                totalItems={this.props.totalCards}
+                                totalItemsLabel={this.props.activeQuery}
+                            />
+                        )}
                         <CardList
                             cards={this.props.cards.filter(cardFilter)}
                             products={this.props.products}
@@ -139,7 +147,7 @@ const mapStateToProps = (state) => ({
     cardToEdit: state.cardToEdit,
     activeCardId: state.activeCardId,
     isLoading: state.isLoading,
-    activeQuery: state.activeQuery,
+    activeQuery: searchQuerySelector(state),
     totalCards: state.totalCards,
     errors: state.errors,
     products: state.products,

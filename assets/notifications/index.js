@@ -4,7 +4,7 @@ import NotificationApp from './components/NotificationsApp';
 import {initData, pushNotification} from './actions';
 
 
-const store = createStore(notificationReducer);
+const store = createStore(notificationReducer, 'Notifications');
 
 
 if (window.notificationData) {

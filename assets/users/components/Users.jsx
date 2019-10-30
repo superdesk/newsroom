@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import EditUser from './EditUser';
-import UsersList from './UsersList';
-import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import {connect} from 'react-redux';
+
+import {gettext} from 'utils';
+
 import {
     deleteUser,
     editUser,
@@ -13,8 +14,11 @@ import {
     setError,
     cancelEdit
 } from '../actions';
-import {gettext} from 'utils';
-import {connect} from 'react-redux';
+import {searchQuerySelector} from 'search/selectors';
+
+import EditUser from './EditUser';
+import UsersList from './UsersList';
+import SearchResults from 'search/components/SearchResults';
 
 
 class Users extends React.Component {
@@ -69,11 +73,15 @@ class Users extends React.Component {
                     </div>
                     :
                     <div className="flex-col flex-column">
-                        {this.props.activeQuery &&
-                        <SearchResultsInfo
-                            totalItems={this.props.totalUsers}
-                            query={this.props.activeQuery} />
-                        }
+                        {this.props.activeQuery && (
+                            <SearchResults
+                                showTotalItems={true}
+                                showTotalLabel={true}
+                                showSaveTopic={false}
+                                totalItems={this.props.totalUsers}
+                                totalItemsLabel={this.props.activeQuery}
+                            />
+                        )}
                         <UsersList
                             users={this.props.users}
                             onClick={this.props.selectUser}
@@ -123,7 +131,7 @@ const mapStateToProps = (state) => ({
     userToEdit: state.userToEdit,
     activeUserId: state.activeUserId,
     isLoading: state.isLoading,
-    activeQuery: state.activeQuery,
+    activeQuery: searchQuerySelector(state),
     totalUsers: state.totalUsers,
     companies: state.companies,
     companiesById: state.companiesById,
