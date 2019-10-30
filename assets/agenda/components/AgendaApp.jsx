@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEmpty} from 'lodash';
+
 import {getItemFromArray, gettext} from 'utils';
+import {noNavigationSelected} from 'search/utils';
 
 import {
     fetchItems,
@@ -114,8 +116,10 @@ class AgendaApp extends BaseApp {
             },
         ];
         const eventsOnly = this.props.eventsOnlyView || this.props.eventsOnlyAccess;
-        const hideFeaturedToggle = this.props.activeNavigation ||
-            this.props.bookmarks || this.props.activeTopic || eventsOnly;
+        const hideFeaturedToggle = !noNavigationSelected(this.props.activeNavigation) ||
+            this.props.bookmarks ||
+            this.props.activeTopic ||
+            eventsOnly;
 
         const numNavigations = get(this.props, 'searchParams.navigation.length', 0);
         let showSaveTopic = this.props.showSaveTopic &&
