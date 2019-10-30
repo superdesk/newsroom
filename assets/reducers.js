@@ -92,7 +92,11 @@ function updateItemActions(state, items, action) {
 
 
 
-export function defaultReducer(state, action) {
+export function defaultReducer(state={}, action) {
+    if (!action) {
+        return state;
+    }
+
     switch (action.type) {
 
     case SET_ITEMS: {

@@ -456,7 +456,6 @@ export function updateRouteParams(updates, state, deleteEmpty = true) {
         }
     });
 
-
     const stateClone = cloneDeep(state);
     stateClone.items = [];
     stateClone.itemsById = {};

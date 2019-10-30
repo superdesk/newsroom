@@ -1,12 +1,20 @@
-
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 import { createStore, applyMiddleware } from 'redux';
 
+import server from 'server';
+
 import wireApp from '../reducers';
 import * as actions from '../actions';
 import * as utils from 'utils';
-import {setQuery, toggleNavigation} from 'search/actions';
+import {
+    setQuery,
+    toggleNavigation,
+    toggleFilter,
+    setCreatedFilter,
+    loadMyTopic,
+} from 'search/actions';
+import {initData} from '../actions';
 
 describe('wire actions', () => {
     let store;
@@ -190,5 +198,51 @@ describe('wire actions', () => {
         expect(store.getState().search.activeNavigation).toEqual(['bar']);
         store.dispatch(toggleNavigation());
         expect(store.getState().search.activeNavigation).toEqual([]);
+    });
+
+    describe('can search with parameters', () => {
+        beforeEach(() => {
+            spyOn(server, 'get');
+        });
+
+        it('can search using navigations & filters', () => {
+            store.dispatch(initData({ui_config: {multi_select_topics: true}}));
+            store.dispatch(toggleNavigation('nav1'));
+            store.dispatch(toggleNavigation('nav2'));
+            store.dispatch(setQuery('search something'));
+            store.dispatch(toggleFilter('service', 'serv1'));
+            store.dispatch(toggleFilter('service', 'serv2'));
+            store.dispatch(setCreatedFilter({from: 'now/M'}));
+
+            actions.search(store.getState());
+            const url = server.get.calls.argsFor(0)[0];
+
+            expect(url).toContain('q=search%20something');
+            expect(url).toContain('navigation=nav1,nav2');
+            expect(url).toContain('filter=%7B%22service%22%3A%5B%22serv1%22%2C%22serv2%22%5D%7D');
+            expect(url).toContain('created_from=now/M&created_to=now/M');
+        });
+
+        it('can search using myTopic', () => {
+            store.dispatch(initData({
+                ui_config: {multi_select_topics: true},
+                topics: [{
+                    _id: 'topic1',
+                    created: {from: 'now/M'},
+                    query: 'search something',
+                    filter: {service: ['serv1', 'serv2']},
+                    navigation: ['nav1', 'nav2'],
+                }],
+            }));
+            store.dispatch(loadMyTopic('topic1'));
+
+            actions.search(store.getState());
+            const url = server.get.calls.argsFor(0)[0];
+
+            expect(url).toContain('q=search%20something');
+            expect(url).toContain('navigation=nav1,nav2');
+            expect(url).toContain('filter=%7B%22service%22%3A%5B%22serv1%22%2C%22serv2%22%5D%7D');
+            expect(url).toContain('created_from=now/M&created_to=now/M');
+        });
     });
 });

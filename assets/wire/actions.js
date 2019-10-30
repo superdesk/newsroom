@@ -177,7 +177,7 @@ export function printItem(item) {
  * @param {bool} next
  * @return {Promise}
  */
-function search(state, next) {
+export function search(state, next) {
     const searchParams = searchParamsSelector(state);
     const createdFilter = get(searchParams, 'created') || {};
     let created_to = createdFilter.to;
@@ -190,7 +190,7 @@ function search(state, next) {
     const context = get(state, 'context', 'wire');
 
     const params = {
-        q: searchParams.query,
+        q: !searchParams.query ? null : encodeURIComponent(searchParams.query),
         bookmarks: state.bookmarks && state.user,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),
         filter: !isEmpty(searchParams.filter) && encodeURIComponent(JSON.stringify(searchParams.filter)),

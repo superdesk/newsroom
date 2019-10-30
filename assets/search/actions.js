@@ -62,7 +62,7 @@ export function toggleNavigation(navigation) {
         const state = getState();
         const currentNavigation = searchNavigationSelector(state);
         let newNavigation = [...currentNavigation];
-        const navigationId = get(navigation, '_id');
+        const navigationId = get(navigation, '_id') || navigation;
 
         if (!navigationId) {
             // If no id has been provided, then we select all topics
