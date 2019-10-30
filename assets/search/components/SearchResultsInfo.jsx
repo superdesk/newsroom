@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import 'react-toggle/style.css';
 import {connect} from 'react-redux';
-import {isEmpty, get, merge} from 'lodash';
+import {isEmpty, get} from 'lodash';
 
 import {gettext} from 'utils';
 
