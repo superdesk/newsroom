@@ -48,6 +48,8 @@ class TopicEditor extends React.Component {
             topic: topic,
             saving: false,
             valid: !get(topic, '_id'),
+        }, () => {
+            this.updateFormValidity(topic);
         });
     }
 
@@ -62,7 +64,8 @@ class TopicEditor extends React.Component {
             this.setState({valid: true});
         } else if (original._id) {
             // Otherwise the form is not dirty
-            this.setState({valid: false});
+            // Set the valid flag to true if in fullscreen
+            this.setState({valid: this.props.editorFullscreen});
         }
     }
 

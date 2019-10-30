@@ -21,13 +21,12 @@ class SearchResultsInfo extends React.Component {
     }
 
     saveMyTopic() {
-        const item = merge(
+        this.props.saveMyTopic(Object.assign(
+            {},
             this.props.activeTopic,
             this.props.searchParams,
             {topic_type: this.props.topicType}
-        );
-
-        this.props.saveMyTopic(item);
+        ));
     }
 
     render() {

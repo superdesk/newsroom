@@ -98,6 +98,7 @@ export default function itemReducer(state = initialState, action) {
         return {
             ...state,
             selectedItem: action.item,
+            editorFullscreen: false,
         };
     }
 
