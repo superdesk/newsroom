@@ -1,6 +1,7 @@
-import { gettext, notify, errorHandler } from 'utils';
+import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
-import { initSections } from 'features/sections/actions';
+import {initSections} from 'features/sections/actions';
+import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_PRODUCT = 'SELECT_PRODUCT';
@@ -21,11 +22,6 @@ export function newProduct() {
 export const CANCEL_EDIT = 'CANCEL_EDIT';
 export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
-}
-
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    return {type: SET_QUERY, query};
 }
 
 export const QUERY_PRODUCTS = 'QUERY_PRODUCTS';
@@ -71,7 +67,7 @@ export function setError(errors) {
 export function fetchProducts() {
     return function (dispatch, getState) {
         dispatch(queryProducts());
-        const query = getState().query || '';
+        const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/products/search?q=${query}`)
             .then((data) => dispatch(getProducts(data)))

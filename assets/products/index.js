@@ -4,7 +4,7 @@ import ProductsApp from './components/ProductsApp';
 import { initViewData } from './actions';
 
 
-const store = createStore(productReducer);
+const store = createStore(productReducer, 'Products');
 
 
 if (window.viewData) {

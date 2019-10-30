@@ -106,7 +106,7 @@ AgendaFilters.propTypes = {
     activeFilter: PropTypes.object,
     eventsOnlyAccess: PropTypes.bool,
     eventsOnlyView: PropTypes.bool,
-    locators: PropTypes.object,
+    locators: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default AgendaFilters;

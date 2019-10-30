@@ -20,7 +20,7 @@ import {
 } from '../search/actions';
 
 
-const store = createStore(wireReducer);
+const store = createStore(wireReducer, 'AM');
 
 // init data
 store.dispatch(initData(getInitData(window.amNewsData), getReadItems(), false));
@@ -47,7 +47,6 @@ window.onpopstate = function(event) {
         if (!isMobilePhone()) {
             store.dispatch(setState(event.state));
         }
-        
     }
 };
 

@@ -5,8 +5,8 @@ import { gettext } from 'utils';
 import {
     newCompany,
     fetchCompanies,
-    setQuery,
 } from '../actions';
+import {setSearchQuery} from 'search/actions';
 import Companies from './Companies';
 import ListBar from 'components/ListBar';
 
@@ -57,7 +57,7 @@ CompaniesApp.propTypes = {
 const mapDispatchToProps = {
     newCompany,
     fetchCompanies,
-    setQuery,
+    setQuery: setSearchQuery,
 };
 
 export default connect(null, mapDispatchToProps)(CompaniesApp);
