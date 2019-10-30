@@ -4,6 +4,8 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
+import {noNavigationSelected} from 'search/utils';
+
 import BaseApp from '../../layout/components/BaseApp';
 import SearchBar from 'search/components/SearchBar';
 import SearchResultsInfo from 'search/components/SearchResultsInfo';
@@ -56,7 +58,7 @@ class AmNewsApp extends BaseApp {
     }
 
     getSnapshotBeforeUpdate(prevProps) {
-        if (prevProps.itemToOpen && !this.props.itemToOpen && !this.props.activeNavigation) {
+        if (prevProps.itemToOpen && !this.props.itemToOpen && noNavigationSelected(this.props.activeNavigation)) {
             // enable first navigation
             this.props.toggleNavigation(get(this.props, 'navigations[0]'));
         }
