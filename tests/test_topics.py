@@ -157,7 +157,7 @@ def test_share_agenda_topics(client, app):
             session['user'] = user_id
             session['name'] = 'tester'
         resp = client.post('/topic_share', data=json.dumps({
-            'items': [agenda_topic],
+            'items': agenda_topic,
             'users': [test_user_id],
             'message': 'Some info message',
         }), content_type='application/json')
