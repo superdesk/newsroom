@@ -130,7 +130,7 @@ def test_share_wire_topics(client, app):
             session['user'] = user_id
             session['name'] = 'tester'
         resp = client.post('/topic_share', data=json.dumps({
-            'items': [topic],
+            'items': topic,
             'users': [test_user_id],
             'message': 'Some info message',
         }), content_type='application/json')
