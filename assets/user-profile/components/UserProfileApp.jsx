@@ -27,11 +27,7 @@ import ProfileToggle from './ProfileToggle';
 
 import '../style';
 
-const modals = {
-    shareItem: ShareItemModal,
-};
-
-
+const modals = { shareItem: ShareItemModal };
 
 class UserProfileApp extends React.Component {
     constructor(props, context) {
@@ -59,6 +55,15 @@ class UserProfileApp extends React.Component {
                 label: gettext('My Agenda Topics'),
                 content: FollowedTopics,
                 type: 'agenda',
+            });
+        }
+
+        if (this.isSectionEnabled('watch_lists')) {
+            this.links.push({
+                name: 'watch_lists',
+                label: gettext('My Watch Lists'),
+                content: FollowedTopics,
+                type: 'watch_lists',
             });
         }
     }

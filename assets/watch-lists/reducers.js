@@ -11,9 +11,10 @@ import {
     SELECT_WATCH_LIST,
     SET_WATCH_LIST_COMPANIES,
     SET_SCHEDULE_MODE,
+    SET_USER_COMPANY_WATCH_LISTS,
 } from './actions';
 
-import {GET_COMPANY_USERS} from '../companies/actions';
+import {GET_COMPANY_USERS} from 'companies/actions';
 
 const initialState = {
     companies: [],
@@ -117,6 +118,9 @@ export default function userReducer(state = initialState, action) {
             ...state,
             scheduleMode: !state.scheduleMode,
         };
+
+    case SET_USER_COMPANY_WATCH_LISTS: 
+        return {...state, watchLists: action.data};     
 
     default:
         return state;

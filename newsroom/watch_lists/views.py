@@ -4,15 +4,16 @@ from flask import jsonify
 from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound
-from newsroom.auth.views import is_current_user_admin, is_current_user
 from newsroom.decorator import admin_only, login_required
 from newsroom.watch_lists import blueprint
 from .forms import WatchListsForm
-from newsroom.utils import query_resource, find_one, get_items_by_id
+from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404
+from newsroom.template_filters import is_admin
+from newsroom.auth import get_user
 
 
 def get_settings_data():
-    return {"companies": list(query_resource('companies'))}
+    return {"companies": list(query_resource('companies', lookup={'sections.watch_lists': True}))}
 
 
 @blueprint.route('/watch_lists/<id>/users', methods=['POST'])
@@ -42,7 +43,6 @@ def update_schedule(id):
 
 
 @blueprint.route('/watch_lists/search', methods=['GET'])
-@admin_only
 def search():
     watch_lists = list(query_resource('watch_lists'))
     return jsonify(watch_lists), 200
@@ -71,9 +71,6 @@ def create():
 @blueprint.route('/watch_lists/<_id>', methods=['GET', 'POST'])
 @login_required
 def edit(_id):
-    if not is_current_user_admin() and not is_current_user(_id):
-        flask.abort(401)
-
     watch_list = find_one('watch_lists', _id=ObjectId(_id))
     if not watch_list:
         return NotFound(gettext('Watch List not found'))
@@ -81,12 +78,29 @@ def edit(_id):
     if flask.request.method == 'POST':
         form = WatchListsForm(watch_list=watch_list)
         if form.validate_on_submit():
-
             updates = form.data
+            request_updates = flask.request.get_json()
+
+            # If the updates have anything other than 'users', only admin or watch_list_admin can update
+            if len(request_updates.keys()) == 1 and 'users' not in request_updates:
+                user = get_user()
+                if not is_admin(user):
+                    return jsonify({'error': 'Bad request'}), 400
+
+                company = get_entity_or_404(watch_list['company'], 'companies')
+                if str(user['_id']) != str(company.get('watch_list_administrator')):
+                    return jsonify({'error': 'Bad request'}), 400
+
+            if 'schedule' in request_updates:
+                updates['schedule'] = request_updates['schedule']
+
+            if 'users' in request_updates:
+                updates['users'] = [ObjectId(u) for u in request_updates['users']]
+
             if form.company.data:
                 updates['company'] = ObjectId(form.company.data)
 
-            watch_list = get_resource_service('watch_lists').patch(ObjectId(_id), updates=updates)
+            get_resource_service('watch_lists').patch(ObjectId(_id), updates=updates)
             return jsonify({'success': True}), 200
         return jsonify(form.errors), 400
     return jsonify(watch_list), 200

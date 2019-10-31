@@ -18,7 +18,7 @@ class WatchListsForm(FlaskForm):
     name = StringField(gettext('Name'), validators=[DataRequired()])
     subject = StringField(gettext('Subject'))
     description = StringField(gettext('Description'))
-    alert_type = SelectField(gettext('Alert Type'), choices=alert_types)
+    alert_type = SelectField(gettext('Alert Type'), choices=alert_types, default='full_text')
     company = StringField(gettext('Company'), validators=[DataRequired()])
     is_enabled = BooleanField(gettext('Enabled'), default=True, validators=[])
     query = TextAreaField(gettext('Query'))

@@ -58,6 +58,9 @@ class CompaniesResource(newsroom.Resource):
         'account_manager': {
             'type': 'string'
         },
+        'watch_list_administrator': {
+            'type': 'ObjectId'
+        }
     }
     datasource = {
         'source': 'companies',

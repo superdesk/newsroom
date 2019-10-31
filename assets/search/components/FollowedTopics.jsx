@@ -18,6 +18,7 @@ import {
     topicEditorFullscreenSelector,
 } from 'user-profile/selectors';
 
+import WatchListEditor from 'search/components/WatchListEditor';
 import TopicEditor from 'search/components/TopicEditor';
 import TopicList from 'search/components/TopicList';
 
@@ -35,15 +36,22 @@ class FollowedTopics extends React.Component {
             name: gettext('Edit'),
             icon: 'edit',
             action: this.editTopic,
-        }, {
-            name: gettext('Share'),
-            icon: 'share',
-            action: this.props.shareTopic,
-        }, {
-            name: gettext('Delete'),
-            icon: 'trash',
-            action: this.deleteTopic,
         }];
+
+        if (!this.props.topicType === 'watch_lists') {
+            this.actions = [
+                ...this.actions,
+                {
+                    name: gettext('Share'),
+                    icon: 'share',
+                    action: this.props.shareTopic,
+                }, {
+                    name: gettext('Delete'),
+                    icon: 'trash',
+                    action: this.deleteTopic,
+                }
+            ];
+        }
     }
 
     componentDidMount() {
@@ -77,6 +85,10 @@ class FollowedTopics extends React.Component {
     }
 
     getFilteredTopics() {
+        if (this.props.topicType === 'watch_lists') {
+            return this.props.watchLists;
+        }
+
         return this.props.topics.filter(
             (topic) => topic.topic_type === this.props.topicType
         );
@@ -84,6 +96,10 @@ class FollowedTopics extends React.Component {
 
     onTopicChanged() {
         this.props.fetchTopics();
+    }
+
+    isWatchListAdmin() {
+        return this.props.watchListAdministrator === get(this.props, 'user._id');
     }
 
     render() {
@@ -104,13 +120,18 @@ class FollowedTopics extends React.Component {
                         />
                     </div>
                 )}
-                {this.props.selectedItem && (
+                {this.props.selectedItem && (this.props.topicType === 'watch_lists' ?
+                    <WatchListEditor
+                        item={this.props.selectedItem}
+                        closeEditor={this.closeEditor}
+                        onTopicChanged={this.onTopicChanged}
+                        isAdmin={this.isWatchListAdmin()}
+                    /> :
                     <TopicEditor
                         topic={this.props.selectedItem}
                         closeEditor={this.closeEditor}
                         onTopicChanged={this.onTopicChanged}
-                    />
-                )}
+                    />)}
             </div>
         );
     }
@@ -131,10 +152,15 @@ FollowedTopics.propTypes = {
     selectedItem: PropTypes.object,
     selectedMenu: PropTypes.string,
     editorFullscreen: PropTypes.bool,
+    watchLists: PropTypes.array,
+    watchListAdministrator: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
     topics: state.topics,
+    watchLists: state.watchLists,
+    watchListAdministrator: state.watchListAdministrator,
+    user: state.user,
     selectedItem: selectedItemSelector(state),
     selectedMenu: selectedMenuSelector(state),
     editorFullscreen: topicEditorFullscreenSelector(state),

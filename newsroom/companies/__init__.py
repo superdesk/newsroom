@@ -19,16 +19,21 @@ def get_user_company(user):
                                                                                                      'user') else None
 
 
-def get_company_sections(company_id):
+def get_company_sections_watch_list_data(company_id):
     """get the section configured for the company"""
     if not company_id:
-        return newsroom_app.sections
+        return {'userSections': newsroom_app.sections}
 
     company = superdesk.get_resource_service('companies').find_one(req=None, _id=company_id)
-    if not company or not company.get('sections'):
-        return newsroom_app.sections
 
-    return [s for s in newsroom_app.sections if company.get('sections').get(s['_id'])]
+    rv = {
+        'watch_list_administrator': (company or {}).get('watch_list_administrator'),
+        'userSections': newsroom_app.sections,
+    }
+    if company and company.get('sections'):
+        rv['userSections'] = [s for s in newsroom_app.sections if company.get('sections').get(s['_id'])]
+
+    return rv
 
 
 def get_user_company_name(user=None):

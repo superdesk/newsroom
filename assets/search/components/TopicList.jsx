@@ -27,7 +27,7 @@ const TopicList = ({topics, actions}) => {
             <div key={topic._id} className='simple-card-wrap col-12 col-lg-6'>
                 <div className="simple-card">
                     <div className="simple-card__header simple-card__header-with-icons">
-                        <h6 className="simple-card__headline">{topic.label}</h6>
+                        <h6 className="simple-card__headline">{topic.label || topic.name}</h6>
                         <div className='simple-card__icons'>
                             {getActionButtons(topic)}
                         </div>

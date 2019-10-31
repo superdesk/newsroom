@@ -1,7 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const SelectInput = ({name, label, onChange, defaultOption, value, error, options, className}) => {
+const SelectInput = ({
+    name,
+    label,
+    onChange,
+    defaultOption,
+    value,
+    error,
+    options,
+    className,
+    readOnly}) => {
     return (
         <div className={className ? className : 'form-group'}>
             <label htmlFor={name}>{label}</label>
@@ -11,7 +20,8 @@ const SelectInput = ({name, label, onChange, defaultOption, value, error, option
                     name={name}
                     value={value}
                     onChange={onChange}
-                    className="form-control">
+                    className="form-control"
+                    disabled={readOnly}>
                     {defaultOption != null &&
                         <option value="">{defaultOption}</option>
                     }
@@ -37,6 +47,7 @@ SelectInput.propTypes = {
         value: PropTypes.string.isRequired,
     })).isRequired,
     className: PropTypes.string,
+    readOnly: PropTypes.bool,
 };
 
 export default SelectInput;

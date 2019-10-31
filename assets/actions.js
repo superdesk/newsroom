@@ -41,3 +41,8 @@ export function modalFormInvalid() {
         return Promise.resolve();
     };
 }
+
+export const USER_PROFILE_CLOSED = 'USER_PROFILE_CLOSED';
+export function userProfileClosed() {
+    return {type: USER_PROFILE_CLOSED};
+}
