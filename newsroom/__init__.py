@@ -8,7 +8,7 @@ Superdesk Newsroom
 import superdesk
 from superdesk import register_resource  # noqa
 
-__version__ = '1.15.2'
+__version__ = '1.16.0'
 
 # reuse content api dbs
 MONGO_PREFIX = 'CONTENTAPI_MONGO'

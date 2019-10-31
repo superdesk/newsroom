@@ -1,5 +1,22 @@
 # Newsroom Changelog
 
+## [1.16.0] 31-10-31
+### Features
+- None
+
+### Improvements
+- [SDAN-582] Save topic with multiple navigations (#876)
+- [SDAN-581] Allow multi-selecting Navigation topics (#850)
+
+### Fixes
+- [SDAN-605] Image and Video coverages are not showing a 'coverage available' date/time (#874)
+- [SDAN-608] 'View Content' button not visible on some coverages in Full View Mode (#873)
+- [SDAN-602] 'Update to come' was not clearing when news item related to agenda was published (#868)
+- [SDAN-604] Preview of an Event fails if the links attribute is null (#872)
+- [SDAN-602] Coverage Status text should not change before an Update has been published (#867)
+- [SDAN-582](fix): Agenda featured toggle not showing (#879)
+- [SDAN-582](fix): Unable to create or update My Agenda topic (#880)
+
 ## [1.15.2] 2019-10-17
 ### Features
 - None
