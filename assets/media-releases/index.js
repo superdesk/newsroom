@@ -18,7 +18,7 @@ import {
 } from 'search/actions';
 
 
-const store = createStore(wireReducer);
+const store = createStore(wireReducer, 'MediaReleases');
 
 // init data
 store.dispatch(initData(getInitData(window.mediaReleasesData), getReadItems(), false));

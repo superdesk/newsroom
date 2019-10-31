@@ -5,16 +5,16 @@ import {
     SELECT_CARD,
     EDIT_CARD,
     QUERY_CARDS,
-    SET_QUERY,
     CANCEL_EDIT,
     NEW_CARD,
     SET_ERROR,
     GET_PRODUCTS,
     GET_NAVIGATIONS,
 } from './actions';
-import { INIT_DASHBOARD, SELECT_DASHBOARD } from 'features/dashboard/actions';
-import { dashboardReducer } from 'features/dashboard/reducers';
-import { getCard } from 'components/cards/utils';
+import {INIT_DASHBOARD, SELECT_DASHBOARD} from 'features/dashboard/actions';
+import {dashboardReducer} from 'features/dashboard/reducers';
+import {searchReducer} from 'search/reducers';
+import {getCard} from 'components/cards/utils';
 
 
 const initialState = {
@@ -28,6 +28,7 @@ const initialState = {
     products: [],
     navigations: [],
     dashboards: dashboardReducer(),
+    search: searchReducer(),
 };
 
 export default function cardReducer(state = initialState, action) {
@@ -59,9 +60,9 @@ export default function cardReducer(state = initialState, action) {
         }
 
         if (field === 'type') {
-            if (target.value == '2x2-events') {
+            if (target.value === '2x2-events') {
                 card['config'] = {events: [{}, {}, {}, {}]};
-            } else if (target.value == '4-photo-gallery') {
+            } else if (target.value === '4-photo-gallery') {
                 card['config'] = {sources: [{}, {}, {}, {}]};
             } else {
                 card['config'] = {};
@@ -105,9 +106,6 @@ export default function cardReducer(state = initialState, action) {
         return {...state, cardToEdit: null, errors: null};
     }
 
-    case SET_QUERY:
-        return {...state, query: action.query};
-
     case SET_ERROR:
         return {...state, errors: action.errors};
 
@@ -125,7 +123,13 @@ export default function cardReducer(state = initialState, action) {
             return card._id;
         });
 
-        return {...state, cards, cardsById, isLoading: false, totalCards: cards.length};
+        return {
+            ...state,
+            cards,
+            cardsById,
+            isLoading: false,
+            totalCards: cards.length,
+        };
     }
 
     case GET_PRODUCTS: {
@@ -140,7 +144,14 @@ export default function cardReducer(state = initialState, action) {
     case SELECT_DASHBOARD:
         return {...state, dashboards: dashboardReducer(state.dashboards, action)};
 
-    default:
+    default: {
+        const search = searchReducer(state.search, action);
+
+        if (search !== state.search) {
+            return {...state, search};
+        }
+
         return state;
+    }
     }
 }

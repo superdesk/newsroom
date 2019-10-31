@@ -4,7 +4,7 @@ import NavigationsApp from './components/NavigationsApp';
 import { initViewData } from './actions';
 
 
-const store = createStore(navigationReducer);
+const store = createStore(navigationReducer, 'Navigations');
 
 
 if (window.viewData) {

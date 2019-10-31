@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import {get, cloneDeep, uniqBy} from 'lodash';
 import {gettext} from 'utils';
 
 import NavGroup from './NavGroup';
@@ -38,16 +38,23 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
     const compareFunction = (a, b) => group.sorted ? -1 : String(a.key).localeCompare(String(b.key));
 
     const groupFilter = get(activeFilter, group.field, []);
-
-    const buckets =  aggregations && aggregations[group.field] ? get(aggregations[group.field], 'buckets', group.buckets)
+    const activeBuckets = (get(activeFilter, group.field) || [])
+        .map((filter) => ({key: filter}));
+    const buckets = uniqBy(
+        cloneDeep(get(aggregations, `${group.field}.buckets`) || group.buckets || [])
+            .concat(activeBuckets),
+        'key'
+    )
         .sort(compareFunction)
-        .map((bucket) => <FilterItem
-            key={bucket.key}
-            bucket={bucket}
-            group={group}
-            toggleFilter={toggleFilter}
-            groupFilter={groupFilter}
-        />) : [];
+        .map((bucket) => (
+            <FilterItem
+                key={bucket.key}
+                bucket={bucket}
+                group={group}
+                toggleFilter={toggleFilter}
+                groupFilter={groupFilter}
+            />
+        ));
 
     return (
         <NavGroup key={group.field} label={group.label}>

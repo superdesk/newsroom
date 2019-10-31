@@ -1,6 +1,6 @@
-import { gettext, notify, errorHandler } from 'utils';
+import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
-
+import {searchQuerySelector} from 'search/selectors';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id) {
@@ -26,11 +26,6 @@ export function newUser(data) {
 export const CANCEL_EDIT = 'CANCEL_EDIT';
 export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
-}
-
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    return {type: SET_QUERY, query};
 }
 
 export const QUERY_USERS = 'QUERY_USERS';
@@ -75,7 +70,7 @@ export function toggleSortDirection() {
 export function fetchUsers() {
     return function (dispatch, getState) {
         dispatch(queryUsers());
-        const query = getState().query || '';
+        const query = searchQuerySelector(getState()) || '';
         const filter = getState().company &&
             getState().company !== '' ? '&where={"company":"' + getState().company + '"}' : '';
         const sort = !getState().sort ? '' :

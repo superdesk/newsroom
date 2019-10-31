@@ -18,7 +18,7 @@ from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
 from newsroom.template_filters import is_admin_or_internal, is_admin
-from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404
+from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404, parse_date_str
 from newsroom.wire.search import query_string, set_product_query, \
     planning_items_query_string, nested_query
 from newsroom.wire.utils import get_local_date, get_end_date
@@ -511,11 +511,15 @@ class AgendaService(newsroom.Service):
         get_resource_service('section_filters').apply_section_filter(query, self.section)
         product_query = {'bool': {'must': [], 'should': []}}
 
+        navigation_id = req.args.get('navigation')
+        if navigation_id:
+            navigation_id = list(navigation_id.split(','))
+
         set_product_query(
             product_query,
             company,
             self.section,
-            navigation_id=req.args.get('navigation'),
+            navigation_id=navigation_id,
             events_only=is_events_only
         )
         query['bool']['must'].append(product_query)
@@ -748,6 +752,13 @@ class AgendaService(newsroom.Service):
                     coverage['delivery_href'] = url_for_wire(None, _external=False, section='wire.item',
                                                              _id=wire_item['guid'])
                     coverage['workflow_status'] = ASSIGNMENT_WORKFLOW_STATE.COMPLETED
+                    deliveries = coverage['deliveries']
+                    d = next((d for d in deliveries if d.get('delivery_id') == wire_item['guid']), None)
+                    if d and d.get('delivery_state') != 'published':
+                        d['delivery_state'] = 'published'
+                        d['publish_time'] = parse_date_str(wire_item.get('publish_schedule') or
+                                                           wire_item.get('firstpublished'))
+
                     self.system_update(item['_id'], {'coverages': coverages}, item)
                     updated_agenda = get_entity_or_404(item.get('_id'), 'agenda')
 

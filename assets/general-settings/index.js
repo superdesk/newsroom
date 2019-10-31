@@ -4,7 +4,7 @@ import GeneralSettingsApp from './components/GeneralSettingsApp';
 import { initViewData } from './actions';
 
 
-const store = createStore(settingsReducer);
+const store = createStore(settingsReducer, 'GeneralSettings');
 
 
 if (window.viewData) {

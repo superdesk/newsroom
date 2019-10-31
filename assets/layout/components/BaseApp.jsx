@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { isTouchDevice, gettext } from 'utils';
 
 // tabs
-import TopicsTab from 'wire/components/TopicsTab';
+import TopicsTab from 'search/components/TopicsTab';
 import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
 
@@ -44,11 +44,17 @@ export default class BaseApp extends React.Component {
             return null;
         }
 
-        let name = get(navigations.find((nav) => nav._id === activeNavigation), 'name', '');
-        if (!name && activeTopic) {
+        let name;
+        const numNavigations = get(activeNavigation, 'length', 0);
+
+        if (activeTopic) {
             name = `/ ${activeTopic.label}`;
-        } else if (name) {
-            name = `/ ${name}`;
+        } else if (numNavigations > 1) {
+            name = '/ ' + gettext('Custom View');
+        } else if (numNavigations === 1) {
+            name = '/ ' + get(navigations.find((nav) => nav._id === activeNavigation[0]), 'name', '');
+        } else {
+            name = '';
         }
 
         return createPortal(name , dest);

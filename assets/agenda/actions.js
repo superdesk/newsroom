@@ -1,5 +1,6 @@
-
 import { get, isEmpty, includes } from 'lodash';
+import moment from 'moment';
+
 import server from 'server';
 import analytics from 'analytics';
 import {
@@ -13,6 +14,7 @@ import {
     TIME_FORMAT,
     recordAction
 } from 'utils';
+import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
 
 import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
 import { renderModal, closeModal, setSavedItemsCount } from 'actions';
@@ -26,20 +28,17 @@ import {
 } from './utils';
 
 import {
-    setQuery,
-    toggleTopic,
-    resetFilter,
     toggleFilter,
-    toggleNavigation,
-    setCreatedFilter,
-    toggleNavigationById,
     initParams as initSearchParams,
+    setNewItemsByTopic,
+    loadTopics,
+    setTopics,
+    loadMyTopic,
 } from 'search/actions';
+import {searchParamsSelector} from 'search/selectors';
 
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
-import moment from 'moment';
-
 
 const WATCH_URL = '/agenda_watch';
 
@@ -157,11 +156,6 @@ export function initData(agendaData, readData, activeDate, featuredOnly) {
     return {type: INIT_DATA, agendaData, readData, activeDate, featuredOnly};
 }
 
-export const ADD_TOPIC = 'ADD_TOPIC';
-export function addTopic(topic) {
-    return {type: ADD_TOPIC, topic};
-}
-
 export const SELECT_DATE = 'SELECT_DATE';
 export function selectDate(dateString, grouping) {
     return {type: SELECT_DATE, dateString, grouping};
@@ -260,21 +254,32 @@ export function copyPreviewContents(item) {
  */
 function search(state, next) {
     const currentMoment = moment();
-    const activeFilter = get(state, 'search.activeFilter', {});
-    const activeNavigation = get(state, 'search.activeNavigation');
-    const createdFilter = get(state, 'search.createdFilter', {});
-    const eventsOnlyFilter = !state.bookmarks && get(state, 'agenda.eventsOnlyView', false);
-    const featuredFilter = !activeNavigation && !state.bookmarks && !eventsOnlyFilter && get(state, 'agenda.featuredOnly');
+    const searchParams = searchParamsSelector(state);
+    const createdFilter = get(searchParams, 'created') || {};
+
+    const eventsOnlyFilter = !state.bookmarks &&
+        get(state, 'agenda.eventsOnlyView', false);
+
+    const featuredFilter = noNavigationSelected(searchParams.navigation) &&
+        !state.bookmarks &&
+        !eventsOnlyFilter &&
+        get(state, 'agenda.featuredOnly');
+
     let fromDateFilter;
 
     if (featuredFilter) {
-        fromDateFilter = getMomentDate(get(state, 'agenda.activeDate'))
-            .set({hour: currentMoment.hour(), minute: currentMoment.minute()}).format(`${DATE_FORMAT} ${TIME_FORMAT}`);
+        fromDateFilter = getMomentDate(get(state, 'agenda.activeDate')).set({
+            hour: currentMoment.hour(),
+            minute: currentMoment.minute()
+        }).format(`${DATE_FORMAT} ${TIME_FORMAT}`);
     } else {
         const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
-        fromDateFilter = isEmpty(createdFilter.from) && isEmpty(createdFilter.to) && !(state.bookmarks && state.user) ? agendaDate : createdFilter.from;
+        fromDateFilter = (
+            isEmpty(createdFilter.from) &&
+            isEmpty(createdFilter.to) &&
+            !(state.bookmarks && state.user)
+        ) ? agendaDate : createdFilter.from;
     }
-
 
     let dateTo = createdFilter.to;
     if (createdFilter.from && createdFilter.from.indexOf('now') >= 0) {
@@ -282,11 +287,11 @@ function search(state, next) {
     }
 
     const params = {
-        q: state.query,
+        q: searchParams.query,
         id: state.queryId,
         bookmarks: state.bookmarks && state.user,
-        navigation: activeNavigation,
-        filter: !isEmpty(activeFilter) && JSON.stringify(activeFilter),
+        navigation: getNavigationUrlParam(searchParams.navigation, true, false),
+        filter: !isEmpty(searchParams.filter) && encodeURIComponent(JSON.stringify(searchParams.filter)),
         from: next ? state.items.length : 0,
         date_from: fromDateFilter,
         date_to: dateTo,
@@ -306,22 +311,13 @@ function search(state, next) {
 /**
  * Fetch items for current query
  */
-export function fetchItems(updateRoute = true) {
+export function fetchItems() {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
         return search(getState())
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
-                const state = getState();
-                updateRoute && updateRouteParams({
-                    q: state.query,
-                    filter: get(state, 'search.activeFilter'),
-                    navigation: get(state, 'search.activeNavigation'),
-                    created: get(state, 'search.createdFilter'),
-                    eventsOnlyView: get(state, 'agenda.eventsOnlyView', false) ? true : null,
-                    featured: get(state, 'agenda.featuredOnly', false) ? true : null,
-                }, state);
                 analytics.timingComplete('search', Date.now() - start);
             })
             .catch(errorHandler);
@@ -357,7 +353,7 @@ export function stopWatchingEvents(items) {
                 notify.success(gettext('Stopped watching items successfully.'));
                 if (getState().bookmarks) {
                     if (includes(items, getState().previewItem)) { // close preview if it's opened
-                        dispatch(previewItem()); 
+                        dispatch(previewItem());
                     }
 
                     dispatch(fetchItems()); // item should get removed from the list in bookmarks view
@@ -365,18 +361,6 @@ export function stopWatchingEvents(items) {
                     dispatch({type: STOP_WATCHING_EVENTS, items: items});
                 }
             });
-    };
-}
-
-export function submitFollowTopic(data) {
-    return (dispatch, getState) => {
-        const user = getState().user;
-        const url = `/api/users/${user}/topics`;
-        data.timezone_offset = getTimezoneOffset();
-        return server.post(url, data)
-            .then((updates) => dispatch(addTopic(Object.assign(data, updates))))
-            .then(() => dispatch(closeModal()))
-            .catch(errorHandler);
     };
 }
 
@@ -395,29 +379,6 @@ export function shareItems(items) {
             .catch(errorHandler);
     };
 }
-
-/**
- * Submit share item form and close modal if that works
- *
- * @param {Object} data
- */
-export function submitShareItem(data) {
-    return (dispatch, getState) => {
-        return server.post('/agenda_share', data)
-            .then(() => {
-                if (data.items.length > 1) {
-                    notify.success(gettext('Items were shared successfully.'));
-                } else {
-                    notify.success(gettext('Item was shared successfully.'));
-                }
-                dispatch(closeModal());
-            })
-            .then(() => multiItemEvent('share', data.items, getState()))
-            .then(() => dispatch(setShareItems(data.items)))
-            .catch(errorHandler);
-    };
-}
-
 
 export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
 export function setBookmarkItems(items) {
@@ -511,11 +472,6 @@ export function submitDownloadItems(items, format) {
     };
 }
 
-export const SET_NEW_ITEMS_BY_TOPIC = 'SET_NEW_ITEMS_BY_TOPIC';
-export function setNewItemsByTopic(data) {
-    return {type: SET_NEW_ITEMS_BY_TOPIC, data};
-}
-
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
 export function removeNewItems(data) {
@@ -540,26 +496,31 @@ export function pushNotification(push) {
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
 
+        case `topic_created:${user}`:
+            return dispatch(reloadTopics(user, true));
+
         case `saved_items:${user}`:
             return dispatch(setSavedItemsCount(push.extra.count));
         }
     };
 }
 
-function reloadTopics(user) {
+function reloadTopics(user, reloadTopic = false) {
     return function (dispatch) {
-        return server.get(`/users/${user}/topics`)
+        return loadTopics(user)
             .then((data) => {
                 const agendaTopics = data._items.filter((topic) => topic.topic_type === 'agenda');
-                return dispatch(setTopics(agendaTopics));
+                dispatch(setTopics(agendaTopics));
+
+                if (reloadTopic) {
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('topic')) {
+                        dispatch(loadMyAgendaTopic(params.get('topic')));
+                    }
+                }
             })
             .catch(errorHandler);
     };
-}
-
-export const SET_TOPICS = 'SET_TOPICS';
-function setTopics(topics) {
-    return {type: SET_TOPICS, topics};
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
@@ -573,7 +534,7 @@ export function setAndUpdateNewItems(data) {
             if (get(data, '_items[0].type') !== 'text' || (!state.previewItem && !state.openItem)) {
                 return Promise.resolve();
             }
-            
+
             const agendaItem = state.openItem ? state.openItem : state.itemsById[state.previewItem];
             if (!agendaItem || get(agendaItem, 'coverages.length', 0) === 0) {
                 return Promise.resolve();
@@ -676,21 +637,17 @@ export function initParams(params) {
 /**
  * Set query for given topic
  *
- * @param {Object} topic
+ * @param {String} topicId
  * @return {Promise}
  */
-export function setEventQuery(topic) {
+export function loadMyAgendaTopic(topicId) {
     return (dispatch, getState) => {
         // Set featured query option to false when using navigations
         if (get(getState(), 'agenda.featuredOnly')) {
             dispatch({type: TOGGLE_FEATURED_FILTER});
         }
 
-        topic.navigation ? dispatch(toggleNavigationById(topic.navigation)) : dispatch(toggleNavigation());
-        dispatch(toggleTopic(topic));
-        dispatch(setQuery(topic.query));
-        dispatch(resetFilter(topic.filter));
-        dispatch(setCreatedFilter(topic.created));
+        dispatch(loadMyTopic(topicId));
         return dispatch(fetchItems());
     };
 }
@@ -712,7 +669,7 @@ export function toggleFeaturedFilter(fetch = true) {
         }
 
         return dispatch(fetchItems());
-    };   
+    };
 }
 
 export const TOGGLE_EVENTS_ONLY_FILTER = 'TOGGLE_EVENTS_ONLY_FILTER';

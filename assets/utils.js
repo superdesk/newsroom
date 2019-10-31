@@ -28,13 +28,22 @@ export const LIST_ANIMATIONS = getConfig('list_animations', true);
  * Create redux store with default middleware
  *
  * @param {func} reducer
+ * @param {String} name
  * @return {Store}
  */
-export function createStore(reducer) {
+export function createStore(reducer, name = 'default') {
     const logger = createLogger({
         duration: true,
         collapsed: true,
         timestamp: false,
+        titleFormatter: (action, time, took) => (
+            // Adds the name of the store to the console logs
+            // derived based on the defaultTitleFormatter from redux-logger
+            // https://github.com/LogRocket/redux-logger/blob/master/src/core.js#L25
+            (action && action.type) ?
+                `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)` :
+                `${name} - action (in ${took.toFixed(2)} ms)`
+        ),
     });
 
     return _createStore(reducer, applyMiddleware(thunk, logger));
@@ -437,12 +446,12 @@ export function toggleValue(items, value) {
 }
 
 
-export function updateRouteParams(updates, state) {
+export function updateRouteParams(updates, state, deleteEmpty = true) {
     const params = new URLSearchParams(window.location.search);
 
     Object.keys(updates).forEach((key) => {
         let updatedValue = updates[key];
-        if (!isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
+        if (!deleteEmpty || !isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
             if (typeof updatedValue === 'object') {
                 updatedValue = JSON.stringify(updatedValue);
             }
@@ -451,7 +460,6 @@ export function updateRouteParams(updates, state) {
             params.delete(key);
         }
     });
-
 
     const stateClone = cloneDeep(state);
     stateClone.items = [];

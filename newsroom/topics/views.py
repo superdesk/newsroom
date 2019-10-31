@@ -31,7 +31,10 @@ def update_topic(id):
     updates = {
         'label': data.get('label'),
         'notifications': data.get('notifications', False),
-        'query': data.get('query')
+        'query': data.get('query'),
+        'created': data.get('created'),
+        'filter': data.get('filter'),
+        'navigation': data.get('navigation'),
     }
 
     get_resource_service('topics').patch(id=ObjectId(id), updates=updates)
@@ -68,7 +71,11 @@ def get_topic_url(topic):
     if topic.get('filter'):
         query_strings.append('filter={}'.format(parse.quote(json.dumps(topic.get('filter')))))
     if topic.get('navigation'):
-        query_strings.append('navigation={}'.format(topic.get('navigation')))
+        query_strings.append(
+            'navigation={}'.format(
+                ','.join(topic.get('navigation'))
+            )
+        )
     if topic.get('created'):
         query_strings.append('created={}'.format(parse.quote(json.dumps(topic.get('created')))))
 

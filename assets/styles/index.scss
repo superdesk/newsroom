@@ -964,12 +964,14 @@ article.list {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    padding: 10px 0px 0px 0px;
+    padding: 10px 0 0 0;
     position: relative;
+    overflow-y: hidden;
+
     .nav {
         flex: 0 0 44px;
-        margin-left: 0px;
-        margin-right: 0px;
+        margin-left: 0;
+        margin-right: 0;
         border-bottom: 1px solid $nav-sidebar-border;
     }
     .tab-content {
@@ -990,7 +992,6 @@ article.list {
                 right: 15px;
                 padding: 10px 20px 0 20px;
                 background: $nav-sidebar-bg;
-                opacity: 0.8;
 
                 &.reset {
                     bottom: 0;
@@ -998,6 +999,9 @@ article.list {
 
                 &.search {
                     bottom: 50px;
+                }
+
+                &--border {
                     border-top: 1px solid $nav-sidebar-border;
                 }
             }
@@ -2910,6 +2914,33 @@ a.wire-articles__versions {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+
+    &__topics {
+        flex-direction: row;
+    }
+
+    .list-item__preview {
+        top: 0;
+
+        &-header {
+            background-color: #3e4557;
+            color: #fff;
+        }
+
+        @include md {
+            top: 155px;
+
+            &-header {
+                background-color: unset;
+                color: unset;
+            }
+        }
+
+        &--new {
+            width: 100%;
+        }
+    }
+
     > .row {
         display: flex;
         align-content: flex-start;

@@ -1,6 +1,7 @@
-import { gettext, notify, errorHandler } from 'utils';
+import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
-import { initSections } from 'features/sections/actions';
+import {initSections} from 'features/sections/actions';
+import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_SECTION_FILTER = 'SELECT_SECTION_FILTER';
@@ -21,11 +22,6 @@ export function newSectionFilter() {
 export const CANCEL_EDIT = 'CANCEL_EDIT';
 export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
-}
-
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    return {type: SET_QUERY, query};
 }
 
 export const QUERY_SECTION_FILTERS = 'QUERY_SECTION_FILTERS';
@@ -51,7 +47,7 @@ export function setError(errors) {
 export function fetchSectionFilters() {
     return function (dispatch, getState) {
         dispatch(querySectionFilters());
-        const query = getState().query || '';
+        const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/section_filters/search?q=${query}`)
             .then((data) => dispatch(getSectionFilters(data)))

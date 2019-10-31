@@ -3,7 +3,7 @@ import companyReducer from './reducers';
 import CompaniesApp from './components/CompaniesApp';
 import { initViewData } from './actions';
 
-const store = createStore(companyReducer);
+const store = createStore(companyReducer, 'Company');
 
 
 if (window.viewData && window.viewData.companies) {

@@ -1,6 +1,7 @@
-import { gettext, notify, errorHandler } from 'utils';
+import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
-import { renderModal, closeModal } from 'actions';
+import {renderModal, closeModal} from 'actions';
+import {store as userProfileStore} from './store';
 
 export const GET_TOPICS = 'GET_TOPICS';
 export function getTopics(topics) {
@@ -27,10 +28,34 @@ export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
-
 export const SELECT_MENU = 'SELECT_MENU';
 export function selectMenu(data) {
     return {type: SELECT_MENU, data};
+}
+
+export const SET_TOPIC_EDITOR_FULLSCREEN = 'SET_TOPIC_EDITOR_FULLSCREEN';
+export function setTopicEditorFullscreen(fullscreen) {
+    return {type: SET_TOPIC_EDITOR_FULLSCREEN, payload: fullscreen};
+}
+
+export const SELECT_MENU_ITEM = 'SELECT_MENU_ITEM';
+export function selectMenuItem(item) {
+    return {type: SELECT_MENU_ITEM, item};
+}
+
+export function createOrUpdateTopic(menu, item, fullscreen) {
+    userProfileStore.dispatch(selectMenuItem(item));
+    userProfileStore.dispatch(selectMenu(menu));
+    userProfileStore.dispatch(setTopicEditorFullscreen(fullscreen));
+}
+
+export const SELECT_PROFILE_MENU = 'SELECT_PROFILE_MENU';
+export function selectProfileMenu({menu, item}) {
+    userProfileStore.dispatch({
+        type: SELECT_PROFILE_MENU,
+        menu: menu,
+        item: item,
+    });
 }
 
 export const TOGGLE_DROPDOWN = 'TOGGLE_DROPDOWN';
@@ -92,10 +117,6 @@ export function fetchTopics() {
             })
             .catch((error) => errorHandler(error, dispatch, setError));
     };
-}
-
-export function editTopic(topic) {
-    return renderModal('followTopic', {topic});
 }
 
 /**
