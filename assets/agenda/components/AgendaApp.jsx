@@ -124,7 +124,7 @@ class AgendaApp extends BaseApp {
         const numNavigations = get(this.props, 'searchParams.navigation.length', 0);
         let showSaveTopic = this.props.showSaveTopic &&
             !this.props.bookmarks &&
-            this.props.featuredOnly;
+            !this.props.featuredOnly;
         let showTotalItems = false;
         let showTotalLabel = false;
         let totalItemsLabel;

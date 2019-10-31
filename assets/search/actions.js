@@ -191,15 +191,13 @@ export function saveMyTopic(searchParams) {
 }
 
 export function followStory(item, type) {
-    return function(dispatch) {
-        const slugline = get(item, 'slugline');
+    const slugline = get(item, 'slugline');
 
-        return dispatch(saveMyTopic({
-            label: slugline,
-            query: `slugline:"${slugline}"`,
-            topic_type: type,
-        }));
-    };
+    saveMyTopic({
+        label: slugline,
+        query: `slugline:"${slugline}"`,
+        topic_type: type,
+    });
 }
 
 /**

@@ -214,7 +214,7 @@ const mapDispatchToProps = (dispatch) => ({
     },
     actions: getItemActions(dispatch),
     fetchCardExternalItems: (cardId, cardLabel) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
-    followStory: (item) => dispatch(followStory(item, 'wire')),
+    followStory: (item) => followStory(item, 'wire'),
     downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType))
 });
 

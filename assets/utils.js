@@ -37,7 +37,12 @@ export function createStore(reducer, name = 'default') {
         collapsed: true,
         timestamp: false,
         titleFormatter: (action, time, took) => (
-            `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)`
+            // Adds the name of the store to the console logs
+            // derived based on the defaultTitleFormatter from redux-logger
+            // https://github.com/LogRocket/redux-logger/blob/master/src/core.js#L25
+            (action && action.type) ?
+                `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)` :
+                `${name} - action (in ${took.toFixed(2)} ms)`
         ),
     });
 
