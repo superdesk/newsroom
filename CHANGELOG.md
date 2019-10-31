@@ -1,6 +1,6 @@
 # Newsroom Changelog
 
-## [1.16.0] 31-10-31
+## [1.16.0] 2019-10-31
 ### Features
 - None
 
