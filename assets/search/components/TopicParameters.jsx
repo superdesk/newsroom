@@ -49,14 +49,15 @@ const TopicParameters = ({topic, navigations, locators}) => {
             return null;
         }
 
-        const place = get(filters, 'place[0]');
-        let region = (Object.values(locators) || []).find((l) => l.name === place);
+        const getPlaceName = (placeId) => {
+            let region = (Object.values(locators) || []).find((l) => l.name === placeId);
+            return region ?
+                (get(region, 'state') || get(region, 'country') || get(region, 'world_region')) :
+                placeId;
+        };
+        const places = (get(filters, 'place') || []).map(getPlaceName);
 
-        const placeName = region ?
-            (get(region, 'state') || get(region, 'country') || get(region, 'world_region')) :
-            place;
-
-        return renderParam(gettext('Place'), [placeName]);
+        return renderParam(gettext('Place'), places);
     };
 
     return (
