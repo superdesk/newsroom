@@ -73,7 +73,7 @@ def get_topic_url(topic):
     if topic.get('navigation'):
         query_strings.append(
             'navigation={}'.format(
-                ','.join(topic.get('navigation'))
+                parse.quote(json.dumps(topic.get('navigation')))
             )
         )
     if topic.get('created'):
