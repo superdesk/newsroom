@@ -95,7 +95,7 @@ def share():
     data = get_json_or_400()
     assert data.get('users')
     assert data.get('items')
-    topic = get_entity_or_404(data.get('items')[0]['_id'], 'topics')
+    topic = get_entity_or_404(data.get('items')['_id'], 'topics')
     for user_id in data['users']:
         user = get_resource_service('users').find_one(req=None, _id=user_id)
         if not user or not user.get('email'):

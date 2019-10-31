@@ -16,6 +16,7 @@
 - [SDAN-602] Coverage Status text should not change before an Update has been published (#867)
 - [SDAN-582](fix): Agenda featured toggle not showing (#879)
 - [SDAN-582](fix): Unable to create or update My Agenda topic (#880)
+- [SDAN-582](fix): Cannot share a topic (#881)
 
 ## [1.15.2] 2019-10-17
 ### Features
