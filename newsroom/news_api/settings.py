@@ -7,9 +7,13 @@ CORE_APPS = [
     'newsroom.news_api.api_tokens',
     'newsroom.companies',
     'content_api.items',
+    'content_api.items_versions',
     'newsroom.wire',
     'newsroom.section_filters',
-    'newsroom.news_api.products'
+    'newsroom.news_api.products',
+    'newsroom.news_api.formatters',
+    'newsroom.news_api.news',
+    'newsroom.news_api.news.item'
 ]
 
 #: mongo db name, only used when mongo_uri is not set

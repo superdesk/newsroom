@@ -2,7 +2,7 @@
 from planning.output_formatters.json_event import JsonEventFormatter
 from copy import deepcopy
 from flask import json
-from newsroom.formatter import BaseFormatter
+from .base import BaseFormatter
 
 agenda_json_fields = [
     'name',

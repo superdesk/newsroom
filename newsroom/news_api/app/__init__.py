@@ -5,6 +5,7 @@ from eve import Eve
 from eve.io.mongo.mongo import MongoJSONEncoder
 from newsroom.news_api.api_tokens import CompanyTokenAuth
 from superdesk.datalayer import SuperdeskDataLayer
+from newsroom.news_api.news.item.item import bp
 import importlib
 
 
@@ -43,6 +44,8 @@ def get_app(config=None):
               settings=app_config)
 
     app._general_settings = {}
+
+    app.register_blueprint(bp)
 
     for module_name in app_config.get('CORE_APPS', []):
         app_module = importlib.import_module(module_name)
