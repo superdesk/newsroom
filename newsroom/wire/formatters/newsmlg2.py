@@ -5,7 +5,7 @@ from flask import current_app as app
 from superdesk.publish.formatters.nitf_formatter import NITFFormatter
 from superdesk.publish.formatters.newsml_g2_formatter import NewsMLG2Formatter as SuperdeskFormatter
 
-from newsroom.formatter import BaseFormatter
+from .base import BaseFormatter
 
 
 class NewsroomFormatter(SuperdeskFormatter):
