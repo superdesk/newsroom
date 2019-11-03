@@ -23,7 +23,7 @@ export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt
         );
 
         return (
-            <div title={`${labelText}: ${internalNote}`}
+            <div title={`${labelText}:\n${internalNote}`}
                 data-toggle="tooltip"
                 data-placement="right"
                 className={className}
@@ -35,7 +35,8 @@ export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt
         return (
             <div className={classNames('wire-column__preview_article-note', {'m-0': noMargin}, {'mt-2': mt2})}>
                 <i className="icon--info icon--red icon--info--smaller" title={labelText}/>
-                <span className='ml-1'>{internalNote}</span>
+                <span className='ml-1'>{internalNote.split('\n').map((item, key) =>
+                    <span key={key}>{item}<br/></span>)}</span>
             </div>
         );
     }
