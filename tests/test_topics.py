@@ -184,7 +184,10 @@ def test_get_topic_share_url(client, app):
     assert get_topic_url(topic) == 'http://newsroom.com/wire?filter=%7B%22location%22%3A%20%5B%5B%22Sydney%22%5D%5D%7D'
 
     topic = {'topic_type': 'wire', 'navigation': ['123']}
-    assert get_topic_url(topic) == 'http://newsroom.com/wire?navigation=123'
+    assert get_topic_url(topic) == 'http://newsroom.com/wire?navigation=%5B%22123%22%5D'
+
+    topic = {'topic_type': 'wire', 'navigation': ['123', '456']}
+    assert get_topic_url(topic) == 'http://newsroom.com/wire?navigation=%5B%22123%22%2C%20%22456%22%5D'
 
     topic = {'topic_type': 'wire', 'created': {'from': '2018-06-01'}}
     assert get_topic_url(topic) == 'http://newsroom.com/wire?created=%7B%22from%22%3A%20%222018-06-01%22%7D'
@@ -196,4 +199,8 @@ def test_get_topic_share_url(client, app):
         'navigation': ['123'],
         'created': {'from': '2018-06-01'},
     }
-    assert get_topic_url(topic) == 'http://newsroom.com/wire?q=art%20exhibition&filter=%7B%22urgency%22%3A%20%5B3%5D%7D&navigation=123&created=%7B%22from%22%3A%20%222018-06-01%22%7D' # noqa
+    assert get_topic_url(topic) == 'http://newsroom.com/wire?' \
+                                   'q=art%20exhibition' \
+                                   '&filter=%7B%22urgency%22%3A%20%5B3%5D%7D' \
+                                   '&navigation=%5B%22123%22%5D' \
+                                   '&created=%7B%22from%22%3A%20%222018-06-01%22%7D'
