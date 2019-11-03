@@ -48,3 +48,20 @@ Feature: News API Item
     """
     When we get "v1/news/item/111?version=5"
     Then we get OK response
+
+  Scenario: Retrieve an item nijs
+    Given "items"
+    """
+    [{
+      "_id": "111",
+      "pubstatus": "usable",
+      "headline": "Headline of the story"
+    }]
+    """
+    When we get "v1/news/item/#items._id#?format=NINJSFormatter"
+    Then we get existing resource
+    """
+     {"guid": "111",
+     "headline": "Headline of the story"}
+    """
+
