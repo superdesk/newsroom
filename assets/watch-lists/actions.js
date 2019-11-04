@@ -1,6 +1,7 @@
 import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
 import {watchListToEdit, company, scheduleMode} from './selectors';
+import {get} from 'lodash';
 
 export const SET_COMPANIES = 'SET_COMPANIES';
 export function setCompanies(data) {
@@ -48,6 +49,11 @@ export function setWatchLists(data) {
     return {type: SET_WATCH_LISTS, data};
 }
 
+export const SET_USER_COMPANY_WATCH_LISTS = 'SET_USER_COMPANY_WATCH_LISTS';
+export function setUserCompanyWatchLists(data) {
+    return {type: SET_USER_COMPANY_WATCH_LISTS, data};
+}
+
 export const QUERY_WATCH_LISTS = 'QUERY_WATCH_LISTS';
 export function queryWatchLists() {
     return {type: QUERY_WATCH_LISTS};
@@ -68,50 +74,56 @@ export function toggleScheduleMode() {
     return {type: SET_SCHEDULE_MODE};
 }
 
-export function postWatchList() {
+export function postWatchList(userWatchList, notifyMsg) {
     return function (dispatch, getState) {
 
-        const wl = watchListToEdit(getState());
+        const wl = userWatchList || watchListToEdit(getState());
         const url = `/watch_lists/${wl._id ? wl._id : 'new'}`;
 
         return server.post(url, wl)
             .then(function(item) {
                 if (wl._id) {
-                    notify.success(gettext('Watch list updated successfully'));
+                    notify.success(notifyMsg || gettext('Watch list updated successfully'));
                 } else {
                     notify.success(gettext('Watch list created successfully'));
-                    dispatch(updateWatchList({
-                        target: {
-                            name: '_id',
-                            value: item._id,
-                        }
-                    }));
-
-                    if (item.users) {
+                    if (!userWatchList) {
                         dispatch(updateWatchList({
                             target: {
-                                name: 'users',
-                                value: item.users,
+                                name: '_id',
+                                value: item._id,
                             }
                         }));
+
+                        if (item.users) {
+                            dispatch(updateWatchList({
+                                target: {
+                                    name: 'users',
+                                    value: item.users,
+                                }
+                            }));
+                        }
                     }
                 }
-                dispatch(fetchWatchLists());
+                dispatch(fetchWatchLists(get(userWatchList, 'company')));
             })
             .catch((error) => errorHandler(error, dispatch, setError));
 
     };
 }
 
-export function fetchWatchLists() {
+export function fetchWatchLists(userCompany) {
     return function (dispatch, getState) {
         dispatch(queryWatchLists());
-        const companyFilter = company(getState());
-        const filter = companyFilter && companyFilter !== '' ? '&where={"company":"' + companyFilter + '"}' : '';
+        const companyFilter = userCompany || company(getState());
+        const filter = get(companyFilter, 'length', 0) > 0 ? '&where={"company":"' + companyFilter + '"}' : '';
 
         return server.get(`/watch_lists/search?q=${filter}`)
             .then((data) => {
-                dispatch(setWatchLists(data));
+                if (!userCompany) {
+                    dispatch(setWatchLists(data));
+                } else {
+                    dispatch(setUserCompanyWatchLists(data));
+                }
 
                 if (!scheduleMode(getState())) {
                     return;

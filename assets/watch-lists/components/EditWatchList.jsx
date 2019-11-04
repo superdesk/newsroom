@@ -53,10 +53,16 @@ class EditWatchList extends React.Component {
     componentDidUpdate(prevProps) {
         if (this.props.item._id !== prevProps.item._id) {
             this.setState({activeTab: this.props.scheduleMode ? 'schedule' : 'watch-list'});
+            return;
         }
 
         if (this.props.scheduleMode && prevProps.scheduleMode !== this.props.scheduleMode) {
             this.setState({activeTab: 'schedule'});
+            return;
+        }
+
+        if (!this.props.scheduleMode && prevProps.scheduleMode !== this.props.scheduleMode) {
+            this.setState({activeTab: 'watch-list'});
             return;
         }
     }
@@ -144,8 +150,7 @@ class EditWatchList extends React.Component {
                                     <SelectInput
                                         name='alert_type'
                                         label={gettext('Alert type')}
-                                        value={item.alert_type}
-                                        defaultOption={''}
+                                        value={item.alert_type || 'full_text'}
                                         options={[
                                             {value: 'linked_text', text: 'Linked extract(s)'},
                                             {value: 'full_text', text: 'Full text'}
