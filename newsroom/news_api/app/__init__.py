@@ -43,7 +43,8 @@ def get_app(config=None):
               data=SuperdeskDataLayer,
               settings=app_config)
 
-    app._general_settings = {}
+    app._general_settings = {'news_api_time_limit_days': {'type': 'number',
+                                                          'default': app.config.get('NEWS_API_TIME_LIMIT_DAYS', 0)}}
 
     app.register_blueprint(bp)
 
