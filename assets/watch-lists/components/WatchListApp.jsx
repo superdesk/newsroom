@@ -43,17 +43,19 @@ class WatchListApp extends React.Component {
     }
 
     onSectionChange(sectionName) {
-        this.setState({
-            activeSection: sectionName,
-            filter: {
-                label: this.isScheduleMode(sectionName) ? gettext('Companies with schedules') :
-                    gettext('All Companies'),
-                field: 'company'
-            }
-        });
+        if (sectionName !== this.state.activeSection) {
+            this.setState({
+                activeSection: sectionName,
+                filter: {
+                    label: this.isScheduleMode(sectionName) ? gettext('Companies with schedules') :
+                        gettext('All Companies'),
+                    field: 'company'
+                }
+            });
 
-        this.props.toggleScheduleMode();
-        this.onChange('company', null);
+            this.props.toggleScheduleMode();
+            this.onChange('company', null);
+        }
     }
 
     getDropdownItems(filter) {

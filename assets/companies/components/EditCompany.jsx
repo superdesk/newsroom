@@ -7,7 +7,7 @@ import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 import DateInput from 'components/DateInput';
 
-import { isEmpty } from 'lodash';
+import { isEmpty, get, sortBy } from 'lodash';
 import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
 import CompanyPermissions from './CompanyPermissions';
 import EditCompanyAPI from './EditCompanyAPI';
@@ -170,6 +170,16 @@ class EditCompany extends React.Component {
                                         value={getDateInputDate(this.props.company.expiry_date)}
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.expiry_date : null}/>
+
+                                    {get(this.props, 'company.sections.watch_lists') && <SelectInput
+                                        name='watch_list_administrator'
+                                        label={gettext('Watch List Administrator')}
+                                        value={this.props.company.watch_list_administrator}
+                                        options={sortBy(this.props.users || [], 'first_name').map((u) => ({
+                                            text: `${u.first_name} ${u.last_name}`,
+                                            value: u._id}))}
+                                        defaultOption=""
+                                        onChange={this.props.onChange}/>}
 
                                     <CheckboxInput
                                         labelClass={isInPast(this.props.company.expiry_date) ? 'text-danger' : ''}

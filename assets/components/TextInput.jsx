@@ -42,7 +42,7 @@ function TextInput({
                     onChange={onChange}
                     required={required}
                     maxLength={maxLength}
-                    readOnly={readOnly}
+                    disabled={readOnly}
                     placeholder={placeholder}
                     min={min}
                     autoFocus={autoFocus}

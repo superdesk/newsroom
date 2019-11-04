@@ -83,38 +83,44 @@ class WatchListSchedule extends React.Component {
     }
 
     render() {
-        const { watchList, onsaveWatchListSchedule } = this.props;
+        const { watchList, onsaveWatchListSchedule, noForm, readOnly } = this.props;
         const timeValue = get(watchList, 'schedule.time') ? moment().set({
             'hour': watchList.schedule.time.split(':')[0],
             'minute': watchList.schedule.time.split(':')[1],
         }) : moment();
 
-        return (
+        const ui = (
+            <div>
+                <SelectInput
+                    name='schedule'
+                    label={gettext('Schedule type')}
+                    value={get(watchList, 'schedule.interval') || ''}
+                    defaultOption={''}
+                    options={this.options}
+                    onChange={this.onChangeSchedule}
+                    readOnly={readOnly} />
+                {this.state.needTime && (
+                    <div className='form-group'>
+                        <label htmlFor='schedule.time'>{gettext('Time')}</label>
+                        <div className="field">
+                            <DatePicker
+                                value={timeValue.format('HH:mm')}
+                                onChange={this.onTimeChange}
+                                showTimeSelect
+                                showTimeSelectOnly
+                                timeCaption="Time"
+                                dateFormat="HH:mm"
+                                timeFormat="HH:mm" />
+                        </div>
+                    </div>
+                )}
+            </div>);
+
+        return noForm ? ui : (
             <div className='tab-pane active' id='navigations'>
                 <form>
                     <div className='list-item__preview-form'>
-                        <SelectInput
-                            name='schedule'
-                            label={gettext('Schedule type')}
-                            value={get(watchList, 'schedule.interval') || ''}
-                            defaultOption={''}
-                            options={this.options}
-                            onChange={this.onChangeSchedule} />
-                        {this.state.needTime && (
-                            <div className='form-group'>
-                                <label htmlFor='schedule.time'>{gettext('Time')}</label>
-                                <div className="field">
-                                    <DatePicker
-                                        value={timeValue.format('HH:mm')}
-                                        onChange={this.onTimeChange}
-                                        showTimeSelect
-                                        showTimeSelectOnly
-                                        timeCaption="Time"
-                                        dateFormat="HH:mm"
-                                        timeFormat="HH:mm" />
-                                </div>
-                            </div>
-                        )}
+                        {ui}
                     </div>
                     <div className='list-item__preview-footer'>
                         <input
@@ -134,6 +140,8 @@ WatchListSchedule.propTypes = {
     watchList: PropTypes.object,
     onsaveWatchListSchedule: PropTypes.func,
     onChange: PropTypes.func,
+    noForm: PropTypes.bool,
+    readOnly: PropTypes.bool,
 };
 
 export default WatchListSchedule;

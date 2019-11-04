@@ -11,7 +11,7 @@ from newsroom.auth import get_user, get_user_by_email
 from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user
 from newsroom.decorator import admin_only, login_required
-from newsroom.companies import get_user_company_name, get_company_sections
+from newsroom.companies import get_user_company_name, get_company_sections_watch_list_data
 from newsroom.notifications.notifications import get_user_notifications
 from newsroom.notifications import push_user_notification
 from newsroom.topics import get_user_topics
@@ -29,14 +29,19 @@ def get_settings_data():
 
 def get_view_data():
     user = get_user()
-    return {
+    company = user['company'] if user and user.get('company') else None
+    rv = {
         'user': user if user else None,
-        'company': str(user['company']) if user and user.get('company') else None,
+        'company': str(company),
         'topics': get_user_topics(user['_id']) if user else [],
         'companyName': get_user_company_name(user),
-        'userSections': get_company_sections(user['company'] if user and user.get('company') else None),
         'locators': get_vocabulary('locators'),
+        'watch_lists': list(query_resource('watch_lists', lookup={'company': company})),
     }
+
+    rv.update(get_company_sections_watch_list_data(company))
+
+    return rv
 
 
 @blueprint.route('/myprofile', methods=['GET'])

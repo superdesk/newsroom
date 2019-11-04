@@ -12,6 +12,8 @@ import {
 } from './actions';
 
 import { RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID } from 'actions';
+import {GET_COMPANY_USERS} from 'companies/actions';
+import {SET_USER_COMPANY_WATCH_LISTS} from 'watch-lists/actions';
 
 import {modalReducer} from 'reducers';
 import {GET_NAVIGATIONS} from 'navigations/actions';
@@ -34,6 +36,7 @@ const initialState = {
 };
 
 export default function itemReducer(state = initialState, action) {
+    let newSelected, newState;
     switch (action.type) {
 
     case GET_TOPICS: {
@@ -82,6 +85,8 @@ export default function itemReducer(state = initialState, action) {
             company: action.data.company || null,
             userSections: action.data.userSections || null,
             locators: action.data.locators || null,
+            watchLists: action.data.watch_lists || [],
+            watchListAdministrator: action.data.watch_list_administrator,
         };
     }
 
@@ -138,6 +143,23 @@ export default function itemReducer(state = initialState, action) {
             ...state,
             editorFullscreen: action.payload,
         };
+
+    case GET_COMPANY_USERS:
+        return {...state, watchListUsers: action.data};
+
+    case SET_USER_COMPANY_WATCH_LISTS:
+        newSelected = state.selectedItem && (action.data || []).find((w) => w._id === state.selectedItem._id);
+        newState = {
+            ...state,
+            watchLists: action.data,
+
+        };
+
+        if (newSelected) {
+            newState.selectedItem = newSelected;
+        }
+
+        return newState;        
 
     default:
         return state;
