@@ -1,5 +1,12 @@
 # Newsroom Changelog
 
+## [1.16.1] 2019-11-04
+### Improvements
+- [SDAN-609] Support multi-line internal and editorial note (#886)
+
+### Fixes
+- [SDAN-611](fix): Invalid URL params in the share topic email (#882)
+
 ## [1.16.0] 2019-10-31
 ### Features
 - None
