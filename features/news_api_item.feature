@@ -49,7 +49,7 @@ Feature: News API Item
     When we get "v1/news/item/111?version=5"
     Then we get OK response
 
-  Scenario: Retrieve an item nijs
+  Scenario: Retrieve an item in ninjs
     Given "items"
     """
     [{
@@ -65,3 +65,15 @@ Feature: News API Item
      "headline": "Headline of the story"}
     """
 
+    Scenario: Attempt to retrieve an expired item
+      Given "items"
+      """
+      [{
+        "_id": "111",
+        "pubstatus": "usable",
+        "headline": "Headline of the story",
+        "versioncreated": "2018-11-01T03:01:40.000Z"
+      }]
+      """
+      When we get "v1/news/item/#items._id#?format=NINJSFormatter"
+      Then we get response code 404

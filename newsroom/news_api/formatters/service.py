@@ -5,6 +5,9 @@ from flask import abort
 from superdesk import get_resource_service
 from flask import current_app as app
 from eve.versioning import versioned_id_field
+from datetime import timedelta
+from superdesk.utc import utcnow
+from newsroom.settings import get_setting
 
 
 class APIFormattersService(BaseService):
@@ -33,7 +36,11 @@ class APIFormattersService(BaseService):
             item['_id'] = item[id_field]
         else:
             item = get_resource_service('items').find_one(req=None, _id=id)
-        if not item:
+            if not item:
+                abort(404)
+        # Ensure that the item has not expired
+        if utcnow() - timedelta(days=int(get_setting('news_api_time_limit_days'))) > item.get('versioncreated',
+                                                                                              utcnow()):
             abort(404)
         ret = formatter.format_item(item)
         return {'formatted_item': ret, 'mimetype': formatter.MIMETYPE}
