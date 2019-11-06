@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get, isEmpty} from 'lodash';
 
+import KeywordInput from 'components/KeywordInput';
 import TextInput from 'components/TextInput';
 import TextAreaInput from 'components/TextAreaInput';
 import SelectInput from 'components/SelectInput';
@@ -146,6 +147,12 @@ class EditWatchList extends React.Component {
                                                     className='btn btn-outline-secondary float-right mt-3'>{gettext('Test Watch List query')}
                                                 </a>}
                                     </TextAreaInput>
+
+                                    <KeywordInput
+                                        name='keywords'
+                                        value={item.keywords || []}
+                                        onChange={onChange} />
+
 
                                     <SelectInput
                                         name='alert_type'

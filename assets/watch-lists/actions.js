@@ -137,7 +137,7 @@ export function fetchWatchLists(userCompany) {
 
 export function fetchWatchListCompanies() {
     return function (dispatch) {
-        return server.get('/watch_lists/companies')
+        return server.get('/watch_lists/schedule_companies')
             .then((data) => {
                 dispatch(setWatchListCompanies(data));
             })

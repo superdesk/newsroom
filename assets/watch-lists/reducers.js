@@ -52,7 +52,8 @@ export default function userReducer(state = initialState, action) {
                 alert_type: 'full_text',
                 company: '',
                 is_enabled: true,
-                query: ''
+                query: '',
+                keywords: [],
             },
             errors: null};
     }
