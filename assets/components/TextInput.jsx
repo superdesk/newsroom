@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import InputWrapper from './InputWrapper';
 
 function TextInput({
     type,
@@ -15,20 +16,11 @@ function TextInput({
     placeholder,
     description,
     min,
-    autoFocus
+    autoFocus,
+    ...props
 }) {
-    let wrapperClass = 'form-group';
-
-    if (error && error.length > 0) {
-        wrapperClass += ' has-error';
-    }
-
-    if (!name) {
-        name = `input-${label}`;
-    }
-
     return (
-        <div className={wrapperClass}>
+        <InputWrapper error={error} name={name}>
             {label && (
                 <label htmlFor={name}>{label}</label>
             )}
@@ -46,11 +38,12 @@ function TextInput({
                     placeholder={placeholder}
                     min={min}
                     autoFocus={autoFocus}
+                    {...props}
                 />
                 {error && <div className="alert alert-danger">{error}</div>}
                 {description && <small className="form-text text-muted">{description}</small>}
             </div>
-        </div>
+        </InputWrapper>
     );
 }
 

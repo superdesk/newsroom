@@ -16,6 +16,20 @@ def get_settings_data():
     return {"companies": list(query_resource('companies', lookup={'sections.watch_lists': True}))}
 
 
+def process_form_request(updates, request_updates, form):
+    if 'schedule' in request_updates:
+        updates['schedule'] = request_updates['schedule']
+
+    if 'users' in request_updates:
+        updates['users'] = [ObjectId(u) for u in request_updates['users']]
+
+    if form.company.data:
+        updates['company'] = ObjectId(form.company.data)
+
+    if 'keywords' in request_updates:
+        updates['keywords'] = request_updates['keywords']
+
+
 @blueprint.route('/watch_lists/<id>/users', methods=['POST'])
 @admin_only
 def update_users(id):
@@ -26,10 +40,10 @@ def update_users(id):
         return jsonify({'success': True}), 200
 
 
-@blueprint.route('/watch_lists/companies', methods=['GET'])
+@blueprint.route('/watch_lists/schedule_companies', methods=['GET'])
 @admin_only
 def watch_list_companies():
-    watch_lists = list(query_resource('watch_lists'))
+    watch_lists = list(query_resource('watch_lists', lookup={'schedule.interval': {'$ne': None}}))
     companies = get_items_by_id([ObjectId(w['company']) for w in watch_lists], 'companies')
     return jsonify(companies), 200
 
@@ -58,6 +72,9 @@ def create():
             new_watch_list['company'] = ObjectId(form.company.data)
             company_users = list(query_resource('users', lookup={'company': new_watch_list['company']}))
             new_watch_list['users'] = [ObjectId(u['_id']) for u in company_users]
+
+        request_updates = flask.request.get_json()
+        process_form_request(new_watch_list, request_updates, form)
 
         ids = get_resource_service('watch_lists').post([new_watch_list])
         return jsonify({
@@ -91,16 +108,16 @@ def edit(_id):
                 if str(user['_id']) != str(company.get('watch_list_administrator')):
                     return jsonify({'error': 'Bad request'}), 400
 
-            if 'schedule' in request_updates:
-                updates['schedule'] = request_updates['schedule']
-
-            if 'users' in request_updates:
-                updates['users'] = [ObjectId(u) for u in request_updates['users']]
-
-            if form.company.data:
-                updates['company'] = ObjectId(form.company.data)
-
+            process_form_request(updates, request_updates, form)
             get_resource_service('watch_lists').patch(ObjectId(_id), updates=updates)
             return jsonify({'success': True}), 200
         return jsonify(form.errors), 400
     return jsonify(watch_list), 200
+
+
+@blueprint.route('/watch_lists/<_id>', methods=['DELETE'])
+@admin_only
+def delete(_id):
+    """ Deletes the watch_list by given id """
+    get_resource_service('watch_lists').delete_action({'_id': ObjectId(_id)})
+    return jsonify({'success': True}), 200

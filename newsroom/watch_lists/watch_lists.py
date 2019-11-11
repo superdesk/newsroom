@@ -41,8 +41,11 @@ class WatchListsResource(newsroom.Resource):
                 'interval': {'type': 'string'},
                 'time': {'type': 'string'},
             }
+        },
+        'keywords': {
+            'type': 'list',
+            'mapping': {'type': 'string'}
         }
-
     }
     datasource = {
         'source': 'watch_lists',
