@@ -1,20 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import InputWrapper from './InputWrapper';
 
 function TextAreaInput({name, label, onChange, value, error, required, readOnly, maxLength, children}) {
-    let wrapperClass = 'form-group';
-
-    if (error && error.length > 0) {
-        wrapperClass += ' has-error';
-    }
-
-    if (!name) {
-        name = `input-${label}`;
-    }
-
     return (
-        <div className={wrapperClass}>
+        <InputWrapper error={error} name={name}>
             <label htmlFor={name}>{label}</label>
             <div className="field">
                 <textarea
@@ -30,7 +21,7 @@ function TextAreaInput({name, label, onChange, value, error, required, readOnly,
                 {error && <div className="alert alert-danger">{error}</div>}
                 {children}
             </div>
-        </div>
+        </InputWrapper>
     );
 }
 

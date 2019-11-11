@@ -70,7 +70,7 @@ def test_non_admin_actions_fail(client, app):
             "schedule": {"interval": "immediate"}}), content_type='application/json')
         assert response.status_code == 403
 
-        response = client.get('/watch_lists/companies')
+        response = client.get('/watch_lists/schedule_companies')
         assert response.status_code == 403
 
         response = client.post('/watch_lists/5db11ec55f627d8aa0b545fb/users', data=json.dumps({
@@ -140,9 +140,9 @@ def test_set_watch_list_schedule(client):
     assert "four_hour" == items[0]['schedule']['interval']
 
 
-def test_get_companies_with_watch_lists(client):
+def test_get_companies_with_watch_list_schedules(client):
     test_login_succeeds_for_admin(client)
-    response = client.get('/watch_lists/companies')
+    response = client.get('/watch_lists/schedule_companies')
     assert response.status_code == 200
     items = json.loads(response.get_data())
     assert 1 == len(items)
