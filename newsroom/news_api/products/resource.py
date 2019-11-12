@@ -2,6 +2,7 @@ from flask import g, current_app as app
 from newsroom.products import ProductsService, ProductsResource
 from bson import ObjectId
 import json
+from eve.utils import ParsedRequest
 
 
 class NewsAPIProductsResource(ProductsResource):
@@ -38,8 +39,11 @@ class NewsAPIProductsService(ProductsService):
     def get(self, req, lookup):
         # Get the identity of the company
         company_id = g.user
+        if not req:
+            req = ParsedRequest()
         req.projection = self.allowed_fields
         lookup['companies'] = str(company_id)
+        lookup['product_type'] = 'news_api'
         return super().get(req=req, lookup=lookup)
 
     def on_fetched(self, doc):

@@ -189,6 +189,8 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 # If false, aggregations will change by filters applied
 FILTER_BY_POST_FILTER = False
 
+FILTER_AGGREGATIONS = True
+
 # List of filters to remove matching stories when news only switch is turned on
 NEWS_ONLY_FILTERS = [
    {'match': {'genre.code': 'Results (sport)'}},
