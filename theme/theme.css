@@ -3,8 +3,37 @@
 .navbar__logo {
     max-width: none;
 }
+.navbar__logo a, 
+.navbar__logo img {
+    height: 100%;
+}
+.navbar-brand span.breadcrumb-item {
+    font-size: 1rem;
+    color: white;
+    font-family: "Merriweather", serif;
+}
+.footer {
+    height: 50px;
+}
+.footer--home {
+    margin-bottom: -50px;
+}
+@media only screen and (min-width: 375px) {
+    .footer {
+        justify-content: center;
+    }
+    .footer a {
+        margin: 0 10px;
+    }
+}
 @media only screen and (min-width: 576px) {
     .navbar__logo {
         padding-bottom: 0;
+    }
+    .navbar-brand span.breadcrumb-item {
+        font-size: 1.2rem;
+    }
+    .footer {
+        justify-content: center;
     }
 }
