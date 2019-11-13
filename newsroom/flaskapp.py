@@ -34,6 +34,7 @@ from newsroom.template_filters import (
 from newsroom.celery_app import init_celery
 from newsroom.gettext import setup_babel
 import newsroom
+from superdesk.logging import configure_logging
 
 
 NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -100,6 +101,7 @@ class Newsroom(eve.Eve):
         self._setup_cache()
         self._setup_error_handlers()
         self._setup_theme()
+        configure_logging(app_config.get('LOG_CONFIG_FILE'))
 
     def load_config(self):
         # Override Eve.load_config in order to get default_settings
