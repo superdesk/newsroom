@@ -7,7 +7,7 @@ SHOW_COPYRIGHT = False
 COPYRIGHT_HOLDER = 'CP'
 COPYRIGHT_NOTICE = ''
 USAGE_TERMS = ''
-LANGUAGES = ['en']
+LANGUAGES = ['en', 'fr_CA']
 DEFAULT_LANGUAGE = 'en'
 
 PRIVACY_POLICY = PRIVACY_POLICY_EN = 'https://www.thecanadianpress.com/privacy-policy/'
