@@ -31,7 +31,12 @@ export default class ArticleBodyHtml extends React.PureComponent {
             return null;
         }
 
-        const html = formatHTML(item.body_html);
+        const esHighlightedItem = get(item, 'es_highlight.body_html.length', 0) > 0 ? 
+            {
+                ...item,
+                body_html: item.es_highlight.body_html[0]
+            } : item;
+        const html = formatHTML(esHighlightedItem.body_html);
 
         return (
             <div

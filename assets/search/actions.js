@@ -57,7 +57,7 @@ export function setTopics(topics) {
 }
 
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
-export function toggleNavigation(navigation) {
+export function toggleNavigation(navigation, disableSameNavigationDeselect) {
     return (dispatch, getState) => {
         const state = getState();
         const currentNavigation = searchNavigationSelector(state);
@@ -80,7 +80,7 @@ export function toggleNavigation(navigation) {
             }
         } else {
             // If multi selecting topics is disabled for this section
-            if (get(currentNavigation, '[0]') === navigationId) {
+            if (get(currentNavigation, '[0]') === navigationId && !disableSameNavigationDeselect) {
                 // The navigation is already selected, so deselect it
                 newNavigation = [];
             } else {

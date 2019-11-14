@@ -9,7 +9,7 @@ export function getItemActions(dispatch, actions) {
         previewAndCopy,
         downloadItems,
         bookmarkItems,
-        removeBookmarks
+        removeBookmarks,
     } = actions;
 
 
