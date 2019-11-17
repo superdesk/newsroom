@@ -6,7 +6,7 @@ import {
     SET_CARD_ITEMS,
 } from './actions';
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
-import {CLOSE_MODAL, RENDER_MODAL} from '../actions';
+import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from '../actions';
 import {modalReducer} from '../reducers';
 
 const initialState = {
@@ -76,6 +76,7 @@ export default function homeReducer(state = initialState, action) {
     }
 
     case RENDER_MODAL:
+    case MODAL_FORM_VALID:
     case CLOSE_MODAL:
         return {...state, modal: modalReducer(state.modal, action)};
 
