@@ -14,7 +14,7 @@ def init_app(app):
     superdesk.register_resource('watch_lists', WatchListsResource, WatchListsService, _app=app)
     app.section('watch_lists', 'Watch Lists', 'watch_lists', 'wire')
     app.settings_app('watch_lists', gettext('Watch Lists'), weight=200, data=views.get_settings_data)
-    app.sidenav('Watch Lists', 'watch_lists.index', 'watched', section='watch_lists')
+    app.sidenav('Watch Lists', 'watch_lists.index', 'settings', section='watch_lists')
     app.sidenav(gettext('Saved/Watched Items'), 'watch_lists.bookmarks', 'bookmark',
                 group=1, blueprint='watch_lists', badge='saved-items-count')
 
