@@ -7,9 +7,7 @@ import {
     getPicture,
     getVideos,
     getOriginalVideo,
-    getPreviewRendition,
     showItemVersions,
-    getCaption,
     isEqualItem,
     isKilled,
     DISPLAY_ABSTRACT,
@@ -77,10 +75,9 @@ class WirePreview extends React.PureComponent {
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
                     {picture && <ArticlePicture
-                        picture={getPreviewRendition(picture, isCustom)}
+                        picture={picture}
                         isKilled={isKilled(item)}
-                        isCustomRendition={isCustom}
-                        caption={getCaption(picture)}/>}
+                        isCustomRendition={isCustom} />}
 
                     {isDisplayed('metadata_section', previewConfig) &&
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig}/>}

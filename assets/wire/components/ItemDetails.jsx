@@ -12,9 +12,7 @@ import {
     getPicture,
     getVideos,
     getOriginalVideo,
-    getDetailRendition,
     showItemVersions,
-    getCaption,
     isKilled,
     DISPLAY_ABSTRACT,
     isPreformatted,
@@ -54,11 +52,10 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
             <ArticleItemDetails>
                 <ArticleContent>
                     {picture && <ArticlePicture
-                        picture={getDetailRendition(picture, isCustomRendition)}
+                        picture={picture}
                         isKilled={isKilled(item)}
-                        caption={getCaption(picture)}
                         isCustomRendition={isCustom}
-                        isItemDetails/>}
+                        isItemDetails />}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
