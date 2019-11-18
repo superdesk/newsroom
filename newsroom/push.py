@@ -473,16 +473,17 @@ def get_coverages(planning_items, original_coverages, new_plan):
                 })
         else:
             if coverage.get('workflow_status') == 'completed':
-                cov_deliveries.append({
-                    'delivery_href': app.set_photo_coverage_href(coverage, planning_item),
-                    'sequence_no': 0,
-                    'delivery_state': 'published'
-                })
-
-                if not orig_coverage or len(orig_coverage.get('deliveries') or []) == 0 or \
-                        not orig_coverage['deliveries'][0].get('publish_time'):
-                    cov_deliveries[0]['publish_time'] = next((parse_date_str(d.get('publish_time')) for d in
-                                                              deliveries), None) or utcnow()
+                if orig_coverage['workflow_status'] != coverage['workflow_status']:
+                    cov_deliveries.append({
+                        'sequence_no': 0,
+                        'delivery_state': 'published',
+                        'publish_time': (next((parse_date_str(d.get('publish_time')) for d in deliveries), None) or
+                                         utcnow())
+                    })
+                    cov_deliveries[0]['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item,
+                                                                                     cov_deliveries),
+                elif (len((orig_coverage or {}).get('deliveries') or []) > 0):
+                    cov_deliveries.append(orig_coverage['deliveries'][0])
 
         coverage['deliveries'] = cov_deliveries
         # Sort the deliveries in reverse sequence order here, so sorting required anywhere else
