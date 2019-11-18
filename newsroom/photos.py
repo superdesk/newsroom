@@ -1,4 +1,4 @@
-def set_photo_coverage_href(coverage, planning_item):
+def set_photo_coverage_href(coverage, planning_item, deliveries=[]):
     pass
 
 
