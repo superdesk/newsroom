@@ -18,6 +18,12 @@
 .footer--home {
     margin-bottom: -50px;
 }
+.card a.btn-outline-primary {
+    color: #00acec;
+    }
+    .card a.btn-outline-primary:hover {
+        color: white;
+    }
 @media only screen and (min-width: 375px) {
     .footer {
         justify-content: center;
