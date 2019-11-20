@@ -39,6 +39,7 @@ class WireSearchResource(newsroom.Resource):
             'ancestors': 1,
             'wordcount': 1,
             'charcount': 1,
+            'version': 1,
         },
         'elastic_filter': {'bool': {'must': [{'term': {'_type': 'items'}}]}},
     }
