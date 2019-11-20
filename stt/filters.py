@@ -1,11 +1,23 @@
+import superdesk
+
 from flask_babel import gettext
 from eve_elastic.elastic import parse_date
 
 from superdesk.resource import not_analyzed
 from newsroom.signals import publish_item
-
+from copy import copy
 
 STT_FIELDS = ['sttdepartment', 'sttversion', 'sttgenre', 'sttdone1']
+
+
+def get_previous_version(app, guid, version):
+    for i in range(int(version) - 1, 1, -1):
+        id = "{}:{}".format(guid, i)
+        original = app.data.find_one('wire_search', req=None, _id=id)
+        if original:
+            return original
+
+    return app.data.find_one('wire_search', req=None, _id=guid)
 
 
 def on_publish_item(app, item, is_new, **kwargs):
@@ -31,6 +43,23 @@ def on_publish_item(app, item, is_new, **kwargs):
             item['ednote'] = '{}\n{}'.format(item['ednote'], item['extra']['sttnote_private'])
         else:
             item['ednote'] = item['extra']['sttnote_private']
+
+    # link the previous versions and update the id of the story
+    if not is_new and 'evolvedfrom' not in item:
+        original = get_previous_version(app, item['guid'], item['version'])
+
+        if original:
+            if original['version'] == item['version']:
+                # the same version of the story been sent again so no need to create new version
+                return
+
+            service = superdesk.get_resource_service('content_api')
+            new_id = '{}:{}'.format(item['guid'], item['version'])
+            service.system_update(original['_id'], {'nextversion': new_id}, original)
+            item['guid'] = new_id
+            item['ancestors'] = copy(original.get('ancestors', []))
+            item['ancestors'].append(original['_id'])
+            item['bookmarks'] = original.get('bookmarks', [])
 
 
 def init_app(app):
