@@ -194,30 +194,30 @@ def test_local_time(client, app, mocker):
     # 9 am Sydney Time - day light saving on
     format = '%Y-%m-%dT%H:%M:%S'
     test_utcnow = datetime.strptime('2018-11-23T22:00:00', format)
-    with mocker.patch('newsroom.wire.utils.get_utcnow', return_value=test_utcnow):
-        local_date = get_local_date('now/d', '00:00:00', -660)
-        assert '2018-11-23T13:00:00' == local_date.strftime(format)
+    mocker.patch('newsroom.wire.utils.get_utcnow', return_value=test_utcnow)
+    local_date = get_local_date('now/d', '00:00:00', -660)
+    assert '2018-11-23T13:00:00' == local_date.strftime(format)
 
-        local_date = get_local_date('now/w', '00:00:00', -660)
-        assert '2018-11-18T13:00:00' == local_date.strftime(format)
+    local_date = get_local_date('now/w', '00:00:00', -660)
+    assert '2018-11-18T13:00:00' == local_date.strftime(format)
 
-        local_date = get_local_date('now/M', '00:00:00', -660)
-        assert '2018-10-31T13:00:00' == local_date.strftime(format)
+    local_date = get_local_date('now/M', '00:00:00', -660)
+    assert '2018-10-31T13:00:00' == local_date.strftime(format)
 
-        local_date = get_local_date('2018-11-24', '00:00:00', -660)
-        assert '2018-11-23T13:00:00' == local_date.strftime(format)
+    local_date = get_local_date('2018-11-24', '00:00:00', -660)
+    assert '2018-11-23T13:00:00' == local_date.strftime(format)
 
-        end_local_date = get_local_date('2018-11-24', '23:59:59', -660)
-        assert '2018-11-24T12:59:59' == end_local_date.strftime(format)
+    end_local_date = get_local_date('2018-11-24', '23:59:59', -660)
+    assert '2018-11-24T12:59:59' == end_local_date.strftime(format)
 
-        end_date = get_end_date('now/d', end_local_date)
-        assert '2018-11-24T12:59:59' == end_date.strftime(format)
+    end_date = get_end_date('now/d', end_local_date)
+    assert '2018-11-24T12:59:59' == end_date.strftime(format)
 
-        end_date = get_end_date('now/w', end_local_date)
-        assert '2018-11-30T12:59:59' == end_date.strftime(format)
+    end_date = get_end_date('now/w', end_local_date)
+    assert '2018-11-30T12:59:59' == end_date.strftime(format)
 
-        end_date = get_end_date('now/M', end_local_date)
-        assert '2018-12-23T12:59:59' == end_date.strftime(format)
+    end_date = get_end_date('now/M', end_local_date)
+    assert '2018-12-23T12:59:59' == end_date.strftime(format)
 
 
 def test_get_location_string():
