@@ -1,0 +1,19 @@
+{% extends "products_layout.html" %}
+
+{% block title %}{{ gettext('Watch Lists') }}{% endblock %}
+
+{% block breadcrumb %}
+<span class="breadcrumb-item active">{{ gettext('Watch Lists') }}</span>
+<span id="nav-breadcrumb" class="breadcrumb-item active breadcrumb-sub-item"></span>
+{% endblock %}
+
+{% block content %}
+<div id="watch_lists-app" class="content"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        viewData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('watch_lists_js') | safe }}
+{% endblock %}

@@ -1,15 +1,40 @@
 import flask
+import io
 from bson import ObjectId
-from flask import jsonify
+from flask import jsonify, current_app as app, render_template, send_file
 from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound
+from werkzeug.utils import secure_filename
+from eve.methods.get import get_internal
+from eve.render import send_response
 from newsroom.decorator import admin_only, login_required
+from newsroom.companies import section
 from newsroom.watch_lists import blueprint
 from .forms import WatchListsForm
-from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404
+from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400
 from newsroom.template_filters import is_admin
-from newsroom.auth import get_user
+from newsroom.auth import get_user, get_user_id
+from newsroom.wire.utils import update_action_list
+from newsroom.wire.views import item as wire_print
+from superdesk.utc import utcnow
+from newsroom.notifications import push_user_notification
+from newsroom.wire.search import get_bookmarks_count
+
+
+def get_view_data():
+    user = get_user()
+    return {
+        'user': str(user['_id']) if user else None,
+        'company': str(user['company']) if user and user.get('company') else None,
+        'navigations': get_watch_lists_for_company(user),
+        'context': 'watch_lists',
+        'groups': app.config.get('WATCH_LIST_GROUPS') or app.config.get('WIRE_GROUPS', []),
+        'ui_config': get_resource_service('ui_config').getSectionConfig('watch_lists'),
+        'saved_items': get_bookmarks_count(user['_id'], 'watch_lists'),
+        'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
+                    if 'watch_lists' in f['types']],
+    }
 
 
 def get_settings_data():
@@ -28,6 +53,11 @@ def process_form_request(updates, request_updates, form):
 
     if 'keywords' in request_updates:
         updates['keywords'] = request_updates['keywords']
+
+
+def get_watch_lists_for_company(user):
+    company = user['company'] if user and user.get('company') else None
+    return list(query_resource('watch_lists', lookup={'company': company}))
 
 
 @blueprint.route('/watch_lists/<id>/users', methods=['POST'])
@@ -56,10 +86,16 @@ def update_schedule(id):
     return jsonify({'success': True}), 200
 
 
-@blueprint.route('/watch_lists/search', methods=['GET'])
-def search():
+@blueprint.route('/watch_lists/all', methods=['GET'])
+def search_all():
     watch_lists = list(query_resource('watch_lists'))
     return jsonify(watch_lists), 200
+
+
+@blueprint.route('/watch_lists/search', methods=['GET'])
+def search():
+    response = get_internal('watch_lists_search')
+    return send_response('watch_lists_search', response)
 
 
 @blueprint.route('/watch_lists/new', methods=['POST'])
@@ -88,6 +124,9 @@ def create():
 @blueprint.route('/watch_lists/<_id>', methods=['GET', 'POST'])
 @login_required
 def edit(_id):
+    if 'print' in flask.request.args:
+        return wire_print(_id)
+
     watch_list = find_one('watch_lists', _id=ObjectId(_id))
     if not watch_list:
         return NotFound(gettext('Watch List not found'))
@@ -121,3 +160,60 @@ def delete(_id):
     """ Deletes the watch_list by given id """
     get_resource_service('watch_lists').delete_action({'_id': ObjectId(_id)})
     return jsonify({'success': True}), 200
+
+
+@blueprint.route('/watch_lists')
+@section('watch_lists')
+@login_required
+def index():
+    return flask.render_template('watch_lists_index.html', data=get_view_data())
+
+
+@blueprint.route('/watch_lists/export/<_ids>')
+@login_required
+def export(_ids):
+    user = get_user(required=True)
+    items = get_items_by_id([_id for _id in _ids.split(',')], 'items')
+    if len(items) > 0:
+        exported_text = str.encode(render_template('watch_list_export.html', items=items), 'utf-8')
+        update_action_list(_ids.split(','), 'export', force_insert=True)
+        get_resource_service('history').create_history_record(items, 'export', user, 'watch_lists')
+
+        if exported_text:
+            try:
+                temp_file = io.BytesIO()
+                attachment_filename = '%s-export.txt' % utcnow().strftime('%Y%m%d%H%M%S')
+                temp_file.write(exported_text)
+                temp_file.seek(0)
+                mimetype = 'text/plain'
+                attachment_filename = secure_filename(attachment_filename)
+                return send_file(temp_file, mimetype=mimetype, attachment_filename=attachment_filename,
+                                 as_attachment=True)
+            except Exception:
+                return jsonify({'message': 'Error exporting items to file'}), 400
+    else:
+        return jsonify({'message': 'No files to export.'}), 400
+
+
+@blueprint.route('/watch_lists_bookmark', methods=['POST', 'DELETE'])
+@login_required
+def bookmark():
+    """Bookmark an item.
+
+    Stores user id into item.bookmarks array.
+    Uses mongodb to update the array and then pushes updated array to elastic.
+    """
+    data = get_json_or_400()
+    assert data.get('items')
+    update_action_list(data.get('items'), 'bookmarks', item_type='items')
+    user_id = get_user_id()
+    push_user_notification('saved_items', count=get_bookmarks_count(user_id, 'watch_lists'))
+    return flask.jsonify(), 200
+
+
+@blueprint.route('/bookmarks_watch_lists')
+@login_required
+def bookmarks():
+    data = get_view_data()
+    data['bookmarks'] = True
+    return flask.render_template('watch_lists_bookmarks.html', data=data)

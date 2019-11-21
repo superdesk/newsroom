@@ -3,6 +3,12 @@ import server from 'server';
 import {watchListToEdit, company, scheduleMode} from './selectors';
 import {get} from 'lodash';
 
+
+export const INIT_DATA = 'INIT_DATA';
+export function initData(data) {
+    return {type: INIT_DATA, data};
+}
+
 export const SET_COMPANIES = 'SET_COMPANIES';
 export function setCompanies(data) {
     return {type: SET_COMPANIES, data};
@@ -117,7 +123,7 @@ export function fetchWatchLists(userCompany) {
         const companyFilter = userCompany || company(getState());
         const filter = get(companyFilter, 'length', 0) > 0 ? '&where={"company":"' + companyFilter + '"}' : '';
 
-        return server.get(`/watch_lists/search?q=${filter}`)
+        return server.get(`/watch_lists/all?q=${filter}`)
             .then((data) => {
                 if (!userCompany) {
                     dispatch(setWatchLists(data));

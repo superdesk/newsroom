@@ -25,6 +25,7 @@ import {
     SHARE_ITEMS,
     START_LOADING,
     TOGGLE_SELECTED,
+    EXPORT_ITEMS,
 } from './wire/actions';
 
 import {
@@ -234,6 +235,15 @@ export function defaultReducer(state={}, action) {
 
     case DOWNLOAD_ITEMS: {
         const itemsById = updateItemActions(state, action.items, 'downloads');
+
+        return {
+            ...state,
+            itemsById
+        };
+    }
+
+    case EXPORT_ITEMS: {
+        const itemsById = updateItemActions(state, action.items, 'exports');
 
         return {
             ...state,

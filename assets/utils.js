@@ -61,10 +61,10 @@ export function createStore(reducer, name = 'default') {
  * @param {Component} App
  * @param {Element} element
  */
-export function render(store, App, element) {
+export function render(store, App, element, props) {
     return _render(
         <Provider store={store}>
-            <App />
+            <App {...props}/>
         </Provider>,
         element
     );

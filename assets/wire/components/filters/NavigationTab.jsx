@@ -8,13 +8,20 @@ import NavLink from './NavLink';
 import {toggleNavigation} from 'search/actions';
 import {noNavigationSelected} from 'search/utils';
 
-function NavigationTab({navigations, activeNavigation, toggleNavigation, fetchItems, addAllOption}) {
+function NavigationTab({
+    navigations,
+    activeNavigation,
+    toggleNavigation,
+    fetchItems,
+    addAllOption,
+    disableSameNavigationDeselect,
+}) {
     const navLinks = navigations.map((navigation) => (
         <NavLink key={navigation.name}
             isActive={activeNavigation.includes(navigation._id) || navigations.length === 1}
             onClick={(event) => {
                 event.preventDefault();
-                toggleNavigation(navigation);
+                toggleNavigation(navigation, disableSameNavigationDeselect);
                 fetchItems();
             }}
             label={navigation.name}
