@@ -24,7 +24,7 @@ const initialState = {
     watchListCompanies: [],
 };
 
-export default function userReducer(state = initialState, action) {
+export default function watchListsReducer(state = initialState, action) {
     switch (action.type) {
 
     case SELECT_WATCH_LIST:

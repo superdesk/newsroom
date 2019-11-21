@@ -275,6 +275,11 @@ export function setDownloadItems(items) {
     return {type: DOWNLOAD_ITEMS, items};
 }
 
+export const EXPORT_ITEMS = 'EXPORT_ITEMS';
+export function setExportItems(items) {
+    return {type: EXPORT_ITEMS, items};
+}
+
 export const COPY_ITEMS = 'COPY_ITEMS';
 export function setCopyItem(item) {
     return {type: COPY_ITEMS, items: [item]};
@@ -375,6 +380,19 @@ export function submitDownloadItems(items, format) {
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
         analytics.multiItemEvent('download', items.map((_id) => getState().itemsById[_id]));
+    };
+}
+
+/**
+ * Start export - open export view in new window.
+ *
+ * @param {Array} items
+ */
+export function submitExportItems(items) {
+    return (dispatch, getState) => {
+        window.open(`/watch_lists/export/${items.join(',')}`, '_blank');
+        dispatch(setExportItems(items));
+        analytics.multiItemEvent('export', items.map((_id) => getState().itemsById[_id]));
     };
 }
 

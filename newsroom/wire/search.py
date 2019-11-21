@@ -14,6 +14,7 @@ from newsroom.products.products import get_products_by_company, get_products_by_
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.wire.utils import get_local_date, get_end_date
+from newsroom.utils import query_resource
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ def get_aggregation_field(key):
     return get_aggregations()[key]['terms']['field']
 
 
-def set_product_query(query, company, section, user=None, navigation_id=None, events_only=False):
+def set_product_query(query, company, section, user=None, navigation_id=None, events_only=False, source_query=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -67,15 +68,17 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
     If not provided session user will be checked
     """
     products = None
+    for_watch_lists = section == 'watch_lists'
+    internal_section = 'wire' if for_watch_lists else section
 
-    if is_admin(user):
+    if is_admin(user) and not for_watch_lists:
         if navigation_id:
             products = get_products_by_navigation(navigation_id)
         else:
             return  # admin will see everything by default
 
     if company:
-        products = get_products_by_company(company['_id'], navigation_id, product_type=section)
+        products = get_products_by_company(company['_id'], navigation_id, product_type=internal_section)
     else:
         # user does not belong to a company so blocking all stories
         abort(403, gettext('User does not belong to a company.'))
@@ -94,29 +97,58 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
                 if company_type.get('wire_must_not'):
                     query['bool']['must_not'].append(company_type['wire_must_not'])
 
-    planning_items_should = []
-    for product in products:
-        if product.get('query'):
-            query['bool']['should'].append(query_string(product['query']))
-            if product.get('planning_item_query') and not events_only:
-                # form the query for the agenda planning items
-                planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
+    if for_watch_lists:
+        watch_lists = []
+        if navigation_id and isinstance(navigation_id, list) and len(navigation_id) > 0:
+            watch_lists.append(get_resource_service('watch_lists').find_one(req=None, _id=navigation_id[0]))
+        else:
+            watch_lists = list(query_resource('watch_lists'))
 
-    if planning_items_should:
-        query['bool']['should'].append(
-            nested_query(
-                'planning_items',
-                {
-                    'bool': {'should': planning_items_should, 'minimum_should_match': 1}
-                },
-                name='products'
+        if len(watch_lists) > 0:
+            for w in watch_lists:
+                query['bool']['should'].append(query_string(w['query']))
+
+            if navigation_id and len(watch_lists[0].get('keywords') or []) > 0 and source_query is not None:
+                source_query['highlight'] = {'fields': {}}
+                fields = ['body_html']
+                for f in fields:
+                    source_query['highlight']['fields'][f] = {
+                        "number_of_fragments": 0,
+                        "highlight_query": {
+                            "query_string": {
+                                "query": ' '.join(watch_lists[0]['keywords']),
+                                "default_operator": "AND",
+                                "lenient": False
+                            }
+                        }
+                    }
+                source_query['highlight']['pre_tags'] = ["<span class='es-highlight'>"]
+                source_query['highlight']['post_tags'] = ["</span>"]
+                source_query['highlight']['require_field_match'] = False
+    else:
+        planning_items_should = []
+        for product in products:
+            if product.get('query'):
+                query['bool']['should'].append(query_string(product['query']))
+                if product.get('planning_item_query') and not events_only:
+                    # form the query for the agenda planning items
+                    planning_items_should.append(planning_items_query_string(product.get('planning_item_query')))
+
+        if planning_items_should:
+            query['bool']['should'].append(
+                nested_query(
+                    'planning_items',
+                    {
+                        'bool': {'should': planning_items_should, 'minimum_should_match': 1}
+                    },
+                    name='products'
+                )
             )
-        )
 
     query['bool']['minimum_should_match'] = 1
-    _add_limit_days(query, section, company, user)
+    _add_limit_days(query, internal_section, company, user)
 
-    if not query['bool']['should']:
+    if not query['bool']['should'] and not for_watch_lists:
         abort(403, gettext('Your company doesn\'t have any products defined.'))
 
 
@@ -223,6 +255,7 @@ class WireSearchService(newsroom.Service):
         return super().get(internal_req, None).count()
 
     def get(self, req, lookup, size=25, aggs=True, ignore_latest=False):
+        source = {}
         query = _items_query(ignore_latest)
         user = get_user(required=False)
         company = get_user_company(user)
@@ -233,7 +266,7 @@ class WireSearchService(newsroom.Service):
         if navigation_id:
             navigation_id = list(navigation_id.split(','))
 
-        set_product_query(query, company, self.section, navigation_id=navigation_id)
+        set_product_query(query, company, self.section, navigation_id=navigation_id, source_query=source)
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
@@ -261,7 +294,7 @@ class WireSearchService(newsroom.Service):
             if req.args.get('created_from') or req.args.get('created_to'):
                 query['bool']['must'].append(versioncreated_range(req.args))
 
-        source = {'query': query}
+        source['query'] = query
         source['sort'] = [{'versioncreated': 'desc'}]
         source['size'] = size
         source['from'] = int(req.args.get('from', 0))

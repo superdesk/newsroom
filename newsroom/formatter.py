@@ -15,7 +15,7 @@ class BaseFormatter():
     #: File extension to use for downloaded file.
     FILE_EXTENSION = None
 
-    def format_item(self, item, item_type=None):
+    def format_item(self, item, item_type=None, items=[]):
         raise NotImplementedError
 
     def format_filename(self, item):

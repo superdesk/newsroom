@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import { submitDownloadItems } from 'wire/actions';
 import { modalFormValid } from 'actions';
+import {getFormats, context} from '../../selectors';
 
 import Modal from 'components/Modal';
 import SelectInput from 'components/SelectInput';
@@ -13,7 +14,7 @@ class DownloadItemsModal extends React.Component {
         super(props);
         this.state = {
             items: props.data.items,
-            format: 'text',
+            format: props.context === 'watch_lists' ? 'watch_lists' : 'text',
         };
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -63,10 +64,12 @@ DownloadItemsModal.propTypes = {
     data: PropTypes.shape({
         items: PropTypes.arrayOf(PropTypes.string).isRequired,
     }),
+    context: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
-    options: state.formats.map((format) => ({value: format.format, text: format.name})),
+    options: getFormats(state),
+    context: context(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
