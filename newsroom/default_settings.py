@@ -4,6 +4,9 @@ import tzlocal
 from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
+from datetime import timedelta
+from newsroom import company_expiry_alerts  # noqa
+from newsroom.watch_lists import email_alerts  # noqa
 
 from superdesk.default_settings import (   # noqa
     VERSION,
@@ -284,7 +287,7 @@ CELERY_TASK_ROUTES = {
     'newsroom.*': {
         'queue': celery_queue('newsroom'),
         'routing_key': 'newsroom.task',
-    },
+    }
 }
 
 #: celery beat config
@@ -292,6 +295,14 @@ CELERY_BEAT_SCHEDULE = {
     'newsroom:company_expiry': {
         'task': 'newsroom.company_expiry_alerts.company_expiry',
         'schedule': crontab(hour=local_to_utc_hour(0), minute=0),  # Runs every day at midnight
+    },
+    'newsroom:watch_list_schedule_alerts': {
+        'task': 'newsroom.watch_lists.email_alerts.watch_list_schedule_alerts',
+        'schedule': timedelta(seconds=60),
+    },
+    'newsroom:watch_list_immediate_alerts': {
+        'task': 'newsroom.watch_lists.email_alerts.watch_list_immediate_alerts',
+        'schedule': timedelta(seconds=60),
     }
 }
 

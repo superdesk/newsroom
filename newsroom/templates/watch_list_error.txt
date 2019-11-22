@@ -1,0 +1,4 @@
+{{ gettext("The following watch list has errored while sending alerts:") }}
+{{ gettext("Name:") }} {{ name }}
+{{ gettext("Company:") }} {{ company }}
+{{ gettext("Run time:") }} {{ run_time }}
