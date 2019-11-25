@@ -33,3 +33,49 @@ WIRE_GROUPS = [
         'label': gettext('Subject'),
     }
 ]
+
+BLUEPRINTS = [
+    'newsroom.wire',
+    'newsroom.auth',
+    'newsroom.users',
+    'newsroom.companies',
+    'newsroom.design',
+    'newsroom.history',
+    'newsroom.push',
+    'newsroom.topics',
+    'newsroom.upload',
+    'newsroom.notifications',
+    'newsroom.products',
+    'newsroom.section_filters',
+    'newsroom.navigations',
+    'newsroom.cards',
+    'newsroom.reports',
+    'newsroom.public',
+    'newsroom.settings'
+]
+
+CORE_APPS = [
+    'superdesk.notification',
+    'content_api.items',
+    'content_api.items_versions',
+    'content_api.search',
+    'content_api.auth',
+    'content_api.publish',
+    'newsroom.users',
+    'newsroom.companies',
+    'newsroom.wire',
+    'newsroom.topics',
+    'newsroom.upload',
+    'newsroom.history',
+    'newsroom.ui_config',
+    'newsroom.notifications',
+    'newsroom.products',
+    'newsroom.section_filters',
+    'newsroom.navigations',
+    'newsroom.cards',
+    'newsroom.reports',
+    'newsroom.public',
+    'newsroom.settings',
+    'newsroom.photos',
+    'newsroom.media_utils',
+]
