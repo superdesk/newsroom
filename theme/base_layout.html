@@ -40,7 +40,7 @@
             {% else %}
             <div class="form-inline my-lg-0 ml-auto pr-2 pr-sm-3">
                 <div class="mr-3 d-none d-md-block">{{ get_date() | date_header }}</div>
-                <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>                
+                <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
             </div>
             {% endif %}
         </nav>
@@ -68,9 +68,9 @@
                 {% block default_navs %}
                     {% for group in range(0, 10) %}
                         {% for nav in sidenavs(request.blueprint)|selectattr("group", "equalto", group) %}
-                        {% if group > 0 and loop.first and loop.length %}
-                        <li class="sidenav-icons__item d-none d-sm-block"><span><i class="icon--more icon--rotate-90 icon--mid-blue"></i></span></li>
-                        {% endif %}
+{#                        {% if group > 0 and loop.first and loop.length %}#}
+{#                        <li class="sidenav-icons__item d-none d-sm-block"><span><i class="icon--more icon--rotate-90 icon--mid-blue"></i></span></li>#}
+{#                        {% endif %}#}
 
                         {% include "sidenav_icon.html" %}
                         {% endfor %}
