@@ -261,7 +261,8 @@ CLIENT_CONFIG = {
     'coverage_date_format': CLIENT_COVERAGE_DATE_FORMAT,
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
-    'list_animations': True,  # Enables or disables the animations for list item select boxes
+    'list_animations': True,  # Enables or disables the animations for list item select boxes,
+    'display_news_only': True  # Displays news only switch in wire
 }
 
 LANGUAGES = ['en', 'fi', 'cs']
