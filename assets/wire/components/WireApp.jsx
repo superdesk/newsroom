@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
-import {gettext, getItemFromArray} from 'utils';
+import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY} from 'utils';
 
 import {
     fetchItems,
@@ -160,7 +160,7 @@ class WireApp extends BaseApp {
                             activeNavigation={this.props.activeNavigation}
                             newsOnly={this.props.newsOnly}
                             toggleNews={this.props.toggleNews}
-                            hideNewsOnly={this.props.context !== 'wire'}
+                            hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY)}
                         />
                     </nav>
                 </section>,

@@ -22,6 +22,7 @@ export const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
 export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
+export const DISPLAY_NEWS_ONLY = getConfig('display_news_only', true);
 
 
 /**
