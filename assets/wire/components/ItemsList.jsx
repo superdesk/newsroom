@@ -5,12 +5,13 @@ import classNames from 'classnames';
 import {isEqual} from 'lodash';
 
 
-import { gettext } from 'utils';
+import {gettext, isDisplayed} from 'utils';
 import WireListItem from './WireListItem';
 import { setActive, previewItem, toggleSelected, openItem } from '../actions';
 import { EXTENDED_VIEW } from '../defaults';
 import { getIntVersion } from '../utils';
 import {searchNavigationSelector} from 'search/selectors';
+import {previewConfigSelector} from 'ui/selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
@@ -120,8 +121,9 @@ class ItemsList extends React.Component {
         }
     }
 
-    filterActions(item) {
-        return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
+    filterActions(item, config) {
+        return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
+          (!action.when || action.when(this.props, item)));
     }
 
     componentDidUpdate(nextProps) {
@@ -147,7 +149,7 @@ class ItemsList extends React.Component {
                 onActionList={this.onActionList}
                 showActions={!!this.state.actioningItem && this.state.actioningItem._id === _id}
                 toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
-                actions={this.filterActions(itemsById[_id])}
+                actions={this.filterActions(itemsById[_id], this.props.previewConfig)}
                 isExtended={isExtended}
                 user={this.props.user}
                 context={this.props.context}
@@ -192,6 +194,7 @@ ItemsList.propTypes = {
     activeNavigation: PropTypes.arrayOf(PropTypes.string),
     resultsFiltered: PropTypes.bool,
     isLoading: PropTypes.bool,
+    previewConfig: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -209,6 +212,7 @@ const mapStateToProps = (state) => ({
     activeNavigation: searchNavigationSelector(state),
     resultsFiltered: state.resultsFiltered,
     isLoading: state.isLoading,
+    previewConfig: previewConfigSelector(state),
 });
 
 export default connect(mapStateToProps)(ItemsList);
