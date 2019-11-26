@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { createPortal } from 'react-dom';
-import { isTouchDevice, gettext } from 'utils';
+import { isTouchDevice, gettext, isDisplayed } from 'utils';
 
 // tabs
 import TopicsTab from 'search/components/TopicsTab';
@@ -96,8 +96,9 @@ export default class BaseApp extends React.Component {
         }
     }
 
-    filterActions(item) {
-        return this.props.actions.filter((action) => !action.when || action.when(this.props.state, item));
+    filterActions(item, config) {
+        return this.props.actions.filter((action) => (!config || isDisplayed(action.id, config)) &&
+          (!action.when || action.when(this.props.state, item)));
     }
 
     componentDidMount() {

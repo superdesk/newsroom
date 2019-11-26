@@ -119,7 +119,7 @@ class WireApp extends BaseApp {
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
-                actions={this.filterActions(this.props.itemToOpen)}
+                actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 detailsConfig={this.props.detailsConfig}
                 downloadVideo={this.props.downloadVideo}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
@@ -204,7 +204,7 @@ class WireApp extends BaseApp {
                             <WirePreview
                                 item={this.props.itemToPreview}
                                 user={this.props.user}
-                                actions={this.filterActions(this.props.itemToPreview)}
+                                actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig)}
                                 followStory={this.props.followStory}
                                 isFollowing={!!isFollowing}
                                 closePreview={this.props.closePreview}
