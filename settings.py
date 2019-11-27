@@ -3,6 +3,9 @@ from flask_babel import gettext
 
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'MMM DD, YYYY'
+CLIENT_COVERAGE_DATE_TIME_FORMAT = 'HH:mm DD/MM'
+CLIENT_COVERAGE_DATE_FORMAT = 'DD/MM'
+
 SITE_NAME = 'CP Newsroom LJI'
 SHOW_USER_REGISTER = True
 SHOW_COPYRIGHT = False
@@ -51,7 +54,9 @@ BLUEPRINTS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.settings'
+    'newsroom.settings',
+    'newsroom.news_api.api_tokens',
+    'newsroom.watch_lists',
 ]
 
 CORE_APPS = [
@@ -78,4 +83,35 @@ CORE_APPS = [
     'newsroom.settings',
     'newsroom.photos',
     'newsroom.media_utils',
+    'newsroom.news_api',
+    'newsroom.news_api.api_tokens',
+    'newsroom.watch_lists',
 ]
+
+COVERAGE_TYPES = {
+    'text': {'name': 'Text', 'icon': 'text'},
+    'photo': {'name': 'Photo', 'icon': 'photo'},
+    'picture': {'name': 'Picture', 'icon': 'photo'},
+    'audio': {'name': 'Audio', 'icon': 'audio'},
+    'video': {'name': 'Video', 'icon': 'video'},
+    'explainer': {'name': 'Explainer', 'icon': 'explainer'},
+    'infographics': {'name': 'Infographics', 'icon': 'infographics'},
+    'graphic': {'name': 'Graphic', 'icon': 'infographics'},
+    'live_video': {'name': 'Live Video', 'icon': 'live-video'},
+    'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'},
+    'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
+}
+
+DISPLAY_ABSTRACT = False
+
+# Client configuration
+CLIENT_CONFIG = {
+    'time_format': CLIENT_TIME_FORMAT,
+    'date_format': CLIENT_DATE_FORMAT,
+    'coverage_date_time_format': CLIENT_COVERAGE_DATE_TIME_FORMAT,
+    'coverage_date_format': CLIENT_COVERAGE_DATE_FORMAT,
+    'coverage_types': COVERAGE_TYPES,
+    'display_abstract': DISPLAY_ABSTRACT,
+    'list_animations': True,  # Enables or disables the animations for list item select boxes,
+    'display_news_only': False  # Displays news only switch in wire
+}
