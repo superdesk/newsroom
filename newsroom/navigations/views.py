@@ -28,7 +28,6 @@ def index():
 
 
 @blueprint.route('/navigations/search', methods=['GET'])
-@admin_only
 def search():
     lookup = None
     if flask.request.args.get('q'):
