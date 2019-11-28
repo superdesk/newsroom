@@ -261,7 +261,7 @@ CLIENT_CONFIG = {
     'display_news_only': True  # Displays news only switch in wire
 }
 
-LANGUAGES = ['en', 'fi', 'cs']
+LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
 DEFAULT_LANGUAGE = 'en'
 
 # Enable iframely support for item body_html
