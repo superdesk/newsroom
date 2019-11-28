@@ -1,20 +1,13 @@
 
-from babel import support, core
+from babel import core
 from flask import request, current_app, session
-from flask_babel import Babel, get_locale
+from flask_babel import Babel, get_translations
 from newsroom.auth import get_user
 
 
 def get_client_translations(domain='client'):
-    babel = current_app.extensions['babel']
-    for dirname in babel.translation_directories:
-        translations = support.Translations.load(
-            dirname,
-            [get_locale()],
-            domain
-        )
-        return {key: val for key, val in translations._catalog.items() if key}
-    return {}
+    translations = get_translations()
+    return {key: val for key, val in translations._catalog.items() if key and val}
 
 
 def get_client_locales():
