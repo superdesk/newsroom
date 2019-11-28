@@ -14,7 +14,6 @@
     "lint": "eslint assets --ext .js --ext .jsx",
     "fix": "eslint assets --ext .js --ext .jsx --fix",
     "test": "karma start --single-run",
-    "extract_messages": "react-gettext-parser --output newsroom-client.pot 'assets/**/{*.js,*.jsx}'",
     "karma": "karma start"
   },
   "dependencies": {
@@ -70,7 +69,6 @@
     "karma-jasmine": "^1.1.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.4",
-    "react-gettext-parser": "1.7.0",
     "react-test-renderer": "^16.0.0",
     "sinon": "^4.0.0"
   }
