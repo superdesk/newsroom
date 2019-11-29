@@ -54,6 +54,14 @@
                             {{ form.company_size(class="form-control", id="company_size", required="true") }}
                         </div>
 
+                        <div class="form-group mb-4 p-0">
+                            <div class="custom-control custom-checkbox">
+                                {{ form.consent(class="custom-control-input", id="consent", required="true") }}
+                                <label class="custom-control-label" for="consent">{{ form.consent.label.text }}</label>
+                                <a href="{{ terms }}">{{ gettext("terms and conditions") }}</a>
+                            </div>
+                        </div>
+
                         <div class="g-recaptcha mb-4" data-sitekey={{ sitekey }} data-callback="enableSubmitButton"></div>
 
                         <button type="submit" class="btn btn-primary btn-block" id="signup-submit" disabled>

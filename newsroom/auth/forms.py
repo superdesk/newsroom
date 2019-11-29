@@ -21,6 +21,7 @@ class SignupForm(FlaskForm):
     country = StringField(lazy_gettext('Your country'), validators=[DataRequired()])
     occupation = SelectField(lazy_gettext('Your position'), choices=occupations, validators=[DataRequired()])
     company_size = SelectField(lazy_gettext('Size of your company'), choices=company_sizes, validators=[DataRequired()])
+    consent = BooleanField(lazy_gettext('I agree to'), validators=[])
     recaptcha = RecaptchaField()
 
 
