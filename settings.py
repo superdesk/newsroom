@@ -115,3 +115,5 @@ CLIENT_CONFIG = {
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
     'display_news_only': False  # Displays news only switch in wire
 }
+
+WATERMARK_IMAGE = None
