@@ -17,9 +17,10 @@ export default function ArticlePicture({isKilled, picture, isItemDetails, isCust
 
     const classes = classNames({'wire-column__preview__image--custom': isCustomRendition});
     const caption = getCaption(picture);
-    const byline = get(picture, 'byline');
+    const byline = get(picture, 'byline') ? `(${picture.byline})`.replace('((', '(').replace('))', ')') :
+        null;
     const searchUrl = getConfig('multimedia_website_search_url', '');
-    const bylineHref = searchUrl && byline ? `${searchUrl}/${get(picture, 'guid')}` : '';
+    const bylineHref = searchUrl && byline ? `${searchUrl}${get(picture, 'guid')}` : '';
 
     return (<figure className='wire-column__preview__image'>
         {isItemDetails &&
@@ -27,7 +28,7 @@ export default function ArticlePicture({isKilled, picture, isItemDetails, isCust
         <img src={renditions.href} className={classes}/>}
         <figcaption className='wire-column__preview__caption'>
             {caption}
-            {bylineHref && <a href={bylineHref} target='_blank'> ({byline})</a>}
+            {bylineHref && <a href={bylineHref} target='_blank'> {byline}</a>}
         </figcaption>
     </figure>);
 }
