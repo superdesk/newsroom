@@ -1,8 +1,6 @@
 import superdesk
 
 from flask_babel import gettext
-from eve_elastic.elastic import parse_date
-
 from superdesk.resource import not_analyzed
 from newsroom.signals import publish_item
 from copy import copy
@@ -27,15 +25,6 @@ def on_publish_item(app, item, is_new, **kwargs):
             if subject.get('scheme', '') in STT_FIELDS:
                 item[subject['scheme']] = subject.get('name', subject.get('code'))
         item['subject'] = [subject for subject in item['subject'] if subject.get('scheme') != 'sttdone1']
-
-    # set versioncreated for archive items
-    if item.get('firstcreated') and is_new:
-        if isinstance(item.get('firstcreated'), str):
-            firstcreated = parse_date(item['firstcreated'])
-        else:
-            firstcreated = item['firstcreated']
-        if firstcreated < item['versioncreated']:
-            item['versioncreated'] = firstcreated
 
     # add private note to ednote
     if item.get('extra', {}).get('sttnote_private'):

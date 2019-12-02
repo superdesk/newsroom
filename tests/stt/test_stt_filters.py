@@ -39,25 +39,6 @@ item = {
 }
 
 
-def test_push_firstcreated_is_older_copies_to_versioncreated(client, app):
-    from stt.filters import init_app
-    init_app(app)
-    payload = item.copy()
-    payload['firstcreated'] = '2017-11-26T08:00:57+0000'
-    payload['versioncreated'] = '2017-11-27T08:00:57+0000'
-    payload['version'] = '1'
-    client.post('/push', data=json.dumps(payload), content_type='application/json')
-    parsed = get_entity_or_404(item['guid'], 'items')
-    assert parsed['firstcreated'] == parsed['versioncreated']
-
-    # post the same story again as a correction, versioncreated is preserved
-    payload['versioncreated'] = '2017-11-28T08:00:57+0000'
-    client.post('/push', data=json.dumps(payload), content_type='application/json')
-    parsed = get_entity_or_404(item['guid'], 'items')
-    assert parsed['firstcreated'].strftime('%Y%m%d%H%M') == '201711260800'
-    assert parsed['versioncreated'].strftime('%Y%m%d%H%M') == '201711280800'
-
-
 def test_push_updates_ednote(client, app):
     from stt.filters import init_app
     init_app(app)
