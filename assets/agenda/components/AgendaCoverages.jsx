@@ -6,7 +6,7 @@ import CoverageItemStatus from './CoverageItemStatus';
 import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, WORKFLOW_STATUS, formatCoverageDate} from '../utils';
 
 
-export default function AgendaCoverages({item, coverages, wireItems}) {
+export default function AgendaCoverages({item, coverages, wireItems, actions, user}) {
     if (isEmpty(coverages)) {
         return null;
     }
@@ -36,7 +36,12 @@ export default function AgendaCoverages({item, coverages, wireItems}) {
                 <span className='coverage-item__text-label mr-1'>{gettext('Source')}:</span>
                 <span className='mr-2'>{coverage.coverage_provider}</span>
             </div>}
-            <CoverageItemStatus coverage={coverage} item={item} wireItems={wireItems} />
+            <CoverageItemStatus
+                coverage={coverage}
+                item={item}
+                wireItems={wireItems}
+                actions={actions}
+                user={user} />
         </div>
     ));
 }

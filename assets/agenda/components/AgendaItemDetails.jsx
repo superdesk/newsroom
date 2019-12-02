@@ -46,6 +46,7 @@ export default function AgendaItemDetails(
         planningId,
         eventsOnly,
         wireItems,
+        coverageActions,
     })
 {
     const locations = getLocations(item);
@@ -85,7 +86,9 @@ export default function AgendaItemDetails(
                             item={item}
                             currentCoverage={displayCoverages.current}
                             previousCoverage={displayCoverages.previous}
-                            wireItems={wireItems} />}
+                            wireItems={wireItems}
+                            actions={coverageActions}
+                            user={user} />}
                     </div>
                     {hasAttachments(item) && (
                         <ArticleSidebarBox label={gettext('Attachments')}>
@@ -117,4 +120,5 @@ AgendaItemDetails.propTypes = {
     planningId: PropTypes.string,
     eventsOnly: PropTypes.bool,
     wireItems: PropTypes.array,
+    coverageActions: PropTypes.array,
 };

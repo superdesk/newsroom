@@ -2,17 +2,16 @@ import {getItemActions} from '../item-actions';
 import * as agendaActions from './actions';
 import {gettext} from '../utils';
 import {isWatched} from './utils';
-import { get, includes } from 'lodash';
 
 
-export default (dispatch) => {
+export const getAgendaItemActions = (dispatch) => {
     const { watchEvents, stopWatchingEvents } = agendaActions;
     return getItemActions(dispatch, { ...agendaActions }).concat([
         {
             name: gettext('Watch'),
             icon: 'watch',
             multi: true,
-            when: (state, item) => state.user && !includes(get(item, 'watches', []), state.user),
+            when: (state, item) => state.user && !isWatched(item, state.user),
             action: (items) => dispatch(watchEvents(items)),
         },
         {
@@ -24,3 +23,22 @@ export default (dispatch) => {
         },
     ]);
 };
+
+export const getCoverageItemActions = (dispatch) => {
+    const { watchCoverage, stopWatchingCoverage } = agendaActions;
+    return [
+        {
+            name: gettext('Watch'),
+            icon: 'watch',
+            when: (cov, user, item) => user && !isWatched(item, user) && !isWatched(cov, user),
+            action: (coverage, group, item) => dispatch(watchCoverage(coverage, item)),
+        },
+        {
+            name: gettext('Stop watching'),
+            icon: 'unwatch',
+            when: (cov, user) => user && isWatched(cov, user),
+            action: (coverage, group, item) => dispatch(stopWatchingCoverage(coverage, item)),
+        },
+    ];
+};
+
