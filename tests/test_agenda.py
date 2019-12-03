@@ -182,7 +182,7 @@ def test_coverage_request(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['admin@bar.com']
-        assert outbox[0].subject == 'A new coverage request'
+        assert outbox[0].subject == 'Coverage inquiry: Conference Planning'
         assert 'admin admin' in outbox[0].body
         assert 'admin@sourcefabric.org' in outbox[0].body
         assert 'http://localhost:5050/agenda?item={}'.format(parse.quote('urn:conference')) in outbox[0].body
