@@ -4,7 +4,6 @@ import tzlocal
 from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
-from newsroom import company_expiry_alerts  # noqa
 
 from superdesk.default_settings import (   # noqa
     VERSION,
@@ -40,9 +39,6 @@ from superdesk.default_settings import (   # noqa
     CELERY_WORKER_LOG_FORMAT,
     CELERY_WORKER_TASK_LOG_FORMAT,
     CELERY_WORKER_CONCURRENCY,
-    CELERY_TASK_DEFAULT_QUEUE,
-    CELERY_TASK_DEFAULT_EXCHANGE,
-    CELERY_TASK_DEFAULT_ROUTING_KEY,
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
 )
@@ -127,6 +123,7 @@ CORE_APPS = [
     'newsroom.news_api',
     'newsroom.news_api.api_tokens',
     'newsroom.watch_lists',
+    'newsroom.company_expiry_alerts',
 ]
 
 SITE_NAME = 'AAP Newsroom'
