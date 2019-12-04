@@ -2,6 +2,7 @@ import os
 from superdesk.default_settings import env
 
 URL_PREFIX = os.environ.get('CONTENT_API_PREFIX', 'api/v1')
+QUERY_MAX_RESULTS = 100
 
 CORE_APPS = [
     'newsroom.news_api.api_tokens',
@@ -13,7 +14,9 @@ CORE_APPS = [
     'newsroom.news_api.products',
     'newsroom.news_api.formatters',
     'newsroom.news_api.news',
-    'newsroom.news_api.news.item'
+    'newsroom.news_api.news.item',
+    'newsroom.news_api.news.search',
+    'newsroom.products'
 ]
 
 #: mongo db name, only used when mongo_uri is not set
@@ -32,3 +35,6 @@ CONTENTAPI_ELASTICSEARCH_URL = env('CONTENTAPI_ELASTICSEARCH_URL', ELASTICSEARCH
 #: elastic index name
 ELASTICSEARCH_INDEX = env('ELASTICSEARCH_INDEX', 'superdesk')
 CONTENTAPI_ELASTICSEARCH_INDEX = env('CONTENTAPI_ELASTICSEARCH_INDEX', CONTENTAPI_MONGO_DBNAME)
+
+FILTER_AGGREGATIONS = False
+ELASTIC_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
