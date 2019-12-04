@@ -14,7 +14,7 @@ export default function ArticleAuthor({item, isPreview, displayConfig}) {
                 {isPreview && isDisplayed('located', displayConfig) && item.located && (
                     <span>{gettext('in {{ located}}', {located: item.located})}</span>
                 )}
-                {!isPreview && item.versioncreated && (
+                {item.versioncreated && (
                     <span>{`${gettext('on')} ${fullDate(item.versioncreated)}`}</span>
                 )}
             </p>
