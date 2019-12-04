@@ -1,11 +1,12 @@
 /* CP theme custom css */
 
 .navbar__logo {
-    max-width: none;
+    max-width: 80%;
 }
 .navbar__logo a, 
 .navbar__logo img {
     height: 100%;
+    max-height: 100%;
 }
 .navbar-brand span.breadcrumb-item {
     font-size: 1rem;
@@ -24,6 +25,10 @@
     .card a.btn-outline-primary:hover {
         color: white;
     }
+.d-flex {
+    display: -webkit-flex !important;
+    display: flex !important;
+}
 @media only screen and (min-width: 375px) {
     .footer {
         justify-content: center;
@@ -41,5 +46,10 @@
     }
     .footer {
         justify-content: center;
+    }
+}
+@media only screen and (min-width: 786px) {
+    .navbar__logo {
+        max-width: none;
     }
 }
