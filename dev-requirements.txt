@@ -4,3 +4,4 @@ sphinx-autobuild
 pytest==3.10.0
 pytest-cov
 pytest-mock
+responses>=0.10.6,<0.11
