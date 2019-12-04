@@ -134,13 +134,15 @@ def get_company_report():
     for _id, details in company_products.items():
         users = list(query_resource('users', lookup={'company': ObjectId(_id)}))
         if companies.get(ObjectId(_id)):
+            company = companies[ObjectId(_id)]
             results.append({
                 '_id': _id,
-                'name': companies[ObjectId(_id)]['name'],
-                'is_enabled': companies[ObjectId(_id)]['is_enabled'],
+                'name': company['name'],
+                'is_enabled': company['is_enabled'],
                 'products': details.get('products', []),
                 'users': users,
-                'company': companies[ObjectId(_id)],
+                'company': company,
+                'account_manager': company.get('account_manager'),
             })
 
     sorted_results = sorted(results, key=lambda k: k['name'])

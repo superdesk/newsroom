@@ -63,6 +63,14 @@ function Company({results, print}) {
                 {getContactDetails(item.company)}
             </td>
         </tr>,
+        <tr key={`${item._id}-account_manager`}>
+            <td colSpan="4">
+                <div className="d-flex align-items-center m-2">
+                    <div><span className="font-italic">{gettext('Account Manager')}: </span>
+                        {item.account_manager}</div>
+                </div>
+            </td>
+        </tr>,
         <tr key={`${item._id}-users`}>
             <td colSpan="5">
                 {getUsers(item.users)}
