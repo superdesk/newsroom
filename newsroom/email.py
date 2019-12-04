@@ -34,8 +34,8 @@ def send_email(to, subject, text_body, html_body=None, sender=None):
     :param sender: Sender
     :return:
     """
-    args = {'to': to, 'subject': subject, 'text_body': text_body, 'html_body': html_body, 'sender': sender}
-    _send_email.apply_async(kwargs=args, serializer="eve/json")
+    kwargs = {'to': to, 'subject': subject, 'text_body': text_body, 'html_body': html_body, 'sender': sender}
+    _send_email.apply_async(kwargs=kwargs)
 
 
 def send_new_signup_email(user):

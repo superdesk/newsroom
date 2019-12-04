@@ -47,7 +47,11 @@ class CompanyExpiryAlerts():
 
         # Check if there are any recipients
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
-        recipients = general_settings['values']['company_expiry_alert_recipients'].split(',')
+        try:
+            recipients = general_settings['values']['company_expiry_alert_recipients'].split(',')
+        except KeyError:
+            logger.warning('there are no alert expiry recipients')
+            return
         expiry_time = (utcnow() + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
         companies_service = get_resource_service('companies')
         companies = list(companies_service.find({
