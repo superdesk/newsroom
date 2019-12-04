@@ -5,7 +5,7 @@ import { gettext, isDisplayed } from 'utils';
 export default function ArticleAuthor({item, displayConfig}) {
     const inStr = item.located && item.byline ? gettext('in ') : '';
     return (
-        (item.byline || item.located) && (
+        (item.byline || item.located || item.versioncreated) && (
             <p className='wire-column__preview__author'>
                 {isDisplayed('byline', displayConfig) && item.byline && (
                     <span>{gettext('By ')}<b>
