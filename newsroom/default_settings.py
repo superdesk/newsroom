@@ -5,7 +5,6 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 
 from superdesk.default_settings import local_to_utc_hour
-from newsroom import company_expiry_alerts  # noqa
 
 from superdesk.default_settings import (   # noqa
     VERSION,
@@ -41,9 +40,6 @@ from superdesk.default_settings import (   # noqa
     CELERY_WORKER_LOG_FORMAT,
     CELERY_WORKER_TASK_LOG_FORMAT,
     CELERY_WORKER_CONCURRENCY,
-    CELERY_TASK_DEFAULT_QUEUE,
-    CELERY_TASK_DEFAULT_EXCHANGE,
-    CELERY_TASK_DEFAULT_ROUTING_KEY,
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
 )
@@ -123,6 +119,7 @@ CORE_APPS = [
     'newsroom.settings',
     'newsroom.photos',
     'newsroom.media_utils',
+    'newsroom.company_expiry_alerts',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -271,19 +268,17 @@ COMPANY_TYPES = []
 
 #: celery config
 WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
+
+CELERY_TASK_DEFAULT_QUEUE = celery_queue('newsroom')
 CELERY_TASK_QUEUES = (
-    Queue(celery_queue('default'), Exchange(celery_queue('default')), routing_key='default'),
     Queue(celery_queue('newsroom'), Exchange(celery_queue('newsroom'), type='topic'), routing_key='newsroom.#'),
 )
+
 CELERY_TASK_ROUTES = {
-    'newsroom.company_expiry_alerts.company_expiry': {
+    'newsroom.*': {
         'queue': celery_queue('newsroom'),
-        'routing_key': 'newsroom.company_expiry_alerts'
+        'routing_key': 'newsroom.task',
     },
-    'newsroom.email._send_email': {
-        'queue': celery_queue('newsroom'),
-        'routing_key': 'newsroom._send_email'
-    }
 }
 
 #: celery beat config
