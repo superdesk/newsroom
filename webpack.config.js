@@ -1,6 +1,7 @@
+/* eslint-env node */
+
 const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const NODE_MODULES = process.env.NODE_MODULES || 'node_modules';
 
