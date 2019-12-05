@@ -22,6 +22,7 @@ Feature: News API Products
         """
         [{"name": "Sample Product",
         "decsription": "a description",
+        "product_type": "news_api",
         "companies" : [
         "5ab03a87bdd78169bb6d0783",
         "5aa5e9fbbdd7810885f0dac1",
@@ -30,13 +31,14 @@ Feature: News API Products
         },
         {"name": "Sample Product 2",
         "decsription": "another description",
+        "product_type": "news_api",
         "companies" : [
         "5ab03a87bdd78169bb6d0783",
         "5aa5e9fbbdd7810885f0dac1"
         ]
         }]
         """
-    When we get "products"
+    When we get "newsapi_products"
     Then we get list with 1 items
         """
         {"_items": [{
@@ -72,7 +74,7 @@ Feature: News API Products
         "sd_product_id" : null
         }]
         """
-    When we get "products/#products._id#"
+    When we get "newsapi_products/#products._id#"
     Then we get OK response
     Then we get existing resource
         """
@@ -101,5 +103,5 @@ Feature: News API Products
         "sd_product_id" : null
         }]
         """
-    When we get "products/#products._id#"
+    When we get "newsapi_products/#products._id#"
     Then we get error 401

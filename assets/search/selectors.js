@@ -36,6 +36,7 @@ export const searchParamsSelector = createSelector(
             params.navigation = navigation;
         }
 
+        params.filter = {};
         if (filter && Object.keys(filter).length > 0) {
             params.filter = {};
             Object.keys(filter).forEach((key) => {
@@ -45,10 +46,6 @@ export const searchParamsSelector = createSelector(
                     params.filter[key] = value;
                 }
             });
-
-            if (isEmpty(params.filter)) {
-                delete params.filter;
-            }
         }
 
         return params;

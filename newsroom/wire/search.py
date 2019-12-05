@@ -53,7 +53,8 @@ def get_aggregation_field(key):
     return get_aggregations()[key]['terms']['field']
 
 
-def set_product_query(query, company, section, user=None, navigation_id=None, events_only=False, source_query=None):
+def set_product_query(query, company, section, user=None, navigation_id=None, events_only=False,
+                      source_query=None, client_products=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -126,8 +127,16 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
                 source_query['highlight']['post_tags'] = ["</span>"]
                 source_query['highlight']['require_field_match'] = False
     else:
+        # If a product list string has been provided it is assumed to be a comma delimited string of product id's
+        if client_products:
+            # Ensure that all the provided products are permissioned for this request
+            if not all(p in [c.get('_id') for c in products] for p in client_products):
+                abort(404, 'Invalid product parameter')
+
         planning_items_should = []
         for product in products:
+            if client_products and product.get('_id') not in client_products:
+                continue
             if product.get('query'):
                 query['bool']['should'].append(query_string(product['query']))
                 if product.get('planning_item_query') and not events_only:
@@ -156,7 +165,7 @@ def _add_limit_days(query, section, company, user):
     # This limit is only for wire content, ignore this limit for agenda
     # If later we require time limit for agenda, this will have to be separate as versioncreated
     # is not sufficient for calendar based items (i.e. using the event's date or the coverages scheduled date)
-    if section == 'agenda':
+    if section == 'agenda' or section == 'news_api':
         return
 
     limit_days = get_setting('aapx_time_limit_days') if section == 'aapX' else get_setting('wire_time_limit_days')
@@ -237,6 +246,7 @@ def _items_query(ignore_latest=False):
 
 
 class WireSearchService(newsroom.Service):
+
     section = 'wire'
 
     def get_bookmarks_count(self, user_id):
@@ -266,10 +276,14 @@ class WireSearchService(newsroom.Service):
         if navigation_id:
             navigation_id = list(navigation_id.split(','))
 
-        set_product_query(query, company, self.section, navigation_id=navigation_id, source_query=source)
+        set_product_query(query, company, req.args.get('section', self.section), navigation_id=navigation_id,
+                          client_products=req.args.get('requested_products'), source_query=source)
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))
+
+        if req.args.get('api_dates'):
+            query['bool']['must'].append(req.args.get('api_dates'))
 
         if req.args.get('newsOnly') and not (req.args.get('navigation') or req.args.get('product_type')):
             news_only_filter = get_setting('news_only_filter')
@@ -288,21 +302,23 @@ class WireSearchService(newsroom.Service):
             filters = json.loads(req.args['filter'])
 
         if not app.config.get('FILTER_BY_POST_FILTER', False):
-            if filters:
+            if filters and app.config.get('FILTER_AGGREGATIONS', True):
                 query['bool']['must'] += _filter_terms(filters)
+            elif filters:
+                query['bool']['must'].append(filters)
 
             if req.args.get('created_from') or req.args.get('created_to'):
                 query['bool']['must'].append(versioncreated_range(req.args))
 
         source['query'] = query
-        source['sort'] = [{'versioncreated': 'desc'}]
+        source['sort'] = [{'versioncreated': 'desc'}] if not req.sort else req.sort
         source['size'] = size
         source['from'] = int(req.args.get('from', 0))
 
         if app.config.get('FILTER_BY_POST_FILTER', False):
             if filters or req.args.get('created_from') or req.args.get('created_to'):
                 source['post_filter'] = {'bool': {'must': []}}
-            if filters:
+            if filters and app.config.get('FILTER_AGGREGATIONS', True):
                 source['post_filter']['bool']['must'] += _filter_terms(filters)
             if req.args.get('created_from') or req.args.get('created_to'):
                 source['post_filter']['bool']['must'].append(versioncreated_range(req.args))
@@ -316,6 +332,8 @@ class WireSearchService(newsroom.Service):
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
+        if req.projection:
+            internal_req.args['projections'] = req.projection
         return super().get(internal_req, lookup)
 
     def has_permissions(self, item, ignore_latest=False):

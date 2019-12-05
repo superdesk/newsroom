@@ -33,6 +33,8 @@ def get_app(config=None):
     if config:
         app_config.update(config)
 
+    app_config.from_envvar('NEWS_API_SETTINGS', silent=True)
+
     # check that the API is enabled to run
     if not app_config.get('NEWS_API_ENABLED', False):
         logger.error('News API is not enabled')
