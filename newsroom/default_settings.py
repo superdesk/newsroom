@@ -29,6 +29,7 @@ from superdesk.default_settings import (   # noqa
     MAIL_USE_TLS,
     MAIL_USE_SSL,
     _MAIL_FROM,
+    MAIL_USERNAME,
     MAIL_PASSWORD,
     CELERY_TASK_ALWAYS_EAGER,
     CELERY_TASK_SERIALIZER,
