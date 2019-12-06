@@ -116,7 +116,7 @@ def request_coverage():
     assert data.get('item')
     assert data.get('message')
     item = get_entity_or_404(data.get('item'), 'agenda')
-    send_coverage_request_email(user, data.get('message'), item['_id'])
+    send_coverage_request_email(user, data.get('message'), item)
     return flask.jsonify(), 201
 
 
