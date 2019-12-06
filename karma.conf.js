@@ -1,17 +1,16 @@
+/* eslint-env node */
 
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.config.js');
 
 module.exports = function(config) {
     config.set({
-        frameworks: ['jasmine'],
-
         files: [
-            {pattern: 'assets/**/*spec.js', watched: false},
+            'assets/tests.js',
         ],
 
         preprocessors: {
-            'assets/**/*.js': ['webpack', 'sourcemap'],
+            'assets/tests.js': ['webpack', 'sourcemap'],
         },
 
         webpack: {
@@ -25,6 +24,8 @@ module.exports = function(config) {
             stats: 'errors-only'
         },
 
+        reporters: ['dots'],
+        frameworks: ['jasmine'],
         browsers: ['ChromeHeadless'],
     });
 };
