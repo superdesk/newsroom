@@ -54,7 +54,7 @@ def get_aggregation_field(key):
 
 
 def set_product_query(query, company, section, user=None, navigation_id=None, events_only=False,
-                      source_query=None, client_products=None):
+                      source_query=None, client_products=None, req=None):
     """
     Checks the user for admin privileges
     If user is administrator then there's no filtering
@@ -68,11 +68,11 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
     :param events_only: From agenda to display events only or not
     If not provided session user will be checked
     """
-    products = None
-    for_watch_lists = section == 'watch_lists'
+    products = []
+    for_watch_lists = section == 'watch_lists' or (req and req.args.get('celery'))
     internal_section = 'wire' if for_watch_lists else section
 
-    if is_admin(user) and not for_watch_lists:
+    if not for_watch_lists and is_admin(user):
         if navigation_id:
             products = get_products_by_navigation(navigation_id)
         else:
@@ -80,7 +80,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
 
     if company:
         products = get_products_by_company(company['_id'], navigation_id, product_type=internal_section)
-    else:
+    elif not for_watch_lists:
         # user does not belong to a company so blocking all stories
         abort(403, gettext('User does not belong to a company.'))
 
@@ -100,7 +100,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
 
     if for_watch_lists:
         watch_lists = []
-        if navigation_id and isinstance(navigation_id, list) and len(navigation_id) > 0:
+        if navigation_id and navigation_id and len(navigation_id) > 0:
             watch_lists.append(get_resource_service('watch_lists').find_one(req=None, _id=navigation_id[0]))
         else:
             watch_lists = list(query_resource('watch_lists'))
@@ -213,7 +213,7 @@ def versioncreated_range(created):
     _range = {}
     offset = int(created.get('timezone_offset', '0'))
     if created.get('created_from'):
-        _range['gte'] = get_local_date(created['created_from'], '00:00:00', offset)
+        _range['gte'] = get_local_date(created['created_from'], created.get('created_from_time', '00:00:00'), offset)
     if created.get('created_to'):
         _range['lte'] = get_end_date(created['created_to'], get_local_date(created['created_to'], '23:59:59', offset))
     return {'range': {'versioncreated': _range}}
@@ -267,7 +267,7 @@ class WireSearchService(newsroom.Service):
     def get(self, req, lookup, size=25, aggs=True, ignore_latest=False):
         source = {}
         query = _items_query(ignore_latest)
-        user = get_user(required=False)
+        user = get_user(required=False) if not req.args.get('celery') else None
         company = get_user_company(user)
 
         get_resource_service('section_filters').apply_section_filter(query, self.section)
@@ -277,7 +277,7 @@ class WireSearchService(newsroom.Service):
             navigation_id = list(navigation_id.split(','))
 
         set_product_query(query, company, req.args.get('section', self.section), navigation_id=navigation_id,
-                          client_products=req.args.get('requested_products'), source_query=source)
+                          client_products=req.args.get('requested_products'), source_query=source, req=req)
 
         if req.args.get('q'):
             query['bool']['must'].append(query_string(req.args['q']))

@@ -566,8 +566,9 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         {'_id': 'filter', 'filter': {'genre': ['other']}, 'user': 'bar'},
         {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
     ]
-    matching = search.get_matching_topics(item['guid'], topics, users, companies)
-    assert ['created_from_future', 'query'] == matching
+    with app.test_request_context():
+        matching = search.get_matching_topics(item['guid'], topics, users, companies)
+        assert ['created_from_future', 'query'] == matching
 
 
 def test_push_parsed_item(client, app):
