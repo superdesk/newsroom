@@ -165,6 +165,7 @@ class AgendaResource(newsroom.Resource):
                     }
 
                 },
+                'watches': not_analyzed,
             },
         },
     }
@@ -794,25 +795,35 @@ class AgendaService(newsroom.Service):
         if agenda and original_agenda.get('state') != WORKFLOW_STATE.KILLED:
             user_dict = get_user_dict()
             company_dict = get_company_dict()
+            coverage_watched = len([c.get('watches') for c in (original_agenda.get('coverages') or [])]) > 0
             notify_user_ids = filter_active_users(original_agenda.get('watches', []),
                                                   user_dict,
                                                   company_dict,
                                                   events_only)
+
             users = [user_dict[str(user_id)] for user_id in notify_user_ids]
             # Only one push-notification
             push_notification('agenda_update',
                               item=agenda,
                               users=notify_user_ids)
 
-            if len(notify_user_ids) == 0:
+            if len(notify_user_ids) == 0 and not coverage_watched:
                 return
 
             def get_detailed_coverage(cov):
                 plan = next((p for p in (agenda.get('planning_items') or []) if p['guid'] == cov.get('planning_id')),
                             None)
                 if plan and plan.get('state') != WORKFLOW_STATE.KILLED:
-                    return next((c for c in (plan.get('coverages') or [])
-                                 if c.get('coverage_id') == cov.get('coverage_id')), None)
+                    detail_cov = next((c for c in (plan.get('coverages') or [])
+                                       if c.get('coverage_id') == cov.get('coverage_id')), None)
+                    if detail_cov:
+                        detail_cov['watches'] = cov.get('watches')
+
+                    return detail_cov
+
+                original_cov = next((c for c in original_agenda.get('coverages') if
+                                    c['coverage_id'] == cov['coverage_id']), cov)
+                cov['watches'] = original_cov.get('watches') or []
                 return cov
 
             def fill_all_coverages(skip_coverages=[], cancelled=False, use_original_agenda=False):
@@ -921,6 +932,12 @@ class AgendaService(newsroom.Service):
                     if reason_prefix > 0:
                         message = '{} {}'.format(
                                 message, agenda['state_reason'][(reason_prefix+1):len(agenda['state_reason'])])
+
+                # append coverage watching users too - except for unaltered_coverages
+                for c in coverage_updates['cancelled_coverages'] + coverage_updates['modified_coverages']:
+                    if c.get('watches'):
+                        notify_user_ids = filter_active_users(c['watches'], user_dict, company_dict, events_only)
+                        users = users + [user_dict[str(user_id)] for user_id in notify_user_ids]
 
                 # Send notifications to users
                 for user in users:

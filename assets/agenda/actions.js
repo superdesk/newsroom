@@ -41,6 +41,7 @@ import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
 
 const WATCH_URL = '/agenda_watch';
+const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -675,4 +676,40 @@ export function toggleFeaturedFilter(fetch = true) {
 export const TOGGLE_EVENTS_ONLY_FILTER = 'TOGGLE_EVENTS_ONLY_FILTER';
 export function toggleEventsOnlyFilter(value) {
     return {type: TOGGLE_EVENTS_ONLY_FILTER, value};
+}
+
+export const WATCH_COVERAGE = 'WATCH_COVERAGE';
+export function watchCoverage(coverage, item) {
+    return (dispatch) => {
+        server.post(WATCH_COVERAGE_URL, {
+            coverage_id: coverage.coverage_id,
+            item_id: item._id
+        })
+            .then(() => {
+                dispatch({
+                    type: WATCH_COVERAGE,
+                    coverage,
+                    item
+                });
+                notify.success(gettext('Started watching coverage successfully.'));
+            }, (error) => { errorHandler(error, dispatch);});
+    };
+}
+
+export const STOP_WATCHING_COVERAGE = 'STOP_WATCHING_COVERAGE';
+export function stopWatchingCoverage(coverage, item) {
+    return (dispatch) => {
+        server.del(WATCH_COVERAGE_URL, {
+            coverage_id: coverage.coverage_id,
+            item_id: item._id
+        })
+            .then(() => {
+                notify.success(gettext('Stopped watching coverage successfully.'));
+                dispatch({
+                    type: STOP_WATCHING_COVERAGE,
+                    coverage,
+                    item
+                });
+            }, (error) => { errorHandler(error, dispatch);});
+    };
 }

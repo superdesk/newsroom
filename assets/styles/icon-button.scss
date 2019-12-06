@@ -51,6 +51,13 @@
     }
 }
 
+.icon-button[disabled] {
+    cursor: default;
+    &:hover  {
+        border-color: transparent;
+    }
+}
+
 .icon-button--small {
     height: 29px;
     width: 28px;

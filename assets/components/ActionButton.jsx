@@ -19,12 +19,13 @@ class ActionButton extends React.Component {
         const classes = classNames(`icon--${this.props.action.icon}`, {
             'icon--gray': this.props.isVisited,
         });
-        const {item, group, plan, action} = this.props;
+        const {item, group, plan, action, disabled} = this.props;
 
         return (
             <button
                 type='button'
                 className={this.props.className}
+                disabled={disabled}
                 onClick={
                     () => {
                         if (action.multi) {
@@ -54,7 +55,8 @@ ActionButton.propTypes = {
         icon: PropTypes.string.isRequired,
         action: PropTypes.func.isRequired,
         multi: PropTypes.bool,
-    })
+    }),
+    disabled: PropTypes.bool,
 };
 
 export default ActionButton;

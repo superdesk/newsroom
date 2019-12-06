@@ -3,6 +3,7 @@ from newsroom.agenda import blueprint
 import flask
 
 from flask import current_app as app, request
+from flask_babel import gettext
 from eve.methods.get import get_internal
 from eve.render import send_response
 from superdesk import get_resource_service
@@ -10,7 +11,7 @@ from superdesk import get_resource_service
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
-from newsroom.auth import get_user
+from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
 from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, \
     get_agenda_dates, get_location_string, get_public_contacts, get_links, get_vocabulary
@@ -135,6 +136,51 @@ def bookmark():
 def follow():
     data = get_json_or_400()
     assert data.get('items')
-    update_action_list(data.get('items'), 'watches', item_type='agenda')
+    for item_id in data.get('items'):
+        user_id = get_user_id()
+        item = get_entity_or_404(item_id, 'agenda')
+        if request.method == 'POST':
+            updates = {'watches': list(set((item.get('watches')or []) + [user_id]))}
+            if item.get('coverages'):
+                updates['coverages'] = item['coverages']
+                for c in updates['coverages']:
+                    if c.get('watches') and user_id in c['watches']:
+                        c['watches'].remove(user_id)
+
+            get_resource_service('agenda').patch(item_id, updates)
+        else:
+            update_action_list(data.get('items'), 'watches', item_type='agenda')
+
     push_user_notification('saved_items', count=get_resource_service('agenda').get_saved_items_count())
+    return flask.jsonify(), 200
+
+
+@blueprint.route('/agenda_coverage_watch', methods=['POST', 'DELETE'])
+@login_required
+def watch_coverage():
+    user_id = get_user_id()
+    data = get_json_or_400()
+    assert data.get('item_id')
+    assert data.get('coverage_id')
+    item = get_entity_or_404(data['item_id'], 'agenda')
+
+    if item.get('watches') and user_id in item['watches']:
+        return flask.jsonify({'error': gettext('Cannot edit coverage watch when watching a parent item.')}), 403
+
+    try:
+        coverage_index = [c['coverage_id'] for c in (item.get('coverages') or [])].index(data['coverage_id'])
+    except ValueError:
+        return flask.jsonify({'error': gettext('Coverage not found.')}), 403
+
+    updates = {'coverages': item['coverages']}
+    if request.method == 'POST':
+        updates['coverages'][coverage_index]['watches'] = list(set((updates['coverages'][coverage_index].get('watches')
+                                                                    or []) + [user_id]))
+    else:
+        try:
+            updates['coverages'][coverage_index]['watches'].remove(user_id)
+        except Exception:
+            return flask.jsonify({'error': gettext('Error removing watch.')}), 403
+
+    get_resource_service('agenda').patch(data['item_id'], updates)
     return flask.jsonify(), 200
