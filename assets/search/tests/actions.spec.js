@@ -10,17 +10,17 @@ describe('search actions', () => {
     let store;
     let params;
 
-    const updateParams = () => {
+    const updateParams = (search) => {
         params = {
             state: store.getState(),
-            url: new URLSearchParams(window.location.search),
+            url: new URLSearchParams(search != null ? search : window.location.search),
         };
     };
 
     beforeEach(() => {
         history.pushState({}, null, ''); // reset window.location.search
         store = createStore(wireReducer, applyMiddleware(thunk));
-        updateParams();
+        updateParams('');
     });
 
     it('setQuery', () => {

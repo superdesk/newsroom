@@ -2,8 +2,8 @@
   "scripts": {
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "build": "webpack --config webpack.config.js --progress --profile --colors",
-    "lint": "eslint assets --ext .js --ext .jsx",
-    "fix": "eslint assets --ext .js --ext .jsx --fix",
+    "lint": "eslint *.js assets --ext .js --ext .jsx",
+    "fix": "eslint *.js assets --ext .js --ext .jsx --fix",
     "test": "karma start --single-run",
     "karma": "karma start"
   },
