@@ -17,6 +17,7 @@ import {
     getAttachments,
     isCoverageBeingUpdated,
     getCoverageStatusText,
+    isWatched,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -79,7 +80,7 @@ const getCoverageTootip = (coverage, beingUpdated) => {
     return '';
 };
 
-function AgendaListItemIcons({item, planningItem, group, hideCoverages, row, isMobilePhone}) {
+function AgendaListItemIcons({item, planningItem, group, hideCoverages, row, isMobilePhone, user}) {
     const className = bem('wire-articles', 'item__meta', {row});
     const internalNote = getInternalNote(item, planningItem);
     const coveragesToDisplay = !hasCoverages(item) || hideCoverages ?
@@ -115,6 +116,8 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row, isM
                           >
                               <i className={`${coverageClass} ${WORKFLOW_COLORS[coverage.workflow_status]}`}>
                                   {beingUpdated && <i className="blue-circle" />}
+                                  {isWatched(coverage, user) &&
+                                    <i className="icon--watched coverage--secondary-icon icon--gray-light" />}
                               </i>
                           </span>);
                     })}
@@ -160,6 +163,7 @@ AgendaListItemIcons.propTypes = {
     hideCoverages: PropTypes.bool,
     row: PropTypes.bool,
     isMobilePhone: PropTypes.bool,
+    user: PropTypes.string,
 };
 
 AgendaListItemIcons.defaultProps = {isMobilePhone: false};

@@ -49,7 +49,7 @@ import AgendaItemDetails from 'agenda/components/AgendaItemDetails';
 import SearchResultsInfo from 'search/components/SearchResultsInfo';
 
 import ShareItemModal from 'components/ShareItemModal';
-import getItemActions from '../item-actions';
+import {getAgendaItemActions, getCoverageItemActions} from '../item-actions';
 import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
@@ -160,6 +160,7 @@ class AgendaApp extends BaseApp {
                 planningId={this.props.previewPlan}
                 eventsOnly={eventsOnly}
                 wireItems={this.props.wireItems}
+                coverageActions={this.props.coverageActions}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar
@@ -269,6 +270,7 @@ class AgendaApp extends BaseApp {
                             item={this.props.itemToPreview}
                             user={this.props.user}
                             actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig)}
+                            coverageActions={this.props.coverageActions}
                             closePreview={this.props.closePreview}
                             openItemDetails={this.props.openItemDetails}
                             requestCoverage={this.props.requestCoverage}
@@ -383,7 +385,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     fetchItems: () => dispatch(fetchItems()),
-    actions: getItemActions(dispatch),
+    actions: getAgendaItemActions(dispatch),
+    coverageActions: getCoverageItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),

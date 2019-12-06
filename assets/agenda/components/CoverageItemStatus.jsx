@@ -7,10 +7,12 @@ import {
     WORKFLOW_STATUS,
     isCoverageBeingUpdated,
     getNotesFromCoverages,
+    isWatched,
 } from '../utils';
 
 import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
+import ActionButton from 'components/ActionButton';
 
 function getDeliveryHref(coverage) {
     return get(coverage, 'delivery_href');
@@ -24,6 +26,7 @@ export default class CoverageItemStatus extends React.Component {
     constructor(props) {
         super(props);
         this.state = { wireItem: null };
+        this.filterActions = this.filterActions.bind(this);
     }
 
     componentDidMount() {
@@ -56,11 +59,25 @@ export default class CoverageItemStatus extends React.Component {
     }
 
     getStatusContent(coverage) {
-        const content = [
+        const actionsToShow = this.filterActions();
+        const parentWatched = isWatched(this.props.item, this.props.user);
+        const actions = actionsToShow.map((action) =>
+            <ActionButton
+                key={action.name}
+                item={coverage}
+                className='icon-button'
+                action={action}
+                plan={this.props.item}
+                isVisited={parentWatched}
+                disabled={parentWatched}
+            />);
+
+        let content = [
             <span className="coverage-item--element-grow" key="topRow">
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>
                 <span key="value">{gettext('coverage {{ state }} ',
                     {state: getCoverageStatusText(coverage)})}</span>
+                {actions}
             </span>
         ];
 
@@ -108,12 +125,16 @@ export default class CoverageItemStatus extends React.Component {
         return get(edNotes, this.props.coverage.coverage_id);
     }
 
+    filterActions() {
+        return this.props.actions.filter((action) => !action.when ||
+            action.when(this.props.coverage, this.props.user, this.props.item));
+    }
+
     render() {
         const internalNotes = this.getInternalNotes();
         const edNote = this.getEdNoteToDisplay();
         const coverage = this.props.coverage;
         const wireText = this.getItemText(coverage);
-
 
         return (
             <Fragment>
@@ -125,9 +146,8 @@ export default class CoverageItemStatus extends React.Component {
                         <span className='label label--blue'>{gettext('Update coming')}</span>
                     </div>                
                 )}
-                <div className='coverage-item__row'>
-                    {this.getStatusContent(coverage)}
-                </div>
+                <div className='coverage-item__row'>{this.getStatusContent(coverage)}</div>
+
                 {edNote && <div className='coverage-item__row'>
                     <AgendaEdNote item={{ednote: edNote}} noMargin/>
                 </div>}
@@ -144,4 +164,8 @@ CoverageItemStatus.propTypes = {
     item: PropTypes.object,
     coverage: PropTypes.object,
     wireItems: PropTypes.array,
+    actions: PropTypes.array,
+    user: PropTypes.string,
 };
+
+CoverageItemStatus.defaultProps = { actions: [] };
