@@ -2463,6 +2463,10 @@ a.wire-articles__versions {
     p {
         font-size: 0.75rem
     }
+    i, button {
+        font-size: 20px;
+        height: 20px;
+    }
 }
 .coverage-item__column {
     display: flex;
@@ -2479,6 +2483,12 @@ a.wire-articles__versions {
 }
 .coverage-item--element-grow {
     flex-grow: 1;
+}
+
+.coverage--secondary-icon {
+    font-size: 15px  !important;
+    margin-left: -6px  !important;
+    display: inline !important;
 }
 
 .column__preview__tags__column {

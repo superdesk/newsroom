@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {get} from 'lodash';
+import {get, isEqual} from 'lodash';
 
 import ActionButton from 'components/ActionButton';
 
@@ -54,7 +54,8 @@ class AgendaListItem extends React.Component {
             props.isRead !== nextProps.isRead ||
             (get(props, 'item.bookmarks') || []).includes(props.user) !==
             (get(nextProps, 'item.bookmarks') || []).includes(nextProps.user) ||
-            isWatched(props.item, props.user) !== isWatched(nextProps.item, nextProps.user);
+            isWatched(props.item, props.user) !== isWatched(nextProps.item, nextProps.user) ||
+            isEqual(get(nextProps, 'coverages'), get(this.props, 'coverages'));
     }
 
     componentDidMount() {
@@ -134,7 +135,8 @@ class AgendaListItem extends React.Component {
                                 {item.headline}</span>}
                         </h4>
 
-                        <AgendaListItemIcons item={item} group={group} planningItem={planningItem} isMobilePhone={isMobile} />
+                        <AgendaListItemIcons item={item} group={group} planningItem={planningItem}
+                            isMobilePhone={isMobile} user={this.props.user} />
 
                         {(isMobile || isExtended) && description && (
                             <p className="wire-articles__item__text">
