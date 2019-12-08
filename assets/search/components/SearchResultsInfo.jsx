@@ -25,8 +25,9 @@ class SearchResultsInfo extends React.Component {
             {},
             this.props.activeTopic,
             this.props.searchParams,
-            {topic_type: this.props.topicType}
-        ));
+            {topic_type: this.props.topicType},
+            {filter: get(this.props, 'searchParams.filter', null)})
+        );
     }
 
     render() {
