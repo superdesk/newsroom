@@ -36,7 +36,6 @@ export const searchParamsSelector = createSelector(
             params.navigation = navigation;
         }
 
-        params.filter = {};
         if (filter && Object.keys(filter).length > 0) {
             params.filter = {};
             Object.keys(filter).forEach((key) => {
@@ -46,6 +45,10 @@ export const searchParamsSelector = createSelector(
                     params.filter[key] = value;
                 }
             });
+
+            if (isEmpty(params.filter)) {
+                delete params.filter;
+            }
         }
 
         return params;
@@ -55,6 +58,18 @@ export const searchParamsSelector = createSelector(
 export const showSaveTopicSelector = createSelector(
     [searchParamsSelector, activeTopicSelector],
     (current, topic) => {
+        const areTopicFieldsSame = (field1, filed2) => {
+            if (field1 && filed2) {
+                return isEqual(field1, filed2);
+            }
+
+            if (!field1 && !filed2) {
+                return true;
+            }
+
+            return false;
+        };
+
         if (!topic) {
             if (isEqual(current, {})) {
                 return false;
@@ -65,11 +80,11 @@ export const showSaveTopicSelector = createSelector(
                 isEqual(Object.keys(current), ['navigation']) &&
                 get(current, 'navigation.length', 0) === 1
             );
-        } else if (!isEqual(get(current, 'query'), get(topic, 'query'))) {
+        } else if (!areTopicFieldsSame(get(current, 'query'), get(topic, 'query'))) {
             return true;
-        } else if (!isEqual(get(current, 'created'), get(topic, 'created'))) {
+        } else if (!areTopicFieldsSame(get(current, 'created'), get(topic, 'created'))) {
             return true;
-        } else if (!isEqual(get(current, 'filter'), get(topic, 'filter'))) {
+        } else if (!areTopicFieldsSame(get(current, 'filter'), get(topic, 'filter'))) {
             return true;
         }
 
