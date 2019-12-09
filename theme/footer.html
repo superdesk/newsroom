@@ -1,11 +1,10 @@
 <footer class="footer" id="footer">
-    <div>
-        <img src="{{ url_for('theme', filename = 'login-logo-footer.svg') }}" class="d-none d-lg-block mr-3" />
+    <div class="d-none d-md-block mr-3">
+        <img src="{{ url_for('theme', filename = 'login-logo-footer.svg') }}" />
     </div>
     <div>
-        {% if config.PRIVACY_POLICY %}<a href="{{ config.PRIVACY_POLICY }}" target="_blank">{{ gettext('Privacy Policy') }}</a>{% endif %}
-        {% if config.TERMS_AND_CONDITIONS %}<a href="{{ config.TERMS_AND_CONDITIONS }}" target="_blank">{{ gettext('Terms and Conditions') }}</a>{% endif %}
-        {% if config.CONTACT_ADDRESS %}<a href="{{ config.CONTACT_ADDRESS }}" target="_blank">{{ gettext('Contact Us') }}</a>{% endif %}
-        {% if config.SHOW_COPYRIGHT %}<a href="{{ url_for('public.copyright') }}" target="_blank">{{ gettext('Copyright') }}</a>{% endif %}
+        <a href="{{ url_for('public.privacy') }}" target="_blank">{{ gettext('Privacy Policy') }}</a>
+        <a href="{{ url_for('public.terms') }}" target="_blank">{{ gettext('Terms and Conditions') }}</a>
+        <a href="{{ url_for('public.contact') }}" target="_blank">{{ gettext('Contact Us') }}</a>
     </div>
 </footer>

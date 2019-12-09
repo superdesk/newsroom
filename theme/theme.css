@@ -14,7 +14,10 @@
     font-family: "Merriweather", serif;
 }
 .footer {
-    height: 50px;
+    min-height: 50px;
+    height: auto;
+    padding: 6px 0;
+    flex-wrap: wrap;
 }
 .footer--home {
     margin-bottom: -50px;
