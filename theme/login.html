@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="card-footer bg-white border-0 text-muted small">
-                    {% if config.SHOW_USER_REGISTER %}{{ gettext("Still not a member?") }}<a href="{{ url_for('auth.signup') }}" class="btn btn-outline-primary btn-block mb-4 mt-2">{{ gettext("Register") }}</a>{% endif %}
+                    {% if config.SHOW_USER_REGISTER %}{{ gettext("Still not a member?") }}<a href="{{ url_for('auth.signup') }}" class="btn btn-outline-primary btn-block mb-4 mt-2">{{ gettext("Sign up") }}</a>{% endif %}
 
                     <p>{{ gettext('Forgot your password?') }} <a href="{{ url_for('auth.token', token_type='reset_password') }}">{{ gettext('Click here to reset.') }}</a>
                     </p>
