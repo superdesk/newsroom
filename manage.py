@@ -9,6 +9,7 @@ from newsroom.elastic_utils import rebuild_elastic_index
 from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_timestamp
 from newsroom.auth import get_user_by_email
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
+from newsroom.watch_lists.email_alerts import WatchListEmailAlerts
 from newsroom.data_updates import GenerateUpdate, Upgrade, get_data_updates_files, Downgrade
 
 import content_api
@@ -77,6 +78,16 @@ def content_reset():
 @manager.command
 def send_company_expiry_alerts():
     CompanyExpiryAlerts().send_alerts()
+
+
+@manager.command
+def send_watch_list_schedule_alerts():
+    WatchListEmailAlerts().run()
+
+
+@manager.command
+def send_watch_list_immediate_alerts():
+    WatchListEmailAlerts().run(True)
 
 
 @manager.option('-m', '--expiry', dest='expiry_days', required=False)

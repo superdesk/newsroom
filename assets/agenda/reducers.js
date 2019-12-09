@@ -9,9 +9,11 @@ import {
     TOGGLE_FEATURED_FILTER,
     TOGGLE_EVENTS_ONLY_FILTER,
     AGENDA_WIRE_ITEMS,
+    WATCH_COVERAGE,
+    STOP_WATCHING_COVERAGE,
 } from './actions';
 
-import { get, isEmpty, uniqBy } from 'lodash';
+import { get, isEmpty, uniqBy, uniq } from 'lodash';
 import { getActiveDate } from 'local-store';
 import { EXTENDED_VIEW } from 'wire/defaults';
 import { searchReducer } from 'search/reducers';
@@ -157,7 +159,37 @@ export default function agendaReducer(state = initialState, action) {
         action.items.forEach((_id) => {
             const watches = get(itemsById[_id], 'watches', []).concat(state.user);
             itemsById[_id] = Object.assign({}, itemsById[_id], {watches});
+            (get(itemsById[_id], 'coverages') || []).forEach((c) => {
+                if (get(c, 'watches.length', 0) > 0) {
+                    c.watches = [];
+                }
+            });
         });
+
+        return {...state, itemsById};
+    }
+
+    case WATCH_COVERAGE: {
+        const itemsById = Object.assign({}, state.itemsById);
+        const item = itemsById[get(action, 'item._id')];
+        const coverage = (get(item, 'coverages') || []).find((c) => c.coverage_id === action.coverage.coverage_id);
+        if (coverage) {
+            coverage['watches'] = uniq([
+                ...(get(coverage, 'watches') || []),
+                state.user
+            ]);
+        }
+
+        return {...state, itemsById};
+    }
+
+    case STOP_WATCHING_COVERAGE: {
+        const itemsById = Object.assign({}, state.itemsById);
+        const item = itemsById[get(action, 'item._id')];
+        const coverage = (get(item, 'coverages') || []).find((c) => c.coverage_id === action.coverage.coverage_id);
+        if (coverage) {
+            coverage['watches'] = (get(coverage, 'watches') || []).filter((u) => u !== state.user);
+        }
 
         return {...state, itemsById};
     }

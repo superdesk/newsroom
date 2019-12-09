@@ -36,8 +36,40 @@ class WatchListSchedule extends React.Component {
             },
         ];
 
+        this.days = [
+            {
+                value: 'mon',
+                'text': gettext('Monday')
+            },
+            {
+                value: 'tue',
+                'text': gettext('Tuesday')
+            },
+            {
+                value: 'wed',
+                'text': gettext('Wednesday')
+            },
+            {
+                value: 'thu',
+                'text': gettext('Thursday')
+            },
+            {
+                value: 'fri',
+                'text': gettext('Friday')
+            },
+            {
+                value: 'sat',
+                'text': gettext('Saturday')
+            },
+            {
+                value: 'sun',
+                'text': gettext('Sunday')
+            },
+        ];
+
         this.onChangeSchedule = this.onChangeSchedule.bind(this);
         this.onTimeChange = this.onTimeChange.bind(this);
+        this.onChangeDay = this.onChangeDay.bind(this);
 
         this.state = {needTime: this.getNeedTime(get(this.props, 'watchList.schedule.interval'))};
     }
@@ -53,8 +85,13 @@ class WatchListSchedule extends React.Component {
     }
 
     onChangeSchedule(event) {
-        if (this.getNeedTime(event.target.value)) {
+        const needTime = this.getNeedTime(event.target.value);
+        if (needTime) {
             this.setState({ needTime: true });
+            if (!get(this.props, 'watchList.schedule.time')) {
+                this.onTimeChange(moment(), event.target.value);
+                return;
+            }
         } else if (this.state.needTime) {
             this.setState({ needTime: false });
         }
@@ -64,30 +101,50 @@ class WatchListSchedule extends React.Component {
                 name: 'schedule',
                 value: event.target.value ? {
                     interval: event.target.value,
-                    time: get(this.props.watchList, 'schedule.time')
+                    time: needTime ? get(this.props.watchList, 'schedule.time') : null,
+                    day: event.target.value === 'weekly' ? this.days[0].value : null,
                 } : null
             }
         });
     }
 
-    onTimeChange(date) {
+    onTimeChange(date, schedule) {
         this.props.onChange({
             target: {
                 name: 'schedule',
                 value: {
-                    interval: get(this.props.watchList, 'schedule.interval'),
-                    time: date.format('HH:mm')
+                    interval: schedule || get(this.props.watchList, 'schedule.interval'),
+                    time: date.format('HH:mm'),
+                    day: get(this.props.watchList, 'schedule.day'),
                 }
             }
         });
     }
 
+    onChangeDay(event) {
+        this.props.onChange({
+            target: {
+                name: 'schedule',
+                value: event.target.value ? {
+                    interval: get(this.props.watchList, 'schedule.interval'),
+                    time: get(this.props.watchList, 'schedule.time'),
+                    day: event.target.value,
+                } : null
+            }
+        });
+
+    }
+
     render() {
         const { watchList, onsaveWatchListSchedule, noForm, readOnly } = this.props;
-        const timeValue = get(watchList, 'schedule.time') ? moment().set({
-            'hour': watchList.schedule.time.split(':')[0],
-            'minute': watchList.schedule.time.split(':')[1],
-        }) : moment();
+        let timeValue = get(watchList, 'schedule.time');
+        if (get(timeValue, 'length', 0) > 0) {
+            timeValue = moment();
+            timeValue.set({
+                hour: parseInt(watchList.schedule.time.split(':')[0]),
+                minute: parseInt(watchList.schedule.time.split(':')[1]),
+            });
+        }
 
         const ui = (
             <div>
@@ -99,6 +156,13 @@ class WatchListSchedule extends React.Component {
                     options={this.options}
                     onChange={this.onChangeSchedule}
                     readOnly={readOnly} />
+                {get(watchList, 'schedule.interval') === 'weekly' && <SelectInput
+                    name='schedule.day'
+                    label={gettext('Day of week')}
+                    value={get(watchList, 'schedule.day') || ''}
+                    options={this.days}
+                    onChange={this.onChangeDay}
+                    readOnly={readOnly} />}
                 {this.state.needTime && (
                     <div className='form-group'>
                         <label htmlFor='schedule.time'>{gettext('Time')}</label>

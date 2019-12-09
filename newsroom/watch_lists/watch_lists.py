@@ -40,12 +40,14 @@ class WatchListsResource(newsroom.Resource):
             'schema': {
                 'interval': {'type': 'string'},
                 'time': {'type': 'string'},
+                'day': {'type': 'string'},
             }
         },
         'keywords': {
             'type': 'list',
             'mapping': {'type': 'string'}
-        }
+        },
+        'last_run_time': {'type': 'datetime'}
     }
     datasource = {
         'source': 'watch_lists',
