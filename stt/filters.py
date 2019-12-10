@@ -3,6 +3,7 @@ import superdesk
 from flask_babel import gettext
 from superdesk.resource import not_analyzed
 from newsroom.signals import publish_item
+from eve_elastic.elastic import parse_date
 from copy import copy
 
 STT_FIELDS = ['sttdepartment', 'sttversion', 'sttgenre', 'sttdone1']
@@ -32,6 +33,16 @@ def on_publish_item(app, item, is_new, **kwargs):
             item['ednote'] = '{}\n{}'.format(item['ednote'], item['extra']['sttnote_private'])
         else:
             item['ednote'] = item['extra']['sttnote_private']
+
+    # set versioncreated for archive items
+    if item.get('firstpublished') and is_new:
+        if isinstance(item.get('firstpublished'), str):
+            firstpublished = parse_date(item['firstpublished'])
+        else:
+            firstpublished = item['firstpublished']
+
+        if firstpublished < item['versioncreated']:
+            item['versioncreated'] = firstpublished
 
     # link the previous versions and update the id of the story
     if not is_new and 'evolvedfrom' not in item:
