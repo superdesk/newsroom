@@ -18,13 +18,13 @@ from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_user, get_user_id
-from newsroom.decorator import login_required
+from newsroom.decorator import login_required, admin_only
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
     get_agenda_dates, get_location_string, get_public_contacts, get_links
-from newsroom.notifications import push_user_notification
+from newsroom.notifications import push_user_notification, push_notification
 from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
 
@@ -59,6 +59,7 @@ def get_view_data():
     topics = get_user_topics(user['_id']) if user else []
     return {
         'user': str(user['_id']) if user else None,
+        'user_type': (user or {}).get('user_type') or 'public',
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': [t for t in topics if t.get('topic_type') == 'wire'],
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
@@ -239,6 +240,39 @@ def share():
     get_resource_service('history').create_history_record(items, 'share', current_user,
                                                           request.args.get('type', 'wire'))
     return flask.jsonify(), 201
+
+
+@blueprint.route('/wire', methods=['DELETE'])
+@admin_only
+def remove_wire_items():
+    data = get_json_or_400()
+    assert data.get('items')
+
+    items_service = get_resource_service('items')
+    versions_service = get_resource_service('items_versions')
+
+    ids = []
+    for doc in items_service.get_from_mongo(req=None, lookup={'_id': {'$in': data['items']}}):
+        ids.append(doc['_id'])
+        ids.extend(doc.get('ancestors') or [])
+
+    if not ids:
+        flask.abort(404)
+
+    docs = list(doc for doc in items_service.get_from_mongo(req=None, lookup={'_id': {'$in': ids}}))
+
+    for doc in docs:
+        items_service.on_delete(doc)
+
+    items_service.delete({'_id': {'$in': ids}})
+
+    for doc in docs:
+        items_service.on_deleted(doc)
+        versions_service.on_item_deleted(doc)
+
+    push_notification('items_deleted', ids=ids)
+
+    return flask.jsonify(), 200
 
 
 @blueprint.route('/wire_bookmark', methods=['POST', 'DELETE'])

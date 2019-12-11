@@ -29,6 +29,7 @@ def get_view_data():
     get_story_count(navigations, user)
     return {
         'user': str(user['_id']) if user else None,
+        'user_type': (user or {}).get('user_type') or 'public',
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': [t for t in topics if t.get('topic_type') == SECTION_ID],
         'navigations': navigations,

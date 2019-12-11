@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import {get} from 'lodash';
 
 import { gettext, fullDate, wordCount, LIST_ANIMATIONS } from 'utils';
 import {getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled, getVideos} from 'wire/utils';
@@ -20,6 +21,8 @@ class WireListItem extends React.Component {
         this.state = {isHover: false, previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
+
+        this.dom = {article: null};
     }
 
     onKeyDown(event) {
@@ -41,8 +44,8 @@ class WireListItem extends React.Component {
     }
 
     componentDidMount() {
-        if (this.props.isActive) {
-            this.articleElem.focus();
+        if (this.props.isActive && this.dom.article) {
+            this.dom.article.focus();
         }
     }
 
@@ -50,8 +53,45 @@ class WireListItem extends React.Component {
         event.stopPropagation();
     }
 
-    render() {
+    renderDeleted() {
+        const {item} = this.props;
+
+        const selectClassName = classNames('no-bindable-select', {
+            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
+        });
+
+        return (
+            <article key={item._id}
+                className="wire-articles__item-wrap col-12 wire-item item--deleted"
+                tabIndex='0'
+            >
+                <div className="wire-articles__item wire-articles__item--list wire-articles__item--visited">
+                    <div className='wire-articles__item-text'>
+                        <h4 className='wire-articles__item-headline'>
+                            <div className={selectClassName}>
+                                <label>
+                                    <i className="icon--info icon--gray" />
+                                </label>
+                            </div>
+                            {item.headline}
+                        </h4>
+
+                        <div className='wire-articles__item__text'>
+                            <p>{gettext(
+                                'This item has been removed from {{ context_name }}',
+                                {context_name: this.props.contextName}
+                            )}</p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        );
+    }
+
+    renderActive() {
         const {item, onClick, onDoubleClick, isExtended} = this.props;
+
         const cardClassName = classNames('wire-articles__item-wrap col-12 wire-item');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--visited': this.props.isRead,
@@ -65,18 +105,18 @@ class WireListItem extends React.Component {
         const picture = getPicture(item);
         const videos = getVideos(item);
         const isMarketPlace = this.props.context === 'aapX';
+
         return (
             <article key={item._id}
                 className={cardClassName}
                 tabIndex='0'
-                ref={(elem) => this.articleElem = elem}
+                ref={(elem) => this.dom.article = elem}
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
                 onMouseEnter={() => this.setState({isHover: true})}
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
             >
-
                 <div className={wrapClassName}>
                     <div className='wire-articles__item-text'>
 
@@ -174,6 +214,12 @@ class WireListItem extends React.Component {
             </article>
         );
     }
+
+    render() {
+        return (get(this.props, 'item.deleted') || false) ?
+            this.renderDeleted() :
+            this.renderActive();
+    }
 }
 
 WireListItem.propTypes = {
@@ -193,6 +239,7 @@ WireListItem.propTypes = {
     isExtended: PropTypes.bool.isRequired,
     user: PropTypes.string,
     context: PropTypes.string,
+    contextName: PropTypes.string,
 };
 
 export default WireListItem;

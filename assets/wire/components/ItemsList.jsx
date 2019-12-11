@@ -12,6 +12,7 @@ import { EXTENDED_VIEW } from '../defaults';
 import { getIntVersion } from '../utils';
 import {searchNavigationSelector} from 'search/selectors';
 import {previewConfigSelector} from 'ui/selectors';
+import {getContextName} from 'selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
@@ -153,6 +154,7 @@ class ItemsList extends React.Component {
                 isExtended={isExtended}
                 user={this.props.user}
                 context={this.props.context}
+                contextName={this.props.contextName}
             />
         );
 
@@ -187,6 +189,7 @@ ItemsList.propTypes = {
     })),
     bookmarks: PropTypes.bool,
     user: PropTypes.string,
+    userType: PropTypes.string,
     company: PropTypes.string,
     activeView: PropTypes.string,
     context: PropTypes.string,
@@ -195,6 +198,7 @@ ItemsList.propTypes = {
     resultsFiltered: PropTypes.bool,
     isLoading: PropTypes.bool,
     previewConfig: PropTypes.object,
+    contextName: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -206,6 +210,7 @@ const mapStateToProps = (state) => ({
     readItems: state.readItems,
     bookmarks: state.bookmarks,
     user: state.user,
+    userType: state.userType,
     company: state.company,
     context: state.context,
     searchInitiated: state.searchInitiated,
@@ -213,6 +218,7 @@ const mapStateToProps = (state) => ({
     resultsFiltered: state.resultsFiltered,
     isLoading: state.isLoading,
     previewConfig: previewConfigSelector(state),
+    contextName: getContextName(state),
 });
 
 export default connect(mapStateToProps)(ItemsList);

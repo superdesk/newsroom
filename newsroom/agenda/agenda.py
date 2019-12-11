@@ -158,12 +158,11 @@ class AgendaResource(newsroom.Resource):
                         'planning_id': not_analyzed,
                         'coverage_id': not_analyzed,
                         'assignment_id': not_analyzed,
-                        'item_id': not_analyzed,
-                        'item_state': not_analyzed,
                         'sequence_no': not_analyzed,
                         'publish_time': {'type': 'date'},
+                        'delivery_id': not_analyzed,
+                        'delivery_state': not_analyzed,
                     }
-
                 },
                 'watches': not_analyzed,
             },

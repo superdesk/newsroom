@@ -5,10 +5,11 @@ import { createSelector } from 'reselect';
 import { groupBy } from 'lodash';
 import moment from 'moment/moment';
 
-import { gettext, formatDate, DATE_FORMAT } from 'utils';
+import {gettext, formatDate, DATE_FORMAT} from 'utils';
 import AmNewsListItem from './AmNewsListItem';
-import { setActive, previewItem, toggleSelected, openItem } from '../../wire/actions';
-import { getIntVersion } from '../../wire/utils';
+import {setActive, previewItem, toggleSelected, openItem} from '../../wire/actions';
+import {getIntVersion} from '../../wire/utils';
+import {getContextName} from 'selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
@@ -172,6 +173,7 @@ class AmNewsList extends React.Component {
                                 toggleSelected={() => this.props.dispatch(toggleSelected(item._id))}
                                 actions={this.filterActions(item)}
                                 user={this.props.user}
+                                contextName={this.props.contextName}
                             />)
                     }
 
@@ -209,10 +211,12 @@ AmNewsList.propTypes = {
     })),
     bookmarks: PropTypes.bool,
     user: PropTypes.string,
+    userType: PropTypes.string,
     company: PropTypes.string,
     groupedItems: PropTypes.object,
     refNode: PropTypes.func,
     onScroll: PropTypes.func,
+    contextName: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -224,8 +228,10 @@ const mapStateToProps = (state) => ({
     readItems: state.readItems,
     bookmarks: state.bookmarks,
     user: state.user,
+    userType: state.userType,
     company: state.company,
     groupedItems: groupedItemsSelector(state),
+    contextName: getContextName(state),
 });
 
 export default connect(mapStateToProps)(AmNewsList);

@@ -10,6 +10,7 @@ export function getItemActions(dispatch, actions) {
         downloadItems,
         bookmarkItems,
         removeBookmarks,
+        removeItems,
     } = actions;
 
 
@@ -72,5 +73,13 @@ export function getItemActions(dispatch, actions) {
             when: (state, item) => state.user && item && item.bookmarks && item.bookmarks.includes(state.user),
             action: (items) => dispatch(removeBookmarks(items)),
         },
+        {
+            id: 'remove',
+            name: gettext('Remove'),
+            icon: 'trash',
+            multi: true,
+            when: (state) => state.user && state.userType === 'administrator',
+            action: (items) => removeItems(items),
+        }
     ];
 }
