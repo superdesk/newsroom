@@ -15,6 +15,7 @@ import {
 } from './actions';
 
 import {GET_COMPANY_USERS} from 'companies/actions';
+import {ADD_EDIT_USERS} from 'actions';
 
 const initialState = {
     companies: [],
@@ -122,6 +123,16 @@ export default function watchListsReducer(state = initialState, action) {
 
     case SET_USER_COMPANY_WATCH_LISTS: 
         return {...state, watchLists: action.data};     
+
+    case ADD_EDIT_USERS: {
+        return {
+            ...state,
+            editUsers: [
+                ...(state.editUsers || []),
+                ...action.data,
+            ]
+        };
+    }
 
     default:
         return state;

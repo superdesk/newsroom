@@ -110,6 +110,7 @@ export function postWatchList(userWatchList, notifyMsg) {
                         }
                     }
                 }
+                dispatch(cancelEdit());
                 dispatch(fetchWatchLists(get(userWatchList, 'company')));
             })
             .catch((error) => errorHandler(error, dispatch, setError));
@@ -158,6 +159,7 @@ export function saveWatchListUsers(users) {
             .then(() => {
                 notify.success(gettext('Watch list users updated successfully'));
                 dispatch(fetchWatchLists());
+                dispatch(cancelEdit());
             })
             .catch((error) => errorHandler(error, dispatch, setError));
     };
@@ -174,6 +176,7 @@ export function saveWatchListSchedule() {
             .then(() => {
                 notify.success(gettext('Watch list schedule updated successfully'));
                 dispatch(fetchWatchLists());
+                dispatch(cancelEdit());
             })
             .catch((error) => errorHandler(error, dispatch, setError));
     };

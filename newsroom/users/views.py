@@ -58,6 +58,10 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'$or': [{'first_name': regex}, {'last_name': regex}]}
+
+    if flask.request.args.get('ids'):
+        lookup = {'_id': {'$in': (flask.request.args.get('ids') or '').split(',')}}
+
     users = list(query_resource('users', lookup=lookup))
     return jsonify(users), 200
 

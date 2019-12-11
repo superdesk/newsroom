@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 
 import TextInput from 'components/TextInput';
+import AuditInformation from 'components/AuditInformation';
 import SelectInput from 'components/SelectInput';
 
 import { gettext } from 'utils';
@@ -42,7 +43,7 @@ class EditCard extends React.Component {
         return (
             <div className='list-item__preview'>
                 <div className='list-item__preview-header'>
-                    <h3>{this.props.card.name}</h3>
+                    <h3>{this.props.card.label}</h3>
                     <button
                         id='hide-sidebar'
                         type='button'
@@ -53,7 +54,7 @@ class EditCard extends React.Component {
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>
                 </div>
-
+                <AuditInformation item={this.props.card} />
                 <form>
                     <div className="list-item__preview-form">
                         <TextInput
