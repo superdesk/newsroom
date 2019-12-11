@@ -2,11 +2,11 @@
 # Copyright (C) 2019 ORGANIZATION
 # This file is distributed under the same license as the Newsroom project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
-# 
+#
 # Translators:
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2019
 # Simon Peacock <simon.peacock@gmail.com>, 2019
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -2200,3 +2200,51 @@ msgstr "À"
 #: assets/wire/components/filters/NavigationTab.jsx:39
 msgid "All"
 msgstr "Toute"
+
+#: theme/base_layout.html:43 theme/login.html:13 theme/login.html:36
+msgid "Login"
+msgstr "S'identifier"
+
+#: theme/base_layout.html:55
+msgid "Settings"
+msgstr "Paramètres"
+
+#: theme/base_layout.html:62
+msgid "Reports"
+msgstr "Rapports"
+
+#: theme/footer.html:6
+msgid "Privacy Policy"
+msgstr "Politique de confidentialité"
+
+#: theme/footer.html:7
+msgid "Terms and Conditions"
+msgstr "Termes et conditions"
+
+#: theme/footer.html:8
+msgid "Contact Us"
+msgstr "Contactez nous"
+
+#: theme/footer.html:9
+msgid "Copyright"
+msgstr "Droits d'auteur"
+
+#: theme/login.html:41
+msgid "Still not a member?"
+msgstr "Vous n'êtes toujours pas membre?"
+
+#: theme/login.html:41
+msgid "Register"
+msgstr "Enregistrer"
+
+#: theme/login.html:43
+msgid "Forgot your password?"
+msgstr "Mot de passe oublié?"
+
+#: theme/login.html:43
+msgid "Click here to reset."
+msgstr "Cliquez ici pour réinitialiser."
+
+#: theme/login.html:51
+msgid "Language"
+msgstr "La langue"
