@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import {get} from 'lodash';
 
-import { gettext, fullDate, wordCount, LIST_ANIMATIONS } from 'utils';
+import {gettext, fullDate, wordCount, LIST_ANIMATIONS} from 'utils';
 import {getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled, getVideos} from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -11,6 +12,7 @@ import ListItemPreviousVersions from './ListItemPreviousVersions';
 import WireListItemIcons from './WireListItemIcons';
 import WireListItemEmbargoed from './WireListItemEmbargoed';
 import ActionMenu from '../../components/ActionMenu';
+import WireListItemDeleted from './WireListItemDeleted';
 
 class WireListItem extends React.Component {
     constructor(props) {
@@ -20,6 +22,8 @@ class WireListItem extends React.Component {
         this.state = {isHover: false, previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
+
+        this.dom = {article: null};
     }
 
     onKeyDown(event) {
@@ -41,8 +45,8 @@ class WireListItem extends React.Component {
     }
 
     componentDidMount() {
-        if (this.props.isActive) {
-            this.articleElem.focus();
+        if (this.props.isActive && this.dom.article) {
+            this.dom.article.focus();
         }
     }
 
@@ -52,6 +56,16 @@ class WireListItem extends React.Component {
 
     render() {
         const {item, onClick, onDoubleClick, isExtended} = this.props;
+
+        if (get(this.props, 'item.deleted')) {
+            return (
+                <WireListItemDeleted
+                    item={this.props.item}
+                    contextName={this.props.contextName}
+                />
+            );
+        }
+
         const cardClassName = classNames('wire-articles__item-wrap col-12 wire-item');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--visited': this.props.isRead,
@@ -65,21 +79,20 @@ class WireListItem extends React.Component {
         const picture = getPicture(item);
         const videos = getVideos(item);
         const isMarketPlace = this.props.context === 'aapX';
+
         return (
             <article key={item._id}
                 className={cardClassName}
                 tabIndex='0'
-                ref={(elem) => this.articleElem = elem}
+                ref={(elem) => this.dom.article = elem}
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
                 onMouseEnter={() => this.setState({isHover: true})}
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
             >
-
                 <div className={wrapClassName}>
                     <div className='wire-articles__item-text'>
-
                         <h4 className='wire-articles__item-headline'>
                             <div className={selectClassName} onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">
@@ -193,6 +206,7 @@ WireListItem.propTypes = {
     isExtended: PropTypes.bool.isRequired,
     user: PropTypes.string,
     context: PropTypes.string,
+    contextName: PropTypes.string,
 };
 
 export default WireListItem;

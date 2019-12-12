@@ -23,6 +23,7 @@ def get_view_data():
     user = get_user()
     return {
         'user': str(user['_id']) if user else None,
+        'user_type': (user or {}).get('user_type') or 'public',
         'company': str(user['company']) if user and user.get('company') else None,
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='am_news'),
