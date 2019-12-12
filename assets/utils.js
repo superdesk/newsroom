@@ -615,3 +615,22 @@ export function closeItemOnMobile(dispatch, state, openItemDetails, previewItem)
     }
 }
 
+/**
+ * Get the slugline appended by the takekey if one is defined
+ * @param {Object} item - The wire item to get the slugline from
+ * @param {boolean} withTakeKey - If true, appends the takekey to the response
+ * @returns {String}
+ */
+export function getSlugline(item, withTakeKey = false) {
+    if (!item || !item.slugline) {
+        return '';
+    }
+
+    let slugline = item.slugline.trim();
+
+    if (withTakeKey && item.anpa_take_key) {
+        slugline += ` | ${item.anpa_take_key}`;
+    }
+
+    return slugline;
+}

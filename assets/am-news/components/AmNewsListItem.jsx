@@ -26,7 +26,6 @@ class AmNewsListItem extends React.Component {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item);
-        this.slugline = props.item.slugline && props.item.slugline.trim();
         this.state = {isHover: false, previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
