@@ -1,7 +1,7 @@
-import { createStore, render, getInitData } from 'utils';
+import {createStore, render, getInitData, initWebSocket} from 'utils';
 import homeReducer from './reducers';
 import HomeApp from './components/HomeApp';
-import {initData} from './actions';
+import {initData, pushNotification} from './actions';
 
 
 const store = createStore(homeReducer, 'Home');
@@ -16,3 +16,5 @@ render(
     HomeApp,
     document.getElementById('home-app')
 );
+
+initWebSocket(store, pushNotification);

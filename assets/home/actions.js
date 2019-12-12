@@ -38,3 +38,14 @@ export function fetchCardExternalItems(cardId, cardLabel) {
             .catch(errorHandler);
     };
 }
+
+export function pushNotification(push) {
+    return () => {
+        if (push.event === 'items_deleted') {
+            setTimeout(
+                () => window.location.reload(),
+                1000
+            );
+        }
+    };
+}
