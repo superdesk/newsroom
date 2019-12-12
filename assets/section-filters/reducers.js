@@ -7,6 +7,7 @@ import {
     NEW_SECTION_FILTER,
     SET_ERROR,
 } from './actions';
+import {ADD_EDIT_USERS} from 'actions';
 
 import {INIT_SECTIONS, SELECT_SECTION} from 'features/sections/actions';
 import {sectionsReducer} from 'features/sections/reducers';
@@ -94,6 +95,16 @@ export default function sectionFiltersReducer(state = initialState, action) {
     case INIT_SECTIONS:
     case SELECT_SECTION:
         return {...state, sections: sectionsReducer(state.sections, action)};
+
+    case ADD_EDIT_USERS: {
+        return {
+            ...state,
+            editUsers: [
+                ...(state.editUsers || []),
+                ...action.data,
+            ]
+        };
+    }
 
     default: {
         const search = searchReducer(state.search, action);

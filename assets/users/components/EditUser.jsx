@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
+import AuditInformation from 'components/AuditInformation';
 
 import { gettext } from 'utils';
 import {userTypes} from '../utils';
@@ -24,7 +25,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                     <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                 </button>
             </div>
-
+            <AuditInformation item={user} />
             <form>
                 <div className="list-item__preview-form">
                     <TextInput

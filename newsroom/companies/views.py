@@ -10,7 +10,8 @@ from werkzeug.exceptions import NotFound
 
 from newsroom.decorator import admin_only, login_required
 from newsroom.companies import blueprint
-from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400
+from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400, set_original_creator, \
+    set_version_creator
 
 
 def get_company_types_options(company_types):
@@ -47,6 +48,7 @@ def create():
     company = get_json_or_400()
     validate_company(company)
     new_company = get_company_updates(company)
+    set_original_creator(new_company)
     ids = get_resource_service('companies').post([new_company])
     return jsonify({'success': True, '_id': ids[0]}), 201
 
@@ -96,7 +98,7 @@ def edit(_id):
         company = get_json_or_400()
         validate_company(company)
         updates = get_company_updates(company)
-
+        set_version_creator(updates)
         get_resource_service('companies').patch(ObjectId(_id), updates=updates)
         app.cache.delete(_id)
         return jsonify({'success': True}), 200

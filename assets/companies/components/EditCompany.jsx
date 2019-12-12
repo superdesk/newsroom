@@ -8,6 +8,8 @@ import DateInput from 'components/DateInput';
 import { isEmpty } from 'lodash';
 import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
 import CompanyPermissions from './CompanyPermissions';
+import AuditInformation from 'components/AuditInformation';
+
 import { countries } from '../utils';
 
 class EditCompany extends React.Component {
@@ -69,7 +71,7 @@ class EditCompany extends React.Component {
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>
                 </div>
-
+                <AuditInformation item={this.props.company} />
                 <ul className='nav nav-tabs'>
                     {this.tabs.filter((tab, index) => index === 0 || this.props.company._id).map((tab) => (
                         <li key={tab.name} className='nav-item'>

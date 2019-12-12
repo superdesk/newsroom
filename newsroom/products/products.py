@@ -40,6 +40,8 @@ class ProductsResource(newsroom.Resource):
             'type': 'string',
             'default': 'wire'
         },
+        'original_creator': newsroom.Resource.rel('users'),
+        'version_creator': newsroom.Resource.rel('users'),
     }
     datasource = {
         'source': 'products',

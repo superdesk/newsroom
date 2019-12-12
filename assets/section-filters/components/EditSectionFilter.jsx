@@ -4,6 +4,7 @@ import {get} from 'lodash';
 
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
+import AuditInformation from 'components/AuditInformation';
 import { gettext } from 'utils';
 import {sectionsPropType} from '../../features/sections/types';
 
@@ -27,6 +28,7 @@ class EditSectionFilter extends React.Component {
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>
                 </div>
+                <AuditInformation item={this.props.sectionFilter} />
                 <form>
                     <div className="list-item__preview-form">
                         <TextInput
