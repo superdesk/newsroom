@@ -11,7 +11,8 @@ import {
     getTimezoneOffset,
     getTextFromHtml,
     fullDate,
-    recordAction
+    recordAction,
+    errorHandler as notifyErrors,
 } from 'utils';
 import {getNavigationUrlParam} from 'search/utils';
 
@@ -107,6 +108,31 @@ export const TOGGLE_NEWS = 'TOGGLE_NEWS';
 export function toggleNews() {
     toggleNewsOnlyParam();
     return {type: TOGGLE_NEWS};
+}
+
+export function removeItems(items) {
+    if (confirm(gettext('Are you sure you want to permanently remove these item(s)?'))) {
+        return server.del('/wire', {items})
+            .then(() => {
+                if (items.length > 1) {
+                    notify.success(gettext('Items were removed successfully'));
+                } else {
+                    notify.success(gettext('Item wes removed successfully'));
+                }
+            })
+            .catch(notifyErrors);
+    }
+
+    return Promise.resolve();
+}
+
+export const WIRE_ITEM_REMOVED = 'WIRE_ITEM_REMOVED';
+/**
+ * Marks the items as deleted when they're removed from the system
+ * @param {Array<String>} ids - List of ids of items that were removed
+ */
+export function onItemsDeleted(ids) {
+    return {type: WIRE_ITEM_REMOVED, ids: ids};
 }
 
 /**
@@ -406,6 +432,9 @@ export function pushNotification(push) {
 
         case `saved_items:${user}`:
             return dispatch(setSavedItemsCount(push.extra.count));
+
+        case 'items_deleted':
+            return dispatch(onItemsDeleted(push.extra.ids));
         }
     };
 }

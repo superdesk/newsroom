@@ -21,3 +21,20 @@
         }
     }
 }
+
+.item--deleted {
+    cursor: not-allowed !important;
+
+    .icon--info {
+        position: relative;
+        display: inline-block;
+        top: -1px;
+        width: 24px;
+        height: 24px;
+        margin: 0;
+        vertical-align: middle;
+        z-index: 90;
+        transition: background 200ms ease;
+        font-size: 24px;
+    }
+}
