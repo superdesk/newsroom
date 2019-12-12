@@ -9,6 +9,7 @@ import { get } from 'lodash';
 import { gettext } from 'utils';
 import { sectionsPropType } from 'features/sections/types';
 import {MAX_TILE_IMAGES} from '../actions';
+import AuditInformation from 'components/AuditInformation';
 
 
 class EditNavigation extends React.Component {
@@ -58,6 +59,7 @@ class EditNavigation extends React.Component {
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>
                 </div>
+                <AuditInformation item={this.props.navigation} />
 
                 <ul className='nav nav-tabs'>
                     {this.tabs.map((tab) => (

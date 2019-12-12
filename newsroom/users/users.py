@@ -5,6 +5,7 @@ import newsroom
 from content_api import MONGO_PREFIX
 from superdesk.utils import is_hashed, get_hash
 from newsroom.auth import get_user_id
+from newsroom.utils import set_original_creator, set_version_creator
 
 
 class UsersResource(newsroom.Resource):
@@ -85,7 +86,9 @@ class UsersResource(newsroom.Resource):
             'type': 'datetime',
             'required': False,
             'nullable': True
-        }
+        },
+        'original_creator': newsroom.Resource.rel('users'),
+        'version_creator': newsroom.Resource.rel('users'),
     }
 
     item_methods = ['GET', 'PATCH', 'PUT']
@@ -112,10 +115,12 @@ class UsersService(newsroom.Service):
     def on_create(self, docs):
         super().on_create(docs)
         for doc in docs:
+            set_original_creator(doc)
             if doc.get('password', None) and not is_hashed(doc.get('password')):
                 doc['password'] = self._get_password_hash(doc['password'])
 
     def on_update(self, updates, original):
+        set_version_creator(updates)
         if 'password' in updates:
             updates['password'] = self._get_password_hash(updates['password'])
 

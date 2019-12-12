@@ -7,7 +7,7 @@ from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, login_required
 from newsroom.cards import blueprint
-from newsroom.utils import get_entity_or_404, query_resource
+from newsroom.utils import get_entity_or_404, query_resource, set_original_creator, set_version_creator
 from newsroom.upload import get_file
 
 
@@ -43,6 +43,7 @@ def search():
 def create():
     data = json.loads(flask.request.form['card'])
     card_data = _get_card_data(data)
+    set_original_creator(card_data)
     ids = get_resource_service('cards').post([card_data])
     return jsonify({'success': True, '_id': ids[0]}), 201
 
@@ -92,6 +93,7 @@ def edit(id):
 
     data = json.loads(flask.request.form['card'])
     card_data = _get_card_data(data)
+    set_version_creator(card_data)
     get_resource_service('cards').patch(id=ObjectId(id), updates=card_data)
     return jsonify({'success': True}), 200
 

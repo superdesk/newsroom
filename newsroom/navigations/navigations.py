@@ -33,7 +33,9 @@ class NavigationsResource(newsroom.Resource):
         'tile_images': {
             'type': 'list',
             'nullable': True
-        }
+        },
+        'original_creator': newsroom.Resource.rel('users'),
+        'version_creator': newsroom.Resource.rel('users'),
     }
 
     datasource = {

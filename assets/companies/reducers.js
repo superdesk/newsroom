@@ -11,6 +11,8 @@ import {
     GET_PRODUCTS
 } from './actions';
 
+import {ADD_EDIT_USERS} from 'actions';
+
 import {searchReducer} from 'search/reducers';
 
 const initialState = {
@@ -141,6 +143,16 @@ export default function companyReducer(state = initialState, action) {
         };
 
         return setupCompanies(action.data.companies, nextState);
+    }
+
+    case ADD_EDIT_USERS: {
+        return {
+            ...state,
+            editUsers: [
+                ...(state.editUsers || []),
+                ...action.data,
+            ]
+        };
     }
 
     default: {
