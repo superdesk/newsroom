@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {formatTime, formatDate, wordCount, characterCount, gettext, isDisplayed} from 'utils';
+import {formatTime, formatDate, wordCount, characterCount, gettext, isDisplayed, getSlugline} from 'utils';
 
 export default function ItemVersion({version, baseClass, showDivider, onClick, displayConfig}) {
     return (
@@ -12,7 +12,7 @@ export default function ItemVersion({version, baseClass, showDivider, onClick, d
                 </div>
                 <div className={`${baseClass}__versions__meta`}>
                     <div className={`${baseClass}__item__meta-info`}>
-                        <span className="bold">{version.slugline}</span>
+                        <span className="bold">{getSlugline(version, true)}</span>
                         <span>{formatDate(version.versioncreated)} {' // '}
                             <span>{wordCount(version)}</span> {gettext('words')}
                             {isDisplayed('charcount', displayConfig) && [

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { shortDate } from 'utils';
+import {shortDate, getSlugline} from 'utils';
 
 
 function CardBody({item, displayMeta, displayDescription, displaySource}) {
@@ -14,7 +14,7 @@ function CardBody({item, displayMeta, displayDescription, displaySource}) {
         {displayMeta && (
             <div className="wire-articles__item__meta">
                 <div className="wire-articles__item__meta-info">
-                    <span className="bold">{item.slugline}</span>
+                    <span className="bold">{getSlugline(item, true)}</span>
                     {displaySource &&
                     <span>{item.source} {'//'} </span>}
                     <span>{shortDate(item.versioncreated)}</span>
