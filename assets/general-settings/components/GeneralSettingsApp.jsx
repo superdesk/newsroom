@@ -7,6 +7,7 @@ import {get, sortBy} from 'lodash';
 import {save} from '../actions';
 
 import TextInput from 'components/TextInput';
+import AuditInformation from 'components/AuditInformation';
 
 function isInput(field) {
     return field.type === 'text' || field.type === 'number';
@@ -15,12 +16,23 @@ function isInput(field) {
 class GeneralSettingsApp extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {values: {}};
+        this.state = {
+            values: {},
+            _updated: get(this.props, 'config._updated'),
+        };
         Object.keys(props.config).forEach((key) => {
             this.state.values[key] = get(props.config[key], 'value') || '';
         });
 
         this.onSubmit = this.onSubmit.bind(this);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.updatedTime !== this.props.updatedTime) {
+            this.setState({
+                _updated: nextProps.updatedTime
+            });
+        }
     }
 
     onChange(key, val) {
@@ -54,11 +66,17 @@ class GeneralSettingsApp extends React.Component {
             }
             return null;
         });
+        const audit = {
+            '_updated': this.props.updatedTime,
+            'version_creator': this.props.versionCreator
+        };
+
         return (
             <div className="flex-row">
                 <div className="flex-col flex-column">
                     <section className="content-main">
                         <div className="list-items-container">
+                            <AuditInformation item={audit} noPadding/>
                             <form onSubmit={this.onSubmit}>
                                 {fields}
 
@@ -75,10 +93,14 @@ class GeneralSettingsApp extends React.Component {
 GeneralSettingsApp.propTypes = {
     config: PropTypes.object.isRequired,
     save: PropTypes.func.isRequired,
+    updatedTime: PropTypes.string,
+    versionCreator: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
     config: state.config,
+    updatedTime: state._updated,
+    versionCreator: state.version_creator,
 });
 
 const mapDispatchToProps = {

@@ -47,7 +47,9 @@ class WatchListsResource(newsroom.Resource):
             'type': 'list',
             'mapping': {'type': 'string'}
         },
-        'last_run_time': {'type': 'datetime'}
+        'last_run_time': {'type': 'datetime'},
+        'original_creator': newsroom.Resource.rel('users'),
+        'version_creator': newsroom.Resource.rel('users')
     }
     datasource = {
         'source': 'watch_lists',

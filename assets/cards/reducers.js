@@ -12,6 +12,7 @@ import {
     GET_NAVIGATIONS,
 } from './actions';
 import {INIT_DASHBOARD, SELECT_DASHBOARD} from 'features/dashboard/actions';
+import {ADD_EDIT_USERS} from 'actions';
 import {dashboardReducer} from 'features/dashboard/reducers';
 import {searchReducer} from 'search/reducers';
 import {getCard} from 'components/cards/utils';
@@ -143,6 +144,16 @@ export default function cardReducer(state = initialState, action) {
     case INIT_DASHBOARD:
     case SELECT_DASHBOARD:
         return {...state, dashboards: dashboardReducer(state.dashboards, action)};
+
+    case ADD_EDIT_USERS: {
+        return {
+            ...state,
+            editUsers: [
+                ...(state.editUsers || []),
+                ...action.data,
+            ]
+        };
+    }
 
     default: {
         const search = searchReducer(state.search, action);

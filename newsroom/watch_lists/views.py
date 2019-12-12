@@ -12,7 +12,8 @@ from newsroom.decorator import admin_only, login_required
 from newsroom.companies import section
 from newsroom.watch_lists import blueprint
 from .forms import WatchListsForm
-from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400
+from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400, \
+    set_original_creator, set_version_creator
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
 from newsroom.wire.utils import update_action_list
@@ -112,6 +113,7 @@ def create():
         request_updates = flask.request.get_json()
         process_form_request(new_watch_list, request_updates, form)
 
+        set_original_creator(new_watch_list)
         ids = get_resource_service('watch_lists').post([new_watch_list])
         return jsonify({
             'success': True,
@@ -148,6 +150,7 @@ def edit(_id):
                     return jsonify({'error': 'Bad request'}), 400
 
             process_form_request(updates, request_updates, form)
+            set_version_creator(updates)
             get_resource_service('watch_lists').patch(ObjectId(_id), updates=updates)
             return jsonify({'success': True}), 200
         return jsonify(form.errors), 400

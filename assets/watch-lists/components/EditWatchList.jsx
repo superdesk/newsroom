@@ -8,6 +8,7 @@ import TextAreaInput from 'components/TextAreaInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 import EditPanel from '../../components/EditPanel';
+import AuditInformation from 'components/AuditInformation';
 
 import WatchListSchedule from './WatchListSchedule';
 
@@ -87,7 +88,7 @@ class EditWatchList extends React.Component {
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>
                 </div>
-
+                <AuditInformation item={item} />
                 <ul className='nav nav-tabs'>
                     {this.tabs.filter((tab, index) => index === 0 || this.props.item._id).map((tab) => (
                         <li key={tab.name} className='nav-item'>

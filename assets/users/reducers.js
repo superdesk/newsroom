@@ -11,6 +11,9 @@ import {
     SET_SORT,
     TOGGLE_SORT_DIRECTION,
 } from './actions';
+
+import {ADD_EDIT_USERS} from 'actions';
+
 import {searchReducer} from 'search/reducers';
 
 const initialState = {
@@ -128,6 +131,16 @@ export default function userReducer(state = initialState, action) {
 
     case TOGGLE_SORT_DIRECTION: {
         return {...state, sortDirection: state.sortDirection === 1 ? -1 : 1};
+    }
+
+    case ADD_EDIT_USERS: {
+        return {
+            ...state,
+            editUsers: [
+                ...(state.editUsers || []),
+                ...action.data,
+            ]
+        };
     }
 
     default: {
