@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
-import {gettext, fullDate, wordCount, LIST_ANIMATIONS} from 'utils';
+import {gettext, fullDate, wordCount, LIST_ANIMATIONS, getSlugline} from 'utils';
 import {getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled, getVideos} from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -18,7 +18,6 @@ class WireListItem extends React.Component {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item);
-        this.slugline = props.item.slugline && props.item.slugline.trim();
         this.state = {isHover: false, previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
@@ -110,7 +109,7 @@ class WireListItem extends React.Component {
                             <div className='wire-articles__item__meta'>
                                 <WireListItemIcons item={item} picture={picture} videos={videos} />
                                 <div className='wire-articles__item__meta-info'>
-                                    <span className='bold'>{this.slugline}</span>
+                                    <span className='bold'>{getSlugline(item, true)}</span>
                                     <span>{item.source}
                                         {' // '}<span>{this.wordCount}</span> {gettext('words')}
                                         {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
