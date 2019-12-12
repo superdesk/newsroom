@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
-import {gettext, LIST_ANIMATIONS, wordCount} from 'utils';
+import {LIST_ANIMATIONS, wordCount} from 'utils';
 import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
 
 import ActionMenu from 'components/ActionMenu';
@@ -12,6 +12,8 @@ import MetaTime from 'ui/components/MetaTime';
 import AMNewsIcon from './AmNewsIcon';
 
 import ListItemPreviousVersions from '../../wire/components/ListItemPreviousVersions';
+import WireListItemDeleted from '../../wire/components/WireListItemDeleted';
+
 import {
     getAMNewsIcon,
     isAlert,
@@ -58,44 +60,18 @@ class AmNewsListItem extends React.Component {
         event.stopPropagation();
     }
 
-    renderDeleted() {
-        const {item} = this.props;
-
-        const selectClassName = classNames('no-bindable-select', {
-            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
-            'wire-articles__item-select': LIST_ANIMATIONS,
-        });
-
-        return (
-            <article key={item._id}
-                className="wire-articles__item-wrap col-12 wire-item item--deleted"
-                tabIndex='0'
-            >
-                <div className="wire-articles__item wire-articles__item--list wire-articles__item--visited">
-                    <div className='wire-articles__item-text'>
-                        <h4 className='wire-articles__item-headline'>
-                            <div className={selectClassName}>
-                                <label>
-                                    <i className="icon--info icon--gray" />
-                                </label>
-                            </div>
-                            {item.headline}
-                        </h4>
-
-                        <div className='wire-articles__item__text'>
-                            <p>{gettext(
-                                'This item has been removed from {{ context_name }}',
-                                {context_name: this.props.contextName}
-                            )}</p>
-                        </div>
-                    </div>
-                </div>
-            </article>
-        );
-    }
-
-    renderActive() {
+    render() {
         const {item, onClick, onDoubleClick} = this.props;
+
+        if (get(this.props, 'item.deleted')) {
+            return (
+                <WireListItemDeleted
+                    item={this.props.item}
+                    contextName={this.props.contextName}
+                />
+            );
+        }
+
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--visited': this.props.isRead,
@@ -126,7 +102,6 @@ class AmNewsListItem extends React.Component {
                 onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
             >
-
                 <div className={wrapClassName}>
                     <div className='wire-articles__item-text'>
                         <h4 className='wire-articles__item-headline'>
@@ -184,12 +159,6 @@ class AmNewsListItem extends React.Component {
                 }
             </article>
         );
-    }
-
-    render() {
-        return (get(this.props, 'item.deleted') || false) ?
-            this.renderDeleted() :
-            this.renderActive();
     }
 }
 
