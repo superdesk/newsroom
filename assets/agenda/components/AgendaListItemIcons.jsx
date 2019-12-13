@@ -118,7 +118,7 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row, isM
                               <i className={`${coverageClass} ${WORKFLOW_COLORS[coverage.workflow_status]}`}>
                                   {beingUpdated && <i className="blue-circle" />}
                                   {isWatched(coverage, user) &&
-                                    <i className="icon--watched coverage--secondary-icon icon--red" />}
+                                    <i className="blue-circle blue-circle--pale blue-circle--right" />}
                               </i>
                           </span>);
                     })}
