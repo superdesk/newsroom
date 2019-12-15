@@ -1,6 +1,5 @@
 from flask_babel import gettext
-from celery.schedules import crontab
-from superdesk.default_settings import local_to_utc_hour
+from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
 
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'MMM DD, YYYY'
@@ -113,10 +112,7 @@ CLIENT_CONFIG = {
 
 WATERMARK_IMAGE = None
 
-#: celery beat config
-CELERY_BEAT_SCHEDULE = {
-    'newsroom:company_expiry': {
-        'task': 'newsroom.company_expiry_alerts.company_expiry',
-        'schedule': crontab(hour=local_to_utc_hour(0), minute=0),  # Runs every day at midnight
-    }
-}
+CELERY_BEAT_SCHEDULE = {key: val for key, val in CELERY_BEAT_SCHEDULE_DEFAULT.items()
+                        if key == 'newsroom.company_expiry'}
+
+ENABLE_WATCH_LISTS = False

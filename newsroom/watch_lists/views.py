@@ -12,7 +12,8 @@ from newsroom.decorator import admin_only, login_required
 from newsroom.companies import section
 from newsroom.watch_lists import blueprint
 from .forms import WatchListsForm
-from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400
+from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400, \
+    get_watch_lists_for_company
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
 from newsroom.wire.utils import update_action_list
@@ -53,11 +54,6 @@ def process_form_request(updates, request_updates, form):
 
     if 'keywords' in request_updates:
         updates['keywords'] = request_updates['keywords']
-
-
-def get_watch_lists_for_company(user):
-    company = user['company'] if user and user.get('company') else None
-    return list(query_resource('watch_lists', lookup={'company': company}))
 
 
 @blueprint.route('/watch_lists/<id>/users', methods=['POST'])
