@@ -62,23 +62,25 @@ export default class CoverageItemStatus extends React.Component {
         const actionsToShow = this.filterActions();
         const parentWatched = isWatched(this.props.item, this.props.user);
         const actions = actionsToShow.map((action) =>
-            <ActionButton
-                key={action.name}
-                item={coverage}
-                className='icon-button'
-                action={action}
-                plan={this.props.item}
-                isVisited={parentWatched}
-                disabled={parentWatched}
-            />);
+            <span className="coverage-item--element-grow" key="action-button">
+                <ActionButton
+                    key={action.name}
+                    item={coverage}
+                    className='icon-button'
+                    action={action}
+                    plan={this.props.item}
+                    isVisited={parentWatched}
+                    disabled={parentWatched}
+                />
+            </span>);
 
         let content = [
-            <span className="coverage-item--element-grow" key="topRow">
+            (<span key="topRow">
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>
                 <span key="value">{gettext('coverage {{ state }} ',
                     {state: getCoverageStatusText(coverage)})}</span>
-                {actions}
-            </span>
+            </span>),
+            actions
         ];
 
         if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED &&

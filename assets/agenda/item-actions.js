@@ -30,8 +30,9 @@ export const getCoverageItemActions = (dispatch) => {
         {
             name: gettext('Watch'),
             icon: 'watch',
-            when: (cov, user, item) => user && !isWatched(item, user) && !isWatched(cov, user),
+            when: (cov, user) => user && !isWatched(cov, user),
             action: (coverage, group, item) => dispatch(watchCoverage(coverage, item)),
+            tooltip: gettext('Watch this coverage'),
         },
         {
             name: gettext('Stop watching'),
