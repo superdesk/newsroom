@@ -92,7 +92,7 @@ class Newsroom(eve.Eve):
         self._setup_limiter()
         self._setup_babel()
         init_celery(self)
-        newsroom.app = self
+        newsroom.flask_app = self
         self._setup_blueprints(self.config['BLUEPRINTS'])
         self._setup_apps(self.config['CORE_APPS'])
         self._setup_apps(self.config.get('INSTALLED_APPS', []))
