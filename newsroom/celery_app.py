@@ -21,7 +21,7 @@ from celery import Celery
 from kombu.serialization import register
 from eve.io.mongo import MongoJSONEncoder
 from eve.utils import str_to_date
-from flask import json
+from flask import json, current_app as app
 from superdesk.errors import SuperdeskError
 import newsroom
 import logging
@@ -54,13 +54,13 @@ def try_cast(v):
 
 
 def dumps(o):
-    with newsroom.app.app_context():
+    with app.app_context():
         return MongoJSONEncoder().encode(o)
 
 
 def loads(s):
     o = json.loads(s)
-    with newsroom.app.app_context():
+    with app.app_context():
         return serialize(o)
 
 
@@ -92,14 +92,14 @@ class AppContextTask(TaskBase):
     )
 
     def __call__(self, *args, **kwargs):
-        with newsroom.app.app_context():
+        with app.app_context():
             try:
                 return super().__call__(*args, **kwargs)
             except self.app_errors as e:
                 handle_exception(e)
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        with newsroom.app.app_context():
+        with app.app_context():
             handle_exception(exc)
 
 
