@@ -1,5 +1,40 @@
 # Newsroom Changelog
 
+## [1.17.0-rc1] Not released yet
+### Features
+- [SDAN-614] Watch individual coverages (#910)
+- [SDAN-600] Item action to remove wire based items (#928)
+
+### Improvements
+- [SDAN-603] Configure logging to add timestamp for log messages (#890)
+- [SDAN-613] Provide byline/hyperlink for featuremedia images (#894)
+- [SDCP-110] Adding optional preview configuration for actions in newshub (#905)
+- [SDCP-115] Making newsonly toggle optional (#906)
+- [SDCP-114] Consent checkbox for user sign up (#908)
+- [SDAN-617] Add 'account_manager' to Company report (#915)
+- [SDAN-620] Improvements to coverage inquiry email (#913)
+- [SDAN-621] Audit Information for forms in the settings (#927)
+- [SDAN-622] Append 'anpa_take_key' to slugline in views (#929)
+- [SDAN-620] Change to make mail-to common for all email links in the Coverage Inquiry email (#933)
+- [SDAN-614] Minor UI changes to watching individual coverages (#930)
+
+### Fixes
+- [SDAN-616] Use current time to populate date filter for media hrefs (#893)
+- PR to fix failing tests due to pytest-mock plugin (#903)
+- [SDCP-42] - Download button is disabled in home page (#895)
+- fix(my topics): Standard user is unable to search navigations endpoint (#907)
+- use single domain for translations (#909)
+- [SDAN-610] Photo coverage URL should not be generated on push but on get from the client (#896)
+- [SDAN-613] Corrected byline text and hyper-link for photo (#904)
+- Fix sending emails via celery (#916)
+- fix(dev-requirements): Add responses lib (#918)
+- [SDAN-615] Unable to remove all filter parameters from a Topic (#914)
+- support mail username config (#921)
+- fix tests setup (#920)
+- [SDAN-619] Correct tagging for AM Weather (#922)
+- [SDAN-615] Unable to empty filters on a topic (#923)
+- fix(celery): Incorrect reference to app in dumps/loads (#932)
+
 ## [1.16.1] 2019-11-04
 ### Improvements
 - [SDAN-609] Support multi-line internal and editorial note (#886)
