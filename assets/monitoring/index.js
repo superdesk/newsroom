@@ -2,10 +2,10 @@ import {get, startsWith} from 'lodash';
 
 import { createStore, render, getInitData, initWebSocket, closeItemOnMobile, isMobilePhone } from 'utils';
 import {getReadItems} from 'local-store';
-import watchListsReducer from './reducers';
+import monitoringReducer from './reducers';
 import WireApp from 'wire/components/WireApp';
-import WatchListApp from './components/WatchListApp';
-import { initViewData, fetchWatchLists } from './actions';
+import MonitoringApp from './components/MonitoringApp';
+import { initViewData, fetchMonitoring } from './actions';
 import {
     fetchItems,
     initData,
@@ -25,8 +25,8 @@ import {
 
 let store;
 
-if (get(window.viewData, 'context', '') === 'watch_lists') {
-    store = createStore(wireReducer, 'WatchLists');
+if (get(window.viewData, 'context', '') === 'monitoring') {
+    store = createStore(wireReducer, 'Monitoring');
     // init data
     store.dispatch(initData(getInitData(window.viewData), getReadItems(), false));
 
@@ -57,9 +57,10 @@ if (get(window.viewData, 'context', '') === 'watch_lists') {
         store.dispatch(toggleNavigation(firstNavigation));
     }
 
-    // fetch items & render
-    store.dispatch(fetchItems()).then(() =>
-        render(store, WireApp, document.getElementById('watch_lists-app'),
+    const promise = navigationId || firstNavigation ? store.dispatch(fetchItems()) : Promise.resolve();
+
+    promise.then(() =>
+        render(store, WireApp, document.getElementById('monitoring-app'),
             {
                 addAllOption: false,
                 disableSameNavigationDeselect: true,
@@ -69,10 +70,10 @@ if (get(window.viewData, 'context', '') === 'watch_lists') {
     // initialize web socket listener
     initWebSocket(store, pushNotification);
 } else {
-    store = createStore(watchListsReducer, 'WatchLists');
+    store = createStore(monitoringReducer, 'Monitoring');
     if (window.viewData) {
         store.dispatch(initViewData(window.viewData));
-        store.dispatch(fetchWatchLists());
+        store.dispatch(fetchMonitoring());
     }
-    render(store, WatchListApp, document.getElementById('settings-app'));
+    render(store, MonitoringApp, document.getElementById('settings-app'));
 }

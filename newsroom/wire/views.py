@@ -173,9 +173,9 @@ def download(_ids):
     formatter = app.download_formatters[_format]['formatter']
     mimetype = None
     attachment_filename = '%s-newsroom.zip' % utcnow().strftime('%Y%m%d%H%M')
-    if len(items) == 1 or _format == 'watch_lists':
+    if len(items) == 1 or _format == 'monitoring':
         item = items[0]
-        args_item = item if _format != 'watch_lists' else items
+        args_item = item if _format != 'monitoring' else items
         parse_dates(item)  # fix for old items
         _file.write(formatter.format_item(args_item, item_type=item_type))
         _file.seek(0)

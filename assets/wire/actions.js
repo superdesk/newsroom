@@ -416,7 +416,7 @@ export function submitDownloadItems(items, format) {
  */
 export function submitExportItems(items) {
     return (dispatch, getState) => {
-        window.open(`/watch_lists/export/${items.join(',')}`, '_blank');
+        window.open(`/monitoring/export/${items.join(',')}`, '_blank');
         dispatch(setExportItems(items));
         analytics.multiItemEvent('export', items.map((_id) => getState().itemsById[_id]));
     };

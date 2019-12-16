@@ -16,7 +16,7 @@ def get_settings_data():
         'products': list(query_resource('products')),
         'navigations': list(query_resource('navigations')),
         'companies': list(query_resource('companies')),
-        'sections': [s for s in current_app.sections if s.get('_id') != 'watch_lists'],  # watch_lists has no products
+        'sections': [s for s in current_app.sections if s.get('_id') != 'monitoring'],  # monitoring has no products
     }
 
 

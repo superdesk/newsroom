@@ -7,24 +7,24 @@ import EditPanel from 'components/EditPanel';
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 import SelectInput from 'components/SelectInput';
-import WatchListSchedule from '../../watch-lists/components/WatchListSchedule';
+import MonitoringSchedule from '../../monitoring/components/MonitoringSchedule';
 
 import {fetchCompanyUsers} from 'companies/actions';
-import {postWatchList} from 'watch-lists/actions';
+import {postMonitoringProfile} from 'monitoring/actions';
 
-class WatchListEditor extends React.Component {
+class MonitoringEditor extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            watchList: null,
+            profile: null,
             saving: false,
             dirty: false,
-            activeTab: 'watch-list',
+            activeTab: 'profile',
         };
 
         this.tabs = [
-            {label: gettext('Watch List'), name: 'watch-list'}
+            {label: gettext('Monitoring Profile'), name: 'profile'}
         ];
 
         if (this.props.isAdmin) {
@@ -33,7 +33,7 @@ class WatchListEditor extends React.Component {
 
         this.handleTabClick = this.handleTabClick.bind(this);
         this.onChange = this.onChange.bind(this);
-        this.saveWatchList = this.saveWatchList.bind(this);
+        this.saveMonitoringProfile = this.saveMonitoringProfile.bind(this);
     }
 
     handleTabClick(event) {
@@ -45,34 +45,34 @@ class WatchListEditor extends React.Component {
 
     componentDidMount() {
         if (this.props.item != null) {
-            this.changeWatchList(this.props.item);
+            this.changeMonitoringProfile(this.props.item);
         }
     }
 
     componentDidUpdate(prevProps) {
         if (get(prevProps, 'item._id') !== get(this.props, 'item._id') ||
             get(prevProps, 'item._updated') !== get(this.props, 'item._updated')) {
-            this.changeWatchList(this.props.item);
+            this.changeMonitoringProfile(this.props.item);
         }
     }
 
-    changeWatchList(item) {
+    changeMonitoringProfile(item) {
         this.setState({
-            watchList: cloneDeep(item),
+            profile: cloneDeep(item),
             saving: false,
             dirty: false,
         });
     }
 
     onChange(event) {
-        let wl = cloneDeep(this.state.watchList);
+        let wl = cloneDeep(this.state.profile);
         let field = event.target.name;
         let value = event.target.value;
         let autoSave, msg;
 
         if (field === 'notifications') {
             field = 'users';
-            value = get(this.state, 'watchList.users') || [];
+            value = get(this.state, 'profile.users') || [];
             if (value.includes(this.props.user)) {
                 value = value.filter((u) => u !== this.props.user);
                 msg = gettext('Unsubscribed');
@@ -82,33 +82,33 @@ class WatchListEditor extends React.Component {
             }
             autoSave = true;
         } else if (field === 'is_enabled') {
-            value = !get(this.state, 'watchList.is_enabled');
+            value = !get(this.state, 'profile.is_enabled');
         }
         
         set(wl, field, value);
 
         this.setState({
-            watchList: wl,
+            profile: wl,
             dirty: !isEqual((get(this.props, 'item') || {}), wl),
         });
 
         if (autoSave && msg) {
-            this.props.saveWatchList(wl, gettext('{{ msg }} successfully', {msg: msg}));
+            this.props.saveMonitoringProfile(wl, gettext('{{ msg }} successfully', {msg: msg}));
         }
     }
 
-    saveWatchList(event) {
+    saveMonitoringProfile(event) {
         if (event && 'preventDefault' in event) {
             event.preventDefault();
         }
 
-        this.props.saveWatchList(this.state.watchList);
+        this.props.saveMonitoringProfile(this.state.profile);
     }
 
     render() {
         const {item, isAdmin, user} = this.props;
-        const watchList = get(this.state, 'watchList');
-        if (!watchList) {
+        const profile = get(this.state, 'profile');
+        if (!profile) {
             return null;
         }
         
@@ -116,7 +116,7 @@ class WatchListEditor extends React.Component {
             'onChange': this.onChange,
             'readOnly': !isAdmin,
         };
-        const subscribed = (get(this.state, 'watchList.users') || []).includes(user);
+        const subscribed = (get(this.state, 'profile.users') || []).includes(user);
 
         return (
             <div className='list-item__preview'>
@@ -146,8 +146,8 @@ class WatchListEditor extends React.Component {
                 </ul>
                 <div className="list-item__preview-form">
                     <div className='tab-content'>
-                        {this.state.activeTab === 'watch-list' &&
-                        <div className='tab-pane active' id='watch-list'>
+                        {this.state.activeTab === 'profile' &&
+                        <div className='tab-pane active' id='profile'>
                             <form>
                                 <div className="list-item__preview-form">
                                     {!isAdmin && (
@@ -164,35 +164,35 @@ class WatchListEditor extends React.Component {
                                     <TextInput
                                         name='subject'
                                         label={gettext('Subject line')}
-                                        value={watchList.subject}
+                                        value={profile.subject}
                                         {...propsToFields} />
 
                                     <TextInput
                                         name='description'
                                         label={gettext('Description')}
-                                        value={watchList.description}
+                                        value={profile.description}
                                         {...propsToFields} /> 
 
                                     <SelectInput
                                         name='alert_type'
                                         label={gettext('Alert type')}
-                                        value={watchList.alert_type}
+                                        value={profile.alert_type}
                                         options={[
                                             {value: 'linked_text', text: 'Linked extract(s)'},
                                             {value: 'full_text', text: 'Full text'}
                                         ]}
                                         {...propsToFields} />
 
-                                    <WatchListSchedule 
-                                        watchList={watchList}
-                                        onsaveWatchListSchedule={this.onChange}
+                                    <MonitoringSchedule 
+                                        item={profile}
+                                        onsaveMonitoringProfileSchedule={this.onChange}
                                         {...propsToFields}
                                         noForm />
 
                                     <CheckboxInput
                                         name='is_enabled'
                                         label={gettext('Enabled')}
-                                        value={watchList.is_enabled}
+                                        value={profile.is_enabled}
                                         {...propsToFields} />
                                 </div>
                                 {isAdmin && (<div className="list-item__preview-footer">
@@ -207,7 +207,7 @@ class WatchListEditor extends React.Component {
                                         type="button"
                                         className="btn btn-outline-primary"
                                         value={gettext('Save')}
-                                        onClick={this.saveWatchList}
+                                        onClick={this.saveprofile}
                                         disabled={this.state.saving || !this.state.dirty}
                                     />
                                 </div>)}
@@ -215,17 +215,17 @@ class WatchListEditor extends React.Component {
                         </div>}
                         {this.state.activeTab === 'users' &&
                             <EditPanel
-                                parent={watchList}
-                                items={this.props.watchListUsers.map((u) => ({
+                                parent={profile}
+                                items={this.props.monitoringProfileUsers.map((u) => ({
                                     ...u,
                                     name: `${u.first_name} ${u.last_name}`
                                 }))}
                                 field="users"
                                 onChange={this.onChange}
-                                onSave={this.saveWatchList}
+                                onSave={this.saveMonitoringProfile}
                                 onCancel={this.props.closeEditor}
                                 saveDisabled={this.state.saving || isEqual(get(this.props, 'item.users'),
-                                    get(this.state, 'watchList.users')) }
+                                    get(this.state, 'profile.users')) }
                                 cancelDisabled={this.state.saving}
                             />
                         }
@@ -236,8 +236,7 @@ class WatchListEditor extends React.Component {
     }
 }
 
-WatchListEditor.propTypes = {
-    watchList: PropTypes.object,
+MonitoringEditor.propTypes = {
     closeEditor: PropTypes.func,
     onTopicChanged: PropTypes.func,
     hideModal: PropTypes.func,
@@ -246,18 +245,18 @@ WatchListEditor.propTypes = {
     fetchCompanyUsers: PropTypes.func,
     item: PropTypes.object,
     user: PropTypes.string,
-    saveWatchList: PropTypes.func,
-    watchListUsers: PropTypes.array,
+    saveMonitoringProfile: PropTypes.func,
+    monitoringProfileUsers: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
-    watchListUsers: state.watchListUsers || [],
+    monitoringProfileUsers: state.monitoringProfileUsers || [],
     user: get(state, 'editedUser._id'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    saveWatchList: (item, notifyMsg) => dispatch(postWatchList(item, notifyMsg)),
+    saveMonitoringProfile: (item, notifyMsg) => dispatch(postMonitoringProfile(item, notifyMsg)),
     fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId, true)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(WatchListEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(MonitoringEditor);

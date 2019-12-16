@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import WatchListItem from './WatchListItem';
+import MonitoringItem from './MonitoringItem';
 import { gettext } from 'utils';
 
 
-function WatchList({watchLists, onClick, activeWatchListId, companiesById}) {
-    const list = watchLists.map((w) =>
-        <WatchListItem
-            key={w._id}
-            watchList={w}
+function MonitoringList({list, onClick, activeMonitoringProfileId, companiesById}) {
+    const listElement = list.map((m) =>
+        <MonitoringItem
+            key={m._id}
+            item={m}
             onClick={onClick}
-            isActive={activeWatchListId===w._id}
+            isActive={activeMonitoringProfileId===m._id}
             companiesById={companiesById} />
     );
 
@@ -28,18 +28,18 @@ function WatchList({watchLists, onClick, activeWatchListId, companiesById}) {
                             <th>{ gettext('Status') }</th>
                         </tr>
                     </thead>
-                    <tbody>{list}</tbody>
+                    <tbody>{listElement}</tbody>
                 </table>
             </div>
         </section>
     );
 }
 
-WatchList.propTypes = {
-    watchLists: PropTypes.array.isRequired,
+MonitoringList.propTypes = {
+    list: PropTypes.array.isRequired,
     onClick: PropTypes.func.isRequired,
-    activeWatchListId: PropTypes.string,
+    activeMonitoringProfileId: PropTypes.string,
     companiesById: PropTypes.object,
 };
 
-export default WatchList;
+export default MonitoringList;

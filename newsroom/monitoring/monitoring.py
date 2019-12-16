@@ -3,7 +3,7 @@ import newsroom
 from content_api import MONGO_PREFIX
 
 
-class WatchListsResource(newsroom.Resource):
+class MonitoringResource(newsroom.Resource):
     """
     Company schema
     """
@@ -52,7 +52,7 @@ class WatchListsResource(newsroom.Resource):
         'version_creator': newsroom.Resource.rel('users')
     }
     datasource = {
-        'source': 'watch_lists',
+        'source': 'monitoring',
         'default_sort': [('name', 1)]
     }
     item_methods = ['GET', 'PATCH', 'DELETE']
@@ -60,5 +60,5 @@ class WatchListsResource(newsroom.Resource):
     mongo_prefix = MONGO_PREFIX
 
 
-class WatchListsService(newsroom.Service):
+class MonitoringService(newsroom.Service):
     pass
