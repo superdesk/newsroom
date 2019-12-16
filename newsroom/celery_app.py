@@ -106,7 +106,7 @@ class AppContextTask(TaskBase):
 celery.Task = AppContextTask
 
 
-def init_celery(app):
-    celery.config_from_object(app.config, namespace='CELERY')
-    app.celery = celery
-    app.redis = __get_redis(app)
+def init_celery(_app):
+    celery.config_from_object(_app.config, namespace='CELERY')
+    _app.celery = celery
+    _app.redis = __get_redis(_app)
