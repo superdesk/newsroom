@@ -2,7 +2,7 @@ import os
 from superdesk.default_settings import env
 
 URL_PREFIX = os.environ.get('CONTENT_API_PREFIX', 'api/v1')
-QUERY_MAX_RESULTS = 100
+QUERY_MAX_PAGE_SIZE = 100
 
 CORE_APPS = [
     'newsroom.news_api.api_tokens',

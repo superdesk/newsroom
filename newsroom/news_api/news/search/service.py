@@ -8,7 +8,7 @@ from werkzeug.datastructures import MultiDict
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
 import json
 from superdesk.utc import utcnow
-from newsroom.news_api.settings import ELASTIC_DATETIME_FORMAT, QUERY_MAX_RESULTS
+from newsroom.news_api.settings import ELASTIC_DATETIME_FORMAT, QUERY_MAX_PAGE_SIZE
 import functools
 import re
 from dateutil import parser
@@ -23,7 +23,7 @@ class NewsAPISearchService(BaseService):
     allowed_params = {
         'start_date', 'end_date',
         'include_fields', 'exclude_fields',
-        'max_results', 'page', 'version', 'where',
+        'page_size', 'page', 'version', 'where',
         'q', 'default_operator', 'filter',
         'service', 'subject', 'genre', 'urgency',
         'priority', 'type', 'item_source', 'sort', 'timezone', 'products'
@@ -37,7 +37,9 @@ class NewsAPISearchService(BaseService):
     # set of fields that can be specified in the include_fields parameter
     allowed_include_fields = {'type', 'urgency', 'priority', 'language', 'description_html', 'located', 'keywords',
                               'source', 'subject', 'place', 'wordcount', 'charcount', 'body_html', 'readtime',
-                              'profile', 'service', 'genre'}
+                              'profile', 'service', 'genre', 'versioncreated'}
+
+    default_fields = {'_id', 'uri', 'embargoed', 'pubstatus', 'ednote', 'signal', 'copyrightnotice', 'copyrightholder'}
 
     # set of fields that will be removed from all responses, we are not currently supporting associations and
     # the products embedded in the items are the superdesk products
@@ -246,6 +248,11 @@ class NewsAPISearchService(BaseService):
                 if field not in ItemsResource.schema:
                     raise BadParameterValueError(desc=err_msg.format(field))
 
+        if request_params.get('include_fields'):
+            include_fields = self.default_fields.union(include_fields)
+        else:
+            include_fields = self.default_fields.union(self.allowed_exclude_fields)
+
         return include_fields, exclude_fields
 
     def _create_field_filter(self, include_fields, exclude_fields):
@@ -355,7 +362,7 @@ class NewsAPISearchService(BaseService):
                     end_date = request_params.get('end_date')
                     relative_end = True
                 else:
-                    end_date = self._parse_iso_date(request_params.get('start_date'), request_params.get('timezone'))
+                    end_date = self._parse_iso_date(request_params.get('end_date'), request_params.get('timezone'))
             else:
                 end_date = None
         except ValueError:
@@ -462,14 +469,16 @@ class NewsAPISearchService(BaseService):
         self._set_sort(internal_req)
 
         internal_req.args['section'] = 'news_api'
-        internal_req.args.setdefault('from', (req.page - 1) * req.max_results)
 
-        if req.args.get('max_results') and int(req.args.get('max_results')) > QUERY_MAX_RESULTS:
-            raise BadParameterValueError('Requested maximum number of results exceeds {}'.format(QUERY_MAX_RESULTS))
+        page_size = int(req.args.get('page_size') if req.args.get('page_size') else 25)
+        page = int(req.args.get('page') if req.args.get('page') else 1)
 
-        resp = get_resource_service('wire_search').get(internal_req, lookup,
-                                                       size=req.args.get('max_results')
-                                                       if req.args.get('max_results') else 25, aggs=False)
+        internal_req.args.setdefault('from', (page - 1) * page_size)
+
+        if req.args.get('page_size') and int(req.args.get('page_size')) > QUERY_MAX_PAGE_SIZE:
+            raise BadParameterValueError('Requested maximum number of results exceeds {}'.format(QUERY_MAX_PAGE_SIZE))
+
+        resp = get_resource_service('wire_search').get(internal_req, lookup, size=page_size, aggs=False)
 
         # Can't get the exclude projection to work do pop the excude fields here
         exclude_fields = self.mandatory_exclude_fields.union(

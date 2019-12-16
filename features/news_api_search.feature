@@ -34,7 +34,7 @@ Feature: News API Products
         "product_type": "news_api"
         }]
         """
-    When we get "news/search?q=fish"
+    When we get "news/search?q=fish&include_fields=body_html"
     Then we get list with 1 items
      """
      {"_items": [
@@ -76,7 +76,7 @@ Feature: News API Products
         "product_type": "news_api"
         }]
         """
-    When we get "news/search?start_date=now-2d"
+    When we get "news/search?start_date=now-2d&include_fields=body_html"
     Then we get list with 1 items
      """
      {"_items": [
@@ -119,7 +119,7 @@ Feature: News API Products
         "product_type": "news_api"
         }]
         """
-    When we get "news/search?start_date=now-4d&end_date=now-2d"
+    When we get "news/search?start_date=now-4d&end_date=now-2d&include_fields=body_html"
     Then we get list with 1 items
      """
      {"_items": [
@@ -162,14 +162,14 @@ Feature: News API Products
         "product_type": "news_api"
         }]
         """
-    When we get "news/search?start_date=2018-11-11T03:48:39&end_date=2018-11-12T02:48:39"
+    When we get "news/search?start_date=2018-11-11T03:48:38&end_date=2018-11-12T02:48:40&include_fields=body_html"
     Then we get list with 1 items
      """
      {"_items": [
          {"body_html": "Once upon a time there was a quokka who could swim"}
      ]}
      """
-    When we get "news/search?start_date=2018-11-11"
+    When we get "news/search?start_date=2018-11-11&include_fields=body_html"
     Then we get list with 2 items
     """
      {"_items": [
@@ -177,13 +177,19 @@ Feature: News API Products
         {"body_html": "Once upon a time there was a aardvark that could not swim"}
      ]}
      """
-   When we get "news/search?start_date=2018-11-09T10:48:39&timezone=Australia/Sydney"
+   When we get "news/search?start_date=2018-11-09T10:48:39&timezone=Australia/Sydney&include_fields=body_html"
     Then we get list with 3 items
     """
      {"_items": [
         {"body_html": "Once upon a time there was a quokka who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"},
         {"body_html": "Once upon a time there was a fish who could swim"}
+     ]}
+     """
+    When we get "news/search?start_date=2018-11-12T01:48:38&end_date=2018-11-12T02:48:40"
+    Then we get list with 0 items
+     """
+     {"_items": [
      ]}
      """
 
@@ -222,7 +228,7 @@ Feature: News API Products
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&sort=versioncreated:asc"
+   When we get "news/search?start_date=now-10d&sort=versioncreated:asc&include_fields=body_html,versioncreated"
     Then we get list ordered by versioncreated with 3 items
     """
      {"_items": [
@@ -318,9 +324,9 @@ Feature: News API Products
  Scenario: exclude fields
      Given "items"
         """
-        [{"body_html": "Three", "versioncreated": "#DATE-3#", "headline": "Headline 1" },
-        {"body_html": "Five", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
-        {"body_html": "One", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
+        [{"body_html": "Three", "versioncreated": "#DATE-3#", "pubstatus": "usable1" },
+        {"body_html": "Five", "versioncreated": "#DATE-5#", "pubstatus": "usable2"  },
+        {"body_html": "One", "versioncreated": "#DATE-1#", "pubstatus": "usable3"  }]
         """
      Given "companies"
         """
@@ -350,13 +356,13 @@ Feature: News API Products
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&exclude_fields=headline"
+   When we get "news/search?start_date=now-10d&exclude_fields=versioncreated"
     Then we get list with 3 items
     """
      {"_items": [
-        {"body_html": "One"},
-        {"body_html": "Three"},
-        {"body_html": "Five"}
+        {"pubstatus": "usable1"},
+        {"pubstatus": "usable2"},
+        {"pubstatus": "usable3"}
      ]}
      """
 
@@ -396,7 +402,7 @@ Feature: News API Products
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&max_results=2&page=1&sort=versioncreated:asc"
+   When we get "news/search?start_date=now-10d&page_size=2&page=1&sort=versioncreated:asc"
     Then we get list with 3 items
     """
      {"_items": [
@@ -404,7 +410,7 @@ Feature: News API Products
         {"headline": "Headline 1"}
      ]}
      """
-    When we get "news/search?start_date=now-10d&max_results=2&page=2&sort=versioncreated:asc"
+    When we get "news/search?start_date=now-10d&page_size=2&page=2&sort=versioncreated:asc"
     Then we get list with 3 items
     """
      {"_items": [
