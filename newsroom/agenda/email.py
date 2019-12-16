@@ -68,14 +68,15 @@ def send_coverage_request_email(user, message, item):
     name = '{} {}'.format(user.get('first_name'), user.get('last_name'))
     email = user.get('email')
 
-    subject = gettext('Coverage inquiry: {}'.format(item.get('name') or item.get('slugline')))
+    item_name = item.get('name') or item.get('slugline')
+    subject = gettext('Coverage inquiry: {}'.format(item_name))
     user_company = get_user_company(user)
     if user_company:
         user_company = user_company.get('name')
 
     text_body = render_template('coverage_request_email.txt', name=name, email=email, message=message, url=url,
-                                company=user_company, recipients=recipients, subject=subject)
+                                company=user_company, recipients=recipients, subject=subject, item_name=item_name)
     html_body = render_template('coverage_request_email.html', name=name, email=email, message=message, url=url,
-                                company=user_company, recipients=recipients, subject=subject)
+                                company=user_company, recipients=recipients, subject=subject, item_name=item_name)
 
     send_email(to=recipients, subject=subject, text_body=text_body, html_body=html_body)
