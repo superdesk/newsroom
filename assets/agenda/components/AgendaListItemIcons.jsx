@@ -106,18 +106,19 @@ function AgendaListItemIcons({item, planningItem, group, hideCoverages, row, isM
                         const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
                         const beingUpdated = isCoverageBeingUpdated(coverage);
                         const showBorder = isMobilePhone && index === coveragesToDisplay.length - 1;
+                        const watchText = isWatched(coverage, user) ? gettext('(Watching)') : '';
 
                         return (!group || (isCoverageForExtraDay(coverage, group) &&
                             coverage.planning_id === get(planningItem, 'guid')) &&
                           <span
                               className={classNames('wire-articles__item__icon', {'dashed-border': showBorder})}
                               key={coverage.coverage_id}
-                              title={getCoverageTootip(coverage, beingUpdated)}
+                              title={`${watchText} ${getCoverageTootip(coverage, beingUpdated)}`}
                           >
                               <i className={`${coverageClass} ${WORKFLOW_COLORS[coverage.workflow_status]}`}>
                                   {beingUpdated && <i className="blue-circle" />}
                                   {isWatched(coverage, user) &&
-                                    <i className="icon--watched coverage--secondary-icon icon--gray-light" />}
+                                    <i className="blue-circle blue-circle--pale blue-circle--right" />}
                               </i>
                           </span>);
                     })}
