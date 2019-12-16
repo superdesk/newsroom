@@ -3225,15 +3225,23 @@ a.wire-articles__versions {
     height: 8px;
     width: 8px;
     bottom: -1px;
-    right: 19px;
+    right: 28px;
     position: absolute;
+
+    @include md {
+        right: 19px;
+    }
 
     &--pale {
         background-color: #00adec4f;
     }
 
     &--right {
-        right: -4px;
+        right: 7px;
+
+        @include md {
+            right: -4px;
+        }
     }
 }
 
