@@ -1,5 +1,5 @@
 {% block content %}
-<p>A coverage inquiry has been submitted by {{ name }} ({{ email }}) from {{ company }} regarding Agenda item: <a href="{{url}}">{{ url }}</a></p>
+<p>A coverage inquiry has been submitted by {{ name }} (<a href="mailto:{{ email }}?cc={{ recipients|join(',') }}&subject={{ subject }}">{{ email }}</a>) from {{ company }} regarding Agenda item: <a href="{{url}}">{{ url }}</a></p>
 
 Message:
 {% include "message.html" %}
