@@ -1,5 +1,5 @@
 from flask_babel import gettext
-
+from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
 
 CLIENT_TIME_FORMAT = 'HH:mm'
 CLIENT_DATE_FORMAT = 'MMM DD, YYYY'
@@ -53,9 +53,7 @@ BLUEPRINTS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.settings',
-    'newsroom.news_api.api_tokens',
-    'newsroom.watch_lists',
+    'newsroom.settings'
 ]
 
 CORE_APPS = [
@@ -81,10 +79,7 @@ CORE_APPS = [
     'newsroom.public',
     'newsroom.settings',
     'newsroom.photos',
-    'newsroom.media_utils',
-    'newsroom.news_api',
-    'newsroom.news_api.api_tokens',
-    'newsroom.watch_lists',
+    'newsroom.media_utils'
 ]
 
 COVERAGE_TYPES = {
@@ -116,3 +111,8 @@ CLIENT_CONFIG = {
 }
 
 WATERMARK_IMAGE = None
+
+CELERY_BEAT_SCHEDULE = {key: val for key, val in CELERY_BEAT_SCHEDULE_DEFAULT.items()
+                        if key == 'newsroom.company_expiry'}
+
+ENABLE_WATCH_LISTS = False

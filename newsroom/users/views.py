@@ -17,8 +17,7 @@ from newsroom.notifications import push_user_notification
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
-from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
-from newsroom.watch_lists.views import get_watch_lists_for_company
+from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary, get_watch_lists_for_company
 
 
 def get_settings_data():
@@ -36,9 +35,11 @@ def get_view_data():
         'company': str(company),
         'topics': get_user_topics(user['_id']) if user else [],
         'companyName': get_user_company_name(user),
-        'locators': get_vocabulary('locators'),
-        'watch_lists': get_watch_lists_for_company(user),
+        'locators': get_vocabulary('locators')
     }
+
+    if app.config.get('ENABLE_WATCH_LISTS'):
+        rv['watch_lists'] = get_watch_lists_for_company(user)
 
     rv.update(get_company_sections_watch_list_data(company))
 
