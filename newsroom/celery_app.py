@@ -23,7 +23,6 @@ from eve.io.mongo import MongoJSONEncoder
 from eve.utils import str_to_date
 from flask import json, current_app as app
 from superdesk.errors import SuperdeskError
-import newsroom
 import logging
 from superdesk.celery_app import (  # noqa
     finish_subtask_from_progress,
