@@ -2463,9 +2463,9 @@ a.wire-articles__versions {
     p {
         font-size: 0.75rem
     }
-    i, button {
-        font-size: 20px;
-        height: 20px;
+    i {
+        font-size: 16px;
+        height: 17px;
     }
 }
 .coverage-item__column {
@@ -3216,14 +3216,30 @@ a.wire-articles__versions {
 
 .blue-circle {
     background-color: $main-blue;
-    border: 1px solid $main-blue;
+    border: 1px solid #0600ec;
     box-shadow: 0px 0 0 2px #dedede;
     border-radius: 50%;
     height: 8px;
     width: 8px;
     bottom: -1px;
-    right: -4px;
+    right: 28px;
     position: absolute;
+
+    @include md {
+        right: 19px;
+    }
+
+    &--pale {
+        background-color: #00adec4f;
+    }
+
+    &--right {
+        right: 7px;
+
+        @include md {
+            right: -4px;
+        }
+    }
 }
 
 .noselect {
