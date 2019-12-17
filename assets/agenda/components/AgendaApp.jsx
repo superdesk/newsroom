@@ -66,8 +66,6 @@ class AgendaApp extends BaseApp {
         super(props);
         this.modals = modals;
 
-        this.dom.list = null;
-
         this.fetchItemsOnNavigation = this.fetchItemsOnNavigation.bind(this);
     }
 
