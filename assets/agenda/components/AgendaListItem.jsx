@@ -63,7 +63,7 @@ class AgendaListItem extends React.Component {
     }
 
     onMouseEnter() {
-        if (this.props.actioningItem && this.props.actioningItem._id !== item._id) {
+        if (this.props.actioningItem && this.props.actioningItem._id !== this.props.item._id) {
             this.props.resetActioningItem();
         }
     }
