@@ -77,7 +77,8 @@ class AgendaListCoverageItem extends React.Component {
     }
 
     shouldComponentUpdate(nextProps) {
-        return !isEqual(this.props.coverage, nextProps.coverage);
+        return !isEqual(this.props.coverage, nextProps.coverage) ||
+            !isEqual(get(nextProps, 'coverages'), get(this.props, 'coverages'));
     }
 
     componentWillReceiveProps(nextProps) {
@@ -111,7 +112,6 @@ class AgendaListCoverageItem extends React.Component {
         ) && (
             <span
                 className={classNames('wire-articles__item__icon', {'dashed-border': props.showBorder})}
-                key={props.coverage.coverage_id}
                 title={state.tooltip}
             >
                 <i className={`${state.coverageClass} ${WORKFLOW_COLORS[props.coverage.workflow_status]}`}>
@@ -126,7 +126,7 @@ class AgendaListCoverageItem extends React.Component {
 
 AgendaListCoverageItem.propTypes = {
     planningItem: PropTypes.object,
-    user: PropTypes.object,
+    user: PropTypes.string,
     coverage: PropTypes.object,
     showBorder: PropTypes.bool,
     group: PropTypes.string,
