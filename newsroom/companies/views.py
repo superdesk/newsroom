@@ -77,7 +77,7 @@ def get_company_updates(company):
         'country': company.get('country'),
         'is_enabled': company.get('is_enabled'),
         'company_type': company.get('company_type'),
-        'watch_list_administrator': company.get('watch_list_administrator'),
+        'monitoring_administrator': company.get('monitoring_administrator'),
     }
 
     if company.get('expiry_date'):

@@ -69,10 +69,10 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
     If not provided session user will be checked
     """
     products = []
-    for_watch_lists = section == 'watch_lists' or (req and req.args.get('celery'))
-    internal_section = 'wire' if for_watch_lists else section
+    for_monitoring = section == 'monitoring' or (req and req.args.get('celery'))
+    internal_section = 'wire' if for_monitoring else section
 
-    if not for_watch_lists and is_admin(user):
+    if not for_monitoring and is_admin(user):
         if navigation_id:
             products = get_products_by_navigation(navigation_id)
         else:
@@ -80,7 +80,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
 
     if company:
         products = get_products_by_company(company['_id'], navigation_id, product_type=internal_section)
-    elif not for_watch_lists:
+    elif not for_monitoring:
         # user does not belong to a company so blocking all stories
         abort(403, gettext('User does not belong to a company.'))
 
@@ -98,18 +98,21 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
                 if company_type.get('wire_must_not'):
                     query['bool']['must_not'].append(company_type['wire_must_not'])
 
-    if for_watch_lists:
-        watch_lists = []
-        if navigation_id and navigation_id and len(navigation_id) > 0:
-            watch_lists.append(get_resource_service('watch_lists').find_one(req=None, _id=navigation_id[0]))
+    if for_monitoring:
+        monitoring_list = []
+        if req:
+            if navigation_id and navigation_id and len(navigation_id) > 0:
+                monitoring_list.append(get_resource_service('monitoring').find_one(req=None, _id=navigation_id[0]))
+            else:
+                abort(403, gettext('No monitoring profile requested.'))
         else:
-            watch_lists = list(query_resource('watch_lists'))
+            monitoring_list = list(query_resource('monitoring'))
 
-        if len(watch_lists) > 0:
-            for w in watch_lists:
-                query['bool']['should'].append(query_string(w['query']))
+        if len(monitoring_list) > 0:
+            for m in monitoring_list:
+                query['bool']['should'].append(query_string(m['query']))
 
-            if navigation_id and len(watch_lists[0].get('keywords') or []) > 0 and source_query is not None:
+            if navigation_id and len(monitoring_list[0].get('keywords') or []) > 0 and source_query is not None:
                 source_query['highlight'] = {'fields': {}}
                 fields = ['body_html']
                 for f in fields:
@@ -117,7 +120,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
                         "number_of_fragments": 0,
                         "highlight_query": {
                             "query_string": {
-                                "query": ' '.join(watch_lists[0]['keywords']),
+                                "query": ' '.join(monitoring_list[0]['keywords']),
                                 "default_operator": "AND",
                                 "lenient": False
                             }
@@ -157,7 +160,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
     query['bool']['minimum_should_match'] = 1
     _add_limit_days(query, internal_section, company, user)
 
-    if not query['bool']['should'] and not for_watch_lists:
+    if not query['bool']['should'] and not for_monitoring:
         abort(403, gettext('Your company doesn\'t have any products defined.'))
 
 

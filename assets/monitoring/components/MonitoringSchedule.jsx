@@ -9,7 +9,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import SelectInput from 'components/SelectInput';
 
-class WatchListSchedule extends React.Component {
+class MonitoringSchedule extends React.Component {
     constructor(props) {
         super(props);
         
@@ -71,12 +71,12 @@ class WatchListSchedule extends React.Component {
         this.onTimeChange = this.onTimeChange.bind(this);
         this.onChangeDay = this.onChangeDay.bind(this);
 
-        this.state = {needTime: this.getNeedTime(get(this.props, 'watchList.schedule.interval'))};
+        this.state = {needTime: this.getNeedTime(get(this.props, 'item.schedule.interval'))};
     }
 
     componentDidUpdate(prevPops) {
-        if (get(this.props, 'watchList._id') !== get(prevPops, 'watchList._id')) {
-            this.setState({ needTime: this.getNeedTime(get(this.props, 'watchList.schedule.interval')) });
+        if (get(this.props, 'item._id') !== get(prevPops, 'item._id')) {
+            this.setState({ needTime: this.getNeedTime(get(this.props, 'item.schedule.interval')) });
         }
     }
 
@@ -88,7 +88,7 @@ class WatchListSchedule extends React.Component {
         const needTime = this.getNeedTime(event.target.value);
         if (needTime) {
             this.setState({ needTime: true });
-            if (!get(this.props, 'watchList.schedule.time')) {
+            if (!get(this.props, 'item.schedule.time')) {
                 this.onTimeChange(moment(), event.target.value);
                 return;
             }
@@ -101,7 +101,7 @@ class WatchListSchedule extends React.Component {
                 name: 'schedule',
                 value: event.target.value ? {
                     interval: event.target.value,
-                    time: needTime ? get(this.props.watchList, 'schedule.time') : null,
+                    time: needTime ? get(this.props.item, 'schedule.time') : null,
                     day: event.target.value === 'weekly' ? this.days[0].value : null,
                 } : null
             }
@@ -113,9 +113,9 @@ class WatchListSchedule extends React.Component {
             target: {
                 name: 'schedule',
                 value: {
-                    interval: schedule || get(this.props.watchList, 'schedule.interval'),
+                    interval: schedule || get(this.props.item, 'schedule.interval'),
                     time: date.format('HH:mm'),
-                    day: get(this.props.watchList, 'schedule.day'),
+                    day: get(this.props.item, 'schedule.day'),
                 }
             }
         });
@@ -126,8 +126,8 @@ class WatchListSchedule extends React.Component {
             target: {
                 name: 'schedule',
                 value: event.target.value ? {
-                    interval: get(this.props.watchList, 'schedule.interval'),
-                    time: get(this.props.watchList, 'schedule.time'),
+                    interval: get(this.props.item, 'schedule.interval'),
+                    time: get(this.props.item, 'schedule.time'),
                     day: event.target.value,
                 } : null
             }
@@ -136,13 +136,13 @@ class WatchListSchedule extends React.Component {
     }
 
     render() {
-        const { watchList, onsaveWatchListSchedule, noForm, readOnly } = this.props;
-        let timeValue = get(watchList, 'schedule.time');
+        const { item, onsaveMonitoringProfileSchedule, noForm, readOnly } = this.props;
+        let timeValue = get(item, 'schedule.time');
         if (get(timeValue, 'length', 0) > 0) {
             timeValue = moment();
             timeValue.set({
-                hour: parseInt(watchList.schedule.time.split(':')[0]),
-                minute: parseInt(watchList.schedule.time.split(':')[1]),
+                hour: parseInt(item.schedule.time.split(':')[0]),
+                minute: parseInt(item.schedule.time.split(':')[1]),
             });
         }
 
@@ -151,15 +151,15 @@ class WatchListSchedule extends React.Component {
                 <SelectInput
                     name='schedule'
                     label={gettext('Schedule type')}
-                    value={get(watchList, 'schedule.interval') || ''}
+                    value={get(item, 'schedule.interval') || ''}
                     defaultOption={''}
                     options={this.options}
                     onChange={this.onChangeSchedule}
                     readOnly={readOnly} />
-                {get(watchList, 'schedule.interval') === 'weekly' && <SelectInput
+                {get(item, 'schedule.interval') === 'weekly' && <SelectInput
                     name='schedule.day'
                     label={gettext('Day of week')}
-                    value={get(watchList, 'schedule.day') || ''}
+                    value={get(item, 'schedule.day') || ''}
                     options={this.days}
                     onChange={this.onChangeDay}
                     readOnly={readOnly} />}
@@ -191,7 +191,7 @@ class WatchListSchedule extends React.Component {
                             type='button'
                             className='btn btn-outline-primary'
                             value={gettext('Save')}
-                            onClick={onsaveWatchListSchedule}
+                            onClick={onsaveMonitoringProfileSchedule}
                         />
                     </div>
                 </form>
@@ -200,12 +200,12 @@ class WatchListSchedule extends React.Component {
     }
 }
 
-WatchListSchedule.propTypes = {
-    watchList: PropTypes.object,
-    onsaveWatchListSchedule: PropTypes.func,
+MonitoringSchedule.propTypes = {
+    item: PropTypes.object,
+    onsaveMonitoringProfileSchedule: PropTypes.func,
     onChange: PropTypes.func,
     noForm: PropTypes.bool,
     readOnly: PropTypes.bool,
 };
 
-export default WatchListSchedule;
+export default MonitoringSchedule;

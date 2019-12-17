@@ -10,20 +10,20 @@ import CheckboxInput from 'components/CheckboxInput';
 import EditPanel from '../../components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 
-import WatchListSchedule from './WatchListSchedule';
+import MonitoringSchedule from './MonitoringSchedule';
 
 import { gettext } from 'utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
-class EditWatchList extends React.Component {
+class EditMonitoringProfile extends React.Component {
     constructor(props) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getUsers = this.getUsers.bind(this);
-        this.state = {activeTab: this.props.scheduleMode ? 'schedule' : 'watch-list'};
+        this.state = {activeTab: this.props.scheduleMode ? 'schedule' : 'profile'};
         this.tabs = [
-            {label: gettext('Watch List'), name: 'watch-list'},
+            {label: gettext('Profile'), name: 'profile'},
             {label: gettext('Users'), name: 'users'},
             {label: gettext('Schedule'), name: 'schedule'},
         ];
@@ -40,7 +40,7 @@ class EditWatchList extends React.Component {
         if (isEmpty(this.props.users)) {
             return (
                 <tr>
-                    <td colSpan="2">{gettext('There are no users for this watch list.')}</td>
+                    <td colSpan="2">{gettext('There are no users for this monitoring profile.')}</td>
                 </tr>
             );
         }
@@ -54,7 +54,7 @@ class EditWatchList extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.item._id !== prevProps.item._id) {
-            this.setState({activeTab: this.props.scheduleMode ? 'schedule' : 'watch-list'});
+            this.setState({activeTab: this.props.scheduleMode ? 'schedule' : 'profile'});
             return;
         }
 
@@ -64,7 +64,7 @@ class EditWatchList extends React.Component {
         }
 
         if (!this.props.scheduleMode && prevProps.scheduleMode !== this.props.scheduleMode) {
-            this.setState({activeTab: 'watch-list'});
+            this.setState({activeTab: 'profile'});
             return;
         }
     }
@@ -77,7 +77,7 @@ class EditWatchList extends React.Component {
         return (
             <div className='list-item__preview'>
                 <div className='list-item__preview-header'>
-                    <h3>{ gettext('Add/Edit Watch List') }</h3>
+                    <h3>{ gettext('Add/Edit Monitoring Profile') }</h3>
                     <button
                         id='hide-sidebar'
                         type='button'
@@ -103,8 +103,8 @@ class EditWatchList extends React.Component {
                 </ul>
 
                 <div className='tab-content'>
-                    {this.state.activeTab === 'watch-list' &&
-                        <div className='tab-pane active' id='watch-list'>
+                    {this.state.activeTab === 'profile' &&
+                        <div className='tab-pane active' id='profile'>
                             <form>
                                 <div className="list-item__preview-form">
                                     <TextInput
@@ -145,7 +145,7 @@ class EditWatchList extends React.Component {
                                         error={getError('query')}>
                                         {item.query &&
                                                 <a target="_blank" href={`/${'wire'}?q=${item.query}`}
-                                                    className='btn btn-outline-secondary float-right mt-3'>{gettext('Test Watch List query')}
+                                                    className='btn btn-outline-secondary float-right mt-3'>{gettext('Test Monitoring Profile query')}
                                                 </a>}
                                     </TextAreaInput>
 
@@ -197,13 +197,13 @@ class EditWatchList extends React.Component {
                                 name: `${u.first_name} ${u.last_name}`
                             }))}
                             field="users"
-                            onSave={this.props.saveWatchListUsers}
+                            onSave={this.props.saveMonitoringProfileUsers}
                         />
                     }
                     {this.state.activeTab === 'schedule' &&
-                        <WatchListSchedule
-                            watchList={item}
-                            onsaveWatchListSchedule={this.props.saveWatchListSchedule}
+                        <MonitoringSchedule
+                            item={item}
+                            onsaveMonitoringProfileSchedule={this.props.saveMonitoringProfileSchedule}
                             onChange={onChange}
                         />
                     }
@@ -213,7 +213,7 @@ class EditWatchList extends React.Component {
     }
 }
 
-EditWatchList.propTypes = {
+EditMonitoringProfile.propTypes = {
     item: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     errors: PropTypes.object,
@@ -224,8 +224,8 @@ EditWatchList.propTypes = {
     onDelete: PropTypes.func.isRequired,
     scheduleMode: PropTypes.bool,
     users: PropTypes.arrayOf(PropTypes.object),
-    saveWatchListUsers: PropTypes.func,
-    saveWatchListSchedule: PropTypes.func,
+    saveMonitoringProfileUsers: PropTypes.func,
+    saveMonitoringProfileSchedule: PropTypes.func,
 };
 
-export default EditWatchList;
+export default EditMonitoringProfile;

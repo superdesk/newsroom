@@ -4,9 +4,9 @@ from newsroom.wire.search import WireSearchResource, WireSearchService
 logger = logging.getLogger(__name__)
 
 
-class WatchListsSearchResource(WireSearchResource):
+class MonitoringSearchResource(WireSearchResource):
     pass
 
 
-class WatchListsSearchService(WireSearchService):
-    section = 'watch_lists'
+class MonitoringSearchService(WireSearchService):
+    section = 'monitoring'

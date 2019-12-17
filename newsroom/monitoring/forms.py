@@ -5,7 +5,7 @@ from wtforms import SelectField
 from wtforms.validators import DataRequired
 
 
-class WatchListsForm(FlaskForm):
+class MonitoringForm(FlaskForm):
     class Meta:
         csrf = False
 

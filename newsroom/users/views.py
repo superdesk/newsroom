@@ -11,14 +11,14 @@ from newsroom.auth import get_user, get_user_by_email
 from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user
 from newsroom.decorator import admin_only, login_required
-from newsroom.companies import get_user_company_name, get_company_sections_watch_list_data
+from newsroom.companies import get_user_company_name, get_company_sections_monitoring_data
 from newsroom.notifications.notifications import get_user_notifications
 from newsroom.notifications import push_user_notification
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
 from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
-from newsroom.watch_lists.views import get_watch_lists_for_company
+from newsroom.monitoring.views import get_monitoring_for_company
 
 
 def get_settings_data():
@@ -37,10 +37,10 @@ def get_view_data():
         'topics': get_user_topics(user['_id']) if user else [],
         'companyName': get_user_company_name(user),
         'locators': get_vocabulary('locators'),
-        'watch_lists': get_watch_lists_for_company(user),
+        'monitoring_list': get_monitoring_for_company(user),
     }
 
-    rv.update(get_company_sections_watch_list_data(company))
+    rv.update(get_company_sections_monitoring_data(company))
 
     return rv
 

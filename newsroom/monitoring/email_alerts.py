@@ -25,12 +25,12 @@ from eve.utils import ParsedRequest
 logger = logging.getLogger(__name__)
 
 
-class WatchListEmailAlerts(Command):
+class MonitoringEmailAlerts(Command):
     def run(self, immediate=False):
-        self.log_msg = 'Watch Lists Scheduled Alerts: {}'.format(utcnow())
+        self.log_msg = 'Monitoring Scheduled Alerts: {}'.format(utcnow())
         logger.info('{} Starting to send alerts.'.format(self.log_msg))
 
-        lock_name = get_lock_id('newsroom', 'watch_list_{0}'.format('scheduled' if not immediate else 'immediate'))
+        lock_name = get_lock_id('newsroom', 'monitoring_{0}'.format('scheduled' if not immediate else 'immediate'))
         if not lock(lock_name, expire=610):
             logger.error('{} Job already running'.format(self.log_msg))
             return
@@ -49,25 +49,25 @@ class WatchListEmailAlerts(Command):
         unlock(lock_name)
         remove_locks()
 
-        logger.info('{} Completed sending Watch Lists Scheduled Alerts.'.format(self.log_msg))
+        logger.info('{} Completed sending Monitoring Scheduled Alerts.'.format(self.log_msg))
 
     def immediate_worker(self, now):
         last_minute = now - datetime.timedelta(minutes=1)
-        self.send_alerts(self.get_immediate_watch_lists(),
+        self.send_alerts(self.get_immediate_monitoring_list(),
                          local_to_utc(app.config['DEFAULT_TIMEZONE'], last_minute).strftime('%Y-%m-%d'),
                          local_to_utc(app.config['DEFAULT_TIMEZONE'], last_minute).strftime('%H:%M:%S'), now)
 
-    def get_scheduled_watch_lists(self):
-        return list(get_resource_service('watch_lists').find(where={'schedule.interval': {'$in': ['two_hour',
-                                                                                                  'four_hour', 'weekly',
-                                                                                                  'daily']}}))
+    def get_scheduled_monitoring_list(self):
+        return list(get_resource_service('monitoring').find(where={'schedule.interval': {'$in': ['two_hour',
+                                                                                                 'four_hour', 'weekly',
+                                                                                                 'daily']}}))
 
-    def get_immediate_watch_lists(self):
+    def get_immediate_monitoring_list(self):
         return list(
-            get_resource_service('watch_lists').find(where={'schedule.interval': 'immediate'}))
+            get_resource_service('monitoring').find(where={'schedule.interval': 'immediate'}))
 
     def scheduled_worker(self, now):
-        watch_lists = self.get_scheduled_watch_lists()
+        monitoring_list = self.get_scheduled_monitoring_list()
 
         two_hours_ago = now - datetime.timedelta(hours=2)
         four_hours_ago = now - datetime.timedelta(hours=4)
@@ -79,7 +79,7 @@ class WatchListEmailAlerts(Command):
         yesterday_utc = local_to_utc(app.config['DEFAULT_TIMEZONE'], yesterday)
         last_week_utc = local_to_utc(app.config['DEFAULT_TIMEZONE'], last_week)
 
-        alert_watch_list = {
+        alert_monitoring = {
             'two': {
                 'w_lists': [],
                 'created_from': two_hours_ago_utc.strftime('%Y-%m-%d'),
@@ -102,10 +102,10 @@ class WatchListEmailAlerts(Command):
             },
         }
 
-        for w in watch_lists:
-            self.add_to_send_list(alert_watch_list, w, now, two_hours_ago, four_hours_ago, yesterday, last_week)
+        for m in monitoring_list:
+            self.add_to_send_list(alert_monitoring, m, now, two_hours_ago, four_hours_ago, yesterday, last_week)
 
-        for key, value in alert_watch_list.items():
+        for key, value in alert_monitoring.items():
             self.send_alerts(value['w_lists'], value['created_from'], value['created_from_time'], now)
 
     def is_within_five_minutes(self, new_scheduled_time, now):
@@ -114,105 +114,104 @@ class WatchListEmailAlerts(Command):
     def is_past_range(self, last_run_time, upper_range):
         return (not last_run_time or last_run_time < upper_range)
 
-    def add_to_send_list(self, alert_watch_list, watch_list, now, two_hours_ago, four_hours_ago, yesterday, last_week):
+    def add_to_send_list(self, alert_monitoring, profile, now, two_hours_ago, four_hours_ago, yesterday, last_week):
         schedule_today_plus_five_mins = None
 
         # Convert time to current date for range comparision
-        if watch_list['schedule'].get('time'):
-            hour_min = watch_list['schedule']['time'].split(':')
+        if profile['schedule'].get('time'):
+            hour_min = profile['schedule']['time'].split(':')
             schedule_today_plus_five_mins = utc_to_local(app.config['DEFAULT_TIMEZONE'], utcnow())
             schedule_today_plus_five_mins = schedule_today_plus_five_mins.replace(hour=int(hour_min[0]),
                                                                                   minute=int(hour_min[1]))
             schedule_today_plus_five_mins = schedule_today_plus_five_mins + datetime.timedelta(minutes=5)
 
-        last_run_time = parse_date_str(watch_list['last_run_time']) if watch_list.get('last_run_time') else None
+        last_run_time = parse_date_str(profile['last_run_time']) if profile.get('last_run_time') else None
         if last_run_time:
             last_run_time = utc_to_local(app.config['DEFAULT_TIMEZONE'], last_run_time)
 
-        if watch_list['schedule']['interval'] == 'two_hour' and self.is_past_range(last_run_time, two_hours_ago):
-            alert_watch_list['two']['w_lists'].append(watch_list)
+        if profile['schedule']['interval'] == 'two_hour' and self.is_past_range(last_run_time, two_hours_ago):
+            alert_monitoring['two']['w_lists'].append(profile)
             return
 
-        if watch_list['schedule']['interval'] == 'four_hour' and self.is_past_range(last_run_time, four_hours_ago):
-            alert_watch_list['four']['w_lists'].append(watch_list)
+        if profile['schedule']['interval'] == 'four_hour' and self.is_past_range(last_run_time, four_hours_ago):
+            alert_monitoring['four']['w_lists'].append(profile)
             return
 
         # Check if the time window is according to schedule
-        if (watch_list['schedule']['interval'] == 'daily'
+        if (profile['schedule']['interval'] == 'daily'
                 and self.is_within_five_minutes(schedule_today_plus_five_mins, now)
                 and self.is_past_range(last_run_time, yesterday)):
-            alert_watch_list['daily']['w_lists'].append(watch_list)
+            alert_monitoring['daily']['w_lists'].append(profile)
             return
 
         # Check if the time window is according to schedule
         # Check if 'day' is according to schedule
-        if (watch_list['schedule']['interval'] == 'weekly'
+        if (profile['schedule']['interval'] == 'weekly'
                 and self.is_within_five_minutes(schedule_today_plus_five_mins, now)
-                and schedule_today_plus_five_mins.strftime('%a').lower() == watch_list['schedule']['day']
+                and schedule_today_plus_five_mins.strftime('%a').lower() == profile['schedule']['day']
                 and self.is_past_range(last_run_time, last_week)):
-            alert_watch_list['weekly']['w_lists'].append(watch_list)
+            alert_monitoring['weekly']['w_lists'].append(profile)
 
-    def send_alerts(self, watch_lists, created_from, created_from_time, now):
-        processed_watch_list = []
+    def send_alerts(self, monitoring_list, created_from, created_from_time, now):
+        processed_monitoring_list = []
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         error_recipients = []
         if general_settings and general_settings['values'].get('system_alerts_recipients'):
             error_recipients = general_settings['values']['system_alerts_recipients'].split(',')
 
-        for w in watch_lists:
-            if w.get('users') and w['_id'] not in processed_watch_list:
-                processed_watch_list.append(w['_id'])
+        from newsroom.email import send_email
+        for m in monitoring_list:
+            if m.get('users') and m['_id'] not in processed_monitoring_list:
+                processed_monitoring_list.append(m['_id'])
                 internal_req = ParsedRequest()
                 internal_req.args = {
-                    'navigation': str(w['_id']),
+                    'navigation': str(m['_id']),
                     'created_from': created_from,
                     'created_from_time': created_from_time,
                     'celery': True
                 }
                 items = list(get_resource_service('wire_search').get(req=internal_req, lookup=None))
                 if items:
-                    company = get_entity_or_404(w['company'], 'companies')
+                    company = get_entity_or_404(m['company'], 'companies')
                     try:
-                        from newsroom.email import send_email
-
                         template_kwargs = {
                             'items': items,
                             'section': 'wire',
                         }
                         send_email(
-                            [u['email'] for u in get_items_by_id([ObjectId(u) for u in w['users']], 'users')],
-                            w.get('subject') or w['name'],
-                            text_body=render_template('watch_list_email.txt', **template_kwargs),
-                            html_body=render_template('watch_list_email.html', **template_kwargs),
+                            [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
+                            m.get('subject') or m['name'],
+                            text_body=render_template('monitoring_email.txt', **template_kwargs),
+                            html_body=render_template('monitoring_email.html', **template_kwargs),
                         )
                     except Exception:
-                        logger.exception('{0} Error processing watch list {1} for company {2}.'.format(
-                            self.log_msg, w['name'], company['name']))
+                        logger.exception('{0} Error processing monitoring profile {1} for company {2}.'.format(
+                            self.log_msg, m['name'], company['name']))
                         if error_recipients:
                             # Send an email to admin
                             template_kwargs = {
-                                'name': w['name'],
+                                'name': m['name'],
                                 'company': company['name'],
                                 'run_time': now,
                             }
                             send_email(
                                 error_recipients,
-                                gettext('Error sending alerts for watch_list: {0}'.format(w['name'])),
-                                text_body=render_template('watch_list_error.txt', **template_kwargs),
-                                html_body=render_template('watch_list_error.html', **template_kwargs),
+                                gettext('Error sending alerts for monitoring: {0}'.format(m['name'])),
+                                text_body=render_template('monitoring_error.txt', **template_kwargs),
+                                html_body=render_template('monitoring_error.html', **template_kwargs),
                             )
-                            processed_watch_list.remove(w['_id'])
+                            processed_monitoring_list.remove(m['_id'])
 
-        for w_id in processed_watch_list:
-            get_resource_service('watch_lists').patch(w_id, {
+        for w_id in processed_monitoring_list:
+            get_resource_service('monitoring').patch(w_id, {
                     'last_run_time': local_to_utc(app.config['DEFAULT_TIMEZONE'], now)})
 
 
 @celery.task(soft_time_limit=600)
-def watch_list_schedule_alerts():
-    WatchListEmailAlerts().run()
+def monitoring_schedule_alerts():
+    MonitoringEmailAlerts().run()
 
 
 @celery.task(soft_time_limit=600)
-def watch_list_immediate_alerts():
-    WatchListEmailAlerts().run(True)
+def monitoring_immediate_alerts():
+    MonitoringEmailAlerts().run(True)

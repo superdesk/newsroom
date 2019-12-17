@@ -1,17 +1,17 @@
 
 import {
     SET_COMPANIES,
-    NEW_WATCH_LIST,
+    NEW_MONITORING_PROFILE,
     CANCEL_EDIT,
-    UPDATE_WATCH_LIST,
+    UPDATE_MONITORING_PROFILE,
     SET_ERROR,
     SET_COMPANY,
-    SET_WATCH_LISTS,
-    QUERY_WATCH_LISTS,
-    SELECT_WATCH_LIST,
-    SET_WATCH_LIST_COMPANIES,
+    SET_MONITORING_LIST,
+    QUERY_MONITORING,
+    SELECT_MONITORING_PROFILE,
+    SET_MONITORING_COMPANIES,
     SET_SCHEDULE_MODE,
-    SET_USER_COMPANY_WATCH_LISTS,
+    SET_USER_COMPANY_MONITORING_LIST,
 } from './actions';
 
 import {GET_COMPANY_USERS} from 'companies/actions';
@@ -19,20 +19,20 @@ import {ADD_EDIT_USERS} from 'actions';
 
 const initialState = {
     companies: [],
-    watchLists: [],
-    watchListsById: null,
+    monitoringList: [],
+    monitoringListById: null,
     isLoading: false,
-    watchListCompanies: [],
+    monitoringListCompanies: [],
 };
 
-export default function watchListsReducer(state = initialState, action) {
+export default function monitoringReducer(state = initialState, action) {
     switch (action.type) {
 
-    case SELECT_WATCH_LIST:
+    case SELECT_MONITORING_PROFILE:
         return {
             ...state,
-            activeWatchListId: action.id || null,
-            watchListToEdit: action.id ? (state.watchListsById[action.id]) : {},
+            activeMonitoringProfileId: action.id || null,
+            monitoringProfileToEdit: action.id ? (state.monitoringListById[action.id]) : {},
             errors: null,
         };
 
@@ -43,10 +43,10 @@ export default function watchListsReducer(state = initialState, action) {
 
     }
 
-    case NEW_WATCH_LIST: {
+    case NEW_MONITORING_PROFILE: {
         return {
             ...state,
-            watchListToEdit: {
+            monitoringProfileToEdit: {
                 name: '',
                 subject: '',
                 description: '',
@@ -60,14 +60,14 @@ export default function watchListsReducer(state = initialState, action) {
     }
 
     case CANCEL_EDIT: {
-        return {...state, watchListToEdit: null, errors: null};
+        return {...state, monitoringProfileToEdit: null, errors: null};
     }
 
-    case UPDATE_WATCH_LIST: {
+    case UPDATE_MONITORING_PROFILE: {
         return {
             ...state,
-            watchListToEdit: {
-                ...state.watchListToEdit,
+            monitoringProfileToEdit: {
+                ...state.monitoringProfileToEdit,
                 ...action.data,
             },
             errors: null,
@@ -81,23 +81,23 @@ export default function watchListsReducer(state = initialState, action) {
         return {...state, company: action.company};
     }
 
-    case SET_WATCH_LISTS: {
-        const watchListsById = Object.assign({}, state.watchListsById);
-        const watchLists = action.data.map((w) => {
-            watchListsById[w._id] = w;
-            return w._id;
+    case SET_MONITORING_LIST: {
+        let monitoringListById = Object.assign({}, state.monitoringListById);
+        const profiles = action.data.map((p) => {
+            monitoringListById[p._id] = p;
+            return p._id;
         });
 
         return {
             ...state,
-            watchLists,
-            watchListsById,
+            monitoringList: profiles,
+            monitoringListById,
             isLoading: false,
-            totalWatchLists: watchLists.length,
+            totalProfiles: profiles.length,
         };
     }
 
-    case QUERY_WATCH_LISTS:
+    case QUERY_MONITORING:
         return {
             ...state,
             isLoading: true,
@@ -107,12 +107,12 @@ export default function watchListsReducer(state = initialState, action) {
         };
 
     case GET_COMPANY_USERS:
-        return {...state, watchListUsers: action.data};
+        return {...state, monitoringUsers: action.data};
 
-    case SET_WATCH_LIST_COMPANIES:
+    case SET_MONITORING_COMPANIES:
         return {
             ...state,
-            watchListCompanies: action.data,
+            monitoringListCompanies: action.data,
         };
 
     case SET_SCHEDULE_MODE:
@@ -121,8 +121,8 @@ export default function watchListsReducer(state = initialState, action) {
             scheduleMode: !state.scheduleMode,
         };
 
-    case SET_USER_COMPANY_WATCH_LISTS: 
-        return {...state, watchLists: action.data};     
+    case SET_USER_COMPANY_MONITORING_LIST: 
+        return {...state, monitoringList: action.data};     
 
     case ADD_EDIT_USERS: {
         return {

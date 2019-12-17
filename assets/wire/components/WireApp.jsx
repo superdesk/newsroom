@@ -64,9 +64,9 @@ class WireApp extends BaseApp {
 
         // Show my-topics tab only if WireApp is in 'wire' context (not 'aapX', etc.)
         this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
-        if (this.props.context === 'watch_lists') {
+        if (this.props.context === 'monitoring') {
             let navTab = this.tabs.find((t) => t.id === 'nav');
-            navTab.label = gettext('Watch Lists');
+            navTab.label = gettext('Monitoring Profiles');
         }
     }
 
