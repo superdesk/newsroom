@@ -82,7 +82,6 @@ class AgendaApp extends BaseApp {
 
 
         this.props.fetchItems();
-
     }
 
     render() {
@@ -170,7 +169,7 @@ class AgendaApp extends BaseApp {
                         {this.state.withSidebar && (
                             <span
                                 className='content-bar__menu content-bar__menu--nav--open'
-                                ref={(elem) => this.elemOpen = elem}
+                                ref={this.setOpenRef}
                                 title={gettext('Close filter panel')}
                                 onClick={this.toggleSidebar}>
                                 <i className='icon--close-thin icon--white' />
@@ -180,7 +179,7 @@ class AgendaApp extends BaseApp {
                         {!this.state.withSidebar && !this.props.bookmarks && (
                             <span
                                 className='content-bar__menu content-bar__menu--nav'
-                                ref={(elem) => this.elemClose = elem}
+                                ref={this.setCloseRef}
                                 title={gettext('Open filter panel')}
                                 onClick={this.toggleSidebar}>
                                 <i className='icon--hamburger' />
@@ -262,7 +261,7 @@ class AgendaApp extends BaseApp {
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
                                 onScroll={this.onListScroll}
-                                refNode={(node) => this.elemList = node}
+                                refNode={this.setListRef}
                             />
                         </div>
 

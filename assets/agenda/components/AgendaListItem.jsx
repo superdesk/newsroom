@@ -26,8 +26,15 @@ class AgendaListItem extends React.Component {
     constructor(props) {
         super(props);
         this.slugline = props.item.slugline && props.item.slugline.trim();
-        this.state = {isHover: false, previousVersions: false};
+
+        this.state = {previousVersions: false};
+        this.dom = {article: null};
+
         this.onKeyDown = this.onKeyDown.bind(this);
+        this.setArticleRef = this.setArticleRef.bind(this);
+        this.onArticleClick = this.onArticleClick.bind(this);
+        this.onArticleDoubleClick = this.onArticleDoubleClick.bind(this);
+        this.onMouseEnter = this.onMouseEnter.bind(this);
     }
 
     onKeyDown(event) {
@@ -41,6 +48,24 @@ class AgendaListItem extends React.Component {
         }
 
         event.preventDefault();
+    }
+
+    setArticleRef(elem) {
+        this.dom.article = elem;
+    }
+
+    onArticleClick() {
+        this.props.onClick(this.props.item, this.props.group, this.props.planningId);
+    }
+
+    onArticleDoubleClick() {
+        this.props.onDoubleClick(this.props.item, this.props.group, this.props.planningId);
+    }
+
+    onMouseEnter() {
+        if (this.props.actioningItem && this.props.actioningItem._id !== this.props.item._id) {
+            this.props.resetActioningItem();
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -59,8 +84,8 @@ class AgendaListItem extends React.Component {
     }
 
     componentDidMount() {
-        if (this.props.isActive) {
-            this.articleElem.focus();
+        if (this.props.isActive && this.dom.article) {
+            this.dom.article.focus();
         }
     }
 
@@ -93,7 +118,7 @@ class AgendaListItem extends React.Component {
     }
 
     renderListItem(isMobile, children) {
-        const {item, onClick, onDoubleClick, isExtended, group, planningId} = this.props;
+        const {item, isExtended, group, planningId} = this.props;
         const classes = this.getClassNames(isExtended);
         const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
         const description = getDescription(item, planningItem);
@@ -105,16 +130,10 @@ class AgendaListItem extends React.Component {
             <article key={item._id}
                 className={classes.card}
                 tabIndex='0'
-                ref={(elem) => this.articleElem = elem}
-                onClick={() => onClick(item, group, planningId)}
-                onDoubleClick={() => onDoubleClick(item, group, planningId)}
-                onMouseEnter={() => {
-                    this.setState({isHover: true});
-                    if (this.props.actioningItem && this.props.actioningItem._id !== item._id) {
-                        this.props.resetActioningItem();
-                    }
-                }}
-                onMouseLeave={() => this.setState({isHover: false})}
+                ref={this.setArticleRef}
+                onClick={this.onArticleClick}
+                onDoubleClick={this.onArticleDoubleClick}
+                onMouseEnter={this.onMouseEnter}
                 onKeyDown={this.onKeyDown}
             >
                 <div className={classes.wrap}>
@@ -135,8 +154,13 @@ class AgendaListItem extends React.Component {
                                 {item.headline}</span>}
                         </h4>
 
-                        <AgendaListItemIcons item={item} group={group} planningItem={planningItem}
-                            isMobilePhone={isMobile} user={this.props.user} />
+                        <AgendaListItemIcons
+                            item={item}
+                            group={group}
+                            planningItem={planningItem}
+                            isMobilePhone={isMobile}
+                            user={this.props.user}
+                        />
 
                         {(isMobile || isExtended) && description && (
                             <p className="wire-articles__item__text">
