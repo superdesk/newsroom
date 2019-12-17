@@ -1,6 +1,6 @@
 # Newsroom Changelog
 
-## [1.17.0-rc1] Not released yet
+## [1.17.0] 2019-12-17
 ### Features
 - [SDAN-614] Watch individual coverages (#910)
 - [SDAN-600] Item action to remove wire based items (#928)
@@ -17,6 +17,7 @@
 - [SDAN-622] Append 'anpa_take_key' to slugline in views (#929)
 - [SDAN-620] Change to make mail-to common for all email links in the Coverage Inquiry email (#933)
 - [SDAN-614] Minor UI changes to watching individual coverages (#930)
+- [SDAN-625] Improve rendering performance of Agenda list (#937)
 
 ### Fixes
 - [SDAN-616] Use current time to populate date filter for media hrefs (#893)
@@ -34,6 +35,7 @@
 - [SDAN-619] Correct tagging for AM Weather (#922)
 - [SDAN-615] Unable to empty filters on a topic (#923)
 - fix(celery): Incorrect reference to app in dumps/loads (#932)
+- fix(celery): Use newsroom.flask_app instead of flask.current_app (#936)
 
 ## [1.16.1] 2019-11-04
 ### Improvements
