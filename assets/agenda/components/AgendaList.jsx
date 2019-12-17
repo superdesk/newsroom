@@ -2,7 +2,7 @@ import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { get, isEqual } from 'lodash';
+import {get, isEqual, cloneDeep} from 'lodash';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -237,7 +237,7 @@ class AgendaList extends React.Component {
                                         <AgendaListItem
                                             key={`${_id}--${plan._id}`}
                                             group={group.date}
-                                            item={itemsById[_id]}
+                                            item={cloneDeep(itemsById[_id])}
                                             isActive={this.isActiveItem(_id, group.date, plan)}
                                             isSelected={selectedItems.indexOf(_id) !== -1}
                                             isRead={readItems[_id] === getIntVersion(itemsById[_id])}
