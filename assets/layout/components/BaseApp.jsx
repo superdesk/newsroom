@@ -18,15 +18,36 @@ export default class BaseApp extends React.Component {
             scrollClass: '',
         };
 
+        this.dom = {
+            open: null,
+            close: null,
+            list: null,
+        };
+
         this.toggleSidebar = this.toggleSidebar.bind(this);
         this.onListScroll = this.onListScroll.bind(this);
         this.filterActions = this.filterActions.bind(this);
+        this.setOpenRef = this.setOpenRef.bind(this);
+        this.setCloseRef = this.setCloseRef.bind(this);
+        this.setListRef = this.setListRef.bind(this);
 
         this.tabs = [
             {id: 'nav', label: gettext('Topics'), component: NavigationTab},
             {id: 'topics', label: gettext('My Topics'), component: TopicsTab},
             {id: 'filters', label: gettext('Filters'), component: FiltersTab},
         ];
+    }
+
+    setOpenRef(elem) {
+        this.dom.open = elem;
+    }
+
+    setCloseRef(elem) {
+        this.dom.close = elem;
+    }
+
+    setListRef(elem) {
+        this.dom.list = elem;
     }
 
     renderModal(specs) {
@@ -78,7 +99,7 @@ export default class BaseApp extends React.Component {
         const BUFFER = 10;
         const container = event.target;
 
-        if (container !== this.elemList && !this.elemList.contains(container)) {
+        if (container !== this.dom.list && !this.dom.list.contains(container)) {
             // Not scrolled on the actual list
             return;
         }
@@ -107,14 +128,14 @@ export default class BaseApp extends React.Component {
 
     initTooltips() {
         if ( !isTouchDevice() ) {
-            this.elemOpen && $(this.elemOpen).tooltip();
-            this.elemClose && $(this.elemClose).tooltip();
+            this.dom.open && $(this.dom.open).tooltip();
+            this.dom.close && $(this.dom.close).tooltip();
         }
     }
 
     disposeTooltips() {
-        this.elemOpen && $(this.elemOpen).tooltip('dispose');
-        this.elemClose && $(this.elemClose).tooltip('dispose');
+        this.dom.open && $(this.dom.open).tooltip('dispose');
+        this.dom.close && $(this.dom.close).tooltip('dispose');
     }
 
     componentWillUnmount() {
@@ -128,7 +149,7 @@ export default class BaseApp extends React.Component {
 
     componentDidUpdate(nextProps) {
         if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery)) {
-            this.elemList.scrollTop = 0;
+            this.dom.list.scrollTop = 0;
         }
         this.initTooltips();
     }

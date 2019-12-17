@@ -131,7 +131,7 @@ class WireApp extends BaseApp {
                     <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
                         {this.state.withSidebar && <span
                             className='content-bar__menu content-bar__menu--nav--open'
-                            ref={(elem) => this.elemOpen = elem}
+                            ref={this.setOpenRef}
                             title={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--close-thin icon--white" />
@@ -143,7 +143,7 @@ class WireApp extends BaseApp {
 
                         {!this.state.withSidebar && !this.props.bookmarks && <span
                             className="content-bar__menu content-bar__menu--nav"
-                            ref={(elem) => this.elemClose = elem}
+                            ref={this.setCloseRef}
                             title={gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--hamburger" />
@@ -173,7 +173,7 @@ class WireApp extends BaseApp {
                         </div>
                         <div className={mainClassName}
                             onScroll={this.onListScroll}
-                            ref={(elem) => this.elemList = elem}
+                            ref={this.setListRef}
                         >
                             <SearchResultsInfo
                                 scrollClass={this.state.scrollClass}
