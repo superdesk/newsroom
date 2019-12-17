@@ -97,7 +97,7 @@ def get_type():
         'am_news': 'items',
         'aapX': 'items',
         'media_releases': 'items',
-        'watch_lists': 'items',
+        'monitoring': 'items',
     }
     return types[item_type]
 

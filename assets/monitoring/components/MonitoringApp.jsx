@@ -4,19 +4,18 @@ import {get} from 'lodash';
 import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import {
-    newWatchList,
+    newMonitoringProfile,
     setQuery,
-    fetchUsers,
-    fetchWatchLists,
+    fetchMonitoring,
     setCompany,
     toggleScheduleMode
 } from '../actions';
-import WatchListsPanel from './WatchListsPanel';
+import MonitoringPanel from './MonitoringPanel';
 import ListBar from 'components/ListBar';
 import DropdownFilter from 'components/DropdownFilter';
 
 
-class WatchListApp extends React.Component {
+class MonitoringApp extends React.Component {
     constructor(props, context) {
         super(props, context);
 
@@ -25,7 +24,7 @@ class WatchListApp extends React.Component {
         this.onSectionChange = this.onSectionChange.bind(this);
 
         this.sections = [
-            { name: gettext('Watch Lists') },
+            { name: gettext('Monitoring Profiles') },
             { name: gettext('Schedules') },
         ];
 
@@ -59,7 +58,7 @@ class WatchListApp extends React.Component {
     }
 
     getDropdownItems(filter) {
-        const companies = this.isScheduleMode() ? this.props.watchListCompanies : this.props.companies;
+        const companies = this.isScheduleMode() ? this.props.monitoringListCompanies : this.props.companies;
         return (companies).map((item, i) => (<button
             key={i}
             className='dropdown-item'
@@ -79,8 +78,8 @@ class WatchListApp extends React.Component {
         return (
             <Fragment>
                 <ListBar
-                    onNewItem={this.isScheduleMode() ? null : this.props.newWatchList}
-                    buttonName={gettext('Watch List')}
+                    onNewItem={this.isScheduleMode() ? null : this.props.newMonitoringProfile}
+                    buttonName={gettext('Monitoring Profile')}
                     noSearch>
                     <div className="btn-group btn-group--navbar ml-0 mr-3">
                         {this.sections.map((section) => (
@@ -101,7 +100,7 @@ class WatchListApp extends React.Component {
                         className='pl-3'
                     />
                 </div>
-                <WatchListsPanel />
+                <MonitoringPanel />
             </Fragment>
             
         );
@@ -113,40 +112,38 @@ class WatchListApp extends React.Component {
             this.props.setCompany(value);
         }
         
-        this.props.fetchWatchLists();
+        this.props.fetchMonitoring();
     }
 }
 
 const mapStateToProps = (state) => ({
     companies: state.companies,
     company: state.company,
-    watchListCompanies: state.watchListCompanies,
+    monitoringListCompanies: state.monitoringListCompanies,
 });
 
-WatchListApp.propTypes = {
+MonitoringApp.propTypes = {
     users: PropTypes.arrayOf(PropTypes.object),
     activeQuery: PropTypes.string,
     companies: PropTypes.arrayOf(PropTypes.object),
-    fetchUsers: PropTypes.func,
     setQuery: PropTypes.func,
     errors: PropTypes.object,
     dispatch: PropTypes.func,
     fetchCompanies: PropTypes.func,
     setCompany: PropTypes.func,
     company: PropTypes.string,
-    watchListCompanies: PropTypes.array,
+    monitoringListCompanies: PropTypes.array,
     toggleScheduleMode: PropTypes.func,
-    newWatchList: PropTypes.func,
-    fetchWatchLists: PropTypes.func,
+    newMonitoringProfile: PropTypes.func,
+    fetchMonitoring: PropTypes.func,
 };
 
 const mapDispatchToProps = {
-    newWatchList,
-    fetchUsers,
+    newMonitoringProfile,
     setQuery,
-    fetchWatchLists,
+    fetchMonitoring,
     setCompany,
     toggleScheduleMode,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WatchListApp);
+export default connect(mapStateToProps, mapDispatchToProps)(MonitoringApp);

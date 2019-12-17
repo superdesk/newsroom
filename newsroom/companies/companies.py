@@ -58,7 +58,7 @@ class CompaniesResource(newsroom.Resource):
         'account_manager': {
             'type': 'string'
         },
-        'watch_list_administrator': {
+        'monitoring_administrator': {
             'type': 'ObjectId'
         },
         'original_creator': newsroom.Resource.rel('users'),
