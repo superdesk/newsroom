@@ -76,8 +76,10 @@ class AgendaListItemIcons extends React.Component {
                             <AgendaListCoverageItem
                                 key={index}
                                 planningItem={props.planningItem}
+                                user={props.user}
                                 coverage={coverage}
                                 showBorder={props.isMobilePhone && index === state.coveragesToDisplay.length - 1}
+                                group={props.group}
                             />
                         ))}
                     </div>

@@ -128,8 +128,6 @@ AgendaListCoverageItem.propTypes = {
     planningItem: PropTypes.object,
     user: PropTypes.object,
     coverage: PropTypes.object,
-    index: PropTypes.number,
-    isMobilePhone: PropTypes.bool,
     showBorder: PropTypes.bool,
     group: PropTypes.string,
 };
