@@ -77,8 +77,7 @@ class AgendaListCoverageItem extends React.Component {
     }
 
     shouldComponentUpdate(nextProps) {
-        return !isEqual(this.props.coverage, nextProps.coverage) ||
-            !isEqual(get(nextProps, 'coverages'), get(this.props, 'coverages'));
+        return !isEqual(this.props.coverage, nextProps.coverage);
     }
 
     componentWillReceiveProps(nextProps) {

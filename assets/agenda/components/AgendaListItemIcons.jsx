@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {get} from 'lodash';
+import {get, isEqual} from 'lodash';
 import {bem} from 'ui/utils';
 import classNames from 'classnames';
 import {
@@ -28,14 +28,18 @@ class AgendaListItemIcons extends React.Component {
         this.state = this.getUpdatedState(props);
     }
 
-    shouldComponentUpdate(nextProps) {
+    itemChanged(nextProps) {
         return get(this.props, 'item._id') !== get(nextProps, 'item._id') ||
-            get(this.props, 'item._etag') !== get(nextProps, 'item._etag');
+            get(this.props, 'item._etag') !== get(nextProps, 'item._etag') ||
+            !isEqual(get(this.props, 'item.coverages'), get(nextProps, 'item.coverages'));
+    }
+
+    shouldComponentUpdate(nextProps) {
+        return this.itemChanged(nextProps);
     }
 
     componentWillReceiveProps(nextProps) {
-        if (get(this.props, 'item._id') !== get(nextProps, 'item._id') ||
-            get(this.props, 'item._etag') !== get(nextProps, 'item._etag')) {
+        if (this.itemChanged(nextProps)) {
             this.setState(this.getUpdatedState(nextProps));
         }
     }
