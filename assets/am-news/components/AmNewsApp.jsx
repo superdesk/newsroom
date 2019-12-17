@@ -118,14 +118,14 @@ class AmNewsApp extends BaseApp {
                     <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
                         {this.state.isMobile && this.state.withSidebar && <span
                             className='content-bar__menu content-bar__menu--nav--open'
-                            ref={(elem) => this.elemOpen = elem}
+                            ref={this.setOpenRef}
                             title={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--close-thin icon--white"></i>
                         </span>}
                         {this.state.isMobile && !this.state.withSidebar && !this.props.bookmarks && <span
                             className='content-bar__menu content-bar__menu--nav'
-                            ref={(elem) => this.elemClose = elem}
+                            ref={this.setCloseRef}
                             title={gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--hamburger"></i>
@@ -179,7 +179,7 @@ class AmNewsApp extends BaseApp {
                                 actions={this.props.actions}
                                 activeView={'list-view'}
                                 onScroll={this.onListScroll}
-                                refNode={(elem) => this.elemList = elem}
+                                refNode={this.setListRef}
                             />
                         </div>
 

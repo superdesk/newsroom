@@ -18,7 +18,7 @@ class WireListItem extends React.Component {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item);
-        this.state = {isHover: false, previousVersions: false};
+        this.state = {previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
 
@@ -86,8 +86,6 @@ class WireListItem extends React.Component {
                 ref={(elem) => this.dom.article = elem}
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
-                onMouseEnter={() => this.setState({isHover: true})}
-                onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
             >
                 <div className={wrapClassName}>
