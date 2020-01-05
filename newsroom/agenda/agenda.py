@@ -912,7 +912,7 @@ class AgendaService(newsroom.Service):
                 agenda['definition_short'] = agenda.get('definition_short', original_agenda.get('definition_short'))
                 agenda['ednote'] = agenda.get('ednote', original_agenda.get('ednote'))
                 agenda['state_reason'] = agenda.get('state_reason', original_agenda.get('state_reason'))
-                subject = '{} -{} updated'.format(agenda['name'] or agenda['definition_short'],
+                subject = '{} -{} updated'.format(agenda['name'] or agenda['headline'],
                                                   ' Coverage' if coverage_modified else '')
                 action = 'been updated.'
                 if state_changed:
