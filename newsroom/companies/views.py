@@ -29,6 +29,7 @@ def get_settings_data():
         'sections': app.sections,
         'company_types': get_company_types_options(app.config.get('COMPANY_TYPES', [])),
         'api_enabled': app.config.get('NEWS_API_ENABLED', False),
+        'ui_config': get_resource_service('ui_config').getSectionConfig('companies'),
     }
 
 
