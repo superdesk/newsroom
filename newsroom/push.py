@@ -131,6 +131,7 @@ def publish_item(doc, is_new):
         if agenda_items:
             [notify_new_item(item, check_topics=False) for item in agenda_items]
     publish_item_signal.send(app._get_current_object(), item=doc, is_new=is_new)
+    doc['anpa_take_key'] = '4th update'
     _id = service.create([doc])[0]
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
