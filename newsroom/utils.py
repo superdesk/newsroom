@@ -83,6 +83,7 @@ def get_entity_or_404(_id, resource):
 
 
 def get_entities_elastic_or_mongo_or_404(_ids, resource):
+    '''Finds item in elastic search as fist preference. If not configured, finds from mongo'''
     elastic = app.data._search_backend(resource)
     items = []
     if elastic:

@@ -121,6 +121,8 @@ def get_previous_versions(item):
 
 
 def get_items_for_user_action(_ids, item_type):
+    # Getting entities from elastic first so that we get all fields
+    # even those which are not a part of ItemsResource(content_api) schema.
     items = get_entities_elastic_or_mongo_or_404(_ids, item_type)
 
     if not items or items[0].get('type') != 'text':
