@@ -15,6 +15,7 @@ import {
     setError,
 } from '../actions';
 import {searchQuerySelector} from 'search/selectors';
+import {companiesSubscriberIdEnabled} from 'ui/selectors';
 import {gettext} from 'utils';
 
 class Companies extends React.Component {
@@ -84,6 +85,7 @@ class Companies extends React.Component {
                             onClick={this.props.selectCompany}
                             activeCompanyId={this.props.activeCompanyId}
                             companyTypes={this.props.companyTypes}
+                            showSubscriberId={this.props.showSubscriberId}
                         />
                     </div>
                 )}
@@ -127,6 +129,7 @@ Companies.propTypes = {
     products: PropTypes.array,
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
+    showSubscriberId: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -143,6 +146,7 @@ const mapStateToProps = (state) => ({
     errors: state.errors,
     companyTypes: state.companyTypes,
     apiEnabled: state.apiEnabled,
+    showSubscriberId: companiesSubscriberIdEnabled(state),
 });
 
 
