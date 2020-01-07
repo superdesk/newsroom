@@ -1,7 +1,15 @@
 import {errorHandler, getItemFromArray, getDateInputDate, notify, gettext} from '../utils';
-import {REPORTS_NAMES} from './utils';
 import server from '../server';
 import {get, cloneDeep} from 'lodash';
+
+export const REPORTS_NAMES = {
+    'COMPANY_SAVED_SEARCHES': 'company-saved-searches',
+    'USER_SAVED_SEARCHES': 'user-saved-searches',
+    'COMPANY_PRODUCTS': 'company-products',
+    'PRODUCT_STORIES': 'product-stories',
+    'COMPANY': 'company',
+    'SUBSCRIBER_ACTIVITY': 'subscriber-activity'
+};
 
 
 export const REPORTS = {
@@ -146,4 +154,20 @@ export function toggleFilterAndQuery(filter, value) {
 
         return dispatch(runReport());
     };
+}
+
+export function printReport() {
+    return function (dispatch, getState) {
+        const state = getState();
+        const activeReport = state.activeReport;
+
+        if (activeReport === REPORTS_NAMES.SUBSCRIBER_ACTIVITY) {
+            const queryString = getReportQueryString(state, false, false, notify);
+            window.open(`/reports/print/${activeReport}?${queryString}`, '_blank');
+        } else {
+            window.open(`/reports/print/${activeReport}`, '_blank');
+        }
+
+        return Promise.resolve();
+    };   
 }
