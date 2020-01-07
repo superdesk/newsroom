@@ -28,6 +28,7 @@ def get_settings_data():
         'products': list(query_resource('products')),
         'sections': app.sections,
         'company_types': get_company_types_options(app.config.get('COMPANY_TYPES', [])),
+        'ui_config': get_resource_service('ui_config').getSectionConfig('companies'),
     }
 
 

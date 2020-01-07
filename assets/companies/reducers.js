@@ -138,6 +138,7 @@ export default function companyReducer(state = initialState, action) {
             products: action.data.products,
             sections: action.data.sections,
             companyTypes: action.data.company_types || [],
+            ui_config: action.data.ui_config,
         };
 
         return setupCompanies(action.data.companies, nextState);
