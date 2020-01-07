@@ -174,6 +174,7 @@ class SubscriberActivity extends React.Component {
                 selectDate={this.onEndDateChange}
                 activeDate={get(reportParams, 'date_to') || moment()} />)
         ];
+        // Commented out currently until there is a workaround for pagination with export/print.
         /* filterNodes.push(<span
             key='subscriver_activity_export'
             className="btn btn-outline-secondary ml-2"
