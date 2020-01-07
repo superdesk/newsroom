@@ -4,9 +4,11 @@ import { connect } from 'react-redux';
 import {
     setActiveReport,
     runReport,
+    REPORTS_NAMES,
+    printReport,
 } from '../actions';
 import { gettext } from 'utils';
-import { panels, REPORTS_NAMES } from '../utils';
+import { panels } from '../utils';
 
 const options = [
     {value: '', text: ''},
@@ -53,13 +55,12 @@ class CompanyReportsApp extends React.Component {
                             onClick={this.props.runReport}>
                             {gettext('Run report')}
                         </button>}
-                        {this.props.activeReport && <a
+                        {this.props.activeReport && <button
                             className='btn btn-outline-secondary ml-2'
                             type='button'
-                            href={`/reports/print/${this.props.activeReport}`}
-                            target="_blank">
+                            onClick={this.props.printReport} >
                             {gettext('Print report')}
-                        </a>}
+                        </button>}
                     </div>
                 </nav>
             </section>,
@@ -75,6 +76,7 @@ CompanyReportsApp.propTypes = {
     setActiveReport: PropTypes.func,
     runReport: PropTypes.func,
     companies: PropTypes.array,
+    printReport: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -86,6 +88,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
     setActiveReport,
     runReport,
+    printReport,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CompanyReportsApp);
