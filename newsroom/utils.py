@@ -82,6 +82,23 @@ def get_entity_or_404(_id, resource):
     return item
 
 
+def get_entities_elastic_or_mongo_or_404(_ids, resource):
+    '''Finds item in elastic search as fist preference. If not configured, finds from mongo'''
+    elastic = app.data._search_backend(resource)
+    items = []
+    if elastic:
+        for id in _ids:
+            item = elastic.find_one('items', req=None, _id=id)
+            if not item:
+                item = get_entity_or_404(id, resource)
+
+            items.append(item)
+    else:
+        items = [get_entity_or_404(i, resource) for i in _ids]
+
+    return items
+
+
 def get_json_or_400():
     data = request.get_json()
     if not isinstance(data, dict):
