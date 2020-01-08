@@ -13,6 +13,7 @@ import {
     fullDate,
     recordAction,
     errorHandler as notifyErrors,
+    getSlugline,
 } from 'utils';
 import {getNavigationUrlParam} from 'search/utils';
 
@@ -146,7 +147,7 @@ export function copyPreviewContents(item) {
         const contents = [];
 
         contents.push(fullDate(item.versioncreated));
-        item.slugline && contents.push(item.slugline);
+        item.slugline && contents.push(getSlugline(item, true));
         item.headline && contents.push(item.headline);
         item.byline && contents.push(gettext('By: {{ byline }}', {byline: item.byline}));
         item.located && contents.push(gettext('Location: {{ located }}', {located: item.located}));
