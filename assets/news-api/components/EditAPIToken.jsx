@@ -8,7 +8,14 @@ import ExpiryDateInput from 'components/ExpiryDateInput';
 import TextAreaInput from 'components/TextAreaInput';
 import CheckboxInput from 'components/CheckboxInput';
 
-import {gettext, getDateInputDate, isInPast} from '../../utils';
+import {
+    gettext,
+    isInPast,
+    DEFAULT_TIMEZONE,
+    getEndOfDayFromDate,
+    convertUtcToTimezone,
+    SERVER_DATETIME_FORMAT,
+} from '../../utils';
 import {getTokenForCompany, generateTokenForCompany, deleteTokenForCompany, updateTokenForCompany} from '../actions';
 
 const EDITOR_ACTIONS = {
@@ -30,6 +37,7 @@ export default class EditAPIToken extends React.Component {
         };
 
         this.onExpiryChange = this.onExpiryChange.bind(this);
+        this.getExpiryDate = this.getExpiryDate.bind(this);
         this.saveToken = this.saveToken.bind(this);
         this.editToken = this.editToken.bind(this);
         this.deleteToken = this.deleteToken.bind(this);
@@ -87,7 +95,9 @@ export default class EditAPIToken extends React.Component {
     onExpiryChange(value) {
         const newState = cloneDeep(this.state);
 
-        newState.token.expiry = value;
+        newState.token.expiry = getEndOfDayFromDate(value, DEFAULT_TIMEZONE)
+            .utc()
+            .format(SERVER_DATETIME_FORMAT);
 
         if (isInPast(value)) {
             newState.errors.expiry = gettext('Cannot be in the past');
@@ -96,6 +106,11 @@ export default class EditAPIToken extends React.Component {
         }
 
         this.setState(newState);
+    }
+
+    getExpiryDate() {
+        return convertUtcToTimezone(this.state.token.expiry, DEFAULT_TIMEZONE)
+            .format('YYYY-MM-DD');
     }
 
     saveToken(event) {
@@ -169,7 +184,7 @@ export default class EditAPIToken extends React.Component {
                                 <ExpiryDateInput
                                     name="expiry"
                                     label={gettext('Expires:')}
-                                    value={getDateInputDate(this.state.token.expiry)}
+                                    value={this.getExpiryDate()}
                                     onChange={this.onExpiryChange}
                                     error={get(this.state, 'errors.expiry')}
                                 />
