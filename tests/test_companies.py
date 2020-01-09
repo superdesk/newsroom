@@ -109,3 +109,13 @@ def test_save_company_permissions(client, app):
     # test section protection
     resp = client.get(url_for('agenda.index'))
     assert resp.status_code == 403
+
+
+def test_company_ip_whitelist_validation(client):
+    new_company = {
+        'name': 'Test',
+        'allowed_ip_list': ['wrong']
+    }
+    test_login_succeeds_for_admin(client)
+    resp = client.post('companies/new', data=json.dumps(new_company), content_type='application/json')
+    assert resp.status_code == 400

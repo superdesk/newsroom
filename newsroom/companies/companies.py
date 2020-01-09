@@ -61,6 +61,10 @@ class CompaniesResource(newsroom.Resource):
         'monitoring_administrator': {
             'type': 'ObjectId'
         },
+        'allowed_ip_list': {
+            'type': 'list',
+            'mapping': {'type': 'string'}
+        },
         'original_creator': newsroom.Resource.rel('users'),
         'version_creator': newsroom.Resource.rel('users'),
     }

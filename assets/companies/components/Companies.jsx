@@ -40,11 +40,13 @@ class Companies extends React.Component {
         return valid;
     }
 
-    save(event) {
-        event.preventDefault();
+    save(externalEvent) {
+        if (externalEvent) {
+            externalEvent.preventDefault();
 
-        if (!this.isFormValid()) {
-            return;
+            if (!this.isFormValid()) {
+                return;
+            }
         }
 
         this.props.saveCompany('companies');

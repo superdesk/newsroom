@@ -69,7 +69,7 @@ class AuditInformation extends React.Component {
 
 AuditInformation.propTypes = {
     item: PropTypes.object,
-    editUsers: PropTypes.string,
+    editUsers: PropTypes.array,
     getEditUsers: PropTypes.func.isRequired,
     noPadding: PropTypes.bool
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {get, cloneDeep} from 'lodash';
 import moment from 'moment';
@@ -50,6 +50,14 @@ export default class EditAPIToken extends React.Component {
     }
 
     loadToken() {
+        if (this.props.disableToken) {
+            this.setState({ action: EDITOR_ACTIONS.PREVIEW });
+            if (this.props.onCardPreview) {
+                this.props.onCardPreview();
+            }
+            return;
+        }
+
         this.setState({loaded: false}, () => {
             if (!this.props.companyId) {
                 this.setState({
@@ -115,6 +123,11 @@ export default class EditAPIToken extends React.Component {
 
     saveToken(event) {
         event.preventDefault();
+        if (this.props.onSave) {
+            this.props.onSave();
+            this.setState({ action: EDITOR_ACTIONS.PREVIEW });
+            return;
+        }
 
         if (get(this.state, 'action') === EDITOR_ACTIONS.CREATE) {
             generateTokenForCompany(this.state.token)
@@ -138,6 +151,10 @@ export default class EditAPIToken extends React.Component {
     editToken(event) {
         event.preventDefault();
         this.setState({action: EDITOR_ACTIONS.UPDATE});
+
+        if (this.props.onCardEdit) {
+            this.props.onCardEdit();
+        }
     }
 
     deleteToken(event) {
@@ -168,41 +185,79 @@ export default class EditAPIToken extends React.Component {
         });
     }
 
+    getPreviewCardBody() {
+        let elem = this.props.previewCardBody;
+        if (!elem) {
+            const token = get(this.state, 'token.token', '');
+            const expiry = get(this.state, 'token.expiry');
+            const expiryString = !expiry ?
+                gettext('Never') :
+                moment(expiry).format('dddd, DD MMMM YYYY');
+            const expiresLabel = isInPast(expiry) ?
+                gettext('Expired On:') :
+                gettext('Expires On:');
+
+            elem = (<Fragment>
+                <TextInput
+                    name='expiry'
+                    label={expiresLabel}
+                    value={expiryString}
+                    readOnly={true}
+                />
+                <TextAreaInput
+                    name='token'
+                    label={gettext('Token:')}
+                    value={token}
+                    readOnly={true}
+                />
+            </Fragment>);
+        }
+
+        return (<div className="card-body">{elem}</div>);
+    }
+
+    getEditorCardBody() {
+        const elem = this.props.editorCardBody ? this.props.editorCardBody :
+            (<Fragment>
+                <ExpiryDateInput
+                    name="expiry"
+                    label={gettext('Expires:')}
+                    value={this.getExpiryDate()}
+                    onChange={this.onExpiryChange}
+                    error={get(this.state, 'errors.expiry')}
+                />
+                <CheckboxInput
+                    name='is_enabled'
+                    label={gettext('Enabled')}
+                    value={this.state.token.enabled}
+                    onChange={this.onEnabledChange}
+                />
+            </Fragment>);
+
+        return (<div className="card-body">{elem}</div>);
+    }
+
     renderEditor() {
         const existing = get(this.state, 'action') === EDITOR_ACTIONS.UPDATE;
         const title = existing ?
             gettext('Edit API Token') :
             gettext('Create New API Token');
+        const saveText = this.props.disableToken ? gettext('Save') : '';
 
         return (
             <div className='tab-pane active company-api__token-edit' id='company-api-token'>
                 <form onSubmit={(event) => {event.preventDefault();}}>
-                    <div className="list-item__preview-form">
+                    <div className="list-item__preview-form pb-0 pt-0">
                         <div className="card mt-3 d-block">
-                            <div className="card-header d-flex flex-row">{title}</div>
-                            <div className="card-body">
-                                <ExpiryDateInput
-                                    name="expiry"
-                                    label={gettext('Expires:')}
-                                    value={this.getExpiryDate()}
-                                    onChange={this.onExpiryChange}
-                                    error={get(this.state, 'errors.expiry')}
-                                />
-
-                                <CheckboxInput
-                                    name='is_enabled'
-                                    label={gettext('Enabled')}
-                                    value={this.state.token.enabled}
-                                    onChange={this.onEnabledChange}
-                                />
-                            </div>
+                            <div className="card-header d-flex flex-row">{this.props.label || title}</div>
+                            {this.getEditorCardBody()}
                             <div className="card-footer d-flex">
                                 <button
                                     className="btn btn-outline-primary ml-auto"
                                     onClick={this.saveToken}
                                     disabled={Object.keys(this.state.errors).length > 0}
                                 >
-                                    {existing ? gettext('Save') : gettext('Generate Token')}
+                                    {saveText || (existing ? gettext('Save Token') : gettext('Generate Token'))}
                                 </button>
                                 {existing && (
                                     <button
@@ -221,47 +276,33 @@ export default class EditAPIToken extends React.Component {
     }
 
     renderPreview() {
-        const expiry = get(this.state, 'token.expiry');
-        const expiryString = !expiry ?
-            gettext('Never') :
-            moment(expiry).format('dddd, DD MMMM YYYY');
-        const token = get(this.state, 'token.token', '');
-        const expiresLabel = isInPast(expiry) ?
-            gettext('Expired On:') :
-            gettext('Expires On:');
+        let title;
+
+        if(this.props.label) {
+            title = (<span>{this.props.label}</span>);
+        } else {
+            title = !get(this.state, 'token.enabled', false) ? (
+                <span className="text-danger">{gettext('API Token - Disabled')}</span>
+            ) : (
+                <span>{gettext('API Token')}</span>
+            );
+        }
 
         return (
             <div className='tab-pane active company-api__token-preview' id='company-api-token'>
                 <form onSubmit={this.onSubmit}>
-                    <div className="list-item__preview-form" key='api-token'>
+                    <div className="list-item__preview-form  pb-0 pt-0" key='api-token'>
                         <div className="card mt-3 d-block">
                             <div className="card-header d-flex justify-content-start align-items-center">
-                                {!get(this.state, 'token.enabled', false) ? (
-                                    <span className="text-danger">{gettext('API Token - Disabled')}</span>
-                                ) : (
-                                    <span>{gettext('API Token')}</span>
-                                )}
+                                {title}
                                 <button className="icon-button ml-auto" onClick={this.editToken}>
                                     <i className="icon--edit" />
                                 </button>
-                                <button className="icon-button" onClick={this.deleteToken}>
+                                {!this.props.noDelete && <button className="icon-button" onClick={this.deleteToken}>
                                     <i className="icon--trash" />
-                                </button>
+                                </button>}
                             </div>
-                            <div className="card-body">
-                                <TextInput
-                                    name='expiry'
-                                    label={expiresLabel}
-                                    value={expiryString}
-                                    readOnly={true}
-                                />
-                                <TextAreaInput
-                                    name='token'
-                                    label={gettext('Token:')}
-                                    value={token}
-                                    readOnly={true}
-                                />
-                            </div>
+                            {this.getPreviewCardBody()}
                         </div>
                     </div>
                 </form>
@@ -270,7 +311,7 @@ export default class EditAPIToken extends React.Component {
     }
 
     render() {
-        if (this.state.loaded === false) {
+        if (this.state.loaded === false && !this.props.disableToken) {
             return null;
         }
 
@@ -286,4 +327,14 @@ export default class EditAPIToken extends React.Component {
     }
 }
 
-EditAPIToken.propTypes = {companyId: PropTypes.string.isRequired};
+EditAPIToken.propTypes = {
+    companyId: PropTypes.string,
+    disableToken: PropTypes.bool,
+    onCardEdit: PropTypes.func,
+    onCardPreview: PropTypes.func,
+    onSave: PropTypes.func,
+    label: PropTypes.string,
+    previewCardBody: PropTypes.node,
+    editorCardBody: PropTypes.node,
+    noDelete: PropTypes.bool,
+};

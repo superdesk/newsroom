@@ -219,7 +219,10 @@ class EditCompany extends React.Component {
                     }
                     {this.props.apiEnabled && this.state.activeTab === 'api' && this.props.company._id && (
                         <EditCompanyAPI
-                            companyId={this.props.company._id}
+                            company={this.props.company}
+                            onEditCompany={this.props.onChange}
+                            onSave={this.props.onSave}
+                            errors={this.props.errors}
                         />
                     )}
                 </div>
