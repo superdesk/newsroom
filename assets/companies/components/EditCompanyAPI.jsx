@@ -5,6 +5,7 @@ import {gettext} from '../../utils';
 
 import EditAPIToken from 'news-api/components/EditAPIToken';
 import TextListInput from 'components/TextListInput';
+import CardEditor from 'components/CardEditor';
 
 
 export default class EditCompanyAPI extends React.Component {
@@ -47,8 +48,8 @@ export default class EditCompanyAPI extends React.Component {
         this.props.onSave();
         this.setState({ noListInput: true });
     }
-    
-    render() {
+
+    renderIPWhiteList() {
         const cardBody = (<TextListInput
             name='allowed_ip_list'
             value={this.props.company.allowed_ip_list || []}
@@ -56,18 +57,26 @@ export default class EditCompanyAPI extends React.Component {
             readOnly={this.state.noListInput}
             error={this.props.errors ? this.props.errors.allowed_ip_list.join(', ') : null} />);
 
+        return(
+            <CardEditor
+                label={gettext('Allowed IP Addresses')}
+                noDelete
+                previewCardBody={cardBody}
+                editorCardBody={cardBody}
+                onSave={this.onSaveIpList}
+                onCancel={this.onCardPreview}
+                onEdit={this.onCardEdit}
+                editorClassNames='company-api__token-edit'
+                previewClassNames='company-api__token-preview'
+                saveText={gettext('Save')} />
+        );
+    }
+    
+    render() {
         return (
             <Fragment>
                 <EditAPIToken companyId={this.props.company._id} />
-                <EditAPIToken
-                    label={gettext('Allowed IP Addresses')}
-                    disableToken
-                    noDelete
-                    previewCardBody={cardBody}
-                    editorCardBody={cardBody}
-                    onSave={this.onSaveIpList}
-                    onCardEdit={this.onCardEdit}
-                    onCardPreview={this.onCardPreview}  />
+                {this.renderIPWhiteList()}
             </Fragment>
         );
     }

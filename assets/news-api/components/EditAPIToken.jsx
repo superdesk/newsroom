@@ -7,6 +7,7 @@ import TextInput from 'components/TextInput';
 import ExpiryDateInput from 'components/ExpiryDateInput';
 import TextAreaInput from 'components/TextAreaInput';
 import CheckboxInput from 'components/CheckboxInput';
+import CardEditor from 'components/CardEditor';
 
 import {
     gettext,
@@ -18,13 +19,6 @@ import {
 } from '../../utils';
 import {getTokenForCompany, generateTokenForCompany, deleteTokenForCompany, updateTokenForCompany} from '../actions';
 
-const EDITOR_ACTIONS = {
-    NONE: null,
-    CREATE: 'CREATE',
-    UPDATE: 'UPDATE',
-    PREVIEW: 'PREVIEW',
-};
-
 export default class EditAPIToken extends React.Component {
     constructor(props) {
         super(props);
@@ -33,7 +27,7 @@ export default class EditAPIToken extends React.Component {
             token: null,
             loaded: false,
             errors: {},
-            action: EDITOR_ACTIONS.NONE,
+            creating: false,
         };
 
         this.onExpiryChange = this.onExpiryChange.bind(this);
@@ -50,20 +44,12 @@ export default class EditAPIToken extends React.Component {
     }
 
     loadToken() {
-        if (this.props.disableToken) {
-            this.setState({ action: EDITOR_ACTIONS.PREVIEW });
-            if (this.props.onCardPreview) {
-                this.props.onCardPreview();
-            }
-            return;
-        }
-
         this.setState({loaded: false}, () => {
             if (!this.props.companyId) {
                 this.setState({
                     loaded: true,
                     token: null,
-                    action: EDITOR_ACTIONS.NONE,
+                    creating: false,
                 });
             } else {
                 // Retrieve the API Token from the server
@@ -73,7 +59,7 @@ export default class EditAPIToken extends React.Component {
                         this.setState({
                             token: token,
                             loaded: true,
-                            action: EDITOR_ACTIONS.PREVIEW,
+                            creating: false,
                         });
                     }, (error) => {
                         if (error.response.status === 404) {
@@ -83,7 +69,7 @@ export default class EditAPIToken extends React.Component {
                                     company: this.props.companyId,
                                     enabled: true,
                                 },
-                                action: EDITOR_ACTIONS.CREATE,
+                                creating: true,
                             });
                         } else {
                             throw error;
@@ -122,14 +108,17 @@ export default class EditAPIToken extends React.Component {
     }
 
     saveToken(event) {
-        event.preventDefault();
+        if (event) {
+            event.preventDefault();
+        }
+
         if (this.props.onSave) {
             this.props.onSave();
-            this.setState({ action: EDITOR_ACTIONS.PREVIEW });
+            this.setState({ creating: false });
             return;
         }
 
-        if (get(this.state, 'action') === EDITOR_ACTIONS.CREATE) {
+        if (this.state.creating) {
             generateTokenForCompany(this.state.token)
                 .then((token) => {
                     this.setState({
@@ -137,20 +126,23 @@ export default class EditAPIToken extends React.Component {
                             ...this.state.token,
                             token: token,
                         },
-                        action: EDITOR_ACTIONS.PREVIEW,
+                        creating: false,
                     });
                 });
         } else {
             updateTokenForCompany(this.state.token)
                 .then(() => {
-                    this.setState({action: EDITOR_ACTIONS.PREVIEW});
+                    this.setState({creating: false});
                 });
         }
     }
 
     editToken(event) {
-        event.preventDefault();
-        this.setState({action: EDITOR_ACTIONS.UPDATE});
+        if (event) {
+            event.preventDefault();
+        }
+        
+        this.setState({creating: false,});
 
         if (this.props.onCardEdit) {
             this.props.onCardEdit();
@@ -158,7 +150,9 @@ export default class EditAPIToken extends React.Component {
     }
 
     deleteToken(event) {
-        event.preventDefault();
+        if (event) {
+            event.preventDefault();
+        }
 
         if (!confirm(gettext('Are you sure you want to delete this Company\'s API Token?'))) {
             return;
@@ -171,12 +165,16 @@ export default class EditAPIToken extends React.Component {
                         company: this.props.companyId,
                         enabled: true,
                     },
-                    action: EDITOR_ACTIONS.CREATE,
+                    creating: true
                 });
             });
     }
 
     onEnabledChange(event) {
+        if (event) {
+            event.preventDefault();
+        }
+        
         this.setState({
             token: {
                 ...this.state.token,
@@ -186,34 +184,29 @@ export default class EditAPIToken extends React.Component {
     }
 
     getPreviewCardBody() {
-        let elem = this.props.previewCardBody;
-        if (!elem) {
-            const token = get(this.state, 'token.token', '');
-            const expiry = get(this.state, 'token.expiry');
-            const expiryString = !expiry ?
-                gettext('Never') :
-                moment(expiry).format('dddd, DD MMMM YYYY');
-            const expiresLabel = isInPast(expiry) ?
-                gettext('Expired On:') :
-                gettext('Expires On:');
+        const token = get(this.state, 'token.token', '');
+        const expiry = get(this.state, 'token.expiry');
+        const expiryString = !expiry ?
+            gettext('Never') :
+            moment(expiry).format('dddd, DD MMMM YYYY');
+        const expiresLabel = isInPast(expiry) ?
+            gettext('Expired On:') :
+            gettext('Expires On:');
 
-            elem = (<Fragment>
-                <TextInput
-                    name='expiry'
-                    label={expiresLabel}
-                    value={expiryString}
-                    readOnly={true}
-                />
-                <TextAreaInput
-                    name='token'
-                    label={gettext('Token:')}
-                    value={token}
-                    readOnly={true}
-                />
-            </Fragment>);
-        }
-
-        return (<div className="card-body">{elem}</div>);
+        return (<Fragment>
+            <TextInput
+                name='expiry'
+                label={expiresLabel}
+                value={expiryString}
+                readOnly={true}
+            />
+            <TextAreaInput
+                name='token'
+                label={gettext('Token:')}
+                value={token}
+                readOnly={true}
+            />
+        </Fragment>);
     }
 
     getEditorCardBody() {
@@ -311,25 +304,37 @@ export default class EditAPIToken extends React.Component {
     }
 
     render() {
-        if (this.state.loaded === false && !this.props.disableToken) {
+        if (this.state.loaded === false) {
             return null;
         }
 
-        switch (this.state.action) {
-        case EDITOR_ACTIONS.CREATE:
-        case EDITOR_ACTIONS.UPDATE:
-            return this.renderEditor();
-        case EDITOR_ACTIONS.PREVIEW:
-            return this.renderPreview();
-        }
+        const title = !this.state.creating ?
+            gettext('Edit API Token') :
+            gettext('Create New API Token');
+        const previewTitle= !get(this.state, 'token.enabled', false) ? gettext('API Token - Disabled') :
+            gettext('API Token');
+        const saveText = !this.state.creating ? gettext('Save Token') : gettext('Generate Token');
 
-        return null;
+        return (<CardEditor
+            editorTitle={title}
+            previewTitle={previewTitle}
+            titleClassNames={!get(this.state, 'token.enabled', false) ? 'text-danger' : ''}
+            forceEditor={this.state.creating}
+            hideCancel={this.state.creating}
+            previewCardBody={this.getPreviewCardBody()}
+            editorCardBody={this.getEditorCardBody()}
+            onSave={this.saveToken}
+            onCancel={this.loadToken}
+            onEdit={this.editToken}
+            onDelete={this.deleteToken}
+            previewClassNames='company-api__token-preview'
+            editorClassNames='company-api__token-edit'
+            saveText={saveText} />);
     }
 }
 
 EditAPIToken.propTypes = {
     companyId: PropTypes.string,
-    disableToken: PropTypes.bool,
     onCardEdit: PropTypes.func,
     onCardPreview: PropTypes.func,
     onSave: PropTypes.func,
