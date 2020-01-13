@@ -69,7 +69,11 @@ class NewsroomNewsAPI(NewsroomApp):
         self.register_error_handler(Exception, base_exception_error)
 
 
-app = NewsroomNewsAPI(__name__)
+def get_app(config=None):
+    return NewsroomNewsAPI(__name__, config=config)
+
+
+app = get_app()
 
 if __name__ == '__main__':
     host = '0.0.0.0'

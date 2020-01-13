@@ -11,10 +11,10 @@ sys.path.insert(0, str(root))
 @fixture
 def app():
     from flask import Config
-    from newsroom import Newsroom
+    from newsroom.web import NewsroomWebApp
 
     cfg = Config(root)
     cfg.from_object('newsroom.default_settings')
     cfg.from_object('tests.aap.settings')
     update_config(cfg)
-    return Newsroom(config=cfg, testing=True)
+    return NewsroomWebApp(config=cfg, testing=True)
