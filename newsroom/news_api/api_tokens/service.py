@@ -26,12 +26,12 @@ class NewsApiTokensService(CompanyTokenService):
 
     def on_update(self, updates, original):
         """
-        Check that the updates are only for the expiry date and/or the enable flag
+        Check that the updates are only for the expiry date and/or the enable flag nad rate limit keys
         :param updates:
         :param original:
         :return:
         """
-        if not len(set(updates.keys()) - {'expiry', 'enabled'}) == 0:
+        if not len(set(updates.keys()) - {'expiry', 'enabled', 'rate_limit_requests', 'rate_limit_expiry'}) == 0:
             raise Exception('Bad update request')
 
         return super().on_update(updates, original)
