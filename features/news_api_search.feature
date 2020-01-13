@@ -642,6 +642,11 @@ Feature: News API Products
         """
    When we get "news/search?start_date=now-10d&products=#products._id#"
     Then we get list with 1 items
+    """
+     {"_items": [
+        {"headline": "Headline 1"}
+     ]}
+     """
 
   @rate_limit
   Scenario: RATE_LIMIT_REQUESTS config is used for request validation
