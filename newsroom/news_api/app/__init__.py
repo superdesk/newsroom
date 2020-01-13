@@ -21,13 +21,16 @@ class NewsroomNewsAPI(NewsroomApp):
 
         super(NewsroomNewsAPI, self).__init__(import_name=import_name, config=config, **kwargs)
 
-        if not self.config.get('NEWS_API_ENABLED', False):
-            raise RuntimeError('News API is not enabled')
-
     def load_app_config(self):
         super(NewsroomNewsAPI, self).load_app_config()
         self.config.from_object('newsroom.news_api.settings')
         self.config.from_envvar('NEWS_API_SETTINGS', silent=True)
+
+    def run(self, host=None, port=None, debug=None, **options):
+        if not self.config.get('NEWS_API_ENABLED', False):
+            raise RuntimeError('News API is not enabled')
+
+        super(NewsroomNewsAPI, self).run(host, port, debug, **options)
 
     def setup_error_handlers(self):
         def json_error(err):
