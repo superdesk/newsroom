@@ -20,6 +20,3 @@ class Resource(superdesk.Resource):
 
 class Service(superdesk.Service):
     pass
-
-
-from newsroom.flaskapp import Newsroom  # noqa

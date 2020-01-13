@@ -1,140 +1,41 @@
-"""
-Newsroom Flask app
-------------------
-
-This module implements WSGI application extending eve.Eve
-"""
-
 import os
-
-import eve
 import flask
 import jinja2
-import importlib
 
-from eve.io.mongo import MongoJSONEncoder
-
-from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
-from superdesk.datalayer import SuperdeskDataLayer
-from newsroom.auth import SessionAuth
-from flask_mail import Mail
-from flask_cache import Cache
-
-from newsroom.settings import SettingsApp
-from newsroom.utils import is_json_request
-from newsroom.webpack import NewsroomWebpack
-from newsroom.notifications.notifications import get_initial_notifications
-from newsroom.limiter import limiter
+from newsroom.factory import NewsroomApp
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, char_count, newsroom_config, is_admin,
     hash_string, date_header, get_date, get_multi_line_message,
     sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager
 )
+from newsroom.notifications.notifications import get_initial_notifications
+from newsroom.limiter import limiter
 from newsroom.celery_app import init_celery
-from newsroom.gettext import setup_babel
-import newsroom
-from superdesk.logging import configure_logging
+from newsroom.webpack import NewsroomWebpack
+from newsroom.settings import SettingsApp
 
 
-NEWSROOM_DIR = os.path.abspath(os.path.dirname(__file__))
-
-
-class Newsroom(eve.Eve):
-    """The main Newsroom object.
-
-    Usage::
-
-        from newsroom import Newsroom
-
-        app = Newsroom(__name__)
-        app.run()
-    """
-
-    def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
-        """Override __init__ to do Newsroom specific config and still be able
-        to create an instance using ``app = Newsroom()``
-        """
+class NewsroomWebApp(NewsroomApp):
+    def __init__(self, import_name=__package__, config=None, **kwargs):
+        self.download_formatters = {}
+        self.sections = []
         self.sidenavs = []
         self.settings_apps = []
-        self.download_formatters = {}
-        self.extensions = {}
-        self.theme_folder = 'theme'
-        self.sections = []
         self.dashboards = []
-        self._testing = testing
-        self._general_settings = {}
+        self.theme_folder = 'theme'
 
-        app_config = flask.Config(NEWSROOM_DIR)
-        app_config.from_object('content_api.app.settings')
-        app_config.from_pyfile(os.path.join(NEWSROOM_DIR, 'default_settings.py'), silent=True)
+        super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 
-        # get content api default conf
-
-        if config:
-            app_config.update(config)
-
-        super(Newsroom, self).__init__(
-            import_name,
-            data=SuperdeskDataLayer,
-            auth=SessionAuth,
-            settings=app_config,
-            template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
-            static_folder=os.path.join(NEWSROOM_DIR, 'static'),
-            json_encoder=MongoJSONEncoder,
-            **kwargs)
-        self.json_encoder = MongoJSONEncoder
-        if self.config.get('AMAZON_CONTAINER_NAME'):
-            self.media = AmazonMediaStorage(self)
-        else:
-            self.media = SuperdeskGridFSMediaStorage(self)
         self._setup_jinja()
         self._setup_limiter()
-        self._setup_babel()
         init_celery(self)
-        newsroom.flask_app = self
-        self._setup_blueprints(self.config['BLUEPRINTS'])
-        self._setup_apps(self.config['CORE_APPS'])
-        self._setup_apps(self.config.get('INSTALLED_APPS', []))
         self._setup_webpack()
-        self._setup_email()
-        self._setup_cache()
-        self._setup_error_handlers()
         self._setup_theme()
-        configure_logging(app_config.get('LOG_CONFIG_FILE'))
 
-    def load_config(self):
-        # Override Eve.load_config in order to get default_settings
-        super(Newsroom, self).load_config()
+    def load_app_config(self):
+        super(NewsroomWebApp, self).load_app_config()
         self.config.from_envvar('NEWSROOM_SETTINGS', silent=True)
-        if not self._testing:
-            try:
-                self.config.from_pyfile(os.path.join(os.getcwd(), 'settings.py'))
-            except FileNotFoundError:
-                pass
-
-    def _setup_blueprints(self, modules):
-        """Setup configured blueprints."""
-        for name in modules:
-            mod = importlib.import_module(name)
-            self.register_blueprint(mod.blueprint)
-
-    def _setup_apps(self, apps):
-        """Setup configured apps."""
-        for name in apps:
-            mod = importlib.import_module(name)
-            if hasattr(mod, 'init_app'):
-                mod.init_app(self)
-
-    def _setup_babel(self):
-        self.config.setdefault(
-            'BABEL_TRANSLATION_DIRECTORIES',
-            os.path.join(NEWSROOM_DIR, 'translations'))
-        # avoid events on this
-        self.babel_tzinfo = None
-        self.babel_locale = None
-        self.babel_translations = None
-        setup_babel(self)
 
     def _setup_jinja(self):
         self.add_template_filter(datetime_short)
@@ -161,36 +62,11 @@ class Newsroom(eve.Eve):
             jinja2.FileSystemLoader(self.template_folder),
         ])
 
-    def _setup_webpack(self):
-        NewsroomWebpack(self)
-
-    def _setup_email(self):
-        self.mail = Mail(self)
-
     def _setup_limiter(self):
         limiter.init_app(self)
 
-    def _setup_cache(self):
-        # configuring for in-memory cache for now
-        self.cache = Cache(self)
-
-    def _setup_error_handlers(self):
-        def assertion_error(err):
-            return flask.jsonify({'error': err.args[0] if err.args else 1}), 400
-
-        def render_404(err):
-            if flask.request and is_json_request(flask.request):
-                return flask.jsonify({'code': 404}), 404
-            return flask.render_template('404.html'), 404
-
-        def render_403(err):
-            if flask.request and is_json_request(flask.request):
-                return flask.jsonify({'code': 403, 'error': str(err), 'info': getattr(err, 'description', None)}), 403
-            return flask.render_template('403.html'), 403
-
-        self.register_error_handler(AssertionError, assertion_error)
-        self.register_error_handler(404, render_404)
-        self.register_error_handler(403, render_403)
+    def _setup_webpack(self):
+        NewsroomWebpack(self)
 
     def _setup_theme(self):
         self.add_url_rule(
@@ -276,6 +152,7 @@ class Newsroom(eve.Eve):
         """
         if endpoint is None and url is None:
             raise ValueError('please specify endpoint or url')
+
         self.sidenavs.append({
             'name': name,
             'endpoint': endpoint,
@@ -295,21 +172,6 @@ class Newsroom(eve.Eve):
             data=data,
             weight=weight
         ))
-
-    def general_setting(self, _id, label, type='text', default=None,
-                        weight=0, description=None, min=None, client_setting=False):
-        self._general_settings[_id] = {
-            'type': type,
-            'label': label,
-            'weight': weight,
-            'default': default,
-            'description': description,
-            'min': min,
-            'client_setting': client_setting
-        }
-
-        if flask.g:  # reset settings cache
-            flask.g.settings = None
 
     def dashboard(self, _id, name, cards=[]):
         """Define new dashboard

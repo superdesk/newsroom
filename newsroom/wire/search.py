@@ -134,7 +134,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
         if client_products:
             # Ensure that all the provided products are permissioned for this request
             if not all(p in [c.get('_id') for c in products] for p in client_products):
-                abort(404, 'Invalid product parameter')
+                abort(404, gettext('Invalid product parameter'))
 
         planning_items_should = []
         for product in products:
@@ -328,7 +328,7 @@ class WireSearchService(newsroom.Service):
 
         if source['from'] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
-            return abort(400)
+            return abort(400, gettext('Page limit exceeded'))
 
         if not source['from'] and aggs:  # avoid aggregations when handling pagination
             source['aggs'] = get_aggregations()

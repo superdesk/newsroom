@@ -1,72 +1,77 @@
 import os
-import flask
 import logging
-from eve import Eve
-from eve.io.mongo.mongo import MongoJSONEncoder
+import flask
+
+from werkzeug.exceptions import HTTPException
+from superdesk.errors import SuperdeskApiError
+
+from newsroom.factory import NewsroomApp
 from newsroom.news_api.api_tokens import CompanyTokenAuth
-from superdesk.datalayer import SuperdeskDataLayer
-from newsroom.news_api.news.item.item import bp
-import importlib
 
 
 logger = logging.getLogger(__name__)
 
 
-def get_app(config=None):
-    app_config = flask.Config('.')
+class NewsroomNewsAPI(NewsroomApp):
+    AUTH_SERVICE = CompanyTokenAuth
 
-    # set some required fields
-    app_config.update({'DOMAIN': {'upload': {}}, 'SOURCES': {}})
+    def __init__(self, import_name=__package__, config=None, **kwargs):
+        if not getattr(self, 'settings'):
+            self.settings = flask.Config('.')
 
-    # pickup the default newsroom settings
-    app_config.from_object('newsroom.default_settings')
+        super(NewsroomNewsAPI, self).__init__(import_name=import_name, config=config, **kwargs)
 
-    try:
-        # override from settings module, but only things defined in default config
-        import newsroom.news_api.settings as server_settings
-        for key in dir(server_settings):
-            if key.isupper() and key in app_config:
-                app_config[key] = getattr(server_settings, key)
-    except ImportError:
-        pass  # if exists
+        if not self.config.get('NEWS_API_ENABLED', False):
+            raise RuntimeError('News API is not enabled')
 
-    if config:
-        app_config.update(config)
+    def load_app_config(self):
+        super(NewsroomNewsAPI, self).load_app_config()
+        self.config.from_object('newsroom.news_api.settings')
+        self.config.from_envvar('NEWS_API_SETTINGS', silent=True)
 
-    app_config.from_envvar('NEWS_API_SETTINGS', silent=True)
+    def setup_error_handlers(self):
+        def json_error(err):
+            return flask.jsonify(err), err['code']
 
-    # check that the API is enabled to run
-    if not app_config.get('NEWS_API_ENABLED', False):
-        logger.error('News API is not enabled')
-        return None
+        def handle_werkzeug_errors(err):
+            return json_error({
+                'error': str(err),
+                'message': getattr(err, 'description') or None,
+                'code': getattr(err, 'code') or 500
+            })
 
-    app = Eve(auth=CompanyTokenAuth,
-              json_encoder=MongoJSONEncoder,
-              data=SuperdeskDataLayer,
-              settings=app_config)
+        def superdesk_api_error(err):
+            return json_error({
+                'error': err.message or '',
+                'message': err.payload,
+                'code': err.status_code or 500,
+            })
 
-    app._general_settings = {'news_api_time_limit_days': {'type': 'number',
-                                                          'default': app.config.get('NEWS_API_TIME_LIMIT_DAYS', 0)}}
+        def assertion_error(err):
+            return json_error({
+                'error': err.args[0] if err.args else 1,
+                'message': str(err),
+                'code': 400
+            })
 
-    app.register_blueprint(bp)
+        def base_exception_error(err):
+            return json_error({
+                'error': err.args[0] if err.args else 1,
+                'message': str(err),
+                'code': 500
+            })
 
-    for module_name in app_config.get('CORE_APPS', []):
-        app_module = importlib.import_module(module_name)
-        try:
-            app_module.init_app(app)
-        except AttributeError:
-            pass
+        for cls in HTTPException.__subclasses__():
+            self.register_error_handler(cls, handle_werkzeug_errors)
 
-    return app
+        self.register_error_handler(SuperdeskApiError, superdesk_api_error)
+        self.register_error_handler(AssertionError, assertion_error)
+        self.register_error_handler(Exception, base_exception_error)
 
 
-app = get_app()
+app = NewsroomNewsAPI(__name__)
 
 if __name__ == '__main__':
     host = '0.0.0.0'
     port = int(os.environ.get('APIPORT', '5400'))
-    app = get_app()
-    if app.config.get('NEWS_API_ENABLED', False):
-        app.run(host=host, port=port, debug=True, use_reloader=True)
-    else:
-        logger.error('News API is not enabled')
+    app.run(host=host, port=port, debug=True, use_reloader=True)
