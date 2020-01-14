@@ -45,12 +45,12 @@ def clean_databases(app):
 @fixture
 def app():
     from flask import Config
-    from newsroom import Newsroom
+    from newsroom.web import NewsroomWebApp
 
     cfg = Config(root)
     cfg.from_object('newsroom.default_settings')
     update_config(cfg)
-    return Newsroom(config=cfg, testing=True)
+    return NewsroomWebApp(config=cfg, testing=True)
 
 
 @fixture

@@ -5,7 +5,8 @@ def init_app(app):
     if not app.config.get('NEWS_API_ENABLED'):
         return
 
-    app.section('news_api', 'News API', 'api')
+    if getattr(app, 'section'):
+        app.section('news_api', 'News API', 'api')
 
     app.general_setting(
         'news_api_time_limit_days',

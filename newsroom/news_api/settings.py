@@ -5,6 +5,7 @@ URL_PREFIX = os.environ.get('CONTENT_API_PREFIX', 'api/v1')
 QUERY_MAX_PAGE_SIZE = 100
 
 CORE_APPS = [
+    'newsroom.news_api',
     'newsroom.news_api.api_tokens',
     'newsroom.companies',
     'content_api.items',
@@ -17,6 +18,12 @@ CORE_APPS = [
     'newsroom.news_api.news.item',
     'newsroom.news_api.news.search',
     'newsroom.products'
+]
+
+INSTALLED_APPS = []
+
+BLUEPRINTS = [
+    'newsroom.news_api.news.item.item'
 ]
 
 #: mongo db name, only used when mongo_uri is not set

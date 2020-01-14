@@ -273,7 +273,7 @@ def remove_wire_items():
         ids.extend(doc.get('ancestors') or [])
 
     if not ids:
-        flask.abort(404)
+        flask.abort(404, gettext('Not found'))
 
     docs = list(doc for doc in items_service.get_from_mongo(req=None, lookup={'_id': {'$in': ids}}))
 
