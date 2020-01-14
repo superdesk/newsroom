@@ -265,7 +265,8 @@ CLIENT_CONFIG = {
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
-    'display_news_only': True  # Displays news only switch in wire
+    'display_news_only': True,  # Displays news only switch in wire,
+    'default_timezone': DEFAULT_TIMEZONE
 }
 
 LANGUAGES = ['en', 'fi', 'cs']
