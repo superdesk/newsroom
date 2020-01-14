@@ -473,7 +473,7 @@ def get_coverages(planning_items, original_coverages, new_plan):
                 })
         else:
             if coverage.get('workflow_status') == 'completed':
-                if orig_coverage['workflow_status'] != coverage['workflow_status']:
+                if orig_coverage.get('workflow_status') != coverage['workflow_status']:
                     cov_deliveries.append({
                         'sequence_no': 0,
                         'delivery_state': 'published',
