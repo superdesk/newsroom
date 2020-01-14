@@ -50,9 +50,9 @@ export default class CardEditor extends React.Component {
         } = this.props;
 
         return (
-            <div className={`tab-pane active ${editorClassNames}`} id='card-editor'>
+            <div className={`tab-pane active tab-pane--no-scroll ${editorClassNames}`} id='card-editor'>
                 <form onSubmit={(event) => {event.preventDefault();}}>
-                    <div className="list-item__preview-form pb-0 pt-0">
+                    <div className="list-item__preview-form list-item__preview-form--no-scroll pb-0 pt-0">
                         <div className="card mt-3 d-block">
                             <div className="card-header d-flex flex-row">{editorTitle || label}</div>
                             <div className="card-body">{editorCardBody}</div>

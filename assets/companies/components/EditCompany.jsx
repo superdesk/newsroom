@@ -223,6 +223,7 @@ class EditCompany extends React.Component {
                             onEditCompany={this.props.onChange}
                             onSave={this.props.onSave}
                             errors={this.props.errors}
+                            originalItem={this.props.originalItem}
                         />
                     )}
                 </div>
@@ -242,6 +243,7 @@ EditCompany.propTypes = {
     fetchCompanyUsers: PropTypes.func.isRequired,
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
+    originalItem: PropTypes.object,
 };
 
 export default EditCompany;

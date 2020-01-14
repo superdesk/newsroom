@@ -23,6 +23,10 @@ export default class EditCompanyAPI extends React.Component {
         if (!isEqual(get(this.props, 'company.allowed_ip_list'), get(nextProps, 'company.allowed_ip_list'))) {
             this.setState({ noListInput: true });
         }
+
+        if (get(nextProps, 'errors.allowed_ip_list')) {
+            this.setState({ noListInput: false });   
+        }
     }
 
     onIpWhitelistChange(event) {
@@ -41,6 +45,16 @@ export default class EditCompanyAPI extends React.Component {
     onCardPreview() {
         if (!this.state.noListInput) {
             this.setState({ noListInput: true });
+        }
+
+        // Reset to original values if errors are present
+        if (get(this.props, 'errors.allowed_ip_list')) {
+            this.props.onEditCompany({
+                target: {
+                    name: 'allowed_ip_list',
+                    value: get(this.props.originalItem, 'allowed_ip_list', []),
+                }
+            });
         }
     }
 
@@ -68,7 +82,8 @@ export default class EditCompanyAPI extends React.Component {
                 onEdit={this.onCardEdit}
                 editorClassNames='company-api__token-edit'
                 previewClassNames='company-api__token-preview'
-                saveText={gettext('Save')} />
+                saveText={gettext('Save')}
+                forceEditor={get(this.props, 'errors.allowed_ip_list')} />
         );
     }
     
@@ -87,4 +102,5 @@ EditCompanyAPI.propTypes = {
     onEditCompany: PropTypes.func,
     onSave: PropTypes.func,
     errors: PropTypes.object,
+    originalItem: PropTypes.object,
 };
