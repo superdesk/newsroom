@@ -4,7 +4,7 @@ from flask_script import Manager
 
 from superdesk import get_resource_service
 
-from newsroom import Newsroom
+from newsroom.web import NewsroomWebApp
 from newsroom.elastic_utils import rebuild_elastic_index
 from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_timestamp
 from newsroom.auth import get_user_by_email
@@ -14,7 +14,7 @@ from newsroom.data_updates import GenerateUpdate, Upgrade, get_data_updates_file
 
 import content_api
 
-app = Newsroom()
+app = NewsroomWebApp()
 manager = Manager(app)
 
 
