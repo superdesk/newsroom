@@ -1,8 +1,8 @@
 import os
 
-from newsroom import Newsroom
+from newsroom.web import NewsroomWebApp
 
-app = Newsroom(__name__)
+app = NewsroomWebApp(__name__)
 
 if __name__ == '__main__':
     host = '0.0.0.0'
