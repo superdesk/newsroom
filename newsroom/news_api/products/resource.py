@@ -3,6 +3,7 @@ from newsroom.products import ProductsService, ProductsResource
 from bson import ObjectId
 import json
 from eve.utils import ParsedRequest
+from newsroom.news_api.utils import post_api_audit
 
 
 class NewsAPIProductsResource(ProductsResource):
@@ -51,5 +52,8 @@ class NewsAPIProductsService(ProductsService):
         for item in doc.get('_items', []):
             self._prefix_hateoas(item)
 
+        post_api_audit(doc)
+
     def on_fetched_item(self, doc):
         self._prefix_hateoas(doc.get('_links', {}))
+        post_api_audit(doc)
