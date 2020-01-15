@@ -504,8 +504,17 @@ class AgendaService(newsroom.Service):
 
         media_coverages = [c for c in completed_coverages if c.get('coverage_type') != 'text']
         for c in media_coverages:
-            c['deliveries'][0]['delivery_href'] = c['delivery_href'] = app.set_photo_coverage_href(c, None,
-                                                                                                   c['deliveries'])
+            try:
+                c['deliveries'][0]['delivery_href'] = c['delivery_href'] = app.set_photo_coverage_href(
+                    c,
+                    None,
+                    c['deliveries']
+                )
+            except Exception as e:
+                logger.exception(e)
+                logger.error('Failed to generate delivery_href for coverage={}'.format(
+                    c.get('coverage_id')
+                ))
 
     def enhance_coverage_with_wire_details(self, coverage, wire_item):
         coverage['publish_time'] = wire_item.get('publish_schedule') or wire_item.get('firstpublished')
