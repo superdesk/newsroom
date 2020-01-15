@@ -480,8 +480,18 @@ def get_coverages(planning_items, original_coverages, new_plan):
                         'publish_time': (next((parse_date_str(d.get('publish_time')) for d in deliveries), None) or
                                          utcnow())
                     })
-                    cov_deliveries[0]['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item,
-                                                                                     cov_deliveries),
+
+                    try:
+                        cov_deliveries[0]['delivery_href'] = app.set_photo_coverage_href(
+                            coverage,
+                            planning_item,
+                            cov_deliveries
+                        )
+                    except Exception as e:
+                        logger.exception(e)
+                        logger.error('Failed to generate delivery_href for coverage={}'.format(
+                            coverage.get('coverage_id')
+                        ))
                 elif (len((orig_coverage or {}).get('deliveries') or []) > 0):
                     cov_deliveries.append(orig_coverage['deliveries'][0])
 
