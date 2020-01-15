@@ -16,3 +16,8 @@ from behave import when
 def step_save_token(context):
     context.headers.append(('Authorization', context.news_api_tokens.get('_id')))
     return
+
+
+@when('we set header "{name}" to value "{value}"')
+def step_set_header(context, name, value):
+    context.headers.append((name, value))

@@ -6,8 +6,8 @@ export default function TagList({tags, onClick, icon}) {
     return ((get(tags, 'length', 0) > 0 && <div className='tag-list'>
         <ul>
             {tags.map((t, index) => (
-                <li className='noselect' key={index} onClick={onClick ? onClick.bind(null, index) : null}>
-                    {icon && <i className={icon}/>}
+                <li className='noselect' key={index}>
+                    {icon && <i className={icon} onClick={onClick ? onClick.bind(null, index) : null}/>}
                     {t}
                 </li>
             ))}
@@ -17,5 +17,6 @@ export default function TagList({tags, onClick, icon}) {
 
 TagList.propTypes = {
     icon: PropTypes.string,
-    text: PropTypes.string.isRequired,
+    tags: PropTypes.array,
+    onClick: PropTypes.func,
 };

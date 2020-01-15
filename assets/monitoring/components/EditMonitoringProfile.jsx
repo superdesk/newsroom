@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get, isEmpty} from 'lodash';
 
-import KeywordInput from 'components/KeywordInput';
+import TextListInput from 'components/TextListInput';
 import TextInput from 'components/TextInput';
 import TextAreaInput from 'components/TextAreaInput';
 import SelectInput from 'components/SelectInput';
@@ -149,7 +149,8 @@ class EditMonitoringProfile extends React.Component {
                                                 </a>}
                                     </TextAreaInput>
 
-                                    <KeywordInput
+                                    <TextListInput
+                                        label={gettext('Keywords')}
                                         name='keywords'
                                         value={item.keywords || []}
                                         onChange={onChange} />

@@ -513,8 +513,6 @@ article.list {
         display: flex;
         flex-direction: column;
         flex: 1;
-        overflow: hidden;
-        overflow-y: auto;
     }
     .tab-content {
         display: flex;
@@ -527,8 +525,11 @@ article.list {
         display: flex;
         flex-direction: column;
         flex: 1;
-        overflow: hidden;
-        overflow-y: auto;
+
+        &--no-scroll {
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+        }
     }
     .nav-tabs {
         .nav-item {
@@ -589,6 +590,10 @@ article.list {
     overflow: hidden;
     overflow-y: auto;
     padding: 20px;
+
+    &--no-scroll {
+        overflow: visible !important;
+    }
 }
 .list-item__preview-footer {
     display: flex;
