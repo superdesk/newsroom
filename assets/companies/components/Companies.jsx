@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import {get} from 'lodash';
+
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
 import SearchResults from 'search/components/SearchResults';
@@ -40,11 +42,13 @@ class Companies extends React.Component {
         return valid;
     }
 
-    save(event) {
-        event.preventDefault();
+    save(externalEvent) {
+        if (externalEvent) {
+            externalEvent.preventDefault();
 
-        if (!this.isFormValid()) {
-            return;
+            if (!this.isFormValid()) {
+                return;
+            }
         }
 
         this.props.saveCompany('companies');
@@ -60,6 +64,8 @@ class Companies extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
+        const originalCompanyEdited = !get(this.props, 'companyToEdit._id') ? this.props.companyToEdit :
+            this.props.companiesById[this.props.companyToEdit._id];
 
         return (
             <div className="flex-row">
@@ -91,6 +97,7 @@ class Companies extends React.Component {
                 )}
                 {this.props.companyToEdit &&
                     <EditCompany
+                        originalItem={originalCompanyEdited}
                         company={this.props.companyToEdit}
                         onChange={this.props.editCompany}
                         errors={this.props.errors}
@@ -130,6 +137,7 @@ Companies.propTypes = {
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
     showSubscriberId: PropTypes.bool,
+    companiesById: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
