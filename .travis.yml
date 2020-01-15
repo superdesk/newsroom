@@ -14,7 +14,6 @@ addons:
             - google-chrome
         packages:
             - elasticsearch
-            - google-chrome-stable
 
 cache:
   - pip
@@ -24,6 +23,7 @@ cache:
 before_install:
     - sudo apt-get purge elasticsearch
     - sudo apt-get install -y -t stable --allow-unauthenticated elasticsearch
+    - sudo apt-get install -y --allow-unauthenticated google-chrome-stable
     - sudo service elasticsearch restart
 
 install:
