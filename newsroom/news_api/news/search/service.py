@@ -16,6 +16,7 @@ import pytz
 from superdesk.utc import local_to_utc
 from bson import ObjectId
 from flask import abort
+from newsroom.news_api.utils import post_api_audit
 
 
 class NewsAPISearchService(BaseService):
@@ -489,3 +490,6 @@ class NewsAPISearchService(BaseService):
                 doc.pop(field, None)
 
         return resp
+
+    def on_fetched(self, doc):
+        post_api_audit(doc)
