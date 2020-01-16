@@ -7,7 +7,7 @@ from superdesk.errors import SuperdeskApiError
 
 from newsroom.factory import NewsroomApp
 from newsroom.news_api.api_tokens import CompanyTokenAuth
-
+from superdesk.utc import utcnow
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,20 @@ class NewsroomNewsAPI(NewsroomApp):
 
 
 def get_app(config=None):
-    return NewsroomNewsAPI(__name__, config=config)
+    app = NewsroomNewsAPI(__name__, config=config)
+
+    @app.after_request
+    def after_request(response):
+        if flask.g.get('rate_limit_requests'):
+            response.headers.add('X-RateLimit-Remaining',
+                                 app.config.get('RATE_LIMIT_REQUESTS') - flask.g.get('rate_limit_requests'))
+            response.headers.add('X-RateLimit-Limit', app.config.get('RATE_LIMIT_REQUESTS'))
+
+            if flask.g.get('rate_limit_expiry'):
+                response.headers.add('X-RateLimit-Reset', (flask.g.get('rate_limit_expiry') - utcnow()).seconds)
+        return response
+
+    return app
 
 
 app = get_app()
