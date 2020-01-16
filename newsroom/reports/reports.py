@@ -3,7 +3,7 @@ from collections import defaultdict
 import superdesk
 from bson import ObjectId
 from flask_babel import gettext
-from flask import request, send_file, current_app as newsroom_app, session
+from flask import request, send_file, current_app as newsroom_app
 import io
 import csv
 from superdesk.utc import utcnow

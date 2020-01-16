@@ -1,9 +1,8 @@
 from io import StringIO
 import csv
 
-from flask import jsonify, render_template, abort, current_app as newsroom_app, send_file
+from flask import jsonify, render_template, abort, current_app as newsroom_app
 from flask_babel import gettext
-from werkzeug.utils import secure_filename
 
 from newsroom.decorator import account_manager_only
 from newsroom.reports import blueprint
