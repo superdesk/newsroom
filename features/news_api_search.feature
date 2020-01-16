@@ -647,3 +647,85 @@ Feature: News API Products
         {"headline": "Headline 1"}
      ]}
      """
+
+  @rate_limit
+  Scenario: X-RateLimit-Remaining header is set in response
+     Given "items"
+        """
+        [{"body_html": "Once upon a time there was a fish who could swim"},
+        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        """
+     Given "companies"
+        """
+        [
+        {
+          "name": "Test Company",
+          "is_enabled" : true
+        }
+        ]
+        """
+     Given "news_api_tokens"
+        """
+        [{
+          "company" : "#companies._id#",
+          "enabled" : true
+        }]
+        """
+     When we save API token
+     Given "products"
+        """
+        [{"name": "A fishy Product",
+        "decsription": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        }]
+        """
+    When we get "news/search?q=fish&include_fields=body_html"
+    Then we get headers in response
+      """
+      [{ "X-RateLimit-Remaining": "1" }]
+      """
+
+  @rate_limit
+  Scenario: X-RateLimit-Reset header is set in response
+     Given "items"
+        """
+        [{"body_html": "Once upon a time there was a fish who could swim"},
+        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        """
+     Given "companies"
+        """
+        [
+        {
+          "name": "Test Company",
+          "is_enabled" : true
+        }
+        ]
+        """
+     Given "news_api_tokens"
+        """
+        [{
+          "company" : "#companies._id#",
+          "enabled" : true
+        }]
+        """
+     When we save API token
+     Given "products"
+        """
+        [{"name": "A fishy Product",
+        "decsription": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        }]
+        """
+    When we get "news/search?q=fish&include_fields=body_html"
+    Then we get headers in response
+      """
+      [{ "X-RateLimit-Reset":  "__any_value__"}]
+      """
