@@ -18,6 +18,7 @@ const options = [
     {value: REPORTS_NAMES.PRODUCT_STORIES, text: gettext('Stories per product')},
     {value: REPORTS_NAMES.COMPANY, text: gettext('Company')},
     {value: REPORTS_NAMES.SUBSCRIBER_ACTIVITY, text: gettext('Subscriber activity')},
+    {value: REPORTS_NAMES.CONTENT_ACTIVITY, text: gettext('Content activity')},
 ];
 
 

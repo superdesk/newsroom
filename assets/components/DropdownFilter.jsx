@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import {gettext} from 'utils';
 import DropdownFilterButton from './DropdownFilterButton';
 
@@ -15,8 +16,19 @@ const processBuckets = (buckets, filter, toggleFilter) => (filter.notSorted ? bu
                 onClick={() => toggleFilter(filter.field, bucket.key)}
             >{filter.transform ? filter.transform(bucket.key, bucket) : bucket.key}</button>);
 
-function DropdownFilter({aggregations, filter, toggleFilter, activeFilter, getDropdownItems, getFilterLabel, ...props}) {
-    return (<div className="btn-group" key={filter.field}>
+function DropdownFilter({
+    aggregations,
+    filter,
+    toggleFilter,
+    activeFilter,
+    getDropdownItems,
+    getFilterLabel,
+    className,
+    ...props}) {
+    return (<div className={classNames(
+        'btn-group',
+        {[className]: className}
+    )} key={filter.field}>
         <DropdownFilterButton
             filter={filter}
             activeFilter={activeFilter}
@@ -42,6 +54,7 @@ DropdownFilter.propTypes = {
     activeFilter: PropTypes.object,
     getDropdownItems: PropTypes.func,
     getFilterLabel: PropTypes.func,
+    className: PropTypes.string,
 };
 
 export default DropdownFilter;
