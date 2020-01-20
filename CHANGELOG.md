@@ -1,5 +1,21 @@
 # Newsroom Changelog
 
+## [1.17.1-rc1] Not released yet
+### Features
+- [SDAN-632] ContentActivity report (#954)
+
+### Improvements
+- [SDAN-628] Improve email subject when watching ad-hoc planning item (#942)
+- [SDAN-586] Make the 'Superdesk Subscriber Id' column visibility configurable in the Company list (#944)
+- [SDAN-624] Display Take Key when Downloading, Copying, Printing and Sharing wire items (#943)
+
+### Fixes
+- [SDAN-639] Notifications dropdown was not fully visible (#941)
+- [SDAN-631] The 'PRINT REPORT' action produces a page without any report data (#945)
+- fix(push): Exception raised when receiving new completed coverages (#948)
+- fix(coverage-href): Catch all exceptions when generating coverage href (949)
+- fix(travis-ci): Force install of google-chrome
+
 ## [1.17.0] 2019-12-17
 ### Features
 - [SDAN-614] Watch individual coverages (#910)
