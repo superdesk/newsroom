@@ -12,6 +12,7 @@ from copy import deepcopy
 from newsroom.agenda.agenda import get_date_filters
 from flask import abort
 from newsroom.utils import query_resource, get_entity_dict, get_items_by_id
+from .content_activity import get_content_activity_report  # noqa
 
 
 def get_company_saved_searches():
