@@ -6,6 +6,7 @@ import {
     runReport,
     REPORTS_NAMES,
     printReport,
+    toggleFilterAndQuery,
 } from '../actions';
 import { gettext } from 'utils';
 import { panels } from '../utils';
@@ -31,10 +32,16 @@ class CompanyReportsApp extends React.Component {
 
     getPanel() {
         const Panel = panels[this.props.activeReport];
-        return Panel && this.props.results && <Panel key="panel" results={this.props.results} companies={this.props.companies} />;
+        return Panel && this.props.results && <Panel key="panel" {...this.props}/>;
     }
 
     render() {
+        const reportOptions = !this.props.apiEnabled ? options :
+            [
+                ...options,
+                {value: REPORTS_NAMES.COMPANY_NEWS_API_USAGE, text: gettext('Company News API Usage')},
+            ];
+
         return (
             [<section key="header" className="content-header">
                 <nav className="content-bar navbar content-bar--side-padding">
@@ -45,7 +52,7 @@ class CompanyReportsApp extends React.Component {
                             name={'company-reports'}
                             value={this.props.activeReport || ''}
                             onChange={(event) => this.props.setActiveReport(event.target.value)}>
-                            {options.map((option) => <option key={option.value} value={option.value}>{option.text}</option>)}
+                            {reportOptions.map((option) => <option key={option.value} value={option.value}>{option.text}</option>)}
                         </select>
                     </div>
 
@@ -78,18 +85,24 @@ CompanyReportsApp.propTypes = {
     runReport: PropTypes.func,
     companies: PropTypes.array,
     printReport: PropTypes.func,
+    isLoading: PropTypes.bool,
+    apiEnabled: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
     activeReport: state.activeReport,
     results: state.results,
     companies: state.companies,
+    apiEnabled: state.apiEnabled,
+    reportParams: state.reportParams,
+    isLoading: state.isLoading,
 });
 
 const mapDispatchToProps = {
     setActiveReport,
     runReport,
     printReport,
+    toggleFilterAndQuery,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CompanyReportsApp);

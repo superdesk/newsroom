@@ -38,6 +38,7 @@ export default function companyReportReducer(state = initialState, action) {
             ...state,
             companies: action.data.companies,
             sections: action.data.sections,
+            apiEnabled: action.data.api_enabled || false,
         };
 
     case QUERY_REPORT: {

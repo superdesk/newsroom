@@ -126,6 +126,7 @@ CORE_APPS = [
     'newsroom.media_utils',
     'newsroom.news_api',
     'newsroom.news_api.api_tokens',
+    'newsroom.news_api.api_audit',
     'newsroom.monitoring',
     'newsroom.company_expiry_alerts',
 ]
