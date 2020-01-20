@@ -8,7 +8,8 @@ export const REPORTS_NAMES = {
     'COMPANY_PRODUCTS': 'company-products',
     'PRODUCT_STORIES': 'product-stories',
     'COMPANY': 'company',
-    'SUBSCRIBER_ACTIVITY': 'subscriber-activity'
+    'SUBSCRIBER_ACTIVITY': 'subscriber-activity',
+    'CONTENT_ACTIVITY': 'content-activity',
 };
 
 
@@ -19,6 +20,7 @@ export const REPORTS = {
     [REPORTS_NAMES.PRODUCT_STORIES]: '/reports/product-stories',
     [REPORTS_NAMES.COMPANY]: '/reports/company',
     [REPORTS_NAMES.SUBSCRIBER_ACTIVITY]: '/reports/subscriber-activity',
+    [REPORTS_NAMES.CONTENT_ACTIVITY]: '/reports/content-activity',
 
 };
 
@@ -100,6 +102,20 @@ export function runReport() {
     };
 }
 
+export function fetchAggregations(url) {
+    return function(dispatch, getState) {
+        let queryString = getReportQueryString(getState(), 0, false, notify);
+
+        server.get(`${url}?${queryString}&aggregations=1`)
+            .then((data) => {
+                dispatch({
+                    type: 'RECEIVE_REPORT_AGGREGATIONS',
+                    data: data,
+                });
+            });
+    };
+}
+
 /**
  * Fetches the report data
  *
@@ -142,16 +158,19 @@ export function fetchReport(url, next, exportReport) {
 }
 
 export const TOGGLE_REPORT_FILTER = 'TOGGLE_REPORT_FILTER';
+export function toggleFilter(filter, value) {
+    return {
+        type: TOGGLE_REPORT_FILTER,
+        data: {
+            filter,
+            value
+        }
+    };
+}
+
 export function toggleFilterAndQuery(filter, value) {
     return function (dispatch) {
-        dispatch({
-            type: TOGGLE_REPORT_FILTER,
-            data: {
-                filter,
-                value
-            }
-        });
-
+        dispatch(toggleFilter(filter, value));
         return dispatch(runReport());
     };
 }
@@ -169,5 +188,5 @@ export function printReport() {
         }
 
         return Promise.resolve();
-    };   
+    };
 }

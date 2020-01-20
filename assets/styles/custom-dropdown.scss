@@ -21,11 +21,13 @@
 
 .dropdown-item {
   padding: 0.7rem 1rem;
+  cursor: pointer;
+
   [class^="icon--"], [class*=" icon--"] {
     margin-right: 1rem;
   }
   &:focus {
-    color: #16181b;      
+    color: #16181b;
     background-color: #eff4f6 !important;
   }
   &:active, &:hover {
@@ -37,7 +39,7 @@
   }
   .no-touch & {
     &:hover, &:focus {
-      color: #16181b !important;      
+      color: #16181b !important;
       background-color: #eff4f6 !important;
       [class^="icon--"], [class*=" icon--"] {
         color: $main-blue !important;
@@ -49,7 +51,7 @@
       [class^="icon--"], [class*=" icon--"] {
         color: white !important;
       }
-    }  
+    }
   }
 }
 

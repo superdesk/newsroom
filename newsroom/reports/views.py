@@ -1,3 +1,6 @@
+from io import StringIO
+import csv
+
 from flask import jsonify, render_template, abort, current_app as newsroom_app
 from flask_babel import gettext
 
@@ -45,12 +48,32 @@ def get_report(report):
     return jsonify(results), 200
 
 
-# @blueprint.route('/reports/export/<report>', methods=['GET'])
-# @account_manager_only
-# def export_reports(report):
-    # func = reports.get(report)
+@blueprint.route('/reports/export/<report>', methods=['GET'])
+@account_manager_only
+def export_reports(report):
+    func = reports.get(report)
 
-    # if not func:
-    # abort(400, gettext('Unknown report {}'.format(report)))
+    if not func:
+        abort(400, gettext('Unknown report {}'.format(report)))
 
-    # return func(), 200
+    rows = func()
+    data = StringIO()
+    writer = csv.writer(data, dialect='excel')
+
+    for row in rows:
+        writer.writerow(row)
+
+    csv_file = data.getvalue().encode('utf-8')
+
+    response = newsroom_app.response_class(
+        response=csv_file,
+        status=200,
+        mimetype='text/csv',
+        direct_passthrough=True
+    )
+
+    response.content_length = len(csv_file)
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = 'attachment; filename="report-export.csv"'
+
+    return response

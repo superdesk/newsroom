@@ -89,6 +89,12 @@ export default function companyReportReducer(state = initialState, action) {
             isLoading: action.data
         };
 
+    case 'RECEIVE_REPORT_AGGREGATIONS':
+        return {
+            ...state,
+            reportAggregations: action.data,
+        };
+
     default:
         return state;
     }
