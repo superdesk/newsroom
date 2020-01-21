@@ -16,6 +16,7 @@ const initialState = {
     isLoading: false,
     activeReport: null,
     results: [],
+    resultHeaders: [],
     aggregations: null,
     companies: [],
     sections: [],
@@ -62,7 +63,8 @@ export default function companyReportReducer(state = initialState, action) {
             ...state,
             results: get(action, 'data.results'),
             isLoading: false,
-            aggregations: get(action, 'data.aggregations', null)
+            aggregations: get(action, 'data.aggregations', null),
+            resultHeaders: get(action, 'data.result_headers', []),
         };
     }
 

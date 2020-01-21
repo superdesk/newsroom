@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from copy import deepcopy
 from newsroom.agenda.agenda import get_date_filters
 from flask import abort
-from newsroom.utils import query_resource, get_entity_dict, get_items_by_id, get_entity_or_404
+from newsroom.utils import query_resource, get_entity_dict, get_items_by_id
 from .content_activity import get_content_activity_report  # noqa
 from eve.utils import ParsedRequest
 from newsroom.news_api.api_tokens import API_TOKENS
@@ -280,30 +280,49 @@ def get_company_api_usage():
     if not date_range.get('gt') and date_range.get('lt'):
         abort(400, 'No date range specified.')
 
+    source = {}
     must_terms = [{"range": {"created": date_range}}]
-    source = {'sort': [{'created': 'desc'}]}
+    source['query'] = {'bool': {'must': must_terms}}
+    source['sort'] = [{'created': 'desc'}]
     source['size'] = 200
     source['from'] = int(args.get('from', 0))
-    source['aggs'] = {'endpoints': {'terms': {'field': 'endpoint'}}}
+    source['aggs'] = {"items": {
+      "aggs": {
+        "companies": {
+          "terms": {
+            "size": 0,
+            "field": "subscriber"
+          }
+        },
+        "endpoints": {
+          "terms": {
+            "size": 0,
+            "field": "endpoint"
+          }
+        }
+      },
+      "terms": {
+        "size": 0,
+        "field": "subscriber"
+      }
+    }}
+    company_ids = [t['company'] for t in query_resource(API_TOKENS)]
+    source['query']['bool']['must'].append({"terms": {"subscriber": company_ids}})
+    companies = get_entity_dict(query_resource('companies', lookup={'_id': {'$in': company_ids}}), str_id=True)
+    req = ParsedRequest()
+    req.args = {'source': json.dumps(source)}
 
     if source['from'] >= 1000:
         # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
         return abort(400)
 
-    results = {}
-    companies = [t['company'] for t in query_resource(API_TOKENS)]
-    for c in companies:
-        company = get_entity_or_404(c, 'companies')
-        source['query'] = {'bool': {'must': must_terms[:]}}
-        source['query']['bool']['must'].append({"term": {"subscriber": str(c)}})
-        req = ParsedRequest()
-        req.args = {'source': json.dumps(source)}
-
-        search_result = superdesk.get_resource_service('api_audit').get(req, None)
-        results[company['name']] = format_report_results(search_result)
+    unique_endpoints = []
+    search_result = superdesk.get_resource_service('api_audit').get(req, None)
+    results = format_report_results(search_result, unique_endpoints, companies)
 
     results = {
         'results': results,
         'name': gettext('Company News API Usage'),
+        'result_headers': unique_endpoints,
     }
     return results

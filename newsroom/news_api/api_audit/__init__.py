@@ -15,7 +15,10 @@ class NewsApiAuditResource(newsroom.Resource):
         'items_id': not_analyzed,
         'version': not_analyzed,
         'remote_addr': not_analyzed,
-        'endpoint': not_analyzed,
+        'endpoint': {
+            'type': 'string',
+            'mapping': not_analyzed
+        },
     }
     schema.update({'items_id': {
             'type': 'list',

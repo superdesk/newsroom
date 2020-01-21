@@ -96,6 +96,7 @@ const mapStateToProps = (state) => ({
     apiEnabled: state.apiEnabled,
     reportParams: state.reportParams,
     isLoading: state.isLoading,
+    resultHeaders: state.resultHeaders
 });
 
 const mapDispatchToProps = {

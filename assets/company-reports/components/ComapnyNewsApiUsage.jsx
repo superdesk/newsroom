@@ -26,7 +26,7 @@ class ComapnyNewsApiUsage extends React.Component {
         }
     }
 
-    onScroll() {
+    onScroll(event) {
         if (this.props.isLoading) {
             return;
         }
@@ -55,16 +55,15 @@ class ComapnyNewsApiUsage extends React.Component {
     }
 
     render() {
-        const {results, print, reportParams} = this.props;
+        const {results, print, reportParams, resultHeaders} = this.props;
         let list = [];
         Object.keys(results).forEach((company) => {
-            Object.keys(results[company]).forEach((endpoint_name) => {
-                list.push((<tr key={company+endpoint_name}>
-                    <td>{company}</td>
-                    <td>{endpoint_name}</td>
-                    <td>{results[company][endpoint_name]}</td>
-                </tr>));
-            });
+            const rowColums = [
+                (<td key={'name-' + company}>{company}</td>),
+                ...resultHeaders.map((headerName, index) => 
+                    (<td key={index}>{get(results[company], headerName, 0)}</td>))
+            ];
+            list.push((<tr key={company}>{rowColums}</tr>));
         });
 
         if (!list.length) {
@@ -75,7 +74,7 @@ class ComapnyNewsApiUsage extends React.Component {
             </tr>)];
         }
 
-        const headers = [gettext('Company'), gettext('Endpoint'), gettext('Total Number Of Requests')];
+        const headers = [gettext('Company'), ...(resultHeaders)];
         const filterNodes = [
             (<CalendarButton
                 key='news_api_from'
@@ -109,6 +108,7 @@ ComapnyNewsApiUsage.propTypes = {
     fetchReport: PropTypes.func,
     runReport: PropTypes.func,
     toggleFilterAndQuery: PropTypes.func,
+    resultHeaders: PropTypes.array,
 
 };
 
