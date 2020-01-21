@@ -288,12 +288,6 @@ def get_company_api_usage():
     source['from'] = int(args.get('from', 0))
     source['aggs'] = {"items": {
       "aggs": {
-        "companies": {
-          "terms": {
-            "size": 0,
-            "field": "subscriber"
-          }
-        },
         "endpoints": {
           "terms": {
             "size": 0,

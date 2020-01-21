@@ -2,6 +2,11 @@ from superdesk import register_resource
 import newsroom
 from superdesk.resource import not_analyzed
 
+not_analayzed_mapping = {
+    'type': 'string',
+    'mapping': not_analyzed
+}
+
 
 class NewsApiAuditService(newsroom.Service):
     pass
@@ -9,16 +14,12 @@ class NewsApiAuditService(newsroom.Service):
 
 class NewsApiAuditResource(newsroom.Resource):
     schema = {
-        'type': not_analyzed,
-        'subscriber': not_analyzed,
-        'uri': not_analyzed,
-        'items_id': not_analyzed,
-        'version': not_analyzed,
-        'remote_addr': not_analyzed,
-        'endpoint': {
-            'type': 'string',
-            'mapping': not_analyzed
-        },
+        'type': not_analayzed_mapping,
+        'subscriber': not_analayzed_mapping,
+        'uri': not_analayzed_mapping,
+        'version': not_analayzed_mapping,
+        'remote_addr': not_analayzed_mapping,
+        'endpoint': not_analayzed_mapping,
     }
     schema.update({'items_id': {
             'type': 'list',
