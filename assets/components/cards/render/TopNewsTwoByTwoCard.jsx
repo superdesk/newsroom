@@ -29,7 +29,7 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
                     slugline={getSlugline(item, true)}
                 />
                 <div className='wire-articles__item__text'>
-                    <p className='card-text'>{item.description_text}</p>
+                    <p className='card-text'>{getTextFromHtml(item.body_html)}</p>
                 </div>
             </div>
         </div>

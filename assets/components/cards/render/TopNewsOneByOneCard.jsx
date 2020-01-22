@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { wordCount } from 'utils';
+import {getTextFromHtml, wordCount} from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import CardRow from './CardRow';
 import CardMeta from './CardMeta';
 
 const getTopNewsPanel = (item, picture, openItem, cardId) => {
-    
+
     const rendition = getThumbnailRendition(picture, true);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
@@ -24,7 +24,7 @@ const getTopNewsPanel = (item, picture, openItem, cardId) => {
                     displayDivider={false}
                 />
                 <div className='wire-articles__item__text'>
-                    <p className='card-text small'>{item.description_text}</p>
+                    <p className='card-text small'>{getTextFromHtml(item.body_html)}</p>
                 </div>
             </div>
         </div>
