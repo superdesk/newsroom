@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getTextFromHtml, wordCount} from 'utils';
+import {wordCount} from 'utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
-import {getPicture} from 'wire/utils';
+import {getPicture, shortText} from 'wire/utils';
 
 const getTextOnlyPanel = (item, openItem, picture, cardId) => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
@@ -11,7 +11,7 @@ const getTextOnlyPanel = (item, openItem, picture, cardId) => (
             <div className='card-body'>
                 <h4 className='card-title'>{item.headline}</h4>
                 <div className='wire-articles__item__text'>
-                    <p className='card-text small'>{getTextFromHtml(item.body_html)}</p>
+                    <p className='card-text small'>{shortText(item, 40, true)}</p>
                 </div>
             </div>
             <CardFooter
