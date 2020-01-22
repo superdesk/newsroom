@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { wordCount } from 'utils';
+import { wordCount, getTextFromHtml } from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
@@ -29,7 +29,7 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
                     slugline={item.slugline}
                 />
                 <div className='wire-articles__item__text'>
-                    <p className='card-text'>{item.description_text}</p>
+                    <p className='card-text'>{getTextFromHtml(item.body_html)}</p>
                 </div>
             </div>
         </div>

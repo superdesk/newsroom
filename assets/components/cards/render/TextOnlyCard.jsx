@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { wordCount } from 'utils';
+import {getTextFromHtml, wordCount} from 'utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
 import {getPicture} from 'wire/utils';
@@ -11,7 +11,7 @@ const getTextOnlyPanel = (item, openItem, picture, cardId) => (
             <div className='card-body'>
                 <h4 className='card-title'>{item.headline}</h4>
                 <div className='wire-articles__item__text'>
-                    <p className='card-text small'>{item.description_text}</p>
+                    <p className='card-text small'>{getTextFromHtml(item.body_html)}</p>
                 </div>
             </div>
             <CardFooter

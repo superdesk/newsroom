@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { shortDate } from 'utils';
+import { shortDate, getTextFromHtml } from 'utils';
 
 
 function CardBody({item, displayMeta, displayDescription, displaySource}) {
@@ -8,7 +8,7 @@ function CardBody({item, displayMeta, displayDescription, displaySource}) {
         <h4 className="card-title">{item.headline}</h4>
 
         {displayDescription && <div className="wire-articles__item__text">
-            <p className='card-text small'>{item.description_text}</p>
+            <p className='card-text small'>{getTextFromHtml(item.body_html)}</p>
         </div>}
 
         {displayMeta && (
