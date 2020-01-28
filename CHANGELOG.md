@@ -1,6 +1,6 @@
 # Newsroom Changelog
 
-## [1.17.1-rc1] Not released yet
+## [1.17.1] 2020-01-29
 ### Features
 - [SDAN-632] ContentActivity report (#954)
 
