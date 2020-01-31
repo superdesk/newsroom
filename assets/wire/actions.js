@@ -18,6 +18,7 @@ import {
 import {getNavigationUrlParam} from 'search/utils';
 
 import {searchParamsSelector} from 'search/selectors';
+import {context} from 'selectors';
 
 import {markItemAsRead, toggleNewsOnlyParam} from 'local-store';
 import {renderModal, closeModal, setSavedItemsCount} from 'actions';
@@ -189,7 +190,13 @@ export function copyPreviewContents(item) {
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        window.open(`/${getState().context}/${item._id}?print`, '_blank');
+        const userContext = context(getState());
+        let uri = `/${userContext}/${item._id}?print`;
+        if (userContext === 'monitoring') {
+            const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
+            uri = `${uri}=true&monitoring_profile=${monitoringProfile}&type=monitoring`;
+        }
+        window.open(uri, '_blank');
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
@@ -403,25 +410,19 @@ export function downloadItems(items) {
  */
 export function submitDownloadItems(items, format) {
     return (dispatch, getState) => {
-        window.open(`/download/${items.join(',')}?format=${format}&type=${getState().context}`, '_blank');
+        const userContext = context(getState());
+        let uri = `/download/${items.join(',')}?format=${format}&type=${userContext}`;
+        if (userContext === 'monitoring') {
+            const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
+            uri = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
+        }
+        window.open(uri, '_blank');
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
         analytics.multiItemEvent('download', items.map((_id) => getState().itemsById[_id]));
     };
 }
 
-/**
- * Start export - open export view in new window.
- *
- * @param {Array} items
- */
-export function submitExportItems(items) {
-    return (dispatch, getState) => {
-        window.open(`/monitoring/export/${items.join(',')}`, '_blank');
-        dispatch(setExportItems(items));
-        analytics.multiItemEvent('export', items.map((_id) => getState().itemsById[_id]));
-    };
-}
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
 export function removeNewItems(data) {
