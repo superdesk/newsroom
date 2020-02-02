@@ -55,6 +55,7 @@ def init(app):
         "description": "D3",
         "alert_type": "full_text",
         "query": "headline: (product)",
+        "format_type": "monitoring_pdf",
         "schedule": {
             "interval": "immediate"
         }}])
@@ -179,7 +180,7 @@ def test_send_immediate_alerts(client, app):
         '_id': 'foo',
         'headline': 'product immediate',
         'products': [{'code': '12345'}],
-        "versioncreated": utcnow()
+        "versioncreated": utcnow(),
     }])
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run(True)
@@ -187,7 +188,8 @@ def test_send_immediate_alerts(client, app):
         assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Immediate'
-        assert 'product immediate' in outbox[0].body
+        assert 'Newsroom Monitoring: W1' in outbox[0].body
+        assert 'monitoring-export.pdf' in outbox[0].attachments[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -215,8 +217,8 @@ def test_send_two_hour_alerts(client, app):
         assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Immediate'
-        assert 'product last hour' in outbox[0].body
-        assert 'product yesterday' not in outbox[0].body
+        assert 'Newsroom Monitoring: W1' in outbox[0].body
+        assert 'monitoring-export.pdf' in outbox[0].attachments[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -244,8 +246,8 @@ def test_send_four_hour_alerts(client, app):
         assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Immediate'
-        assert 'product three hours' in outbox[0].body
-        assert 'product yesterday' not in outbox[0].body
+        assert 'Newsroom Monitoring: W1' in outbox[0].body
+        assert 'monitoring-export.pdf' in outbox[0].attachments[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -286,9 +288,8 @@ def test_send_daily_alerts(client, app):
         assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Immediate'
-        assert 'product three hours' in outbox[0].body
-        assert 'product yesterday' in outbox[0].body
-        assert 'product four days' not in outbox[0].body
+        assert 'Newsroom Monitoring: W1' in outbox[0].body
+        assert 'monitoring-export.pdf' in outbox[0].attachments[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -330,9 +331,8 @@ def test_send_weekly_alerts(client, app):
         assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Immediate'
-        assert 'product three hours' in outbox[0].body
-        assert 'product yesterday' in outbox[0].body
-        assert 'product four days' in outbox[0].body
+        assert 'Newsroom Monitoring: W1' in outbox[0].body
+        assert 'monitoring-export.pdf' in outbox[0].attachments[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -360,8 +360,8 @@ def test_send_alerts_respects_last_run_time(client, app):
         assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Immediate'
-        assert 'product last hour' in outbox[0].body
-        assert 'product yesterday' not in outbox[0].body
+        assert 'Newsroom Monitoring: W1' in outbox[0].body
+        assert 'monitoring-export.pdf' in outbox[0].attachments[0]
 
     with app.mail.record_messages() as newoutbox:
         w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
