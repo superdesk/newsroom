@@ -10,6 +10,7 @@ export const REPORTS_NAMES = {
     'COMPANY': 'company',
     'SUBSCRIBER_ACTIVITY': 'subscriber-activity',
     'CONTENT_ACTIVITY': 'content-activity',
+    'COMPANY_NEWS_API_USAGE': 'company-news-api-usage',
 };
 
 
@@ -21,7 +22,7 @@ export const REPORTS = {
     [REPORTS_NAMES.COMPANY]: '/reports/company',
     [REPORTS_NAMES.SUBSCRIBER_ACTIVITY]: '/reports/subscriber-activity',
     [REPORTS_NAMES.CONTENT_ACTIVITY]: '/reports/content-activity',
-
+    [REPORTS_NAMES.COMPANY_NEWS_API_USAGE]: '/reports/company-news-api-usage',
 };
 
 function getReportQueryString(currentState, next, exportReport, notify) {

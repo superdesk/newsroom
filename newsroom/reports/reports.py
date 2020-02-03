@@ -3,7 +3,7 @@ from collections import defaultdict
 import superdesk
 from bson import ObjectId
 from flask_babel import gettext
-from flask import request, send_file, current_app as newsroom_app
+from flask import request, send_file, current_app as newsroom_app, json
 import io
 import csv
 from superdesk.utc import utcnow
@@ -13,6 +13,9 @@ from newsroom.agenda.agenda import get_date_filters
 from flask import abort
 from newsroom.utils import query_resource, get_entity_dict, get_items_by_id
 from .content_activity import get_content_activity_report  # noqa
+from eve.utils import ParsedRequest
+from newsroom.news_api.api_tokens import API_TOKENS
+from newsroom.news_api.utils import format_report_results
 
 
 def get_company_saved_searches():
@@ -268,3 +271,52 @@ def get_subscriber_activity_report():
         temp_file.close()
         attachment_filename = secure_filename(attachment_filename)
         return send_file(mem, mimetype=mimetype, attachment_filename=attachment_filename, as_attachment=True)
+
+
+def get_company_api_usage():
+    args = deepcopy(request.args.to_dict())
+    date_range = get_date_filters(args)
+
+    if not date_range.get('gt') and date_range.get('lt'):
+        abort(400, 'No date range specified.')
+
+    source = {}
+    must_terms = [{"range": {"created": date_range}}]
+    source['query'] = {'bool': {'must': must_terms}}
+    source['sort'] = [{'created': 'desc'}]
+    source['size'] = 200
+    source['from'] = int(args.get('from', 0))
+    source['aggs'] = {"items": {
+      "aggs": {
+        "endpoints": {
+          "terms": {
+            "size": 0,
+            "field": "endpoint"
+          }
+        }
+      },
+      "terms": {
+        "size": 0,
+        "field": "subscriber"
+      }
+    }}
+    company_ids = [t['company'] for t in query_resource(API_TOKENS)]
+    source['query']['bool']['must'].append({"terms": {"subscriber": company_ids}})
+    companies = get_entity_dict(query_resource('companies', lookup={'_id': {'$in': company_ids}}), str_id=True)
+    req = ParsedRequest()
+    req.args = {'source': json.dumps(source)}
+
+    if source['from'] >= 1000:
+        # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
+        return abort(400)
+
+    unique_endpoints = []
+    search_result = superdesk.get_resource_service('api_audit').get(req, None)
+    results = format_report_results(search_result, unique_endpoints, companies)
+
+    results = {
+        'results': results,
+        'name': gettext('Company News API Usage'),
+        'result_headers': unique_endpoints,
+    }
+    return results
