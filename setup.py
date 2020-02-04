@@ -15,6 +15,8 @@ install_requires = [
     'gunicorn>=19.7.1',
     'superdesk-core>=1.31.1,<=1.32',
     'icalendar>=4.0.3,<4.1',
+    'PyRTF3>=0.47.5',
+    'xhtml2pdf>=0.2.4',
 ]
 
 setup(
