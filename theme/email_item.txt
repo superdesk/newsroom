@@ -1,0 +1,8 @@
+{{ item.headline }}
+
+{% if item.body_txt %}{{ item.body_txt }}{% elif item.body_html %}{{ item.body_html | plain_text }}{% endif %}
+
+{% if item.headline %}Otsikko: {{ item.headline }}{% endif %}
+{% if item.service %}Kategoria: {{ item.service.0.name }}{% endif %}
+Julkaistu: {{ item.versioncreated | datetime_long }}
+Linkki: {{ url_for_wire(item, True, section) }}

@@ -1,0 +1,21 @@
+Hei {{app_name}}-ylläpitäjä,
+
+Uusi käyttäjä on kiinnostunut Mediapankista:
+
+
+Etusivu:     {{user.first_name}}
+Sukunimi:      {{user.last_name}}
+Sähköposti:          {{user.email}}
+Puhelin:      {{user.phone}}
+Maa:        {{user.country}}
+Yhtiö:        {{user.company}}
+Rooli:     {{user.occupation}}
+Yhtiön koko:   {{user.company_size}}
+
+
+Siirry osoitteeseen {{url}} luodaksesi uuden käyttäjän.
+
+
+Terveisin,
+{{app_name}}
+
