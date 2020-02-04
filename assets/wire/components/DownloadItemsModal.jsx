@@ -15,7 +15,7 @@ class DownloadItemsModal extends React.Component {
         super(props);
         this.state = {
             items: props.data.items,
-            format: props.context === 'monitoring' ? 'monitoring' : 'text',
+            format: props.context === 'monitoring' ? 'monitoring_pdf' : 'text',
         };
 
         this.onSubmit = this.onSubmit.bind(this);

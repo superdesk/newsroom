@@ -49,7 +49,8 @@ class MonitoringResource(newsroom.Resource):
         },
         'last_run_time': {'type': 'datetime'},
         'original_creator': newsroom.Resource.rel('users'),
-        'version_creator': newsroom.Resource.rel('users')
+        'version_creator': newsroom.Resource.rel('users'),
+        'format_type': {'type': 'string'},
     }
     datasource = {
         'source': 'monitoring',

@@ -167,6 +167,17 @@ class EditMonitoringProfile extends React.Component {
                                         onChange={onChange}
                                         error={getError('alert_type')} />
 
+                                    <SelectInput
+                                        name='format_type'
+                                        label={gettext('Format type')}
+                                        value={item.format_type || 'monitoring_pdf'}
+                                        options={[
+                                            {value: 'monitoring_pdf', text: 'PDF'},
+                                            {value: 'monitoring_rtf', text: 'RTF'}
+                                        ]}
+                                        onChange={onChange}
+                                        error={getError('format_type')} />
+
                                     <CheckboxInput
                                         name='is_enabled'
                                         label={gettext('Enabled')}

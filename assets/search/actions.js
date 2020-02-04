@@ -20,6 +20,8 @@ import {
     activeTopicSelector,
 } from './selectors';
 
+import {context} from 'selectors';
+
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query) {
     return function(dispatch, getState) {
@@ -256,12 +258,19 @@ export function submitFollowTopic(data) {
  */
 export function submitShareItem(data) {
     return (dispatch, getState) => {
-        const type = getState().context || data.items[0].topic_type;
+        const userContext = context(getState());
+        const type = userContext || data.items[0].topic_type;
         data.maps = [];
+        let url = 'wire_share';
+        if (userContext === 'monitoring') {
+            url = 'monitoring/share';
+            data.monitoring_profile = get(getState(), 'search.activeNavigation[0]');
+        }
+        
         if (type === 'agenda') {
             data.items.map((_id) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
         }
-        return server.post(`/wire_share?type=${getState().context || data.items[0].topic_type}`, data)
+        return server.post(`/${url}?type=${type}`, data)
             .then(() => {
                 dispatch(closeModal());
                 dispatch(setShareItems(data.items));
