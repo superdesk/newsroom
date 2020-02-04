@@ -5,8 +5,6 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
-from newsroom import company_expiry_alerts  # noqa
-from newsroom.monitoring import email_alerts  # noqa
 
 from superdesk.default_settings import (   # noqa
     VERSION,
