@@ -1,0 +1,12 @@
+{% block name %}{% if name %}{{ name }},{% endif %}{% endblock %}
+{% block content %}{% endblock %}
+
+{% block footer %}
+Terveisin,
+STT
+Tämä on automaattisesti luotu viesti. Ethän vastaa tähän sähköpostiosoitteeseen. Löydät yhteystietomme täältä: https://stt.fi/yhteystiedot/
+
+{{app_name}} on Suomen Tietotoimiston ylläpitämä palvelu. Palvelun on kehittänyt Sourcefabric.
+https://stt.fi/
+http://sourcefabric.org
+{% endblock %}

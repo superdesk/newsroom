@@ -1,0 +1,14 @@
+{% block name %}{% if name %}<p>{{ name }},</p>
+
+{% endif %}{% endblock %}
+{% block content %}{% endblock %}
+
+{% block footer %}
+<p>Terveisin,</p>
+<p>STT</p>
+
+<p>Tämä on automaattisesti luotu viesti. Ethän vastaa tähän sähköpostiosoitteeseen. Löydät yhteystietomme täältä: https://stt.fi/yhteystiedot/</p>
+<p>{{app_name}} on Suomen Tietotoimiston ylläpitämä palvelu. Palvelun on kehittänyt Sourcefabric.</p>
+<p>https://stt.fi/</p>
+<p>http://sourcefabric.org</p>
+{% endblock %}

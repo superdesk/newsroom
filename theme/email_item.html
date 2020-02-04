@@ -1,0 +1,10 @@
+<h1>{{ item.headline }}</h1>
+
+{% if item.body_html %}{{ item.body_html | safe }}{% elif item.body_txt %}<pre>{{ item.body_txt }}</pre>{% endif %}
+
+<dl>
+{% if item.headline %}<dt>Otsikko:</dt><dd>{{ item.headline }}</dd>{% endif %}
+{% if item.service %}<dt>Kategoria:</dt><dd>{{ item.service.0.name }}</dd>{% endif %}
+<dt>Julkaistu:</dt><dd>{{ item.versioncreated | datetime_long }}</dd>
+<dt>Linkki:</dt><dd><a href="{{ url_for_wire(item, True, section) }}">{{ url_for_wire(item, True, section) }}</a></dd>
+</dl>
