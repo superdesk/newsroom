@@ -1,0 +1,7 @@
+<h3>Seuraavien asiakkaiden sopimukset vanhenevat viikon kuluessa: (before {{expiry_date.strftime('%Y-%m-%d')}}):</h3>
+
+<ul>
+    {% for company in companies %}
+        <h3><pre>&nbsp;{{ company.get('name') }} (Email: {{ company.contact_email if company.contact_email else '-'}}), Tel: ({{ company.phone if company.phone else '-' }}) expiring on {{ company.expiry_date.strftime('%Y-%m-%d')}}</pre></h3>
+    {% endfor %}
+</ul>

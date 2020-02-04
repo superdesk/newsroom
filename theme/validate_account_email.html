@@ -1,0 +1,8 @@
+{% extends "email_layout.html" %}
+
+{% block content %}
+<p>Sinulle on luotu käyttäjätunnus {{app_name}}-palveluun.</p>
+<p>Ole hyvä klikkaa linkkiä aktivoidaksesi tunnuksesi: <a href="{{url}}">{{url}}</a></p>
+<p>Linkki vanhenee {{expires}} tunnissa.</p>
+<p>Jos luulet, että {{app_name}}-tili on luotu erheellisesti, jätä tämä viesti huomiotta.</p>
+{% endblock %}
