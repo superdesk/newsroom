@@ -21,6 +21,7 @@ import datetime
 import logging
 from bson import ObjectId
 from eve.utils import ParsedRequest
+from .utils import get_monitoring_file_attachment, truncate_article_body
 
 logger = logging.getLogger(__name__)
 
@@ -177,12 +178,24 @@ class MonitoringEmailAlerts(Command):
                         template_kwargs = {
                             'items': items,
                             'section': 'wire',
+                            'profile': m,
                         }
+                        truncate_article_body(items, m)
+                        file_path = get_monitoring_file_attachment(m, items, as_temp_file=True)
+                        formatter = app.download_formatters[m['format_type']]['formatter']
+
                         send_email(
                             [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
                             m.get('subject') or m['name'],
                             text_body=render_template('monitoring_email.txt', **template_kwargs),
                             html_body=render_template('monitoring_email.html', **template_kwargs),
+                            attachments_info=[{
+                                'file_path': file_path,
+                                'file_name': formatter.format_filename(None),
+                                'content_type': 'application/{}'.format(formatter.FILE_EXTENSION),
+                                'file_desc': 'Monitoring Report for Celery monitoring alerts for profile: {}'.format(
+                                        m['name'])
+                            }]
                         )
                     except Exception:
                         logger.exception('{0} Error processing monitoring profile {1} for company {2}.'.format(

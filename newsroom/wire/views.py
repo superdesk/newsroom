@@ -340,16 +340,22 @@ def item(_id):
     if not item.get('_access'):
         return flask.render_template('wire_item_access_restricted.html', item=item)
     previous_versions = get_previous_versions(item)
+    template = 'wire_item.html'
+    data = {'item': item}
     if 'print' in flask.request.args:
-        template = 'wire_item_print.html'
+        if flask.request.args.get('monitoring_profile'):
+            data.update(flask.request.view_args)
+            template = 'monitoring_export.html'
+        else:
+            template = 'wire_item_print.html'
+
         update_action_list([_id], 'prints', force_insert=True)
         get_resource_service('history').create_history_record([item], 'print', get_user(),
                                                               request.args.get('type', 'wire'))
-    else:
-        template = 'wire_item.html'
+
     return flask.render_template(
         template,
-        item=item,
+        **data,
         previous_versions=previous_versions,
         display_char_count=display_char_count)
 

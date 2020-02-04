@@ -1,5 +1,7 @@
 httmock
 wooper
+PyRTF3
+xhtml2pdf
 -e .
 git+git://github.com/superdesk/superdesk-planning.git@master#egg=superdesk-planning
 git+git://github.com/superdesk/superdesk-core.git@master#egg=superdesk-core

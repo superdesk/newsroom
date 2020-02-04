@@ -3,7 +3,9 @@ from flask_babel import gettext
 import superdesk
 from .monitoring import MonitoringResource, MonitoringService
 from .search import MonitoringSearchResource, MonitoringSearchService
-from .formatter import MonitoringFormatter
+from .formatters.pdf_formatter import MonitoringPDFFormatter
+from .formatters.rtf_formatter import MonitoringRTFFormatter
+from .utils import get_keywords_in_text
 
 blueprint = Blueprint('monitoring', __name__)
 
@@ -18,9 +20,12 @@ def init_app(app):
     app.sidenav(gettext('Saved/Watched Items'), 'monitoring.bookmarks', 'bookmark',
                 group=1, blueprint='monitoring', badge='saved-items-count')
 
-    app.download_formatter('monitoring', MonitoringFormatter(), gettext('Monitoring Format'), ['monitoring'])
+    app.download_formatter('monitoring_pdf', MonitoringPDFFormatter(), gettext('PDF'), ['monitoring'])
+    app.download_formatter('monitoring_rtf', MonitoringRTFFormatter(), gettext('RTF'), ['monitoring'])
 
     superdesk.register_resource('monitoring_search',
                                 MonitoringSearchResource,
                                 MonitoringSearchService,
                                 _app=app)
+
+    app.add_template_global(get_keywords_in_text, 'get_keywords_in_text')
