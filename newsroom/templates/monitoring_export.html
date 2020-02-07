@@ -1,4 +1,4 @@
-<h1>{{ monitoring_report_name }} Monitoring Profile: {{ monitoring_profile.name }} {% if current_date %}({{ current_date }}){% endif %}</h1>
+<h1>{{ monitoring_report_name }} Monitoring: {{ monitoring_profile.name }} {% if current_date %}({{ current_date }}){% endif %}</h1>
     {% for d in date_items_dict.keys() %}
         {% if not print %}<h3>{{ d.strftime('%d/%m/%Y') }}</h3>{% endif %}
         {% for item in date_items_dict[d]  %}

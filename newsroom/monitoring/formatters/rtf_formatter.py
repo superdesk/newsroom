@@ -49,8 +49,8 @@ class MonitoringRTFFormatter(BaseFormatter):
         section = Section()
         ss = doc.StyleSheet
         p1 = Paragraph(ss.ParagraphStyles.Heading1)
-        p1.append('{} Monitoring Profile: {} ({})'.format(app.config.get('MONITORING_REPORT_NAME', 'Newsroom'),
-                                                          monitoring_profile['name'], current_date))
+        p1.append('{} Monitoring: {} ({})'.format(app.config.get('MONITORING_REPORT_NAME', 'Newsroom'),
+                                                  monitoring_profile['name'], current_date))
         section.append(p1)
 
         for d in date_items_dict.keys():
@@ -61,5 +61,7 @@ class MonitoringRTFFormatter(BaseFormatter):
                 self.format_item(item, ss, monitoring_profile, section)
 
         doc.Sections.append(section)
+        app.customize_rtf_file(doc)
+
         doc.write(_file.name)
         return _file
