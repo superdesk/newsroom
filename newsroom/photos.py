@@ -18,6 +18,11 @@ def get_media_cards_external(card):
     pass
 
 
+def customize_rtf_file(rtf_document):
+    pass
+
+
 def init_app(app):
     app.set_photo_coverage_href = set_photo_coverage_href
     app.get_media_cards_external = get_media_cards_external
+    app.customize_rtf_file = customize_rtf_file

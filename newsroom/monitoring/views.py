@@ -22,6 +22,7 @@ from newsroom.monitoring.utils import get_date_items_dict, get_monitoring_file_a
     get_items_for_monitoring_report
 from superdesk.logging import logger
 from newsroom.email import send_email
+import os
 
 
 def get_view_data():
@@ -193,20 +194,24 @@ def export(_ids):
 
     if len(items) > 0:
         try:
-            date_items_dict = get_date_items_dict(items)
-            _file = formatter.get_monitoring_file(date_items_dict, monitoring_profile)
+            monitoring_profile['format_type'] = _format
+            file_path = get_monitoring_file_attachment(monitoring_profile, items, as_temp_file=True)
         except Exception as e:
             logger.exception(e)
             return jsonify({'message': 'Error exporting items to file'}), 400
 
-        if _file:
+        if file_path:
             update_action_list(_ids.split(','), 'export', force_insert=True)
             get_resource_service('history').create_history_record(items, 'export', user, 'monitoring')
 
-            return send_file(_file,
-                             mimetype=formatter.get_mimetype(None),
-                             attachment_filename=formatter.format_filename(None),
-                             as_attachment=True)
+            rv = send_file(file_path, mimetype=formatter.get_mimetype(None),
+                           attachment_filename=formatter.format_filename(None), as_attachment=True)
+
+            fp = open(file_path, "rb")
+            if fp:
+                fp.close()
+                os.remove(file_path)
+            return rv
 
     return jsonify({'message': 'No files to export.'}), 400
 
