@@ -1,5 +1,6 @@
 
 from planning.output_formatters.json_event import JsonEventFormatter
+from planning.output_formatters.utils import expand_contact_info
 from copy import deepcopy
 from flask import json
 from .base import BaseFormatter
@@ -37,7 +38,7 @@ class JsonFormatter(BaseFormatter):
             raise Exception('Undefined format for wire')
 
         output_item = deepcopy(item)
-        output_item['event_contact_info'] = self.formatter._expand_contact_info(item)
+        output_item['event_contact_info'] = expand_contact_info(item.get('event_contact_info', []))
 
         self.format_coverages(output_item)
 
