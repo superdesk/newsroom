@@ -31,4 +31,4 @@ def init_app(app):
                                 _app=app)
 
     app.add_template_global(get_keywords_in_text, 'get_keywords_in_text')
-    app.add_template_global(app.static_folder, 'monitoring_image_path')
+    app.add_template_global(app.theme_folder, 'monitoring_image_path')
