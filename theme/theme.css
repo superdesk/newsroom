@@ -1,0 +1,240 @@
+/* CP theme custom css */
+
+/* Fonts */
+body,
+.wire-articles__item__text,
+.wire-column__preview__text {
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+}
+.wire-articles__item-headline,
+.wire-column__preview__headline,
+.wire-column__preview__lead,
+.wire-articles__versions__headline,
+.wire-column__preview__versions__headline,
+h1.card-title, 
+h2.card-title, 
+h3.card-title, 
+h4.card-title, 
+h5.card-title,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Titilium Web', sans-serif;
+}
+h3.home-section-heading,
+.simple-card__headline {
+    color: #333;
+}
+a, 
+.card a.btn-outline-primary,
+.btn-outline-primary,
+.icon-button:hover,
+.wire-articles__item__versions-btn,
+.btn-outline-primary.disabled,
+.btn-outline-primary:disabled {
+    color: #CC0000;
+    border-color: #CC0000;
+}
+a:hover {
+    color: #a50606;
+}
+.btn-primary, 
+.card a.btn-outline-primary:hover,
+.btn-outline-primary:hover,
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+    background-color: #CC0000;
+    border-color: #CC0000;
+    color: white !important;
+}
+.btn-primary:hover {
+    background-color: #a50606;
+    border-color: #a50606;
+}
+.btn-primary:focus,
+.btn-primary.focus,
+.btn-outline-primary:focus,
+.btn-outline-primary.focus {
+    box-shadow: 0 0 0 2px rgba(236, 0, 0, 0.3);
+}
+.btn-outline-secondary {
+    color: #aba6a6;
+    border-color: #868080;
+}
+.btn-outline-secondary:hover {
+    background-color: #868080;
+    border-color: #868080;
+}
+.btn-outline-primary:not([disabled]):not(.disabled):active,
+.btn-outline-primary:not([disabled]):not(.disabled).active,
+.show > .btn-outline-primary.dropdown-toggle {
+    color: #fff;
+    background-color: #CC0000;
+    border-color: #CC0000;
+}
+.btn-primary:not(:disabled):not(.disabled):active:focus,
+.btn-primary:not(:disabled):not(.disabled).active:focus,
+.btn-outline-primary:not(:disabled):not(.disabled):active:focus,
+.btn-outline-primary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-primary.dropdown-toggle:focus,
+.btn-outline-primary:not([disabled]):not(.disabled):active,
+.show > .btn-outline-primary.dropdown-toggle {
+    box-shadow: 0 0 0 0.2rem rgba(236, 0, 0, 0.4);
+}
+.icon-button:focus {
+    box-shadow: 0 0 0 2px rgba(236, 0, 0, 0.3);
+}
+.form-control:focus {
+    border-color: #CC0000;
+}
+.content-bar__menu--nav--open {
+    background: #737373;
+}
+.sidenav,
+.profile-side-navigation {
+    background-color: #423d3d;
+}
+.sidenav-icons .active i,
+.wire-articles__item__meta-info .blue-text,
+.no-touch .dropdown-item:hover [class^="icon--"],
+.no-touch .dropdown-item:hover [class*=" icon--"],
+.no-touch .dropdown-item:focus [class^="icon--"],
+.no-touch .dropdown-item:focus [class*=" icon--"],
+.side-navigation__btn.active {
+    color: #CC0000 !important;
+}
+.wire-column__nav {
+    background: #504949;
+}
+.wire-articles__item--open,
+.table-hover tbody tr.table--selected {
+    outline: 1px solid #CC0000;
+}
+.navbar.main { 
+    background-color: #262424;
+}
+.navbar__logo {
+    max-width: 50%;
+    padding: .8rem 1rem .8rem 1rem;
+}
+.navbar__logo a, 
+.navbar__logo img {
+    height: 100%;
+    max-height: 100%;
+}
+.navbar-brand span.breadcrumb-item {
+    font-size: 1rem;
+    color: white;
+    font-family: 'Titilium Web', sans-serif;
+}
+.wire-column__nav__tab a.active {
+    color: #fff !important;
+    border-bottom: 3px solid #CC0000;
+}
+.wire-column__nav__tab a {
+    color: #B3B3B3;
+}
+.wire-column__nav__items .tab-content .tab-pane .filter-button {
+    background: #2d2b2b;
+}
+.wire-column__nav__items .tab-content .tab-pane .filter-button--border {
+    border-top: 1px solid #2d2b2b;
+}
+.wire-column__preview__slug {
+    color: #262424;
+}
+.wire-articles__item.wire-articles__item--selected {
+    outline: 1px solid #CC0000;
+}
+.no-touch .dropdown-item:hover, .no-touch .dropdown-item:focus {
+    background-color: #f6efef !important;
+}
+.multi-action-bar {
+    background-color: #e8e8e8 !important;
+}
+.footer {
+    min-height: 50px;
+    height: auto;
+    padding: 6px 0;
+    flex-wrap: wrap;
+}
+.footer--home {
+    margin-bottom: -50px;
+}
+.card a.btn-outline-primary {
+    color: #CC0000;
+}
+.card a.btn-outline-primary:hover {
+    color: white;
+}
+[class^="icon--"], [class*=" icon--"] {
+    color: #262424;
+}
+[class^="icon-small--"], [class*=" icon-small--"] {
+    color: #CC0000;
+}
+.toggle-background.react-toggle--checked .react-toggle-track {
+    background-color: #CC0000 !important;
+}
+.react-toggle--focus .react-toggle-thumb {
+    -webkit-box-shadow: 0 0 0 0.2rem rgba(236, 0, 0, 0.4) !important;
+    box-shadow: 0 0 0 0.2rem rgba(236, 0, 0, 0.4) !important;
+}
+.react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb {
+    -webkit-box-shadow: 0 0 0 0.2rem rgba(236, 0, 0, 0.4) !important;
+    box-shadow: 0 0 0 0.2rem rgba(236, 0, 0, 0.4) !important;
+}
+.content--item-detail .wire-column__preview__image > span {
+    background-color: #423d3d;
+}
+.list-group-item--link a:hover {
+    background-color: #f3f1f1;
+}
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #CC0000 !important;
+}
+.custom-control-input:checked ~ .custom-control-label::before {
+    border-color: #CC0000;
+}
+.circle-checkbox .css-checkbox:checked + i {
+    background: #CC0000;
+    border-color: #CC0000;
+}
+.profile__group.profile__group--dark-bck .profile__avatar.initials {
+    border: 2px solid #a0a0a0;
+    background: #222;
+}
+.custom-control.ui-dark .custom-control-label {
+    font-weight: 400;
+}
+.d-flex {
+    display: -webkit-flex !important;
+    display: flex !important;
+}
+@media only screen and (min-width: 360px) {
+    .footer {
+        justify-content: center;
+    }
+    .footer a {
+        margin: 0 10px;
+    }
+}
+@media only screen and (min-width: 576px) {
+    .navbar-brand span.breadcrumb-item {
+        font-size: 1.2rem;
+    }
+    .footer {
+        justify-content: center;
+    }
+}
+@media only screen and (min-width: 768px) {
+    .navbar__logo {
+        max-width: 280px;
+        padding: .6rem 1.3rem .6rem 1.3rem;
+    }
+}

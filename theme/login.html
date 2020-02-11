@@ -1,0 +1,68 @@
+{% extends "layout_wire.html" %}
+
+{% block contentMain %}
+
+<div class="container-fluid py-5 overflow-auto">
+    <div class="row">
+        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mx-auto">
+            <div class="card border-0 bg-white box-shadow--z1">
+                <div class="card-header pt-4 border-0 bg-white">
+                    <div class="text-center mb-4">
+                        {% include 'login_logo.html' %}
+                    </div>
+                    <h5 class="mb-0">{{ gettext("Login") }}</h5>
+                </div>
+                <div class="card-body pt-1 pb-2">
+                    <form class="form" role="form" id="formLogin" method="post">
+
+                        {{ form.csrf_token }}
+
+                        {% include "form_alerts.html" %}
+
+                        <div class="form-group">
+                            <label for="email">{{ form.email.label.text }}</label>
+                            {{ form.email(class="form-control", id="email", required="true") }}
+                        </div>
+                        <div class="form-group">
+                            <label for="password">{{ form.password.label.text }}</label>
+                            {{ form.password(class="form-control", id="password", required="true") }}
+                        </div>
+                        <div class="form-check mb-4 p-0">
+                            <div class="custom-control custom-checkbox">
+                                {{ form.remember_me(class="custom-control-input", id="remember_me") }}
+                                <label class="custom-control-label" for="remember_me">{{ form.remember_me.label.text }}</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">{{ gettext("Login") }}</button>
+                    </form>
+                </div>
+
+                <div class="card-footer bg-white border-0 text-muted small">
+                    {% if config.SHOW_USER_REGISTER %}{{ gettext("Still not a member?") }}<a href="{{ url_for('auth.signup') }}" class="btn btn-outline-primary btn-block mb-4 mt-2">{{ gettext("Sign up") }}</a>{% endif %}
+
+                    <p>{{ gettext('Forgot your password?') }} <a href="{{ url_for('auth.token', token_type='reset_password') }}">{{ gettext('Click here to reset.') }}</a>
+                    </p>
+                </div>
+
+                {% if get_client_locales()|length is gt 1 %}
+                <div class="card-body pt-1">
+                    <form class="form" role="form" method="post" action="{{ url_for('auth.set_locale') }}">
+                        <div class="form-group">
+                            <label for="language">{{ gettext('Language') }}</label>
+                            <div class="field">
+                                <select name="locale" class="form-control" onchange="this.form.submit()">
+                                    {% for locale in get_client_locales() %}
+                                    <option value="{{ locale.locale }}" {% if locale.locale == get_locale() %}selected{% endif %}>{{ locale.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% include "login_messages.html" %}
+</div>
+{% endblock %}
