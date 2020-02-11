@@ -5,7 +5,9 @@ import {get} from 'lodash';
 import {gettext} from 'utils';
 
 import InfoBox from './InfoBox';
-import AgendaListItemIcons from 'agenda/components/AgendaListItemIcons';
+import PreviewTagsBlock from './PreviewTagsBlock';
+import AgendaCoverages from 'agenda/components/AgendaCoverages';
+import AgendaEventInfo from 'agenda/components/AgendaEventInfo';
 
 function getAgendaHref(item) {
     return get(item, 'agenda_href');
@@ -14,7 +16,13 @@ function getAgendaHref(item) {
 export default class AgendaLinks extends React.PureComponent {
     constructor(props) {
         super(props);
-        this.state = {agenda: null};
+
+        this.openAgenda = this.openAgenda.bind(this);
+
+        this.state = {
+            agenda: null,
+            agendaWireItems: []
+        };
         this.fetchAgenda();
     }
 
@@ -31,12 +39,25 @@ export default class AgendaLinks extends React.PureComponent {
         if (url) {
             server.getJson(url).then((agenda) => {
                 this.setState({agenda});
+                this.fetchWireItemsForAgenda(agenda);
             });
         }
     }
 
+    fetchWireItemsForAgenda(agenda) {
+        this.props.fetchWireItemsForAgenda(agenda).then((items) =>
+        // {this.setState({agendaWireItems: (items || []).filter((i) => (i._id !== get(this.props, 'item._id')))});
+        {this.setState({agendaWireItems: items});
+
+        });
+    }
+
+    openAgenda() {
+        window.open(getAgendaHref(this.props.item, '_blank'));
+    }
+
     render() {
-        const {agenda} = this.state;
+        const {agenda, agendaWireItems} = this.state;
 
         if (!agenda) {
             return null;
@@ -44,14 +65,20 @@ export default class AgendaLinks extends React.PureComponent {
 
         return (
             <InfoBox label={gettext('Agenda')}>
-                <a className="wire-articles__versions"
-                    target="_blank"
-                    href={'/agenda?item=' + agenda._id} title={gettext('Open agenda item "{{ name }}"', {name: agenda.name})}>
-                    <div className="wire-articles__versions__item d-flex flex-column align-items-start">
-                        <strong className="wire-articles__item-headline">{agenda.name}</strong>
-                        <AgendaListItemIcons item={agenda} hideCoverages={false} row={true} />
-                    </div>
-                </a>
+                {get(agenda, 'event', null) &&
+                    <PreviewTagsBlock label={gettext('Related Event')}>
+                        <AgendaEventInfo item={agenda} onClick={this.openAgenda}/>
+                    </PreviewTagsBlock>}
+
+                {get(agenda, 'coverages.length', 0) > 0 &&
+                    <PreviewTagsBlock label={gettext('Related Coverage')}>
+                        <AgendaCoverages
+                            item={agenda}
+                            coverages={agenda.coverages}
+                            wireItems={agendaWireItems}
+                            onClick={this.openAgenda}
+                            hideViewContentItems={[get(this.props, 'item._id')]} />
+                    </PreviewTagsBlock>}
             </InfoBox>
         );
     }
@@ -62,4 +89,5 @@ AgendaLinks.propTypes = {
         agenda_href: PropTypes.string,
     }),
     preview: PropTypes.bool,
+    fetchWireItemsForAgenda: PropTypes.func,
 };

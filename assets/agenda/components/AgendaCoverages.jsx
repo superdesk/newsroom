@@ -13,7 +13,7 @@ import {
 } from '../utils';
 
 
-export default function AgendaCoverages({item, coverages, wireItems, actions, user}) {
+export default function AgendaCoverages({item, coverages, wireItems, actions, user, onClick, hideViewContentItems}) {
     if (isEmpty(coverages)) {
         return null;
     }
@@ -25,7 +25,7 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
     };
 
     return coverages.map((coverage) => (
-        <div className='coverage-item' key={coverage.coverage_id}>
+        <div className='coverage-item' key={coverage.coverage_id} onClick={onClick}>
             <div className='coverage-item__row'>
                 <span className='d-flex coverage-item--element-grow text-overflow-ellipsis'>
                     <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} ${WORKFLOW_COLORS[coverage.workflow_status]} mr-2`}></i>
@@ -49,7 +49,8 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
                 wireItems={wireItems}
                 actions={actions}
                 user={user}
-                coverageData={getDataFromCoverages(item)} />
+                coverageData={getDataFromCoverages(item)}
+                hideViewContentItems={hideViewContentItems} />
         </div>
     ));
 }
