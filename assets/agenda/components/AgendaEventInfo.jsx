@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { get, isEmpty } from 'lodash';
+
+import {gettext} from 'utils';
 import AgendaName from './AgendaName';
 import AgendaMetaTime from './AgendaMetaTime';
 import AgendaLocation from'./AgendaLocation';
@@ -12,7 +15,8 @@ const AgendaEventInfo = ({item, onClick}) => {
     }
 
     return (
-        <div className='coverage-item' onClick={onClick}>
+        <div className={classNames('coverage-item mt-3', {'coverage-item--clickable': onClick})} onClick={onClick}
+            title={onClick ? gettext('Open Agenda in new tab') : onClick}>
             <div className='coverage-item__row'>
                 <AgendaName item={item} noMargin small/>
             </div>

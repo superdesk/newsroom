@@ -2454,6 +2454,12 @@ a.wire-articles__versions {
     @include xl {
         padding: 6px 12px;
     }
+
+    &--clickable {
+        &:hover {
+            cursor: pointer;
+        }
+    }
 }
 .coverage-item__row {
     display: flex;

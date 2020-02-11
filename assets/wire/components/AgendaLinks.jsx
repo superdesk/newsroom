@@ -72,12 +72,14 @@ export default class AgendaLinks extends React.PureComponent {
 
                 {get(agenda, 'coverages.length', 0) > 0 &&
                     <PreviewTagsBlock label={gettext('Related Coverage')}>
-                        <AgendaCoverages
-                            item={agenda}
-                            coverages={agenda.coverages}
-                            wireItems={agendaWireItems}
-                            onClick={this.openAgenda}
-                            hideViewContentItems={[get(this.props, 'item._id')]} />
+                        <div className='mt-3'>
+                            <AgendaCoverages
+                                item={agenda}
+                                coverages={agenda.coverages}
+                                wireItems={agendaWireItems}
+                                onClick={this.openAgenda}
+                                hideViewContentItems={[get(this.props, 'item._id')]} />
+                        </div>
                     </PreviewTagsBlock>}
             </InfoBox>
         );

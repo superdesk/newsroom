@@ -6,7 +6,8 @@ import {getName} from '../utils';
 
 export default function AgendaName({item, noMargin, small}) {
     return (
-        <h2 className={classNames({'wire-column__preview__headline': !small}, {'wire-articles__item-headline': small},
+        <h2 className={classNames({'wire-column__preview__headline': !small},
+            {'wire-articles__item__text wire-column__preview__versions__box-headline': small},
             {'mt-4': !noMargin})}>{getName(item)}</h2>
     );
 }
