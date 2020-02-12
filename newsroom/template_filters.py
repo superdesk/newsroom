@@ -33,7 +33,7 @@ def datetime_long(datetime):
 
 
 def date_header(datetime):
-    return format_datetime(parse_date(datetime if datetime else utcnow()), 'EEEE, MMMM d, yyyy')
+    return format_datetime(parse_date(datetime if datetime else utcnow()), 'EEEE, MM.dd.yyyy')
 
 
 def time_short(datetime):

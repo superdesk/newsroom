@@ -13,8 +13,8 @@
 =======
 #
 # Translators:
-# Olli Vesala <olli.vesala@stt.fi>, 2019
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2019
+# Olli Vesala <olli.vesala@stt.fi>, 2020
 #
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
 msgid ""
@@ -27,8 +27,12 @@ msgstr ""
 =======
 "POT-Creation-Date: 2019-03-18 20:51+1100\n"
 "PO-Revision-Date: 2018-09-24 11:22+0000\n"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
 "Last-Translator: Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2019\n"
+=======
+"Last-Translator: Olli Vesala <olli.vesala@stt.fi>, 2020\n"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 "Language-Team: Finnish (https://www.transifex.com/sourcefabric/teams/6584/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -153,7 +157,7 @@ msgstr "{} salasanan uusiminen"
 
 #: newsroom/email.py:116
 msgid "New story for followed topic: {}"
-msgstr "Uusi juttu seuratusta aiheesta: {}"
+msgstr "Uusi juttu seuraamastasi aiheesta: {}"
 
 #: newsroom/email.py:135
 msgid "New update for followed agenda: {}"
@@ -173,7 +177,7 @@ msgstr "Ilmoitus poistosta"
 
 #: newsroom/email.py:225
 msgid "Agenda cancelled notice"
-msgstr ""
+msgstr "Agenda peruttu -ilmoitus"
 
 #: newsroom/push.py:84
 msgid "Unknown type {}"
@@ -181,7 +185,9 @@ msgstr "Tuntematon tyyppi {}"
 
 #: newsroom/settings.py:73
 msgid "Company expiry alert recipients: Email IDs not in proper format"
-msgstr "Sopimuksen vanhenemisvaroituksen vastaanottajat: Sähköpostitunnukset eivät ole asianmukaisessa muodossa"
+msgstr ""
+"Sopimuksen vanhenemisvaroituksen vastaanottajat: Sähköpostitunnukset eivät "
+"ole asianmukaisessa muodossa"
 
 #: newsroom/settings.py:77
 msgid "General Settings"
@@ -189,19 +195,23 @@ msgstr "Yleiset asetukset"
 
 #: newsroom/settings.py:82
 msgid "Google Analytics ID"
-msgstr ""
+msgstr "Google Analytics ID"
 
 #: newsroom/settings.py:83
 msgid "Company expiry alert recipients"
 msgstr "Yhtiön sopimuksen vanhentumisilmoitusten vastaanottajat"
 
 #: newsroom/settings.py:84
-msgid "Comma separated list of email addresses to which the expiration alerts of companies will be sent to."
-msgstr "Pilkulla erotettu luettelo sähköpostiosoitteista, joihin lähetetään ilmoitus siitä, että yhtiön sopimus on päättymässä"
+msgid ""
+"Comma separated list of email addresses to which the expiration alerts of "
+"companies will be sent to."
+msgstr ""
+"Pilkulla erotettu luettelo sähköpostiosoitteista, joihin lähetetään ilmoitus"
+" siitä, että yhtiön sopimus on päättymässä"
 
 #: newsroom/agenda/utils.py:28 newsroom/utils.py:164
 msgid "ALL DAY"
-msgstr "Koko päivä"
+msgstr "KOKO PÄIVÄ"
 
 #: newsroom/agenda/__init__.py:24 newsroom/templates/agenda_index.html:3
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
@@ -292,8 +302,16 @@ msgid "Google Maps Styles"
 msgstr ""
 
 #: newsroom/agenda/__init__.py:34
-msgid "Provide styles delimited by &(ampersand). For example, feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to https://developers.google.com/maps/documentation/maps-static/styling for more details"
+msgid ""
+"Provide styles delimited by &(ampersand). For example, "
+"feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to "
+"https://developers.google.com/maps/documentation/maps-static/styling for "
+"more details"
 msgstr ""
+"Anna tyylit, jotka on rajattu & (ampersand). Esimerkiksi ominaisuus: poi | "
+"element: label | näkyvyys: off & transit | näkyvyys: off. Lisätietoja on "
+"osoitteessa https://developers.google.com/maps/documentation/maps-"
+"static/styling"
 
 #: newsroom/agenda/agenda.py:44
 msgid "An event you have been watching has been updated"
@@ -346,6 +364,7 @@ msgstr "Uusi seurantapyyntö"
 
 #: newsroom/auth/forms.py:9
 msgid "Editor"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 <<<<<<< 26bf0c4603701d61f7f9491340ec7ee415bfaa10
 msgstr "Leikkaaja"
 
@@ -386,43 +405,50 @@ msgid "Your telephone number"
 msgstr "Puhelinnumerosi"
 =======
 msgstr ""
+=======
+msgstr "Toimitussihteeri"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/auth/forms.py:10
 msgid "Journalist"
-msgstr ""
+msgstr "Toimittaja"
 
 #: newsroom/auth/forms.py:11
 msgid "Sales"
-msgstr ""
+msgstr "Myynti"
 
 #: newsroom/auth/forms.py:12
 msgid "CTO"
-msgstr ""
+msgstr "Teknologiajohtaja"
 
 #: newsroom/auth/forms.py:13
 msgid "CEO"
-msgstr ""
+msgstr "Toimitusjohtaja"
 
 #: newsroom/auth/forms.py:14
 msgid "Other"
-msgstr ""
+msgstr "Muu"
 
 #: newsroom/auth/forms.py:16
 msgid "Your email"
-msgstr ""
+msgstr "Sähköpostiosoitteesi"
 
 #: newsroom/auth/forms.py:17
 msgid "Your First Name"
-msgstr ""
+msgstr "Etunimesi"
 
 #: newsroom/auth/forms.py:18
 msgid "Your Last Name"
-msgstr ""
+msgstr "Sukunimesi"
 
 #: newsroom/auth/forms.py:19
 msgid "Your telephone number"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 msgstr ""
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
+=======
+msgstr "Puhelinnumerosi"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/auth/forms.py:20
 msgid "Your company"
@@ -430,6 +456,7 @@ msgstr "Yhtiö"
 
 #: newsroom/auth/forms.py:21
 msgid "Your country"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 <<<<<<< 26bf0c4603701d61f7f9491340ec7ee415bfaa10
 msgstr "Maa"
 
@@ -443,6 +470,13 @@ msgstr ""
 msgid "Your position"
 msgstr ""
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
+=======
+msgstr "Maa"
+
+#: newsroom/auth/forms.py:22
+msgid "Your position"
+msgstr "Rooli"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/auth/forms.py:23
 msgid "Size of your company"
@@ -521,7 +555,7 @@ msgstr "Salasanasi on vaihdettu. Ole hyvä ja kirjaudu sisään uudelleen."
 =======
 #: newsroom/auth/views.py:38
 msgid "Insufficient Permissions. Access denied."
-msgstr ""
+msgstr "Oikeudet eivät riitä. Pääsy evätty."
 
 #: newsroom/auth/views.py:42 newsroom/auth/views.py:190
 msgid "Company account has been disabled."
@@ -640,7 +674,7 @@ msgstr ""
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
 #: newsroom/navigations/__init__.py:14
 msgid "Navigation"
-msgstr "Navigaatio"
+msgstr "Navigaatiot"
 
 <<<<<<< 26bf0c4603701d61f7f9491340ec7ee415bfaa10
 #: newsroom/news_api/__init__.py:12
@@ -718,7 +752,7 @@ msgstr "Tuotteen jutut"
 
 #: newsroom/reports/reports.py:140 newsroom/users/forms.py:27
 msgid "Company"
-msgstr "Yhtiö"
+msgstr "Koosteraportti yhtiöistä"
 
 #: newsroom/reports/views.py:15 newsroom/reports/views.py:36
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
@@ -798,7 +832,7 @@ msgstr ""
 
 #: newsroom/templates/agenda_item_print.html:27
 msgid "Contact"
-msgstr ""
+msgstr "Yhteyshenkilö"
 
 #: newsroom/templates/agenda_item_print.html:37
 msgid "Web"
@@ -806,15 +840,15 @@ msgstr ""
 
 #: newsroom/templates/agenda_item_print.html:52
 msgid "Editorial Note"
-msgstr ""
+msgstr "Toimituksellinen huomautus"
 
 #: newsroom/templates/agenda_item_print.html:60
 msgid "Coverages:"
-msgstr ""
+msgstr "Uutisointi:"
 
 #: newsroom/templates/agenda_item_print.html:67
 msgid "Coverage Type"
-msgstr ""
+msgstr "Seurannan Tyyppi"
 
 #: newsroom/templates/agenda_item_print.html:70
 msgid "Due"
@@ -830,7 +864,7 @@ msgstr "Seurannan tila"
 
 #: newsroom/templates/agenda_item_print.html:81
 msgid "Internal Note"
-msgstr ""
+msgstr "Sisäinen huomautus"
 
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
 #: newsroom/templates/am_news_index.html:3
@@ -860,11 +894,15 @@ msgstr "Tilastot"
 
 #: newsroom/templates/copyright.html:3 newsroom/templates/footer.html:5
 msgid "Copyright"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 <<<<<<< 26bf0c4603701d61f7f9491340ec7ee415bfaa10
 msgstr "Tekijänoikeudet"
 =======
 msgstr ""
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
+=======
+msgstr "Tekijänoikeudet"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/templates/footer.html:2
 msgid "Privacy Policy"
@@ -986,7 +1024,7 @@ msgstr ""
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
 #: newsroom/templates/wire_index.html:3 newsroom/templates/wire_index.html:6
 msgid "Wire"
-msgstr "Uusimmat uutiset"
+msgstr "Uutiset"
 
 #: newsroom/templates/wire_item.html:40
 #: newsroom/templates/wire_item_print.html:10
@@ -1012,8 +1050,12 @@ msgstr "merkkejä"
 =======
 #: newsroom/templates/wire_item.html:64 newsroom/templates/wire_item.html:110
 msgid "characters"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 msgstr ""
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
+=======
+msgstr "merkkejä"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/templates/wire_item.html:66
 msgid "Source:"
@@ -1048,17 +1090,17 @@ msgstr "Sisältötyyppi"
 #: newsroom/templates/wire_item.html:73
 #: newsroom/templates/wire_item_print.html:21
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: newsroom/templates/wire_item.html:76
 #: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:113
 msgid "Category"
-msgstr "Kategoria"
+msgstr "Asiasanat"
 
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:121
 msgid "Content Type"
-msgstr ""
+msgstr "Sisältötyyppi"
 
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
 #: newsroom/templates/wire_item.html:98
@@ -1067,6 +1109,7 @@ msgstr "Aiemmat versiot"
 
 #: newsroom/templates/wire_item_print.html:10
 msgid "On:"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 <<<<<<< 26bf0c4603701d61f7f9491340ec7ee415bfaa10
 msgstr "klo:"
 
@@ -1081,10 +1124,17 @@ msgstr ""
 #: newsroom/topics/views.py:114 newsroom/wire/views.py:234
 =======
 msgstr ""
+=======
+msgstr "klo:"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/topics/views.py:29
-msgid "Please enable 'Receive notifications via email' option in your profile to receive topic notifications"
+msgid ""
+"Please enable 'Receive notifications via email' option in your profile to "
+"receive topic notifications"
 msgstr ""
+"Jos haluat hakuasi vastaavista jutuista ilmoituksen sähköpostiisi, aktivoi "
+"valinta \"Ota vastaan ilmoituksia sähköpostilla\" profiiliasetuksissa."
 
 #: newsroom/topics/views.py:109 newsroom/wire/views.py:214
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
@@ -1102,11 +1152,15 @@ msgstr "Ylläpitäjä"
 
 #: newsroom/users/forms.py:15
 msgid "Public"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 <<<<<<< 26bf0c4603701d61f7f9491340ec7ee415bfaa10
 msgstr "STT:n asiakkaan käyttäjä"
 =======
 msgstr "Julkinen"
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
+=======
+msgstr "Ulkoinen"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/users/forms.py:16
 msgid "Internal"
@@ -1114,6 +1168,7 @@ msgstr "Sisäinen"
 
 #: newsroom/users/forms.py:17
 msgid "Account Management"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 <<<<<<< 26bf0c4603701d61f7f9491340ec7ee415bfaa10
 msgstr "Tilin hallinta"
 
@@ -1148,6 +1203,9 @@ msgstr "Rooli"
 #: assets/users/components/UsersList.jsx:28 newsroom/users/forms.py:26
 =======
 msgstr ""
+=======
+msgstr "Tilin hallinta"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/users/forms.py:20
 msgid "First Name"
@@ -1316,8 +1374,12 @@ msgstr "Käyttäjä-id:tä ei löytynyt"
 
 #: newsroom/wire/__init__.py:48
 msgid "Newsroom"
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 msgstr ""
 >>>>>>> [STTNHUB-54] - Displaying of the first published date
+=======
+msgstr "Mediapankki"
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/wire/__init__.py:69
 msgid "Plain Text"
@@ -1328,12 +1390,16 @@ msgid "News only filter"
 msgstr "Vain uutiset -suodatin"
 
 #: newsroom/wire/__init__.py:82
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 <<<<<<< 26bf0c4603701d61f7f9491340ec7ee415bfaa10
+=======
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 msgid ""
 "This query defines what is NOT considered 'news' content. It is used by the "
 "News only switch to filter the view. When switched on, stories matching this"
 " filter will not be displayed."
 msgstr ""
+<<<<<<< d26c83a62d6e2d952a1cd77eeda2542e2eb9e6af
 
 #: newsroom/wire/__init__.py:87
 msgid "Time limit for Wire products (in days)"
@@ -2633,14 +2699,18 @@ msgstr "Kaikki"
 =======
 msgid "This query defines what is NOT considered 'news' content. It is used by the News only switch to filter the view. When switched on, stories matching this filter will not be displayed."
 msgstr "Tämän hakulausekkeen ehdot täyttävät jutut poistetaan näkymästä, kun käyttäjä kytkee päälle \"Vain uutiset\" -suodattimen."
+=======
+>>>>>>> [STTNHUB-92] - Updating translations and header date format
 
 #: newsroom/wire/__init__.py:91
 msgid "Time limit for Wire products (in days)"
 msgstr "Uutistuotteiden aikarajoitus (päiviä)"
 
 #: newsroom/wire/__init__.py:95
-msgid "You can create an additional filter on top of the product definition. The time limit can be enabled for each company in the Permissions."
-msgstr "Voit luoda lisäsuodattimen tuotteen lisäksi. Aikarajauksen voi kytkeä päälle yhtiöasetuksista."
+msgid ""
+"You can create an additional filter on top of the product definition. The "
+"time limit can be enabled for each company in the Permissions."
+msgstr ""
 
 #: newsroom/wire/__init__.py:117
 msgid "Subject"
