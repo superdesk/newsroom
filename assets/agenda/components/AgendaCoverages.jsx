@@ -3,7 +3,14 @@ import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import { gettext } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
-import {getCoverageDisplayName, getCoverageIcon, WORKFLOW_COLORS, WORKFLOW_STATUS, formatCoverageDate} from '../utils';
+import {
+    getDataFromCoverages,
+    getCoverageDisplayName,
+    getCoverageIcon,
+    WORKFLOW_COLORS,
+    WORKFLOW_STATUS,
+    formatCoverageDate
+} from '../utils';
 
 
 export default function AgendaCoverages({item, coverages, wireItems, actions, user}) {
@@ -16,6 +23,7 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
 
         return slugline ? ` | ${slugline}` : '';
     };
+    const coverageData = getDataFromCoverages(item);
 
     return coverages.map((coverage) => (
         <div className='coverage-item' key={coverage.coverage_id}>
@@ -41,7 +49,10 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
                 item={item}
                 wireItems={wireItems}
                 actions={actions}
-                user={user} />
+                user={user}
+                internal_notes={coverageData.internal_note}
+                ednotes={coverageData.ednote}
+                workflowStatusReasons={coverageData.workflow_status_reason} />
         </div>
     ));
 }

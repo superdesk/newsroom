@@ -444,23 +444,33 @@ export function getInternalNote(item, plan) {
  * @param {Object} item
  * @return {Object}
  */
-export function getNotesFromCoverages(item, field = 'internal_note') {
-    const notes = {};
+export function getDataFromCoverages(item) {
     const planningItems = get(item, 'planning_items', []);
-    planningItems.forEach(p => {
-        const planning_note = p[field];
-        (get(p, 'coverages') || []).forEach((c) => {
-            // If the coverage has news item published, use that 'ednote' instead
-            if (field === 'ednote' && get(c, 'deliveries.length', 0) > 0) {
-                return;
-            }
+    let data = {
+        'internal_note': {},
+        'ednote': {},
+        'workflow_status_reason': {}
+    };
 
-            if (get(c, `planning.${field}`, '') && c.planning[field] !== planning_note) {
-                notes[c.coverage_id] = c.planning[field];
-            }
+    planningItems.forEach(p => {
+        (get(p, 'coverages') || []).forEach((c) => {
+            ['internal_note', 'ednote', 'workflow_status_reason'].forEach((field) => {
+                // If the coverage has news item published, use that 'ednote' instead
+                if (field === 'ednote' && get(c, 'deliveries.length', 0) > 0) {
+                    return;
+                }
+
+                if (!get(c, `planning.${field}`, '') || c.planning[field] === p[field] ||
+                        (field === 'workflow_status_reason' && p['state'] === STATUS_CANCELED)) {
+                    return;
+                }
+
+                data[field][c.coverage_id] = c.planning[field];
+            });
+
         });
     });
-    return notes;
+    return data;
 }
 
 /**
