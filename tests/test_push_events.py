@@ -7,6 +7,7 @@ from datetime import datetime
 from copy import deepcopy
 
 from superdesk import get_resource_service
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
 from newsroom.notifications import get_user_notifications
 from .fixtures import init_auth  # noqa
