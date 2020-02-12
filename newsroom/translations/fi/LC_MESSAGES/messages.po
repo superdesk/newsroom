@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
 #
 # Translators:
-# Olli Vesala <olli.vesala@stt.fi>, 2019
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2019
+# Olli Vesala <olli.vesala@stt.fi>, 2020
 #
 msgid ""
 msgstr ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2019-03-18 20:51+1100\n"
 "PO-Revision-Date: 2018-09-24 11:22+0000\n"
-"Last-Translator: Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2019\n"
+"Last-Translator: Olli Vesala <olli.vesala@stt.fi>, 2020\n"
 "Language-Team: Finnish (https://www.transifex.com/sourcefabric/teams/6584/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,7 +36,7 @@ msgstr "{} salasanan uusiminen"
 
 #: newsroom/email.py:116
 msgid "New story for followed topic: {}"
-msgstr "Uusi juttu seuratusta aiheesta: {}"
+msgstr "Uusi juttu seuraamastasi aiheesta: {}"
 
 #: newsroom/email.py:135
 msgid "New update for followed agenda: {}"
@@ -56,7 +56,7 @@ msgstr "Ilmoitus poistosta"
 
 #: newsroom/email.py:225
 msgid "Agenda cancelled notice"
-msgstr ""
+msgstr "Agenda peruttu -ilmoitus"
 
 #: newsroom/push.py:84
 msgid "Unknown type {}"
@@ -64,7 +64,9 @@ msgstr "Tuntematon tyyppi {}"
 
 #: newsroom/settings.py:73
 msgid "Company expiry alert recipients: Email IDs not in proper format"
-msgstr "Sopimuksen vanhenemisvaroituksen vastaanottajat: Sähköpostitunnukset eivät ole asianmukaisessa muodossa"
+msgstr ""
+"Sopimuksen vanhenemisvaroituksen vastaanottajat: Sähköpostitunnukset eivät "
+"ole asianmukaisessa muodossa"
 
 #: newsroom/settings.py:77
 msgid "General Settings"
@@ -72,19 +74,23 @@ msgstr "Yleiset asetukset"
 
 #: newsroom/settings.py:82
 msgid "Google Analytics ID"
-msgstr ""
+msgstr "Google Analytics ID"
 
 #: newsroom/settings.py:83
 msgid "Company expiry alert recipients"
 msgstr "Yhtiön sopimuksen vanhentumisilmoitusten vastaanottajat"
 
 #: newsroom/settings.py:84
-msgid "Comma separated list of email addresses to which the expiration alerts of companies will be sent to."
-msgstr "Pilkulla erotettu luettelo sähköpostiosoitteista, joihin lähetetään ilmoitus siitä, että yhtiön sopimus on päättymässä"
+msgid ""
+"Comma separated list of email addresses to which the expiration alerts of "
+"companies will be sent to."
+msgstr ""
+"Pilkulla erotettu luettelo sähköpostiosoitteista, joihin lähetetään ilmoitus"
+" siitä, että yhtiön sopimus on päättymässä"
 
 #: newsroom/agenda/utils.py:28 newsroom/utils.py:164
 msgid "ALL DAY"
-msgstr "Koko päivä"
+msgstr "KOKO PÄIVÄ"
 
 #: newsroom/agenda/__init__.py:24 newsroom/templates/agenda_index.html:3
 #: newsroom/templates/agenda_index.html:6
@@ -103,8 +109,16 @@ msgid "Google Maps Styles"
 msgstr ""
 
 #: newsroom/agenda/__init__.py:34
-msgid "Provide styles delimited by &(ampersand). For example, feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to https://developers.google.com/maps/documentation/maps-static/styling for more details"
+msgid ""
+"Provide styles delimited by &(ampersand). For example, "
+"feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to "
+"https://developers.google.com/maps/documentation/maps-static/styling for "
+"more details"
 msgstr ""
+"Anna tyylit, jotka on rajattu & (ampersand). Esimerkiksi ominaisuus: poi | "
+"element: label | näkyvyys: off & transit | näkyvyys: off. Lisätietoja on "
+"osoitteessa https://developers.google.com/maps/documentation/maps-"
+"static/styling"
 
 #: newsroom/agenda/agenda.py:44
 msgid "An event you have been watching has been updated"
@@ -156,43 +170,43 @@ msgstr "Uusi seurantapyyntö"
 
 #: newsroom/auth/forms.py:9
 msgid "Editor"
-msgstr ""
+msgstr "Toimitussihteeri"
 
 #: newsroom/auth/forms.py:10
 msgid "Journalist"
-msgstr ""
+msgstr "Toimittaja"
 
 #: newsroom/auth/forms.py:11
 msgid "Sales"
-msgstr ""
+msgstr "Myynti"
 
 #: newsroom/auth/forms.py:12
 msgid "CTO"
-msgstr ""
+msgstr "Teknologiajohtaja"
 
 #: newsroom/auth/forms.py:13
 msgid "CEO"
-msgstr ""
+msgstr "Toimitusjohtaja"
 
 #: newsroom/auth/forms.py:14
 msgid "Other"
-msgstr ""
+msgstr "Muu"
 
 #: newsroom/auth/forms.py:16
 msgid "Your email"
-msgstr ""
+msgstr "Sähköpostiosoitteesi"
 
 #: newsroom/auth/forms.py:17
 msgid "Your First Name"
-msgstr ""
+msgstr "Etunimesi"
 
 #: newsroom/auth/forms.py:18
 msgid "Your Last Name"
-msgstr ""
+msgstr "Sukunimesi"
 
 #: newsroom/auth/forms.py:19
 msgid "Your telephone number"
-msgstr ""
+msgstr "Puhelinnumerosi"
 
 #: newsroom/auth/forms.py:20
 msgid "Your company"
@@ -200,11 +214,11 @@ msgstr "Yhtiö"
 
 #: newsroom/auth/forms.py:21
 msgid "Your country"
-msgstr ""
+msgstr "Maa"
 
 #: newsroom/auth/forms.py:22
 msgid "Your position"
-msgstr ""
+msgstr "Rooli"
 
 #: newsroom/auth/forms.py:23
 msgid "Size of your company"
@@ -241,7 +255,7 @@ msgstr "Vahvista salasana"
 
 #: newsroom/auth/views.py:38
 msgid "Insufficient Permissions. Access denied."
-msgstr ""
+msgstr "Oikeudet eivät riitä. Pääsy evätty."
 
 #: newsroom/auth/views.py:42 newsroom/auth/views.py:190
 msgid "Company account has been disabled."
@@ -326,7 +340,7 @@ msgstr ""
 
 #: newsroom/navigations/__init__.py:14
 msgid "Navigation"
-msgstr "Navigaatio"
+msgstr "Navigaatiot"
 
 #: newsroom/products/__init__.py:14
 msgid "Products"
@@ -350,7 +364,7 @@ msgstr "Tuotteen jutut"
 
 #: newsroom/reports/reports.py:140 newsroom/users/forms.py:27
 msgid "Company"
-msgstr "Yhtiö"
+msgstr "Koosteraportti yhtiöistä"
 
 #: newsroom/reports/views.py:15 newsroom/reports/views.py:36
 msgid "Unknown report {}"
@@ -403,7 +417,7 @@ msgstr ""
 
 #: newsroom/templates/agenda_item_print.html:27
 msgid "Contact"
-msgstr ""
+msgstr "Yhteyshenkilö"
 
 #: newsroom/templates/agenda_item_print.html:37
 msgid "Web"
@@ -411,15 +425,15 @@ msgstr ""
 
 #: newsroom/templates/agenda_item_print.html:52
 msgid "Editorial Note"
-msgstr ""
+msgstr "Toimituksellinen huomautus"
 
 #: newsroom/templates/agenda_item_print.html:60
 msgid "Coverages:"
-msgstr ""
+msgstr "Uutisointi:"
 
 #: newsroom/templates/agenda_item_print.html:67
 msgid "Coverage Type"
-msgstr ""
+msgstr "Seurannan Tyyppi"
 
 #: newsroom/templates/agenda_item_print.html:70
 msgid "Due"
@@ -435,7 +449,7 @@ msgstr "Seurannan tila"
 
 #: newsroom/templates/agenda_item_print.html:81
 msgid "Internal Note"
-msgstr ""
+msgstr "Sisäinen huomautus"
 
 #: newsroom/templates/am_news_index.html:3
 #: newsroom/templates/am_news_index.html:10
@@ -464,7 +478,7 @@ msgstr "Tilastot"
 
 #: newsroom/templates/copyright.html:3 newsroom/templates/footer.html:5
 msgid "Copyright"
-msgstr ""
+msgstr "Tekijänoikeudet"
 
 #: newsroom/templates/footer.html:2
 msgid "Privacy Policy"
@@ -540,7 +554,7 @@ msgstr "Oma profiili"
 
 #: newsroom/templates/wire_index.html:3 newsroom/templates/wire_index.html:6
 msgid "Wire"
-msgstr "Uusimmat uutiset"
+msgstr "Uutiset"
 
 #: newsroom/templates/wire_item.html:40
 #: newsroom/templates/wire_item_print.html:10
@@ -553,7 +567,7 @@ msgstr "sanoja"
 
 #: newsroom/templates/wire_item.html:64 newsroom/templates/wire_item.html:110
 msgid "characters"
-msgstr ""
+msgstr "merkkejä"
 
 #: newsroom/templates/wire_item.html:66
 msgid "Source:"
@@ -562,17 +576,17 @@ msgstr "Lähde"
 #: newsroom/templates/wire_item.html:73
 #: newsroom/templates/wire_item_print.html:21
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: newsroom/templates/wire_item.html:76
 #: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:113
 msgid "Category"
-msgstr "Kategoria"
+msgstr "Asiasanat"
 
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:121
 msgid "Content Type"
-msgstr ""
+msgstr "Sisältötyyppi"
 
 #: newsroom/templates/wire_item.html:98
 msgid "Previous versions"
@@ -580,11 +594,15 @@ msgstr "Aiemmat versiot"
 
 #: newsroom/templates/wire_item_print.html:10
 msgid "On:"
-msgstr ""
+msgstr "klo:"
 
 #: newsroom/topics/views.py:29
-msgid "Please enable 'Receive notifications via email' option in your profile to receive topic notifications"
+msgid ""
+"Please enable 'Receive notifications via email' option in your profile to "
+"receive topic notifications"
 msgstr ""
+"Jos haluat hakuasi vastaavista jutuista ilmoituksen sähköpostiisi, aktivoi "
+"valinta \"Ota vastaan ilmoituksia sähköpostilla\" profiiliasetuksissa."
 
 #: newsroom/topics/views.py:109 newsroom/wire/views.py:214
 #, python-format
@@ -601,7 +619,7 @@ msgstr "Ylläpitäjä"
 
 #: newsroom/users/forms.py:15
 msgid "Public"
-msgstr "Julkinen"
+msgstr "Ulkoinen"
 
 #: newsroom/users/forms.py:16
 msgid "Internal"
@@ -609,7 +627,7 @@ msgstr "Sisäinen"
 
 #: newsroom/users/forms.py:17
 msgid "Account Management"
-msgstr ""
+msgstr "Tilin hallinta"
 
 #: newsroom/users/forms.py:20
 msgid "First Name"
@@ -673,7 +691,7 @@ msgstr "Käyttäjä-id:tä ei löytynyt"
 
 #: newsroom/wire/__init__.py:48
 msgid "Newsroom"
-msgstr ""
+msgstr "Mediapankki"
 
 #: newsroom/wire/__init__.py:69
 msgid "Plain Text"
@@ -684,16 +702,21 @@ msgid "News only filter"
 msgstr "Vain uutiset -suodatin"
 
 #: newsroom/wire/__init__.py:82
-msgid "This query defines what is NOT considered 'news' content. It is used by the News only switch to filter the view. When switched on, stories matching this filter will not be displayed."
-msgstr "Tämän hakulausekkeen ehdot täyttävät jutut poistetaan näkymästä, kun käyttäjä kytkee päälle \"Vain uutiset\" -suodattimen."
+msgid ""
+"This query defines what is NOT considered 'news' content. It is used by the "
+"News only switch to filter the view. When switched on, stories matching this"
+" filter will not be displayed."
+msgstr ""
 
 #: newsroom/wire/__init__.py:91
 msgid "Time limit for Wire products (in days)"
 msgstr "Uutistuotteiden aikarajoitus (päiviä)"
 
 #: newsroom/wire/__init__.py:95
-msgid "You can create an additional filter on top of the product definition. The time limit can be enabled for each company in the Permissions."
-msgstr "Voit luoda lisäsuodattimen tuotteen lisäksi. Aikarajauksen voi kytkeä päälle yhtiöasetuksista."
+msgid ""
+"You can create an additional filter on top of the product definition. The "
+"time limit can be enabled for each company in the Permissions."
+msgstr ""
 
 #: newsroom/wire/__init__.py:117
 msgid "Subject"
