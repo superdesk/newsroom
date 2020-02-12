@@ -6,7 +6,6 @@ import {
     getCoverageStatusText,
     WORKFLOW_STATUS,
     isCoverageBeingUpdated,
-    getNotesFromCoverages,
     isWatched,
 } from '../utils';
 
@@ -35,10 +34,6 @@ export default class CoverageItemStatus extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setWireItem(nextProps);
-    }
-
-    getInternalNotes() {
-        return getNotesFromCoverages(this.props.item);
     }
 
     setWireItem(props) {
@@ -118,25 +113,17 @@ export default class CoverageItemStatus extends React.Component {
         return content;
     }
 
-    getEdNoteToDisplay() {
-        if (get(this.state.wireItem, 'ednote')) {
-            return this.state.wireItem.ednote;
-        }
-
-        const edNotes = getNotesFromCoverages();
-        return get(edNotes, this.props.coverage.coverage_id);
-    }
-
     filterActions() {
         return this.props.actions.filter((action) => !action.when ||
             action.when(this.props.coverage, this.props.user, this.props.item));
     }
 
     render() {
-        const internalNotes = this.getInternalNotes();
-        const edNote = this.getEdNoteToDisplay();
         const coverage = this.props.coverage;
         const wireText = this.getItemText(coverage);
+        const internalNote = get(this.props.internal_notes, coverage.coverage_id);
+        const edNote = get(this.state, 'wireItem.ednote') || get(this.props.ednotes, coverage.coverage_id);
+        const reason = get(this.props.workflowStatusReasons, coverage.coverage_id);
 
         return (
             <Fragment>
@@ -154,8 +141,12 @@ export default class CoverageItemStatus extends React.Component {
                     <AgendaEdNote item={{ednote: edNote}} noMargin/>
                 </div>}
 
-                {get(internalNotes, coverage.coverage_id) && <div className='coverage-item__row'>
-                    <AgendaInternalNote internalNote={internalNotes[coverage.coverage_id]} noMargin />
+                {reason && <div className='coverage-item__row'>
+                    <AgendaEdNote item={{ednote: reason}} noMargin/>
+                </div>}
+
+                {internalNote && <div className='coverage-item__row'>
+                    <AgendaInternalNote internalNote={internalNote} noMargin />
                 </div>}
             </Fragment>
         );
@@ -168,6 +159,9 @@ CoverageItemStatus.propTypes = {
     wireItems: PropTypes.array,
     actions: PropTypes.array,
     user: PropTypes.string,
+    internal_notes: PropTypes.object,
+    ednotes: PropTypes.object,
+    workflowStatusReasons: PropTypes.object,
 };
 
 CoverageItemStatus.defaultProps = { actions: [] };
