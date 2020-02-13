@@ -121,9 +121,12 @@ export default class CoverageItemStatus extends React.Component {
     render() {
         const coverage = this.props.coverage;
         const wireText = this.getItemText(coverage);
-        const internalNote = get(this.props.internal_notes, coverage.coverage_id);
-        const edNote = get(this.state, 'wireItem.ednote') || get(this.props.ednotes, coverage.coverage_id);
-        const reason = get(this.props.workflowStatusReasons, coverage.coverage_id);
+        const internalNote = get(this.props, 'coverageData.internal_note', {})[coverage.coverage_id];
+        const edNote = this.state.wireItem ? this.state.wireItem.ednote :
+            get(this.props, 'coverageData.ednote', {})[coverage.coverage_id];
+        const reason = get(this.props, 'coverageData.workflow_status_reason', {})[coverage.coverage_id];
+        const scheduledStatus = get(this.props, 'coverageData.scheduled_update_status', {})[coverage.coverage_id];
+
 
         return (
             <Fragment>
@@ -136,6 +139,10 @@ export default class CoverageItemStatus extends React.Component {
                     </div>                
                 )}
                 <div className='coverage-item__row'>{this.getStatusContent(coverage)}</div>
+
+                {scheduledStatus && <div className='coverage-item__row'>
+                    <span>{scheduledStatus}</span>
+                </div>}
 
                 {edNote && <div className='coverage-item__row'>
                     <AgendaEdNote item={{ednote: edNote}} noMargin/>

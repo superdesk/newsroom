@@ -23,7 +23,6 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
 
         return slugline ? ` | ${slugline}` : '';
     };
-    const coverageData = getDataFromCoverages(item);
 
     return coverages.map((coverage) => (
         <div className='coverage-item' key={coverage.coverage_id}>
@@ -50,9 +49,7 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
                 wireItems={wireItems}
                 actions={actions}
                 user={user}
-                internal_notes={coverageData.internal_note}
-                ednotes={coverageData.ednote}
-                workflowStatusReasons={coverageData.workflow_status_reason} />
+                coverageData={getDataFromCoverages(item)} />
         </div>
     ));
 }
