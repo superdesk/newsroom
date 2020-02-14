@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import { submitDownloadItems } from 'wire/actions';
 import { modalFormValid } from 'actions';
-import { context } from '../../selectors';
+import { context, modalOptions, modalSecondaryFormatOptions } from '../../selectors';
 import { get } from 'lodash';
 
 import Modal from 'components/Modal';
@@ -15,7 +15,10 @@ class DownloadItemsModal extends React.Component {
         super(props);
         this.state = {
             items: props.data.items,
-            format: props.context === 'monitoring' ? 'monitoring_pdf' : 'text',
+            params: {
+                format: props.context === 'monitoring' ? 'monitoring_pdf' : 'text',
+                secondaryFormat: get(props, 'secondaryOptions.length', 0) ? props.secondaryOptions[0].value : null
+            }
         };
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -27,8 +30,14 @@ class DownloadItemsModal extends React.Component {
         this.props.modalFormValid();
     }
 
-    onChange(event) {
-        this.setState({format: event.target.value});
+    onChange(field, event) {
+        this.setState({
+            ...this.state,
+            params: {
+                ...this.state.params,
+                [field]: event.target.value,
+            }
+        });
     }
 
     onSubmit(event) {
@@ -48,10 +57,17 @@ class DownloadItemsModal extends React.Component {
                         name='format'
                         label={gettext('Format')}
                         required={true}
-                        value={this.state.format}
-                        onChange={this.onChange}
+                        value={this.state.params.format}
+                        onChange={this.onChange.bind(null, 'format')}
                         options={this.props.options}
                     />
+                    {get(this.props, 'secondaryOptions.length', 0) > 0 && <SelectInput
+                        name='format'
+                        label={gettext('Format')}
+                        value={this.state.params.secondaryFormat}
+                        onChange={this.onChange.bind(null, 'secondaryFormat')}
+                        options={this.props.secondaryOptions}
+                    />}
                 </form>
             </Modal>
         );
@@ -66,25 +82,17 @@ DownloadItemsModal.propTypes = {
         items: PropTypes.arrayOf(PropTypes.string).isRequired,
     }),
     context: PropTypes.string,
-};
-
-const mapOptions = (state, props) => {
-    let options = state.formats;
-    if (props.data.items && props.data.items.length) {
-        const itemType = state.format === 'agenda' ? 'agenda' : 'wire';
-        options = options.filter((opt) => get(opt, 'types', ['wire', 'agenda']).includes(itemType));
-    }
-
-    return options.map((format) => ({value: format.format, text: format.name}));
+    secondaryOptions: PropTypes.array,
 };
 
 const mapStateToProps = (state, props) => ({
-    options: mapOptions(state, props),
+    options: modalOptions(state, props),
     context: context(state),
+    secondaryOptions: modalSecondaryFormatOptions(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    onSubmit: ({items, format}) => dispatch(submitDownloadItems(items, format)),
+    onSubmit: ({items, params}) => dispatch(submitDownloadItems(items, params)),
     modalFormValid: () => dispatch(modalFormValid()),
 });
 

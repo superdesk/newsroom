@@ -17,7 +17,7 @@ import {
 import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
 
 import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
-import { renderModal, closeModal, setSavedItemsCount } from 'actions';
+import { renderModal, setSavedItemsCount } from 'actions';
 import {
     getCalendars,
     getDateInputDate,
@@ -458,22 +458,6 @@ export function downloadItems(items) {
     return renderModal('downloadItems', {items});
 }
 
-/**
- * Start download - open download view in new window.
- *
- * @param {Array} items
- * @param {String} format
- */
-export function submitDownloadItems(items, format) {
-    return (dispatch, getState) => {
-        window.open(`/download/${items.join(',')}?format=${format}&type=${getState().context}`, '_blank');
-        dispatch(setDownloadItems(items));
-        dispatch(closeModal());
-        multiItemEvent('download', items, getState());
-    };
-}
-
-
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
 export function removeNewItems(data) {
     return {type: REMOVE_NEW_ITEMS, data};
@@ -651,13 +635,6 @@ export function loadMyAgendaTopic(topicId) {
         dispatch(loadMyTopic(topicId));
         return dispatch(fetchItems());
     };
-}
-
-function multiItemEvent(event, items, state) {
-    items.forEach((itemId) => {
-        const item = state.itemsById[itemId];
-        item && analytics.itemEvent(event, item);
-    });
 }
 
 export const TOGGLE_FEATURED_FILTER = 'TOGGLE_FEATURED_FILTER';

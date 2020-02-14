@@ -406,15 +406,17 @@ export function downloadItems(items) {
  * Start download - open download view in new window.
  *
  * @param {Array} items
- * @param {String} format
+ * @param {String} params
  */
-export function submitDownloadItems(items, format) {
+export function submitDownloadItems(items, params) {
     return (dispatch, getState) => {
+        const {format, secondaryFormat} = params;
         const userContext = context(getState());
         let uri = `/download/${items.join(',')}?format=${format}&type=${userContext}`;
         if (userContext === 'monitoring') {
             const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
             uri = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
+            uri = `${uri}&secondary_format=${secondaryFormat}`;
         }
         window.open(uri, '_blank');
         dispatch(setDownloadItems(items));
