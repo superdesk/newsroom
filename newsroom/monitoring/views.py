@@ -9,7 +9,7 @@ from eve.render import send_response
 from newsroom.decorator import admin_only, login_required
 from newsroom.companies import section
 from newsroom.monitoring import blueprint
-from .forms import MonitoringForm
+from .forms import MonitoringForm, alert_types
 from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400, \
     set_original_creator, set_version_creator
 from newsroom.template_filters import is_admin
@@ -37,6 +37,7 @@ def get_view_data():
         'saved_items': get_bookmarks_count(user['_id'], 'monitoring'),
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
                     if 'monitoring' in f['types']],
+        'secondary_formats': [{'format': f[0], 'name': f[1]} for f in alert_types]
     }
 
 
@@ -185,16 +186,19 @@ def index():
 @login_required
 def export(_ids):
     user = get_user(required=True)
-    monitoring_profile = get_entity_or_404(flask.request.args.get('monitoring_profile'), 'monitoring')
-    items = get_items_for_monitoring_report([_id for _id in _ids.split(',')], monitoring_profile)
     _format = flask.request.args.get('format')
-    formatter = app.download_formatters[_format]['formatter']
     if not _format:
         return jsonify({'message': 'No format specified.'}), 400
 
+    layout_format = flask.request.args.get('secondary_format')
+    formatter = app.download_formatters[_format]['formatter']
+    monitoring_profile = get_entity_or_404(flask.request.args.get('monitoring_profile'), 'monitoring')
+    monitoring_profile['format_type'] = _format
+    monitoring_profile['alert_type'] = layout_format
+    items = get_items_for_monitoring_report([_id for _id in _ids.split(',')], monitoring_profile)
+
     if len(items) > 0:
         try:
-            monitoring_profile['format_type'] = _format
             file_path = get_monitoring_file_attachment(monitoring_profile, items, as_temp_file=True)
         except Exception as e:
             logger.exception(e)
