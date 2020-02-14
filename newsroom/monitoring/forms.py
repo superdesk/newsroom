@@ -4,17 +4,15 @@ from wtforms import StringField, HiddenField, BooleanField, TextAreaField
 from wtforms import SelectField
 from wtforms.validators import DataRequired
 
+alert_types = [('full_text', gettext('Full text')), ('linked_text', gettext('Linked extract(s)'))]
+format_types = [('monitoring_pdf', gettext('PDF')), ('monitoring_rtf', gettext('RTF'))]
+
 
 class MonitoringForm(FlaskForm):
     class Meta:
         csrf = False
 
     BooleanField.false_values = {False, 'false', ''}
-
-    alert_types = [('linked_text', gettext('Linked extract(s)')),
-                   ('full_text', gettext('Full text'))]
-    format_types = [('monitoring_pdf', gettext('PDF')),
-                    ('monitoring_rtf', gettext('RTF'))]
 
     id = HiddenField('Id')
     name = StringField(gettext('Name'), validators=[DataRequired()])
