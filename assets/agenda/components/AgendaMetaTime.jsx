@@ -8,7 +8,7 @@ import {bem} from 'ui/utils';
 import {formatTime, formatDate, DATE_FORMAT, gettext, getScheduleType} from 'utils';
 import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE, isItemTBC, TO_BE_CONFIRMED_TEXT} from '../utils';
 
-function format(item, group) {
+function format(item, group, onlyDates) {
     let start = moment(item.dates.start);
     let end = moment(item.dates.end);
     let duration = end.diff(start, 'minutes');
@@ -19,11 +19,12 @@ function format(item, group) {
     const tbcStr = ` (${TO_BE_CONFIRMED_TEXT})`;
 
     function timeElement(start, end, key) {
-        if (!end) {
-            return (<span className='time-text mr-2' key={key}>{formatTime(start)}</span>);
+        let value = end ? `${formatTime(start)} - ${formatTime(end)}` : formatTime(start);
+        if (onlyDates) {
+            return (<span className="mr-2 border-right pr-2" key={key}>{value}</span>);
         }
 
-        return <span key={key} className='time-text mr-2'>{formatTime(start)} - {formatTime(end)}</span>;
+        return (<span className="time-text mr-2" key={key}>{value}</span>);
     }
 
     function dateElement(date) {
@@ -97,15 +98,19 @@ function getCalendarClass(item) {
     }
 }
 
-export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone}) {
+export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone, onlyDates}) {
     const times = (
         <div key="times" className={classNames(
             bem('wire-articles__item', 'meta-time', {'border-right': borderRight}),
-            {'w-100': isMobilePhone}
-        )}>
-            {format(item, group)}
+            {'w-100': isMobilePhone},
+            {'m-0': onlyDates})}>
+            {format(item, group, onlyDates)}
         </div>
     );
+
+    if (onlyDates) {
+        return times;
+    }
 
     const icons = (
         <div key="icon" className={bem('wire-articles__item', 'icons',{'dashed-border': !isMobilePhone})}>
@@ -130,6 +135,7 @@ AgendaMetaTime.propTypes = {
     isRecurring: PropTypes.bool,
     group: PropTypes.string,
     isMobilePhone: PropTypes.bool,
+    onlyDates: PropTypes.bool,
 };
 
 AgendaMetaTime.defaultProps = {

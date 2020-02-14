@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+
 import { isEmpty } from 'lodash';
 import { gettext } from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
@@ -13,7 +15,7 @@ import {
 } from '../utils';
 
 
-export default function AgendaCoverages({item, coverages, wireItems, actions, user}) {
+export default function AgendaCoverages({item, coverages, wireItems, actions, user, onClick, hideViewContentItems}) {
     if (isEmpty(coverages)) {
         return null;
     }
@@ -25,7 +27,9 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
     };
 
     return coverages.map((coverage) => (
-        <div className='coverage-item' key={coverage.coverage_id}>
+        <div className={classNames('coverage-item',
+            {'coverage-item--clickable': onClick})} key={coverage.coverage_id} onClick={onClick}
+        title={onClick ? gettext('Open Agenda in new tab') : onClick} >
             <div className='coverage-item__row'>
                 <span className='d-flex coverage-item--element-grow text-overflow-ellipsis'>
                     <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} ${WORKFLOW_COLORS[coverage.workflow_status]} mr-2`}></i>
@@ -49,7 +53,8 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
                 wireItems={wireItems}
                 actions={actions}
                 user={user}
-                coverageData={getDataFromCoverages(item)} />
+                coverageData={getDataFromCoverages(item)}
+                hideViewContentItems={hideViewContentItems} />
         </div>
     ));
 }

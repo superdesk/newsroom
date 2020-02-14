@@ -26,6 +26,11 @@ export default class CoverageItemStatus extends React.Component {
         super(props);
         this.state = { wireItem: null };
         this.filterActions = this.filterActions.bind(this);
+        this.onAnchorClick = this.onAnchorClick.bind(this);
+    }
+
+    onAnchorClick(e) {
+        e.stopPropagation();
     }
 
     componentDidMount() {
@@ -70,7 +75,7 @@ export default class CoverageItemStatus extends React.Component {
             </span>);
 
         let content = [
-            (<span key="topRow">
+            (<span key="topRow" className={get(actions, 'length', 0) === 0 ? 'coverage-item--element-grow' : ''} >
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>
                 <span key="value">{gettext('coverage {{ state }} ',
                     {state: getCoverageStatusText(coverage)})}</span>
@@ -85,6 +90,7 @@ export default class CoverageItemStatus extends React.Component {
                     <a  href={coverage.delivery_href}
                         className="wire-column__preview__coverage__available-story"
                         target="_blank"
+                        onClick={this.onAnchorClick}
                         title={gettext('Open in new tab')}>
                         {gettext('View Content')}
                     </a>
@@ -92,7 +98,8 @@ export default class CoverageItemStatus extends React.Component {
             );
         }
 
-        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && this.state.wireItem) {
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && this.state.wireItem &&
+            !(this.props.hideViewContentItems || []).includes(this.state.wireItem._id)) {
             content.push(
                 this.state.wireItem._access
                     ? <span key="contentLink" className="label label--available">
@@ -100,12 +107,14 @@ export default class CoverageItemStatus extends React.Component {
                             key="value"
                             href={'/wire?item='+ get(coverage, 'delivery_id')}
                             target="_blank"
+                            onClick={this.onAnchorClick}
                             title={gettext('Open in new tab')}>
                             {gettext('View Content')}
                         </a></span>
                     : <span key="contentLink" className="label label--restricted">
                         <a className="wire-column__preview__coverage__restricted-story"
                             key="value" href="#"
+                            onClick={this.onAnchorClick}
                             target="_blank">{gettext('View Content')}</a></span>
             );
         }
@@ -169,6 +178,7 @@ CoverageItemStatus.propTypes = {
     internal_notes: PropTypes.object,
     ednotes: PropTypes.object,
     workflowStatusReasons: PropTypes.object,
+    hideViewContentItems: PropTypes.array,
 };
 
 CoverageItemStatus.defaultProps = { actions: [] };

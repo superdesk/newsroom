@@ -2454,6 +2454,12 @@ a.wire-articles__versions {
     @include xl {
         padding: 6px 12px;
     }
+
+    &--clickable {
+        &:hover {
+            cursor: pointer;
+        }
+    }
 }
 .coverage-item__row {
     display: flex;
@@ -2474,6 +2480,10 @@ a.wire-articles__versions {
     i {
         font-size: 16px;
         height: 17px;
+    }
+
+    &--gray {
+        color: #747474 !important;
     }
 }
 .coverage-item__column {

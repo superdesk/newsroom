@@ -19,6 +19,7 @@ import SearchSidebar from '../../wire/components/SearchSidebar';
 import getItemActions from '../../wire/item-actions';
 import {gettext} from 'utils';
 
+import {fetchWireItemsForAgenda} from 'agenda/actions';
 import {
     fetchItems,
     fetchMoreItems,
@@ -87,7 +88,8 @@ class AmNewsApp extends BaseApp {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
                 detailsConfig={this.props.detailsConfig}
-                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}/>
+                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
+                fetchWireItemsForAgenda={this.props.fetchWireItemsForAgenda} />
         ]);
     }
 
@@ -191,6 +193,7 @@ class AmNewsApp extends BaseApp {
                                     actions={this.filterActions(this.props.itemToPreview)}
                                     closePreview={this.props.closePreview}
                                     previewConfig={this.props.previewConfig}
+                                    fetchWireItemsForAgenda={this.props.fetchWireItemsForAgenda}
                                 />
                             }
                         </div>
@@ -277,7 +280,8 @@ const mapDispatchToProps = (dispatch) => ({
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     closePreview: () => dispatch(previewItem(null)),
-    toggleNavigation: (navigation) => dispatch(toggleNavigation(navigation))
+    toggleNavigation: (navigation) => dispatch(toggleNavigation(navigation)),
+    fetchWireItemsForAgenda: (agenda) => dispatch(fetchWireItemsForAgenda(agenda))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AmNewsApp);

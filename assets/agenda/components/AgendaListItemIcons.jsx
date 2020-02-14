@@ -2,12 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get, isEqual} from 'lodash';
 import {bem} from 'ui/utils';
-import classNames from 'classnames';
 import {
     hasCoverages,
     isCoverageForExtraDay,
-    hasLocation,
-    getLocationString,
     isRecurring,
     getInternalNote,
     getAttachments,
@@ -17,6 +14,7 @@ import AgendaListItemLabels from './AgendaListItemLabels';
 import AgendaMetaTime from './AgendaMetaTime';
 import AgendaInternalNote from './AgendaInternalNote';
 import AgendaListCoverageItem from './AgendaListCoverageItem';
+import AgendaLocation from './AgendaLocation';
 
 import {gettext} from 'utils';
 
@@ -54,8 +52,6 @@ class AgendaListItemIcons extends React.Component {
                 ),
             attachments: (getAttachments(props.item)).length,
             isRecurring: isRecurring(props.item),
-            hasLocation: hasLocation(props.item),
-            locationString: getLocationString(props.item),
         };
     }
 
@@ -98,22 +94,7 @@ class AgendaListItemIcons extends React.Component {
                 )}
 
                 <div className='wire-articles__item__meta-info flex-row align-items-start'>
-                    {state.hasLocation && (
-                        <React.Fragment>
-                            <span className='mr-2'>
-                                <i className='icon-small--location icon--gray' />
-                            </span>
-
-                            {props.isMobilePhone ? (
-                                <span>{state.locationString}</span>
-                            ) : (
-                                <span className={classNames('mr-2',
-                                    {'wire-articles__item__icons--dashed-border': state.internalNote})}>
-                                    {state.locationString}
-                                </span>
-                            )}
-                        </React.Fragment>
-                    )}
+                    <AgendaLocation item={props.item} isMobilePhone={props.isMobilePhone} border={state.internalNote} />
 
                     {!props.isMobilePhone && (
                         <AgendaInternalNote internalNote={state.internalNote} onlyIcon={true}/>

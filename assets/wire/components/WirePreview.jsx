@@ -106,7 +106,9 @@ class WirePreview extends React.PureComponent {
                             inputId={previousVersions}
                         />
                     }
-                    {isDisplayed('agenda_links', previewConfig) && <AgendaLinks item={item} preview={true} />}
+                    {isDisplayed('agenda_links', previewConfig) &&
+                        <AgendaLinks item={item} preview={true}
+                            fetchWireItemsForAgenda={this.props.fetchWireItemsForAgenda}/>}
                 </div>
             </Preview>
         );
@@ -126,6 +128,7 @@ WirePreview.propTypes = {
     closePreview: PropTypes.func,
     previewConfig: PropTypes.object,
     downloadVideo: PropTypes.func,
+    fetchWireItemsForAgenda: PropTypes.func,
 };
 
 export default WirePreview;
