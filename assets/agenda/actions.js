@@ -79,7 +79,7 @@ export function previewItem(item, group, plan) {
     };
 }
 
-function fetchWireItemsForAgenda(item) {
+export function fetchWireItemsForAgenda(item) {
     return (dispatch) => {
         let wireIds = [];
         (get(item, 'coverages') || []).forEach((c) => {
