@@ -8,7 +8,7 @@ export default function InfoBox(props) {
     const className = bem('info-box', null, {
         'top': props.top,
     });
-    const renderChildren = (props.children || []).filter((c) => c);
+    const renderChildren = (Array.isArray(props.children) ? props.children : [props.children] || []).filter((c) => c);
 
     return (
         <div className={className} id={props.id || null}>
