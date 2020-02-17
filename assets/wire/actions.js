@@ -262,7 +262,7 @@ export function fetchItems() {
 
 export function fetchItem(id) {
     return (dispatch, getState) => {
-        return server.get(`/${getState().context}/${id}?format=json`)
+        return server.get(`/${context(getState())}/${id}?format=json&context=wire`)
             .then((data) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
