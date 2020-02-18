@@ -177,9 +177,10 @@ class MonitoringEmailAlerts(Command):
                     'navigation': str(m['_id']),
                     'created_from': created_from,
                     'created_from_time': created_from_time,
-                    'celery': True
+                    'skip_user_validation': True
                 }
-                items = list(get_resource_service('wire_search').get(req=internal_req, lookup=None))
+
+                items = list(get_resource_service('monitoring_search').get(req=internal_req, lookup=None))
                 if items:
                     company = get_entity_or_404(m['company'], 'companies')
                     try:
