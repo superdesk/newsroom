@@ -53,13 +53,29 @@ export default class AgendaLinks extends React.PureComponent {
     }
 
     openAgenda() {
-        window.open(getAgendaHref(this.props.item, '_blank'));
+        if (get(this.props, 'item.agenda_id')) {
+            window.open(`/agenda?item=${this.props.item.agenda_id}`, '_blank');
+        }
+    }
+
+    coveragesToDisplay() {
+        if (!get(this.props, 'item.coverage_id') || !this.state.agenda) {
+            return [];
+        }
+
+        return (get(this.state.agenda, 'coverages') || []).filter((c) => c.coverage_id !== this.props.item.coverage_id);
     }
 
     render() {
         const {agenda, agendaWireItems} = this.state;
 
         if (!agenda) {
+            return null;
+        }
+
+        const coverages = this.coveragesToDisplay();
+
+        if (coverages.length === 0 && !get(agenda, 'event')) {
             return null;
         }
 
@@ -70,17 +86,16 @@ export default class AgendaLinks extends React.PureComponent {
                         <AgendaEventInfo item={agenda} onClick={this.openAgenda}/>
                     </PreviewTagsBlock>}
 
-                {get(agenda, 'coverages.length', 0) > 0 &&
-                    <PreviewTagsBlock label={gettext('Related Coverage')}>
-                        <div className='mt-3'>
-                            <AgendaCoverages
-                                item={agenda}
-                                coverages={agenda.coverages}
-                                wireItems={agendaWireItems}
-                                onClick={this.openAgenda}
-                                hideViewContentItems={[get(this.props, 'item._id')]} />
-                        </div>
-                    </PreviewTagsBlock>}
+                {coverages.length > 0 && <PreviewTagsBlock label={gettext('Related Coverage')}>
+                    <div className='mt-3'>
+                        <AgendaCoverages
+                            item={agenda}
+                            coverages={coverages}
+                            wireItems={agendaWireItems}
+                            onClick={this.openAgenda}
+                            hideViewContentItems={[get(this.props, 'item._id')]} />
+                    </div>
+                </PreviewTagsBlock>}
             </InfoBox>
         );
     }
@@ -89,6 +104,8 @@ export default class AgendaLinks extends React.PureComponent {
 AgendaLinks.propTypes = {
     item: PropTypes.shape({
         agenda_href: PropTypes.string,
+        agenda_id: PropTypes.string,
+        coverage_id: PropTypes.string,
     }),
     preview: PropTypes.bool,
     fetchWireItemsForAgenda: PropTypes.func,
