@@ -8,9 +8,13 @@
             {% if item.byline %}
                 <div><span>By {{ item.get('byline', '') }}</span></div>
             {% endif %}
-            <div><span>{{ item.get('body_str', '') }}</span></div>
+            {% if monitoring_profile.alert_type == 'linked_text' %}
+                <div>{{ item.get('body_str', '') | safe }}</div>
+            {% else %}
+                <div>{{ item.get('body_html', '') | safe }}</div>
+            {% endif %}
             {% if monitoring_profile.alert_type == 'linked_text' and not print%}
-                <a style="color: grey" href="{{ url_for_wire(item, True) }}">View Article</a>
+                <a style="color: grey" href="{{ url_for('monitoring.index', item=item._id, _external=True) }}">View Article</a>
             {% endif %}
             </br>
         {% endfor %}

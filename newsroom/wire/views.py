@@ -23,7 +23,7 @@ from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
-    get_agenda_dates, get_location_string, get_public_contacts, get_links, get_entities_elastic_or_mongo_or_404
+    get_agenda_dates, get_location_string, get_public_contacts, get_links, get_items_for_user_action
 from newsroom.notifications import push_user_notification, push_notification
 from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
@@ -118,21 +118,6 @@ def get_previous_versions(item):
             reverse=True
         )
     return []
-
-
-def get_items_for_user_action(_ids, item_type):
-    # Getting entities from elastic first so that we get all fields
-    # even those which are not a part of ItemsResource(content_api) schema.
-    items = get_entities_elastic_or_mongo_or_404(_ids, item_type)
-
-    if not items or items[0].get('type') != 'text':
-        return items
-
-    for item in items:
-        if item.get('slugline') and item.get('anpa_take_key'):
-            item['slugline'] = '{0} | {1}'.format(item['slugline'], item['anpa_take_key'])
-
-    return items
 
 
 @blueprint.route('/')

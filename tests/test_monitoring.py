@@ -8,6 +8,7 @@ from unittest import mock
 from .utils import mock_send_email
 from superdesk.utc import utcnow, utc_to_local
 from datetime import timedelta
+from superdesk import get_resource_service
 
 
 company_id = "5c3eb6975f627db90c84093c"
@@ -370,3 +371,42 @@ def test_send_alerts_respects_last_run_time(client, app):
         assert w['last_run_time'] > (utcnow() - timedelta(minutes=5))
         MonitoringEmailAlerts().run()
         assert len(newoutbox) == 0
+
+
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_disabled_profile_wont_send_immediate_alerts(client, app):
+    test_login_succeeds_for_admin(client)
+    get_resource_service('monitoring').patch(ObjectId("5db11ec55f627d8aa0b545fb"), {'is_enabled': False})
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'product immediate',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow(),
+    }])
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run(True)
+        assert len(outbox) == 0
+
+
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_disabled_profile_wont_send_scheduled_alerts(client, app):
+    test_login_succeeds_for_admin(client)
+    w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
+    assert w is not None
+    app.data.update('monitoring', ObjectId('5db11ec55f627d8aa0b545fb'),
+                    {'schedule': {'interval': 'two_hour'}, 'is_enabled': False}, w)
+    app.data.insert('items', [{
+        '_id': 'foo_yesterday',
+        'headline': 'product yesterday',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow() - timedelta(days=1)
+    }])
+    app.data.insert('items', [{
+        '_id': 'foo_last_hour',
+        'headline': 'product last hour',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow() - timedelta(minutes=90)
+    }])
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run()
+        assert len(outbox) == 0

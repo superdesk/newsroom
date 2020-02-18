@@ -23,6 +23,11 @@ from bson import ObjectId
 from eve.utils import ParsedRequest
 from .utils import get_monitoring_file_attachment, truncate_article_body
 
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,6 +43,9 @@ class MonitoringEmailAlerts(Command):
 
         try:
             now_local = utc_to_local(app.config['DEFAULT_TIMEZONE'], utcnow())
+            app.config['SERVER_NAME'] = urlparse(app.config['CLIENT_URL']).netloc or None
+            celery.conf['SERVER_NAME'] = app.config['SERVER_NAME']
+
             now_to_minute = now_local.replace(second=0, microsecond=0)
 
             if immediate:
@@ -61,11 +69,12 @@ class MonitoringEmailAlerts(Command):
     def get_scheduled_monitoring_list(self):
         return list(get_resource_service('monitoring').find(where={'schedule.interval': {'$in': ['two_hour',
                                                                                                  'four_hour', 'weekly',
-                                                                                                 'daily']}}))
+                                                                                                 'daily']},
+                                                                   'is_enabled': True}))
 
     def get_immediate_monitoring_list(self):
         return list(
-            get_resource_service('monitoring').find(where={'schedule.interval': 'immediate'}))
+            get_resource_service('monitoring').find(where={'schedule.interval': 'immediate', 'is_enabled': True}))
 
     def scheduled_worker(self, now):
         monitoring_list = self.get_scheduled_monitoring_list()
@@ -154,7 +163,6 @@ class MonitoringEmailAlerts(Command):
             alert_monitoring['weekly']['w_lists'].append(profile)
 
     def send_alerts(self, monitoring_list, created_from, created_from_time, now):
-        processed_monitoring_list = []
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         error_recipients = []
         if general_settings and general_settings['values'].get('system_alerts_recipients'):
@@ -162,8 +170,7 @@ class MonitoringEmailAlerts(Command):
 
         from newsroom.email import send_email
         for m in monitoring_list:
-            if m.get('users') and m['_id'] not in processed_monitoring_list:
-                processed_monitoring_list.append(m['_id'])
+            if m.get('users'):
                 internal_req = ParsedRequest()
                 internal_req.args = {
                     'navigation': str(m['_id']),
@@ -197,6 +204,8 @@ class MonitoringEmailAlerts(Command):
                                         m['name'])
                             }]
                         )
+                        get_resource_service('monitoring').patch(m['_id'], {
+                            'last_run_time': local_to_utc(app.config['DEFAULT_TIMEZONE'], now)})
                     except Exception:
                         logger.exception('{0} Error processing monitoring profile {1} for company {2}.'.format(
                             self.log_msg, m['name'], company['name']))
@@ -213,11 +222,6 @@ class MonitoringEmailAlerts(Command):
                                 text_body=render_template('monitoring_error.txt', **template_kwargs),
                                 html_body=render_template('monitoring_error.html', **template_kwargs),
                             )
-                            processed_monitoring_list.remove(m['_id'])
-
-        for w_id in processed_monitoring_list:
-            get_resource_service('monitoring').patch(w_id, {
-                    'last_run_time': local_to_utc(app.config['DEFAULT_TIMEZONE'], now)})
 
 
 @celery.task(soft_time_limit=600)
