@@ -364,3 +364,18 @@ def set_original_creator(doc):
 
 def set_version_creator(doc):
     doc['version_creator'] = get_user_id()
+
+
+def get_items_for_user_action(_ids, item_type):
+    # Getting entities from elastic first so that we get all fields
+    # even those which are not a part of ItemsResource(content_api) schema.
+    items = get_entities_elastic_or_mongo_or_404(_ids, item_type)
+
+    if not items or items[0].get('type') != 'text':
+        return items
+
+    for item in items:
+        if item.get('slugline') and item.get('anpa_take_key'):
+            item['slugline'] = '{0} | {1}'.format(item['slugline'], item['anpa_take_key'])
+
+    return items

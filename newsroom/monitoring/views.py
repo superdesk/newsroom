@@ -11,7 +11,7 @@ from newsroom.companies import section
 from newsroom.monitoring import blueprint
 from .forms import MonitoringForm, alert_types
 from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400, \
-    set_original_creator, set_version_creator
+    set_original_creator, set_version_creator, is_json_request, get_items_for_user_action
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
 from newsroom.wire.utils import update_action_list
@@ -129,6 +129,15 @@ def create():
 @blueprint.route('/monitoring/<_id>', methods=['GET', 'POST'])
 @login_required
 def edit(_id):
+    if flask.request.args.get('context', '') == 'wire':
+        items = get_items_for_user_action([_id], 'items')
+        if not items:
+            return
+
+        item = items[0]
+        if is_json_request(flask.request):
+            return flask.jsonify(item)
+
     if 'print' in flask.request.args:
         assert flask.request.args.get('monitoring_profile')
         monitoring_profile = get_entity_or_404(flask.request.args.get('monitoring_profile'), 'monitoring')

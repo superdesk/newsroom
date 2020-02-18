@@ -28,9 +28,12 @@ class MonitoringRTFFormatter(BaseFormatter):
             p2.append(LINE, ('By ' + item['byline']))
 
         p3 = Paragraph(styles.ParagraphStyles.Normal)
-        p3.append(item.get('body_str'))
+        body_lines = item.get('body_str', '').split('\n')
+        for line in body_lines:
+            p3.append(line, LINE, LINE)
+
         if monitoring_profile['alert_type'] == 'linked_text':
-            p3.append(LINE, LINE, 'View article: {}'.format(url_for_wire(item, True)))
+            p3.append(LINE, LINE, 'View article: {}'.format(url_for_wire(item, True, section='monitoring')))
 
         section.append(p2)
         section.append(p3)
