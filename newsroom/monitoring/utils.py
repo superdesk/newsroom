@@ -54,8 +54,14 @@ def truncate_article_body(items, monitoring_profile, full_text=False):
         if monitoring_profile['alert_type'] == 'linked_text':
             if not full_text and len(i['body_str']) > 160:
                 i['body_str'] = i['body_str'][:159] + '...'
-                if monitoring_profile.get('format_type') == 'monitoring_pdf':
-                    i['body_str'] = i['body_str'].replace("\n", "</br>")
+
+        if monitoring_profile.get('format_type') == 'monitoring_pdf':
+            body_lines = i.get('body_str', '').split('\n')
+            altered_html = ''
+            for line in body_lines:
+                altered_html = '{}<div>{}</div>'.format(altered_html, line)
+
+            i['body_str'] = altered_html
 
 
 def get_items_for_monitoring_report(_ids, monitoring_profile, full_text=False):
