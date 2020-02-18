@@ -17,6 +17,7 @@ install_requires = [
     'icalendar>=4.0.3,<4.1',
     'PyRTF3>=0.47.5',
     'xhtml2pdf>=0.2.4',
+    'werkzeug>=0.9.4,<=0.11.15',
 ]
 
 setup(
