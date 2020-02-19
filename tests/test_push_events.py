@@ -702,7 +702,7 @@ def test_push_event_with_files(client, app):
 
 
 @mock.patch('newsroom.agenda.email.send_email', mock_send_email)
-def test_push_item_with_coverage(client, app, mocker):
+def test_push_story_wont_notify_for_first_publish(client, app, mocker):
     test_item = {
         'type': 'text',
         'guid': 'item',
@@ -729,10 +729,7 @@ def test_push_item_with_coverage(client, app, mocker):
     assert wire_item['agenda_id'] == 'foo'
     assert wire_item['agenda_href'] == '/agenda/foo'
 
-    assert len(outbox) == 1
-    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
-    assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
-    assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
+    assert len(outbox) == 0
 
 
 def assign_active_company(app):
