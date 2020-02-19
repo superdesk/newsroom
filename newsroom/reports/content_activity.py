@@ -29,7 +29,7 @@ def get_items(args):
         'size': CHUNK_SIZE,
         'from': 0,
         'sort': [{'versioncreated': 'asc'}],
-        '_source': ['headline', 'place', 'subject', 'service', 'versioncreated']
+        '_source': ['headline', 'place', 'subject', 'service', 'versioncreated', 'anpa_take_key']
     }
 
     must_terms = []
