@@ -1,4 +1,3 @@
-from flask_babel import gettext
 from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
 
 CLIENT_TIME_FORMAT = 'HH:mm'
@@ -25,16 +24,7 @@ WIRE_AGGS = {
     'subject': {'terms': {'field': 'subject.name', 'size': 20}},
 }
 
-WIRE_GROUPS = [
-    {
-        'field': 'service',
-        'label': gettext('Category'),
-    },
-    {
-        'field': 'subject',
-        'label': gettext('Subject'),
-    }
-]
+WIRE_GROUPS = []
 
 BLUEPRINTS = [
     'newsroom.wire',
