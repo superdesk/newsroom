@@ -787,7 +787,9 @@ class AgendaService(newsroom.Service):
                     self.enhance_coverage_with_wire_details(coverage, wire_item)
                     push_notification('new_item', _items=[item])
 
-                    self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, coverage)
+                    # If published first time, coverage completion will trigger email - not needed now
+                    if (d or {}).get('sequence_no', 0) > 0:
+                        self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, coverage)
                     break
         return agenda_items
 
@@ -871,59 +873,62 @@ class AgendaService(newsroom.Service):
             notify_states = [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED,
                              WORKFLOW_STATE.KILLED, WORKFLOW_STATE.SCHEDULED]
 
-            if not related_planning_removed:
-                # Send notification if time got updated
-                if original_agenda.get('dates') and agenda.get('dates'):
-                    time_updated = (original_agenda.get('dates') or {}).get('start').replace(tzinfo=None) != \
-                                   (agenda.get('dates') or {}).get('start').replace(tzinfo=None) or \
-                        (original_agenda.get('dates') or {}).get('end').replace(tzinfo=None) != \
-                        (agenda.get('dates') or {}).get('end').replace(tzinfo=None)
+            if not coverage_updated:  # If not story updates - but from planning side
+                if not related_planning_removed:
+                    # Send notification if time got updated
+                    if original_agenda.get('dates') and agenda.get('dates'):
+                        time_updated = (original_agenda.get('dates') or {}).get('start').replace(tzinfo=None) != \
+                                       (agenda.get('dates') or {}).get('start').replace(tzinfo=None) or \
+                            (original_agenda.get('dates') or {}).get('end').replace(tzinfo=None) != \
+                            (agenda.get('dates') or {}).get('end').replace(tzinfo=None)
 
-                if agenda.get('state') and agenda.get('state') != original_agenda.get('state'):
-                    state_changed = agenda.get('state') in notify_states
+                    if agenda.get('state') and agenda.get('state') != original_agenda.get('state'):
+                        state_changed = agenda.get('state') in notify_states
 
-                if not state_changed:
-                    if time_updated:
-                        fill_all_coverages()
-                    else:
-                        for coverage in agenda.get('coverages') or []:
-                            existing_coverage = next((c for c in original_agenda.get('coverages') or []
-                                                      if c['coverage_id'] == coverage['coverage_id']), None)
-                            detailed_coverage = get_detailed_coverage(coverage)
-                            if detailed_coverage:
-                                if not existing_coverage:
-                                    if coverage['workflow_status'] != WORKFLOW_STATE.CANCELLED:
+                    if not state_changed:
+                        if time_updated:
+                            fill_all_coverages()
+                        else:
+                            for coverage in agenda.get('coverages') or []:
+                                existing_coverage = next((c for c in original_agenda.get('coverages') or []
+                                                          if c['coverage_id'] == coverage['coverage_id']), None)
+                                detailed_coverage = get_detailed_coverage(coverage)
+                                if detailed_coverage:
+                                    if not existing_coverage:
+                                        if coverage['workflow_status'] != WORKFLOW_STATE.CANCELLED:
+                                            coverage_updates['modified_coverages'].append(detailed_coverage)
+                                    elif coverage.get('workflow_status') == WORKFLOW_STATE.CANCELLED and \
+                                            existing_coverage.get('workflow_status') != coverage.get('workflow_status'):
+                                        coverage_updates['cancelled_coverages'].append(detailed_coverage)
+                                    elif (coverage.get('delivery_state') != existing_coverage.get('delivery_state') and
+                                            coverage.get('delivery_state') == 'published') or \
+                                        (coverage.get('workflow_status') != existing_coverage.get('workflow_status') and
+                                            coverage.get('workflow_status') == 'completed') or \
+                                            (existing_coverage.get('scheduled') != coverage.get('scheduled')):
                                         coverage_updates['modified_coverages'].append(detailed_coverage)
-                                elif coverage.get('workflow_status') == WORKFLOW_STATE.CANCELLED and \
-                                        existing_coverage.get('workflow_status') != coverage.get('workflow_status'):
-                                    coverage_updates['cancelled_coverages'].append(detailed_coverage)
-                                elif (coverage.get('delivery_state') != existing_coverage.get('delivery_state') and
-                                        coverage.get('delivery_state') == 'published') or \
-                                    (coverage.get('workflow_status') != existing_coverage.get('workflow_status') and
-                                        coverage.get('workflow_status') == 'completed') or \
-                                        (existing_coverage.get('scheduled') != coverage.get('scheduled')):
-                                    coverage_updates['modified_coverages'].append(detailed_coverage)
-                                    only_new_coverages = False
-                                elif detailed_coverage['coverage_id'] != (coverage_updated or {}).get('coverage_id'):
-                                    coverage_updates['unaltered_coverages'].append(detailed_coverage)
+                                        only_new_coverages = False
+                                    elif detailed_coverage['coverage_id'] != \
+                                            (coverage_updated or {}).get('coverage_id'):
+                                        coverage_updates['unaltered_coverages'].append(detailed_coverage)
 
-                        # Check for removed coverages - show it as cancelled
-                        if item and item.get('type') == 'planning':
-                            for original_cov in original_agenda.get('coverages') or []:
-                                updated_cov = next((c for c in (agenda.get('coverages') or [])
-                                                    if c.get('coverage_id') == original_cov.get('coverage_id')), None)
-                                if not updated_cov:
-                                    coverage_updates['cancelled_coverages'].append(original_cov)
+                            # Check for removed coverages - show it as cancelled
+                            if item and item.get('type') == 'planning':
+                                for original_cov in original_agenda.get('coverages') or []:
+                                    updated_cov = next((c for c in (agenda.get('coverages') or [])
+                                                        if c.get('coverage_id') ==
+                                                        original_cov.get('coverage_id')), None)
+                                    if not updated_cov:
+                                        coverage_updates['cancelled_coverages'].append(original_cov)
+                    else:
+                        fill_all_coverages(cancelled=False if agenda.get('state') == WORKFLOW_STATE.SCHEDULED else True,
+                                           use_original_agenda=True)
                 else:
-                    fill_all_coverages(cancelled=False if agenda.get('state') == WORKFLOW_STATE.SCHEDULED else True,
-                                       use_original_agenda=True)
-            else:
-                fill_all_coverages(related_planning_removed.get('coverages') or [])
-                # Add removed coverages:
-                for coverage in related_planning_removed.get('coverages') or []:
-                    detailed_coverage = get_detailed_coverage(coverage)
-                    if detailed_coverage:
-                        coverage_updates['cancelled_coverages'].append(detailed_coverage)
+                    fill_all_coverages(related_planning_removed.get('coverages') or [])
+                    # Add removed coverages:
+                    for coverage in related_planning_removed.get('coverages') or []:
+                        detailed_coverage = get_detailed_coverage(coverage)
+                        if detailed_coverage:
+                            coverage_updates['cancelled_coverages'].append(detailed_coverage)
 
             if len(coverage_updates['modified_coverages']) > 0 or len(coverage_updates['cancelled_coverages']) > 0:
                 coverage_modified = True
