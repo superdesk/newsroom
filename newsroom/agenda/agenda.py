@@ -25,6 +25,7 @@ from newsroom.wire.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
+from bson import ObjectId
 
 
 logger = logging.getLogger(__name__)
@@ -764,6 +765,7 @@ class AgendaService(newsroom.Service):
         for item in agenda_items:
             wire_item.setdefault('agenda_id', item['_id'])
             wire_item.setdefault('agenda_href', url_for('agenda.item', _id=item['_id']))
+            self.enhance_coverage_watches(item)
             coverages = item['coverages']
             for coverage in coverages:
                 if coverage['coverage_id'] == wire_item['coverage_id'] and is_delivery_validated(coverage, item):
@@ -789,6 +791,11 @@ class AgendaService(newsroom.Service):
                     break
         return agenda_items
 
+    def enhance_coverage_watches(self, item):
+        for c in (item.get('coverages') or []):
+            if c.get('watches'):
+                c['watches'] = [ObjectId(u) for u in c['watches']]
+
     def notify_new_coverage(self, agenda, wire_item):
         user_dict = get_user_dict()
         company_dict = get_company_dict()
@@ -803,7 +810,12 @@ class AgendaService(newsroom.Service):
         if agenda and original_agenda.get('state') != WORKFLOW_STATE.KILLED:
             user_dict = get_user_dict()
             company_dict = get_company_dict()
-            coverage_watched = len([c.get('watches') for c in (original_agenda.get('coverages') or [])]) > 0
+            coverage_watched = None
+            for c in (original_agenda.get('coverages') or []):
+                if len(c.get('watches') or []) > 0:
+                    coverage_watched = True
+                    break
+
             notify_user_ids = filter_active_users(original_agenda.get('watches', []),
                                                   user_dict,
                                                   company_dict,
@@ -845,12 +857,12 @@ class AgendaService(newsroom.Service):
                             fill_list.append(detailed_coverage)
 
             coverage_updates = {
-                'modified_coverages': [],
+                'modified_coverages': [] if not coverage_updated else [coverage_updated],
                 'cancelled_coverages': [],
                 'unaltered_coverages': []
             }
 
-            only_new_coverages = True
+            only_new_coverages = len(coverage_updates['modified_coverages']) == 0
             time_updated = False
             state_changed = False
             coverage_modified = False

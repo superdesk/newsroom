@@ -170,7 +170,7 @@ def watch_coverage():
     try:
         coverage_index = [c['coverage_id'] for c in (item.get('coverages') or [])].index(data['coverage_id'])
     except ValueError:
-        return flask.jsonify({'error': gettext('Coverage not found.')}), 403
+        return flask.jsonify({'error': gettext('Coverage not found.')}), 404
 
     updates = {'coverages': item['coverages']}
     if request.method == 'POST':
@@ -180,7 +180,7 @@ def watch_coverage():
         try:
             updates['coverages'][coverage_index]['watches'].remove(user_id)
         except Exception:
-            return flask.jsonify({'error': gettext('Error removing watch.')}), 403
+            return flask.jsonify({'error': gettext('Error removing watch.')}), 404
 
     get_resource_service('agenda').patch(data['item_id'], updates)
     return flask.jsonify(), 200

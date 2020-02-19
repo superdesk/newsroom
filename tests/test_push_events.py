@@ -730,7 +730,7 @@ def test_push_item_with_coverage(client, app, mocker):
     assert wire_item['agenda_href'] == '/agenda/foo'
 
     assert len(outbox) == 1
-    assert 'Subject: Prime minister press conference - updated' in str(outbox[0])
+    assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
     assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
     assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
 
