@@ -40,9 +40,12 @@ class NewsAPINewsService(BaseSearchService):
     # set of fields that can be specified in the include_fields parameter
     allowed_include_fields = {'type', 'urgency', 'priority', 'language', 'description_html', 'located', 'keywords',
                               'source', 'subject', 'place', 'wordcount', 'charcount', 'body_html', 'readtime',
-                              'profile', 'service', 'genre', 'versioncreated'}
+                              'profile', 'service', 'genre'}
 
-    default_fields = {'_id', 'uri', 'embargoed', 'pubstatus', 'ednote', 'signal', 'copyrightnotice', 'copyrightholder'}
+    default_fields = {
+        '_id', 'uri', 'embargoed', 'pubstatus', 'ednote', 'signal', 'copyrightnotice', 'copyrightholder',
+        'versioncreated'
+    }
 
     # set of fields that will be removed from all responses, we are not currently supporting associations and
     # the products embedded in the items are the superdesk products
@@ -93,6 +96,7 @@ class NewsAPINewsService(BaseSearchService):
         self.apply_products_filter(search)
         self.apply_fields_filter(search)
         self.apply_date_filter(search)
+        self.apply_request_filter(search)
         self.apply_projections(search)
 
         if len(search.query['bool'].get('should', [])):
@@ -553,6 +557,8 @@ class NewsAPINewsService(BaseSearchService):
                     request_params.get('start_date'),
                     request_params.get('timezone')
                 )
+        except BadParameterValueError:
+            raise
         except ValueError:
             raise BadParameterValueError(
                 desc=err_msg.format('start_date')) from None

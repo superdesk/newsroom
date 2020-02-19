@@ -1,4 +1,15 @@
-Feature: News API Products
+Feature: News API News Search
+
+    Background: Initial setup
+        Given "companies"
+        """
+        [{"name": "Test Company", "is_enabled" : true}]
+        """
+        Given "news_api_tokens"
+        """
+        [{"company" : "#companies._id#", "enabled" : true}]
+        """
+        When we save API token
 
   Scenario: Simple query string request for fish
      Given "items"
@@ -6,23 +17,6 @@ Feature: News API Products
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A fishy Product",
@@ -48,23 +42,6 @@ Feature: News API Products
         [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE-5#" },
         {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE-1#" }]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -91,23 +68,6 @@ Feature: News API Products
         {"body_html": "Once upon a time there was a quokka who could swim", "versioncreated": "#DATE-3#" },
         {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE-1#" }]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -134,23 +94,6 @@ Feature: News API Products
         {"body_html": "Once upon a time there was a quokka who could swim", "versioncreated": "2018-11-11 03:48:39.000Z" },
         {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "2018-11-13 03:48:39.000Z" }]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -200,23 +143,6 @@ Feature: News API Products
         {"body_html": "Five", "versioncreated": "#DATE-5#" },
         {"body_html": "One", "versioncreated": "#DATE-1#" }]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -228,7 +154,7 @@ Feature: News API Products
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&sort=versioncreated:asc&include_fields=body_html,versioncreated"
+   When we get "news/search?start_date=now-10d&sort=versioncreated:asc&include_fields=body_html"
     Then we get list ordered by versioncreated with 3 items
     """
      {"_items": [
@@ -245,23 +171,6 @@ Feature: News API Products
         {"body_html": "Five", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
         {"body_html": "One", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -290,23 +199,6 @@ Feature: News API Products
         {"body_html": "Five", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
         {"body_html": "One", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -328,23 +220,6 @@ Feature: News API Products
         {"body_html": "Five", "versioncreated": "#DATE-5#", "pubstatus": "usable2"  },
         {"body_html": "One", "versioncreated": "#DATE-1#", "pubstatus": "usable3"  }]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -374,23 +249,6 @@ Feature: News API Products
         {"body_html": "Five", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
         {"body_html": "One", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -417,7 +275,6 @@ Feature: News API Products
         {"headline": "Headline 3"}
      ]}
      """
-
 
     Scenario: search by service
      Given "items"
@@ -458,23 +315,6 @@ Feature: News API Products
             }
         ]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -533,23 +373,6 @@ Feature: News API Products
             }
         ]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -570,23 +393,6 @@ Feature: News API Products
      """
 
      Scenario: search by product
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A Product",
@@ -655,23 +461,6 @@ Feature: News API Products
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A fishy Product",
@@ -696,23 +485,6 @@ Feature: News API Products
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "companies"
-        """
-        [
-        {
-          "name": "Test Company",
-          "is_enabled" : true
-        }
-        ]
-        """
-     Given "news_api_tokens"
-        """
-        [{
-          "company" : "#companies._id#",
-          "enabled" : true
-        }]
-        """
-     When we save API token
      Given "products"
         """
         [{"name": "A fishy Product",
@@ -729,3 +501,50 @@ Feature: News API Products
       """
       [{ "X-RateLimit-Reset":  "__any_value__"}]
       """
+
+    Scenario: Parameter validation
+        When we get "/news/search?q=[[h.ldofdjsafalkjsdfkjlsdf\\[[**@#"
+        Then we get error 400
+        """
+        {"code": 400, "message": "Invalid search query"}
+        """
+        When we get "/news/search?include_fields=secret"
+        Then we get error 400
+        """
+        {"code": 400, "message": "Include fields contains a non-allowed value"}
+        """
+        When we get "/news/search?exclude_fields=copyrightnotice"
+        Then we get error 400
+        """
+        {"code": 400, "message": "Exclude fields contains a non-allowed value"}
+        """
+        When we get "/news/search?include_fields=type&include_fields=genre"
+        Then we get error 400
+        """
+        {"code": 400, "message": "Multiple values received for parameter (include_fields)"}
+        """
+        When we get "/news/search?filter=123,456"
+        Then we get error 400
+        """
+        {"code": 400, "message": "Bad parameter value for Parameter (filter)"}
+        """
+        When we get "/news/search?genre=null"
+        Then we get error 400
+        """
+        {"code": 400, "message": "Bad parameter value for Parameter (genre)"}
+        """
+        When we get "/news/search?start_date=2015abcd"
+        Then we get error 400
+        """
+        {"code": 400, "message": "start_date parameter must be a valid ISO 8601 date (YYYY-MM-DD) with optional the time part"}
+        """
+        When we get "/news/search?end_date=2015abcd"
+        Then we get error 400
+        """
+        {"code": 400, "message": "end_date parameter must be a valid ISO 8601 date (YYYY-MM-DD) with optional the time part"}
+        """
+        When we get "/news/search?start_date=2015-06-01&end_date=2015-06-30&timezone=123"
+        Then we get error 400
+        """
+        {"code": 400, "message": "Bad parameter value for Parameter (timezone)"}
+        """

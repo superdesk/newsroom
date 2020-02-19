@@ -17,6 +17,7 @@ CORE_APPS = [
     'newsroom.news_api.news',
     'newsroom.news_api.news.item',
     'newsroom.news_api.news.search',
+    'newsroom.news_api.news.feed',
     'newsroom.products',
     'newsroom.news_api.api_audit',
 ]
