@@ -102,6 +102,7 @@ class ContentActivity extends React.Component {
         const headers = [
             gettext('Published'),
             gettext('Headline'),
+            gettext('Take Key'),
             gettext('Place'),
             gettext('Category'),
             gettext('Subject'),
@@ -151,6 +152,7 @@ class ContentActivity extends React.Component {
                 _id: item._id,
                 versioncreated: formatTime(get(item, 'versioncreated') || ''),
                 headline: get(item, 'headline') || '',
+                anpa_take_key: get(item, 'anpa_take_key') || '',
                 place: (get(item, 'place') || [])
                     .map((place) => place.name)
                     .sort(),
@@ -204,6 +206,7 @@ class ContentActivity extends React.Component {
                 <tr key={item._id}>
                     <td>{item.versioncreated}</td>
                     <td>{item.headline}</td>
+                    <td>{item.anpa_take_key}</td>
                     <td>{item.place.map((place) => (
                         <Fragment key={place}>
                             {place}<br />

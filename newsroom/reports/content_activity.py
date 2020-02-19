@@ -25,7 +25,7 @@ def get_items(args):
         abort(400, gettext('Must provide a section for this report'))
 
     source = {
-        'query': _items_query(),
+        'query': _items_query(True),
         'size': CHUNK_SIZE,
         'from': 0,
         'sort': [{'versioncreated': 'asc'}],
@@ -143,7 +143,7 @@ def get_facets(args):
     def get_genres():
         """Get the list of genres from the news items"""
 
-        query = _items_query()
+        query = _items_query(True)
         must_terms = []
         source = {}
 
@@ -223,6 +223,7 @@ def export_csv(args, results):
     rows = [[
         gettext('Published'),
         gettext('Headline'),
+        gettext('Take Key'),
         gettext('Place'),
         gettext('Category'),
         gettext('Subject'),
@@ -256,6 +257,7 @@ def export_csv(args, results):
         row = [
             utc_to_local('Australia/Sydney', item.get('versioncreated')).strftime('%H:%M'),
             item.get('headline'),
+            item.get('anpa_take_key') or '',
             '\r\n'.join(sorted([place.get('name') or '' for place in item.get('place') or []])),
             '\r\n'.join(sorted([service.get('name') or '' for service in item.get('service') or []])),
             '\r\n'.join(sorted([subject.get('name') or '' for subject in item.get('subject') or []])),
