@@ -1,5 +1,66 @@
 # Newsroom Changelog
 
+## [1.18.0] 2020-02-20
+### Features
+- News API
+    - [SDAN-550] Add token resource for news API (#835)
+    - [SDAN-546] Add 'News API' section filters (#837)
+    - [SDAN-542] Ability to manage Company API Tokens (#839)
+    - [SDAN-547] News API time limit setting (#852)
+    - [SDAN-542] fix(api-key) Unable to set expiry to never (#851)
+    - [SDAN-551] Initialize the news API app (#862)
+    - [SDAN-552] Implement API token authentication (#866)
+    - [SDAN-553] Add Products to the news api (#871)
+    - [SDAN-556][SDAN-557] News API return item in requested format (#883)
+    - [SDAN-607] Add NINJS formatter (#885)
+    - fix(API item expiry) stop the API returning expired items (#887)
+    - [SDAN-554] Search endpoint for News API (#900)
+    - [SDAN-554] News API search paging, absolute date search fixes (#934)
+    - [SDAN-630] Use base class for Web and NewsAPI apps (#950)
+    - [SDAN-606] (fix): API token expiry stored as string instead of datetime (#946)
+    - [SDAN-544][SDAN-561] IP whitelisting feature for News API (#947)
+    - [SDAN-630] (fix): incorrect app import for manage.py (#953)
+    - [SDAN-560] Rate Limiting for News API (#951)
+    - [SDAN-563] News API Audit (#952)
+    - [SDAN-562] Company API Usage report (#955)
+- Monitoring
+    - [SDAN-440] Create and Schedule Watch Lists for a company. also add a section filter (#869)
+    - [SDAN-440] Watch Lists configuration - minor fixes (#877)
+    - [SDAN-441] User and Watch List Administrator activities (#884)
+    - [SDAN-440] Include 'keywords' in watch_list creation and other bug-fixes around watch_list settings feature (#889)
+    - [SDAN-442] Watch Lists view page (#892)
+    - [SDAN-443] Watchlists email alerts (#901)
+    - [SDAN-623] Rename watch_lists to 'monitoring' across the system (#935)
+    - [SDAN-627] Add monitoring icon (#939)
+    - [SDAN-633] Formatting monitoring outputs for alerts, exports, share and print (#957)
+    - Customizing RTF and PDF files to monitoring. (#960)
+    - [SDAN-633] Allow customisation of monitoring logo (#964)
+    - [SDAN-647] Add a 'Layout' dropdown option when downloading items from monitoring (#969)
+    - [SDAN-648] Bug fixes around Monitoring (#971)
+    - [SDAN-648] Minor style changes to PDF reports in Monitoring (#975)
+    - [SDAN-648] Line spacings for monitoring PDF report (#980)
+
+### Improvements
+- [SDAN-635] Break words meaningfully on location display in Agenda (#962)
+- [SDAN-636] Advertise Scheduled Updates in Newsroom Agenda (#968)
+- [SDAN-634] Changes to Agenda tiles displayed on Newsroom wire stories (#965)
+- [SDAN-634] Show only other coverages in Agenda tile on wire items (#972)
+- [SDAN-651] Reduce size of heading in Agenda Watch email (#978)
+
+### Fixes
+- build fix while using _expand_contact_info in json_event formatter (#963)
+- [SDAN-638] Show 'View Content' to Graphic coverages (#961)
+- [SDAN-643][SDAN-644]'Reason for' not being displayed for Cancelled Coverages in Agenda, Coverage ednote not seen (#966)
+- fix(pytest): Cyclic import error when running single test file (#967)
+- [SDAN-655] Previewing an agenda item with a coverage crashes react (#970)
+- fix(tests): Use same werkzeug version as eve 0.7.8 (#973)
+- [SDAN-649] Share/delete icons not showing in my topic pages (#976)
+- [SDAN-654] ContentActivity should report on all versions (#977)
+- [SDAN-650][SDAN-656] Story updates are not triggering emails for watched coverages, 'Forbidden' error raised when unwatching certain coverages (#979)
+- [SDAN-656] Coverage update repeated in watched coverage email (#981)
+- [SDAN-658] fix duplicate take key in slugline view elements (#982)
+- [SDAN-654] Add 'anpa_take_key' to elastic query response for ContentActivity (#984)
+
 ## [1.17.1] 2020-01-29
 ### Features
 - [SDAN-632] ContentActivity report (#954)
