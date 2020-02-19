@@ -673,9 +673,10 @@ export function getSlugline(item, withTakeKey = false) {
     }
 
     let slugline = item.slugline.trim();
+    const takeKey = ` | ${item.anpa_take_key}`;
 
-    if (withTakeKey && item.anpa_take_key) {
-        slugline += ` | ${item.anpa_take_key}`;
+    if (withTakeKey && item.anpa_take_key && !slugline.endsWith(takeKey)) {
+        slugline += takeKey;
     }
 
     return slugline;
