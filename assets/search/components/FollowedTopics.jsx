@@ -38,7 +38,7 @@ class FollowedTopics extends React.Component {
             action: this.editTopic,
         }];
 
-        if (!this.props.topicType === 'monitoring') {
+        if (this.props.topicType !== 'monitoring') {
             this.actions = [
                 ...this.actions,
                 {
