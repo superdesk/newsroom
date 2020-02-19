@@ -59,7 +59,7 @@ def truncate_article_body(items, monitoring_profile, full_text=False):
             body_lines = i.get('body_str', '').split('\n')
             altered_html = ''
             for line in body_lines:
-                altered_html = '{}<div>{}</div>'.format(altered_html, line)
+                altered_html = '{}<div class="line">{}</div>'.format(altered_html, line)
 
             i['body_str'] = altered_html
 
