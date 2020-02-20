@@ -15,6 +15,7 @@ install_requires = [
     'gunicorn>=19.7.1',
     'superdesk-core>=1.31.1,<=1.32',
     'icalendar>=4.0.3,<4.1',
+    'werkzeug>=0.9.4,<=0.11.15'
 ]
 
 setup(
