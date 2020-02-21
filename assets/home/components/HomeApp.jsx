@@ -16,7 +16,6 @@ import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import WirePreview from 'wire/components/WirePreview';
 import {followStory} from 'search/actions';
 import {downloadVideo} from 'wire/actions';
-import {fetchWireItemsForAgenda} from 'agenda/actions';
 import {previewConfigSelector} from 'ui/selectors';
 
 const modals = {
@@ -159,7 +158,6 @@ class HomeApp extends React.Component {
                         closePreview={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
                         previewConfig={this.props.previewConfig}
                         downloadVideo={this.props.downloadVideo}
-                        fetchWireItemsForAgenda={this.props.fetchWireItemsForAgenda}
                     />
                 )}
             </div>,
@@ -194,7 +192,6 @@ HomeApp.propTypes = {
     previewConfig: PropTypes.object,
     downloadVideo: PropTypes.func,
     topics: PropTypes.array,
-    fetchWireItemsForAgenda: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -220,7 +217,6 @@ const mapDispatchToProps = (dispatch) => ({
     fetchCardExternalItems: (cardId, cardLabel) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
     followStory: (item) => followStory(item, 'wire'),
     downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType)),
-    fetchWireItemsForAgenda: (agenda) => dispatch(fetchWireItemsForAgenda(agenda))
 
 });
 

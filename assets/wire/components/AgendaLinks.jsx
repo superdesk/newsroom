@@ -9,10 +9,6 @@ import PreviewTagsBlock from './PreviewTagsBlock';
 import AgendaCoverages from 'agenda/components/AgendaCoverages';
 import AgendaEventInfo from 'agenda/components/AgendaEventInfo';
 
-function getAgendaHref(item) {
-    return get(item, 'agenda_href');
-}
-
 export default class AgendaLinks extends React.PureComponent {
     constructor(props) {
         super(props);
@@ -23,33 +19,34 @@ export default class AgendaLinks extends React.PureComponent {
             agenda: null,
             agendaWireItems: []
         };
-        this.fetchAgenda();
+        this.fetchAgendaData();
     }
 
     componentDidUpdate(prevProps) {
-        if (getAgendaHref(prevProps.item) !== getAgendaHref(this.props.item)) {
-            this.setState({agenda: null});
-            this.fetchAgenda();
-        }
-    }
-
-    fetchAgenda() {
-        const url = getAgendaHref(this.props.item);
-
-        if (url) {
-            server.getJson(url).then((agenda) => {
-                this.setState({agenda});
-                this.fetchWireItemsForAgenda(agenda);
+        if (get(prevProps, 'item._id') !== get(this.props, 'item._id')) {
+            this.setState({
+                agenda: null,
+                'agendaWireItems': [],
             });
+            this.fetchAgendaData();
         }
     }
 
-    fetchWireItemsForAgenda(agenda) {
-        this.props.fetchWireItemsForAgenda(agenda).then((items) =>
-        // {this.setState({agendaWireItems: (items || []).filter((i) => (i._id !== get(this.props, 'item._id')))});
-        {this.setState({agendaWireItems: items});
-
-        });
+    fetchAgendaData() {
+        if (get(this.props, 'item._id')) {
+            server.getJson(`agenda/wire_items/${this.props.item._id}`).then((data) => {
+                this.setState({
+                    'agenda': get(data, 'agenda_item'),
+                    'agendaWireItems': get(data, 'wire_items'),
+                });
+            })
+                .catch(() => {
+                    this.setState({
+                        'agenda': null,
+                        'agendaWireItems': [],
+                    });
+                });
+        }
     }
 
     openAgenda() {
@@ -103,10 +100,9 @@ export default class AgendaLinks extends React.PureComponent {
 
 AgendaLinks.propTypes = {
     item: PropTypes.shape({
-        agenda_href: PropTypes.string,
         agenda_id: PropTypes.string,
+        _id: PropTypes.string,
         coverage_id: PropTypes.string,
     }),
     preview: PropTypes.bool,
-    fetchWireItemsForAgenda: PropTypes.func,
 };

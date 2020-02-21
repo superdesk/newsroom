@@ -21,8 +21,6 @@ import {
     saveMyTopic,
 } from 'search/actions';
 
-import {fetchWireItemsForAgenda} from 'agenda/actions';
-
 import {
     searchQuerySelector,
     activeViewSelector,
@@ -129,7 +127,6 @@ class WireApp extends BaseApp {
                 detailsConfig={this.props.detailsConfig}
                 downloadVideo={this.props.downloadVideo}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
-                fetchWireItemsForAgenda={this.props.fetchWireItemsForAgenda}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar
@@ -217,7 +214,6 @@ class WireApp extends BaseApp {
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
                                 downloadVideo={this.props.downloadVideo}
-                                fetchWireItemsForAgenda={this.props.fetchWireItemsForAgenda}
                             />
                             }
 
@@ -321,7 +317,6 @@ const mapDispatchToProps = (dispatch) => ({
     setView: (view) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
     downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType)),
-    fetchWireItemsForAgenda: (agenda) => dispatch(fetchWireItemsForAgenda(agenda))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

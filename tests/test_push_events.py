@@ -726,8 +726,6 @@ def test_push_story_wont_notify_for_first_publish(client, app, mocker):
 
     wire_item = get_json(client, '/wire/item')
     assert wire_item['_id'] == 'item'
-    assert wire_item['agenda_id'] == 'foo'
-    assert wire_item['agenda_href'] == '/agenda/foo'
 
     assert len(outbox) == 0
 
@@ -973,8 +971,6 @@ def test_push_update_for_an_item_with_coverage(client, app, mocker):
 
     wire_item = get_json(client, '/wire/item')
     assert wire_item['_id'] == 'item'
-    assert wire_item['agenda_id'] == 'foo'
-    assert wire_item['agenda_href'] == '/agenda/foo'
 
     updated_item = {
         'type': 'text',
@@ -993,8 +989,6 @@ def test_push_update_for_an_item_with_coverage(client, app, mocker):
 
     wire_item = get_json(client, '/wire/update')
     assert wire_item['_id'] == 'update'
-    assert wire_item['agenda_id'] == 'foo'
-    assert wire_item['agenda_href'] == '/agenda/foo'
 
 
 def test_push_coverages_with_linked_stories(client, app):
