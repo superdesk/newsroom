@@ -1,31 +1,15 @@
-from flask_mail import Attachment
 from flask import current_app as app
 import collections
-import tempfile
-from superdesk.logging import logger
 from superdesk.text_utils import get_text
 from newsroom.utils import get_items_by_id
 
 
-def get_monitoring_file_attachment(monitoring_profile, items, as_temp_file=False):
+def get_monitoring_file(monitoring_profile, items):
     _format = monitoring_profile.get('format_type', 'monitoring_pdf')
     formatter = app.download_formatters[_format]['formatter']
-    file = formatter.get_monitoring_file(get_date_items_dict(items), monitoring_profile)
-    if as_temp_file:
-        try:
-            _file = tempfile.NamedTemporaryFile(delete=False)
-            _file.write(file.read())
-            return _file.name
-        except Exception as e:
-            logger('Error creating tempFile for monitoring profile: {}. Error: {}'.format(
-                    monitoring_profile['name']), e)
-            return
-
-    fp = file.read()
-    attachments = [Attachment(filename=formatter.format_filename(None),
-                              content_type='application/{}'.format(formatter.FILE_EXTENSION),
-                              data=fp)]
-    return attachments
+    _file = formatter.get_monitoring_file(get_date_items_dict(items), monitoring_profile)
+    _file.seek(0)
+    return _file
 
 
 def get_keywords_in_text(text, keywords):
