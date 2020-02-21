@@ -35,10 +35,6 @@ def init_app(app):
                 }
             }
         },
-        'agenda_id': {
-            'type': 'string',
-            'mapping': not_analyzed,
-        },
     })
 
     superdesk.register_resource('wire_search', WireSearchResource, WireSearchService, _app=app)

@@ -3,7 +3,7 @@ import logging
 from copy import deepcopy
 from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
-from flask import json, abort, url_for, current_app as app
+from flask import json, abort, current_app as app
 from flask_babel import gettext
 from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE, WORKFLOW_STATE
 from planning.events.events_schema import events_schema
@@ -763,8 +763,6 @@ class AgendaService(newsroom.Service):
 
         agenda_items = self.get_items_by_query(query)
         for item in agenda_items:
-            wire_item.setdefault('agenda_id', item['_id'])
-            wire_item.setdefault('agenda_href', url_for('agenda.item', _id=item['_id']))
             self.enhance_coverage_watches(item)
             coverages = item['coverages']
             for coverage in coverages:
