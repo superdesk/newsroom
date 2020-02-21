@@ -7,6 +7,7 @@ from flask_babel import gettext
 from eve.methods.get import get_internal
 from eve.render import send_response
 from superdesk import get_resource_service
+from eve.utils import ParsedRequest
 
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
@@ -20,6 +21,7 @@ from newsroom.agenda.email import send_coverage_request_email
 from newsroom.agenda.utils import remove_fields_for_public_user
 from newsroom.companies import section, get_user_company
 from newsroom.notifications import push_user_notification
+import json
 
 
 @blueprint.route('/agenda')
@@ -189,17 +191,35 @@ def watch_coverage():
 @blueprint.route('/agenda/wire_items/<wire_id>')
 @login_required
 def related_wire_items(wire_id):
-    agenda_item = list(get_resource_service('agenda').find(where={'coverages.deliveries.delivery_id': wire_id}))
-    if len(agenda_item) == 0:
+    elastic = app.data._search_backend('agenda')
+    source = {}
+    must_terms = [{'term': {'coverages.delivery_id': {"value": wire_id}}}]
+    query = {
+        'bool': {
+            'must': must_terms
+            },
+    }
+
+    source.update({'query': {
+        "nested": {
+            "path": "coverages",
+            "query": query
+        }
+    }})
+    internal_req = ParsedRequest()
+    internal_req.args = {'source': json.dumps(source)}
+    agenda_result = elastic.find('agenda', internal_req, None)
+
+    if len(agenda_result.docs) == 0:
         return flask.jsonify({'error': gettext('Agenda item not found')}), 404
 
     wire_ids = []
-    for cov in agenda_item[0].get('coverages') or []:
-        if cov['coverage_type'] == 'text' and cov['delivery_id']:
+    for cov in agenda_result.docs[0].get('coverages') or []:
+        if cov.get('coverage_type') == 'text' and cov.get('delivery_id'):
             wire_ids.append(cov['delivery_id'])
 
     wire_items = get_entities_elastic_or_mongo_or_404(wire_ids, 'items')
     return flask.jsonify({
-        'agenda_item': agenda_item[0],
+        'agenda_item': agenda_result.docs[0],
         'wire_items': wire_items,
     }), 200
