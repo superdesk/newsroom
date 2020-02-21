@@ -36,7 +36,7 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 
 
-function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo, fetchWireItemsForAgenda}) {
+function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo}) {
     const picture = getPicture(item);
     const videos = getVideos(item);
     const isCustom = isCustomRendition(picture);
@@ -94,8 +94,7 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
                                 <ListItemPreviousVersions item={item} isPreview={true}/>
                             }
 
-                            {isDisplayed('agenda_links', detailsConfig) && <AgendaLinks item={item}
-                                fetchWireItemsForAgenda={fetchWireItemsForAgenda}/>}
+                            {isDisplayed('agenda_links', detailsConfig) && <AgendaLinks item={item} />}
                         </ArticleContentInfoWrapper>
                     </ArticleContentWrapper>
                 </ArticleContent>
@@ -115,7 +114,6 @@ ItemDetails.propTypes = {
     onClose: PropTypes.func,
     detailsConfig: PropTypes.object,
     downloadVideo: PropTypes.func,
-    fetchWireItemsForAgenda: PropTypes.func,
 };
 
 export default ItemDetails;

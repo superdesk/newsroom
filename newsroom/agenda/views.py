@@ -13,7 +13,7 @@ from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
-from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, \
+from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, get_entities_elastic_or_mongo_or_404, \
     get_agenda_dates, get_location_string, get_public_contacts, get_links, get_vocabulary
 from newsroom.wire.utils import update_action_list
 from newsroom.agenda.email import send_coverage_request_email
@@ -184,3 +184,22 @@ def watch_coverage():
 
     get_resource_service('agenda').patch(data['item_id'], updates)
     return flask.jsonify(), 200
+
+
+@blueprint.route('/agenda/wire_items/<wire_id>')
+@login_required
+def related_wire_items(wire_id):
+    agenda_item = list(get_resource_service('agenda').find(where={'coverages.deliveries.delivery_id': wire_id}))
+    if len(agenda_item) == 0:
+        return flask.jsonify({'error': gettext('Agenda item not found')}), 404
+
+    wire_ids = []
+    for cov in agenda_item[0].get('coverages') or []:
+        if cov['coverage_type'] == 'text' and cov['delivery_id']:
+            wire_ids.append(cov['delivery_id'])
+
+    wire_items = get_entities_elastic_or_mongo_or_404(wire_ids, 'items')
+    return flask.jsonify({
+        'agenda_item': agenda_item[0],
+        'wire_items': wire_items,
+    }), 200
