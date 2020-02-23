@@ -18,11 +18,11 @@ from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import item as wire_print
 from newsroom.notifications import push_user_notification
 from newsroom.wire.search import get_bookmarks_count
-from newsroom.monitoring.utils import get_date_items_dict, get_monitoring_file_attachment, \
+from newsroom.monitoring.utils import get_date_items_dict, get_monitoring_file, \
     get_items_for_monitoring_report
 from superdesk.logging import logger
 from newsroom.email import send_email
-import os
+import base64
 
 
 def get_view_data():
@@ -208,23 +208,17 @@ def export(_ids):
 
     if len(items) > 0:
         try:
-            file_path = get_monitoring_file_attachment(monitoring_profile, items, as_temp_file=True)
+            _file = get_monitoring_file(monitoring_profile, items)
         except Exception as e:
             logger.exception(e)
             return jsonify({'message': 'Error exporting items to file'}), 400
 
-        if file_path:
+        if _file:
             update_action_list(_ids.split(','), 'export', force_insert=True)
             get_resource_service('history').create_history_record(items, 'export', user, 'monitoring')
 
-            rv = send_file(file_path, mimetype=formatter.get_mimetype(None),
-                           attachment_filename=formatter.format_filename(None), as_attachment=True)
-
-            fp = open(file_path, "rb")
-            if fp:
-                fp.close()
-                os.remove(file_path)
-            return rv
+            return send_file(_file, mimetype=formatter.get_mimetype(None),
+                             attachment_filename=formatter.format_filename(None), as_attachment=True)
 
     return jsonify({'message': 'No files to export.'}), 400
 
@@ -250,7 +244,8 @@ def share():
         }
         formatter = app.download_formatters['monitoring_pdf']['formatter']
         monitoring_profile['format_type'] = 'monitoring_pdf'
-        file_path = get_monitoring_file_attachment(monitoring_profile, items, as_temp_file=True)
+        _file = get_monitoring_file(monitoring_profile, items)
+        attachment = base64.b64encode(_file.read())
 
         send_email(
             [user['email']],
@@ -259,11 +254,11 @@ def share():
             text_body=flask.render_template('share_items.txt', **template_kwargs),
             html_body=flask.render_template('share_items.html', **template_kwargs),
             attachments_info=[{
-                'file_path': file_path,
+                'file': attachment,
                 'file_name': formatter.format_filename(None),
                 'content_type': 'application/{}'.format(formatter.FILE_EXTENSION),
                 'file_desc': 'Monitoring Report'
-            }]
+            }],
         )
 
     update_action_list(data.get('items'), 'shares')

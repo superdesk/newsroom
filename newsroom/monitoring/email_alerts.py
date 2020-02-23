@@ -21,7 +21,8 @@ import datetime
 import logging
 from bson import ObjectId
 from eve.utils import ParsedRequest
-from .utils import get_monitoring_file_attachment, truncate_article_body
+from .utils import get_monitoring_file, truncate_article_body
+import base64
 
 try:
     from urllib.parse import urlparse
@@ -188,7 +189,8 @@ class MonitoringEmailAlerts(Command):
                             'profile': m,
                         }
                         truncate_article_body(items, m)
-                        file_path = get_monitoring_file_attachment(m, items, as_temp_file=True)
+                        _file = get_monitoring_file(m, items)
+                        attachment = base64.b64encode(_file.read())
                         formatter = app.download_formatters[m['format_type']]['formatter']
 
                         send_email(
@@ -197,7 +199,7 @@ class MonitoringEmailAlerts(Command):
                             text_body=render_template('monitoring_email.txt', **template_kwargs),
                             html_body=render_template('monitoring_email.html', **template_kwargs),
                             attachments_info=[{
-                                'file_path': file_path,
+                                'file': attachment,
                                 'file_name': formatter.format_filename(None),
                                 'content_type': 'application/{}'.format(formatter.FILE_EXTENSION),
                                 'file_desc': 'Monitoring Report for Celery monitoring alerts for profile: {}'.format(
