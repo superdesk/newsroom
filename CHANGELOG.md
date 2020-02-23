@@ -1,5 +1,16 @@
 # Newsroom Changelog
 
+## [1.18.1] 2020-02-24
+### Features
+- None
+
+### Improvements
+- None
+
+### Fixes
+- [SDAN-663] Agenda information not shown on Wire Preview/Detail (#985)
+- [SDAN-662] Change the way attachments are send to Celery tasks for Monitoring (#986)
+
 ## [1.18.0] 2020-02-20
 ### Features
 - News API
