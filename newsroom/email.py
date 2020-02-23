@@ -9,27 +9,25 @@ from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.utils import url_for_agenda
 from superdesk.logging import logger
-import os
+import base64
 
 
 @celery.task(bind=True, soft_time_limit=120)
 def _send_email(self, to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
     if sender is None:
         sender = current_app.config['MAIL_DEFAULT_SENDER']
-    attachments = []
-    if attachments_info:
-        for a in attachments_info:
-            try:
-                fp = open(a['file_path'], "rb")
-                if fp:
-                    attachments.append(Attachment(a['file_name'], a['content_type'], data=fp.read()))
-                    fp.close()
-                    os.remove(a['file_path'])
-            except Exception as e:
-                logger.error('Error attaching {} file to mail. Receipient(s): {}. Error: {}'.format(
-                    a['file_desc'], to, e))
 
-    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to, attachments=attachments)
+    decoded_attachments = []
+    for a in attachments_info:
+        try:
+            content = base64.b64decode(a['file'])
+            decoded_attachments.append(Attachment(a['file_name'],
+                                                  a['content_type'], data=content))
+        except Exception as e:
+            logger.error('Error attaching {} file to mail. Receipient(s): {}. Error: {}'.format(
+                a['file_desc'], to, e))
+
+    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
     msg.body = text_body
     msg.html = html_body
     app = current_app._get_current_object()
