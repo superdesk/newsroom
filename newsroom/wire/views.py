@@ -46,7 +46,15 @@ def get_services(user):
 
 
 def set_permissions(item, section='wire', ignore_latest=False):
-    item['_access'] = superdesk.get_resource_service('{}_search'.format(section)).has_permissions(item, ignore_latest)
+    permitted = superdesk.get_resource_service('{}_search'.format(section)).has_permissions(item, ignore_latest)
+    set_item_permission(item, permitted)
+
+
+def set_item_permission(item, permitted=True):
+    if not item:
+        return
+
+    item['_access'] = permitted
     if not item['_access']:
         item.pop('body_text', None)
         item.pop('body_html', None)

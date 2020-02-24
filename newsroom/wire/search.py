@@ -482,7 +482,7 @@ class WireSearchService(newsroom.Service):
 
         return topic_matches
 
-    def get_items(self, item_ids):
+    def get_items(self, item_ids, size=None, aggregations=None, apply_permissions=False):
         try:
             query = {
                 'bool': {
@@ -495,8 +495,20 @@ class WireSearchService(newsroom.Service):
                 }
             }
 
+            if apply_permissions:
+                user = get_user()
+                get_resource_service('section_filters').apply_section_filter(query, self.section)
+                company = get_user_company(user)
+                try:
+                    set_product_query(query, company, self.section)
+                except Forbidden:
+                    pass
+
             source = {'query': query}
-            source['size'] = len(item_ids)
+            source['size'] = len(item_ids) if not size else size
+
+            if aggregations:
+                source['aggs'] = aggregations
 
             req = ParsedRequest()
             req.args = {'source': json.dumps(source)}
