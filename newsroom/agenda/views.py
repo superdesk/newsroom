@@ -17,6 +17,7 @@ from newsroom.decorator import login_required
 from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, get_entities_elastic_or_mongo_or_404, \
     get_agenda_dates, get_location_string, get_public_contacts, get_links, get_vocabulary
 from newsroom.wire.utils import update_action_list
+from newsroom.wire.views import set_item_permission
 from newsroom.agenda.email import send_coverage_request_email
 from newsroom.agenda.utils import remove_fields_for_public_user
 from newsroom.companies import section, get_user_company
@@ -219,6 +220,17 @@ def related_wire_items(wire_id):
             wire_ids.append(cov['delivery_id'])
 
     wire_items = get_entities_elastic_or_mongo_or_404(wire_ids, 'items')
+    aggregations = {"uid": {"terms": {"field": "_uid"}}}
+    permissioned_result = get_resource_service('wire_search').get_items(wire_ids, size=0, aggregations=aggregations,
+                                                                        apply_permissions=True)
+    buckets = permissioned_result.hits['aggregations']['uid']['buckets']
+    permissioned_ids = []
+    for b in buckets:
+        permissioned_ids.append(b['key'].replace('items#', ''))
+
+    for wire_item in wire_items:
+        set_item_permission(wire_item, wire_item.get('_id') in permissioned_ids)
+
     return flask.jsonify({
         'agenda_item': agenda_result.docs[0],
         'wire_items': wire_items,
