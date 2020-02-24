@@ -50,8 +50,8 @@ export default class AgendaLinks extends React.PureComponent {
     }
 
     openAgenda() {
-        if (get(this.props, 'item.agenda_id')) {
-            window.open(`/agenda?item=${this.props.item.agenda_id}`, '_blank');
+        if (get(this.state, 'agenda._id')) {
+            window.open(`/agenda?item=${this.state.agenda._id}`, '_blank');
         }
     }
 
