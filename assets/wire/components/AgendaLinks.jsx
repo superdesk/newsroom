@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import server from 'server';
 import {get} from 'lodash';
@@ -6,6 +6,7 @@ import {gettext} from 'utils';
 
 import InfoBox from './InfoBox';
 import PreviewTagsBlock from './PreviewTagsBlock';
+import PreviewBox from 'ui/components/PreviewBox';
 import AgendaCoverages from 'agenda/components/AgendaCoverages';
 import AgendaEventInfo from 'agenda/components/AgendaEventInfo';
 
@@ -77,13 +78,16 @@ export default class AgendaLinks extends React.PureComponent {
         }
 
         return (
-            <InfoBox label={gettext('Agenda')}>
-                {get(agenda, 'event', null) &&
-                    <PreviewTagsBlock label={gettext('Related Event')}>
-                        <AgendaEventInfo item={agenda} onClick={this.openAgenda}/>
-                    </PreviewTagsBlock>}
+            <Fragment>
+                <InfoBox label={gettext('Agenda')}>
+                    {get(agenda, 'event', null) &&
+                        <PreviewTagsBlock label={gettext('Related Event')}>
+                            <AgendaEventInfo item={agenda} onClick={this.openAgenda}/>
+                        </PreviewTagsBlock>}
+                </InfoBox>
 
-                {coverages.length > 0 && <PreviewTagsBlock label={gettext('Related Coverage')}>
+                {coverages.length > 0 && <PreviewBox labelClass={'wire-column__preview__tags__headline'}
+                    label={gettext('Related Coverage')}>
                     <div className='mt-3'>
                         <AgendaCoverages
                             item={agenda}
@@ -92,8 +96,8 @@ export default class AgendaLinks extends React.PureComponent {
                             onClick={this.openAgenda}
                             hideViewContentItems={[get(this.props, 'item._id')]} />
                     </div>
-                </PreviewTagsBlock>}
-            </InfoBox>
+                </PreviewBox>}
+            </Fragment>
         );
     }
 }

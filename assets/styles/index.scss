@@ -2641,6 +2641,10 @@ a.wire-articles__versions {
     }
 }
 
+.content--item-detail .wire-column__preview__coverage {
+    max-width: 350px;
+}
+
 .content--item-detail .wire-column__preview__headline {
     line-height: 1.2;
     @include lg {
