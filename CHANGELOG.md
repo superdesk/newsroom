@@ -1,5 +1,16 @@
 # Newsroom Changelog
 
+## [1.18.2] 2020-02-25
+### Features
+- None
+
+### Improvements
+- None
+
+### Fixes
+- [SDAN-663] Agenda Tile not opening Agenda item on click (#987)
+- [SDAN-665] Wire previews text width becomes too narrow if related coverage slugline is too long (#988)
+
 ## [1.18.1] 2020-02-24
 ### Features
 - None
