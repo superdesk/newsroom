@@ -128,14 +128,6 @@ export function copyPreviewContents(item) {
 
         contents.push('');
 
-        if (item.description_text) {
-            contents.push(item.description_text);
-        } else if (item.description_html) {
-            contents.push(getTextFromHtml(item.description_html));
-        }
-
-        contents.push('');
-
         if (item.body_text) {
             contents.push(item.body_text);
         } else if (item.body_html) {
