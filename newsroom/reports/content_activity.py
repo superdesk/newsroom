@@ -6,7 +6,7 @@ from flask_babel import gettext
 from superdesk import get_resource_service
 from superdesk.utc import utc_to_local
 
-from newsroom.wire.search import _items_query
+from newsroom.wire.search import items_query
 from newsroom.agenda.agenda import get_date_filters
 from newsroom.utils import query_resource
 
@@ -25,7 +25,7 @@ def get_items(args):
         abort(400, gettext('Must provide a section for this report'))
 
     source = {
-        'query': _items_query(True),
+        'query': items_query(True),
         'size': CHUNK_SIZE,
         'from': 0,
         'sort': [{'versioncreated': 'asc'}],
@@ -143,7 +143,7 @@ def get_facets(args):
     def get_genres():
         """Get the list of genres from the news items"""
 
-        query = _items_query(True)
+        query = items_query(True)
         must_terms = []
         source = {}
 

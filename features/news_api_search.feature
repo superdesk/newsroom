@@ -360,9 +360,9 @@ Feature: News API Products
     Then we get list with 3 items
     """
      {"_items": [
-        {"pubstatus": "usable1"},
-        {"pubstatus": "usable2"},
-        {"pubstatus": "usable3"}
+        {"pubstatus": "usable1", "versioncreated": "__no_value__"},
+        {"pubstatus": "usable2", "versioncreated": "__no_value__"},
+        {"pubstatus": "usable3", "versioncreated": "__no_value__"}
      ]}
      """
 
