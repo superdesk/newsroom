@@ -19,11 +19,10 @@ from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404, parse_date_str
-from newsroom.wire.search import query_string, set_product_query, \
-    planning_items_query_string, nested_query
 from newsroom.wire.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
+from newsroom.search import BaseSearchService, SearchQuery, query_string
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
 from bson import ObjectId
 
@@ -351,6 +350,19 @@ def get_aggregation_field(key):
     return aggregations[key]['terms']['field']
 
 
+def nested_query(path, query, inner_hits=True, name=None):
+    nested = {
+        'path': path,
+        'query': query
+    }
+    if inner_hits:
+        nested['inner_hits'] = {}
+        if name:
+            nested['inner_hits']['name'] = name
+
+    return {'nested': nested}
+
+
 def _filter_terms(filters, events_only=False):
     must_term_filters = []
     must_not_term_filters = []
@@ -431,6 +443,17 @@ def set_post_filter(source, req, events_only=False):
             source['query']['bool']['must_not'] += _filter_terms(filters, events_only)['must_not_term_filters']
 
 
+def planning_items_query_string(query, fields=None):
+    plan_query_string = query_string(query)
+
+    if fields:
+        plan_query_string['query_string']['fields'] = fields
+    else:
+        plan_query_string['query_string']['fields'] = ['planning_items.*']
+
+    return plan_query_string
+
+
 def get_agenda_query(query, events_only=False):
     if events_only:
         return query_string(query)
@@ -465,8 +488,11 @@ def filter_active_users(user_ids, user_dict, company_dict, events_only=False):
     return active
 
 
-class AgendaService(newsroom.Service):
+class AgendaService(BaseSearchService):
     section = 'agenda'
+    limit_days_setting = None
+    default_sort = [{'dates.start': 'asc'}]
+    default_page_size = 100
 
     def on_fetched(self, doc):
         self.enhance_items(doc[config.ITEMS])
@@ -524,86 +550,7 @@ class AgendaService(newsroom.Service):
         if req.args.get('featured'):
             return self.get_featured_stories(req, lookup)
 
-        query = _agenda_query()
-        user = get_user()
-        company = get_user_company(user)
-        is_events_only = is_events_only_access(user, company) or req.args.get('eventsOnlyView')
-        get_resource_service('section_filters').apply_section_filter(query, self.section)
-        product_query = {'bool': {'must': [], 'should': []}}
-
-        navigation_id = req.args.get('navigation')
-        if navigation_id:
-            navigation_id = list(navigation_id.split(','))
-
-        set_product_query(
-            product_query,
-            company,
-            self.section,
-            navigation_id=navigation_id,
-            events_only=is_events_only
-        )
-        query['bool']['must'].append(product_query)
-
-        if req.args.get('q'):
-            test_query = {'or': []}
-            try:
-                q = json.loads(req.args.get('q'))
-                if isinstance(q, dict):
-                    # used for product testing
-                    if q.get('query'):
-                        test_query['or'].append(query_string(q.get('query')))
-                    if q.get('planning_item_query'):
-                        test_query['or'].append(
-                            nested_query(
-                                'planning_items',
-                                planning_items_query_string(q.get('planning_item_query')),
-                                name='product_test'
-                            )
-                        )
-                    if test_query['or']:
-                        query['bool']['must'].append(test_query)
-            except Exception:
-                pass
-
-            if not test_query.get('or'):
-                query['bool']['must'].append(get_agenda_query(req.args['q'], is_events_only))
-
-        if req.args.get('id'):
-            query['bool']['must'].append({'term': {'_id': req.args['id']}})
-
-        if req.args.get('bookmarks'):
-            set_saved_items_query(query, req.args['bookmarks'])
-
-        if req.args.get('date_from') or req.args.get('date_to'):
-            query['bool']['should'].extend(_event_date_range(req.args))
-            if not is_events_only:
-                query['bool']['should'].append(_display_date_range(req.args))
-
-        source = {'query': query}
-        source['sort'] = [{'dates.start': 'asc'}]
-        source['size'] = 100  # we should fetch all items for given date
-        source['from'] = req.args.get('from', 0, type=int)
-
-        set_post_filter(source, req, is_events_only)
-
-        if source['from'] >= 1000:
-            # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
-            return abort(400)
-
-        if not source['from'] and not req.args.get('bookmarks'):  # avoid aggregations when handling pagination
-            source['aggs'] = get_agenda_aggregations(is_events_only)
-
-        if not is_admin_or_internal(user):
-            _remove_fields(source, PRIVATE_FIELDS)
-
-        if is_events_only:
-            # no adhoc planning items and remove planning items and coverages fields
-            query['bool']['must'].append({'exists': {'field': 'event_id'}})
-            _remove_fields(source, PLANNING_ITEMS_FIELDS)
-
-        internal_req = ParsedRequest()
-        internal_req.args = {'source': json.dumps(source)}
-        cursor = super().get(internal_req, lookup)
+        cursor = super().get(req, lookup)
 
         if req.args.get('date_from') and req.args.get('date_to'):
             date_range = get_date_filters(req.args)
@@ -616,8 +563,175 @@ class AgendaService(newsroom.Service):
                 })
         return cursor
 
+    def prefill_search_query(self, search, req=None, lookup=None):
+        """ Generate the search query instance
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        :param ParsedRequest req: The parsed in request instance from the endpoint
+        :param dict lookup: The parsed in lookup dictionary from the endpoint
+        """
+
+        super().prefill_search_query(search, req, lookup)
+        search.is_events_only = is_events_only_access(search.user, search.company) or \
+            search.args.get('eventsOnlyView')
+
+    def prefill_search_items(self, search):
+        """ Prefill the item filters
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        """
+
+        pass
+
+    def apply_filters(self, search):
+        """ Generate and apply the different search filters
+
+        :param newsroom.search.SearchQuery search: the search query instance
+        """
+
+        # First construct the product query
+        self.apply_company_filter(search)
+
+        search.planning_items_should = []
+        self.apply_products_filter(search)
+
+        if search.planning_items_should:
+            search.query['bool']['should'].append(
+                nested_query(
+                    'planning_items',
+                    {
+                        'bool': {
+                            'should': search.planning_items_should,
+                            'minimum_should_match': 1
+                        }
+                    },
+                    name='products'
+                )
+            )
+
+        search.query['bool']['minimum_should_match'] = 1
+
+        # Append the product query to the agenda query
+        agenda_query = _agenda_query()
+        agenda_query['bool']['must'].append(search.query)
+        search.query = agenda_query
+
+        # Apply agenda based filters
+        self.apply_section_filter(search)
+        self.apply_request_filter(search)
+
+        if not is_admin_or_internal(search.user):
+            _remove_fields(search.source, PRIVATE_FIELDS)
+
+        if search.is_events_only:
+            # no adhoc planning items and remove planning items and coverages fields
+            search.query['bool']['must'].append({'exists': {'field': 'event_id'}})
+            _remove_fields(search.source, PLANNING_ITEMS_FIELDS)
+
+    def apply_product_filter(self, search, product):
+        """ Generate the filter for a single product
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        :param dict product: The product to filter
+        :return:
+        """
+        if search.args.get('requested_products') and product['_id'] not in search.args['requested_products']:
+            return
+
+        if product.get('query'):
+            search.query['bool']['should'].append(
+                query_string(product['query'])
+            )
+
+            if product.get('planning_item_query') and not search.is_events_only:
+                search.planning_items_should.append(
+                    planning_items_query_string(
+                        product.get('planning_item_query')
+                    )
+                )
+
+    def apply_request_filter(self, search):
+        """ Generate the request filters
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        """
+
+        if search.args.get('q'):
+            test_query = {'or': []}
+            try:
+                q = json.loads(search.args.get('q'))
+                if isinstance(q, dict):
+                    # used for product testing
+                    if q.get('query'):
+                        test_query['or'].append(query_string(q.get('query')))
+
+                    if q.get('planning_item_query'):
+                        test_query['or'].append(
+                            nested_query(
+                                'planning_items',
+                                planning_items_query_string(q.get('planning_item_query')),
+                                name='product_test'
+                            )
+                        )
+
+                    if test_query['or']:
+                        search.query['bool']['must'].append(test_query)
+            except Exception:
+                pass
+
+            if not test_query.get('or'):
+                search.query['bool']['must'].append(
+                    get_agenda_query(
+                        search.args['q'],
+                        search.is_events_only
+                    )
+                )
+
+        if search.args.get('id'):
+            search.query['bool']['must'].append(
+                {'term': {'_id': search.args['id']}}
+            )
+
+        if search.args.get('bookmarks'):
+            set_saved_items_query(
+                search.query,
+                search.args['bookmarks']
+            )
+
+        if search.args.get('date_from') or search.args.get('date_to'):
+            search.query['bool']['should'].extend(
+                _event_date_range(search.args)
+            )
+
+            if not search.is_events_only:
+                search.query['bool']['should'].append(
+                    _display_date_range(search.args)
+                )
+
+    def gen_source_from_search(self, search):
+        """ Generate the eve source object from the search query instance
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        """
+
+        super().gen_source_from_search(search)
+
+        set_post_filter(search.source, search, search.is_events_only)
+
+        if not search.source['from'] and not search.args.get('bookmarks'):
+            # avoid aggregations when handling pagination
+            search.source['aggs'] = get_agenda_aggregations(search.is_events_only)
+        else:
+            search.source.pop('aggs', None)
+
     def featured(self, req, lookup, featured):
-        """Return featured items."""
+        """Return featured items.
+
+        :param ParsedRequest req: The parsed in request instance from the endpoint
+        :param dict lookup: The parsed in lookup dictionary from the endpoint
+        :param dict featured: list featured items
+        """
+
         user = get_user()
         company = get_user_company(user)
         if is_events_only_access(user, company):
@@ -655,7 +769,7 @@ class AgendaService(newsroom.Service):
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
-        cursor = super().get(internal_req, lookup)
+        cursor = self.internal_get(internal_req, lookup)
 
         docs_by_id = {}
         for doc in cursor.docs:
@@ -700,14 +814,14 @@ class AgendaService(newsroom.Service):
             req = ParsedRequest()
             req.args = {'source': json.dumps(source)}
 
-            return super().get(req, None)
+            return self.internal_get(req, None)
         except Exception as exc:
             logger.error('Error in get_items for agenda query: {}'.format(json.dumps(source)),
                          exc, exc_info=True)
 
     def get_matching_bookmarks(self, item_ids, active_users, active_companies):
-        """
-        Returns a list of user ids bookmarked any of the given items
+        """ Returns a list of user ids bookmarked any of the given items
+
         :param item_ids: list of ids of items to be searched
         :param active_users: user_id, user dictionary
         :param active_companies: company_id, company dictionary
@@ -982,13 +1096,14 @@ class AgendaService(newsroom.Service):
                     )
 
     def get_saved_items_count(self):
-        query = _agenda_query()
-        get_resource_service('section_filters').apply_section_filter(query, self.section)
-        user = get_user()
-        company = get_user_company(user)
-        set_product_query(query, company, self.section)
-        set_saved_items_query(query, str(user['_id']))
-        cursor = self.get_items_by_query(query, size=0)
+        search = SearchQuery()
+        search.query = _agenda_query()
+
+        self.prefill_search_query(search)
+        self.apply_filters(search)
+        set_saved_items_query(search.query, str(search.user['_id']))
+
+        cursor = self.get_items_by_query(search.query, size=0)
         return cursor.count()
 
     def get_featured_stories(self, req, lookup):

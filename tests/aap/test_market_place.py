@@ -251,6 +251,7 @@ def test_search_filter_by_individual_navigation(client, app):
 
     # test admin user filtering
     with client.session_transaction() as session:
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     resp = client.get('/aapX/search')

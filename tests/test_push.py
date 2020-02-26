@@ -8,6 +8,7 @@ from flask import json
 from datetime import datetime
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from superdesk import get_resource_service
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
 from .fixtures import init_auth  # noqa
 from .utils import mock_send_email
