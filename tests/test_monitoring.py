@@ -216,7 +216,7 @@ def test_send_immediate_alerts(client, app):
         '_id': 'foo',
         'headline': 'product immediate',
         'products': [{'code': '12345'}],
-        "versioncreated": even_now,
+        "versioncreated": utcnow(),
     }])
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run(immediate=True)
@@ -553,7 +553,7 @@ def test_last_run_time_always_updated_with_matching_content_immediate(client, ap
         '_id': 'foo',
         'headline': 'product immediate',
         'products': [{'code': '12345'}],
-        "versioncreated": even_now,
+        "versioncreated": utcnow(),
     }])
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run(immediate=True)
