@@ -58,6 +58,13 @@ class NewsroomNewsAPI(NewsroomApp):
             })
 
         def base_exception_error(err):
+            if err.error == 'search_phase_execution_exception':
+                return json_error({
+                    'error': 1,
+                    'message': 'Invalid search query',
+                    'code': 400
+                })
+
             return json_error({
                 'error': err.args[0] if err.args else 1,
                 'message': str(err),
