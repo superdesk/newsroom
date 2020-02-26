@@ -56,6 +56,7 @@ export default function monitoringReducer(state = initialState, action) {
                 is_enabled: true,
                 query: '',
                 keywords: [],
+                always_send: false,
             },
             errors: null};
     }

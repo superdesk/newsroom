@@ -22,4 +22,5 @@ class MonitoringForm(FlaskForm):
     format_type = SelectField(gettext('Format Type'), choices=format_types, default='monitoring_pdf')
     company = StringField(gettext('Company'), validators=[DataRequired()])
     is_enabled = BooleanField(gettext('Enabled'), default=True, validators=[])
+    always_send = BooleanField(gettext('Always Send'), default=False, validators=[])
     query = TextAreaField(gettext('Query'))

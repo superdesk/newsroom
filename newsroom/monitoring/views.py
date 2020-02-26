@@ -48,6 +48,8 @@ def get_settings_data():
 def process_form_request(updates, request_updates, form):
     if 'schedule' in request_updates:
         updates['schedule'] = request_updates['schedule']
+        if updates['schedule'].get('interval') == 'immediate':
+            updates['always_send'] = False
 
     if 'users' in request_updates:
         updates['users'] = [ObjectId(u) for u in request_updates['users']]
