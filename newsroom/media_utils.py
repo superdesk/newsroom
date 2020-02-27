@@ -10,6 +10,8 @@ THUMBNAIL_QUALITY = 80
 def store_image(image, filename=None, _id=None):
     """Store the image to GridFs or AWS S3"""
     binary = io.BytesIO()
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
     image.save(binary, 'jpeg', quality=THUMBNAIL_QUALITY)
     binary.seek(0)
     media_id = app.media.put(binary, filename=filename, _id=_id, resource=ASSETS_RESOURCE, content_type='image/jpeg')
