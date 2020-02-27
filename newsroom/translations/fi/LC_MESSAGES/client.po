@@ -27,6 +27,10 @@ msgstr "Sijainti: {{ location }}"
 msgid "Ednote: {{ ednote }}"
 msgstr "Huomautus: {{ ednote }}"
 
+#: assets/wire/components/PreviewEdnote.jsx:9
+msgid "Note"
+msgstr "Huom"
+
 #: assets/agenda/actions.js:159 assets/agenda/actions.js:184
 #: assets/agenda/actions.js:189
 msgid "Description: {{ description }}"
@@ -425,6 +429,17 @@ msgstr "Median määrän on oltava enemmän kuin nolla"
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:28
 msgid "Total media count across all media config should be between 1 and 4."
 msgstr "Median määrän on oltava väillä 1-4"
+
+#: assets/company-reports/components/SubscriberActivity.jsx:20
+#: assets/users/components/UsersApp.jsx:31
+#: assets/watch-lists/components/WatchListApp.jsx:35
+#: assets/watch-lists/components/WatchListApp.jsx:51
+msgid "All Companies"
+msgstr "Kaikki yhtiöt"
+
+#: assets/users/components/EditUser.jsx:16
+msgid "Add/Edit User"
+msgstr "Uusi käyttäjä / muokkaa"
 
 #: assets/cards/actions.js:116
 msgid "Failed to update Card."
@@ -1527,3 +1542,21 @@ msgstr "embargo"
 #: assets/wire/components/WirePreview.jsx:65
 msgid "Follow story"
 msgstr "Seuraa uutista"
+
+msgid "This query defines what is NOT considered 'news' content. It is used by the News only switch to filter the view. When switched on, stories matching this filter will not be displayed."
+msgstr "Tämän hakulausekkeen ehdot täyttävät jutut poistetaan näkymästä, kun käyttäjä kytkee päälle "Vain uutiset" -suodattimen."
+
+msgid "Time limit for Wire products (in days)"
+msgstr ""
+
+msgid "You can create an additional filter on top of the product definition. The time limit can be enabled for each company in the Permissions."
+msgstr "Voit luoda lisäsuodattimen tuotteen lisäksi. Aikarajauksen voi kytkeä päälle yhtiöasetuksista."
+
+msgid "Comma separated list of email addresses to which the expiration alerts of companies will be sent to."
+msgstr "Pilkulla erotettu luettelo sähköpostiosoitteista, joihin lähetetään ilmoitus siitä, että yhtiön sopimus on päättymässä"
+
+msgid "Provide styles delimited by &(ampersand). For example, feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to https://developers.google.com/maps/documentation/maps-static/styling for more details"
+msgstr ""
+
+msgid "Company expiry alert recipients"
+msgstr ""
