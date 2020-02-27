@@ -35,7 +35,7 @@ class UsersApp extends React.Component {
                     label={''}
                     options={this.props.companies.map(company => ({value: company._id, text: company.name}))}
                     onChange={this.onChange}
-                    defaultOption={'All Companies'}
+                    defaultOption={gettext('All Companies')}
                 />
             </ListBar>,
             <Users key="Users" />
