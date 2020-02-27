@@ -349,7 +349,7 @@ export function watchEvents(ids) {
 export const STOP_WATCHING_EVENTS = 'STOP_WATCHING_EVENTS';
 export function stopWatchingEvents(items) {
     return (dispatch, getState) => {
-        server.del(WATCH_URL, {items})
+        server.del(getState().bookmarks ? `${WATCH_URL}?bookmarks=true` : WATCH_URL, {items})
             .then(() => {
                 notify.success(gettext('Stopped watching items successfully.'));
                 if (getState().bookmarks) {
@@ -675,7 +675,7 @@ export function watchCoverage(coverage, item) {
 
 export const STOP_WATCHING_COVERAGE = 'STOP_WATCHING_COVERAGE';
 export function stopWatchingCoverage(coverage, item) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         server.del(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,
             item_id: item._id
@@ -687,6 +687,10 @@ export function stopWatchingCoverage(coverage, item) {
                     coverage,
                     item
                 });
+
+                if (getState().bookmarks) {
+                    dispatch(fetchItems()); // item should get removed from the list in bookmarks view
+                }
             }, (error) => { errorHandler(error, dispatch);});
     };
 }

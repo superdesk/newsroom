@@ -142,16 +142,25 @@ def follow():
     for item_id in data.get('items'):
         user_id = get_user_id()
         item = get_entity_or_404(item_id, 'agenda')
+        coverage_updates = {'coverages': item.get('coverages') or []}
+        for c in coverage_updates['coverages']:
+            if c.get('watches') and user_id in c['watches']:
+                c['watches'].remove(user_id)
+
         if request.method == 'POST':
             updates = {'watches': list(set((item.get('watches')or []) + [user_id]))}
             if item.get('coverages'):
-                updates['coverages'] = item['coverages']
-                for c in updates['coverages']:
-                    if c.get('watches') and user_id in c['watches']:
-                        c['watches'].remove(user_id)
+                updates.update(coverage_updates)
 
             get_resource_service('agenda').patch(item_id, updates)
         else:
+            if request.args.get('bookmarks'):
+                user_item_watches = [u for u in (item.get('watches') or []) if str(u) == str(user_id)]
+                if not user_item_watches:
+                    # delete user watches of all coverages
+                    get_resource_service('agenda').patch(item_id, coverage_updates)
+                    return flask.jsonify(), 200
+
             update_action_list(data.get('items'), 'watches', item_type='agenda')
 
     push_user_notification('saved_items', count=get_resource_service('agenda').get_saved_items_count())

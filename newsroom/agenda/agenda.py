@@ -70,6 +70,22 @@ def set_saved_items_query(query, user_id):
             'should': [
                 {'term': {'bookmarks': str(user_id)}},
                 {'term': {'watches': str(user_id)}},
+                {
+                    "nested": {
+                        "path": "coverages",
+                        "query": {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "term": {
+                                            "coverages.watches": str(user_id)
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
             ],
         },
     })
