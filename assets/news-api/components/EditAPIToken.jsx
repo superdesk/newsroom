@@ -89,22 +89,26 @@ export default class EditAPIToken extends React.Component {
     onExpiryChange(value) {
         const newState = cloneDeep(this.state);
 
-        newState.token.expiry = getEndOfDayFromDate(value, DEFAULT_TIMEZONE)
-            .utc()
-            .format(SERVER_DATETIME_FORMAT);
-
-        if (isInPast(value)) {
-            newState.errors.expiry = gettext('Cannot be in the past');
+        if (!value) {
+            newState.token.expiry = null;
         } else {
-            delete newState.errors.expiry;
+            newState.token.expiry = getEndOfDayFromDate(value, DEFAULT_TIMEZONE)
+                .utc()
+                .format(SERVER_DATETIME_FORMAT);
+
+            if (isInPast(value)) {
+                newState.errors.expiry = gettext('Cannot be in the past');
+            } else {
+                delete newState.errors.expiry;
+            }
         }
 
         this.setState(newState);
     }
 
     getExpiryDate() {
-        return convertUtcToTimezone(this.state.token.expiry, DEFAULT_TIMEZONE)
-            .format('YYYY-MM-DD');
+        return this.state.token.expiry ? convertUtcToTimezone(this.state.token.expiry, DEFAULT_TIMEZONE)
+            .format('YYYY-MM-DD') : this.state.token.expiry;
     }
 
     saveToken(event) {

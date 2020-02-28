@@ -13,7 +13,7 @@ export default class ExpiryDateInput extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {value: this.props.value === '' ? 'never' : 'on'};
+        this.state = {value: !this.props.value ? 'never' : 'on'};
 
         this.options = [
             {text: gettext('on'), value: 'on'},
