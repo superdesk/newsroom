@@ -19,6 +19,10 @@ class MonitoringSchedule extends React.Component {
                 'text': gettext('Immediate')
             },
             {
+                value: 'one_hour',
+                'text': gettext('Hourly')
+            },
+            {
                 value: 'two_hour',
                 'text': gettext('Every Two Hours')
             },

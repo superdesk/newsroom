@@ -51,6 +51,9 @@ class MonitoringResource(newsroom.Resource):
         'original_creator': newsroom.Resource.rel('users'),
         'version_creator': newsroom.Resource.rel('users'),
         'format_type': {'type': 'string'},
+        'always_send': {
+            'type': 'boolean',
+        },
     }
     datasource = {
         'source': 'monitoring',

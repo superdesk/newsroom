@@ -68,7 +68,7 @@ class MonitoringEmailAlerts(Command):
                          local_to_utc(app.config['DEFAULT_TIMEZONE'], last_minute).strftime('%H:%M:%S'), now)
 
     def get_scheduled_monitoring_list(self):
-        return list(get_resource_service('monitoring').find(where={'schedule.interval': {'$in': ['two_hour',
+        return list(get_resource_service('monitoring').find(where={'schedule.interval': {'$in': ['one_hour', 'two_hour',
                                                                                                  'four_hour', 'weekly',
                                                                                                  'daily']},
                                                                    'is_enabled': True}))
@@ -80,17 +80,24 @@ class MonitoringEmailAlerts(Command):
     def scheduled_worker(self, now):
         monitoring_list = self.get_scheduled_monitoring_list()
 
+        one_hour_ago = now - datetime.timedelta(hours=1)
         two_hours_ago = now - datetime.timedelta(hours=2)
         four_hours_ago = now - datetime.timedelta(hours=4)
         yesterday = now - datetime.timedelta(days=1)
         last_week = now - datetime.timedelta(days=7)
 
+        one_hours_ago_utc = local_to_utc(app.config['DEFAULT_TIMEZONE'], one_hour_ago)
         two_hours_ago_utc = local_to_utc(app.config['DEFAULT_TIMEZONE'], two_hours_ago)
         four_hours_ago_utc = local_to_utc(app.config['DEFAULT_TIMEZONE'], four_hours_ago)
         yesterday_utc = local_to_utc(app.config['DEFAULT_TIMEZONE'], yesterday)
         last_week_utc = local_to_utc(app.config['DEFAULT_TIMEZONE'], last_week)
 
         alert_monitoring = {
+            'one': {
+                'w_lists': [],
+                'created_from': one_hours_ago_utc.strftime('%Y-%m-%d'),
+                'created_from_time': one_hours_ago_utc.strftime('%H:%M:%S')
+            },
             'two': {
                 'w_lists': [],
                 'created_from': two_hours_ago_utc.strftime('%Y-%m-%d'),
@@ -114,7 +121,8 @@ class MonitoringEmailAlerts(Command):
         }
 
         for m in monitoring_list:
-            self.add_to_send_list(alert_monitoring, m, now, two_hours_ago, four_hours_ago, yesterday, last_week)
+            self.add_to_send_list(alert_monitoring, m, now, one_hour_ago, two_hours_ago, four_hours_ago, yesterday,
+                                  last_week)
 
         for key, value in alert_monitoring.items():
             self.send_alerts(value['w_lists'], value['created_from'], value['created_from_time'], now)
@@ -125,8 +133,11 @@ class MonitoringEmailAlerts(Command):
     def is_past_range(self, last_run_time, upper_range):
         return (not last_run_time or last_run_time < upper_range)
 
-    def add_to_send_list(self, alert_monitoring, profile, now, two_hours_ago, four_hours_ago, yesterday, last_week):
-        schedule_today_plus_five_mins = None
+    def add_to_send_list(self, alert_monitoring, profile, now, one_hour_ago, two_hours_ago, four_hours_ago, yesterday,
+                         last_week):
+        last_run_time = parse_date_str(profile['last_run_time']) if profile.get('last_run_time') else None
+        if last_run_time:
+            last_run_time = utc_to_local(app.config['DEFAULT_TIMEZONE'], last_run_time)
 
         # Convert time to current date for range comparision
         if profile['schedule'].get('time'):
@@ -136,32 +147,39 @@ class MonitoringEmailAlerts(Command):
                                                                                   minute=int(hour_min[1]))
             schedule_today_plus_five_mins = schedule_today_plus_five_mins + datetime.timedelta(minutes=5)
 
-        last_run_time = parse_date_str(profile['last_run_time']) if profile.get('last_run_time') else None
-        if last_run_time:
-            last_run_time = utc_to_local(app.config['DEFAULT_TIMEZONE'], last_run_time)
-
-        if profile['schedule']['interval'] == 'two_hour' and self.is_past_range(last_run_time, two_hours_ago):
-            alert_monitoring['two']['w_lists'].append(profile)
-            return
-
-        if profile['schedule']['interval'] == 'four_hour' and self.is_past_range(last_run_time, four_hours_ago):
-            alert_monitoring['four']['w_lists'].append(profile)
-            return
-
-        # Check if the time window is according to schedule
-        if (profile['schedule']['interval'] == 'daily'
+            # Check if the time window is according to schedule
+            if (profile['schedule']['interval'] == 'daily'
                 and self.is_within_five_minutes(schedule_today_plus_five_mins, now)
-                and self.is_past_range(last_run_time, yesterday)):
-            alert_monitoring['daily']['w_lists'].append(profile)
-            return
+                    and self.is_past_range(last_run_time, yesterday)):
+                alert_monitoring['daily']['w_lists'].append(profile)
+                return
 
-        # Check if the time window is according to schedule
-        # Check if 'day' is according to schedule
-        if (profile['schedule']['interval'] == 'weekly'
+            # Check if the time window is according to schedule
+            # Check if 'day' is according to schedule
+            if (profile['schedule']['interval'] == 'weekly'
                 and self.is_within_five_minutes(schedule_today_plus_five_mins, now)
                 and schedule_today_plus_five_mins.strftime('%a').lower() == profile['schedule']['day']
-                and self.is_past_range(last_run_time, last_week)):
-            alert_monitoring['weekly']['w_lists'].append(profile)
+                    and self.is_past_range(last_run_time, last_week)):
+                alert_monitoring['weekly']['w_lists'].append(profile)
+                return
+        else:
+            # Check if current time is within 'hourly' window
+            if now.minute > 4:
+                return
+
+            if profile['schedule']['interval'] == 'one_hour' and self.is_past_range(last_run_time, one_hour_ago):
+                alert_monitoring['one']['w_lists'].append(profile)
+                return
+
+            if profile['schedule']['interval'] == 'two_hour' and now.hour % 2 == 0 and \
+                    self.is_past_range(last_run_time, two_hours_ago):
+                alert_monitoring['two']['w_lists'].append(profile)
+                return
+
+            if profile['schedule']['interval'] == 'four_hour' and now.hour % 4 == 0 and  \
+                    self.is_past_range(last_run_time, four_hours_ago):
+                alert_monitoring['four']['w_lists'].append(profile)
+                return
 
     def send_alerts(self, monitoring_list, created_from, created_from_time, now):
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
@@ -179,16 +197,15 @@ class MonitoringEmailAlerts(Command):
                     'created_from_time': created_from_time,
                     'skip_user_validation': True
                 }
-
                 items = list(get_resource_service('monitoring_search').get(req=internal_req, lookup=None))
+                template_kwargs = {'profile': m}
                 if items:
                     company = get_entity_or_404(m['company'], 'companies')
                     try:
-                        template_kwargs = {
+                        template_kwargs.update({
                             'items': items,
                             'section': 'wire',
-                            'profile': m,
-                        }
+                        })
                         truncate_article_body(items, m)
                         _file = get_monitoring_file(m, items)
                         attachment = base64.b64encode(_file.read())
@@ -207,8 +224,6 @@ class MonitoringEmailAlerts(Command):
                                         m['name'])
                             }]
                         )
-                        get_resource_service('monitoring').patch(m['_id'], {
-                            'last_run_time': local_to_utc(app.config['DEFAULT_TIMEZONE'], now)})
                     except Exception:
                         logger.exception('{0} Error processing monitoring profile {1} for company {2}.'.format(
                             self.log_msg, m['name'], company['name']))
@@ -225,6 +240,16 @@ class MonitoringEmailAlerts(Command):
                                 text_body=render_template('monitoring_error.txt', **template_kwargs),
                                 html_body=render_template('monitoring_error.html', **template_kwargs),
                             )
+                elif m['schedule'].get('interval') != 'immediate' and m.get('always_send'):
+                    send_email(
+                        [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
+                        m.get('subject') or m['name'],
+                        text_body=render_template('monitoring_email_no_updates.txt', **template_kwargs),
+                        html_body=render_template('monitoring_email_no_updates.html', **template_kwargs),
+                    )
+
+            get_resource_service('monitoring').patch(m['_id'], {
+                'last_run_time': local_to_utc(app.config['DEFAULT_TIMEZONE'], now)})
 
 
 @celery.task(soft_time_limit=600)
