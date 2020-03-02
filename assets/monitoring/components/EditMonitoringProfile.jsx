@@ -183,6 +183,13 @@ class EditMonitoringProfile extends React.Component {
                                         label={gettext('Enabled')}
                                         value={item.is_enabled}
                                         onChange={onChange} />
+
+                                    {get(item, 'schedule.interval') && item.schedule.interval !== 'immediate' &&
+                                        <CheckboxInput
+                                            name='always_send'
+                                            label={gettext('Always Send')}
+                                            value={item.always_send}
+                                            onChange={onChange} />}
                                 </div>
 
                                 <div className='list-item__preview-footer'>
