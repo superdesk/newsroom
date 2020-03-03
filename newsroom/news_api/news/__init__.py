@@ -1,7 +1,6 @@
 import superdesk
 import logging
-from superdesk.services import BaseService
-from superdesk.resource import Resource
+from newsroom import Resource, Service
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +12,7 @@ class NewsResource(Resource):
     pass
 
 
-class NewsService(BaseService):
+class NewsService(Service):
     pass
 
 
