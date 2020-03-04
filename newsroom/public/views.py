@@ -15,3 +15,8 @@ def terms():
 @blueprint.route('/contact')
 def contact():
     return flask.render_template('contact.html')
+
+
+@blueprint.route('/support')
+def support():
+    return flask.render_template('support.html')
