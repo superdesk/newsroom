@@ -10,7 +10,7 @@ from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
-from newsroom.wire.utils import get_local_date, get_end_date
+from newsroom.utils import get_local_date, get_end_date
 
 logger = logging.getLogger(__name__)
 

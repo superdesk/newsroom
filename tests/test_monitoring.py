@@ -566,8 +566,7 @@ def test_last_run_time_always_updated_with_matching_content_immediate(client, ap
         w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
         assert w is not None
         assert w.get('last_run_time') is not None
-        last_run_time = local_to_utc(app.config['DEFAULT_TIMEZONE'], even_now)
-        assert w['last_run_time'] > (last_run_time - timedelta(minutes=5))
+        assert w['last_run_time'] > (mock_utcnow() - timedelta(minutes=5))
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -619,8 +618,7 @@ def test_last_run_time_always_updated_with_no_matching_content_immediate(client,
         w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
         assert w is not None
         assert w.get('last_run_time') is not None
-        last_run_time = local_to_utc(app.config['DEFAULT_TIMEZONE'], even_now)
-        assert w['last_run_time'] > (last_run_time - timedelta(minutes=5))
+        assert w['last_run_time'] > (mock_utcnow() - timedelta(minutes=5))
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -665,8 +663,7 @@ def test_last_run_time_always_updated_with_no_users_immediate(client, app):
         w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
         assert w is not None
         assert w.get('last_run_time') is not None
-        last_run_time = local_to_utc(app.config['DEFAULT_TIMEZONE'], even_now)
-        assert w['last_run_time'] > (last_run_time - timedelta(minutes=5))
+        assert w['last_run_time'] > (mock_utcnow() - timedelta(minutes=5))
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
