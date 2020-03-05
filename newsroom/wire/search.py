@@ -11,7 +11,7 @@ import newsroom
 from newsroom.products.products import get_products_by_navigation
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
-from newsroom.wire.utils import get_local_date, get_end_date
+from newsroom.utils import get_local_date, get_end_date
 from newsroom.search import BaseSearchService, SearchQuery, query_string
 
 logger = logging.getLogger(__name__)

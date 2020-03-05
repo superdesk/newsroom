@@ -18,6 +18,7 @@ def update_config(conf):
     conf['TESTING'] = True
     conf['WEBPACK_ASSETS_URL'] = None
     conf['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Prague'
+    conf['DEFAULT_TIMEZONE'] = 'Europe/Prague'
     conf['NEWS_API_ENABLED'] = True
     return conf
 

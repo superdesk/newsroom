@@ -1,5 +1,5 @@
 from superdesk import register_resource
-import newsroom
+from newsroom import Resource, Service
 from superdesk.resource import not_analyzed
 
 not_analayzed_mapping = {
@@ -8,11 +8,11 @@ not_analayzed_mapping = {
 }
 
 
-class NewsApiAuditService(newsroom.Service):
+class NewsApiAuditService(Service):
     pass
 
 
-class NewsApiAuditResource(newsroom.Resource):
+class NewsApiAuditResource(Resource):
     schema = {
         'type': not_analayzed_mapping,
         'subscriber': not_analayzed_mapping,

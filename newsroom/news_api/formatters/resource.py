@@ -1,4 +1,4 @@
-from superdesk.resource import Resource
+from newsroom import Resource
 
 
 class APIFormattersResource(Resource):
