@@ -4,9 +4,9 @@ import * as agendaActions from './actions';
 import {gettext} from '../utils';
 import {isWatched} from './utils';
 
-const canWatchAgendaItem = (state, item) => {
+const canWatchAgendaItem = (state, item, includeCoverages) => {
     let result = state.user && !isWatched(item, state.user);
-    if (!state.bookmarks) {
+    if (!state.bookmarks || includeCoverages) {
         return result;
     }
 
@@ -21,14 +21,14 @@ export const getAgendaItemActions = (dispatch) => {
             name: gettext('Watch'),
             icon: 'watch',
             multi: true,
-            when: (state, item) => canWatchAgendaItem(state, item),
+            when: (state, item, includeCoverages) => canWatchAgendaItem(state, item, includeCoverages),
             action: (items) => dispatch(watchEvents(items)),
         },
         {
             name: gettext('Stop watching'),
             icon: 'unwatch',
             multi: true,
-            when: (state, item) => !canWatchAgendaItem(state, item),
+            when: (state, item, includeCoverages) => !canWatchAgendaItem(state, item, includeCoverages),
             action: (items) => dispatch(stopWatchingEvents(items)),
         },
     ]);
