@@ -343,7 +343,7 @@ def test_fail_watch_coverages(client, app):
         assert resp.status_code == 403
 
 
-@mock.patch('newsroom.wire.utils.get_utcnow', mock_utcnow)
+@mock.patch('newsroom.utils.get_utcnow', mock_utcnow)
 def test_local_time(client, app, mocker):
     # 9 am Sydney Time - day light saving on
     local_date = get_local_date('now/d', '00:00:00', -660)
