@@ -289,42 +289,92 @@ def _agenda_query():
 
 
 def get_date_filters(args):
-    range = {}
+    date_range = {}
     offset = int(args.get('timezone_offset', '0'))
     if args.get('date_from'):
-        range['gt'] = get_local_date(args['date_from'], '00:00:00', offset)
+        date_range['gt'] = get_local_date(args['date_from'], '00:00:00', offset)
     if args.get('date_to'):
-        range['lt'] = get_end_date(args['date_to'], get_local_date(args['date_to'], '23:59:59', offset))
-    return range
+        date_range['lt'] = get_end_date(args['date_to'], get_local_date(args['date_to'], '23:59:59', offset))
+    return date_range
 
 
-def _event_date_range(args):
+def _set_event_date_range(search):
     """Get events for selected date.
 
     ATM it should display everything not finished by that date, even starting later.
+
+    :param newsroom.search.SearchQuery search: The search query instance
     """
-    date_range = get_date_filters(args)
-    date_query = []
-    if date_range.get('gt') and date_range.get('lt'):
-        date_query.append({'range': {'dates.end': date_range}})
-        date_query.append({'range': {'dates.start': date_range}})
-        date_query.append({
+
+    date_range = get_date_filters(search.args)
+    date_from = date_range.get('gt')
+    date_to = date_range.get('lt')
+
+    should = []
+
+    if date_from and not date_to:
+        # Filter from a particular date onwards
+        should = [
+            {'range': {'dates.start': {'gte': date_from}}},
+            {'range': {'dates.end': {'gte': date_from}}}
+        ]
+    elif not date_from and date_to:
+        # Filter up to a particular date
+        should = [
+            {'range': {'dates.start': {'lte': date_to}}},
+            {'range': {'dates.end': {'lte': date_to}}}
+        ]
+    elif date_from and date_to:
+        # Filter based on the date range provided
+        should = [{
+            # Both start/end dates are inside the range
             'bool': {
                 'must': [
-                    {'range': {'dates.start': {'lt': date_range.get('gt')}}},
-                    {'range': {'dates.end': {'gt': date_range.get('lt')}}}
+                    {'range': {'dates.start': {'gte': date_from}}},
+                    {'range': {'dates.end': {'lte': date_to}}}
                 ]
             }
+        }, {
+            # Starts before date_from and finishes after date_to
+            'bool': {
+                'must': [
+                    {'range': {'dates.start': {'lt': date_from}}},
+                    {'range': {'dates.end': {'gt': date_to}}}
+                ]
+            }
+        }, {
+            # Start date is within range OR End date is within range
+            'bool': {
+                'should': [{
+                    'range': {
+                        'dates.start': {
+                            'gte': date_from,
+                            'lte': date_to
+                        }
+                    }
+                }, {
+                    'range': {
+                        'dates.end': {
+                            'gte': date_from,
+                            'lte': date_to
+                        }
+                    }
+                }],
+                'minimum_should_match': 1
+            }
+        }]
+
+    if search.is_events_only:
+        # Get events for extra dates for coverages and planning.
+        should.append({'range': {'display_dates': date_range}})
+
+    if len(should):
+        search.query['bool']['must'].append({
+            'bool': {
+                'should': should,
+                'minimum_should_match': 1
+            }
         })
-    else:
-        date_query.append({'range': {'dates.end': get_date_filters(args)}})
-    return date_query
-
-
-def _display_date_range(args):
-    """Get events for extra dates for coverages and planning.
-    """
-    return {'range': {'display_dates.date': get_date_filters(args)}}
 
 
 aggregations = {
@@ -715,14 +765,7 @@ class AgendaService(BaseSearchService):
             )
 
         if search.args.get('date_from') or search.args.get('date_to'):
-            search.query['bool']['should'].extend(
-                _event_date_range(search.args)
-            )
-
-            if not search.is_events_only:
-                search.query['bool']['should'].append(
-                    _display_date_range(search.args)
-                )
+            _set_event_date_range(search)
 
     def gen_source_from_search(self, search):
         """ Generate the eve source object from the search query instance
