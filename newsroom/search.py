@@ -4,6 +4,8 @@ from eve.utils import ParsedRequest
 import logging
 
 from superdesk import get_resource_service
+from content_api.errors import BadParameterValueError
+
 from newsroom import Service
 from newsroom.products.products import get_products_by_navigation, get_products_by_company
 from newsroom.auth import get_user
@@ -84,7 +86,7 @@ class BaseSearchService(Service):
 
         self.prefill_search_args(search, req)
         self.prefill_search_lookup(search, lookup)
-        self.prefill_search_page(search, req)
+        self.prefill_search_page(search)
         self.prefill_search_user(search)
         self.prefill_search_company(search)
         self.prefill_search_section(search)
@@ -178,10 +180,6 @@ class BaseSearchService(Service):
         else:
             search.args = {}
 
-        search.args['sort'] = [{'versioncreated': 'desc'}] if req is None or not req.sort else req.sort
-        search.args['size'] = int(search.args.get('size', 25))
-        search.args['from'] = int(search.args.get('from', 0))
-
         search.projections = {} if req is None or not req.projection else req.projection
         search.req = req
 
@@ -208,6 +206,7 @@ class BaseSearchService(Service):
                 req=None,
                 _id=search.args['user']
             )
+            search.is_admin = is_admin(search.user)
         else:
             search.user = current_user
 
@@ -219,7 +218,7 @@ class BaseSearchService(Service):
 
         search.company = get_user_company(search.user)
 
-    def prefill_search_page(self, search, req=None):
+    def prefill_search_page(self, search):
         """ Prefill the search page parameters
 
         :param SearchQuery search: The search query instance
@@ -227,7 +226,7 @@ class BaseSearchService(Service):
         """
 
         if not search.args.get('sort'):
-            search.args['sort'] = req.sort if req is not None and req.sort else self.default_sort
+            search.args['sort'] = search.req.sort if search.req is not None and search.req.sort else self.default_sort
 
         search.args['size'] = int(search.args.get('size', self.default_page_size))
         search.args['from'] = int(search.args.get('from', 0))
@@ -247,7 +246,13 @@ class BaseSearchService(Service):
         """
 
         if search.args.get('navigation'):
-            search.navigation_ids = list(search.args['navigation'].split(','))
+            navigation = search.args['navigation']
+            if isinstance(navigation, list):
+                search.navigation_ids = navigation
+            elif getattr(navigation, 'split', None):
+                search.navigation_ids = list(navigation.split(','))
+            else:
+                raise BadParameterValueError('Invalid navigation parameter')
         else:
             search.navigation_ids = []
 
@@ -258,11 +263,20 @@ class BaseSearchService(Service):
         """
 
         if search.args.get('requested_products'):
-            search.requested_products = list(search.args['requested_products'].split(','))
+            products = search.args['requested_products']
+            if isinstance(products, list):
+                search.requested_products = products
+            elif getattr(products, 'split', None):
+                search.requested_products = list(products.split(','))
+            else:
+                raise BadParameterValueError('Invalid requested_products parameter')
 
         if search.is_admin:
             if len(search.navigation_ids):
-                search.products = get_products_by_navigation(search.navigation_ids)
+                search.products = get_products_by_navigation(
+                    search.navigation_ids,
+                    product_type=search.section
+                )
             else:
                 # admin will see everything by default,
                 # regardless of company products
@@ -403,23 +417,34 @@ class BaseSearchService(Service):
 
         filters = None
         if search.args.get('filter'):
-            filters = json.loads(search.args['filter'])
+            if isinstance(search.args['filter'], dict):
+                filters = search.args['filter']
+            else:
+                try:
+                    filters = json.loads(search.args['filter'])
+                except TypeError:
+                    raise BadParameterValueError('Incorrect type supplied for filter parameter')
 
         if not app.config.get('FILTER_BY_POST_FILTER', False):
-            if filters and app.config.get('FILTER_AGGREGATIONS', True):
-                search.query['bool']['must'] += self._filter_terms(filters)
-            elif filters:
-                search.query['bool']['must'].append(filters)
+            if filters:
+                if app.config.get('FILTER_AGGREGATIONS', True):
+                    search.query['bool']['must'] += self._filter_terms(filters)
+                else:
+                    search.query['bool']['must'].append(filters)
 
             if search.args.get('created_from') or search.args.get('created_to'):
                 search.query['bool']['must'].append(
                     self.versioncreated_range(search.args)
                 )
-        else:
-            if filters or search.args.get('created_from') or search.args.get('created_to'):
-                search.source['post_filter'] = {'bool': {'must': []}}
-            if filters and app.config.get('FILTER_AGGREGATIONS', True):
-                search.source['post_filter']['bool']['must'] += self._filter_terms(filters)
+        elif filters or search.args.get('created_from') or search.args.get('created_to'):
+            search.source['post_filter'] = {'bool': {'must': []}}
+
+            if filters:
+                if app.config.get('FILTER_AGGREGATIONS', True):
+                    search.source['post_filter']['bool']['must'] += self._filter_terms(filters)
+                else:
+                    search.source['post_filter']['bool']['must'].append(filters)
+
             if search.args.get('created_from') or search.args.get('created_to'):
                 search.source['post_filter']['bool']['must'].append(
                     self.versioncreated_range(search.args)

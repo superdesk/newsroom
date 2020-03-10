@@ -79,7 +79,7 @@ class NewsAPINewsService(BaseSearchService):
 
         self.prefill_search_args(search, req)
         self.prefill_search_lookup(search, lookup)
-        self.prefill_search_page(search, req)
+        self.prefill_search_page(search)
         self.prefill_search_company(search)
         self.prefill_search_section(search)
         self.prefill_search_products(search)
@@ -154,7 +154,7 @@ class NewsAPINewsService(BaseSearchService):
         self.validate_include_exclude_fields(search)
         self.validate_unknown_params(search, whitelist=self.allowed_params)
 
-    def prefill_search_page(self, search, req=None):
+    def prefill_search_page(self, search):
         """ Prefill the search page parameters
 
         :param newsroom.search.SearchQuery search: The search query instance
@@ -174,7 +174,7 @@ class NewsAPINewsService(BaseSearchService):
         search.args['size'] = search.args['page_size']
         search.args['from'] = (search.args['page'] - 1) * search.args['page_size']
 
-        super().prefill_search_page(search, req)
+        super().prefill_search_page(search)
 
         if isinstance(search.args['sort'], str):
             if search.args['sort'] == 'versioncreated:desc':
