@@ -63,16 +63,16 @@ def _get_navigation_query(ids):
         else str(ids)
 
 
-def get_products_by_navigation(navigation_id):
-    return list(
-        superdesk.get_resource_service('products').get(
-            req=None,
-            lookup={
-                'navigations': _get_navigation_query(navigation_id),
-                'is_enabled': True
-            }
-        )
-    )
+def get_products_by_navigation(navigation_id, product_type=None):
+    lookup = {
+        'is_enabled': True,
+        'navigations': _get_navigation_query(navigation_id)
+    }
+
+    if product_type is not None:
+        lookup['product_type'] = product_type
+
+    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
 
 
 def get_products_by_company(company_id, navigation_id=None, product_type=None):
