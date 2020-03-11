@@ -6,7 +6,7 @@ from newsroom.wire.search import WireSearchResource, WireSearchService
 from . import utils
 from superdesk.metadata.item import not_analyzed
 
-from .formatters.picture import PictureFormatter
+from .formatters.picture import PictureFormatter  # noqa
 
 blueprint = Blueprint('wire', __name__)
 
@@ -72,7 +72,7 @@ def init_app(app):
     app.download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'])
     app.download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'])
     app.download_formatter('json', JsonFormatter(), 'Json', ['agenda'])
-    app.download_formatter('picture', PictureFormatter(), gettext('Story Image'), ['wire'])
+    # app.download_formatter('picture', PictureFormatter(), gettext('Story Image'), ['wire'])
 
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')
