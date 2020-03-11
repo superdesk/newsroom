@@ -5,7 +5,7 @@ import superdesk
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app, request, jsonify
+from flask import current_app as app, request, jsonify, url_for
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -173,7 +173,14 @@ def download(_ids):
     formatter = app.download_formatters[_format]['formatter']
     mimetype = None
     attachment_filename = '%s-newsroom.zip' % utcnow().strftime('%Y%m%d%H%M')
-    if len(items) == 1 or _format == 'watch_lists':
+    if _format == 'picture':
+        try:
+            media_id = formatter.format_item(items[0], item_type=item_type)
+            return flask.redirect(
+                url_for('upload.get_upload', media_id=media_id, filename='baseimage.%s' % formatter.FILE_EXTENSION))
+        except TypeError:
+            return flask.abort(404)
+    elif len(items) == 1 or _format == 'watch_lists':
         item = items[0]
         args_item = item if _format != 'watch_lists' else items
         parse_dates(item)  # fix for old items
