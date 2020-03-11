@@ -13,9 +13,8 @@ USAGE_TERMS = ''
 LANGUAGES = ['en', 'fr_CA']
 DEFAULT_LANGUAGE = 'en'
 
-PRIVACY_POLICY = PRIVACY_POLICY_EN = 'https://www.thecanadianpress.com/privacy-policy/'
-TERMS_AND_CONDITIONS = TERMS_AND_CONDITIONS_EN = \
-    'https://www.thecanadianpress.com/content-services/custom-content-creation/terms-conditions/'
+PRIVACY_POLICY = PRIVACY_POLICY_EN = '/privacy'
+TERMS_AND_CONDITIONS = TERMS_AND_CONDITIONS_EN = '/terms'
 CONTACT_ADDRESS = 'https://www.thecanadianpress.com/contact/'
 CONTACT_ADDRESS_EN = 'https://www.thecanadianpress.com/contact/'
 
