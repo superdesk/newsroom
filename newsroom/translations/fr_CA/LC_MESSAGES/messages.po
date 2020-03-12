@@ -2356,3 +2356,6 @@ msgstr "Cliquez ici pour réinitialiser."
 #: theme/login.html:51
 msgid "Language"
 msgstr "La langue"
+
+msgid "Support"
+msgstr "Soutien"
