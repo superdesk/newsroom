@@ -1,0 +1,32 @@
+{% extends "email_layout.txt" %}
+
+{% block content %}
+
+A Local Journalism Initiative {{app_name}} account has been created for you.
+
+In order to access your account, please visit {{url}} and complete your registration.
+
+This link will expire after {{expires}} hours.
+
+If you believe the Local Journalism Initiative {{app_name}} account was created in error, please ignore this email.
+
+Regards,
+
+Local Journalism Initiative
+
+
+
+
+Un compte {{app_name}} Initiative de journalisme local a été créé pour vous.
+
+Pour accéder à votre compte, veuillez visiter {{url}} et terminer votre inscription.
+
+Ce lien expirera après {{expires}} heures.
+
+Si vous pensez que le compte {{app_name}} de Initiative de journalisme local a été créé par erreur, veuillez ignorer ce courriel.
+
+Merci,
+
+Initiative de journalisme local
+
+{% endblock %}
