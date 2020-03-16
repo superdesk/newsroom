@@ -1,0 +1,23 @@
+{% extends "email_layout.txt" %}
+{% block content %}
+
+A Local Journalism Initiative {{app_name}} account has been created for you.
+
+In order to access your account, please use the link {{url}} to reset your password.
+
+This link will expire after {{expires}} hours.
+
+If you believe the Local Journalism Initiative {{app_name}} account was created in error, please ignore this email.
+
+
+
+
+Un compte Initiative de journalisme local {{app_name}} a été créé pour vous.
+
+Pour accéder à votre compte, veuillez utiliser le lien {{url}} pour réinitialiser votre mot de passe.
+
+Ce lien expirera après {{expires}} heures.
+
+Si vous pensez que le compte {{app_name}} de Initiative de journalisme local a été créé par erreur, veuillez ignorer ce courriel.
+
+{% endblock %}
