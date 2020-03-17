@@ -61,7 +61,8 @@ def get_view_data():
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': [t for t in topics if t.get('topic_type') == 'wire'],
-        'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
+        'formats': [{'format': f['format'], 'name': f['name'], 'assets': f['assets']}
+                    for f in app.download_formatters.values()
                     if 'wire' in f['types']],
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='wire'),
@@ -102,7 +103,7 @@ def get_home_data():
         'products': get_products_by_company(company_id),
         'user': str(user['_id']) if user else None,
         'company': company_id,
-        'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types']}
+        'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types'], 'assets': f['assets']}
                     for f in app.download_formatters.values()],
         'context': 'wire',
         'ui_config': get_resource_service('ui_config').getSectionConfig('wire')

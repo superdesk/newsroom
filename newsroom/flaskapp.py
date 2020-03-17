@@ -200,19 +200,21 @@ class Newsroom(eve.Eve):
             view_func=self.send_theme_file
         )
 
-    def download_formatter(self, _format, formatter, name, types):
+    def download_formatter(self, _format, formatter, name, types, assets=None):
         """Register new download formatter.
 
         :param _format: format id
         :param formatter: formatter class, extending :class:`newsroom.formatter.BaseFormatter` class.
         :param name: human readable name
         :param types: list of supported types, eg. ``['wire', 'agenda']``
+        :param types: list of supported assets, eg. ``['picture']``
         """
         self.download_formatters[_format] = {
             'format': _format,
             'formatter': formatter,
             'name': name,
             'types': types,
+            'assets': assets
         }
 
     def send_theme_file(self, filename):

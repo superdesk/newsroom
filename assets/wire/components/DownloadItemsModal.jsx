@@ -9,6 +9,7 @@ import { get } from 'lodash';
 
 import Modal from 'components/Modal';
 import SelectInput from 'components/SelectInput';
+import {getPicture} from '../utils';
 
 class DownloadItemsModal extends React.Component {
     constructor(props) {
@@ -72,7 +73,12 @@ const mapOptions = (state, props) => {
     let options = state.formats;
     if (props.data.items && props.data.items.length) {
         const itemType = state.format === 'agenda' ? 'agenda' : 'wire';
+        const hasPicture = props.data.items.every((itemId) =>
+            getPicture(state.itemsById && state.itemsById[itemId] || state.itemToOpen));
         options = options.filter((opt) => get(opt, 'types', ['wire', 'agenda']).includes(itemType));
+        if (!hasPicture) {
+            options = options.filter((opt) => get(opt, 'assets', ['text']).includes('text'));
+        }
     }
 
     return options.map((format) => ({value: format.format, text: format.name}));

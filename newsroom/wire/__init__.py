@@ -68,11 +68,11 @@ def init_app(app):
                 group=1, blueprint='wire', badge='saved-items-count')
 
     from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter
-    app.download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'])
-    app.download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'])
-    app.download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'])
-    app.download_formatter('json', JsonFormatter(), 'Json', ['agenda'])
-    # app.download_formatter('picture', PictureFormatter(), gettext('Story Image'), ['wire'])
+    app.download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'], ['text'])
+    app.download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'], ['text'])
+    app.download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'], ['text'])
+    app.download_formatter('json', JsonFormatter(), 'Json', ['agenda'], ['text'])
+    app.download_formatter('picture', PictureFormatter(), gettext('Story Image'), ['wire'], ['picture'])
 
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')
