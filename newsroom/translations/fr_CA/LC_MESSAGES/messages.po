@@ -546,7 +546,7 @@ msgstr "S'identifier"
 #: newsroom/templates/base_layout.html:46 newsroom/templates/footer.html:4
 #: theme/footer.html:9
 msgid "Contact Us"
-msgstr "Contactez nous"
+msgstr "Contactez-nous"
 
 #: newsroom/templates/base_layout.html:58 newsroom/templates/settings.html:3
 #: newsroom/templates/settings.html:6 theme/base_layout.html:55
@@ -2329,11 +2329,11 @@ msgstr "Politique de confidentialité"
 msgid "Terms and Conditions"
 msgstr "Termes et conditions"
 
-#: theme/footer.html:8
-msgid "Contact Us"
-msgstr "Contactez nous"
-
 #: theme/footer.html:9
+msgid "Contact Us"
+msgstr "Contactez-nous"
+
+#: theme/footer.html:5
 msgid "Copyright"
 msgstr "Droits d'auteur"
 
