@@ -249,6 +249,11 @@ def is_company_expired(company):
     return expiry_date.replace(tzinfo=None) <= datetime.utcnow().replace(tzinfo=None)
 
 
+def get_watch_lists_for_company(user):
+    company = user['company'] if user and user.get('company') else None
+    return list(query_resource('watch_lists', lookup={'company': company}))
+
+
 def is_account_enabled(user):
     """
     Checks if user account is active and approved

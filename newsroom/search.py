@@ -141,11 +141,7 @@ class BaseSearchService(Service):
         return internal_req
 
     def _filter_terms(self, filters):
-        return [
-            {'terms': {self.get_aggregation_field(key): val}}
-            for key, val in filters.items()
-            if val
-        ]
+        return [{'terms': {self.get_aggregation_field(key): val}} for key, val in filters.items() if val]
 
     def get_aggregations(self):
         return app.config.get('WIRE_AGGS') or {}

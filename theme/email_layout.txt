@@ -1,0 +1,9 @@
+{% block name %}{% if name %}{{ name }},{% endif %}{% endblock %}
+{% block content %}{% endblock %}
+
+{% block footer %}
+Regards / Merci,
+
+Local Journalism Initiative / Initiative de journalisme local
+
+{% endblock %}

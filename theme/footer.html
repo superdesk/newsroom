@@ -1,0 +1,11 @@
+<footer class="footer" id="footer">
+    <div class="d-none d-md-block mr-3">
+        <img src="{{ url_for('theme', filename = 'login-logo-footer.svg') }}" />
+    </div>
+    <div>
+        <a href="{{ url_for('public.privacy') }}" target="_blank">{{ gettext('Privacy Policy') }}</a>
+        <a href="{{ url_for('public.terms') }}" target="_blank">{{ gettext('Terms and Conditions') }}</a>
+        <a href="{{ url_for('public.support') }}" target="_blank">{{ gettext('Support') }}</a>
+        <a href="{{ url_for('public.contact') }}" target="_blank">{{ gettext('Contact Us') }}</a>
+    </div>
+</footer>

@@ -1,0 +1,58 @@
+/* CP theme custom css */
+
+.navbar__logo {
+    max-width: 80%;
+}
+.navbar__logo a, 
+.navbar__logo img {
+    height: 100%;
+    max-height: 100%;
+}
+.navbar-brand span.breadcrumb-item {
+    font-size: 1rem;
+    color: white;
+    font-family: "Merriweather", serif;
+}
+.footer {
+    min-height: 50px;
+    height: auto;
+    padding: 6px 0;
+    flex-wrap: wrap;
+}
+.footer--home {
+    margin-bottom: -50px;
+}
+.card a.btn-outline-primary {
+    color: #00acec;
+    }
+    .card a.btn-outline-primary:hover {
+        color: white;
+    }
+.d-flex {
+    display: -webkit-flex !important;
+    display: flex !important;
+}
+@media only screen and (min-width: 375px) {
+    .footer {
+        justify-content: center;
+    }
+    .footer a {
+        margin: 0 10px;
+    }
+}
+@media only screen and (min-width: 576px) {
+    .navbar__logo {
+        padding-bottom: 0;
+    }
+    .navbar-brand span.breadcrumb-item {
+        font-size: 1.2rem;
+    }
+    .footer {
+        justify-content: center;
+    }
+}
+@media only screen and (min-width: 786px) {
+    .navbar__logo {
+        max-width: none;
+    }
+}

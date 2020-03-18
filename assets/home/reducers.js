@@ -29,6 +29,7 @@ export default function homeReducer(state = initialState, action) {
             company: action.data.company,
             formats: action.data.formats || [],
             userSections: action.data.userSections,
+            uiConfig: action.data.ui_config || {},
             context: 'wire'
         };
 

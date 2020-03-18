@@ -503,6 +503,7 @@ def test_send_notification_emails(client, app):
 
 
 def test_matching_topics(client, app):
+    app.config['WIRE_AGGS']['genre'] = {'terms': {'field': 'genre.name', 'size': 50}}
     client.post('/push', data=json.dumps(item), content_type='application/json')
     search = get_resource_service('wire_search')
 
@@ -519,6 +520,7 @@ def test_matching_topics(client, app):
 
 
 def test_matching_topics_for_public_user(client, app):
+    app.config['WIRE_AGGS']['genre'] = {'terms': {'field': 'genre.name', 'size': 50}}
     app.data.insert('products', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
         'name': 'Sport',
@@ -546,6 +548,7 @@ def test_matching_topics_for_public_user(client, app):
 
 
 def test_matching_topics_for_user_with_inactive_company(client, app):
+    app.config['WIRE_AGGS']['genre'] = {'terms': {'field': 'genre.name', 'size': 50}}
     app.data.insert('products', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
         'name': 'Sport',

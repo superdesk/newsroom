@@ -1,5 +1,83 @@
 # Newsroom Changelog
 
+## [1.15.2] 2019-10-17
+### Features
+- None
+
+### Improvements
+- Add ANA logo (#856)
+- [SDCP-25] Allow new users to register their interests (#857)
+- [SDAN-596] Pressing back button on a mobile phone when the preview is open should close the preview (#859)
+- [SDAN-599] 'Time to be confirmed' feature for Agenda Items (#860)
+- [SDAN-588] Use Topic instead of Events in navigation labels (#863)
+- [SDAN-599] Display changes to 'Time to be confirmed' label (#864)
+
+### Fixes
+- Use default Ubuntu in Travis (#853)
+- [SDAN-598] fix: Save button not being enabled when turning off topic notifications (#855)
+- [SDAN-595] fix(agenda-emails) Use correct url_for method (#854)
+- Updating superdesk-core version for newsroom package (#861)
+
+## [1.15.1] 2019-09-10
+### Features
+- None
+
+### Improvements
+- None
+
+### Fixes
+- [SDAN-594] Previewing past or future Agenda item from email displays list not the preview (#848)
+- Save Topic and Save Events 'SAVE' button was disabled while saving (#849)
+
+## [1.15] 2019-09-09
+### Features
+- None
+
+### Improvements
+- [SDAN-578][SDAN-579] 'Account Manager' field in Company schema and use that in Company Expiry alerts (#832)
+- [SDAN-570] Fixes/Improvements to the 'share' action (#838)
+- [SDAN-591] Improve company expiry email layout and text (#841)
+- [SDAN-570] Changes to 'share' item template (#842)
+- [SDAN-572] Style changes to display 'Event Completed' label (#843)
+- [SDAN-568] Improve responsive behaviour for mobile phones (#834)
+- [SDAN-568] Further response layout improvements (#844)
+
+### Fixes
+- [SDAN-583] Preview for items that aren't wire or agenda in the Subscriber Activity report don't show the body text (#831)
+- [SDAN-580] Remove company expiry check from user login and notifications (#833)
+- [SDAN-587] Ignore agenda when applying time limit to search (#836)
+- [SDAN-590] (fix): Celery beat and queue configs (#840)
+- [SDAN-592] Coverages in the Agenda Share/Print Preview are misaligned (#845)
+- [SDAN-593] Show all event coverages if no planning item selected (#847)
+
+## [1.14] 2019-08-22
+### Features
+- [SDAN-538] Add the ability to execute the remove expired command (#817)
+
+### Improvements
+- [SDAN-572] Label completed agenda items as 'Completed' (#829)
+- [SDAN-572][SDAN-567] UI changes in displaying 'byline', 'located' and 'slugline' (#823)
+- [SDAN-565] Reposition the 'show map' text in Agenda Preview (#821)
+- [SDAN-566] Add 'preview' and 'open' to 'actions' filter in subscriber activity report (#822)
+- [SDAN-524][SDAN-530] Record 'open' and 'preview' actions in history collection (#815)
+- [SDAN-519] Toggle map display in Agenda Preview (#811)
+
+### Fixes
+- [SDAN-585] (fix): Corrections showing up as 'Updates Coming' (#830)
+- [SDAN-569] Market Place Bookmarks were not seen (#828)
+- UI fix to add padding after 'published' and remove 'on created_time' in wire ite, detail (#826)
+- fix creating new dashboard card when there is single dashboard type (#827)
+- [SDAN-576] Prefer description_text over body_text for image captions (#825)
+- [SDAN-575] Internal note on coverages is visible for public users in Newsroom (#824)
+- [SDAN-548] ednote from wire item was not displayed in Agenda coverage. (#818)
+- [SDAN-549] Text from wire items were not updating in Agenda preview (#818)
+- [SDAN-531] Push errors when event is created from a planning item (#814)
+- [SDAN-516] Show agency logos for AAPX (#816)
+- [SDAN-535] Add 'located' attribute as 'Location' when a wire item is copied (#813)
+
+## [1.13.1] 2019-07-18
+- [SDAN-532] Fetch card external item details after loading the page (#812)
+
 ## [1.13] 2019-07-16
 - [SDAN-529] Fix incorrect coverage scheduled date in Agenda notification email
 - [SDAN-514] Changes to Watched Agenda Emails (#808)

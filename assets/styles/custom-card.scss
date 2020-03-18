@@ -226,7 +226,7 @@
         }
     }
 
-    a {
+    a:not(.link) {
         color: #3e4557;
         text-decoration: none;
     }

@@ -36,9 +36,11 @@ def get_view_data():
         'company': str(company),
         'topics': get_user_topics(user['_id']) if user else [],
         'companyName': get_user_company_name(user),
-        'locators': get_vocabulary('locators'),
-        'monitoring_list': get_monitoring_for_company(user),
+        'locators': get_vocabulary('locators')
     }
+
+    if app.config.get('ENABLE_WATCH_LISTS'):
+        rv['monitoring_list'] = get_monitoring_for_company(user)
 
     rv.update(get_company_sections_monitoring_data(company))
 
