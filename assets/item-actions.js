@@ -1,5 +1,6 @@
-import { gettext } from './utils';
+import {gettext, ITEM_ACTIONS_CONFIG} from './utils';
 
+const isEnabled = (action) => ITEM_ACTIONS_CONFIG[action.id] == null || ITEM_ACTIONS_CONFIG[action.id];
 
 export function getItemActions(dispatch, actions) {
     const {
@@ -12,7 +13,6 @@ export function getItemActions(dispatch, actions) {
         removeBookmarks,
         removeItems,
     } = actions;
-
 
     return [
         {
@@ -81,5 +81,5 @@ export function getItemActions(dispatch, actions) {
             when: (state) => state.user && state.userType === 'administrator',
             action: (items) => removeItems(items),
         }
-    ];
+    ].filter(isEnabled);
 }

@@ -29,6 +29,7 @@ class SelectedItemsBar extends React.PureComponent {
         const actions = this.props.actions.filter(multiActionFilter).map((action) => (
             <button className='icon-button'
                 key={action.name}
+                title={action.name}
                 onClick={(e) => this.onAction(e, action)}
             >
                 <i className={`icon--${action.icon}`}></i>

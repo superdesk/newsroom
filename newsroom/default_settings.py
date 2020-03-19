@@ -265,7 +265,8 @@ CLIENT_CONFIG = {
     'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
     'display_news_only': True,  # Displays news only switch in wire,
-    'default_timezone': DEFAULT_TIMEZONE
+    'default_timezone': DEFAULT_TIMEZONE,
+    'item_actions': {},
 }
 
 LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
