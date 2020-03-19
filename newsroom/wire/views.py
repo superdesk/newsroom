@@ -5,7 +5,7 @@ import superdesk
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app, request, jsonify
+from flask import current_app as app, request, jsonify, url_for
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -70,7 +70,8 @@ def get_view_data():
         'user_type': (user or {}).get('user_type') or 'public',
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': [t for t in topics if t.get('topic_type') == 'wire'],
-        'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
+        'formats': [{'format': f['format'], 'name': f['name'], 'assets': f['assets']}
+                    for f in app.download_formatters.values()
                     if 'wire' in f['types']],
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='wire'),
@@ -111,7 +112,7 @@ def get_home_data():
         'products': get_products_by_company(company_id),
         'user': str(user['_id']) if user else None,
         'company': company_id,
-        'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types']}
+        'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types'], 'assets': f['assets']}
                     for f in app.download_formatters.values()],
         'context': 'wire',
     }
@@ -182,7 +183,14 @@ def download(_ids):
     formatter = app.download_formatters[_format]['formatter']
     mimetype = None
     attachment_filename = '%s-newsroom.zip' % utcnow().strftime('%Y%m%d%H%M')
-    if len(items) == 1 or _format == 'monitoring':
+    if _format == 'picture':
+        try:
+            media_id = formatter.format_item(items[0], item_type=item_type)
+            return flask.redirect(
+                url_for('upload.get_upload', media_id=media_id, filename='baseimage.%s' % formatter.FILE_EXTENSION))
+        except TypeError:
+            return flask.abort(404)
+    elif len(items) == 1 or _format == 'monitoring':
         item = items[0]
         args_item = item if _format != 'monitoring' else items
         parse_dates(item)  # fix for old items

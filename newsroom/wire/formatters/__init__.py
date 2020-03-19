@@ -22,3 +22,4 @@ from .nitf import NITFFormatter  # noqa
 from .newsmlg2 import NewsMLG2Formatter  # noqa
 from .json import JsonFormatter  # noqa
 from .ninjs import NINJSFormatter  # noqa
+from .picture import PictureFormatter  # noqa
