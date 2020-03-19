@@ -82,7 +82,6 @@ class AgendaApp extends BaseApp {
 
 
         this.props.fetchItems();
-
     }
 
     render() {
@@ -153,7 +152,7 @@ class AgendaApp extends BaseApp {
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
-                actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
+                actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig, true)}
                 onClose={onDetailClose}
                 requestCoverage={this.props.requestCoverage}
                 group={this.props.previewGroup}
@@ -170,7 +169,7 @@ class AgendaApp extends BaseApp {
                         {this.state.withSidebar && (
                             <span
                                 className='content-bar__menu content-bar__menu--nav--open'
-                                ref={(elem) => this.elemOpen = elem}
+                                ref={this.setOpenRef}
                                 title={gettext('Close filter panel')}
                                 onClick={this.toggleSidebar}>
                                 <i className='icon--close-thin icon--white' />
@@ -180,7 +179,7 @@ class AgendaApp extends BaseApp {
                         {!this.state.withSidebar && !this.props.bookmarks && (
                             <span
                                 className='content-bar__menu content-bar__menu--nav'
-                                ref={(elem) => this.elemClose = elem}
+                                ref={this.setCloseRef}
                                 title={gettext('Open filter panel')}
                                 onClick={this.toggleSidebar}>
                                 <i className='icon--hamburger' />
@@ -262,14 +261,14 @@ class AgendaApp extends BaseApp {
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
                                 onScroll={this.onListScroll}
-                                refNode={(node) => this.elemList = node}
+                                refNode={this.setListRef}
                             />
                         </div>
 
                         <AgendaPreview
                             item={this.props.itemToPreview}
                             user={this.props.user}
-                            actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig)}
+                            actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig, true)}
                             coverageActions={this.props.coverageActions}
                             closePreview={this.props.closePreview}
                             openItemDetails={this.props.openItemDetails}

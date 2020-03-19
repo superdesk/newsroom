@@ -1,5 +1,11 @@
-from superdesk.resource import Resource
+from newsroom import Resource
 
 
 class NewsAPISearchResource(Resource):
-    pass
+    datasource = {
+        'search_backend': 'elastic',
+        'source': 'items',
+    }
+
+    item_methods = ['GET']
+    resource_methods = ['GET']

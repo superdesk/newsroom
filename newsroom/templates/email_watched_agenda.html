@@ -1,4 +1,4 @@
-<h1>{{ agenda.name or agenda.definition_short }}</h1>
+<h2>{{ agenda.name or agenda.definition_short }}</h2>
 <a href="{{ url_for_agenda(agenda) }}">{{ url_for_agenda(agenda) }}</a>
 <div>
     <br>
@@ -11,7 +11,6 @@
     </div>
 {% endif %}
 <br>
-{% if coverage_updated %}<div><span style="color:red">!</span> {{ get_coverage_email_text(coverage_updated) }}</div>{% if coverage_updated.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i>Note: {{ coverage_updated['planning']['ednote'] }}</i>{% endif %}</div><br>{% endif %}
 {% for cov in coverage_updates.cancelled_coverages %}<div><span style="color:red">!</span> {{ get_coverage_email_text(cov, 'has been cancelled') }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div><br>{% endfor %}
 {% for cov in coverage_updates.modified_coverages %}<div><span style="color:red">!</span> {{ get_coverage_email_text(cov) }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div><br>{% endfor %}
 {% for cov in coverage_updates.unaltered_coverages %}<div>{{ get_coverage_email_text(cov) }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div><br>{% endfor %}

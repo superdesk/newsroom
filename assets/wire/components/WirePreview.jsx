@@ -106,7 +106,8 @@ class WirePreview extends React.PureComponent {
                             inputId={previousVersions}
                         />
                     }
-                    {isDisplayed('agenda_links', previewConfig) && <AgendaLinks item={item} preview={true} />}
+                    {isDisplayed('agenda_links', previewConfig) &&
+                        <AgendaLinks item={item} preview={true} />}
                 </div>
             </Preview>
         );

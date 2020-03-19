@@ -36,7 +36,7 @@ class ActionButton extends React.Component {
                     }
                 }
                 ref={(elem) => this.elem = elem}
-                title={!this.props.displayName ? this.props.action.name : ''}>
+                title={!this.props.displayName ? this.props.action.tooltip || this.props.action.name : ''}>
                 <i className={classes}></i>
                 {this.props.displayName && this.props.action.name}</button>
         );
@@ -55,6 +55,7 @@ ActionButton.propTypes = {
         icon: PropTypes.string.isRequired,
         action: PropTypes.func.isRequired,
         multi: PropTypes.bool,
+        tooltip: PropTypes.string,
     }),
     disabled: PropTypes.bool,
 };

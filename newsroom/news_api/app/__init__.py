@@ -1,61 +1,97 @@
 import os
-import flask
 import logging
-from eve import Eve
-from eve.io.mongo.mongo import MongoJSONEncoder
-from newsroom.news_api.api_tokens import CompanyTokenAuth
-from superdesk.datalayer import SuperdeskDataLayer
-from newsroom.news_api.news.item.item import bp
-import importlib
+import flask
 
+from werkzeug.exceptions import HTTPException
+from superdesk.errors import SuperdeskApiError
+
+from newsroom.factory import NewsroomApp
+from newsroom.news_api.api_tokens import CompanyTokenAuth
+from superdesk.utc import utcnow
 
 logger = logging.getLogger(__name__)
 
 
+class NewsroomNewsAPI(NewsroomApp):
+    AUTH_SERVICE = CompanyTokenAuth
+
+    def __init__(self, import_name=__package__, config=None, **kwargs):
+        if not getattr(self, 'settings'):
+            self.settings = flask.Config('.')
+
+        super(NewsroomNewsAPI, self).__init__(import_name=import_name, config=config, **kwargs)
+
+    def load_app_config(self):
+        super(NewsroomNewsAPI, self).load_app_config()
+        self.config.from_object('newsroom.news_api.settings')
+        self.config.from_envvar('NEWS_API_SETTINGS', silent=True)
+
+    def run(self, host=None, port=None, debug=None, **options):
+        if not self.config.get('NEWS_API_ENABLED', False):
+            raise RuntimeError('News API is not enabled')
+
+        super(NewsroomNewsAPI, self).run(host, port, debug, **options)
+
+    def setup_error_handlers(self):
+        def json_error(err):
+            return flask.jsonify(err), err['code']
+
+        def handle_werkzeug_errors(err):
+            return json_error({
+                'error': str(err),
+                'message': getattr(err, 'description') or None,
+                'code': getattr(err, 'code') or 500
+            })
+
+        def superdesk_api_error(err):
+            return json_error({
+                'error': err.message or '',
+                'message': err.payload,
+                'code': err.status_code or 500,
+            })
+
+        def assertion_error(err):
+            return json_error({
+                'error': err.args[0] if err.args else 1,
+                'message': str(err),
+                'code': 400
+            })
+
+        def base_exception_error(err):
+            if err.error == 'search_phase_execution_exception':
+                return json_error({
+                    'error': 1,
+                    'message': 'Invalid search query',
+                    'code': 400
+                })
+
+            return json_error({
+                'error': err.args[0] if err.args else 1,
+                'message': str(err),
+                'code': 500
+            })
+
+        for cls in HTTPException.__subclasses__():
+            self.register_error_handler(cls, handle_werkzeug_errors)
+
+        self.register_error_handler(SuperdeskApiError, superdesk_api_error)
+        self.register_error_handler(AssertionError, assertion_error)
+        self.register_error_handler(Exception, base_exception_error)
+
+
 def get_app(config=None):
-    app_config = flask.Config('.')
+    app = NewsroomNewsAPI(__name__, config=config)
 
-    # set some required fields
-    app_config.update({'DOMAIN': {'upload': {}}, 'SOURCES': {}})
+    @app.after_request
+    def after_request(response):
+        if flask.g.get('rate_limit_requests'):
+            response.headers.add('X-RateLimit-Remaining',
+                                 app.config.get('RATE_LIMIT_REQUESTS') - flask.g.get('rate_limit_requests'))
+            response.headers.add('X-RateLimit-Limit', app.config.get('RATE_LIMIT_REQUESTS'))
 
-    # pickup the default newsroom settings
-    app_config.from_object('newsroom.default_settings')
-
-    try:
-        # override from settings module, but only things defined in default config
-        import newsroom.news_api.settings as server_settings
-        for key in dir(server_settings):
-            if key.isupper() and key in app_config:
-                app_config[key] = getattr(server_settings, key)
-    except ImportError:
-        pass  # if exists
-
-    if config:
-        app_config.update(config)
-
-    app_config.from_envvar('NEWS_API_SETTINGS', silent=True)
-
-    # check that the API is enabled to run
-    if not app_config.get('NEWS_API_ENABLED', False):
-        logger.error('News API is not enabled')
-        return None
-
-    app = Eve(auth=CompanyTokenAuth,
-              json_encoder=MongoJSONEncoder,
-              data=SuperdeskDataLayer,
-              settings=app_config)
-
-    app._general_settings = {'news_api_time_limit_days': {'type': 'number',
-                                                          'default': app.config.get('NEWS_API_TIME_LIMIT_DAYS', 0)}}
-
-    app.register_blueprint(bp)
-
-    for module_name in app_config.get('CORE_APPS', []):
-        app_module = importlib.import_module(module_name)
-        try:
-            app_module.init_app(app)
-        except AttributeError:
-            pass
+            if flask.g.get('rate_limit_expiry'):
+                response.headers.add('X-RateLimit-Reset', (flask.g.get('rate_limit_expiry') - utcnow()).seconds)
+        return response
 
     return app
 
@@ -65,8 +101,4 @@ app = get_app()
 if __name__ == '__main__':
     host = '0.0.0.0'
     port = int(os.environ.get('APIPORT', '5400'))
-    app = get_app()
-    if app.config.get('NEWS_API_ENABLED', False):
-        app.run(host=host, port=port, debug=True, use_reloader=True)
-    else:
-        logger.error('News API is not enabled')
+    app.run(host=host, port=port, debug=True, use_reloader=True)

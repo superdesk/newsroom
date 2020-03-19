@@ -2,6 +2,8 @@ import pytz
 from flask import json, g
 from datetime import datetime, timedelta
 from urllib import parse
+from bson import ObjectId
+from copy import deepcopy
 
 from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import get_json, get_admin_user_id, mock_send_email
@@ -278,6 +280,7 @@ def test_search_filter_by_individual_navigation(client, app):
 
     # test admin user filtering
     with client.session_transaction() as session:
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     resp = client.get('/wire/search')
@@ -595,3 +598,44 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
     items = get_resource_service('wire_search').get_product_items(10, 20)
     assert 1 == len(items)
     assert items[0]['headline'] == 'china story'
+
+
+def test_wire_delete(client, app):
+    docs = [
+        items[1],
+        items[3],
+        items[4],
+    ]
+    versions = [
+        deepcopy(items[1]),
+        deepcopy(items[3]),
+        deepcopy(items[4]),
+    ]
+
+    versions[0].update({
+        '_id': ObjectId(),
+        '_id_document': docs[0]['_id'],
+    })
+    versions[1].update({
+        '_id': ObjectId(),
+        '_id_document': docs[1]['_id'],
+    })
+    versions[2].update({
+        '_id': ObjectId(),
+        '_id_document': docs[2]['_id'],
+    })
+
+    app.data.insert('items_versions', versions)
+
+    for doc in docs:
+        assert get_resource_service('items').find_one(req=None, _id=doc['_id']) is not None
+        assert get_resource_service('items_versions').find_one(req=None, _id_document=doc['_id']) is not None
+
+    resp = client.delete('/wire', data=json.dumps({
+        'items': [docs[0]['_id']],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    for doc in docs:
+        assert get_resource_service('items').find_one(req=None, _id=doc['_id']) is None
+        assert get_resource_service('items_versions').find_one(req=None, _id_document=doc['_id']) is None

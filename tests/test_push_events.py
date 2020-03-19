@@ -7,6 +7,7 @@ from datetime import datetime
 from copy import deepcopy
 
 from superdesk import get_resource_service
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
 from newsroom.notifications import get_user_notifications
 from .fixtures import init_auth  # noqa
@@ -701,7 +702,7 @@ def test_push_event_with_files(client, app):
 
 
 @mock.patch('newsroom.agenda.email.send_email', mock_send_email)
-def test_push_item_with_coverage(client, app, mocker):
+def test_push_story_wont_notify_for_first_publish(client, app, mocker):
     test_item = {
         'type': 'text',
         'guid': 'item',
@@ -725,13 +726,8 @@ def test_push_item_with_coverage(client, app, mocker):
 
     wire_item = get_json(client, '/wire/item')
     assert wire_item['_id'] == 'item'
-    assert wire_item['agenda_id'] == 'foo'
-    assert wire_item['agenda_href'] == '/agenda/foo'
 
-    assert len(outbox) == 1
-    assert 'Subject: Prime minister press conference - updated' in str(outbox[0])
-    assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
-    assert '! Text coverage \'Vivid Text Explainer\' available' in str(outbox[0])
+    assert len(outbox) == 0
 
 
 def assign_active_company(app):
@@ -975,8 +971,6 @@ def test_push_update_for_an_item_with_coverage(client, app, mocker):
 
     wire_item = get_json(client, '/wire/item')
     assert wire_item['_id'] == 'item'
-    assert wire_item['agenda_id'] == 'foo'
-    assert wire_item['agenda_href'] == '/agenda/foo'
 
     updated_item = {
         'type': 'text',
@@ -995,8 +989,6 @@ def test_push_update_for_an_item_with_coverage(client, app, mocker):
 
     wire_item = get_json(client, '/wire/update')
     assert wire_item['_id'] == 'update'
-    assert wire_item['agenda_id'] == 'foo'
-    assert wire_item['agenda_href'] == '/agenda/foo'
 
 
 def test_push_coverages_with_linked_stories(client, app):

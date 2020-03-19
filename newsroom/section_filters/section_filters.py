@@ -1,6 +1,6 @@
 import newsroom
 import superdesk
-from newsroom.wire.search import query_string
+from newsroom.search import query_string
 
 
 class SectionFiltersResource(newsroom.Resource):
@@ -33,7 +33,9 @@ class SectionFiltersResource(newsroom.Resource):
         'search_type': {
             'type': 'string',
             'default': 'wire'
-        }
+        },
+        'original_creator': newsroom.Resource.rel('users'),
+        'version_creator': newsroom.Resource.rel('users'),
     }
     datasource = {
         'source': 'section_filters',

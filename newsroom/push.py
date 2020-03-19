@@ -473,15 +473,25 @@ def get_coverages(planning_items, original_coverages, new_plan):
                 })
         else:
             if coverage.get('workflow_status') == 'completed':
-                if orig_coverage['workflow_status'] != coverage['workflow_status']:
+                if orig_coverage.get('workflow_status') != coverage['workflow_status']:
                     cov_deliveries.append({
                         'sequence_no': 0,
                         'delivery_state': 'published',
                         'publish_time': (next((parse_date_str(d.get('publish_time')) for d in deliveries), None) or
                                          utcnow())
                     })
-                    cov_deliveries[0]['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item,
-                                                                                     cov_deliveries),
+
+                    try:
+                        cov_deliveries[0]['delivery_href'] = app.set_photo_coverage_href(
+                            coverage,
+                            planning_item,
+                            cov_deliveries
+                        )
+                    except Exception as e:
+                        logger.exception(e)
+                        logger.error('Failed to generate delivery_href for coverage={}'.format(
+                            coverage.get('coverage_id')
+                        ))
                 elif (len((orig_coverage or {}).get('deliveries') or []) > 0):
                     cov_deliveries.append(orig_coverage['deliveries'][0])
 
@@ -637,7 +647,7 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
     for section_id in [
         section['_id']
         for section in app.sections
-        if section['_id'] != 'wire' and section['group'] not in ['api', 'watch_lists']
+        if section['_id'] != 'wire' and section['group'] not in ['api', 'monitoring']
     ]:
         # Add the users for those sections and send the notification
         _send_notification(section_id, _get_users(section_id))

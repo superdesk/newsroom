@@ -17,7 +17,7 @@ import {
 import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
 
 import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
-import { renderModal, closeModal, setSavedItemsCount } from 'actions';
+import { renderModal, setSavedItemsCount } from 'actions';
 import {
     getCalendars,
     getDateInputDate,
@@ -79,7 +79,7 @@ export function previewItem(item, group, plan) {
     };
 }
 
-function fetchWireItemsForAgenda(item) {
+export function fetchWireItemsForAgenda(item) {
     return (dispatch) => {
         let wireIds = [];
         (get(item, 'coverages') || []).forEach((c) => {
@@ -349,7 +349,7 @@ export function watchEvents(ids) {
 export const STOP_WATCHING_EVENTS = 'STOP_WATCHING_EVENTS';
 export function stopWatchingEvents(items) {
     return (dispatch, getState) => {
-        server.del(WATCH_URL, {items})
+        server.del(getState().bookmarks ? `${WATCH_URL}?bookmarks=true` : WATCH_URL, {items})
             .then(() => {
                 notify.success(gettext('Stopped watching items successfully.'));
                 if (getState().bookmarks) {
@@ -457,22 +457,6 @@ export function setPrintItem(item) {
 export function downloadItems(items) {
     return renderModal('downloadItems', {items});
 }
-
-/**
- * Start download - open download view in new window.
- *
- * @param {Array} items
- * @param {String} format
- */
-export function submitDownloadItems(items, format) {
-    return (dispatch, getState) => {
-        window.open(`/download/${items.join(',')}?format=${format}&type=${getState().context}`, '_blank');
-        dispatch(setDownloadItems(items));
-        dispatch(closeModal());
-        multiItemEvent('download', items, getState());
-    };
-}
-
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
 export function removeNewItems(data) {
@@ -653,13 +637,6 @@ export function loadMyAgendaTopic(topicId) {
     };
 }
 
-function multiItemEvent(event, items, state) {
-    items.forEach((itemId) => {
-        const item = state.itemsById[itemId];
-        item && analytics.itemEvent(event, item);
-    });
-}
-
 export const TOGGLE_FEATURED_FILTER = 'TOGGLE_FEATURED_FILTER';
 export function toggleFeaturedFilter(fetch = true) {
     return (dispatch) => {
@@ -698,7 +675,7 @@ export function watchCoverage(coverage, item) {
 
 export const STOP_WATCHING_COVERAGE = 'STOP_WATCHING_COVERAGE';
 export function stopWatchingCoverage(coverage, item) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         server.del(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,
             item_id: item._id
@@ -710,6 +687,10 @@ export function stopWatchingCoverage(coverage, item) {
                     coverage,
                     item
                 });
+
+                if (getState().bookmarks) {
+                    dispatch(fetchItems()); // item should get removed from the list in bookmarks view
+                }
             }, (error) => { errorHandler(error, dispatch);});
     };
 }

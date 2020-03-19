@@ -19,7 +19,7 @@ def get_user_company(user):
                                                                                                      'user') else None
 
 
-def get_company_sections_watch_list_data(company_id):
+def get_company_sections_monitoring_data(company_id):
     """get the section configured for the company"""
     if not company_id:
         return {'userSections': newsroom_app.sections}
@@ -27,7 +27,7 @@ def get_company_sections_watch_list_data(company_id):
     company = superdesk.get_resource_service('companies').find_one(req=None, _id=company_id)
 
     rv = {
-        'watch_list_administrator': (company or {}).get('watch_list_administrator'),
+        'monitoring_administrator': (company or {}).get('monitoring_administrator'),
         'userSections': newsroom_app.sections,
     }
     if company and company.get('sections'):

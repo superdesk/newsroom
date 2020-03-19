@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import {get} from 'lodash';
 
 import {LIST_ANIMATIONS, wordCount} from 'utils';
 import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
@@ -11,6 +12,8 @@ import MetaTime from 'ui/components/MetaTime';
 import AMNewsIcon from './AmNewsIcon';
 
 import ListItemPreviousVersions from '../../wire/components/ListItemPreviousVersions';
+import WireListItemDeleted from '../../wire/components/WireListItemDeleted';
+
 import {
     getAMNewsIcon,
     isAlert,
@@ -23,8 +26,7 @@ class AmNewsListItem extends React.Component {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item);
-        this.slugline = props.item.slugline && props.item.slugline.trim();
-        this.state = {isHover: false, previousVersions: false};
+        this.state = {previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
     }
@@ -59,6 +61,16 @@ class AmNewsListItem extends React.Component {
 
     render() {
         const {item, onClick, onDoubleClick} = this.props;
+
+        if (get(this.props, 'item.deleted')) {
+            return (
+                <WireListItemDeleted
+                    item={this.props.item}
+                    contextName={this.props.contextName}
+                />
+            );
+        }
+
         const cardClassName = classNames('wire-articles__item-wrap col-12');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--list', {
             'wire-articles__item--visited': this.props.isRead,
@@ -85,11 +97,8 @@ class AmNewsListItem extends React.Component {
                 ref={(elem) => this.articleElem = elem}
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
-                onMouseEnter={() => this.setState({isHover: true})}
-                onMouseLeave={() => this.setState({isHover: false})}
                 onKeyDown={this.onKeyDown}
             >
-
                 <div className={wrapClassName}>
                     <div className='wire-articles__item-text'>
                         <h4 className='wire-articles__item-headline'>
@@ -165,6 +174,7 @@ AmNewsListItem.propTypes = {
         action: PropTypes.func,
     })),
     user: PropTypes.string,
+    contextName: PropTypes.string,
 };
 
 export default AmNewsListItem;

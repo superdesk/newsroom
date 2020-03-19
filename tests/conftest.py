@@ -18,6 +18,7 @@ def update_config(conf):
     conf['TESTING'] = True
     conf['WEBPACK_ASSETS_URL'] = None
     conf['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Prague'
+    conf['DEFAULT_TIMEZONE'] = 'Europe/Prague'
     conf['NEWS_API_ENABLED'] = True
     return conf
 
@@ -45,12 +46,12 @@ def clean_databases(app):
 @fixture
 def app():
     from flask import Config
-    from newsroom import Newsroom
+    from newsroom.web import NewsroomWebApp
 
     cfg = Config(root)
     cfg.from_object('newsroom.default_settings')
     update_config(cfg)
-    return Newsroom(config=cfg, testing=True)
+    return NewsroomWebApp(config=cfg, testing=True)
 
 
 @fixture

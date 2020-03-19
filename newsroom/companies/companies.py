@@ -58,9 +58,15 @@ class CompaniesResource(newsroom.Resource):
         'account_manager': {
             'type': 'string'
         },
-        'watch_list_administrator': {
+        'monitoring_administrator': {
             'type': 'ObjectId'
-        }
+        },
+        'allowed_ip_list': {
+            'type': 'list',
+            'mapping': {'type': 'string'}
+        },
+        'original_creator': newsroom.Resource.rel('users'),
+        'version_creator': newsroom.Resource.rel('users'),
     }
     datasource = {
         'source': 'companies',

@@ -1,0 +1,27 @@
+.reports-container .table {
+    tr:nth-child(even) {
+        background: #F5F5F5;
+    }
+
+    tr:hover {
+        background: #cee6fa;
+    }
+}
+
+.content-activity__table {
+    td:first-child {
+        width: 80px;
+    }
+    td:nth-child(2) {
+        width: 450px;
+    }
+    td:nth-child(3) {
+        width: 150px;
+    }
+    td:nth-child(4) {
+        width: 160px;
+    }
+    td:nth-child(5) {
+        width: 175px;
+    }
+}

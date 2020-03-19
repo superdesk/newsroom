@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import {get} from 'lodash';
+
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
 import SearchResults from 'search/components/SearchResults';
@@ -15,6 +17,7 @@ import {
     setError,
 } from '../actions';
 import {searchQuerySelector} from 'search/selectors';
+import {companiesSubscriberIdEnabled} from 'ui/selectors';
 import {gettext} from 'utils';
 
 class Companies extends React.Component {
@@ -39,11 +42,13 @@ class Companies extends React.Component {
         return valid;
     }
 
-    save(event) {
-        event.preventDefault();
+    save(externalEvent) {
+        if (externalEvent) {
+            externalEvent.preventDefault();
 
-        if (!this.isFormValid()) {
-            return;
+            if (!this.isFormValid()) {
+                return;
+            }
         }
 
         this.props.saveCompany('companies');
@@ -59,6 +64,8 @@ class Companies extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
+        const originalCompanyEdited = !get(this.props, 'companyToEdit._id') ? this.props.companyToEdit :
+            this.props.companiesById[this.props.companyToEdit._id];
 
         return (
             <div className="flex-row">
@@ -84,11 +91,13 @@ class Companies extends React.Component {
                             onClick={this.props.selectCompany}
                             activeCompanyId={this.props.activeCompanyId}
                             companyTypes={this.props.companyTypes}
+                            showSubscriberId={this.props.showSubscriberId}
                         />
                     </div>
                 )}
                 {this.props.companyToEdit &&
                     <EditCompany
+                        originalItem={originalCompanyEdited}
                         company={this.props.companyToEdit}
                         onChange={this.props.editCompany}
                         errors={this.props.errors}
@@ -127,6 +136,8 @@ Companies.propTypes = {
     products: PropTypes.array,
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
+    showSubscriberId: PropTypes.bool,
+    companiesById: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -143,6 +154,7 @@ const mapStateToProps = (state) => ({
     errors: state.errors,
     companyTypes: state.companyTypes,
     apiEnabled: state.apiEnabled,
+    showSubscriberId: companiesSubscriberIdEnabled(state),
 });
 
 

@@ -4,8 +4,9 @@ from datetime import datetime
 from urllib import parse
 from unittest import mock
 
-from newsroom.wire.utils import get_local_date, get_end_date
-from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts, get_entity_or_404
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
+from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts, get_entity_or_404, \
+    get_local_date, get_end_date
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
 from copy import deepcopy
@@ -342,7 +343,7 @@ def test_fail_watch_coverages(client, app):
         assert resp.status_code == 403
 
 
-@mock.patch('newsroom.wire.utils.get_utcnow', mock_utcnow)
+@mock.patch('newsroom.utils.get_utcnow', mock_utcnow)
 def test_local_time(client, app, mocker):
     # 9 am Sydney Time - day light saving on
     local_date = get_local_date('now/d', '00:00:00', -660)

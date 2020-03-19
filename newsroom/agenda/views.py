@@ -7,19 +7,22 @@ from flask_babel import gettext
 from eve.methods.get import get_internal
 from eve.render import send_response
 from superdesk import get_resource_service
+from eve.utils import ParsedRequest
 
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
-from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, \
+from newsroom.utils import get_entity_or_404, is_json_request, get_json_or_400, get_entities_elastic_or_mongo_or_404, \
     get_agenda_dates, get_location_string, get_public_contacts, get_links, get_vocabulary
 from newsroom.wire.utils import update_action_list
+from newsroom.wire.views import set_item_permission
 from newsroom.agenda.email import send_coverage_request_email
 from newsroom.agenda.utils import remove_fields_for_public_user
 from newsroom.companies import section, get_user_company
 from newsroom.notifications import push_user_notification
+import json
 
 
 @blueprint.route('/agenda')
@@ -139,16 +142,25 @@ def follow():
     for item_id in data.get('items'):
         user_id = get_user_id()
         item = get_entity_or_404(item_id, 'agenda')
+        coverage_updates = {'coverages': item.get('coverages') or []}
+        for c in coverage_updates['coverages']:
+            if c.get('watches') and user_id in c['watches']:
+                c['watches'].remove(user_id)
+
         if request.method == 'POST':
             updates = {'watches': list(set((item.get('watches')or []) + [user_id]))}
             if item.get('coverages'):
-                updates['coverages'] = item['coverages']
-                for c in updates['coverages']:
-                    if c.get('watches') and user_id in c['watches']:
-                        c['watches'].remove(user_id)
+                updates.update(coverage_updates)
 
             get_resource_service('agenda').patch(item_id, updates)
         else:
+            if request.args.get('bookmarks'):
+                user_item_watches = [u for u in (item.get('watches') or []) if str(u) == str(user_id)]
+                if not user_item_watches:
+                    # delete user watches of all coverages
+                    get_resource_service('agenda').patch(item_id, coverage_updates)
+                    return flask.jsonify(), 200
+
             update_action_list(data.get('items'), 'watches', item_type='agenda')
 
     push_user_notification('saved_items', count=get_resource_service('agenda').get_saved_items_count())
@@ -170,7 +182,7 @@ def watch_coverage():
     try:
         coverage_index = [c['coverage_id'] for c in (item.get('coverages') or [])].index(data['coverage_id'])
     except ValueError:
-        return flask.jsonify({'error': gettext('Coverage not found.')}), 403
+        return flask.jsonify({'error': gettext('Coverage not found.')}), 404
 
     updates = {'coverages': item['coverages']}
     if request.method == 'POST':
@@ -180,7 +192,55 @@ def watch_coverage():
         try:
             updates['coverages'][coverage_index]['watches'].remove(user_id)
         except Exception:
-            return flask.jsonify({'error': gettext('Error removing watch.')}), 403
+            return flask.jsonify({'error': gettext('Error removing watch.')}), 404
 
     get_resource_service('agenda').patch(data['item_id'], updates)
     return flask.jsonify(), 200
+
+
+@blueprint.route('/agenda/wire_items/<wire_id>')
+@login_required
+def related_wire_items(wire_id):
+    elastic = app.data._search_backend('agenda')
+    source = {}
+    must_terms = [{'term': {'coverages.delivery_id': {"value": wire_id}}}]
+    query = {
+        'bool': {
+            'must': must_terms
+            },
+    }
+
+    source.update({'query': {
+        "nested": {
+            "path": "coverages",
+            "query": query
+        }
+    }})
+    internal_req = ParsedRequest()
+    internal_req.args = {'source': json.dumps(source)}
+    agenda_result = elastic.find('agenda', internal_req, None)
+
+    if len(agenda_result.docs) == 0:
+        return flask.jsonify({'error': gettext('Agenda item not found')}), 404
+
+    wire_ids = []
+    for cov in agenda_result.docs[0].get('coverages') or []:
+        if cov.get('coverage_type') == 'text' and cov.get('delivery_id'):
+            wire_ids.append(cov['delivery_id'])
+
+    wire_items = get_entities_elastic_or_mongo_or_404(wire_ids, 'items')
+    aggregations = {"uid": {"terms": {"field": "_uid"}}}
+    permissioned_result = get_resource_service('wire_search').get_items(wire_ids, size=0, aggregations=aggregations,
+                                                                        apply_permissions=True)
+    buckets = permissioned_result.hits['aggregations']['uid']['buckets']
+    permissioned_ids = []
+    for b in buckets:
+        permissioned_ids.append(b['key'].replace('items#', ''))
+
+    for wire_item in wire_items:
+        set_item_permission(wire_item, wire_item.get('_id') in permissioned_ids)
+
+    return flask.jsonify({
+        'agenda_item': agenda_result.docs[0],
+        'wire_items': wire_items,
+    }), 200

@@ -11,9 +11,9 @@
 
 
 import logging
-from .flaskapp import Newsroom
+from newsroom.web import NewsroomWebApp
 
 
 logger = logging.getLogger(__name__)
-app = Newsroom("newsroom_celery")
+app = NewsroomWebApp("newsroom_celery")
 celery = app.celery

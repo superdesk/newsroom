@@ -1,5 +1,4 @@
 import server from 'server';
-import moment from 'moment';
 import {cloneDeep} from 'lodash';
 
 import {notify, gettext} from '../utils';
@@ -11,9 +10,7 @@ export function getTokenForCompany(companyId) {
 export function generateTokenForCompany(token) {
     const newToken = cloneDeep(token);
 
-    newToken.expiry = !token.expiry ?
-        null :
-        moment(token.expiry).format('YYYY-MM-DDTHH:MM:SS+0000');
+    newToken.expiry = !token.expiry ? null : token.expiry;
 
     return server.post('/news_api_tokens', newToken)
         .then((data) => {

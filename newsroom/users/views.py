@@ -11,13 +11,14 @@ from newsroom.auth import get_user, get_user_by_email
 from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user
 from newsroom.decorator import admin_only, login_required
-from newsroom.companies import get_user_company_name, get_company_sections_watch_list_data
+from newsroom.companies import get_user_company_name, get_company_sections_monitoring_data
 from newsroom.notifications.notifications import get_user_notifications
 from newsroom.notifications import push_user_notification
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
-from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary, get_watch_lists_for_company
+from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
+from newsroom.monitoring.views import get_monitoring_for_company
 
 
 def get_settings_data():
@@ -39,9 +40,9 @@ def get_view_data():
     }
 
     if app.config.get('ENABLE_WATCH_LISTS'):
-        rv['watch_lists'] = get_watch_lists_for_company(user)
+        rv['monitoring_list'] = get_monitoring_for_company(user)
 
-    rv.update(get_company_sections_watch_list_data(company))
+    rv.update(get_company_sections_monitoring_data(company))
 
     return rv
 
@@ -59,6 +60,10 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'$or': [{'first_name': regex}, {'last_name': regex}]}
+
+    if flask.request.args.get('ids'):
+        lookup = {'_id': {'$in': (flask.request.args.get('ids') or '').split(',')}}
+
     users = list(query_resource('users', lookup=lookup))
     return jsonify(users), 200
 

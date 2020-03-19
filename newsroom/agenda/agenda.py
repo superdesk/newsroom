@@ -3,7 +3,7 @@ import logging
 from copy import deepcopy
 from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
-from flask import json, abort, url_for, current_app as app
+from flask import json, abort, current_app as app
 from flask_babel import gettext
 from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE, WORKFLOW_STATE
 from planning.events.events_schema import events_schema
@@ -19,12 +19,12 @@ from newsroom.companies import get_user_company
 from newsroom.notifications import push_notification
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404, parse_date_str
-from newsroom.wire.search import query_string, set_product_query, \
-    planning_items_query_string, nested_query
-from newsroom.wire.utils import get_local_date, get_end_date
+from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
+from newsroom.search import BaseSearchService, SearchQuery, query_string
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
+from bson import ObjectId
 
 
 logger = logging.getLogger(__name__)
@@ -70,6 +70,22 @@ def set_saved_items_query(query, user_id):
             'should': [
                 {'term': {'bookmarks': str(user_id)}},
                 {'term': {'watches': str(user_id)}},
+                {
+                    "nested": {
+                        "path": "coverages",
+                        "query": {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "term": {
+                                            "coverages.watches": str(user_id)
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
             ],
         },
     })
@@ -158,12 +174,11 @@ class AgendaResource(newsroom.Resource):
                         'planning_id': not_analyzed,
                         'coverage_id': not_analyzed,
                         'assignment_id': not_analyzed,
-                        'item_id': not_analyzed,
-                        'item_state': not_analyzed,
                         'sequence_no': not_analyzed,
                         'publish_time': {'type': 'date'},
+                        'delivery_id': not_analyzed,
+                        'delivery_state': not_analyzed,
                     }
-
                 },
                 'watches': not_analyzed,
             },
@@ -274,42 +289,92 @@ def _agenda_query():
 
 
 def get_date_filters(args):
-    range = {}
+    date_range = {}
     offset = int(args.get('timezone_offset', '0'))
     if args.get('date_from'):
-        range['gt'] = get_local_date(args['date_from'], '00:00:00', offset)
+        date_range['gt'] = get_local_date(args['date_from'], '00:00:00', offset)
     if args.get('date_to'):
-        range['lt'] = get_end_date(args['date_to'], get_local_date(args['date_to'], '23:59:59', offset))
-    return range
+        date_range['lt'] = get_end_date(args['date_to'], get_local_date(args['date_to'], '23:59:59', offset))
+    return date_range
 
 
-def _event_date_range(args):
+def _set_event_date_range(search):
     """Get events for selected date.
 
     ATM it should display everything not finished by that date, even starting later.
+
+    :param newsroom.search.SearchQuery search: The search query instance
     """
-    date_range = get_date_filters(args)
-    date_query = []
-    if date_range.get('gt') and date_range.get('lt'):
-        date_query.append({'range': {'dates.end': date_range}})
-        date_query.append({'range': {'dates.start': date_range}})
-        date_query.append({
+
+    date_range = get_date_filters(search.args)
+    date_from = date_range.get('gt')
+    date_to = date_range.get('lt')
+
+    should = []
+
+    if date_from and not date_to:
+        # Filter from a particular date onwards
+        should = [
+            {'range': {'dates.start': {'gte': date_from}}},
+            {'range': {'dates.end': {'gte': date_from}}}
+        ]
+    elif not date_from and date_to:
+        # Filter up to a particular date
+        should = [
+            {'range': {'dates.start': {'lte': date_to}}},
+            {'range': {'dates.end': {'lte': date_to}}}
+        ]
+    elif date_from and date_to:
+        # Filter based on the date range provided
+        should = [{
+            # Both start/end dates are inside the range
             'bool': {
                 'must': [
-                    {'range': {'dates.start': {'lt': date_range.get('gt')}}},
-                    {'range': {'dates.end': {'gt': date_range.get('lt')}}}
+                    {'range': {'dates.start': {'gte': date_from}}},
+                    {'range': {'dates.end': {'lte': date_to}}}
                 ]
             }
+        }, {
+            # Starts before date_from and finishes after date_to
+            'bool': {
+                'must': [
+                    {'range': {'dates.start': {'lt': date_from}}},
+                    {'range': {'dates.end': {'gt': date_to}}}
+                ]
+            }
+        }, {
+            # Start date is within range OR End date is within range
+            'bool': {
+                'should': [{
+                    'range': {
+                        'dates.start': {
+                            'gte': date_from,
+                            'lte': date_to
+                        }
+                    }
+                }, {
+                    'range': {
+                        'dates.end': {
+                            'gte': date_from,
+                            'lte': date_to
+                        }
+                    }
+                }],
+                'minimum_should_match': 1
+            }
+        }]
+
+    if search.is_events_only:
+        # Get events for extra dates for coverages and planning.
+        should.append({'range': {'display_dates': date_range}})
+
+    if len(should):
+        search.query['bool']['must'].append({
+            'bool': {
+                'should': should,
+                'minimum_should_match': 1
+            }
         })
-    else:
-        date_query.append({'range': {'dates.end': get_date_filters(args)}})
-    return date_query
-
-
-def _display_date_range(args):
-    """Get events for extra dates for coverages and planning.
-    """
-    return {'range': {'display_dates.date': get_date_filters(args)}}
 
 
 aggregations = {
@@ -349,6 +414,19 @@ def get_aggregation_field(key):
     if key == 'coverage':
         return aggregations[key]['aggs']['coverage_type']['terms']['field']
     return aggregations[key]['terms']['field']
+
+
+def nested_query(path, query, inner_hits=True, name=None):
+    nested = {
+        'path': path,
+        'query': query
+    }
+    if inner_hits:
+        nested['inner_hits'] = {}
+        if name:
+            nested['inner_hits']['name'] = name
+
+    return {'nested': nested}
 
 
 def _filter_terms(filters, events_only=False):
@@ -431,6 +509,17 @@ def set_post_filter(source, req, events_only=False):
             source['query']['bool']['must_not'] += _filter_terms(filters, events_only)['must_not_term_filters']
 
 
+def planning_items_query_string(query, fields=None):
+    plan_query_string = query_string(query)
+
+    if fields:
+        plan_query_string['query_string']['fields'] = fields
+    else:
+        plan_query_string['query_string']['fields'] = ['planning_items.*']
+
+    return plan_query_string
+
+
 def get_agenda_query(query, events_only=False):
     if events_only:
         return query_string(query)
@@ -465,8 +554,11 @@ def filter_active_users(user_ids, user_dict, company_dict, events_only=False):
     return active
 
 
-class AgendaService(newsroom.Service):
+class AgendaService(BaseSearchService):
     section = 'agenda'
+    limit_days_setting = None
+    default_sort = [{'dates.start': 'asc'}]
+    default_page_size = 100
 
     def on_fetched(self, doc):
         self.enhance_items(doc[config.ITEMS])
@@ -505,8 +597,17 @@ class AgendaService(newsroom.Service):
 
         media_coverages = [c for c in completed_coverages if c.get('coverage_type') != 'text']
         for c in media_coverages:
-            c['deliveries'][0]['delivery_href'] = c['delivery_href'] = app.set_photo_coverage_href(c, None,
-                                                                                                   c['deliveries'])
+            try:
+                c['deliveries'][0]['delivery_href'] = c['delivery_href'] = app.set_photo_coverage_href(
+                    c,
+                    None,
+                    c['deliveries']
+                )
+            except Exception as e:
+                logger.exception(e)
+                logger.error('Failed to generate delivery_href for coverage={}'.format(
+                    c.get('coverage_id')
+                ))
 
     def enhance_coverage_with_wire_details(self, coverage, wire_item):
         coverage['publish_time'] = wire_item.get('publish_schedule') or wire_item.get('firstpublished')
@@ -515,86 +616,7 @@ class AgendaService(newsroom.Service):
         if req.args.get('featured'):
             return self.get_featured_stories(req, lookup)
 
-        query = _agenda_query()
-        user = get_user()
-        company = get_user_company(user)
-        is_events_only = is_events_only_access(user, company) or req.args.get('eventsOnlyView')
-        get_resource_service('section_filters').apply_section_filter(query, self.section)
-        product_query = {'bool': {'must': [], 'should': []}}
-
-        navigation_id = req.args.get('navigation')
-        if navigation_id:
-            navigation_id = list(navigation_id.split(','))
-
-        set_product_query(
-            product_query,
-            company,
-            self.section,
-            navigation_id=navigation_id,
-            events_only=is_events_only
-        )
-        query['bool']['must'].append(product_query)
-
-        if req.args.get('q'):
-            test_query = {'or': []}
-            try:
-                q = json.loads(req.args.get('q'))
-                if isinstance(q, dict):
-                    # used for product testing
-                    if q.get('query'):
-                        test_query['or'].append(query_string(q.get('query')))
-                    if q.get('planning_item_query'):
-                        test_query['or'].append(
-                            nested_query(
-                                'planning_items',
-                                planning_items_query_string(q.get('planning_item_query')),
-                                name='product_test'
-                            )
-                        )
-                    if test_query['or']:
-                        query['bool']['must'].append(test_query)
-            except Exception:
-                pass
-
-            if not test_query.get('or'):
-                query['bool']['must'].append(get_agenda_query(req.args['q'], is_events_only))
-
-        if req.args.get('id'):
-            query['bool']['must'].append({'term': {'_id': req.args['id']}})
-
-        if req.args.get('bookmarks'):
-            set_saved_items_query(query, req.args['bookmarks'])
-
-        if req.args.get('date_from') or req.args.get('date_to'):
-            query['bool']['should'].extend(_event_date_range(req.args))
-            if not is_events_only:
-                query['bool']['should'].append(_display_date_range(req.args))
-
-        source = {'query': query}
-        source['sort'] = [{'dates.start': 'asc'}]
-        source['size'] = 100  # we should fetch all items for given date
-        source['from'] = req.args.get('from', 0, type=int)
-
-        set_post_filter(source, req, is_events_only)
-
-        if source['from'] >= 1000:
-            # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
-            return abort(400)
-
-        if not source['from'] and not req.args.get('bookmarks'):  # avoid aggregations when handling pagination
-            source['aggs'] = get_agenda_aggregations(is_events_only)
-
-        if not is_admin_or_internal(user):
-            _remove_fields(source, PRIVATE_FIELDS)
-
-        if is_events_only:
-            # no adhoc planning items and remove planning items and coverages fields
-            query['bool']['must'].append({'exists': {'field': 'event_id'}})
-            _remove_fields(source, PLANNING_ITEMS_FIELDS)
-
-        internal_req = ParsedRequest()
-        internal_req.args = {'source': json.dumps(source)}
-        cursor = super().get(internal_req, lookup)
+        cursor = super().get(req, lookup)
 
         if req.args.get('date_from') and req.args.get('date_to'):
             date_range = get_date_filters(req.args)
@@ -607,8 +629,168 @@ class AgendaService(newsroom.Service):
                 })
         return cursor
 
+    def prefill_search_query(self, search, req=None, lookup=None):
+        """ Generate the search query instance
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        :param ParsedRequest req: The parsed in request instance from the endpoint
+        :param dict lookup: The parsed in lookup dictionary from the endpoint
+        """
+
+        super().prefill_search_query(search, req, lookup)
+        search.is_events_only = is_events_only_access(search.user, search.company) or \
+            search.args.get('eventsOnlyView')
+
+    def prefill_search_items(self, search):
+        """ Prefill the item filters
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        """
+
+        pass
+
+    def apply_filters(self, search):
+        """ Generate and apply the different search filters
+
+        :param newsroom.search.SearchQuery search: the search query instance
+        """
+
+        # First construct the product query
+        self.apply_company_filter(search)
+
+        search.planning_items_should = []
+        self.apply_products_filter(search)
+
+        if search.planning_items_should:
+            search.query['bool']['should'].append(
+                nested_query(
+                    'planning_items',
+                    {
+                        'bool': {
+                            'should': search.planning_items_should,
+                            'minimum_should_match': 1
+                        }
+                    },
+                    name='products'
+                )
+            )
+
+        search.query['bool']['minimum_should_match'] = 1
+
+        # Append the product query to the agenda query
+        agenda_query = _agenda_query()
+        agenda_query['bool']['must'].append(search.query)
+        search.query = agenda_query
+
+        # Apply agenda based filters
+        self.apply_section_filter(search)
+        self.apply_request_filter(search)
+
+        if not is_admin_or_internal(search.user):
+            _remove_fields(search.source, PRIVATE_FIELDS)
+
+        if search.is_events_only:
+            # no adhoc planning items and remove planning items and coverages fields
+            search.query['bool']['must'].append({'exists': {'field': 'event_id'}})
+            _remove_fields(search.source, PLANNING_ITEMS_FIELDS)
+
+    def apply_product_filter(self, search, product):
+        """ Generate the filter for a single product
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        :param dict product: The product to filter
+        :return:
+        """
+        if search.args.get('requested_products') and product['_id'] not in search.args['requested_products']:
+            return
+
+        if product.get('query'):
+            search.query['bool']['should'].append(
+                query_string(product['query'])
+            )
+
+            if product.get('planning_item_query') and not search.is_events_only:
+                search.planning_items_should.append(
+                    planning_items_query_string(
+                        product.get('planning_item_query')
+                    )
+                )
+
+    def apply_request_filter(self, search):
+        """ Generate the request filters
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        """
+
+        if search.args.get('q'):
+            test_query = {'or': []}
+            try:
+                q = json.loads(search.args.get('q'))
+                if isinstance(q, dict):
+                    # used for product testing
+                    if q.get('query'):
+                        test_query['or'].append(query_string(q.get('query')))
+
+                    if q.get('planning_item_query'):
+                        test_query['or'].append(
+                            nested_query(
+                                'planning_items',
+                                planning_items_query_string(q.get('planning_item_query')),
+                                name='product_test'
+                            )
+                        )
+
+                    if test_query['or']:
+                        search.query['bool']['must'].append(test_query)
+            except Exception:
+                pass
+
+            if not test_query.get('or'):
+                search.query['bool']['must'].append(
+                    get_agenda_query(
+                        search.args['q'],
+                        search.is_events_only
+                    )
+                )
+
+        if search.args.get('id'):
+            search.query['bool']['must'].append(
+                {'term': {'_id': search.args['id']}}
+            )
+
+        if search.args.get('bookmarks'):
+            set_saved_items_query(
+                search.query,
+                search.args['bookmarks']
+            )
+
+        if search.args.get('date_from') or search.args.get('date_to'):
+            _set_event_date_range(search)
+
+    def gen_source_from_search(self, search):
+        """ Generate the eve source object from the search query instance
+
+        :param newsroom.search.SearchQuery search: The search query instance
+        """
+
+        super().gen_source_from_search(search)
+
+        set_post_filter(search.source, search, search.is_events_only)
+
+        if not search.source['from'] and not search.args.get('bookmarks'):
+            # avoid aggregations when handling pagination
+            search.source['aggs'] = get_agenda_aggregations(search.is_events_only)
+        else:
+            search.source.pop('aggs', None)
+
     def featured(self, req, lookup, featured):
-        """Return featured items."""
+        """Return featured items.
+
+        :param ParsedRequest req: The parsed in request instance from the endpoint
+        :param dict lookup: The parsed in lookup dictionary from the endpoint
+        :param dict featured: list featured items
+        """
+
         user = get_user()
         company = get_user_company(user)
         if is_events_only_access(user, company):
@@ -646,7 +828,7 @@ class AgendaService(newsroom.Service):
 
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
-        cursor = super().get(internal_req, lookup)
+        cursor = self.internal_get(internal_req, lookup)
 
         docs_by_id = {}
         for doc in cursor.docs:
@@ -691,14 +873,14 @@ class AgendaService(newsroom.Service):
             req = ParsedRequest()
             req.args = {'source': json.dumps(source)}
 
-            return super().get(req, None)
+            return self.internal_get(req, None)
         except Exception as exc:
             logger.error('Error in get_items for agenda query: {}'.format(json.dumps(source)),
                          exc, exc_info=True)
 
     def get_matching_bookmarks(self, item_ids, active_users, active_companies):
-        """
-        Returns a list of user ids bookmarked any of the given items
+        """ Returns a list of user ids bookmarked any of the given items
+
         :param item_ids: list of ids of items to be searched
         :param active_users: user_id, user dictionary
         :param active_companies: company_id, company dictionary
@@ -754,8 +936,7 @@ class AgendaService(newsroom.Service):
 
         agenda_items = self.get_items_by_query(query)
         for item in agenda_items:
-            wire_item.setdefault('agenda_id', item['_id'])
-            wire_item.setdefault('agenda_href', url_for('agenda.item', _id=item['_id']))
+            self.enhance_coverage_watches(item)
             coverages = item['coverages']
             for coverage in coverages:
                 if coverage['coverage_id'] == wire_item['coverage_id'] and is_delivery_validated(coverage, item):
@@ -777,9 +958,16 @@ class AgendaService(newsroom.Service):
                     self.enhance_coverage_with_wire_details(coverage, wire_item)
                     push_notification('new_item', _items=[item])
 
-                    self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, coverage)
+                    # If published first time, coverage completion will trigger email - not needed now
+                    if (d or {}).get('sequence_no', 0) > 0:
+                        self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, coverage)
                     break
         return agenda_items
+
+    def enhance_coverage_watches(self, item):
+        for c in (item.get('coverages') or []):
+            if c.get('watches'):
+                c['watches'] = [ObjectId(u) for u in c['watches']]
 
     def notify_new_coverage(self, agenda, wire_item):
         user_dict = get_user_dict()
@@ -795,7 +983,12 @@ class AgendaService(newsroom.Service):
         if agenda and original_agenda.get('state') != WORKFLOW_STATE.KILLED:
             user_dict = get_user_dict()
             company_dict = get_company_dict()
-            coverage_watched = len([c.get('watches') for c in (original_agenda.get('coverages') or [])]) > 0
+            coverage_watched = None
+            for c in (original_agenda.get('coverages') or []):
+                if len(c.get('watches') or []) > 0:
+                    coverage_watched = True
+                    break
+
             notify_user_ids = filter_active_users(original_agenda.get('watches', []),
                                                   user_dict,
                                                   company_dict,
@@ -837,12 +1030,12 @@ class AgendaService(newsroom.Service):
                             fill_list.append(detailed_coverage)
 
             coverage_updates = {
-                'modified_coverages': [],
+                'modified_coverages': [] if not coverage_updated else [coverage_updated],
                 'cancelled_coverages': [],
                 'unaltered_coverages': []
             }
 
-            only_new_coverages = True
+            only_new_coverages = len(coverage_updates['modified_coverages']) == 0
             time_updated = False
             state_changed = False
             coverage_modified = False
@@ -851,59 +1044,62 @@ class AgendaService(newsroom.Service):
             notify_states = [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED,
                              WORKFLOW_STATE.KILLED, WORKFLOW_STATE.SCHEDULED]
 
-            if not related_planning_removed:
-                # Send notification if time got updated
-                if original_agenda.get('dates') and agenda.get('dates'):
-                    time_updated = (original_agenda.get('dates') or {}).get('start').replace(tzinfo=None) != \
-                                   (agenda.get('dates') or {}).get('start').replace(tzinfo=None) or \
-                        (original_agenda.get('dates') or {}).get('end').replace(tzinfo=None) != \
-                        (agenda.get('dates') or {}).get('end').replace(tzinfo=None)
+            if not coverage_updated:  # If not story updates - but from planning side
+                if not related_planning_removed:
+                    # Send notification if time got updated
+                    if original_agenda.get('dates') and agenda.get('dates'):
+                        time_updated = (original_agenda.get('dates') or {}).get('start').replace(tzinfo=None) != \
+                                       (agenda.get('dates') or {}).get('start').replace(tzinfo=None) or \
+                            (original_agenda.get('dates') or {}).get('end').replace(tzinfo=None) != \
+                            (agenda.get('dates') or {}).get('end').replace(tzinfo=None)
 
-                if agenda.get('state') and agenda.get('state') != original_agenda.get('state'):
-                    state_changed = agenda.get('state') in notify_states
+                    if agenda.get('state') and agenda.get('state') != original_agenda.get('state'):
+                        state_changed = agenda.get('state') in notify_states
 
-                if not state_changed:
-                    if time_updated:
-                        fill_all_coverages()
-                    else:
-                        for coverage in agenda.get('coverages') or []:
-                            existing_coverage = next((c for c in original_agenda.get('coverages') or []
-                                                      if c['coverage_id'] == coverage['coverage_id']), None)
-                            detailed_coverage = get_detailed_coverage(coverage)
-                            if detailed_coverage:
-                                if not existing_coverage:
-                                    if coverage['workflow_status'] != WORKFLOW_STATE.CANCELLED:
+                    if not state_changed:
+                        if time_updated:
+                            fill_all_coverages()
+                        else:
+                            for coverage in agenda.get('coverages') or []:
+                                existing_coverage = next((c for c in original_agenda.get('coverages') or []
+                                                          if c['coverage_id'] == coverage['coverage_id']), None)
+                                detailed_coverage = get_detailed_coverage(coverage)
+                                if detailed_coverage:
+                                    if not existing_coverage:
+                                        if coverage['workflow_status'] != WORKFLOW_STATE.CANCELLED:
+                                            coverage_updates['modified_coverages'].append(detailed_coverage)
+                                    elif coverage.get('workflow_status') == WORKFLOW_STATE.CANCELLED and \
+                                            existing_coverage.get('workflow_status') != coverage.get('workflow_status'):
+                                        coverage_updates['cancelled_coverages'].append(detailed_coverage)
+                                    elif (coverage.get('delivery_state') != existing_coverage.get('delivery_state') and
+                                            coverage.get('delivery_state') == 'published') or \
+                                        (coverage.get('workflow_status') != existing_coverage.get('workflow_status') and
+                                            coverage.get('workflow_status') == 'completed') or \
+                                            (existing_coverage.get('scheduled') != coverage.get('scheduled')):
                                         coverage_updates['modified_coverages'].append(detailed_coverage)
-                                elif coverage.get('workflow_status') == WORKFLOW_STATE.CANCELLED and \
-                                        existing_coverage.get('workflow_status') != coverage.get('workflow_status'):
-                                    coverage_updates['cancelled_coverages'].append(detailed_coverage)
-                                elif (coverage.get('delivery_state') != existing_coverage.get('delivery_state') and
-                                        coverage.get('delivery_state') == 'published') or \
-                                    (coverage.get('workflow_status') != existing_coverage.get('workflow_status') and
-                                        coverage.get('workflow_status') == 'completed') or \
-                                        (existing_coverage.get('scheduled') != coverage.get('scheduled')):
-                                    coverage_updates['modified_coverages'].append(detailed_coverage)
-                                    only_new_coverages = False
-                                elif detailed_coverage['coverage_id'] != (coverage_updated or {}).get('coverage_id'):
-                                    coverage_updates['unaltered_coverages'].append(detailed_coverage)
+                                        only_new_coverages = False
+                                    elif detailed_coverage['coverage_id'] != \
+                                            (coverage_updated or {}).get('coverage_id'):
+                                        coverage_updates['unaltered_coverages'].append(detailed_coverage)
 
-                        # Check for removed coverages - show it as cancelled
-                        if item and item.get('type') == 'planning':
-                            for original_cov in original_agenda.get('coverages') or []:
-                                updated_cov = next((c for c in (agenda.get('coverages') or [])
-                                                    if c.get('coverage_id') == original_cov.get('coverage_id')), None)
-                                if not updated_cov:
-                                    coverage_updates['cancelled_coverages'].append(original_cov)
+                            # Check for removed coverages - show it as cancelled
+                            if item and item.get('type') == 'planning':
+                                for original_cov in original_agenda.get('coverages') or []:
+                                    updated_cov = next((c for c in (agenda.get('coverages') or [])
+                                                        if c.get('coverage_id') ==
+                                                        original_cov.get('coverage_id')), None)
+                                    if not updated_cov:
+                                        coverage_updates['cancelled_coverages'].append(original_cov)
+                    else:
+                        fill_all_coverages(cancelled=False if agenda.get('state') == WORKFLOW_STATE.SCHEDULED else True,
+                                           use_original_agenda=True)
                 else:
-                    fill_all_coverages(cancelled=False if agenda.get('state') == WORKFLOW_STATE.SCHEDULED else True,
-                                       use_original_agenda=True)
-            else:
-                fill_all_coverages(related_planning_removed.get('coverages') or [])
-                # Add removed coverages:
-                for coverage in related_planning_removed.get('coverages') or []:
-                    detailed_coverage = get_detailed_coverage(coverage)
-                    if detailed_coverage:
-                        coverage_updates['cancelled_coverages'].append(detailed_coverage)
+                    fill_all_coverages(related_planning_removed.get('coverages') or [])
+                    # Add removed coverages:
+                    for coverage in related_planning_removed.get('coverages') or []:
+                        detailed_coverage = get_detailed_coverage(coverage)
+                        if detailed_coverage:
+                            coverage_updates['cancelled_coverages'].append(detailed_coverage)
 
             if len(coverage_updates['modified_coverages']) > 0 or len(coverage_updates['cancelled_coverages']) > 0:
                 coverage_modified = True
@@ -913,7 +1109,7 @@ class AgendaService(newsroom.Service):
                 agenda['definition_short'] = agenda.get('definition_short', original_agenda.get('definition_short'))
                 agenda['ednote'] = agenda.get('ednote', original_agenda.get('ednote'))
                 agenda['state_reason'] = agenda.get('state_reason', original_agenda.get('state_reason'))
-                subject = '{} -{} updated'.format(agenda['name'] or agenda['definition_short'],
+                subject = '{} -{} updated'.format(agenda['name'] or agenda['headline'] or agenda['slugline'],
                                                   ' Coverage' if coverage_modified else '')
                 action = 'been updated.'
                 if state_changed:
@@ -959,13 +1155,14 @@ class AgendaService(newsroom.Service):
                     )
 
     def get_saved_items_count(self):
-        query = _agenda_query()
-        get_resource_service('section_filters').apply_section_filter(query, self.section)
-        user = get_user()
-        company = get_user_company(user)
-        set_product_query(query, company, self.section)
-        set_saved_items_query(query, str(user['_id']))
-        cursor = self.get_items_by_query(query, size=0)
+        search = SearchQuery()
+        search.query = _agenda_query()
+
+        self.prefill_search_query(search)
+        self.apply_filters(search)
+        set_saved_items_query(search.query, str(search.user['_id']))
+
+        cursor = self.get_items_by_query(search.query, size=0)
         return cursor.count()
 
     def get_featured_stories(self, req, lookup):

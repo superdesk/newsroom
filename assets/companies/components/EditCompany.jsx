@@ -11,6 +11,7 @@ import { isEmpty, get, sortBy } from 'lodash';
 import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
 import CompanyPermissions from './CompanyPermissions';
 import EditCompanyAPI from './EditCompanyAPI';
+import AuditInformation from 'components/AuditInformation';
 import { countries } from '../utils';
 
 class EditCompany extends React.Component {
@@ -79,7 +80,7 @@ class EditCompany extends React.Component {
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>
                 </div>
-
+                <AuditInformation item={this.props.company} />
                 <ul className='nav nav-tabs'>
                     {this.tabs.filter((tab, index) => index === 0 || this.props.company._id).map((tab) => (
                         <li key={tab.name} className='nav-item'>
@@ -171,10 +172,10 @@ class EditCompany extends React.Component {
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.expiry_date : null}/>
 
-                                    {get(this.props, 'company.sections.watch_lists') && <SelectInput
-                                        name='watch_list_administrator'
-                                        label={gettext('Watch List Administrator')}
-                                        value={this.props.company.watch_list_administrator}
+                                    {get(this.props, 'company.sections.monitoring') && <SelectInput
+                                        name='monitoring_administrator'
+                                        label={gettext('Monitoring Administrator')}
+                                        value={this.props.company.monitoring_administrator}
                                         options={sortBy(this.props.users || [], 'first_name').map((u) => ({
                                             text: `${u.first_name} ${u.last_name}`,
                                             value: u._id}))}
@@ -218,7 +219,11 @@ class EditCompany extends React.Component {
                     }
                     {this.props.apiEnabled && this.state.activeTab === 'api' && this.props.company._id && (
                         <EditCompanyAPI
-                            companyId={this.props.company._id}
+                            company={this.props.company}
+                            onEditCompany={this.props.onChange}
+                            onSave={this.props.onSave}
+                            errors={this.props.errors}
+                            originalItem={this.props.originalItem}
                         />
                     )}
                 </div>
@@ -238,6 +243,7 @@ EditCompany.propTypes = {
     fetchCompanyUsers: PropTypes.func.isRequired,
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
+    originalItem: PropTypes.object,
 };
 
 export default EditCompany;

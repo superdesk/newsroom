@@ -18,13 +18,13 @@ from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_user, get_user_id
-from newsroom.decorator import login_required
+from newsroom.decorator import login_required, admin_only
 from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
-    get_agenda_dates, get_location_string, get_public_contacts, get_links
-from newsroom.notifications import push_user_notification
+    get_agenda_dates, get_location_string, get_public_contacts, get_links, get_items_for_user_action
+from newsroom.notifications import push_user_notification, push_notification
 from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
 
@@ -46,7 +46,15 @@ def get_services(user):
 
 
 def set_permissions(item, section='wire', ignore_latest=False):
-    item['_access'] = superdesk.get_resource_service('{}_search'.format(section)).has_permissions(item, ignore_latest)
+    permitted = superdesk.get_resource_service('{}_search'.format(section)).has_permissions(item, ignore_latest)
+    set_item_permission(item, permitted)
+
+
+def set_item_permission(item, permitted=True):
+    if not item:
+        return
+
+    item['_access'] = permitted
     if not item['_access']:
         item.pop('body_text', None)
         item.pop('body_html', None)
@@ -59,6 +67,7 @@ def get_view_data():
     topics = get_user_topics(user['_id']) if user else []
     return {
         'user': str(user['_id']) if user else None,
+        'user_type': (user or {}).get('user_type') or 'public',
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': [t for t in topics if t.get('topic_type') == 'wire'],
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
@@ -168,7 +177,8 @@ def download(_ids):
     user = get_user(required=True)
     _format = flask.request.args.get('format', 'text')
     item_type = get_type()
-    items = [get_entity_or_404(_id, item_type) for _id in _ids.split(',')]
+    items = get_items_for_user_action(_ids.split(','), item_type)
+
     _file = io.BytesIO()
     formatter = app.download_formatters[_format]['formatter']
     mimetype = None
@@ -180,9 +190,9 @@ def download(_ids):
                 url_for('upload.get_upload', media_id=media_id, filename='baseimage.%s' % formatter.FILE_EXTENSION))
         except TypeError:
             return flask.abort(404)
-    elif len(items) == 1 or _format == 'watch_lists':
+    elif len(items) == 1 or _format == 'monitoring':
         item = items[0]
-        args_item = item if _format != 'watch_lists' else items
+        args_item = item if _format != 'monitoring' else items
         parse_dates(item)  # fix for old items
         _file.write(formatter.format_item(args_item, item_type=item_type))
         _file.seek(0)
@@ -211,7 +221,7 @@ def share():
     data = get_json_or_400()
     assert data.get('users')
     assert data.get('items')
-    items = [get_entity_or_404(_id, item_type) for _id in data.get('items')]
+    items = get_items_for_user_action(data.get('items'), item_type)
     for user_id in data['users']:
         user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
         subject = items[0].get('headline')
@@ -247,6 +257,39 @@ def share():
     get_resource_service('history').create_history_record(items, 'share', current_user,
                                                           request.args.get('type', 'wire'))
     return flask.jsonify(), 201
+
+
+@blueprint.route('/wire', methods=['DELETE'])
+@admin_only
+def remove_wire_items():
+    data = get_json_or_400()
+    assert data.get('items')
+
+    items_service = get_resource_service('items')
+    versions_service = get_resource_service('items_versions')
+
+    ids = []
+    for doc in items_service.get_from_mongo(req=None, lookup={'_id': {'$in': data['items']}}):
+        ids.append(doc['_id'])
+        ids.extend(doc.get('ancestors') or [])
+
+    if not ids:
+        flask.abort(404, gettext('Not found'))
+
+    docs = list(doc for doc in items_service.get_from_mongo(req=None, lookup={'_id': {'$in': ids}}))
+
+    for doc in docs:
+        items_service.on_delete(doc)
+
+    items_service.delete({'_id': {'$in': ids}})
+
+    for doc in docs:
+        items_service.on_deleted(doc)
+        versions_service.on_item_deleted(doc)
+
+    push_notification('items_deleted', ids=ids)
+
+    return flask.jsonify(), 200
 
 
 @blueprint.route('/wire_bookmark', methods=['POST', 'DELETE'])
@@ -286,7 +329,11 @@ def versions(_id):
 @blueprint.route('/wire/<_id>')
 @login_required
 def item(_id):
-    item = get_entity_or_404(_id, 'items')
+    items = get_items_for_user_action([_id], 'items')
+    if not items:
+        return
+
+    item = items[0]
     set_permissions(item, 'wire', False if flask.request.args.get('ignoreLatest') == 'false' else True)
     display_char_count = get_resource_service('ui_config').getSectionConfig('wire').get('char_count', False)
     if is_json_request(flask.request):
@@ -294,16 +341,22 @@ def item(_id):
     if not item.get('_access'):
         return flask.render_template('wire_item_access_restricted.html', item=item)
     previous_versions = get_previous_versions(item)
+    template = 'wire_item.html'
+    data = {'item': item}
     if 'print' in flask.request.args:
-        template = 'wire_item_print.html'
+        if flask.request.args.get('monitoring_profile'):
+            data.update(flask.request.view_args)
+            template = 'monitoring_export.html'
+        else:
+            template = 'wire_item_print.html'
+
         update_action_list([_id], 'prints', force_insert=True)
         get_resource_service('history').create_history_record([item], 'print', get_user(),
                                                               request.args.get('type', 'wire'))
-    else:
-        template = 'wire_item.html'
+
     return flask.render_template(
         template,
-        item=item,
+        **data,
         previous_versions=previous_versions,
         display_char_count=display_char_count)
 

@@ -40,7 +40,9 @@ class CardsResource(newsroom.Resource):
         'dashboard': {
             'type': 'string',
             'required': True,
-        }
+        },
+        'original_creator': newsroom.Resource.rel('users'),
+        'version_creator': newsroom.Resource.rel('users'),
     }
     datasource = {
         'source': 'cards',

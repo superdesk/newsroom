@@ -7,6 +7,7 @@ import CheckboxInput from 'components/CheckboxInput';
 
 import { gettext, getProductQuery } from 'utils';
 import EditPanel from '../../components/EditPanel';
+import AuditInformation from 'components/AuditInformation';
 import {sectionsPropType} from '../../features/sections/types';
 
 class EditProduct extends React.Component {
@@ -82,7 +83,7 @@ class EditProduct extends React.Component {
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>
                 </div>
-
+                <AuditInformation item={this.props.product} />
                 <ul className='nav nav-tabs'>
                     {this.tabs.map((tab) => (
                         <li key={tab.name} className='nav-item'>

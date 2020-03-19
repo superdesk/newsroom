@@ -3,11 +3,11 @@ import os
 import logging
 
 from superdesk.ws import create_server
-from .flaskapp import Newsroom
+from newsroom.web import NewsroomWebApp
 
 
 if __name__ == '__main__':
-    app = Newsroom('newsroom')
+    app = NewsroomWebApp('newsroom')
     host = '0.0.0.0'
     port = int(os.environ.get('PORT', '5100'))
     logging.info('listening on %s:%d', host, port)

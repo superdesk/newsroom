@@ -58,12 +58,12 @@ class UserProfileApp extends React.Component {
             });
         }
 
-        if (this.isSectionEnabled('watch_lists')) {
+        if (this.isSectionEnabled('monitoring')) {
             this.links.push({
-                name: 'watch_lists',
-                label: gettext('My Watch Lists'),
+                name: 'monitoring',
+                label: gettext('My Monitoring'),
                 content: FollowedTopics,
-                type: 'watch_lists',
+                type: 'monitoring',
             });
         }
     }

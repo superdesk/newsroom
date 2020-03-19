@@ -5,7 +5,6 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
-from newsroom import company_expiry_alerts  # noqa
 
 from superdesk.default_settings import (   # noqa
     VERSION,
@@ -94,7 +93,7 @@ BLUEPRINTS = [
     'newsroom.agenda',
     'newsroom.settings',
     'newsroom.news_api.api_tokens',
-    'newsroom.watch_lists',
+    'newsroom.monitoring',
 ]
 
 CORE_APPS = [
@@ -125,7 +124,8 @@ CORE_APPS = [
     'newsroom.media_utils',
     'newsroom.news_api',
     'newsroom.news_api.api_tokens',
-    'newsroom.watch_lists',
+    'newsroom.news_api.api_audit',
+    'newsroom.monitoring',
     'newsroom.company_expiry_alerts',
 ]
 
@@ -264,7 +264,8 @@ CLIENT_CONFIG = {
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
-    'display_news_only': True  # Displays news only switch in wire
+    'display_news_only': True,  # Displays news only switch in wire,
+    'default_timezone': DEFAULT_TIMEZONE
 }
 
 LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
@@ -296,12 +297,12 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'newsroom.company_expiry_alerts.company_expiry',
         'schedule': crontab(hour=local_to_utc_hour(0), minute=0),  # Runs every day at midnight
     },
-    'newsroom:watch_list_schedule_alerts': {
-        'task': 'newsroom.watch_lists.email_alerts.watch_list_schedule_alerts',
+    'newsroom:monitoring_schedule_alerts': {
+        'task': 'newsroom.monitoring.email_alerts.monitoring_schedule_alerts',
         'schedule': timedelta(seconds=60),
     },
-    'newsroom:watch_list_immediate_alerts': {
-        'task': 'newsroom.watch_lists.email_alerts.watch_list_immediate_alerts',
+    'newsroom:monitoring_immediate_alerts': {
+        'task': 'newsroom.monitoring.email_alerts.monitoring_immediate_alerts',
         'schedule': timedelta(seconds=60),
     }
 }

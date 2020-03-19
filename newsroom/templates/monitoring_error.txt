@@ -1,0 +1,4 @@
+The following monitoring profile has errored while sending alerts:
+Name: {{ name }}
+Company: {{ company }}
+Run time: {{ run_time }}

@@ -1,7 +1,6 @@
-from flask import json
+from flask import json, current_app as app
 from superdesk import get_resource_service
 from superdesk.emails import SuperdeskMessage
-from flask import current_app as app
 
 
 def post_json(client, url, data):
@@ -31,12 +30,15 @@ def get_admin_user_id(app):
     return (get_resource_service('users').find_one(req=None, _id=ADMIN_USER_ID) or {}).get('_id')
 
 
-def mock_send_email(to, subject, text_body, html_body=None, sender=None):
+def mock_send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
     if sender is None:
         sender = app.config['MAIL_DEFAULT_SENDER']
+
     msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to)
     msg.body = text_body
     msg.html = html_body
+    msg.attachments = [a['file_name'] for a in attachments_info]
+
     _app = app._get_current_object()
     with _app.mail.connect() as connection:
         if connection:

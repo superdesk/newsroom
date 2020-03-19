@@ -31,4 +31,8 @@ def before_scenario(context, scenario):
         'NEWS_API_TIME_LIMIT_DAYS': 100
     }
 
+    if 'rate_limit' in scenario.tags:
+        config['RATE_LIMIT_PERIOD'] = 300  # 5 minutes
+        config['RATE_LIMIT_REQUESTS'] = 2
+
     setup_before_scenario(context, scenario, config, app_factory=get_app)

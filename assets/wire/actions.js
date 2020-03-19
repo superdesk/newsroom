@@ -11,11 +11,14 @@ import {
     getTimezoneOffset,
     getTextFromHtml,
     fullDate,
-    recordAction
+    recordAction,
+    errorHandler as notifyErrors,
+    getSlugline,
 } from 'utils';
 import {getNavigationUrlParam} from 'search/utils';
 
 import {searchParamsSelector} from 'search/selectors';
+import {context} from 'selectors';
 
 import {markItemAsRead, toggleNewsOnlyParam} from 'local-store';
 import {renderModal, closeModal, setSavedItemsCount} from 'actions';
@@ -109,6 +112,31 @@ export function toggleNews() {
     return {type: TOGGLE_NEWS};
 }
 
+export function removeItems(items) {
+    if (confirm(gettext('Are you sure you want to permanently remove these item(s)?'))) {
+        return server.del('/wire', {items})
+            .then(() => {
+                if (items.length > 1) {
+                    notify.success(gettext('Items were removed successfully'));
+                } else {
+                    notify.success(gettext('Item wes removed successfully'));
+                }
+            })
+            .catch(notifyErrors);
+    }
+
+    return Promise.resolve();
+}
+
+export const WIRE_ITEM_REMOVED = 'WIRE_ITEM_REMOVED';
+/**
+ * Marks the items as deleted when they're removed from the system
+ * @param {Array<String>} ids - List of ids of items that were removed
+ */
+export function onItemsDeleted(ids) {
+    return {type: WIRE_ITEM_REMOVED, ids: ids};
+}
+
 /**
  * Copy contents of item preview.
  *
@@ -120,7 +148,7 @@ export function copyPreviewContents(item) {
         const contents = [];
 
         contents.push(fullDate(item.versioncreated));
-        item.slugline && contents.push(item.slugline);
+        item.slugline && contents.push(getSlugline(item, true));
         item.headline && contents.push(item.headline);
         item.byline && contents.push(gettext('By: {{ byline }}', {byline: item.byline}));
         item.located && contents.push(gettext('Location: {{ located }}', {located: item.located}));
@@ -154,7 +182,13 @@ export function copyPreviewContents(item) {
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        window.open(`/${getState().context}/${item._id}?print`, '_blank');
+        const userContext = context(getState());
+        let uri = `/${userContext}/${item._id}?print`;
+        if (userContext === 'monitoring') {
+            const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
+            uri = `${uri}=true&monitoring_profile=${monitoringProfile}&type=monitoring`;
+        }
+        window.open(uri, '_blank');
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
@@ -220,7 +254,7 @@ export function fetchItems() {
 
 export function fetchItem(id) {
     return (dispatch, getState) => {
-        return server.get(`/${getState().context}/${id}?format=json`)
+        return server.get(`/${context(getState())}/${id}?format=json&context=wire`)
             .then((data) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
@@ -364,29 +398,25 @@ export function downloadItems(items) {
  * Start download - open download view in new window.
  *
  * @param {Array} items
- * @param {String} format
+ * @param {String} params
  */
-export function submitDownloadItems(items, format) {
+export function submitDownloadItems(items, params) {
     return (dispatch, getState) => {
-        window.open(`/download/${items.join(',')}?format=${format}&type=${getState().context}`, '_blank');
+        const {format, secondaryFormat} = params;
+        const userContext = context(getState());
+        let uri = `/download/${items.join(',')}?format=${format}&type=${userContext}`;
+        if (userContext === 'monitoring') {
+            const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
+            uri = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
+            uri = `${uri}&secondary_format=${secondaryFormat}`;
+        }
+        window.open(uri, '_blank');
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
         analytics.multiItemEvent('download', items.map((_id) => getState().itemsById[_id]));
     };
 }
 
-/**
- * Start export - open export view in new window.
- *
- * @param {Array} items
- */
-export function submitExportItems(items) {
-    return (dispatch, getState) => {
-        window.open(`/watch_lists/export/${items.join(',')}`, '_blank');
-        dispatch(setExportItems(items));
-        analytics.multiItemEvent('export', items.map((_id) => getState().itemsById[_id]));
-    };
-}
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
 export function removeNewItems(data) {
@@ -416,6 +446,9 @@ export function pushNotification(push) {
 
         case `saved_items:${user}`:
             return dispatch(setSavedItemsCount(push.extra.count));
+
+        case 'items_deleted':
+            return dispatch(onItemsDeleted(push.extra.ids));
         }
     };
 }

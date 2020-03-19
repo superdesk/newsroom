@@ -1,0 +1,27 @@
+<h1>{{ monitoring_report_name }} Monitoring: {{ monitoring_profile.name }} {% if current_date %}({{ current_date }}){% endif %}</h1>
+    {% for d in date_items_dict.keys() %}
+        {% if not print %}<h3>{{ d.strftime('%d/%m/%Y') }}</h3>{% endif %}
+        {% for item in date_items_dict[d]  %}
+            <div><span><strong>Headline: {{ item.get('headline', '') }}</strong></span></div>
+            <div><span><strong>Source: {{ item.get('source', '') }}</strong></span></div>
+            <div><span><strong>Keywords: {{ get_keywords_in_text(item.get('body_str', ''), monitoring_profile.keywords)|join(',') }}</strong></span></div>
+            {% if item.byline %}
+                <div><span>By {{ item.get('byline', '') }}</span></div>
+            {% endif %}
+            {% if monitoring_profile.alert_type == 'linked_text' %}
+                <div>{{ item.get('body_str', '') | safe }}</div>
+            {% else %}
+                <div>{{ item.get('body_html', '') | safe }}</div>
+            {% endif %}
+            {% if monitoring_profile.alert_type == 'linked_text' and not print%}
+                <a style="color: grey" href="{{ url_for('monitoring.index', item=item._id, _external=True) }}">View Article</a>
+            {% endif %}
+            </br>
+        {% endfor %}
+    {% endfor %}
+
+{% if print %}
+<script>
+    window.print();
+</script>
+{% endif %}

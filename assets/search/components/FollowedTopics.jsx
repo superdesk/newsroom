@@ -18,7 +18,7 @@ import {
     topicEditorFullscreenSelector,
 } from 'user-profile/selectors';
 
-import WatchListEditor from 'search/components/WatchListEditor';
+import MonitoringEditor from 'search/components/MonitoringEditor';
 import TopicEditor from 'search/components/TopicEditor';
 import TopicList from 'search/components/TopicList';
 
@@ -38,7 +38,7 @@ class FollowedTopics extends React.Component {
             action: this.editTopic,
         }];
 
-        if (!this.props.topicType === 'watch_lists') {
+        if (this.props.topicType !== 'monitoring') {
             this.actions = [
                 ...this.actions,
                 {
@@ -85,8 +85,8 @@ class FollowedTopics extends React.Component {
     }
 
     getFilteredTopics() {
-        if (this.props.topicType === 'watch_lists') {
-            return this.props.watchLists;
+        if (this.props.topicType === 'monitoring') {
+            return this.props.monitoringList;
         }
 
         return this.props.topics.filter(
@@ -98,8 +98,8 @@ class FollowedTopics extends React.Component {
         this.props.fetchTopics();
     }
 
-    isWatchListAdmin() {
-        return this.props.watchListAdministrator === get(this.props, 'user._id');
+    isMonitoringAdmin() {
+        return this.props.monitoringAdministrator === get(this.props, 'user._id');
     }
 
     render() {
@@ -120,12 +120,12 @@ class FollowedTopics extends React.Component {
                         />
                     </div>
                 )}
-                {this.props.selectedItem && (this.props.topicType === 'watch_lists' ?
-                    <WatchListEditor
+                {this.props.selectedItem && (this.props.topicType === 'monitoring' ?
+                    <MonitoringEditor
                         item={this.props.selectedItem}
                         closeEditor={this.closeEditor}
                         onTopicChanged={this.onTopicChanged}
-                        isAdmin={this.isWatchListAdmin()}
+                        isAdmin={this.isMonitoringAdmin()}
                     /> :
                     <TopicEditor
                         topic={this.props.selectedItem}
@@ -152,14 +152,14 @@ FollowedTopics.propTypes = {
     selectedItem: PropTypes.object,
     selectedMenu: PropTypes.string,
     editorFullscreen: PropTypes.bool,
-    watchLists: PropTypes.array,
-    watchListAdministrator: PropTypes.string,
+    monitoringList: PropTypes.array,
+    monitoringAdministrator: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
     topics: state.topics,
-    watchLists: state.watchLists,
-    watchListAdministrator: state.watchListAdministrator,
+    monitoringList: state.monitoringList,
+    monitoringAdministrator: state.monitoringAdministrator,
     user: state.user,
     selectedItem: selectedItemSelector(state),
     selectedMenu: selectedMenuSelector(state),

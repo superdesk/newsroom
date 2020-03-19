@@ -3,16 +3,16 @@ import {errorHandler} from '../utils';
 import { gettext, notify } from 'utils';
 
 export const UPDATE_VALUES = 'UPDATE_VALUES';
-function updateValues(values) {
-    return {type: UPDATE_VALUES, values: values};
+function updateValues(data) {
+    return {type: UPDATE_VALUES, data};
 }
 
 export function save(values) {
     return (dispatch) => {
         server.post('/settings/general_settings', values)
-            .then(() => {
+            .then((data) => {
                 notify.success(gettext('Settings were updated successfully.'));
-                dispatch(updateValues(values));
+                dispatch(updateValues(data));
             }, (reason) => errorHandler(reason));
     };
 }

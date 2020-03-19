@@ -1,7 +1,17 @@
 import {errorHandler, getItemFromArray, getDateInputDate, notify, gettext} from '../utils';
-import {REPORTS_NAMES} from './utils';
 import server from '../server';
 import {get, cloneDeep} from 'lodash';
+
+export const REPORTS_NAMES = {
+    'COMPANY_SAVED_SEARCHES': 'company-saved-searches',
+    'USER_SAVED_SEARCHES': 'user-saved-searches',
+    'COMPANY_PRODUCTS': 'company-products',
+    'PRODUCT_STORIES': 'product-stories',
+    'COMPANY': 'company',
+    'SUBSCRIBER_ACTIVITY': 'subscriber-activity',
+    'CONTENT_ACTIVITY': 'content-activity',
+    'COMPANY_NEWS_API_USAGE': 'company-news-api-usage',
+};
 
 
 export const REPORTS = {
@@ -11,7 +21,8 @@ export const REPORTS = {
     [REPORTS_NAMES.PRODUCT_STORIES]: '/reports/product-stories',
     [REPORTS_NAMES.COMPANY]: '/reports/company',
     [REPORTS_NAMES.SUBSCRIBER_ACTIVITY]: '/reports/subscriber-activity',
-
+    [REPORTS_NAMES.CONTENT_ACTIVITY]: '/reports/content-activity',
+    [REPORTS_NAMES.COMPANY_NEWS_API_USAGE]: '/reports/company-news-api-usage',
 };
 
 function getReportQueryString(currentState, next, exportReport, notify) {
@@ -92,6 +103,20 @@ export function runReport() {
     };
 }
 
+export function fetchAggregations(url) {
+    return function(dispatch, getState) {
+        let queryString = getReportQueryString(getState(), 0, false, notify);
+
+        server.get(`${url}?${queryString}&aggregations=1`)
+            .then((data) => {
+                dispatch({
+                    type: 'RECEIVE_REPORT_AGGREGATIONS',
+                    data: data,
+                });
+            });
+    };
+}
+
 /**
  * Fetches the report data
  *
@@ -134,16 +159,35 @@ export function fetchReport(url, next, exportReport) {
 }
 
 export const TOGGLE_REPORT_FILTER = 'TOGGLE_REPORT_FILTER';
+export function toggleFilter(filter, value) {
+    return {
+        type: TOGGLE_REPORT_FILTER,
+        data: {
+            filter,
+            value
+        }
+    };
+}
+
 export function toggleFilterAndQuery(filter, value) {
     return function (dispatch) {
-        dispatch({
-            type: TOGGLE_REPORT_FILTER,
-            data: {
-                filter,
-                value
-            }
-        });
-
+        dispatch(toggleFilter(filter, value));
         return dispatch(runReport());
+    };
+}
+
+export function printReport() {
+    return function (dispatch, getState) {
+        const state = getState();
+        const activeReport = state.activeReport;
+
+        if (activeReport === REPORTS_NAMES.SUBSCRIBER_ACTIVITY) {
+            const queryString = getReportQueryString(state, false, false, notify);
+            window.open(`/reports/print/${activeReport}?${queryString}`, '_blank');
+        } else {
+            window.open(`/reports/print/${activeReport}`, '_blank');
+        }
+
+        return Promise.resolve();
     };
 }

@@ -15,12 +15,14 @@ install_requires = [
     'gunicorn>=19.7.1',
     'superdesk-core>=1.31.1,<=1.32',
     'icalendar>=4.0.3,<4.1',
-    'werkzeug>=0.9.4,<=0.11.15'
+    'PyRTF3>=0.47.5',
+    'xhtml2pdf>=0.2.4',
+    'werkzeug>=0.9.4,<=0.11.15',
 ]
 
 setup(
     name='Newsroom',
-    version='1.15.2',
+    version='1.0',
     description='Newsroom app',
     author='Sourcefabric',
     url='https://github.com/superdesk/newsroom',
