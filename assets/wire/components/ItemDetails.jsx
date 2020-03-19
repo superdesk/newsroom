@@ -7,7 +7,6 @@ import AgendaLinks from './AgendaLinks';
 import { isDisplayed, fullDate, gettext } from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
-import PreviewActionButtons from 'components/PreviewActionButtons';
 import {
     getPicture,
     getVideos,
@@ -18,6 +17,7 @@ import {
     isPreformatted,
     isCustomRendition,
 } from 'wire/utils';
+import types from 'wire/types';
 import Content from 'ui/components/Content';
 import ContentHeader from 'ui/components/ContentHeader';
 import ContentBar from 'ui/components/ContentBar';
@@ -34,9 +34,10 @@ import ArticleBody from 'ui/components/ArticleBody';
 import ArticleAuthor from 'ui/components/ArticleAuthor';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
+import WireActionButtons from './WireActionButtons';
 
 
-function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo}) {
+function ItemDetails({item, user, actions, topics, onClose, detailsConfig, downloadVideo, followStory}) {
     const picture = getPicture(item);
     const videos = getVideos(item);
     const isCustom = isCustomRendition(picture);
@@ -46,7 +47,13 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
         <Content type="item-detail">
             <ContentHeader>
                 <ContentBar onClose={onClose}>
-                    <PreviewActionButtons item={item} user={user} actions={actions}/>
+                    <WireActionButtons
+                        item={item}
+                        user={user}
+                        topics={topics}
+                        actions={actions}
+                        followStory={followStory}
+                    />
                 </ContentBar>
             </ContentHeader>
             <ArticleItemDetails>
@@ -104,16 +111,15 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
 }
 
 ItemDetails.propTypes = {
-    item: PropTypes.object.isRequired,
-    user: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        action: PropTypes.func,
-        url: PropTypes.func,
-    })),
-    onClose: PropTypes.func,
+    item: types.item.isRequired,
+    user: types.user.isRequired,
+    topics: types.topics.isRequired,
+    actions: types.actions,
     detailsConfig: PropTypes.object,
+
+    onClose: PropTypes.func,
     downloadVideo: PropTypes.func,
+    followStory: PropTypes.func,
 };
 
 export default ItemDetails;

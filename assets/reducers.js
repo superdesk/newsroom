@@ -31,13 +31,13 @@ import {
 import {
     SET_QUERY,
     ADD_TOPIC,
-    SET_TOPICS,
     SET_NEW_ITEMS_BY_TOPIC,
 } from 'search/actions';
 
 import {getMaxVersion} from 'local-store';
 import {REMOVE_NEW_ITEMS} from './agenda/actions';
 import {toggleValue} from 'utils';
+import { topicsReducer } from './topics/reducer';
 
 export function modalReducer(state, action) {
     switch (action.type) {
@@ -345,9 +345,6 @@ export function defaultReducer(state={}, action) {
     case START_LOADING:
         return {...state, isLoading: true};
 
-    case SET_TOPICS:
-        return {...state, topics: action.topics};
-
     case SAVED_ITEMS_COUNT:
         return {...state, savedItemsCount: action.count};
 
@@ -358,8 +355,13 @@ export function defaultReducer(state={}, action) {
             return {...state, search};
         }
 
+        const topics = topicsReducer(state.topics, action);
+
+        if (topics !== state.topics) {
+            return {...state, topics};
+        }
+
         return state;
     }
-
     }
 }

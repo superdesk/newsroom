@@ -104,6 +104,7 @@ def get_home_data():
     cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
     company_id = str(user['company']) if user and user.get('company') else None
     items_by_card = get_items_by_card(cards)
+    topics = get_user_topics(user['_id']) if user else []
 
     return {
         'cards': cards,
@@ -114,7 +115,8 @@ def get_home_data():
         'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types']}
                     for f in app.download_formatters.values()],
         'context': 'wire',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('wire')
+        'ui_config': get_resource_service('ui_config').getSectionConfig('wire'),
+        'topics': topics,
     }
 
 

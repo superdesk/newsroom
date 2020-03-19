@@ -133,8 +133,10 @@ class HomeApp extends React.Component {
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
+                topics={this.props.topics}
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
+                followStory={this.props.followStory}
             />, modal] :
                 this.renderContent()
             )
@@ -192,6 +194,7 @@ HomeApp.propTypes = {
     previewConfig: PropTypes.object,
     downloadVideo: PropTypes.func,
     topics: PropTypes.array,
+    isFollowing: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
