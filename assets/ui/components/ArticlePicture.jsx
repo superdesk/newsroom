@@ -29,6 +29,9 @@ export default function ArticlePicture({isKilled, picture, isItemDetails, isCust
         <figcaption className='wire-column__preview__caption'>
             {caption}
             {bylineHref && <a href={bylineHref} target='_blank'> {byline}</a>}
+            {!bylineHref && picture.byline && (
+                <div>{picture.byline}</div>
+            )}
         </figcaption>
     </figure>);
 }
