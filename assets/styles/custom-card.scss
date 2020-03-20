@@ -113,7 +113,22 @@
                 font-weight: 300;
             }
         }
-        
+
+        // use wrapper class to retain image aspect ratio within the home page card
+        .card-img-top-wrapper { 
+            background-color: #3e4557;
+            position: relative;
+            height: 0;
+            padding-bottom: 56.25%; /* outer div has 16:9 aspect ratio */
+
+            .card-img-top {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                object-fit: contain;
+            }              
+        }
     }
 
     // horizontal orientation, image on left side (for bigger screens)

@@ -14,7 +14,9 @@ const getPictureTextPanel = (item, picture, openItem, withPictures, cardId) => {
     return (<div key={item._id} className="col-sm-6 col-lg-3 d-flex mb-4">
         <div className="card card--home" onClick={() => openItem(item, cardId)}>
             {rendition &&
-                <img className="card-img-top" src={imageUrl} alt={caption} />
+                <div className="card-img-top-wrapper">
+                    <img className="card-img-top" src={imageUrl} alt={caption} />
+                </div>
             }
             <CardBody item={item} displayMeta={false} />
             <CardFooter
