@@ -1,0 +1,47 @@
+{% extends "print_layout.html" %}
+
+{% block title %}{{ item.headline }}{% endblock %}
+
+{% block content %}
+<article>
+    <pre>{{ item.slugline }}</pre>
+    <h1>{{ item.headline }}</h1>
+    <p>{{ _('By:') }} <b>{{ item.byline }}</b> {{ _('On:') }} {{ item.versioncreated|datetime_long }}</p>
+    {% if item.source %}<p>{{ item.source }}</p>{% endif %}
+
+    <div class="row">
+        <div class="col-9">
+            <div class="lead">
+                {{ item.description_html | safe }}
+            </div>
+
+            {{ item.body_html | safe }}
+
+            {% if get_picture(item) %}
+            <figure>
+                <img src="{{ get_picture(item).renditions.baseImage.href }}" style="max-width: 100%;">
+                <figcaption>
+                    {{ get_caption(get_picture(item)) }}
+                    {% if get_picture(item).byline %}
+                    <div>{{ get_picture(item).byline }}</div>
+                    {% endif %}
+                </figcaption>
+            </figure>
+            {% endif %}
+        </div>
+        <div class="col">
+            <h3>{{ _('Metadata') }}</h3>
+            <dl>
+                {% if item.subject %}
+                <dt>{{ _('Category') }}</dt>
+                <dd>{{ item.subject|join(', ', attribute='name')}}</dd>
+                {% endif %}
+                {% if item.genre %}
+                <dt>{{ _('Content Type') }}</dt>
+                <dd>{{ item.genre|join(', ', attribute='name')}}</dd>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+</article>
+{% endblock %}
