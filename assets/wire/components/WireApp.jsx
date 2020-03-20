@@ -73,8 +73,6 @@ class WireApp extends BaseApp {
     render() {
         const modal = this.renderModal(this.props.modal);
 
-        const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
-            this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
         const mainClassName = classNames('wire-column__main', {
             'wire-articles__one-side-pane': panesCount === 1,
@@ -123,9 +121,11 @@ class WireApp extends BaseApp {
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
+                topics={this.props.topics}
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 detailsConfig={this.props.detailsConfig}
                 downloadVideo={this.props.downloadVideo}
+                followStory={this.props.followStory}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
                 <section key="contentHeader" className='content-header'>
@@ -208,9 +208,9 @@ class WireApp extends BaseApp {
                             <WirePreview
                                 item={this.props.itemToPreview}
                                 user={this.props.user}
+                                topics={this.props.topics}
                                 actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig)}
                                 followStory={this.props.followStory}
-                                isFollowing={!!isFollowing}
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
                                 downloadVideo={this.props.downloadVideo}

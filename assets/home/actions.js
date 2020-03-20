@@ -1,5 +1,6 @@
 import server from '../server';
 import {errorHandler, recordAction} from 'utils';
+import {pushNotification as wirePushNotification} from 'wire/actions';
 import {get} from 'lodash';
 
 export const INIT_DATA = 'INIT_DATA';
@@ -46,6 +47,8 @@ export function pushNotification(push) {
                 () => window.location.reload(),
                 1000
             );
+        } else {
+            return wirePushNotification(push);
         }
     };
 }

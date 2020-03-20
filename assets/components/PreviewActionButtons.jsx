@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ActionButton from './ActionButton';
+import types from 'wire/types';
 
 
 function PreviewActionButtons({item, user, actions, plan, group}) {
@@ -25,12 +26,9 @@ function PreviewActionButtons({item, user, actions, plan, group}) {
 }
 
 PreviewActionButtons.propTypes = {
-    item: PropTypes.object,
-    user: PropTypes.string,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        action: PropTypes.func,
-    })),
+    item: types.item,
+    user: types.user,
+    actions: types.actions,
     plan: PropTypes.string,
     group: PropTypes.string,
 };
