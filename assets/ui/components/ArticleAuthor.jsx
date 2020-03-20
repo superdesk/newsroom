@@ -8,7 +8,7 @@ export default function ArticleAuthor({item, displayConfig}) {
         (item.byline || item.located) && (
             <p className='wire-column__preview__author'>
                 {isDisplayed('byline', displayConfig) && item.byline && (
-                    <span>{gettext('By ')}<b>
+                    <span>{gettext('By ')}{' '}<b>
                         {item.byline.toLowerCase().startsWith('by ') ? item.byline.substring(3) : item.byline}</b>{' '}
                     </span>
                 )}
