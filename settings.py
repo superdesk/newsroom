@@ -96,7 +96,10 @@ CLIENT_CONFIG = {
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
-    'display_news_only': False  # Displays news only switch in wire
+    'display_news_only': False,  # Displays news only switch in wire
+    'item_actions': {
+        'share': False,
+    },
 }
 
 WATERMARK_IMAGE = None

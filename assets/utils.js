@@ -30,7 +30,7 @@ export const KEYCODES = {
     DOWN: 40,
 };
 
-
+export const ITEM_ACTIONS_CONFIG = getConfig('item_actions', {});
 
 /**
  * Create redux store with default middleware
