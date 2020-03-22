@@ -13,6 +13,7 @@ from flask_babel import gettext
 from superdesk.utc import utcnow
 
 from superdesk import get_resource_service
+
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
@@ -29,6 +30,7 @@ from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
 
 from .search import get_bookmarks_count
+from ..upload import ASSETS_RESOURCE
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
 HOME_EXTERNAL_ITEMS_CACHE_KEY = 'home_external_items'
@@ -183,13 +185,29 @@ def download(_ids):
     formatter = app.download_formatters[_format]['formatter']
     mimetype = None
     attachment_filename = '%s-newsroom.zip' % utcnow().strftime('%Y%m%d%H%M')
-    if _format == 'picture':
-        try:
-            media_id = formatter.format_item(items[0], item_type=item_type)
-            return flask.redirect(
-                url_for('upload.get_upload', media_id=media_id, filename='baseimage.%s' % formatter.FILE_EXTENSION))
-        except TypeError:
-            return flask.abort(404)
+    if formatter.get_mediatype() == 'picture':
+        if len(items) == 1:
+            try:
+                picture = formatter.format_item(items[0], item_type=item_type)
+                return flask.redirect(
+                    url_for('upload.get_upload',
+                            media_id=picture['media'],
+                            filename='baseimage%s' % formatter.get_file_extension()))
+            except ValueError:
+                return flask.abort(404)
+        else:
+            with zipfile.ZipFile(_file, mode='w') as zf:
+                for item in items:
+                    try:
+                        picture = formatter.format_item(item, item_type=item_type)
+                        file = flask.current_app.media.get(picture['media'], ASSETS_RESOURCE)
+                        zf.writestr(
+                            'baseimage{}'.format(formatter.get_file_extension()),
+                            file.read()
+                        )
+                    except ValueError:
+                        pass
+            _file.seek(0)
     elif len(items) == 1 or _format == 'monitoring':
         item = items[0]
         args_item = item if _format != 'monitoring' else items

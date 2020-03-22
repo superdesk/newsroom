@@ -1,5 +1,7 @@
 import io
 import json
+
+import bson
 import lxml
 import zipfile
 import icalendar
@@ -8,13 +10,14 @@ from datetime import timedelta
 from superdesk.utc import utcnow
 
 from .fixtures import items, init_items, init_auth, agenda_items, init_agenda_items  # noqa
+from .test_push import upload_binary
 
 items_ids = [item['_id'] for item in items[:2]]
 item = items[:2][0]
 
 
 def download_zip_file(client, _format, section):
-    resp = client.get('/download/%s?format=%s&type=%s' % (','.join(items_ids), _format, section))
+    resp = client.get('/download/%s?format=%s&type=%s' % (','.join(items_ids), _format, section), follow_redirects=True)
     assert resp.status_code == 200
     assert resp.mimetype == 'application/zip'
     assert resp.headers.get('Content-Disposition') == 'attachment; filename={}-newsroom.zip'.format(
@@ -86,8 +89,12 @@ wire_formats = [
         'filename': filename('amazon-bookstore-opening.xml', item),
         'test_content': newsmlg2_content_test,
     },
+    {
+        'format': 'picture',
+        'mimetype': 'image/jpeg',
+        'filename': 'baseimage.jpg'
+    },
 ]
-
 
 agenda_formats = [
     {
@@ -111,21 +118,41 @@ agenda_formats = [
 ]
 
 
+def setup_image(client, app):
+    media_id = str(bson.ObjectId())
+    upload_binary('picture.jpg', client, media_id=media_id)
+    associations = {
+        'featuremedia': {
+            'mimetype': 'image/jpeg',
+            'renditions': {
+                'baseImage': {
+                    'mimetype': 'image/jpeg',
+                    'media': media_id,
+                },
+            }
+        }
+    }
+    app.data.update('items', item['_id'], {'associations': associations}, item)
+
+
 def test_download_single(client, app):
+    setup_image(client, app)
     for _format in wire_formats:
-        resp = client.get('/download/%s?format=%s' % (item['_id'], _format['format']))
+        resp = client.get('/download/%s?format=%s' % (item['_id'], _format['format']), follow_redirects=True)
         assert resp.status_code == 200
         assert resp.mimetype == _format['mimetype']
         assert resp.headers.get('Content-Disposition') == 'attachment; filename=%s' % _format['filename']
 
 
 def test_wire_download(client, app):
+    setup_image(client, app)
     for _format in wire_formats:
         _file = download_zip_file(client, _format['format'], 'wire')
         with zipfile.ZipFile(_file) as zf:
             assert _format['filename'] in zf.namelist()
             content = zf.open(_format['filename']).read()
-            _format['test_content'](content)
+            if _format.get('test_content'):
+                _format['test_content'](content)
     history = app.data.find('history', None, None)
     assert (len(wire_formats) * len(items_ids)) == history.count()
     assert 'download' == history[0]['action']
@@ -138,15 +165,17 @@ def test_wire_download(client, app):
 
 
 def test_agenda_download(client, app):
+    setup_image(client, app)
     for _format in agenda_formats:
         resp = client.get('/download/%s?format=%s&type=agenda' % (agenda_items[0]['_id'], _format['format']))
         assert resp.status_code == 200, resp.get_data()
         assert resp.mimetype == _format['mimetype']
-        _format['test_content'](resp.get_data())
+        if _format.get('test_content'):
+            _format['test_content'](resp.get_data())
         assert resp.headers.get('content-disposition') == 'attachment; filename=%s' % filename(
             _format['filename'], agenda_items[0])
     history = app.data.find('history', None, None)
-    assert (len(wire_formats) * 1) == history.count()
+    assert (len([w for w in wire_formats if w['format'] != 'picture']) * 1) == history.count()
     assert 'download' == history[0]['action']
     assert history[0].get('user')
     assert history[0].get('versioncreated') + timedelta(seconds=2) >= utcnow()
