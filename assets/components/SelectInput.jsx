@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
 
 const SelectInput = ({
     name,
@@ -27,7 +26,7 @@ const SelectInput = ({
                         <option value="">{defaultOption}</option>
                     }
                     {options.map((option) => {
-                        return <option key={option.value} value={option.value}>{gettext(option.text)}</option>;
+                        return <option key={option.value} value={option.value}>{option.text}</option>;
                     })}
                 </select>
                 {error && <div className="alert alert-danger">{error}</div>}

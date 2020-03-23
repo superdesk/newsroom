@@ -21,8 +21,5 @@ class BaseFormatter(metaclass=FormatterRegistry):
     def get_mimetype(self, item):
         return self.MIMETYPE
 
-    def get_file_extension(self):
-        return self.FILE_EXTENSION
-
     def get_mediatype(self):
         return self.MEDIATYPE

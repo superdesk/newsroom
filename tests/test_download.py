@@ -141,7 +141,8 @@ def test_download_single(client, app):
         resp = client.get('/download/%s?format=%s' % (item['_id'], _format['format']), follow_redirects=True)
         assert resp.status_code == 200
         assert resp.mimetype == _format['mimetype']
-        assert resp.headers.get('Content-Disposition') == 'attachment; filename=%s' % _format['filename']
+        assert resp.headers.get('Content-Disposition') in ['attachment; filename=%s' % _format['filename'],
+                                                           'attachment; filename="%s"' % _format['filename']]
 
 
 def test_wire_download(client, app):

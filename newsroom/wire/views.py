@@ -192,7 +192,7 @@ def download(_ids):
                 return flask.redirect(
                     url_for('upload.get_upload',
                             media_id=picture['media'],
-                            filename='baseimage%s' % formatter.get_file_extension()))
+                            filename='baseimage%s' % picture['file_extension']))
             except ValueError:
                 return flask.abort(404)
         else:
@@ -202,7 +202,7 @@ def download(_ids):
                         picture = formatter.format_item(item, item_type=item_type)
                         file = flask.current_app.media.get(picture['media'], ASSETS_RESOURCE)
                         zf.writestr(
-                            'baseimage{}'.format(formatter.get_file_extension()),
+                            'baseimage%s' % picture['file_extension'],
                             file.read()
                         )
                     except ValueError:

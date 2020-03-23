@@ -48,7 +48,7 @@ def get_upload(media_id):
 
     if flask.request.args.get('filename'):
         response.headers['Content-Type'] = media_file.content_type
-        response.headers['Content-Disposition'] = 'attachment; filename=%s' % flask.request.args['filename']
+        response.headers['Content-Disposition'] = 'attachment; filename="%s"' % flask.request.args['filename']
     else:
         response.headers['Content-Disposition'] = 'inline'
 

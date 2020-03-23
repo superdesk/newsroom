@@ -6,7 +6,6 @@ from newsroom.wire.utils import get_picture
 class PictureFormatter(BaseFormatter):
 
     MIMETYPE = 'image/jpeg'
-    FILE_EXTENSION = 'jpg'
     MEDIATYPE = 'picture'
 
     ALLOWED_EXTENSIONS = ['.jpg', '.png']
@@ -30,6 +29,6 @@ class PictureFormatter(BaseFormatter):
 
         picture_details = picture.get('renditions', {}).get('baseImage', {})
         self.MIMETYPE = picture_details.get('mimetype', 'image/jpeg')
-        self.FILE_EXTENSION = self.update_extension()
+        picture_details['file_extension'] = self.update_extension()
 
         return picture_details
