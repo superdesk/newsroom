@@ -113,7 +113,34 @@
                 font-weight: 300;
             }
         }
-        
+
+        // use wrapper class to retain image aspect ratio within the home page card
+        .card-img-top-wrapper { 
+            background-color: #3e4557;
+            position: relative;
+            height: 0;
+
+            &--aspect-16-9 {
+                padding-bottom: 56.25%; /* outer div has 16:9 aspect ratio */
+            }
+            &--aspect-4-3 {
+                padding-bottom: 75%; /* outer div has 4:3 aspect ratio */
+            }
+            &--aspect-3-2 {
+                padding-bottom: 66.67%; /* outer div has 3:2 aspect ratio */
+            }
+            &--aspect-1-1 {
+                padding-bottom: 100%; /* outer div has 1:1 aspect ratio */
+            }
+
+            .card-img-top {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                object-fit: contain;
+            }              
+        }
     }
 
     // horizontal orientation, image on left side (for bigger screens)
