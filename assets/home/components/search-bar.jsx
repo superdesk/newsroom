@@ -16,7 +16,12 @@ export class SearchBar extends React.PureComponent {
                                     placeholder={gettext('Search for...')}
                                     aria-label={gettext('Search for...')} />
                                 <div className="search__form__buttons">
-                                    <button className="btn btn-outline-secondary" type="submit">
+                                    <button type="reset" className="icon-button search__clear" title={gettext('Clear')}>
+                                        <span className="search__clear">
+                                            <img src="/static/search_clear.png" width="16" height="16"/>
+                                        </span>
+                                    </button>
+                                    <button className="btn btn-outline-secondary" type="submit" title={gettext('Search')}>
                                         {gettext('Search')}
                                     </button>
                                 </div>
