@@ -5,7 +5,7 @@ import superdesk
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app, request, jsonify
+from flask import current_app as app, request, jsonify, url_for
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -13,6 +13,7 @@ from flask_babel import gettext
 from superdesk.utc import utcnow
 
 from superdesk import get_resource_service
+
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
@@ -29,6 +30,7 @@ from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
 
 from .search import get_bookmarks_count
+from ..upload import ASSETS_RESOURCE
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
 HOME_EXTERNAL_ITEMS_CACHE_KEY = 'home_external_items'
@@ -70,7 +72,8 @@ def get_view_data():
         'user_type': (user or {}).get('user_type') or 'public',
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': [t for t in topics if t.get('topic_type') == 'wire'],
-        'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
+        'formats': [{'format': f['format'], 'name': f['name'], 'assets': f['assets']}
+                    for f in app.download_formatters.values()
                     if 'wire' in f['types']],
         'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                                   product_type='wire'),
@@ -111,7 +114,7 @@ def get_home_data():
         'products': get_products_by_company(company_id),
         'user': str(user['_id']) if user else None,
         'company': company_id,
-        'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types']}
+        'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types'], 'assets': f['assets']}
                     for f in app.download_formatters.values()],
         'context': 'wire',
     }
@@ -182,7 +185,30 @@ def download(_ids):
     formatter = app.download_formatters[_format]['formatter']
     mimetype = None
     attachment_filename = '%s-newsroom.zip' % utcnow().strftime('%Y%m%d%H%M')
-    if len(items) == 1 or _format == 'monitoring':
+    if formatter.get_mediatype() == 'picture':
+        if len(items) == 1:
+            try:
+                picture = formatter.format_item(items[0], item_type=item_type)
+                return flask.redirect(
+                    url_for('upload.get_upload',
+                            media_id=picture['media'],
+                            filename='baseimage%s' % picture['file_extension']))
+            except ValueError:
+                return flask.abort(404)
+        else:
+            with zipfile.ZipFile(_file, mode='w') as zf:
+                for item in items:
+                    try:
+                        picture = formatter.format_item(item, item_type=item_type)
+                        file = flask.current_app.media.get(picture['media'], ASSETS_RESOURCE)
+                        zf.writestr(
+                            'baseimage%s' % picture['file_extension'],
+                            file.read()
+                        )
+                    except ValueError:
+                        pass
+            _file.seek(0)
+    elif len(items) == 1 or _format == 'monitoring':
         item = items[0]
         args_item = item if _format != 'monitoring' else items
         parse_dates(item)  # fix for old items
