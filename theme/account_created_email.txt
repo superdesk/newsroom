@@ -14,7 +14,7 @@ If you believe the Local Journalism Initiative {{app_name}} account was created 
 
 Un compte Initiative de journalisme local {{app_name}} a été créé pour vous.
 
-Pour accéder à votre compte, veuillez utiliser le lien {{url}} pour réinitialiser votre mot de passe.
+Pour accéder à votre compte, veuillez utiliser le lien {{url}}?language=fr_CA pour réinitialiser votre mot de passe.
 
 Ce lien expirera après {{expires}} heures.
 

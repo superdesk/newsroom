@@ -30,7 +30,10 @@ def setup_babel(app):
         except RuntimeError:
             pass
         if request:
-            return request.accept_languages.best_match(app.config['LANGUAGES'])
+            if request.args.get('language') and request.args.get('language') in app.config['LANGUAGES']:
+                return request.args['language']
+            else:
+                return request.accept_languages.best_match(app.config['LANGUAGES'])
         return app.config['DEFAULT_LANGUAGE']
 
     app.add_template_global(get_client_translations)
