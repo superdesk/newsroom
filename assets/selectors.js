@@ -1,9 +1,12 @@
 import {get} from 'lodash';
 import {createSelector} from 'reselect';
+import {getPicture} from './wire/utils';
 
 export const formats = (state) => get(state, 'formats') || [];
 export const secondaryFormats = (state) => get(state, 'secondaryFormats') || [];
 export const context = (state) => get(state, 'context') || null;
+export const allItemsById = (state) => get(state, 'itemsById') || null;
+export const itemToOpen = (state) => get(state, 'itemToOpen') || null;
 export const userSectionsSelector = (state) => get(state, 'userSections');
 export const modalItems = (state) => get(state, 'modal.data.items') || [];
 
