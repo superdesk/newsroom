@@ -4,7 +4,7 @@
 
 A Local Journalism Initiative {{app_name}} account has been created for you.
 
-In order to access your account, please visit {{url}} and complete your registration.
+In order to access your account, please visit {{url}}?language=en and complete your registration.
 
 This link will expire after {{expires}} hours.
 
