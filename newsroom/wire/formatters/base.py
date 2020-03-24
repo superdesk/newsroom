@@ -7,6 +7,7 @@ class BaseFormatter(metaclass=FormatterRegistry):
 
     MIMETYPE = None
     FILE_EXTENSION = None
+    MEDIATYPE = 'text'
 
     def format_filename(self, item):
         assert self.FILE_EXTENSION
@@ -19,3 +20,6 @@ class BaseFormatter(metaclass=FormatterRegistry):
 
     def get_mimetype(self, item):
         return self.MIMETYPE
+
+    def get_mediatype(self):
+        return self.MEDIATYPE
