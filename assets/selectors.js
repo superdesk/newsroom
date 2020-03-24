@@ -1,6 +1,5 @@
 import {get} from 'lodash';
 import {createSelector} from 'reselect';
-import {getPicture} from './wire/utils';
 
 export const formats = (state) => get(state, 'formats') || [];
 export const secondaryFormats = (state) => get(state, 'secondaryFormats') || [];
