@@ -4,7 +4,7 @@
 
 A Local Journalism Initiative {{app_name}} account has been created for you.
 
-In order to access your account, please visit {{url}} and complete your registration.
+In order to access your account, please visit {{url}}?language=en and complete your registration.
 
 This link will expire after {{expires}} hours.
 
@@ -19,7 +19,7 @@ Local Journalism Initiative
 
 Un compte {{app_name}} Initiative de journalisme local a été créé pour vous.
 
-Pour accéder à votre compte, veuillez visiter {{url}} et terminer votre inscription.
+Pour accéder à votre compte, veuillez visiter {{url}}?language=fr_CA et terminer votre inscription.
 
 Ce lien expirera après {{expires}} heures.
 
