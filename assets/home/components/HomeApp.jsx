@@ -17,6 +17,7 @@ import WirePreview from 'wire/components/WirePreview';
 import {followStory} from 'search/actions';
 import {downloadVideo} from 'wire/actions';
 import {previewConfigSelector} from 'ui/selectors';
+import {SearchBar} from './search-bar';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -108,21 +109,25 @@ class HomeApp extends React.Component {
 
     renderContent(children) {
         return (
-            <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
-                onScroll={this.onHomeScroll}
-                ref={(elem) => this.elem = elem}
-            >
-                <div className="container-fluid">
-                    {this.props.cards.length > 0 &&
-                    this.props.cards.filter((c) => c.dashboard === 'newsroom').map((card) => this.getPanels(card))}
-                    {this.props.cards.length === 0 &&
-                    <div className="alert alert-warning" role="alert">
-                        <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for home page!')}
+            <React.Fragment>
+                <SearchBar />
+
+                <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
+                    onScroll={this.onHomeScroll}
+                    ref={(elem) => this.elem = elem}
+                >
+                    <div className="container-fluid">
+                        {this.props.cards.length > 0 &&
+                        this.props.cards.filter((c) => c.dashboard === 'newsroom').map((card) => this.getPanels(card))}
+                        {this.props.cards.length === 0 &&
+                        <div className="alert alert-warning" role="alert">
+                            <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for home page!')}
+                        </div>
+                        }
                     </div>
-                    }
-                </div>
-                {children}
-            </section>
+                    {children}
+                </section>
+            </React.Fragment>
         );
     }
 
