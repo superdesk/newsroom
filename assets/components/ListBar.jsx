@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
 import SearchBar from 'search/components/SearchBar';
 
 class ListBar extends React.Component {
@@ -16,11 +15,14 @@ class ListBar extends React.Component {
                         />
                     )}
                     <div className="content-bar__right">
-                        {this.props.onNewItem && <button
-                            className="btn btn-outline-secondary btn-responsive"
-                            onClick={() => this.props.onNewItem()}>
-                            {this.props.buttonText}
-                        </button>}
+                        {this.props.onNewItem && (
+                            <button
+                                className="btn btn-outline-secondary btn-responsive"
+                                onClick={() => this.props.onNewItem()}
+                            >
+                                {this.props.buttonText}
+                            </button>
+                        )}
                     </div>
                 </nav>
             </section>
