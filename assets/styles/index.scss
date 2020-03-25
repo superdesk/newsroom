@@ -1614,9 +1614,11 @@ article.list {
             }
             img {
                 max-width: none;
+                max-height: none;
                 width: 100%;
                 @include xl {
                     max-width: 160px;
+                    max-height: 140px;
                     width: auto;
                 }
             }
@@ -2047,10 +2049,15 @@ article.list {
         }
         img {
             max-width: none;
+            max-height: none;
+            height: auto;
             width: 100%;
             @include md {
                 max-width: 160px;
                 width: auto;
+            }
+            @include lg {
+                max-height: 140px;
             }
         }
     }
