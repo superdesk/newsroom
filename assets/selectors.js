@@ -18,12 +18,16 @@ export const getContextName = createSelector(
 );
 
 export const modalOptions = createSelector(
-    [modalItems, formats, context],
-    (items, fmts, cntxt) => {
+    [modalItems, formats, context, allItemsById, itemToOpen],
+    (items, fmts, cntxt, itemsById, openItem) => {
         let options = fmts;
         if (items && items.length) {
             const itemType = cntxt === 'agenda' ? 'agenda' : 'wire';
+            const hasPicture = items.every((itemId) => getPicture(itemsById && itemsById[itemId] || openItem));
             options = options.filter((opt) => get(opt, 'types', ['wire', 'agenda']).includes(itemType));
+            if (!hasPicture) {
+                options = options.filter((opt) => get(opt, 'assets', ['text']).includes('text'));
+            }
         }
 
         return options.map((format) => ({value: format.format, text: format.name}));
