@@ -42,7 +42,8 @@ BLUEPRINTS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.settings'
+    'newsroom.settings',
+    'newsroom.agenda',
 ]
 
 CORE_APPS = [
@@ -68,7 +69,8 @@ CORE_APPS = [
     'newsroom.public',
     'newsroom.settings',
     'newsroom.photos',
-    'newsroom.media_utils'
+    'newsroom.media_utils',
+    'newsroom.agenda',
 ]
 
 COVERAGE_TYPES = {

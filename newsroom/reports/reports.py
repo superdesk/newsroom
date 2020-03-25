@@ -202,7 +202,8 @@ def get_subscriber_activity_report():
         else:
             wire_ids.append(doc.get('item'))
 
-        company_ids.append(ObjectId(doc.get('company')))
+        if doc.get('company'):
+            company_ids.append(ObjectId(doc.get('company')))
         user_ids.append(ObjectId(doc.get('user')))
 
     agenda_items = get_entity_dict(get_items_by_id(agenda_ids, 'agenda'))
