@@ -15,7 +15,7 @@ def get_client_locales():
 
     for locale in current_app.config['LANGUAGES']:
         lang, *territory = locale.split('_')
-        if len(territory) is 1:
+        if len(territory) == 1:
             display_name = core.Locale(lang, territory=territory[0]).display_name.title()
         else:
             display_name = core.Locale(locale).display_name
