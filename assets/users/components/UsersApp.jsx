@@ -74,7 +74,7 @@ class UsersApp extends React.Component {
                 onNewItem={this.props.newUser}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchUsers}
-                buttonName={gettext('User')}
+                buttonText={gettext('New User')}
             >
                 <DropdownFilter
                     key={this.filters[0].label}

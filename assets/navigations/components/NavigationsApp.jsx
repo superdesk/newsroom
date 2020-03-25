@@ -26,7 +26,7 @@ class NavigationsApp extends React.Component {
                 onNewItem={this.props.newNavigation}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchNavigations}
-                buttonName={gettext('Navigation')}
+                buttonText={gettext('New Navigation')}
             >
                 <SectionSwitch
                     sections={this.props.sections}

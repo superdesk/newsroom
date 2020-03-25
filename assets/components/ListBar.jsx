@@ -19,7 +19,7 @@ class ListBar extends React.Component {
                         {this.props.onNewItem && <button
                             className="btn btn-outline-secondary btn-responsive"
                             onClick={() => this.props.onNewItem()}>
-                            {gettext('New {{ buttonName }}', {buttonName: this.props.buttonName})}
+                            {this.props.buttonText}
                         </button>}
                     </div>
                 </nav>
@@ -31,7 +31,7 @@ class ListBar extends React.Component {
 ListBar.propTypes = {
     setQuery: PropTypes.func,
     fetch: PropTypes.func,
-    buttonName: PropTypes.string,
+    buttonText: PropTypes.string,
     onNewItem: PropTypes.func,
     children: PropTypes.node,
     noSearch: PropTypes.bool,
