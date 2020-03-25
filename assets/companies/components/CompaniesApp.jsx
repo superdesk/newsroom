@@ -22,7 +22,7 @@ class CompaniesApp extends React.Component {
                 onNewItem={this.props.newCompany}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchCompanies}
-                buttonName={gettext('Company')}
+                buttonText={gettext('New Company')}
             />,
             <Companies key="Companies" />
             ]

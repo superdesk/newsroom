@@ -25,7 +25,7 @@ class CardsApp extends React.Component {
                 onNewItem={this.props.newCard}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchCards}
-                buttonName={gettext('Card')}
+                buttonText={gettext('New Card')}
             >
                 <DashboardSwitch
                     dashboards={this.props.dashboards}

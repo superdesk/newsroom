@@ -28,7 +28,7 @@ class ProductsApp extends React.Component {
                 onNewItem={this.props.newProduct}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchProducts}
-                buttonName={gettext('Product')}
+                buttonText={gettext('New Product')}
             >
                 <SectionSwitch
                     sections={this.props.sections}

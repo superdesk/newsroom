@@ -28,7 +28,7 @@ class SectionFiltersApp extends React.Component {
                 onNewItem={this.props.newSectionFilter}
                 setQuery={this.props.setQuery}
                 fetch={this.props.fetchSectionFilters}
-                buttonName={gettext('Section Filter')}
+                buttonText={gettext('New Section Filter')}
             >
                 <SectionSwitch
                     sections={this.props.sections}

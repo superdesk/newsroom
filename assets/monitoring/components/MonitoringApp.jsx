@@ -63,7 +63,7 @@ class MonitoringApp extends React.Component {
             key={i}
             className='dropdown-item'
             onClick={() => {this.onChange(filter.field, item._id);}}
-        >{item.name}</button>));        
+        >{item.name}</button>));
     }
 
     getActiveQuery() {
@@ -79,7 +79,7 @@ class MonitoringApp extends React.Component {
             <Fragment>
                 <ListBar
                     onNewItem={this.isScheduleMode() ? null : this.props.newMonitoringProfile}
-                    buttonName={gettext('Monitoring Profile')}
+                    buttonText={gettext('New Monitoring Profile')}
                     noSearch>
                     <div className="btn-group btn-group--navbar ml-0 mr-3">
                         {this.sections.map((section) => (
@@ -102,7 +102,7 @@ class MonitoringApp extends React.Component {
                 </div>
                 <MonitoringPanel />
             </Fragment>
-            
+
         );
     }
 
@@ -111,7 +111,7 @@ class MonitoringApp extends React.Component {
         if (field === 'company') {
             this.props.setCompany(value);
         }
-        
+
         this.props.fetchMonitoring();
     }
 }

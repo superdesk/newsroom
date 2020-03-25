@@ -242,7 +242,7 @@ msgstr ""
 
 #: newsroom/auth/forms.py:9
 msgid "Editor"
-msgstr "Éditeur/Éditrice"
+msgstr "Rédacteur/trice en chef"
 
 #: newsroom/auth/forms.py:10
 msgid "Journalist"
@@ -254,7 +254,7 @@ msgstr "Ventes"
 
 #: newsroom/auth/forms.py:12
 msgid "CTO"
-msgstr "CTO"
+msgstr "DT"
 
 #: newsroom/auth/forms.py:13
 msgid "CEO"
@@ -266,31 +266,31 @@ msgstr "Autre"
 
 #: newsroom/auth/forms.py:16
 msgid "Your email"
-msgstr "Votre email"
+msgstr "Courriel"
 
 #: newsroom/auth/forms.py:17
 msgid "Your First Name"
-msgstr "Ton prénom"
+msgstr "Prénom"
 
 #: newsroom/auth/forms.py:18
 msgid "Your Last Name"
-msgstr "Votre nom de famille"
+msgstr "Nom de famille"
 
 #: newsroom/auth/forms.py:19
 msgid "Your telephone number"
-msgstr "Ton numéro de téléphone"
+msgstr "Numéro de téléphone"
 
 #: newsroom/auth/forms.py:20
 msgid "Your company"
-msgstr "Votre entreprise"
+msgstr "Entreprise"
 
 #: newsroom/auth/forms.py:21
 msgid "Your country"
-msgstr "Votre pays"
+msgstr "Pays"
 
 #: newsroom/auth/forms.py:22
 msgid "Your position"
-msgstr "Ta position"
+msgstr "Poste"
 
 #: newsroom/auth/forms.py:23
 msgid "Size of your company"
@@ -298,14 +298,14 @@ msgstr "Taille de votre entreprise"
 
 #: newsroom/auth/forms.py:24
 msgid "I agree to"
-msgstr "J'accepte de"
+msgstr "J'accepte les"
 
 #: assets/user-profile/components/profile/UserProfile.jsx:83
 #: assets/users/components/EditUser.jsx:47
 #: assets/users/components/UsersList.jsx:24 newsroom/auth/forms.py:29
 #: newsroom/auth/forms.py:35 newsroom/users/forms.py:22
 msgid "Email"
-msgstr "Email"
+msgstr "Courriel"
 
 #: newsroom/auth/forms.py:30
 msgid "Password"
@@ -313,7 +313,7 @@ msgstr "Mot de passe"
 
 #: newsroom/auth/forms.py:31
 msgid "Remember Me"
-msgstr "Souviens-toi de moi"
+msgstr "Se souvenir de moi"
 
 #: newsroom/auth/forms.py:42
 msgid "Passwords must match."
@@ -841,7 +841,7 @@ msgstr "cliquez ici pour vous inscrire."
 #: assets/user-profile/components/profile/UserProfile.jsx:127
 #: newsroom/templates/login.html:50 theme/login.html:51
 msgid "Language"
-msgstr "La langue"
+msgstr "Langue"
 
 #: newsroom/templates/media_releases_index.html:3
 #: newsroom/templates/media_releases_index.html:6
@@ -1031,7 +1031,7 @@ msgstr "Administrateur"
 
 #: newsroom/users/forms.py:15
 msgid "Public"
-msgstr "Publique"
+msgstr "Public"
 
 #: newsroom/users/forms.py:16
 msgid "Internal"
@@ -1561,7 +1561,7 @@ msgstr "Carte"
 #: assets/section-filters/components/EditSectionFilter.jsx:87
 #: assets/users/components/EditUser.jsx:122
 msgid "Save"
-msgstr "sauver"
+msgstr "Sauver"
 
 #: assets/cards/components/EditCard.jsx:94
 #: assets/companies/components/EditCompany.jsx:202

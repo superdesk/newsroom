@@ -11,9 +11,20 @@ def get_client_translations(domain='client'):
 
 
 def get_client_locales():
-    return [
-        {'locale': locale, 'name': core.Locale(locale).display_name} for locale in current_app.config['LANGUAGES']
-    ]
+    client_locales = []
+
+    for locale in current_app.config['LANGUAGES']:
+        lang, *territory = locale.split('_')
+        if len(territory) == 1:
+            display_name = core.Locale(lang, territory=territory[0]).display_name.title()
+        else:
+            display_name = core.Locale(locale).display_name
+        client_locales.append({
+            'locale': locale,
+            'name': display_name
+        })
+
+    return client_locales
 
 
 def setup_babel(app):
