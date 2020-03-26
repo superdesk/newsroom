@@ -73,6 +73,7 @@ class NewsroomApp(eve.Eve):
                 self.config.from_object(config)
 
         newsroom.flask_app = self
+        self.settings = self.config
 
         self.setup_media_storage()
         self.setup_babel()
