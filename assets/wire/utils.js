@@ -28,7 +28,7 @@ export function getIntVersion(item) {
  * @return {Array}
  */
 export function getVideos(item) {
-    return item.type === 'video' ? [item] : Object.values(get(item, 'associations', {})).filter((assoc) => get(assoc, 'type') === 'video');
+    return item.type === 'video' ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'video');
 }
 
 
@@ -45,7 +45,7 @@ export function getPicture(item) {
 }
 
 function getBodyPicture(item) {
-    const pictures = Object.values(get(item, 'associations', {})).filter((assoc) => get(assoc, 'type') === 'picture');
+    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'picture');
 
     return pictures.length ? pictures[0] : null;
 }
