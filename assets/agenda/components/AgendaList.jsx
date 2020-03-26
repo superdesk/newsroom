@@ -24,9 +24,10 @@ const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
 const activeDateSelector = (state) => get(state, 'agenda.activeDate');
 const activeGroupingSelector = (state) => get(state, 'agenda.activeGrouping');
 const itemsByIdSelector = (state) => get(state, 'itemsById', {});
+const featuredOnlySelector = (state) => get(state, 'agenda.featuredOnly', false);
 
 const groupedItemsSelector = createSelector(
-    [itemsSelector, activeDateSelector, activeGroupingSelector],
+    [itemsSelector, activeDateSelector, activeGroupingSelector, featuredOnlySelector],
     groupItems);
 
 /**
@@ -217,7 +218,15 @@ class AgendaList extends React.Component {
     }
 
     render() {
-        const {groupedItems, itemsById, activeView, selectedItems, readItems, refNode, onScroll} = this.props;
+        const {
+            groupedItems,
+            itemsById,
+            activeView,
+            selectedItems,
+            readItems,
+            refNode,
+            onScroll,
+        } = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
         const articleGroups = groupedItems.map((group) =>
             [
@@ -337,6 +346,7 @@ AgendaList.propTypes = {
     onScroll: PropTypes.func,
     refNode: PropTypes.func,
     previewConfig: PropTypes.object,
+    featuredOnly: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -358,6 +368,7 @@ const mapStateToProps = (state) => ({
     listItems: listItemsSelector(state),
     isLoading: state.isLoading,
     previewConfig: previewConfigSelector(state),
+    featuredOnly: get(state, 'agenda.featuredOnly'),
 });
 
 export default connect(mapStateToProps)(AgendaList);
