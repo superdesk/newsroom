@@ -79,7 +79,7 @@ class MonitoringApp extends React.Component {
             <Fragment>
                 <ListBar
                     onNewItem={this.isScheduleMode() ? null : this.props.newMonitoringProfile}
-                    buttonText={gettext('New Monitoring Profile')}
+                    buttonName={gettext('Monitoring Profile')}
                     noSearch>
                     <div className="btn-group btn-group--navbar ml-0 mr-3">
                         {this.sections.map((section) => (
@@ -111,7 +111,7 @@ class MonitoringApp extends React.Component {
         if (field === 'company') {
             this.props.setCompany(value);
         }
-
+        
         this.props.fetchMonitoring();
     }
 }
