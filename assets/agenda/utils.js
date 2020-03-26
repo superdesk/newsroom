@@ -584,7 +584,7 @@ export function containsExtraDate(item, dateToCheck) {
  * @param activeDate: date that the grouping will start from
  * @param activeGrouping: type of grouping i.e. day, week, month
  */
-export function groupItems (items, activeDate, activeGrouping) {
+export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
     const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
     const groupedItems = {};
     const grouper = Groupers[activeGrouping];
@@ -622,11 +622,15 @@ export function groupItems (items, activeDate, activeGrouping) {
     });
 
     Object.keys(groupedItems).forEach((k) => {
-        const tbcPartitioned = partition(groupedItems[k], (i) => isItemTBC(i));
-        groupedItems[k] = [
-            ...tbcPartitioned[0],
-            ...tbcPartitioned[1],
-        ].map((i) => i._id);
+        if (featuredOnly) {
+            groupedItems[k] = groupedItems[k].map((i) => i._id);
+        } else {
+            const tbcPartitioned = partition(groupedItems[k], (i) => isItemTBC(i));
+            groupedItems[k] = [
+                ...tbcPartitioned[0],
+                ...tbcPartitioned[1],
+            ].map((i) => i._id);
+        }
     });
 
     return sortBy(
