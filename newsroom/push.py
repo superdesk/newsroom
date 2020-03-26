@@ -134,7 +134,7 @@ def publish_item(doc, is_new, previous_associations_exists):
     publish_item_signal.send(app._get_current_object(), item=doc, is_new=is_new)
     _id = service.create([doc])[0]
     if 'associations' not in doc and not is_new and previous_associations_exists:
-        service.patch(_id, updates={'associations': {'featuremedia': None}})
+        service.patch(_id, updates={'associations': None})
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
     return _id
