@@ -80,8 +80,9 @@ def push():
             superdesk.get_resource_service('agenda').enhance_items([agenda])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
-        orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
-        item['_id'] = publish_item(item, is_new=orig is None)
+        orig = superdesk.get_resource_service('items').find_one(req=None, _id=item['guid'])
+        previous_associations_exists = orig is not None and bool(orig.get('associations', {}))
+        item['_id'] = publish_item(item, is_new=orig is None, previous_associations_exists=previous_associations_exists)
         notify_new_item(item, check_topics=orig is None)
     elif item['type'] == 'planning_featured':
         publish_planning_featured(item)
@@ -101,7 +102,7 @@ def set_dates(doc):
     doc.setdefault(app.config['VERSION'], 1)
 
 
-def publish_item(doc, is_new):
+def publish_item(doc, is_new, previous_associations_exists):
     """Duplicating the logic from content_api.publish service."""
     set_dates(doc)
     doc['firstpublished'] = parse_date_str(doc.get('firstpublished'))
@@ -132,6 +133,8 @@ def publish_item(doc, is_new):
             [notify_new_item(item, check_topics=False) for item in agenda_items]
     publish_item_signal.send(app._get_current_object(), item=doc, is_new=is_new)
     _id = service.create([doc])[0]
+    if 'associations' not in doc and not is_new and previous_associations_exists:
+        service.patch(_id, updates={'associations': {'featuremedia': None}})
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
     return _id

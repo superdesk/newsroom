@@ -160,6 +160,55 @@ def test_push_featuremedia_generates_renditions(client):
         assert 200 == resp.status_code
 
 
+def test_push_update_removes_featuremedia(client):
+    media_id = str(bson.ObjectId())
+    upload_binary('picture.jpg', client, media_id=media_id)
+    item = {
+        'guid': 'test',
+        'type': 'text',
+        'version': 1,
+        'associations': {
+            'featuremedia': {
+                'type': 'picture',
+                'mimetype': 'image/jpeg',
+                'renditions': {
+                    '4-3': {
+                        'media': media_id,
+                    },
+                    'baseImage': {
+                        'media': media_id,
+                    },
+                    'viewImage': {
+                        'media': media_id,
+                    }
+                }
+            }
+        }
+    }
+
+    resp = client.post('/push', data=json.dumps(item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    resp = client.get('/wire/test?format=json')
+    data = json.loads(resp.get_data())
+    assert 200 == resp.status_code
+    assert data['associations']['featuremedia'] is not None
+
+    item = {
+        'guid': 'test',
+        'type': 'text',
+        'version': 2,
+    }
+
+    resp = client.post('/push', data=json.dumps(item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    resp = client.get('/wire/test?format=json')
+    data = json.loads(resp.get_data())
+    assert 200 == resp.status_code
+    assert data['associations']['featuremedia'] is None
+
+
 def test_push_featuremedia_has_renditions_for_existing_media(client):
     media_id = str(bson.ObjectId())
     upload_binary('picture.jpg', client, media_id=media_id)
