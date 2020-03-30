@@ -10,7 +10,9 @@ export class SearchBar extends React.PureComponent {
                         <span className="search__icon d-none d-sm-block">
                             <i className="icon--search icon--gray-light" />
                         </span>
-                        <div className="search__form input-group searchForm--active">
+                        <div className={classNames('search__form input-group', {
+                            'searchForm--active': !!this.state.query,
+                        })}>
                             <form className="form-inline" action="/wire">
                                 <input type="text" name="q" className="search__input form-control"
                                     placeholder={gettext('Search for...')}
