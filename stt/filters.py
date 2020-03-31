@@ -86,7 +86,7 @@ def init_app(app):
             'label': gettext('Department'),
         },
         {
-            'field': 'sttgenre',
+            'field': 'genre',
             'label': gettext('Genre'),
         },
         {
