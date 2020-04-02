@@ -30,8 +30,6 @@ export const KEYCODES = {
     DOWN: 40,
 };
 
-export const ITEM_ACTIONS_CONFIG = getConfig('item_actions', {});
-
 /**
  * Create redux store with default middleware
  *
@@ -680,4 +678,12 @@ export function getSlugline(item, withTakeKey = false) {
     }
 
     return slugline;
+}
+
+/**
+ * Factory for filter function to check if action is enabled
+ */
+export function isActionEnabled(configKey) {
+    const config = getConfig(configKey, {});
+    return (action) => config[action.id] == null || config[action.id];
 }
