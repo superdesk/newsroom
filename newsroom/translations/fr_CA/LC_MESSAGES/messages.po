@@ -2,13 +2,13 @@
 # Copyright (C) 2020 ORGANIZATION
 # This file is distributed under the same license as the Newsroom project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
-# 
+#
 # Translators:
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2020
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2020
 # Simon Peacock <simon.peacock@gmail.com>, 2020
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2020
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -300,7 +300,7 @@ msgstr "Taille de votre entreprise"
 
 #: newsroom/auth/forms.py:24
 msgid "I agree to"
-msgstr "J'accepte les"
+msgstr "J'accepte"
 
 #: assets/user-profile/components/profile/UserProfile.jsx:83
 #: assets/users/components/EditUser.jsx:47
@@ -918,8 +918,8 @@ msgid "Sign up"
 msgstr "S'inscrire"
 
 #: newsroom/templates/signup.html:61
-msgid "terms and conditions"
-msgstr ""
+msgid "the terms and conditions"
+msgstr "les termes et conditions"
 
 #: newsroom/templates/signup_success.html:12
 msgid "Newsroom sign up"

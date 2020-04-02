@@ -38,7 +38,7 @@ def date_header(datetime):
     if flask.session.get('locale', '').startswith('fr'):
         date_format_str = "EEEE, 'le' d MMMM, yyyy"  # French format
 
-    return format_datetime(parse_date(datetime if datetime else utcnow()), date_format_str)
+    return format_datetime(parse_date(datetime if datetime else utcnow()), date_format_str).capitalize()
 
 
 def time_short(datetime):
