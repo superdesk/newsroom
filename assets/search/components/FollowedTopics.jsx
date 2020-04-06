@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {get} from 'lodash';
 import classNames from 'classnames';
 
-import {gettext} from 'utils';
+import {gettext, isActionEnabled} from 'utils';
 
 import {
     fetchTopics,
@@ -33,6 +33,7 @@ class FollowedTopics extends React.Component {
         this.onTopicChanged = this.onTopicChanged.bind(this);
 
         this.actions = [{
+            id: 'edit',
             name: gettext('Edit'),
             icon: 'edit',
             action: this.editTopic,
@@ -42,15 +43,17 @@ class FollowedTopics extends React.Component {
             this.actions = [
                 ...this.actions,
                 {
+                    id: 'share',
                     name: gettext('Share'),
                     icon: 'share',
                     action: this.props.shareTopic,
                 }, {
+                    id: 'delete',
                     name: gettext('Delete'),
                     icon: 'trash',
                     action: this.deleteTopic,
                 }
-            ];
+            ].filter(isActionEnabled('topic_actions'));
         }
     }
 

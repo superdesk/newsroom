@@ -102,6 +102,9 @@ CLIENT_CONFIG = {
     'item_actions': {
         'share': False,
     },
+    'topic_actions': {
+        'share': False,
+    },
 }
 
 WATERMARK_IMAGE = None
