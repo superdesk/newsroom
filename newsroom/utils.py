@@ -1,6 +1,8 @@
 import superdesk
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from uuid import uuid4
+import pytz
 
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
@@ -80,6 +82,23 @@ def get_entity_or_404(_id, resource):
     if not item:
         abort(404)
     return item
+
+
+def get_entities_elastic_or_mongo_or_404(_ids, resource):
+    '''Finds item in elastic search as fist preference. If not configured, finds from mongo'''
+    elastic = app.data._search_backend(resource)
+    items = []
+    if elastic:
+        for id in _ids:
+            item = elastic.find_one('items', req=None, _id=id)
+            if not item:
+                item = get_entity_or_404(id, resource)
+
+            items.append(item)
+    else:
+        items = [get_entity_or_404(i, resource) for i in _ids]
+
+    return items
 
 
 def get_json_or_400():
@@ -347,3 +366,58 @@ def set_original_creator(doc):
 
 def set_version_creator(doc):
     doc['version_creator'] = get_user_id()
+
+
+def get_items_for_user_action(_ids, item_type):
+    # Getting entities from elastic first so that we get all fields
+    # even those which are not a part of ItemsResource(content_api) schema.
+    items = get_entities_elastic_or_mongo_or_404(_ids, item_type)
+
+    if not items or items[0].get('type') != 'text':
+        return items
+
+    for item in items:
+        if item.get('slugline') and item.get('anpa_take_key'):
+            item['slugline'] = '{0} | {1}'.format(item['slugline'], item['anpa_take_key'])
+
+    return items
+
+
+def get_utcnow():
+    """ added for unit tests """
+    return datetime.utcnow()
+
+
+def today(time, offset):
+    user_local_date = get_utcnow() - timedelta(minutes=offset)
+    local_start_date = datetime.strptime('%sT%s' % (user_local_date.strftime('%Y-%m-%d'), time),
+                                         '%Y-%m-%dT%H:%M:%S')
+    return local_start_date
+
+
+def format_date(date, time, offset):
+    if date == 'now/d':
+        return today(time, offset)
+    if date == 'now/w':
+        _today = today(time, offset)
+        monday = _today - timedelta(days=_today.weekday())
+        return monday
+    if date == 'now/M':
+        month = today(time, offset).replace(day=1)
+        return month
+    return datetime.strptime('%sT%s' % (date, time), '%Y-%m-%dT%H:%M:%S')
+
+
+def get_local_date(date, time, offset):
+    local_dt = format_date(date, time, offset)
+    return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
+
+
+def get_end_date(date_range, start_date):
+    if date_range == 'now/d':
+        return start_date
+    if date_range == 'now/w':
+        return start_date + timedelta(days=6)
+    if date_range == 'now/M':
+        return start_date + relativedelta(months=+1) - timedelta(days=1)
+    return start_date

@@ -8,7 +8,7 @@ import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE, isItemTBC, TO_BE_CONFIRMED_TEXT} from './agenda/utils';
 
 export const now = moment(); // to enable mocking in tests
@@ -20,9 +20,11 @@ export const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
 export const COVERAGE_DATE_TIME_FORMAT = getConfig('coverage_date_time_format');
 export const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
+export const SERVER_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss+0000';
 export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
 export const DISPLAY_NEWS_ONLY = getConfig('display_news_only', true);
+export const DEFAULT_TIMEZONE = getConfig('default_timezone', 'Australia/Sydney');
 export const KEYCODES = {
     ENTER: 13,
     DOWN: 40,
@@ -118,6 +120,17 @@ export function parseDate(dateString) {
 }
 
 /**
+ * Parse the given date string and return moment instance in the timezone provided
+ * If no timezone is provided, then it will default to the browser's timezone
+ * @param {String} dateString - The datetime string to convert
+ * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
+ * @returns {moment}
+ */
+export function parseDateInTimezone(dateString, timezone = null) {
+    return moment.tz(dateString, timezone || moment.tz.guess());
+}
+
+/**
  * Return date formatted for lists
  *
  * @param {String} dateString
@@ -167,17 +180,21 @@ export function isToday(date) {
 
 /**
  * Test if given day is in the past
+ * If no timezone is provided, then it will default to the browser's timezone
  *
- * @param {Date} date
+ * @param {String} dateString - The datetime string to check
+ * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @return {Boolean}
  */
-export function isInPast(dateString) {
+export function isInPast(dateString, timezone) {
     if(!dateString) {
         return false;
     }
 
-    const parsed = parseDate(dateString);
-    return parsed.format('YYYY-MM-DD') < now.format('YYYY-MM-DD');
+    return parseDateInTimezone(dateString, timezone).isSameOrBefore(
+        now.tz(timezone || moment.tz.guess()),
+        'day'
+    );
 }
 
 /**
@@ -208,6 +225,30 @@ export function formatTime(dateString) {
  */
 export function formatDate(dateString) {
     return parseDate(dateString).format(DATE_FORMAT);
+}
+
+/**
+ * Parse the given date string, setting the time to 23:59:59 (i.e. end of the day).
+ * Ensures that the datetime is for the end of the day in the provided timezone
+ * If no timezone is provided, then it will default to the browser's timezone
+ * @param {String} dateString - The date string to convert (in the format 'YYYY-MM-DD')
+ * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
+ * @returns {moment}
+ */
+export function getEndOfDayFromDate(dateString, timezone = null) {
+    return parseDateInTimezone(dateString + 'T23:59:59', timezone);
+}
+
+/**
+ * Parse the given datetime string and timezone and converts it to utc
+ * If no timezone is provided, then it will default to the browser's timezone
+ * @param {String} datetime - The datetime string
+ * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
+ * @returns {moment}
+ */
+export function convertUtcToTimezone(datetime, timezone) {
+    return parseDateInTimezone(datetime, 'utc')
+        .tz(timezone);
 }
 
 export function getScheduleType(item) {
@@ -632,9 +673,10 @@ export function getSlugline(item, withTakeKey = false) {
     }
 
     let slugline = item.slugline.trim();
+    const takeKey = ` | ${item.anpa_take_key}`;
 
-    if (withTakeKey && item.anpa_take_key) {
-        slugline += ` | ${item.anpa_take_key}`;
+    if (withTakeKey && item.anpa_take_key && !slugline.endsWith(takeKey)) {
+        slugline += takeKey;
     }
 
     return slugline;

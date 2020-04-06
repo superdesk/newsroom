@@ -51,10 +51,12 @@ export default function monitoringReducer(state = initialState, action) {
                 subject: '',
                 description: '',
                 alert_type: 'full_text',
+                format_type: 'monitoring_pdf',
                 company: '',
                 is_enabled: true,
                 query: '',
                 keywords: [],
+                always_send: false,
             },
             errors: null};
     }

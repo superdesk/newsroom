@@ -9,10 +9,10 @@ import {gettext, KEYCODES} from 'utils';
 
 /**
  * @ngdoc react
- * @name KeywordInput
+ * @name TextListInput
  * @description Component to select tags like Keyword of a news story
  */
-class KeywordInput extends React.Component {
+class TextListInput extends React.Component {
     constructor(props) {
         super(props);
 
@@ -64,17 +64,18 @@ class KeywordInput extends React.Component {
     }
 
     render() {
-        const {name, label, value, error} = this.props;
+        const {name, label, value, error, readOnly} = this.props;
 
         return (
             <InputWrapper error={error} name={name}>
-                <div><label htmlFor={name}>{
-                    gettext('Keywords (Type and press ENTER to add a keyword)')}</label></div>
+                {!readOnly && <div><label htmlFor={name}>
+                    {`${label || ''} ${gettext('(Type and press ENTER to add an item)')}`}
+                </label></div>}
                 <TagList
                     tags={value}
-                    icon='icon--close-thin'
+                    icon={readOnly ? null : 'icon--close-thin'}
                     onClick={this.removeKeyword} />
-                <TextInput
+                {!readOnly && <TextInput
                     onChange={this.inputChange}
                     onKeyDown={(event) => {
                         if (event.keyCode === KEYCODES.ENTER ||
@@ -84,18 +85,20 @@ class KeywordInput extends React.Component {
                             this.addKeyword();
                         }
                     }}
-                    value={this.state.inputText} />
+                    value={this.state.inputText} /> }
+                {error && <div className="alert alert-danger">{error}</div>}
             </InputWrapper>
         );
     }
 }
 
-KeywordInput.propTypes = {
+TextListInput.propTypes = {
     label: PropTypes.string,
     value: PropTypes.arrayOf(PropTypes.string),
     onChange: PropTypes.func,
     name: PropTypes.string,
     error: PropTypes.object,
+    readOnly: PropTypes.bool,
 };
 
-export default KeywordInput;
+export default TextListInput;

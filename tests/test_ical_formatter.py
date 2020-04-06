@@ -5,6 +5,7 @@ import icalendar
 
 from flask import json
 from datetime import datetime
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
 from newsroom.agenda.formatters import iCalFormatter
 from .test_push_events import test_event

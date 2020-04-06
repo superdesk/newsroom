@@ -513,8 +513,6 @@ article.list {
         display: flex;
         flex-direction: column;
         flex: 1;
-        overflow: hidden;
-        overflow-y: auto;
     }
     .tab-content {
         display: flex;
@@ -527,8 +525,11 @@ article.list {
         display: flex;
         flex-direction: column;
         flex: 1;
-        overflow: hidden;
-        overflow-y: auto;
+
+        &--no-scroll {
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+        }
     }
     .nav-tabs {
         .nav-item {
@@ -589,6 +590,10 @@ article.list {
     overflow: hidden;
     overflow-y: auto;
     padding: 20px;
+
+    &--no-scroll {
+        overflow: visible !important;
+    }
 }
 .list-item__preview-footer {
     display: flex;
@@ -1892,7 +1897,7 @@ article.list {
     }
     span {
         overflow-wrap: break-word;
-        word-break: break-all;
+        word-break: break-word;
         word-wrap: break-word;
     }
 }
@@ -2449,6 +2454,12 @@ a.wire-articles__versions {
     @include xl {
         padding: 6px 12px;
     }
+
+    &--clickable {
+        &:hover {
+            cursor: pointer;
+        }
+    }
 }
 .coverage-item__row {
     display: flex;
@@ -2469,6 +2480,10 @@ a.wire-articles__versions {
     i {
         font-size: 16px;
         height: 17px;
+    }
+
+    &--gray {
+        color: #747474 !important;
     }
 }
 .coverage-item__column {
@@ -2624,6 +2639,10 @@ a.wire-articles__versions {
     @include lg {
         padding: 0 30px;
     }
+}
+
+.content--item-detail .wire-column__preview__coverage {
+    max-width: 350px;
 }
 
 .content--item-detail .wire-column__preview__headline {
@@ -3233,7 +3252,7 @@ a.wire-articles__versions {
     }
 
     &--pale {
-        background-color: #00adec4f;
+        background-color: #00adec;
     }
 
     &--right {

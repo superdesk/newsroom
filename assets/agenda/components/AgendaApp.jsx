@@ -152,7 +152,7 @@ class AgendaApp extends BaseApp {
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
-                actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
+                actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig, true)}
                 onClose={onDetailClose}
                 requestCoverage={this.props.requestCoverage}
                 group={this.props.previewGroup}
@@ -268,7 +268,7 @@ class AgendaApp extends BaseApp {
                         <AgendaPreview
                             item={this.props.itemToPreview}
                             user={this.props.user}
-                            actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig)}
+                            actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig, true)}
                             coverageActions={this.props.coverageActions}
                             closePreview={this.props.closePreview}
                             openItemDetails={this.props.openItemDetails}

@@ -87,7 +87,7 @@ class AmNewsApp extends BaseApp {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
                 detailsConfig={this.props.detailsConfig}
-                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}/>
+                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)} />
         ]);
     }
 
@@ -277,7 +277,7 @@ const mapDispatchToProps = (dispatch) => ({
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     closePreview: () => dispatch(previewItem(null)),
-    toggleNavigation: (navigation) => dispatch(toggleNavigation(navigation))
+    toggleNavigation: (navigation) => dispatch(toggleNavigation(navigation)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AmNewsApp);

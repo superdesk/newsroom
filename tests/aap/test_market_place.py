@@ -1,6 +1,6 @@
 from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from tests.utils import json, get_json, get_admin_user_id, mock_send_email
-from tests.test_download import wire_formats, download_zip_file, items_ids
+from tests.test_download import wire_formats, download_zip_file, items_ids, setup_image
 from tests.test_push import get_signature_headers
 from tests.test_users import ADMIN_USER_ID
 
@@ -251,6 +251,7 @@ def test_search_filter_by_individual_navigation(client, app):
 
     # test admin user filtering
     with client.session_transaction() as session:
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     resp = client.get('/aapX/search')
@@ -575,12 +576,14 @@ def test_share_items(client, app):
 
 
 def test_download(client, app):
+    setup_image(client, app)
     for _format in wire_formats:
         _file = download_zip_file(client, _format['format'], 'aapX')
         with zipfile.ZipFile(_file) as zf:
             assert _format['filename'] in zf.namelist()
             content = zf.open(_format['filename']).read()
-            _format['test_content'](content)
+            if _format.get('test_content'):
+                _format['test_content'](content)
     history = app.data.find('history', None, None)
     assert (len(wire_formats) * len(items_ids)) == history.count()
     assert 'download' == history[0]['action']

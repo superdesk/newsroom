@@ -122,6 +122,7 @@ export default function wireReducer(state = initialState, action) {
             company: action.wireData.company || null,
             bookmarks: action.wireData.bookmarks || false,
             formats: action.wireData.formats || [],
+            secondaryFormats: get(action, 'wireData.secondary_formats') || [],
             wire: Object.assign({}, state.wire, {newsOnly: action.newsOnly}),
             search: Object.assign({}, state.search, {navigations}),
             context: action.wireData.context || 'wire',

@@ -2,18 +2,32 @@ from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
 from newsroom.celery_app import celery
+from flask_mail import Attachment
 
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
     get_public_contacts
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.utils import url_for_agenda
+from superdesk.logging import logger
+import base64
 
 
 @celery.task(bind=True, soft_time_limit=120)
-def _send_email(self, to, subject, text_body, html_body=None, sender=None):
+def _send_email(self, to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
     if sender is None:
         sender = current_app.config['MAIL_DEFAULT_SENDER']
-    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to)
+
+    decoded_attachments = []
+    for a in attachments_info:
+        try:
+            content = base64.b64decode(a['file'])
+            decoded_attachments.append(Attachment(a['file_name'],
+                                                  a['content_type'], data=content))
+        except Exception as e:
+            logger.error('Error attaching {} file to mail. Receipient(s): {}. Error: {}'.format(
+                a['file_desc'], to, e))
+
+    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
     msg.body = text_body
     msg.html = html_body
     app = current_app._get_current_object()
@@ -24,7 +38,7 @@ def _send_email(self, to, subject, text_body, html_body=None, sender=None):
         return app.mail.send(msg)
 
 
-def send_email(to, subject, text_body, html_body=None, sender=None):
+def send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
     """
     Sends the email
     :param to: List of recipients
@@ -34,7 +48,14 @@ def send_email(to, subject, text_body, html_body=None, sender=None):
     :param sender: Sender
     :return:
     """
-    kwargs = {'to': to, 'subject': subject, 'text_body': text_body, 'html_body': html_body, 'sender': sender}
+    kwargs = {
+        'to': to,
+        'subject': subject,
+        'text_body': text_body,
+        'html_body': html_body,
+        'sender': sender,
+        'attachments_info': attachments_info,
+    }
     _send_email.apply_async(kwargs=kwargs)
 
 

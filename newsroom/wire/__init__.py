@@ -15,7 +15,7 @@ def url_for_wire(item, _external=True, section='wire', **kwargs):
     if kwargs:
         return url_for(section, _external=_external, **kwargs)
 
-    route = 'wire' if section in ['wire', 'monitoring'] else 'index'
+    route = 'wire' if section in ['wire'] else 'index'
     return url_for(
         '{}.{}'.format(section, route),
         item=item.get('_id') or item.get('guid') or item.get('item_id'),
@@ -34,10 +34,6 @@ def init_app(app):
                     'name': not_analyzed
                 }
             }
-        },
-        'agenda_id': {
-            'type': 'string',
-            'mapping': not_analyzed,
         },
     })
 
@@ -65,11 +61,12 @@ def init_app(app):
     app.sidenav(gettext('Saved/Watched Items'), 'wire.bookmarks', 'bookmark',
                 group=1, blueprint='wire', badge='saved-items-count')
 
-    from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter
-    app.download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'])
-    app.download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'])
-    app.download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'])
-    app.download_formatter('json', JsonFormatter(), 'Json', ['agenda'])
+    from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter, PictureFormatter
+    app.download_formatter('text', TextFormatter(), gettext('Plain Text'), ['wire', 'agenda'], ['text'])
+    app.download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'], ['text'])
+    app.download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'], ['text'])
+    app.download_formatter('json', JsonFormatter(), 'Json', ['agenda'], ['text'])
+    app.download_formatter('picture', PictureFormatter(), gettext('Story Image'), ['wire'], ['picture'])
 
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')

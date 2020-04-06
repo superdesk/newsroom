@@ -8,11 +8,39 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.tests.steps import *  # noqa
-from behave import when
+from superdesk.tests.steps import apply_placeholders, json_match, get_json_data
+from superdesk.tests import set_placeholder
+from behave import when, then
+import json
 
 
 @when('we save API token')
 def step_save_token(context):
     context.headers.append(('Authorization', context.news_api_tokens.get('_id')))
     return
+
+
+@when('we set header "{name}" to value "{value}"')
+def step_set_header(context, name, value):
+    context.headers.append((name, value))
+
+
+@then('we get headers in response')
+def step_assert_response_header(context):
+    test_headers = json.loads(apply_placeholders(context, context.text))
+    response_headers = context.response.headers
+    headers_dict = {}
+
+    for h in response_headers:
+        headers_dict[h[0]] = h[1]
+
+    for t_h in test_headers:
+        json_match(t_h, headers_dict)
+
+
+@then('we store NEXT_PAGE from HATEOAS')
+def step_store_next_page_from_response(context):
+    data = get_json_data(context.response)
+    href = ((data.get('_links') or {}).get('next_page') or {}).get('href')
+    assert href, data
+    set_placeholder(context, 'NEXT_PAGE', href)

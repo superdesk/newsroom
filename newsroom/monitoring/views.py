@@ -1,26 +1,28 @@
 import flask
-import io
 from bson import ObjectId
-from flask import jsonify, current_app as app, render_template, send_file
+from flask import jsonify, current_app as app, send_file
 from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound
-from werkzeug.utils import secure_filename
 from eve.methods.get import get_internal
 from eve.render import send_response
 from newsroom.decorator import admin_only, login_required
 from newsroom.companies import section
 from newsroom.monitoring import blueprint
-from .forms import MonitoringForm
+from .forms import MonitoringForm, alert_types
 from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400, \
-    set_original_creator, set_version_creator
+    set_original_creator, set_version_creator, is_json_request, get_items_for_user_action
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import item as wire_print
-from superdesk.utc import utcnow
 from newsroom.notifications import push_user_notification
 from newsroom.wire.search import get_bookmarks_count
+from newsroom.monitoring.utils import get_date_items_dict, get_monitoring_file, \
+    get_items_for_monitoring_report
+from superdesk.logging import logger
+from newsroom.email import send_email
+import base64
 
 
 def get_view_data():
@@ -35,6 +37,7 @@ def get_view_data():
         'saved_items': get_bookmarks_count(user['_id'], 'monitoring'),
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
                     if 'monitoring' in f['types']],
+        'secondary_formats': [{'format': f[0], 'name': f[1]} for f in alert_types]
     }
 
 
@@ -45,6 +48,8 @@ def get_settings_data():
 def process_form_request(updates, request_updates, form):
     if 'schedule' in request_updates:
         updates['schedule'] = request_updates['schedule']
+        if updates['schedule'].get('interval') == 'immediate':
+            updates['always_send'] = False
 
     if 'users' in request_updates:
         updates['users'] = [ObjectId(u) for u in request_updates['users']]
@@ -126,7 +131,23 @@ def create():
 @blueprint.route('/monitoring/<_id>', methods=['GET', 'POST'])
 @login_required
 def edit(_id):
+    if flask.request.args.get('context', '') == 'wire':
+        items = get_items_for_user_action([_id], 'items')
+        if not items:
+            return
+
+        item = items[0]
+        if is_json_request(flask.request):
+            return flask.jsonify(item)
+
     if 'print' in flask.request.args:
+        assert flask.request.args.get('monitoring_profile')
+        monitoring_profile = get_entity_or_404(flask.request.args.get('monitoring_profile'), 'monitoring')
+        items = get_items_for_monitoring_report([_id], monitoring_profile, full_text=True)
+        flask.request.view_args['date_items_dict'] = get_date_items_dict(items)
+        flask.request.view_args['monitoring_profile'] = monitoring_profile
+        flask.request.view_args['monitoring_report_name'] = app.config.get('MONITORING_REPORT_NAME', 'Newsroom')
+        flask.request.view_args['print'] = True
         return wire_print(_id)
 
     profile = find_one('monitoring', _id=ObjectId(_id))
@@ -176,26 +197,75 @@ def index():
 @login_required
 def export(_ids):
     user = get_user(required=True)
-    items = get_items_by_id([_id for _id in _ids.split(',')], 'items')
-    if len(items) > 0:
-        exported_text = str.encode(render_template('monitoring_export.html', items=items), 'utf-8')
-        update_action_list(_ids.split(','), 'export', force_insert=True)
-        get_resource_service('history').create_history_record(items, 'export', user, 'monitoring')
+    _format = flask.request.args.get('format')
+    if not _format:
+        return jsonify({'message': 'No format specified.'}), 400
 
-        if exported_text:
-            try:
-                temp_file = io.BytesIO()
-                attachment_filename = '%s-export.txt' % utcnow().strftime('%Y%m%d%H%M%S')
-                temp_file.write(exported_text)
-                temp_file.seek(0)
-                mimetype = 'text/plain'
-                attachment_filename = secure_filename(attachment_filename)
-                return send_file(temp_file, mimetype=mimetype, attachment_filename=attachment_filename,
-                                 as_attachment=True)
-            except Exception:
-                return jsonify({'message': 'Error exporting items to file'}), 400
-    else:
-        return jsonify({'message': 'No files to export.'}), 400
+    layout_format = flask.request.args.get('secondary_format')
+    formatter = app.download_formatters[_format]['formatter']
+    monitoring_profile = get_entity_or_404(flask.request.args.get('monitoring_profile'), 'monitoring')
+    monitoring_profile['format_type'] = _format
+    monitoring_profile['alert_type'] = layout_format
+    items = get_items_for_monitoring_report([_id for _id in _ids.split(',')], monitoring_profile)
+
+    if len(items) > 0:
+        try:
+            _file = get_monitoring_file(monitoring_profile, items)
+        except Exception as e:
+            logger.exception(e)
+            return jsonify({'message': 'Error exporting items to file'}), 400
+
+        if _file:
+            update_action_list(_ids.split(','), 'export', force_insert=True)
+            get_resource_service('history').create_history_record(items, 'export', user, 'monitoring')
+
+            return send_file(_file, mimetype=formatter.get_mimetype(None),
+                             attachment_filename=formatter.format_filename(None), as_attachment=True)
+
+    return jsonify({'message': 'No files to export.'}), 400
+
+
+@blueprint.route('/monitoring/share', methods=['POST'])
+@login_required
+def share():
+    data = get_json_or_400()
+    assert data.get('users')
+    assert data.get('items')
+    assert data.get('monitoring_profile')
+    current_user = get_user(required=True)
+    monitoring_profile = get_entity_or_404(data.get('monitoring_profile'), 'monitoring')
+    items = get_items_for_monitoring_report(data.get('items'), monitoring_profile)
+
+    for user_id in data['users']:
+        user = get_resource_service('users').find_one(req=None, _id=user_id)
+        template_kwargs = {
+            'recipient': user,
+            'sender': current_user,
+            'message': data.get('message'),
+            'item_name': 'Monitoring Report',
+        }
+        formatter = app.download_formatters['monitoring_pdf']['formatter']
+        monitoring_profile['format_type'] = 'monitoring_pdf'
+        _file = get_monitoring_file(monitoring_profile, items)
+        attachment = base64.b64encode(_file.read())
+
+        send_email(
+            [user['email']],
+            gettext('From %s: %s' % (app.config['SITE_NAME'], monitoring_profile.get('subject',
+                                                                                     monitoring_profile['name']))),
+            text_body=flask.render_template('share_items.txt', **template_kwargs),
+            html_body=flask.render_template('share_items.html', **template_kwargs),
+            attachments_info=[{
+                'file': attachment,
+                'file_name': formatter.format_filename(None),
+                'content_type': 'application/{}'.format(formatter.FILE_EXTENSION),
+                'file_desc': 'Monitoring Report'
+            }],
+        )
+
+    update_action_list(data.get('items'), 'shares')
+    get_resource_service('history').create_history_record(items, 'share', current_user, 'monitoring')
+    return jsonify({'success': True}), 200
 
 
 @blueprint.route('/monitoring_bookmark', methods=['POST', 'DELETE'])

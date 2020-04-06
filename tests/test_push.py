@@ -6,7 +6,9 @@ import bson
 from bson import ObjectId
 from flask import json
 from datetime import datetime
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from superdesk import get_resource_service
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
 from .fixtures import init_auth  # noqa
 from .utils import mock_send_email
@@ -156,6 +158,55 @@ def test_push_featuremedia_generates_renditions(client):
         rendition = picture['renditions']['_newsroom_%s' % name]
         resp = client.get(rendition['href'])
         assert 200 == resp.status_code
+
+
+def test_push_update_removes_featuremedia(client):
+    media_id = str(bson.ObjectId())
+    upload_binary('picture.jpg', client, media_id=media_id)
+    item = {
+        'guid': 'test',
+        'type': 'text',
+        'version': 1,
+        'associations': {
+            'featuremedia': {
+                'type': 'picture',
+                'mimetype': 'image/jpeg',
+                'renditions': {
+                    '4-3': {
+                        'media': media_id,
+                    },
+                    'baseImage': {
+                        'media': media_id,
+                    },
+                    'viewImage': {
+                        'media': media_id,
+                    }
+                }
+            }
+        }
+    }
+
+    resp = client.post('/push', data=json.dumps(item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    resp = client.get('/wire/test?format=json')
+    data = json.loads(resp.get_data())
+    assert 200 == resp.status_code
+    assert data['associations'] is not None
+
+    item = {
+        'guid': 'test',
+        'type': 'text',
+        'version': 2,
+    }
+
+    resp = client.post('/push', data=json.dumps(item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    resp = client.get('/wire/test?format=json')
+    data = json.loads(resp.get_data())
+    assert 200 == resp.status_code
+    assert data['associations'] is None
 
 
 def test_push_featuremedia_has_renditions_for_existing_media(client):

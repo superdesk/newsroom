@@ -12,6 +12,7 @@ from newsroom.decorator import admin_only, login_required
 from newsroom.companies import blueprint
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400, set_original_creator, \
     set_version_creator
+import ipaddress
 
 
 def get_company_types_options(company_types):
@@ -29,6 +30,7 @@ def get_settings_data():
         'sections': app.sections,
         'company_types': get_company_types_options(app.config.get('COMPANY_TYPES', [])),
         'api_enabled': app.config.get('NEWS_API_ENABLED', False),
+        'ui_config': get_resource_service('ui_config').getSectionConfig('companies'),
     }
 
 
@@ -47,22 +49,30 @@ def search():
 @admin_only
 def create():
     company = get_json_or_400()
-    validate_company(company)
+    errors = get_errors_company(company)
+    if errors:
+        return errors
+
     new_company = get_company_updates(company)
     set_original_creator(new_company)
     ids = get_resource_service('companies').post([new_company])
     return jsonify({'success': True, '_id': ids[0]}), 201
 
 
-def validate_company(company):
+def get_errors_company(company):
     if not company.get('name'):
         return jsonify({'name': gettext('Name not found')}), 400
 
-    if company.get('expiry_date'):
-        try:
-            datetime.strptime(company.get('expiry_date'), '%Y-%m-%d')
-        except ValueError:
-            return jsonify({'expiry_date': gettext('Wrong date format')}), 400
+    if company.get('allowed_ip_list'):
+        errors = []
+        for ip in company['allowed_ip_list']:
+            try:
+                ipaddress.ip_network(ip, strict=False)
+            except ValueError as e:
+                errors.append(gettext('{0}: {1}'.format(ip, e)))
+
+        if errors:
+            return jsonify({'allowed_ip_list': errors}), 400
 
 
 def get_company_updates(company):
@@ -78,6 +88,7 @@ def get_company_updates(company):
         'is_enabled': company.get('is_enabled'),
         'company_type': company.get('company_type'),
         'monitoring_administrator': company.get('monitoring_administrator'),
+        'allowed_ip_list': company.get('allowed_ip_list'),
     }
 
     if company.get('expiry_date'):
@@ -98,7 +109,10 @@ def edit(_id):
 
     if flask.request.method == 'POST':
         company = get_json_or_400()
-        validate_company(company)
+        errors = get_errors_company(company)
+        if errors:
+            return errors
+
         updates = get_company_updates(company)
         set_version_creator(updates)
         get_resource_service('companies').patch(ObjectId(_id), updates=updates)

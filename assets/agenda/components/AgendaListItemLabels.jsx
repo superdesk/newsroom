@@ -34,11 +34,12 @@ function AgendaListItemLabels({item, withDate, group, right}) {
         return (<div><span className={classNames('label label--orange ml-2', {'pull-right': right})}>{labelText}</span></div>);
         
     };
-    const dateGroup = group && moment(group, DATE_FORMAT);
 
-    if (!withDate || !dateGroup) {
+    if (!withDate) {
         return getLabel();
     }
+
+    const dateGroup = group ? moment(group, DATE_FORMAT) : moment(get(item, 'dates.start'));
    
     return (<div className='wire-column__preview__date wire-column__preview__date--event p-0'>
         {formatDate(dateGroup)}{getLabel()}

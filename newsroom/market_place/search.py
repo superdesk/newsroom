@@ -11,3 +11,4 @@ class MarketPlaceSearchResource(WireSearchResource):
 
 class MarketPlaceSearchService(WireSearchService):
     section = SECTION_ID
+    limit_days_setting = 'aapx_time_limit_days'

@@ -1,4 +1,0 @@
-{{ gettext("The following monitoring profile has errored while sending alerts:") }}
-{{ gettext("Name:") }} {{ name }}
-{{ gettext("Company:") }} {{ company }}
-{{ gettext("Run time:") }} {{ run_time }}

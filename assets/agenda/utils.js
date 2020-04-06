@@ -444,24 +444,75 @@ export function getInternalNote(item, plan) {
  * @param {Object} item
  * @return {Object}
  */
-export function getNotesFromCoverages(item, field = 'internal_note') {
-    const notes = {};
+export function getDataFromCoverages(item) {
     const planningItems = get(item, 'planning_items', []);
+    let data = {
+        'internal_note': {},
+        'ednote': {},
+        'workflow_status_reason': {},
+        'scheduled_update_status': {},
+    };
+
     planningItems.forEach(p => {
-        const planning_note = p[field];
         (get(p, 'coverages') || []).forEach((c) => {
-            // If the coverage has news item published, use that 'ednote' instead
-            if (field === 'ednote' && get(c, 'deliveries.length', 0) > 0) {
-                return;
+            ['internal_note', 'ednote', 'workflow_status_reason'].forEach((field) => {
+
+                // Don't populate if the value is same as the field in upper level planning_item
+                // Don't populate workflow_status_reason is planning_item is cancelled to avoid UI duplication
+                if (!get(c, `planning.${field}`, '') || c.planning[field] === p[field] ||
+                        (field === 'workflow_status_reason' && p['state'] === STATUS_CANCELED)) {
+                    return;
+                }
+
+                data[field][c.coverage_id] = c.planning[field];
+            });
+
+            if (get(c, 'scheduled_updates.length', 0) > 0 && c['workflow_status'] === WORKFLOW_STATUS.COMPLETED) {
+                // Get latest appropriate scheduled_update
+                const schedUpdate = getNextPendingScheduledUpdate(c);
+                if (schedUpdate) {
+                    const dateString = `${moment(schedUpdate.planning.scheduled).format(COVERAGE_DATE_TIME_FORMAT)}`;
+                    data['scheduled_update_status'][c.coverage_id] = gettext(`Update expected @ ${dateString}`);
+                }
             }
 
-            if (get(c, `planning.${field}`, '') && c.planning[field] !== planning_note) {
-                notes[c.coverage_id] = c.planning[field];
-            }
         });
     });
-    return notes;
+    return data;
 }
+
+const getNextPendingScheduledUpdate = (coverage) => {
+    // No scheduled_updates or deliveries
+    if (get(coverage, 'scheduled_updates.length', 0) === 0 ||
+            get(coverage, 'deliveries.length', 0) === 0) {
+        return null;
+    }
+
+    // Only one delivery: no scheduled_update was published
+    if (get(coverage, 'deliveries.length', 0) === 1) {
+        return coverage.scheduled_updates[0];
+    }
+
+
+    const lastScheduledDelivery = (coverage.deliveries.reverse()).find((d) => d.scheduled_update_id);
+    // More deliveries, but no scheduled_update was published
+    if (!lastScheduledDelivery) {
+        return coverage.scheduled_updates[0];
+    }
+
+    const lastPublishedShceduledUpdateIndex = coverage.scheduled_updates.findIndex((s) =>
+        s.scheduled_update_id === lastScheduledDelivery.scheduled_update_id);
+
+    if (lastPublishedShceduledUpdateIndex === coverage.scheduled_updates.length - 1) {
+        // Last scheduled_update was published, nothing pending
+        return;
+    } 
+
+    if (lastPublishedShceduledUpdateIndex < coverage.scheduled_updates.length - 1){
+        // There is a pending scheduled_update
+        return coverage.scheduled_updates[lastPublishedShceduledUpdateIndex + 1];
+    }
+};
 
 /**
  * Get list of subjects
@@ -533,7 +584,7 @@ export function containsExtraDate(item, dateToCheck) {
  * @param activeDate: date that the grouping will start from
  * @param activeGrouping: type of grouping i.e. day, week, month
  */
-export function groupItems (items, activeDate, activeGrouping) {
+export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
     const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
     const groupedItems = {};
     const grouper = Groupers[activeGrouping];
@@ -571,11 +622,15 @@ export function groupItems (items, activeDate, activeGrouping) {
     });
 
     Object.keys(groupedItems).forEach((k) => {
-        const tbcPartitioned = partition(groupedItems[k], (i) => isItemTBC(i));
-        groupedItems[k] = [
-            ...tbcPartitioned[0],
-            ...tbcPartitioned[1],
-        ].map((i) => i._id);
+        if (featuredOnly) {
+            groupedItems[k] = groupedItems[k].map((i) => i._id);
+        } else {
+            const tbcPartitioned = partition(groupedItems[k], (i) => isItemTBC(i));
+            groupedItems[k] = [
+                ...tbcPartitioned[0],
+                ...tbcPartitioned[1],
+            ].map((i) => i._id);
+        }
     });
 
     return sortBy(

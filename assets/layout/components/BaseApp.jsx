@@ -117,9 +117,9 @@ export default class BaseApp extends React.Component {
         }
     }
 
-    filterActions(item, config) {
+    filterActions(item, config, includeCoverages=false) {
         return this.props.actions.filter((action) => (!config || isDisplayed(action.id, config)) &&
-          (!action.when || action.when(this.props.state, item)));
+          (!action.when || action.when(this.props.state, item, includeCoverages)));
     }
 
     componentDidMount() {

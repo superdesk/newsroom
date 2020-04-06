@@ -4,16 +4,9 @@ import CompanySavedSearches from './components/CompanySavedSearches';
 import ProductStories from './components/ProductStories';
 import Company from './components/Company';
 import SubscriberActivity from './components/SubscriberActivity';
-
-
-export const REPORTS_NAMES = {
-    'COMPANY_SAVED_SEARCHES': 'company-saved-searches',
-    'USER_SAVED_SEARCHES': 'user-saved-searches',
-    'COMPANY_PRODUCTS': 'company-products',
-    'PRODUCT_STORIES': 'product-stories',
-    'COMPANY': 'company',
-    'SUBSCRIBER_ACTIVITY': 'subscriber-activity'
-};
+import ContentActivity from './components/ContentActivity';
+import ComapnyNewsApiUsage from './components/ComapnyNewsApiUsage';
+import {REPORTS_NAMES} from './actions';
 
 export const panels = {
     [REPORTS_NAMES.COMPANY_SAVED_SEARCHES]: CompanySavedSearches,
@@ -22,4 +15,6 @@ export const panels = {
     [REPORTS_NAMES.PRODUCT_STORIES]: ProductStories,
     [REPORTS_NAMES.COMPANY]: Company,
     [REPORTS_NAMES.SUBSCRIBER_ACTIVITY]: SubscriberActivity,
+    [REPORTS_NAMES.CONTENT_ACTIVITY]: ContentActivity,
+    [REPORTS_NAMES.COMPANY_NEWS_API_USAGE]: ComapnyNewsApiUsage,
 };

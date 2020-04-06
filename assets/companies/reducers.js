@@ -120,7 +120,6 @@ export default function companyReducer(state = initialState, action) {
         return {...state,
             isLoading: true,
             totalCompanies: null,
-            companyToEdit: null,
             activeQuery: state.query};
 
     case GET_COMPANIES:
@@ -140,6 +139,7 @@ export default function companyReducer(state = initialState, action) {
             sections: action.data.sections,
             companyTypes: action.data.company_types || [],
             apiEnabled: action.data.api_enabled || false,
+            ui_config: action.data.ui_config,
         };
 
         return setupCompanies(action.data.companies, nextState);

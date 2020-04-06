@@ -63,6 +63,7 @@
         min-width: 300px;
         overflow: auto;
         max-height: calc(100vh - 56px);
+        z-index: 1000;
         @include sm {
             min-width: 420px;
         }

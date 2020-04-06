@@ -5,8 +5,6 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
-from newsroom import company_expiry_alerts  # noqa
-from newsroom.monitoring import email_alerts  # noqa
 
 from superdesk.default_settings import (   # noqa
     VERSION,
@@ -126,6 +124,7 @@ CORE_APPS = [
     'newsroom.media_utils',
     'newsroom.news_api',
     'newsroom.news_api.api_tokens',
+    'newsroom.news_api.api_audit',
     'newsroom.monitoring',
     'newsroom.company_expiry_alerts',
 ]
@@ -265,7 +264,8 @@ CLIENT_CONFIG = {
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
-    'display_news_only': True  # Displays news only switch in wire
+    'display_news_only': True,  # Displays news only switch in wire,
+    'default_timezone': DEFAULT_TIMEZONE
 }
 
 LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']

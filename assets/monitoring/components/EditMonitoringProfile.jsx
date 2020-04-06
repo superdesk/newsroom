@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get, isEmpty} from 'lodash';
 
-import KeywordInput from 'components/KeywordInput';
+import TextListInput from 'components/TextListInput';
 import TextInput from 'components/TextInput';
 import TextAreaInput from 'components/TextAreaInput';
 import SelectInput from 'components/SelectInput';
@@ -149,7 +149,8 @@ class EditMonitoringProfile extends React.Component {
                                                 </a>}
                                     </TextAreaInput>
 
-                                    <KeywordInput
+                                    <TextListInput
+                                        label={gettext('Keywords')}
                                         name='keywords'
                                         value={item.keywords || []}
                                         onChange={onChange} />
@@ -166,11 +167,29 @@ class EditMonitoringProfile extends React.Component {
                                         onChange={onChange}
                                         error={getError('alert_type')} />
 
+                                    <SelectInput
+                                        name='format_type'
+                                        label={gettext('Format type')}
+                                        value={item.format_type || 'monitoring_pdf'}
+                                        options={[
+                                            {value: 'monitoring_pdf', text: 'PDF'},
+                                            {value: 'monitoring_rtf', text: 'RTF'}
+                                        ]}
+                                        onChange={onChange}
+                                        error={getError('format_type')} />
+
                                     <CheckboxInput
                                         name='is_enabled'
                                         label={gettext('Enabled')}
                                         value={item.is_enabled}
                                         onChange={onChange} />
+
+                                    {get(item, 'schedule.interval') && item.schedule.interval !== 'immediate' &&
+                                        <CheckboxInput
+                                            name='always_send'
+                                            label={gettext('Always Send')}
+                                            value={item.always_send}
+                                            onChange={onChange} />}
                                 </div>
 
                                 <div className='list-item__preview-footer'>

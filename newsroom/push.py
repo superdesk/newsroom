@@ -80,8 +80,8 @@ def push():
             superdesk.get_resource_service('agenda').enhance_items([agenda])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
-        orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
-        item['_id'] = publish_item(item, is_new=orig is None)
+        orig = superdesk.get_resource_service('items').find_one(req=None, _id=item['guid'])
+        item['_id'] = publish_item(item, orig)
         notify_new_item(item, check_topics=orig is None)
     elif item['type'] == 'planning_featured':
         publish_planning_featured(item)
@@ -101,7 +101,7 @@ def set_dates(doc):
     doc.setdefault(app.config['VERSION'], 1)
 
 
-def publish_item(doc, is_new):
+def publish_item(doc, original):
     """Duplicating the logic from content_api.publish service."""
     set_dates(doc)
     doc['firstpublished'] = parse_date_str(doc.get('firstpublished'))
@@ -130,8 +130,10 @@ def publish_item(doc, is_new):
         agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
         if agenda_items:
             [notify_new_item(item, check_topics=False) for item in agenda_items]
-    publish_item_signal.send(app._get_current_object(), item=doc, is_new=is_new)
+    publish_item_signal.send(app._get_current_object(), item=doc, is_new=original is None)
     _id = service.create([doc])[0]
+    if 'associations' not in doc and original is not None and bool(original.get('associations', {})):
+        service.patch(_id, updates={'associations': None})
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
     return _id
@@ -473,15 +475,25 @@ def get_coverages(planning_items, original_coverages, new_plan):
                 })
         else:
             if coverage.get('workflow_status') == 'completed':
-                if orig_coverage['workflow_status'] != coverage['workflow_status']:
+                if orig_coverage.get('workflow_status') != coverage['workflow_status']:
                     cov_deliveries.append({
                         'sequence_no': 0,
                         'delivery_state': 'published',
                         'publish_time': (next((parse_date_str(d.get('publish_time')) for d in deliveries), None) or
                                          utcnow())
                     })
-                    cov_deliveries[0]['delivery_href'] = app.set_photo_coverage_href(coverage, planning_item,
-                                                                                     cov_deliveries),
+
+                    try:
+                        cov_deliveries[0]['delivery_href'] = app.set_photo_coverage_href(
+                            coverage,
+                            planning_item,
+                            cov_deliveries
+                        )
+                    except Exception as e:
+                        logger.exception(e)
+                        logger.error('Failed to generate delivery_href for coverage={}'.format(
+                            coverage.get('coverage_id')
+                        ))
                 elif (len((orig_coverage or {}).get('deliveries') or []) > 0):
                     cov_deliveries.append(orig_coverage['deliveries'][0])
 

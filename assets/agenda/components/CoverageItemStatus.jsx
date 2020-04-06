@@ -6,7 +6,6 @@ import {
     getCoverageStatusText,
     WORKFLOW_STATUS,
     isCoverageBeingUpdated,
-    getNotesFromCoverages,
     isWatched,
 } from '../utils';
 
@@ -27,6 +26,11 @@ export default class CoverageItemStatus extends React.Component {
         super(props);
         this.state = { wireItem: null };
         this.filterActions = this.filterActions.bind(this);
+        this.onAnchorClick = this.onAnchorClick.bind(this);
+    }
+
+    onAnchorClick(e) {
+        e.stopPropagation();
     }
 
     componentDidMount() {
@@ -35,10 +39,6 @@ export default class CoverageItemStatus extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setWireItem(nextProps);
-    }
-
-    getInternalNotes() {
-        return getNotesFromCoverages(this.props.item);
     }
 
     setWireItem(props) {
@@ -75,7 +75,7 @@ export default class CoverageItemStatus extends React.Component {
             </span>);
 
         let content = [
-            (<span key="topRow">
+            (<span key="topRow" className={get(actions, 'length', 0) === 0 ? 'coverage-item--element-grow' : ''} >
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>
                 <span key="value">{gettext('coverage {{ state }} ',
                     {state: getCoverageStatusText(coverage)})}</span>
@@ -84,12 +84,13 @@ export default class CoverageItemStatus extends React.Component {
         ];
 
         if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED &&
-            ['video', 'video_explainer', 'picture'].includes(coverage.coverage_type) && getDeliveryHref(coverage)) {
+            ['video', 'video_explainer', 'picture', 'graphic'].includes(coverage.coverage_type) && getDeliveryHref(coverage)) {
             content.push(
                 <span key="contentLink" className="label label--available">
                     <a  href={coverage.delivery_href}
                         className="wire-column__preview__coverage__available-story"
                         target="_blank"
+                        onClick={this.onAnchorClick}
                         title={gettext('Open in new tab')}>
                         {gettext('View Content')}
                     </a>
@@ -97,7 +98,8 @@ export default class CoverageItemStatus extends React.Component {
             );
         }
 
-        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && this.state.wireItem) {
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && this.state.wireItem &&
+            !(this.props.hideViewContentItems || []).includes(this.state.wireItem._id)) {
             content.push(
                 this.state.wireItem._access
                     ? <span key="contentLink" className="label label--available">
@@ -105,26 +107,19 @@ export default class CoverageItemStatus extends React.Component {
                             key="value"
                             href={'/wire?item='+ get(coverage, 'delivery_id')}
                             target="_blank"
+                            onClick={this.onAnchorClick}
                             title={gettext('Open in new tab')}>
                             {gettext('View Content')}
                         </a></span>
                     : <span key="contentLink" className="label label--restricted">
                         <a className="wire-column__preview__coverage__restricted-story"
                             key="value" href="#"
+                            onClick={this.onAnchorClick}
                             target="_blank">{gettext('View Content')}</a></span>
             );
         }
 
         return content;
-    }
-
-    getEdNoteToDisplay() {
-        if (get(this.state.wireItem, 'ednote')) {
-            return this.state.wireItem.ednote;
-        }
-
-        const edNotes = getNotesFromCoverages();
-        return get(edNotes, this.props.coverage.coverage_id);
     }
 
     filterActions() {
@@ -133,10 +128,14 @@ export default class CoverageItemStatus extends React.Component {
     }
 
     render() {
-        const internalNotes = this.getInternalNotes();
-        const edNote = this.getEdNoteToDisplay();
         const coverage = this.props.coverage;
         const wireText = this.getItemText(coverage);
+        const internalNote = get(this.props, 'coverageData.internal_note', {})[coverage.coverage_id];
+        const edNote = this.state.wireItem ? this.state.wireItem.ednote :
+            get(this.props, 'coverageData.ednote', {})[coverage.coverage_id];
+        const reason = get(this.props, 'coverageData.workflow_status_reason', {})[coverage.coverage_id];
+        const scheduledStatus = get(this.props, 'coverageData.scheduled_update_status', {})[coverage.coverage_id];
+
 
         return (
             <Fragment>
@@ -150,12 +149,20 @@ export default class CoverageItemStatus extends React.Component {
                 )}
                 <div className='coverage-item__row'>{this.getStatusContent(coverage)}</div>
 
+                {scheduledStatus && <div className='coverage-item__row'>
+                    <span>{scheduledStatus}</span>
+                </div>}
+
                 {edNote && <div className='coverage-item__row'>
                     <AgendaEdNote item={{ednote: edNote}} noMargin/>
                 </div>}
 
-                {get(internalNotes, coverage.coverage_id) && <div className='coverage-item__row'>
-                    <AgendaInternalNote internalNote={internalNotes[coverage.coverage_id]} noMargin />
+                {reason && <div className='coverage-item__row'>
+                    <AgendaEdNote item={{ednote: reason}} noMargin/>
+                </div>}
+
+                {internalNote && <div className='coverage-item__row'>
+                    <AgendaInternalNote internalNote={internalNote} noMargin />
                 </div>}
             </Fragment>
         );
@@ -168,6 +175,10 @@ CoverageItemStatus.propTypes = {
     wireItems: PropTypes.array,
     actions: PropTypes.array,
     user: PropTypes.string,
+    internal_notes: PropTypes.object,
+    ednotes: PropTypes.object,
+    workflowStatusReasons: PropTypes.object,
+    hideViewContentItems: PropTypes.array,
 };
 
 CoverageItemStatus.defaultProps = { actions: [] };
