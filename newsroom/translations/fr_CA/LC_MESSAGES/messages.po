@@ -2092,7 +2092,7 @@ msgstr "Change de vue"
 #: assets/components/NotificationList.jsx:53
 #: assets/components/NotificationList.jsx:60
 msgid "Notifications"
-msgstr "Les notifications"
+msgstr "Notifications"
 
 #: assets/components/NotificationList.jsx:63
 msgid "Clear All"
@@ -2267,7 +2267,7 @@ msgstr "Vider"
 #: assets/search/components/TopicParameters.jsx:65
 #: assets/wire/components/filters/FiltersTab.jsx:95
 msgid "Search"
-msgstr "Chercher"
+msgstr "Rechercher"
 
 #: assets/layout/components/BaseApp.jsx:35
 #: assets/search/components/TopicParameters.jsx:67
