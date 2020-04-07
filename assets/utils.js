@@ -22,14 +22,20 @@ const NEWSROOM = 'newsroom';
 const CLIENT_CONFIG = 'client_config';
 
 function getLocaleFormat(formatType) {
-    const formats = getConfig('locale_formats');
+    const formats = getConfig('locale_formats', {});
     const locale = getLocale();
 
     if (formats[locale] && formats[locale][formatType]) {
         return formats[locale][formatType];
     }
 
-    return formats[getConfig('default_language')][formatType];
+    const defaultLanguage = getConfig('default_language', 'en');
+
+    if (formats[defaultLanguage] && formats[defaultLanguage][formatType]) {
+        return formats[defaultLanguage][formatType];
+    }
+
+    return 'DD-MM-YYYY';
 }
 
 const getTimeFormat = () => getLocaleFormat('TIME_FORMAT');
