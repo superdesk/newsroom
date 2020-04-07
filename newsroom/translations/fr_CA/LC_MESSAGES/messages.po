@@ -956,7 +956,7 @@ msgstr ""
 
 #: newsroom/templates/wire_index.html:3 newsroom/templates/wire_index.html:6
 msgid "Wire"
-msgstr "fil de presse"
+msgstr "Fil de presse"
 
 #: newsroom/templates/wire_item.html:40
 #: newsroom/templates/wire_item_print.html:10 theme/wire_item_print.html:9
@@ -1164,7 +1164,7 @@ msgstr ""
 #: assets/section-filters/components/EditSectionFilter.jsx:87
 #: assets/users/components/EditUser.jsx:122
 msgid "Save"
-msgstr "Sauver"
+msgstr "Sauvegarde"
 
 #: assets/item-actions.js:69
 msgid "Unsave"
@@ -2941,7 +2941,7 @@ msgstr "Mots:"
 
 #: assets/wire/components/PreviewMeta.jsx:35
 msgid "Characters:"
-msgstr "Des lettres"
+msgstr "Caractères:"
 
 #: assets/wire/components/PreviewMeta.jsx:39
 msgid "{{ count }} previous versions"
