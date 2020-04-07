@@ -260,7 +260,7 @@ CLIENT_LOCALE_FORMATS = {
         "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
         "COVERAGE_DATE_FORMAT": "DD/MM",
     },
-    "fr_CA": { # example - you can overwrite any format above
+    "fr_CA": {  # example - you can overwrite any format above
         "DATE_FORMAT": "DD/MM/YYYY",
     }
 }
