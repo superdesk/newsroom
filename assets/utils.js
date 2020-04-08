@@ -9,17 +9,47 @@ import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
-import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE, isItemTBC, TO_BE_CONFIRMED_TEXT} from './agenda/utils';
+import {
+    hasCoverages,
+    isCoverageForExtraDay,
+    SCHEDULE_TYPE,
+    isItemTBC,
+    TO_BE_CONFIRMED_TEXT
+} from './agenda/utils';
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
 const CLIENT_CONFIG = 'client_config';
 
-export const TIME_FORMAT = getConfig('time_format');
-export const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
-export const COVERAGE_DATE_TIME_FORMAT = getConfig('coverage_date_time_format');
-export const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
+function getLocaleFormat(formatType) {
+    const formats = getConfig('locale_formats', {});
+    const locale = getLocale();
+
+    if (formats[locale] && formats[locale][formatType]) {
+        return formats[locale][formatType];
+    }
+
+    const defaultLanguage = getConfig('default_language', 'en');
+
+    if (formats[defaultLanguage] && formats[defaultLanguage][formatType]) {
+        return formats[defaultLanguage][formatType];
+    }
+
+    return 'DD-MM-YYYY';
+}
+
+const getTimeFormat = () => getLocaleFormat('TIME_FORMAT');
+const getDateFormat = () => getLocaleFormat('DATE_FORMAT');
+const getCoverageDateTimeFormat = () =>
+    getLocaleFormat('COVERAGE_DATE_TIME_FORMAT');
+const getCoverageDateFormat = () => getLocaleFormat('COVERAGE_DATE_FORMAT');
+
+export const TIME_FORMAT = getTimeFormat();
+export const DATE_FORMAT = getDateFormat();
+export const COVERAGE_DATE_TIME_FORMAT = getCoverageDateTimeFormat();
+export const COVERAGE_DATE_FORMAT = getCoverageDateFormat();
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
+
 export const SERVER_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss+0000';
 export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
@@ -570,6 +600,13 @@ export function errorHandler(error, dispatch, setError) {
 export function getConfig(key, defaultValue) {
     const clientConfig = get(window, `${NEWSROOM}.${CLIENT_CONFIG}`, {});
     return get(clientConfig, key, defaultValue);
+}
+
+export function getLocale() {
+    const defaultLanguage = getConfig('default_language');
+    const locale = get(window, 'locale', defaultLanguage);
+
+    return locale;
 }
 
 export function getTimezoneOffset() {
