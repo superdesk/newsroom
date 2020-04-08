@@ -9,6 +9,7 @@ import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
+import 'moment/locale/fr-ca';
 import {
     hasCoverages,
     isCoverageForExtraDay,
@@ -16,6 +17,10 @@ import {
     isItemTBC,
     TO_BE_CONFIRMED_TEXT
 } from './agenda/utils';
+
+// Add locales to moment.js
+moment.locale(convertLocaleToMoment('fr_CA'));
+moment.locale(convertLocaleToMoment('en'));
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
@@ -144,7 +149,7 @@ export function getProductQuery(product) {
  * @return {Date}
  */
 export function parseDate(dateString) {
-    return moment(dateString);
+    return moment(dateString).locale(convertLocaleToMoment(getLocale()));
 }
 
 /**
@@ -722,5 +727,17 @@ export function getSlugline(item, withTakeKey = false) {
  */
 export function isActionEnabled(configKey) {
     const config = getConfig(configKey, {});
-    return (action) => config[action.id] == null || config[action.id];
+    return action => config[action.id] == null || config[action.id];
+}
+
+/**
+ * Convert locale names from babel to moment
+ * @param locale String
+ *
+ * Example
+ *  input:  "fr\_CA"
+ *  output: "fr-ca"
+ */
+export function convertLocaleToMoment(locale) {
+    return locale.toLowerCase().replace('_', '-');
 }
