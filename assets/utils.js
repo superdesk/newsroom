@@ -727,5 +727,5 @@ export function getSlugline(item, withTakeKey = false) {
  */
 export function isActionEnabled(configKey) {
     const config = getConfig(configKey, {});
-    return action => config[action.id] == null || config[action.id];
+    return (action) => config[action.id] == null || config[action.id];
 }
