@@ -225,11 +225,6 @@ SERVICES = [
     # {"name": "Special Events (olympics/ Aus elections)", "code": "x"},
 ]
 
-CLIENT_TIME_FORMAT = 'HH:mm'
-CLIENT_DATE_FORMAT = 'DD/MM/YYYY'
-CLIENT_COVERAGE_DATE_TIME_FORMAT = 'HH:mm DD/MM'
-CLIENT_COVERAGE_DATE_FORMAT = 'DD/MM'
-
 
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
@@ -255,12 +250,25 @@ COVERAGE_TYPES = {
 }
 
 
+LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
+DEFAULT_LANGUAGE = 'en'
+
+CLIENT_LOCALE_FORMATS = {
+    "en": {  # defaults
+        "TIME_FORMAT": "HH:mm",
+        "DATE_FORMAT": "DD/MM/YYYY",
+        "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
+        "COVERAGE_DATE_FORMAT": "DD/MM",
+    },
+    "fr_CA": {  # example - you can overwrite any format above
+        "DATE_FORMAT": "DD/MM/YYYY",
+    }
+}
+
 # Client configuration
 CLIENT_CONFIG = {
-    'time_format': CLIENT_TIME_FORMAT,
-    'date_format': CLIENT_DATE_FORMAT,
-    'coverage_date_time_format': CLIENT_COVERAGE_DATE_TIME_FORMAT,
-    'coverage_date_format': CLIENT_COVERAGE_DATE_FORMAT,
+    'default_language': DEFAULT_LANGUAGE,
+    'locale_formats': CLIENT_LOCALE_FORMATS,
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
@@ -268,8 +276,6 @@ CLIENT_CONFIG = {
     'default_timezone': DEFAULT_TIMEZONE
 }
 
-LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
-DEFAULT_LANGUAGE = 'en'
 
 # Enable iframely support for item body_html
 IFRAMELY = True
