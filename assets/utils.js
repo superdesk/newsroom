@@ -19,8 +19,8 @@ import {
 } from './agenda/utils';
 
 // Add locales to moment.js
-moment.locale(convertLocaleToMoment('fr_CA'));
-moment.locale(convertLocaleToMoment('en'));
+moment.locale('fr_CA');
+moment.locale('en');
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
@@ -149,7 +149,7 @@ export function getProductQuery(product) {
  * @return {Date}
  */
 export function parseDate(dateString) {
-    return moment(dateString).locale(convertLocaleToMoment(getLocale()));
+    return moment(dateString).locale(getLocale());
 }
 
 /**
@@ -728,16 +728,4 @@ export function getSlugline(item, withTakeKey = false) {
 export function isActionEnabled(configKey) {
     const config = getConfig(configKey, {});
     return action => config[action.id] == null || config[action.id];
-}
-
-/**
- * Convert locale names from babel to moment
- * @param locale String
- *
- * Example
- *  input:  "fr\_CA"
- *  output: "fr-ca"
- */
-export function convertLocaleToMoment(locale) {
-    return locale.toLowerCase().replace('_', '-');
 }
