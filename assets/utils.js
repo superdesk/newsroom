@@ -608,7 +608,7 @@ export function getConfig(key, defaultValue) {
 }
 
 export function getLocale() {
-    const defaultLanguage = getConfig('default_language');
+    const defaultLanguage = getConfig('default_language', 'en');
     const locale = get(window, 'locale', defaultLanguage);
 
     return locale;
