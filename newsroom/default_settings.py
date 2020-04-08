@@ -129,8 +129,8 @@ CORE_APPS = [
     'newsroom.company_expiry_alerts',
 ]
 
-SITE_NAME = 'CP Newshub'
-COPYRIGHT_HOLDER = 'CP'
+SITE_NAME = 'AAP Newsroom'
+COPYRIGHT_HOLDER = 'AAP'
 COPYRIGHT_NOTICE = ''
 USAGE_TERMS = ''
 CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
@@ -265,7 +265,8 @@ CLIENT_CONFIG = {
     'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
     'display_news_only': True,  # Displays news only switch in wire,
-    'default_timezone': DEFAULT_TIMEZONE
+    'default_timezone': DEFAULT_TIMEZONE,
+    'item_actions': {},
 }
 
 LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
