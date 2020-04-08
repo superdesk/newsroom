@@ -71,7 +71,7 @@ def get_view_data():
     }
 
 
-def get_items_by_card(cards):
+def get_items_by_card(cards, company_id):
     if app.cache.get(HOME_ITEMS_CACHE_KEY):
         return app.cache.get(HOME_ITEMS_CACHE_KEY)
 
@@ -79,7 +79,7 @@ def get_items_by_card(cards):
     for card in cards:
         if card['config'].get('product'):
             items_by_card[card['label']] = superdesk.get_resource_service('wire_search').\
-                get_product_items(ObjectId(card['config']['product']), card['config']['size'])
+                get_product_items(ObjectId(card['config']['product']), card['config']['size'], company_id)
         elif card['type'] == '4-photo-gallery':
             items_by_card[card['label']] = app.get_media_cards_external(card)
 
@@ -91,7 +91,7 @@ def get_home_data():
     user = get_user()
     cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
     company_id = str(user['company']) if user and user.get('company') else None
-    items_by_card = get_items_by_card(cards)
+    items_by_card = get_items_by_card(cards, company_id)
 
     return {
         'cards': cards,

@@ -580,7 +580,7 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
         'embargoed': (datetime.now() + timedelta(days=10)).replace(tzinfo=pytz.UTC),
         'products': [{'code': '10'}]
     }])
-    items = get_resource_service('wire_search').get_product_items(10, 20)
+    items = get_resource_service('wire_search').get_product_items(10, 20, None)
     assert 0 == len(items)
 
     # ex-embargoed item is fetched
@@ -590,6 +590,6 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
         'embargoed': (datetime.now() - timedelta(days=10)).replace(tzinfo=pytz.UTC),
         'products': [{'code': '10'}]
     }])
-    items = get_resource_service('wire_search').get_product_items(10, 20)
+    items = get_resource_service('wire_search').get_product_items(10, 20, None)
     assert 1 == len(items)
     assert items[0]['headline'] == 'china story'

@@ -86,14 +86,7 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
     if product_ids:
         query['bool']['should'].append({'terms': {'products.code': product_ids}})
 
-    # add company type filters (if any)
-    if company and company.get('company_type'):
-        for company_type in app.config.get('COMPANY_TYPES', []):
-            if company_type['id'] == company['company_type']:
-                if company_type.get('wire_must'):
-                    query['bool']['must'].append(company_type['wire_must'])
-                if company_type.get('wire_must_not'):
-                    query['bool']['must_not'].append(company_type['wire_must_not'])
+    _set_company_filter(company, query)
 
     planning_items_should = []
     for product in products:
@@ -124,6 +117,17 @@ def set_product_query(query, company, section, user=None, navigation_id=None, ev
 
     if not query['bool']['should']:
         abort(403, gettext('Your company doesn\'t have any products defined.'))
+
+
+def _set_company_filter(company, query):
+    # add company type filters (if any)
+    if company and company.get('company_type'):
+        for company_type in app.config.get('COMPANY_TYPES', []):
+            if company_type['id'] == company['company_type']:
+                if company_type.get('wire_must'):
+                    query['bool']['must'].append(company_type['wire_must'])
+                if company_type.get('wire_must_not'):
+                    query['bool']['must_not'].append(company_type['wire_must_not'])
 
 
 def query_string(query):
@@ -282,7 +286,7 @@ class WireSearchService(newsroom.Service):
         except Forbidden:
             return False
 
-    def get_product_items(self, product_id, size):
+    def get_product_items(self, product_id, size, company_id=None):
         query = _items_query()
 
         product = get_resource_service('products').find_one(req=None, _id=product_id)
@@ -290,14 +294,9 @@ class WireSearchService(newsroom.Service):
         if not product:
             return
 
-        query['bool']['must'].append({
-            "bool": {
-                "should": [
-                    {"range": {"embargoed": {"lt": "now"}}},
-                    {"bool": {"must_not": {"exists": {"field": "embargoed"}}}}
-                ]
-            }
-        })
+        if company_id:
+            company = get_resource_service('companies').find_one(req=None, _id=company_id)
+            _set_company_filter(company, query)
 
         get_resource_service('section_filters').apply_section_filter(query, product.get('product_type'))
 
