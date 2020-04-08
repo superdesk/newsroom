@@ -1,17 +1,10 @@
 from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
 
-CLIENT_TIME_FORMAT = 'HH:mm'
-CLIENT_DATE_FORMAT = 'MMM DD, YYYY'
-CLIENT_COVERAGE_DATE_TIME_FORMAT = 'HH:mm DD/MM'
-CLIENT_COVERAGE_DATE_FORMAT = 'DD/MM'
-
 SITE_NAME = 'CP Newsroom LJI'
 SHOW_USER_REGISTER = True
 COPYRIGHT_HOLDER = 'LJI-IJL'
 COPYRIGHT_NOTICE = ''
 USAGE_TERMS = ''
-LANGUAGES = ['en', 'fr_CA']
-DEFAULT_LANGUAGE = 'en'
 
 PRIVACY_POLICY = PRIVACY_POLICY_EN = '/privacy'
 TERMS_AND_CONDITIONS = TERMS_AND_CONDITIONS_EN = '/terms'
@@ -89,12 +82,25 @@ COVERAGE_TYPES = {
 
 DISPLAY_ABSTRACT = False
 
+CLIENT_LOCALE_FORMATS = {
+    "en": {  # defaults
+        "TIME_FORMAT": "HH:mm",
+        "DATE_FORMAT": "MMM DD, YYYY",
+        "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
+        "COVERAGE_DATE_FORMAT": "DD/MM",
+    },
+    "fr_CA": {
+        "DATE_FORMAT": "DD MMM YYYY",
+    }
+}
+
+LANGUAGES = ['en', 'fr_CA']
+DEFAULT_LANGUAGE = 'en'
+
 # Client configuration
 CLIENT_CONFIG = {
-    'time_format': CLIENT_TIME_FORMAT,
-    'date_format': CLIENT_DATE_FORMAT,
-    'coverage_date_time_format': CLIENT_COVERAGE_DATE_TIME_FORMAT,
-    'coverage_date_format': CLIENT_COVERAGE_DATE_FORMAT,
+    'default_language': DEFAULT_LANGUAGE,
+    'locale_formats': CLIENT_LOCALE_FORMATS,
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,

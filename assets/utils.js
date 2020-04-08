@@ -9,6 +9,7 @@ import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
+import 'moment/locale/fr-ca';
 import {
     hasCoverages,
     isCoverageForExtraDay,
@@ -16,6 +17,10 @@ import {
     isItemTBC,
     TO_BE_CONFIRMED_TEXT
 } from './agenda/utils';
+
+// Add locales to moment.js
+moment.locale('fr_CA');
+moment.locale('en');
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
@@ -144,7 +149,7 @@ export function getProductQuery(product) {
  * @return {Date}
  */
 export function parseDate(dateString) {
-    return moment(dateString);
+    return moment(dateString).locale(getLocale());
 }
 
 /**
@@ -603,7 +608,7 @@ export function getConfig(key, defaultValue) {
 }
 
 export function getLocale() {
-    const defaultLanguage = getConfig('default_language');
+    const defaultLanguage = getConfig('default_language', 'en');
     const locale = get(window, 'locale', defaultLanguage);
 
     return locale;
