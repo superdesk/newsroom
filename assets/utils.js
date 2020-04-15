@@ -9,7 +9,6 @@ import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
-import 'moment/locale/fr-ca';
 import {
     hasCoverages,
     isCoverageForExtraDay,
@@ -18,7 +17,13 @@ import {
     TO_BE_CONFIRMED_TEXT
 } from './agenda/utils';
 
-// Add locales to moment.js
+/*
+ * Import and load all locales that will be used in moment.js
+ * This should match the LANGUAGES defined in settings.py
+ *
+ * 'en' comes by default
+ */
+import 'moment/locale/fr-ca';
 moment.locale('fr_CA');
 moment.locale('en');
 
