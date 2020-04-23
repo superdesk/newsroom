@@ -87,8 +87,9 @@ def get_view_data():
 
 
 def get_items_by_card(cards, company_id):
-    if app.cache.get(HOME_ITEMS_CACHE_KEY):
-        return app.cache.get(HOME_ITEMS_CACHE_KEY)
+    cache_key = '{}{}'.format(HOME_ITEMS_CACHE_KEY, company_id or '')
+    if app.cache.get(cache_key):
+        return app.cache.get(cache_key)
 
     items_by_card = {}
     for card in cards:
@@ -100,7 +101,7 @@ def get_items_by_card(cards, company_id):
             # using '/media_card_external' endpoint
             items_by_card[card['label']] = None
 
-    app.cache.set(HOME_ITEMS_CACHE_KEY, items_by_card, timeout=300)
+    app.cache.set(cache_key, items_by_card, timeout=300)
     return items_by_card
 
 
