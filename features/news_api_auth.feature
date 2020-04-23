@@ -128,6 +128,7 @@ Feature: News API Authorization
      """
 
   @rate_limit
+  @notification
   Scenario: RATE_LIMIT_REQUESTS config is used for request validation
      Given "items"
         """
