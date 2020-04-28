@@ -41,7 +41,9 @@ export function getVideos(item) {
  * @return {Object}
  */
 export function getPicture(item) {
-    return item.type === 'picture' ? item : getBodyPicture(item);
+    return item.type === 'picture' ? item : (
+        get(item, 'associations.featuremedia') || getBodyPicture(item)
+    );
 }
 
 function getBodyPicture(item) {
