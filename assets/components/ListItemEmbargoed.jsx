@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, fullDate, getEmbargo } from '../../utils';
+import { gettext, fullDate, getEmbargo } from 'utils';
+import classNames from 'classnames';
 
-export default class WireListItemEmbargoed extends React.Component {
+export default class ListItemEmbargoed extends React.Component {
     constructor(props) {
         super(props);
         this.state = {embargo: getEmbargo(props.item)};
@@ -29,13 +30,17 @@ export default class WireListItemEmbargoed extends React.Component {
         }
 
         return (
-            <span ref={(elem) => this.elem = elem} className="label label--red ml-4">{gettext('embargo')}</span>
+            <span
+                ref={(elem) => this.elem = elem}
+                className={classNames('label label--red ', {'ml-4': !this.props.isCard})}
+            >{gettext('embargo')}</span>
         );
     }
 }
 
-WireListItemEmbargoed.propTypes = {
+ListItemEmbargoed.propTypes = {
     item: PropTypes.shape({
         embargoed: PropTypes.string,
     }),
+    isCard: PropTypes.bool
 };
