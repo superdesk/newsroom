@@ -10,7 +10,7 @@ blueprint = superdesk.Blueprint('news/item', __name__)
 
 @blueprint.route('/{}/news/item/<path:item_id>'.format(URL_PREFIX), methods=['GET'])
 def get_item(item_id):
-    _format = flask.request.args.get('format', 'NITFFormatter')
+    _format = flask.request.args.get('format', 'NINJSFormatter')
     _version = flask.request.args.get('version')
     service = get_resource_service('formatters')
     formatted = service.get_version(item_id, _version, _format)
