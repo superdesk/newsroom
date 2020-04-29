@@ -199,6 +199,7 @@ const mapStateToProps = (state) => ({
     itemsByCard: state.itemsByCard,
     products: state.products,
     user: state.user,
+    userType: state.userType,
     company: state.company,
     format: PropTypes.format,
     itemToOpen: state.itemToOpen,
