@@ -40,8 +40,9 @@ def test_get_item_audit_creation(client, app):
         "pubstatus": "usable",
         "headline": "Headline of the story"
     }])
-
-    response = client.get('api/v1/news/item/111?format=NINJSFormatter')
+    app.data.insert('news_api_tokens', [{"company": "company_123", "enabled": True}])
+    token = app.data.find_one('news_api_tokens', req=None, company='company_123')
+    response = client.get('api/v1/news/item/111?format=NINJSFormatter', headers={'Authorization': token.get('token')})
     assert response.status_code == 200
     audit_check('111')
 
