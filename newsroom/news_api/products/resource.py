@@ -37,7 +37,25 @@ class NewsAPIProductsService(ProductsService):
         return super().get(req=req, lookup=lookup)
 
     def on_fetched(self, doc):
+        self._enhance_hateoas(doc)
         post_api_audit(doc)
 
+    def _enhance_links(self, item):
+        product_id = str(item['_id'])
+        item.setdefault('_links', {})
+        item['_links']['search'] = {
+            'href': 'news/search/?products={}'.format(product_id),
+            'title': 'News Search'
+        }
+        item['_links']['feed'] = {
+            'href': 'news/feed/?products={}'.format(product_id),
+            'title': 'News Feed'
+        }
+
+    def _enhance_hateoas(self, doc):
+        for item in doc.get('_items') or []:
+            self._enhance_links(item)
+
     def on_fetched_item(self, doc):
+        self._enhance_links(doc)
         post_api_audit(doc)
