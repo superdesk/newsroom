@@ -6,6 +6,7 @@ import CardRow from './CardRow';
 import CardFooter from './CardFooter';
 import CardMeta from './CardMeta';
 import CardBody from './CardBody';
+import ListItemEmbargoed from '../../ListItemEmbargoed';
 
 const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
 
@@ -20,6 +21,7 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
             </div>}
             <div className='card-body'>
                 <h2 className='card-title'>{item.headline}</h2>
+                <ListItemEmbargoed item={item} isCard={true} />
                 <CardMeta
                     pictureAvailable={!!picture}
                     wordCount={wordCount(item)}

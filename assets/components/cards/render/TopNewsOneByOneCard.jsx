@@ -4,6 +4,7 @@ import {wordCount} from 'utils';
 import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardMeta from './CardMeta';
+import ListItemEmbargoed from '../../ListItemEmbargoed';
 
 const getTopNewsPanel = (item, picture, openItem, cardId) => {
 
@@ -16,6 +17,7 @@ const getTopNewsPanel = (item, picture, openItem, cardId) => {
             <img className='card-img-top' src={imageUrl} alt={caption} />
             <div className='card-body'>
                 <h4 className='card-title'>{item.headline}</h4>
+                <ListItemEmbargoed item={item} isCard={true} />
                 <CardMeta
                     pictureAvailable={!!picture}
                     wordCount={wordCount(item)}
