@@ -40,24 +40,25 @@ def test_get_item_audit_creation(client, app):
         "pubstatus": "usable",
         "headline": "Headline of the story"
     }])
-
-    response = client.get('api/v1/news/item/111?format=NINJSFormatter')
+    app.data.insert('news_api_tokens', [{"company": "company_123", "enabled": True}])
+    token = app.data.find_one('news_api_tokens', req=None, company='company_123')
+    response = client.get('api/v1/news/item/111?format=NINJSFormatter', headers={'Authorization': token.get('token')})
     assert response.status_code == 200
     audit_check('111')
 
 
 def test_get_all_company_products_audit_creation(client, app):
-    with app.test_request_context(path='/newsapi_products/'):
+    with app.test_request_context(path='/account/products/'):
         g.user = 'company_123'
-        response = get_internal('newsapi_products')
+        response = get_internal('account/products')
         assert len(response[0]['_items']) == 1
         audit_check('5ab03a87bdd78169bb6d0783')
 
 
 def test_get_single_product_audit_creation(client, app):
-    with app.test_request_context(path='/newsapi_products/'):
+    with app.test_request_context(path='/account/products/'):
         g.user = 'company_123'
-        response = getitem_internal('newsapi_products', _id='5ab03a87bdd78169bb6d0783')
+        response = getitem_internal('account/products', _id='5ab03a87bdd78169bb6d0783')
         assert str(response[0]['_id']) == '5ab03a87bdd78169bb6d0783'
         audit_check('5ab03a87bdd78169bb6d0783')
 

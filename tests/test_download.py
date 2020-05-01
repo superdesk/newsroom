@@ -79,7 +79,7 @@ wire_formats = [
     },
     {
         'format': 'nitf',
-        'mimetype': 'application/vnd.nitf',
+        'mimetype': 'application/xml',
         'filename': filename('amazon-bookstore-opening.xml', item),
         'test_content': nitf_content_test,
     },

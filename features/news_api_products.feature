@@ -38,7 +38,7 @@ Feature: News API Products
         ]
         }]
         """
-    When we get "newsapi_products"
+    When we get "account/products"
     Then we get list with 1 items
         """
         {"_items": [{
@@ -74,7 +74,7 @@ Feature: News API Products
         "sd_product_id" : null
         }]
         """
-    When we get "newsapi_products/#products._id#"
+    When we get "account/products/#products._id#"
     Then we get OK response
     Then we get existing resource
         """
@@ -103,5 +103,5 @@ Feature: News API Products
         "sd_product_id" : null
         }]
         """
-    When we get "newsapi_products/#products._id#"
+    When we get "account/products/#products._id#"
     Then we get error 401

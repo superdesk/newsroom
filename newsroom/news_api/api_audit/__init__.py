@@ -30,6 +30,7 @@ class NewsApiAuditResource(Resource):
         'source': 'api_audit',
         'search_backend': 'elastic'
     }
+    internal_resource = True
 
 
 def init_app(app):
