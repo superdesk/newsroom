@@ -1,5 +1,16 @@
 Feature: News API Item
 
+  Background: Initial setup
+    Given "companies"
+      """
+      [{"name": "Test Company", "is_enabled" : true}]
+      """
+    Given "news_api_tokens"
+      """
+      [{"company" : "#companies._id#", "enabled" : true}]
+      """
+    When we save API token
+
   Scenario: Retrieve an item
     Given "items"
     """
@@ -65,8 +76,8 @@ Feature: News API Item
      "headline": "Headline of the story"}
     """
 
-    Scenario: Attempt to retrieve an expired item
-      Given "items"
+  Scenario: Attempt to retrieve an expired item
+    Given "items"
       """
       [{
         "_id": "111",
@@ -75,5 +86,5 @@ Feature: News API Item
         "versioncreated": "2018-11-01T03:01:40.000Z"
       }]
       """
-      When we get "v1/news/item/#items._id#?format=NINJSFormatter"
-      Then we get response code 404
+    When we get "v1/news/item/#items._id#?format=NINJSFormatter"
+    Then we get response code 404

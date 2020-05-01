@@ -2,10 +2,9 @@ from newsroom import Resource
 
 
 class NewsAPISearchResource(Resource):
+    resource_title = 'News Search'
     datasource = {
         'search_backend': 'elastic',
         'source': 'items',
     }
-
-    item_methods = ['GET']
     resource_methods = ['GET']
