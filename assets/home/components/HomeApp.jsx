@@ -177,6 +177,7 @@ HomeApp.propTypes = {
     itemsByCard: PropTypes.object,
     products: PropTypes.array,
     user: PropTypes.string,
+    userType: PropTypes.string,
     company: PropTypes.string,
     format: PropTypes.array,
     itemToOpen: PropTypes.object,
@@ -218,7 +219,6 @@ const mapDispatchToProps = (dispatch) => ({
     fetchCardExternalItems: (cardId, cardLabel) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
     followStory: (item) => followStory(item, 'wire'),
     downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType)),
-
 });
 
 
