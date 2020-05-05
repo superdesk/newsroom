@@ -84,6 +84,9 @@ class NewsAPIFeedService(NewsAPINewsService):
                 'href': 'news/item/{}'.format(doc_id),
                 'title': 'News Item'
             }
+            item.pop('_updated', None)
+            item.pop('_created', None)
+            item.pop('_etag', None)
 
     def _hateoas_set_next_page_links(self, doc):
         args = request.args.to_dict()
