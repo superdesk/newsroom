@@ -22,3 +22,6 @@ class NewsAPISearchService(NewsAPINewsService):
                 'href': 'news/item/{}'.format(doc_id),
                 'title': 'News Item'
             }
+            item.pop('_updated', None)
+            item.pop('_created', None)
+            item.pop('_etag', None)
