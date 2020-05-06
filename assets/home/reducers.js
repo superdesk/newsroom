@@ -26,6 +26,7 @@ export default function homeReducer(state = initialState, action) {
             itemsByCard: action.data.itemsByCard,
             products: action.data.products,
             user: action.data.user,
+            userType: action.data.userType,
             company: action.data.company,
             formats: action.data.formats || [],
             userSections: action.data.userSections,

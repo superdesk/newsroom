@@ -113,6 +113,7 @@ def get_home_data():
         'itemsByCard': items_by_card,
         'products': get_products_by_company(company_id),
         'user': str(user['_id']) if user else None,
+        'userType': user.get('user_type'),
         'company': company_id,
         'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types'], 'assets': f['assets']}
                     for f in app.download_formatters.values()],
