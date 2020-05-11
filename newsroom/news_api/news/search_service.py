@@ -44,7 +44,7 @@ class NewsAPINewsService(BaseSearchService):
 
     default_fields = {
         '_id', 'uri', 'embargoed', 'pubstatus', 'ednote', 'signal', 'copyrightnotice', 'copyrightholder',
-        'versioncreated'
+        'versioncreated', 'evolvedfrom'
     }
 
     # set of fields that will be removed from all responses, we are not currently supporting associations and
