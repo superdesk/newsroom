@@ -1,6 +1,7 @@
 import os
 import logging
 import flask
+import jinja2
 
 from werkzeug.exceptions import HTTPException
 from superdesk.errors import SuperdeskApiError
@@ -8,8 +9,14 @@ from superdesk.errors import SuperdeskApiError
 from newsroom.factory import NewsroomApp
 from newsroom.news_api.api_tokens import CompanyTokenAuth
 from superdesk.utc import utcnow
+from newsroom.template_filters import (
+    datetime_short, datetime_long, time_short, date_short,
+    plain_text, word_count, char_count, date_header
+)
 
 logger = logging.getLogger(__name__)
+
+API_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class NewsroomNewsAPI(NewsroomApp):
@@ -20,6 +27,20 @@ class NewsroomNewsAPI(NewsroomApp):
             self.settings = flask.Config('.')
 
         super(NewsroomNewsAPI, self).__init__(import_name=import_name, config=config, **kwargs)
+
+        template_folder = os.path.abspath(os.path.join(API_DIR, '../../templates'))
+
+        self.add_template_filter(datetime_short)
+        self.add_template_filter(datetime_long)
+        self.add_template_filter(date_header)
+        self.add_template_filter(plain_text)
+        self.add_template_filter(time_short)
+        self.add_template_filter(date_short)
+        self.add_template_filter(word_count)
+        self.add_template_filter(char_count)
+        self.jinja_loader = jinja2.ChoiceLoader([
+            jinja2.FileSystemLoader(template_folder),
+        ])
 
     def load_app_config(self):
         super(NewsroomNewsAPI, self).load_app_config()

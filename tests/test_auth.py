@@ -304,7 +304,7 @@ def test_account_appears_locked_for_non_existing_user(client):
     for i in range(1, 10):
         response = client.post(
             url_for('auth.login'),
-            data={'email': 'xyz@abc.org'.format(i), 'password': 'abc'},
+            data={'email': 'xyz@abc.org', 'password': 'abc'},
             follow_redirects=True
         )
         if i <= 5:

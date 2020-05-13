@@ -148,7 +148,7 @@ def follow():
                 c['watches'].remove(user_id)
 
         if request.method == 'POST':
-            updates = {'watches': list(set((item.get('watches')or []) + [user_id]))}
+            updates = {'watches': list(set((item.get('watches') or []) + [user_id]))}
             if item.get('coverages'):
                 updates.update(coverage_updates)
 
