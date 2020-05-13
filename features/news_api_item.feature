@@ -88,3 +88,15 @@ Feature: News API Item
       """
     When we get "v1/news/item/#items._id#?format=NINJSFormatter"
     Then we get response code 404
+
+  Scenario: Retrieve an item in text format
+    Given "items"
+    """
+    [{
+      "_id": "111",
+      "pubstatus": "usable",
+      "headline": "Headline of the story"
+    }]
+    """
+    When we get "v1/news/item/#items._id#?format=TextFormatter"
+    Then we get OK response
