@@ -12,6 +12,9 @@ from superdesk.tests.steps import apply_placeholders, json_match, get_json_data
 from superdesk.tests import set_placeholder
 from behave import when, then
 import json
+from wooper.general import (
+    get_body
+)
 
 
 @when('we save API token')
@@ -44,3 +47,10 @@ def step_store_next_page_from_response(context):
     href = ((data.get('_links') or {}).get('next_page') or {}).get('href')
     assert href, data
     set_placeholder(context, 'NEXT_PAGE', href)
+
+
+@then('we get "{text}" in text response')
+def we_get_text_in_response(context, text):
+    with context.app.test_request_context(context.app.config['URL_PREFIX']):
+        assert(isinstance(get_body(context.response), str))
+        assert(text in get_body(context.response))
