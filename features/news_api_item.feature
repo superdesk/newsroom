@@ -95,8 +95,11 @@ Feature: News API Item
     [{
       "_id": "111",
       "pubstatus": "usable",
-      "headline": "Headline of the story"
+      "headline": "Headline of the story",
+      "body_html": "<p>test&nbsp;test</p>"
     }]
     """
     When we get "v1/news/item/#items._id#?format=TextFormatter"
     Then we get OK response
+    Then we get "test test" in text response
+
