@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, getProductQuery } from 'utils';
+import {gettext} from 'utils';
 
 function MoreNewsButton({title, product, photoUrl, photoUrlLabel}) {
     return ([<div key='heading' className='col-6 col-sm-8'>
@@ -8,7 +8,7 @@ function MoreNewsButton({title, product, photoUrl, photoUrlLabel}) {
     </div>,
     <div key='more-news' className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
         {product &&
-                <a href={`/wire?q=${getProductQuery(product)}`} role='button' className='btn btn-outline-primary btn-sm mb-3'>
+                <a href={`/wire?product=${product._id}`} role='button' className='btn btn-outline-primary btn-sm mb-3'>
                     {gettext('More news')}
                 </a>}
         {photoUrl &&

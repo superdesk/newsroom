@@ -232,7 +232,8 @@ export function search(state, next) {
         created_from: createdFilter.from,
         created_to,
         timezone_offset: getTimezoneOffset(),
-        newsOnly
+        newsOnly,
+        product: searchParams.product
     };
 
     const queryString = Object.keys(params)

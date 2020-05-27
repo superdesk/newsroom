@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { createPortal } from 'react-dom';
 import { isTouchDevice, gettext, isDisplayed } from 'utils';
+import {getSingleFilterValue} from 'search/utils';
 
 // tabs
 import TopicsTab from 'search/components/TopicsTab';
@@ -59,7 +60,7 @@ export default class BaseApp extends React.Component {
         }
     }
 
-    renderNavBreadcrumb(navigations, activeNavigation, activeTopic) {
+    renderNavBreadcrumb(navigations, activeNavigation, activeTopic, activeProduct = null, activeFilter = null) {
         const dest = document.getElementById('nav-breadcrumb');
         if (!dest) {
             return null;
@@ -67,6 +68,7 @@ export default class BaseApp extends React.Component {
 
         let name;
         const numNavigations = get(activeNavigation, 'length', 0);
+        const filterValue = getSingleFilterValue(activeFilter, ['genre', 'subject']);
 
         if (activeTopic) {
             name = `/ ${activeTopic.label}`;
@@ -74,6 +76,10 @@ export default class BaseApp extends React.Component {
             name = '/ ' + gettext('Custom View');
         } else if (numNavigations === 1) {
             name = '/ ' + get(navigations.find((nav) => nav._id === activeNavigation[0]), 'name', '');
+        } else if (activeProduct != null) {
+            name = `/ ${activeProduct.name}`;
+        } else if (filterValue !== null) {
+            name = `/ ${filterValue}`;
         } else {
             name = '';
         }
