@@ -233,7 +233,8 @@ export function search(state, next) {
         created_to,
         timezone_offset: getTimezoneOffset(),
         newsOnly,
-        product: searchParams.product
+        product: searchParams.product,
+        es_highlight: !searchParams.query ? null : 1,
     };
 
     const queryString = Object.keys(params)

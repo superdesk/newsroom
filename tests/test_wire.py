@@ -639,3 +639,11 @@ def test_wire_delete(client, app):
     for doc in docs:
         assert get_resource_service('items').find_one(req=None, _id=doc['_id']) is None
         assert get_resource_service('items_versions').find_one(req=None, _id_document=doc['_id']) is None
+
+
+def test_highlighting(client, app):
+    app.data.insert('items', [{'_id': 'foo', 'body_html': 'Story that involves cheese and onions'}])
+    resp = client.get('/wire/search?q=cheese&es_highlight=1')
+    data = json.loads(resp.get_data())
+    assert data['_items'][0]['es_highlight']['body_html'][0] == 'Story that involves <span class="es-highlight">' \
+                                                                'cheese</span> and onions'
