@@ -52,7 +52,7 @@ def date_short(datetime):
 
 
 def plain_text(html):
-    return get_text(html, lf_on_block=True) if html else ''
+    return get_text(html, content='html', lf_on_block=True) if html else ''
 
 
 def word_count(html):

@@ -67,16 +67,18 @@ def set_item_permission(item, permitted=True):
 def get_view_data():
     user = get_user()
     topics = get_user_topics(user['_id']) if user else []
+    company_id = str(user['company']) if user and user.get('company') else None
+
     return {
         'user': str(user['_id']) if user else None,
         'user_type': (user or {}).get('user_type') or 'public',
-        'company': str(user['company']) if user and user.get('company') else None,
+        'company': company_id,
         'topics': [t for t in topics if t.get('topic_type') == 'wire'],
         'formats': [{'format': f['format'], 'name': f['name'], 'assets': f['assets']}
                     for f in app.download_formatters.values()
                     if 'wire' in f['types']],
-        'navigations': get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
-                                                  product_type='wire'),
+        'navigations': get_navigations_by_company(company_id, product_type='wire'),
+        'products': get_products_by_company(company_id),
         'saved_items': get_bookmarks_count(user['_id'], 'wire'),
         'context': 'wire',
         'ui_config': get_resource_service('ui_config').getSectionConfig('wire'),
@@ -114,6 +116,7 @@ def get_home_data():
         'itemsByCard': items_by_card,
         'products': get_products_by_company(company_id),
         'user': str(user['_id']) if user else None,
+        'userType': user.get('user_type'),
         'company': company_id,
         'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types'], 'assets': f['assets']}
                     for f in app.download_formatters.values()],

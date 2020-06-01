@@ -7,7 +7,7 @@ from .base import BaseFormatter
 
 class NITFFormatter(BaseFormatter):
 
-    MIMETYPE = 'application/vnd.nitf'
+    MIMETYPE = 'application/xml'
     FILE_EXTENSION = 'xml'
 
     encoding = 'utf-8'

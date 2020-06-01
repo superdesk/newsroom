@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
 import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY} from 'utils';
+import {getSingleFilterValue} from 'search/utils';
 
 import {
     fetchItems,
@@ -27,6 +28,8 @@ import {
     navigationsSelector,
     searchNavigationSelector,
     activeTopicSelector,
+    activeProductSelector,
+    searchFilterSelector,
     searchParamsSelector,
     showSaveTopicSelector,
 } from 'search/selectors';
@@ -86,6 +89,7 @@ class WireApp extends BaseApp {
         let showTotalItems = false;
         let showTotalLabel = false;
         let totalItemsLabel;
+        const filterValue = getSingleFilterValue(this.props.activeFilter, ['genre', 'subject']);
 
         if (get(this.props, 'context') === 'wire') {
             if (get(this.props, 'activeTopic.label')) {
@@ -96,6 +100,12 @@ class WireApp extends BaseApp {
                     this.props.searchParams.navigation[0],
                     this.props.navigations
                 ), 'name') || '';
+                showTotalItems = showTotalLabel = true;
+            } else if (get(this.props, 'activeProduct.name')) {
+                totalItemsLabel = this.props.activeProduct.name;
+                showTotalItems = showTotalLabel = true;
+            } else if (filterValue !== null) {
+                totalItemsLabel = filterValue;
                 showTotalItems = showTotalLabel = true;
             } else if (numNavigations > 1) {
                 totalItemsLabel = gettext('Custom View');
@@ -225,7 +235,10 @@ class WireApp extends BaseApp {
                 this.renderNavBreadcrumb(
                     this.props.navigations,
                     this.props.activeNavigation,
-                    this.props.activeTopic),
+                    this.props.activeTopic,
+                    this.props.activeProduct,
+                    this.props.activeFilter
+                ),
                 this.renderSavedItemsCount(),
             ])
         );
@@ -262,6 +275,8 @@ WireApp.propTypes = {
     toggleNews: PropTypes.func,
     newsOnly: PropTypes.bool,
     activeTopic: PropTypes.object,
+    activeProduct: PropTypes.object,
+    activeFilter: PropTypes.object,
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
     context: PropTypes.string.isRequired,
@@ -295,6 +310,8 @@ const mapStateToProps = (state) => ({
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
     activeTopic: activeTopicSelector(state),
+    activeProduct: activeProductSelector(state),
+    activeFilter: searchFilterSelector(state),
     context: state.context,
     previewConfig: previewConfigSelector(state),
     detailsConfig: detailsConfigSelector(state),

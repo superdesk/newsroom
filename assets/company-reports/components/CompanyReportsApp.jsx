@@ -20,6 +20,8 @@ const options = [
     {value: REPORTS_NAMES.COMPANY, text: gettext('Company')},
     {value: REPORTS_NAMES.SUBSCRIBER_ACTIVITY, text: gettext('Subscriber activity')},
     {value: REPORTS_NAMES.CONTENT_ACTIVITY, text: gettext('Content activity')},
+    {value: REPORTS_NAMES.PRODUCT_COMPANIES, text: gettext('Companies per Product')},
+
 ];
 
 
@@ -87,6 +89,7 @@ CompanyReportsApp.propTypes = {
     printReport: PropTypes.func,
     isLoading: PropTypes.bool,
     apiEnabled: PropTypes.bool,
+    products: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -96,7 +99,8 @@ const mapStateToProps = (state) => ({
     apiEnabled: state.apiEnabled,
     reportParams: state.reportParams,
     isLoading: state.isLoading,
-    resultHeaders: state.resultHeaders
+    resultHeaders: state.resultHeaders,
+    products: state.products,
 });
 
 const mapDispatchToProps = {

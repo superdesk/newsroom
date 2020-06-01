@@ -63,9 +63,12 @@ class NewsAPIFeedService(NewsAPINewsService):
     def _enhance_hateoas(self, doc):
         doc.setdefault('_links', {})
         doc['_links']['parent'] = {
-            'title': 'News Items',
-            'href': 'news'
+            'title': 'Home',
+            'href': '/'
         }
+        # Remove the next and last page references
+        doc['_links'].pop('last', None)
+        doc['_links'].pop('next', None)
 
         doc.setdefault('_meta', {})
         doc['_meta'].pop('page', None)
@@ -81,6 +84,9 @@ class NewsAPIFeedService(NewsAPINewsService):
                 'href': 'news/item/{}'.format(doc_id),
                 'title': 'News Item'
             }
+            item.pop('_updated', None)
+            item.pop('_created', None)
+            item.pop('_etag', None)
 
     def _hateoas_set_next_page_links(self, doc):
         args = request.args.to_dict()

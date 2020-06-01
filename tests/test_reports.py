@@ -118,3 +118,29 @@ def test_company_products(client, app):
     assert len(report['results'][0]['products']) == 1
     assert report['results'][1]['name'] == 'Press Co.'
     assert len(report['results'][1]['products']) == 2
+
+
+def test_product_companies(client, app):
+    app.data.insert('products', [{
+        '_id': 'p-1',
+        'name': 'Sport',
+        'description': 'sport product',
+        'companies': ['59bc460f1d41c8fa815cc2c2'],
+        'is_enabled': True,
+    }, {
+        '_id': 'p-2',
+        'name': 'News',
+        'description': 'news product',
+        'companies': ['59bc460f1d41c8fa815cc2c2', '59c38b965057fb87d7eda9ab'],
+        'is_enabled': True,
+    }])
+
+    test_login_succeeds_for_admin(client)
+    resp = client.get('reports/product-companies')
+    report = json.loads(resp.get_data())
+    assert report['name'] == 'Companies permissioned per product'
+    assert len(report['results']) == 2
+    assert report['results'][0]['product'] == 'News'
+    assert len(report['results'][0]['enabled_companies']) == 2
+    assert report['results'][1]['product'] == 'Sport'
+    assert len(report['results'][1]['enabled_companies']) == 1

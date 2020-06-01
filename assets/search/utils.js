@@ -17,7 +17,7 @@ export const getNavigationUrlParam = (activeNavigation, ignoreEmpty = true, useJ
 export const getSearchParams = (custom, topic) => {
     const params = {};
 
-    ['query', 'created', 'navigation', 'filter'].forEach(
+    ['query', 'created', 'navigation', 'filter', 'product'].forEach(
         (field) => {
             if (get(custom, field)) {
                 params[field] = custom[field];
@@ -28,4 +28,16 @@ export const getSearchParams = (custom, topic) => {
     );
 
     return params;
+};
+
+export const getSingleFilterValue = (activeFilter, fields) => {
+    const filterKeys = Object.keys(activeFilter || {});
+
+    if (filterKeys.length !== 1 || !fields.includes(filterKeys[0])) {
+        return null;
+    } else if (activeFilter[filterKeys[0]].length === 1) {
+        return activeFilter[filterKeys[0]][0];
+    }
+
+    return null;
 };

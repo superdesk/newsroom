@@ -11,6 +11,7 @@ export const REPORTS_NAMES = {
     'SUBSCRIBER_ACTIVITY': 'subscriber-activity',
     'CONTENT_ACTIVITY': 'content-activity',
     'COMPANY_NEWS_API_USAGE': 'company-news-api-usage',
+    'PRODUCT_COMPANIES': 'product-companies',
 };
 
 
@@ -23,6 +24,7 @@ export const REPORTS = {
     [REPORTS_NAMES.SUBSCRIBER_ACTIVITY]: '/reports/subscriber-activity',
     [REPORTS_NAMES.CONTENT_ACTIVITY]: '/reports/content-activity',
     [REPORTS_NAMES.COMPANY_NEWS_API_USAGE]: '/reports/company-news-api-usage',
+    [REPORTS_NAMES.PRODUCT_COMPANIES]: '/reports/product-companies',
 };
 
 function getReportQueryString(currentState, next, exportReport, notify) {
@@ -48,6 +50,10 @@ function getReportQueryString(currentState, next, exportReport, notify) {
             params.section = get(getItemFromArray(params.section, currentState.sections, 'name'), '_id');
         }
 
+        if (params.product) {
+            params.product = get(getItemFromArray(params.product, currentState.products, 'name'), '_id');
+        }
+
         if (exportReport) {
             params.export = true;
         }
@@ -63,7 +69,10 @@ function getReportQueryString(currentState, next, exportReport, notify) {
 
 export const INIT_DATA = 'INIT_DATA';
 export function initData(data) {
-    return {type: INIT_DATA, data};
+    return function (dispatch) {
+        dispatch(fetchProducts());
+        dispatch({type: INIT_DATA, data});
+    };
 }
 
 export const QUERY_REPORT = 'QUERY_REPORT';
@@ -94,6 +103,11 @@ export function setError(errors) {
 export const SET_IS_LOADING = 'SET_IS_LOADING';
 export function isLoading(data = false) {
     return {type: SET_IS_LOADING, data};
+}
+
+export const GET_PRODUCTS = 'GET_PRODUCTS';
+export function getProducts(data) {
+    return {type: GET_PRODUCTS, data};
 }
 
 export function runReport() {
@@ -189,5 +203,19 @@ export function printReport() {
         }
 
         return Promise.resolve();
+    };
+}
+
+/**
+ * Fetches products
+ *
+ */
+export function fetchProducts() {
+    return function (dispatch) {
+        return server.get('/products/search')
+            .then((data) => {
+                dispatch(getProducts(data));
+            })
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }

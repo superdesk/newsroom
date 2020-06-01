@@ -10,6 +10,7 @@ import {
     TOGGLE_REPORT_FILTER,
     ADD_RESULTS,
     SET_IS_LOADING,
+    GET_PRODUCTS,
 } from './actions';
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
     aggregations: null,
     companies: [],
     sections: [],
+    products: [],
     reportParams: {
         date_from: Date.now(),
         date_to: Date.now(),
@@ -27,6 +29,7 @@ const initialState = {
         company: null,
         action: null,
         section: null,
+        product: null,
     }
 };
 
@@ -40,6 +43,7 @@ export default function companyReportReducer(state = initialState, action) {
             companies: action.data.companies,
             sections: action.data.sections,
             apiEnabled: action.data.api_enabled || false,
+            products: action.data.products,
         };
 
     case QUERY_REPORT: {
@@ -91,6 +95,9 @@ export default function companyReportReducer(state = initialState, action) {
             ...state,
             isLoading: action.data
         };
+
+    case GET_PRODUCTS:
+        return {...state, products: action.data};        
 
     case 'RECEIVE_REPORT_AGGREGATIONS':
         return {

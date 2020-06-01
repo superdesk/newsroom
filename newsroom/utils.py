@@ -205,7 +205,7 @@ def get_location_string(agenda):
         location[0].get('address', {}).get('country'),
     ]
 
-    return ', '.join([l for l in location_items if l])
+    return ', '.join([location_part for location_part in location_items if location_part])
 
 
 def get_public_contacts(agenda):

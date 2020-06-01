@@ -1,4 +1,4 @@
-from flask import g, current_app as app
+from flask import g
 from newsroom.products import ProductsService, ProductsResource
 from bson import ObjectId
 import json
@@ -10,24 +10,13 @@ class NewsAPIProductsResource(ProductsResource):
     internal_resource = False
     query_objectid_as_string = True
     item_methods = ['GET']
+    resource_title = 'Account Products'
 
 
 class NewsAPIProductsService(ProductsService):
 
     # The subset of fields that are returned by the API
     allowed_fields = json.dumps({'_id': 1, 'name': 1, 'description': 1})
-
-    def _prefix_hateoas(self, links):
-        """Set the api and version prefix on the HATEOAS
-
-        :param links:
-        :return:
-        """
-        for (k, v) in links.items():
-            if k == 'href':
-                links[k] = app.config.get('URL_PREFIX') + v if v[0] == '/' else app.config.get('URL_PREFIX') + '/' + v
-            elif isinstance(v, dict):
-                self._prefix_hateoas(v)
 
     def find_one(self, req, **lookup):
         req.projection = self.allowed_fields
@@ -48,12 +37,25 @@ class NewsAPIProductsService(ProductsService):
         return super().get(req=req, lookup=lookup)
 
     def on_fetched(self, doc):
-        self._prefix_hateoas(doc.get('_links', {}))
-        for item in doc.get('_items', []):
-            self._prefix_hateoas(item)
-
+        self._enhance_hateoas(doc)
         post_api_audit(doc)
 
+    def _enhance_links(self, item):
+        product_id = str(item['_id'])
+        item.setdefault('_links', {})
+        item['_links']['search'] = {
+            'href': 'news/search/?products={}'.format(product_id),
+            'title': 'News Search'
+        }
+        item['_links']['feed'] = {
+            'href': 'news/feed/?products={}'.format(product_id),
+            'title': 'News Feed'
+        }
+
+    def _enhance_hateoas(self, doc):
+        for item in doc.get('_items') or []:
+            self._enhance_links(item)
+
     def on_fetched_item(self, doc):
-        self._prefix_hateoas(doc.get('_links', {}))
+        self._enhance_links(doc)
         post_api_audit(doc)

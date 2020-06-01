@@ -321,3 +321,35 @@ def get_company_api_usage():
         'result_headers': unique_endpoints,
     }
     return results
+
+
+def get_company_names(companies):
+    service = superdesk.get_resource_service('companies')
+    enabled_companies = []
+    disabled_companies = []
+    for company in companies:
+        company = service.find_one(req=None, _id=company)
+        if company:
+            if not company.get('is_enabled'):
+                disabled_companies.append(company.get('name'))
+            else:
+                enabled_companies.append(company.get('name'))
+    return {'enabled_companies': enabled_companies, 'disabled_companies': disabled_companies}
+
+
+def get_product_company():
+    args = deepcopy(request.args.to_dict())
+    lookup = {'_id': ObjectId(args.get('product'))} if args.get('product') else None
+    products = query_resource('products', lookup=lookup)
+
+    res = [{'_id': product.get('_id'), 'product': product.get('name'), 'companies': product.get('companies', [])} for
+           product in products]
+
+    for r in res:
+        r.update(get_company_names(r.get('companies', [])))
+
+    results = {
+        'results': res,
+        'name': gettext('Companies permissioned per product')
+    }
+    return results
