@@ -100,6 +100,7 @@ export function toggleNavigation(navigation, disableSameNavigationDeselect) {
                 created: null,
                 navigation: getNavigationUrlParam(newNavigation, false),
                 filter: null,
+                product: null,
             },
             state
         );
@@ -342,6 +343,11 @@ export function setSearchCreated(created) {
     return {type: SET_SEARCH_CREATED, payload: created};
 }
 
+export const SET_SEARCH_PRODUCT = 'SET_SEARCH_PRODUCT';
+export function setSearchProduct(productId) {
+    return {type: SET_SEARCH_PRODUCT, payload: productId};
+}
+
 export const RESET_SEARCH_PARAMS = 'RESET_SEARCH_PARAMS';
 export function resetSearchParams() {
     return {type: RESET_SEARCH_PARAMS};
@@ -364,6 +370,10 @@ export function setParams(params) {
         if (get(params, 'filter')) {
             dispatch(setSearchFilters(params.filter));
         }
+
+        if (get(params, 'product')) {
+            dispatch(setSearchProduct(params.product));
+        }
     };
 }
 
@@ -379,6 +389,7 @@ export function initParams(params) {
             created: params.get('created') ? JSON.parse(params.get('created')) : null,
             navigation: params.get('navigation') ? JSON.parse(params.get('navigation')) : null,
             filter: params.get('filter') ? JSON.parse(params.get('filter')) : null,
+            product: params.get('product'),
         };
         let topic = {};
 

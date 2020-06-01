@@ -1,3 +1,5 @@
+from bson import ObjectId
+
 import newsroom
 import superdesk
 
@@ -68,6 +70,21 @@ def get_products_by_navigation(navigation_id, product_type=None):
         'is_enabled': True,
         'navigations': _get_navigation_query(navigation_id)
     }
+
+    if product_type is not None:
+        lookup['product_type'] = product_type
+
+    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
+
+
+def get_product_by_id(product_id, product_type=None, company_id=None):
+    lookup = {
+        '_id': ObjectId(product_id),
+        'is_enabled': True
+    }
+
+    if company_id is not None:
+        lookup['companies'] = str(company_id)
 
     if product_type is not None:
         lookup['product_type'] = product_type

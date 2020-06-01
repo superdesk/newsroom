@@ -7,7 +7,7 @@ from superdesk import get_resource_service
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
-from newsroom.products.products import get_products_by_navigation, get_products_by_company
+from newsroom.products.products import get_products_by_navigation, get_products_by_company, get_product_by_id
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.settings import get_setting
@@ -277,16 +277,28 @@ class BaseSearchService(Service):
                     search.navigation_ids,
                     product_type=search.section
                 )
+            elif search.args.get('product'):
+                search.products = get_product_by_id(
+                    search.args['product'],
+                    product_type=search.section
+                )
             else:
                 # admin will see everything by default,
                 # regardless of company products
                 search.products = []
         elif search.company:
-            search.products = get_products_by_company(
-                search.company.get('_id'),
-                search.navigation_ids,
-                product_type=search.section
-            )
+            if search.args.get('product'):
+                search.products = get_product_by_id(
+                    search.args['product'],
+                    product_type=search.section,
+                    company_id=search.company
+                )
+            else:
+                search.products = get_products_by_company(
+                    search.company.get('_id'),
+                    search.navigation_ids,
+                    product_type=search.section
+                )
         else:
             search.products = []
 
@@ -374,7 +386,7 @@ class BaseSearchService(Service):
         :param SearchQuery search: the search query instance
         """
 
-        if search.is_admin and not len(search.navigation_ids):
+        if search.is_admin and not len(search.navigation_ids) and not search.args.get('product'):
             # admin will see everything by default
             return
 

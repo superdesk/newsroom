@@ -113,6 +113,8 @@ export default function wireReducer(state = initialState, action) {
 
     case INIT_DATA: {
         const navigations = get(action, 'wireData.navigations', []);
+        const products = get(action, 'wireData.products', []);
+
         return {
             ...state,
             readItems: action.readData || {},
@@ -124,7 +126,10 @@ export default function wireReducer(state = initialState, action) {
             formats: action.wireData.formats || [],
             secondaryFormats: get(action, 'wireData.secondary_formats') || [],
             wire: Object.assign({}, state.wire, {newsOnly: action.newsOnly}),
-            search: Object.assign({}, state.search, {navigations}),
+            search: Object.assign({}, state.search, {
+                navigations,
+                products,
+            }),
             context: action.wireData.context || 'wire',
             savedItemsCount: action.wireData.saved_items || null,
             userSections: action.wireData.userSections || {},
