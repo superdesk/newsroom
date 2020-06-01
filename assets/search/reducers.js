@@ -14,6 +14,7 @@ import {
     SET_SEARCH_QUERY,
     SET_SEARCH_FILTERS,
     SET_SEARCH_CREATED,
+    SET_SEARCH_PRODUCT,
     RESET_SEARCH_PARAMS,
 } from './actions';
 
@@ -25,8 +26,10 @@ const INITIAL_STATE = {
     activeQuery: '',
     activeFilter: {},
     createdFilter: {},
+    productId: null,
 
     navigations: [],
+    products: [],
 
     activeView: EXTENDED_VIEW,
 };
@@ -124,6 +127,12 @@ export function searchReducer(state=INITIAL_STATE, action) {
             createdFilter: action.payload,
         };
 
+    case SET_SEARCH_PRODUCT:
+        return {
+            ...state,
+            productId: action.payload,
+        };
+
     case RESET_SEARCH_PARAMS:
         return {
             ...state,
@@ -132,6 +141,7 @@ export function searchReducer(state=INITIAL_STATE, action) {
             activeQuery: INITIAL_STATE.activeQuery,
             activeFilter: INITIAL_STATE.activeFilter,
             createdFilter: INITIAL_STATE.createdFilter,
+            productId: INITIAL_STATE.productId,
         };
 
     default:

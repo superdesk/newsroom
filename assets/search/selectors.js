@@ -6,22 +6,29 @@ export const searchFilterSelector = (state) => get(state, 'search.activeFilter')
 export const searchCreatedSelector = (state) => get(state, 'search.createdFilter');
 export const searchNavigationSelector = (state) => get(state, 'search.activeNavigation') || [];
 export const searchTopicIdSelector = (state) => get(state, 'search.activeTopic') || null;
+export const searchProductSelector = (state) => get(state, 'search.productId') || null;
 
 export const activeViewSelector = (state) => get(state, 'search.activeView');
 export const navigationsSelector = (state) => get(state, 'search.navigations') || [];
 
 export const topicsSelector = (state) => get(state, 'topics') || [];
+export const productsSelector = (state) => get(state, 'search.products') || [];
 
 export const activeTopicSelector = createSelector(
     [searchTopicIdSelector, topicsSelector],
     (topicId, topics) => find(topics, {'_id': topicId})
 );
 
+export const activeProductSelector = createSelector(
+    [searchProductSelector, productsSelector],
+    (productId, products) => find(products, {'_id': productId})
+);
+
 export const resultsFilteredSelector = (state) => state.resultsFiltered;
 
 export const searchParamsSelector = createSelector(
-    [searchQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector],
-    (query, created, navigation, filter) => {
+    [searchQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector],
+    (query, created, navigation, filter, product) => {
         const params = {};
 
         if (!isEmpty(query)) {
@@ -34,6 +41,10 @@ export const searchParamsSelector = createSelector(
 
         if (!isEmpty(navigation)) {
             params.navigation = navigation;
+        }
+
+        if (product) {
+            params.product = product;
         }
 
         if (filter && Object.keys(filter).length > 0) {
