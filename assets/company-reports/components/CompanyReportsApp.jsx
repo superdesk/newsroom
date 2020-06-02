@@ -21,7 +21,7 @@ const options = [
     {value: REPORTS_NAMES.SUBSCRIBER_ACTIVITY, text: gettext('Subscriber activity')},
     {value: REPORTS_NAMES.CONTENT_ACTIVITY, text: gettext('Content activity')},
     {value: REPORTS_NAMES.PRODUCT_COMPANIES, text: gettext('Companies per Product')},
-
+    {value: REPORTS_NAMES.EXPIRED_COMPANIES, text: gettext('Expired companies')},
 ];
 
 
