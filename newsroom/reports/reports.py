@@ -352,3 +352,14 @@ def get_product_company():
         'name': gettext('Companies permissioned per product')
     }
     return results
+
+
+def get_expired_companies():
+    expired = list(superdesk.get_resource_service('companies').find(
+        {'expiry_date': {'$lte': utcnow().replace(hour=0, minute=0, second=0)}}))
+
+    results = {
+        'results': expired,
+        'name': gettext('Expired companies')
+    }
+    return results

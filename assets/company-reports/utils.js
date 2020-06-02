@@ -7,6 +7,7 @@ import SubscriberActivity from './components/SubscriberActivity';
 import ContentActivity from './components/ContentActivity';
 import ComapnyNewsApiUsage from './components/ComapnyNewsApiUsage';
 import ProductCompanies from './components/ProductCompanies';
+import ExpiredCompanies from './components/ExpiredCompanies';
 import {REPORTS_NAMES} from './actions';
 
 export const panels = {
@@ -19,4 +20,5 @@ export const panels = {
     [REPORTS_NAMES.CONTENT_ACTIVITY]: ContentActivity,
     [REPORTS_NAMES.COMPANY_NEWS_API_USAGE]: ComapnyNewsApiUsage,
     [REPORTS_NAMES.PRODUCT_COMPANIES]: ProductCompanies,
+    [REPORTS_NAMES.EXPIRED_COMPANIES]: ExpiredCompanies,
 };

@@ -1,6 +1,7 @@
 from flask import json
 from pytest import fixture
 from bson import ObjectId
+from datetime import datetime, timedelta
 from .test_users import test_login_succeeds_for_admin, init as user_init  # noqa
 
 
@@ -144,3 +145,22 @@ def test_product_companies(client, app):
     assert len(report['results'][0]['enabled_companies']) == 2
     assert report['results'][1]['product'] == 'Sport'
     assert len(report['results'][1]['enabled_companies']) == 1
+
+
+def test_expired_companies(client, app):
+    app.data.insert('companies', [{
+        '_id': ObjectId('5cd0e0b35f627d400e8b7566'),
+        'name': 'Expired and enabled Co.',
+        'is_enabled': True,
+        'expiry_date': datetime.utcnow() - timedelta(days=1)
+    }, {
+        '_id': ObjectId('5b504318975bd5227e5ea0b9'),
+        'name': 'Expired disabled Co.',
+        'expiry_date': datetime.utcnow() - timedelta(days=10),
+        'is_enabled': False,
+    }])
+    test_login_succeeds_for_admin(client)
+    resp = client.get('reports/expired-companies')
+    report = json.loads(resp.get_data())
+    assert report['name'] == 'Expired companies'
+    assert len(report['results']) == 2
