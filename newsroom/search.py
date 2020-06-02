@@ -54,6 +54,7 @@ class SearchQuery(object):
                 'should': []
             }
         }
+        self.highlight = None
 
 
 class BaseSearchService(Service):
@@ -93,6 +94,7 @@ class BaseSearchService(Service):
         self.prefill_search_navigation(search)
         self.prefill_search_products(search)
         self.prefill_search_items(search)
+        self.prefill_search_highlights(search, req)
 
     def apply_filters(self, search):
         """ Generate and apply the different search filters
@@ -125,6 +127,9 @@ class BaseSearchService(Service):
 
         if not search.source['from'] and search.args.get('aggs', True):
             search.source['aggs'] = self.get_aggregations()
+
+        if search.highlight:
+            search.source['highlight'] = search.highlight
 
     def get_internal_request(self, search):
         """ Creates an eve internal request object
@@ -314,6 +319,24 @@ class BaseSearchService(Service):
             search.query['bool']['must_not'].append(
                 {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}}
             )
+
+    def prefill_search_highlights(self, search, req):
+        query_string = search.args.get('q')
+        if app.data.elastic.should_highlight(req) and query_string:
+            field_settings = {'highlight_query': {'query_string': {"query": query_string,
+                                                                   "default_operator": "AND",
+                                                                   "lenient": False}},
+                              'number_of_fragments': 0}
+
+            elastic_highlight_query = {
+                'require_field_match': False,
+                'pre_tags': ['<span class=\"es-highlight\">'],
+                'post_tags': ['</span>'],
+                'fields': {
+                    'body_html': field_settings
+                }
+            }
+            search.highlight = elastic_highlight_query
 
     def validate_request(self, search):
         """ Validate the request parameters

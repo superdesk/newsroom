@@ -26,7 +26,7 @@ describe('wire actions', () => {
     beforeEach(() => {
         spyOn(utils.now, 'utcOffset').and.returnValue('');
         fetchMock.get('begin:/wire/search?&tick=', response);
-        fetchMock.get('begin:/wire/search?q=foo&tick=', response);
+        fetchMock.get('begin:/wire/search?q=foo&es_highlight=1&tick=', response);
         store = createStore(wireApp, applyMiddleware(thunk));
     });
 
