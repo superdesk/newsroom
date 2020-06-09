@@ -1,6 +1,6 @@
 from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
 
-SITE_NAME = 'CP Newsroom LJI'
+SITE_NAME = 'News Centre'
 SHOW_USER_REGISTER = True
 COPYRIGHT_HOLDER = 'LJI-IJL'
 COPYRIGHT_NOTICE = ''
@@ -119,3 +119,5 @@ CELERY_BEAT_SCHEDULE = {key: val for key, val in CELERY_BEAT_SCHEDULE_DEFAULT.it
                         if key == 'newsroom.company_expiry'}
 
 ENABLE_WATCH_LISTS = False
+
+ACCOUNT_CREATED_EMAIL_SUBJECT = 'LJI News Centre account created/Accès au Centre de nouvelles de l’IJL'
