@@ -7,17 +7,17 @@ In order to access your account, please use the link {{url}}?language=en to rese
 
 This link will expire after {{expires}} hours.
 
-If you believe the Local Journalism Initiative {{app_name}} account was created in error, please ignore this email.
+IMPORTANT: Canadian media organizations that create original news content may republish LJI News Centre content at no cost, provided it is credited properly and all terms and conditions published on the LJI News Centre are met. Republished stories must credit: The reporter, the Local Journalism Initiative and the reporter’s host media outlet. For more details, see the News Centre support page at https://lji-ijl.ca/support .
 
 
 
 
-Un compte Initiative de journalisme local {{app_name}} a été créé pour vous.
+Un compte a été créé pour vous permettre d'accéder au Centre de nouvelles de l’Initiative de journalisme local.
 
 Pour accéder à votre compte, veuillez utiliser le lien {{url}}?language=fr_CA pour réinitialiser votre mot de passe.
 
 Ce lien expirera après {{expires}} heures.
 
-Si vous pensez que le compte {{app_name}} de Initiative de journalisme local a été créé par erreur, veuillez ignorer ce courriel.
+IMPORTANT: Tout média canadien qui crée du contenu original peut republier gratuitement les contenus de l’IJL, à condition d’en créditer la source selon les critères du programme. Les contenus reproduits doivent comporter : la signature du journaliste, la mention « Initiative de journalisme local » et le média d’origine. Pour plus de détails, voir la section ‘Soutien’ sur le Centre de nouvelles à https://lji-ijl.ca/support .
 
 {% endblock %}

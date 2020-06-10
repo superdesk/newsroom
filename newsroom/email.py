@@ -85,7 +85,7 @@ def send_validate_account_email(user_name, user_email, token):
     url = url_for('auth.validate_account', token=token, _external=True)
     hours = current_app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'] * 24
 
-    subject = gettext('{} account created'.format(app_name))
+    subject = current_app.config.get('ACCOUNT_CREATED_EMAIL_SUBJECT', gettext('{} account created'.format(app_name)))
     text_body = render_template('validate_account_email.txt',
                                 app_name=app_name, name=user_name, expires=hours, url=url)
     html_body = render_template('validate_account_email.html',
@@ -106,7 +106,7 @@ def send_new_account_email(user_name, user_email, token):
     url = url_for('auth.reset_password', token=token, _external=True)
     hours = current_app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'] * 24
 
-    subject = gettext('{} account created'.format(app_name))
+    subject = current_app.config.get('ACCOUNT_CREATED_EMAIL_SUBJECT', gettext('{} account created'.format(app_name)))
     text_body = render_template('account_created_email.txt', app_name=app_name, name=user_name, expires=hours, url=url)
     html_body = render_template('account_created_email.html', app_name=app_name, name=user_name, expires=hours, url=url)
 
