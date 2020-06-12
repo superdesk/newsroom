@@ -291,7 +291,7 @@ class BaseSearchService(Service):
                 search.products = get_product_by_id(
                     search.args['product'],
                     product_type=search.section,
-                    company_id=search.company
+                    company_id=search.company.get('_id')
                 )
             else:
                 search.products = get_products_by_company(
