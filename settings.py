@@ -1,3 +1,5 @@
+from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
+
 SITE_NAME = 'Mediapankki'
 COPYRIGHT_HOLDER = 'STT'
 
@@ -33,7 +35,8 @@ CORE_APPS = [
     'newsroom.reports',
     'newsroom.public',
     'newsroom.settings',
-    'newsroom.photos'
+    'newsroom.photos',
+    'newsroom.monitoring',
 ]
 
 BLUEPRINTS = [
@@ -52,7 +55,9 @@ BLUEPRINTS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
-    'newsroom.settings'
+    'newsroom.settings',
+    'newsroom.monitoring',
+    'newsroom.history',
 ]
 
 LANGUAGES = ['fi', 'en']
@@ -78,3 +83,12 @@ COMPANY_TYPES = [
         wire_must_not={'range': {'embargoed': {'gte': 'now'}}},  # filter out embargo
     ),
 ]
+
+WATERMARK_IMAGE = None
+
+CELERY_BEAT_SCHEDULE = {key: val for key, val in CELERY_BEAT_SCHEDULE_DEFAULT.items()
+                        if key == 'newsroom.company_expiry'}
+
+ENABLE_WATCH_LISTS = False
+
+NEWS_API_ENABLED = False

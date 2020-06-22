@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {wordCount, getSlugline} from 'utils';
-import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
+import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
 import CardMeta from './CardMeta';

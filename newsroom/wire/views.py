@@ -95,7 +95,7 @@ def get_items_by_card(cards, company_id):
     for card in cards:
         if card['config'].get('product'):
             items_by_card[card['label']] = superdesk.get_resource_service('wire_search').\
-                get_product_items(ObjectId(card['config']['product']), card['config']['size'], company_id)
+                get_product_items(ObjectId(card['config']['product']), card['config']['size'])
         elif card['type'] == '4-photo-gallery':
             # Omit external media, let the client manually request these
             # using '/media_card_external' endpoint

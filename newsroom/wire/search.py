@@ -140,12 +140,16 @@ class WireSearchService(BaseSearchService):
         search = SearchQuery()
         self.prefill_search_args(search)
         self.prefill_search_items(search)
+        self.prefill_search_user(search)
+        self.prefill_search_company(search)
         search.args['size'] = size
 
         product = get_resource_service('products').find_one(req=None, _id=product_id)
 
         if not product:
             return
+
+        self.apply_company_filter(search)
 
         search.query['bool']['must'].append({
             "bool": {

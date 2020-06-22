@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { shortDate } from 'utils';
+import {getSlugline, shortDate} from 'utils';
 import {shortText} from 'wire/utils';
 import ListItemEmbargoed from '../../ListItemEmbargoed';
 
