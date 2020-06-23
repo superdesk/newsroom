@@ -1,6 +1,6 @@
-import { get } from 'lodash';
+import { get, startsWith } from 'lodash';
 
-import { createStore, render, initWebSocket, getInitData} from '../utils';
+import { createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone } from '../utils';
 
 import {getReadItems} from 'local-store';
 import  AmNewsApp from './components/AmNewsApp';
@@ -10,7 +10,9 @@ import {
     initData,
     initParams,
     pushNotification,
-    setState
+    setState,
+    openItemDetails,
+    previewItem,
 } from '../wire/actions';
 import {
     toggleNavigation,
@@ -18,7 +20,7 @@ import {
 } from '../search/actions';
 
 
-const store = createStore(wireReducer);
+const store = createStore(wireReducer, 'AM');
 
 // init data
 store.dispatch(initData(getInitData(window.amNewsData), getReadItems(), false));
@@ -28,8 +30,9 @@ const params = new URLSearchParams(window.location.search);
 store.dispatch(initParams(params));
 
 
-// init first navigations
-const firstNavigation = get(window.amNewsData, 'navigations[0]');
+// init first navigations - only if not loading a page to preview an item
+const firstNavigation = startsWith(window.location.search, '?item=') ? null :
+    get(window.amNewsData, 'navigations[0]');
 const navigationId = params.get('navigation');
 if (navigationId) {
     store.dispatch(toggleNavigationById(navigationId));
@@ -40,7 +43,10 @@ if (navigationId) {
 // handle history
 window.onpopstate = function(event) {
     if (event.state) {
-        store.dispatch(setState(event.state));
+        closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
+        if (!isMobilePhone()) {
+            store.dispatch(setState(event.state));
+        }
     }
 };
 

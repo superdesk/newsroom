@@ -1,0 +1,12 @@
+{% extends "bookmark_layout.html" %}
+
+{% block content %}
+<div id="monitoring-app" class="content"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        viewData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('monitoring_js') | safe }}
+{% endblock %}

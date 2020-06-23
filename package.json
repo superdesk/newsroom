@@ -2,10 +2,9 @@
   "scripts": {
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "build": "webpack --config webpack.config.js --progress --profile --colors",
-    "lint": "eslint assets --ext .js --ext .jsx",
-    "fix": "eslint assets --ext .js --ext .jsx --fix",
+    "lint": "eslint *.js assets --ext .js --ext .jsx",
+    "fix": "eslint *.js assets --ext .js --ext .jsx --fix",
     "test": "karma start --single-run",
-    "extract_messages": "react-gettext-parser --output newsroom-client.pot 'assets/**/{*.js,*.jsx}'",
     "karma": "karma start"
   },
   "dependencies": {
@@ -31,7 +30,7 @@
     "node-sass": "^4.5.3",
     "popper.js": "1.14.4",
     "react": "16.6.0",
-    "react-bootstrap-typeahead": "3.2.2",
+    "react-bootstrap-typeahead": "3.2.4",
     "react-datepicker": "1.8.0",
     "react-dom": "16.6.0",
     "react-redux": "5.0.7",
@@ -61,7 +60,6 @@
     "karma-jasmine": "^1.1.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.4",
-    "react-gettext-parser": "1.7.0",
     "react-test-renderer": "^16.0.0",
     "sinon": "^4.0.0"
   }

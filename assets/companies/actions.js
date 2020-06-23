@@ -1,5 +1,6 @@
-import { gettext, notify, errorHandler } from 'utils';
+import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
+import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_COMPANY = 'SELECT_COMPANY';
@@ -27,11 +28,6 @@ export function newCompany(data) {
 export const CANCEL_EDIT = 'CANCEL_EDIT';
 export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
-}
-
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    return {type: SET_QUERY, query};
 }
 
 export const QUERY_COMPANIES = 'QUERY_COMPANIES';
@@ -67,7 +63,7 @@ export function setError(errors) {
 export function fetchCompanies() {
     return function (dispatch, getState) {
         dispatch(queryCompanies());
-        const query = getState().query || '';
+        const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/companies/search?q=${query}`)
             .then((data) => {
@@ -82,9 +78,9 @@ export function fetchCompanies() {
  *
  * @param {String} companyId
  */
-export function fetchCompanyUsers(companyId) {
+export function fetchCompanyUsers(companyId, force = false) {
     return function (dispatch, getState) {
-        if (!getState().companiesById[companyId].name) {
+        if (!force && !getState().companiesById[companyId].name) {
             return;
         }
 

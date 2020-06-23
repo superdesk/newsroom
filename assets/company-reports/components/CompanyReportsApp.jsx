@@ -4,9 +4,12 @@ import { connect } from 'react-redux';
 import {
     setActiveReport,
     runReport,
+    REPORTS_NAMES,
+    printReport,
+    toggleFilterAndQuery,
 } from '../actions';
 import { gettext } from 'utils';
-import { panels, REPORTS_NAMES } from '../utils';
+import { panels } from '../utils';
 
 const options = [
     {value: '', text: ''},
@@ -15,6 +18,10 @@ const options = [
     {value: REPORTS_NAMES.COMPANY_PRODUCTS, text: gettext('Products per company')},
     {value: REPORTS_NAMES.PRODUCT_STORIES, text: gettext('Stories per product')},
     {value: REPORTS_NAMES.COMPANY, text: gettext('Company')},
+    {value: REPORTS_NAMES.SUBSCRIBER_ACTIVITY, text: gettext('Subscriber activity')},
+    {value: REPORTS_NAMES.CONTENT_ACTIVITY, text: gettext('Content activity')},
+    {value: REPORTS_NAMES.PRODUCT_COMPANIES, text: gettext('Companies per Product')},
+    {value: REPORTS_NAMES.EXPIRED_COMPANIES, text: gettext('Expired companies')},
 ];
 
 
@@ -27,10 +34,16 @@ class CompanyReportsApp extends React.Component {
 
     getPanel() {
         const Panel = panels[this.props.activeReport];
-        return Panel && this.props.activeReportData && <Panel key="panel" data={this.props.activeReportData} />;
+        return Panel && this.props.results && <Panel key="panel" {...this.props}/>;
     }
 
     render() {
+        const reportOptions = !this.props.apiEnabled ? options :
+            [
+                ...options,
+                {value: REPORTS_NAMES.COMPANY_NEWS_API_USAGE, text: gettext('Company News API Usage')},
+            ];
+
         return (
             [<section key="header" className="content-header">
                 <nav className="content-bar navbar content-bar--side-padding">
@@ -41,7 +54,7 @@ class CompanyReportsApp extends React.Component {
                             name={'company-reports'}
                             value={this.props.activeReport || ''}
                             onChange={(event) => this.props.setActiveReport(event.target.value)}>
-                            {options.map((option) => <option key={option.value} value={option.value}>{option.text}</option>)}
+                            {reportOptions.map((option) => <option key={option.value} value={option.value}>{option.text}</option>)}
                         </select>
                     </div>
 
@@ -52,13 +65,12 @@ class CompanyReportsApp extends React.Component {
                             onClick={this.props.runReport}>
                             {gettext('Run report')}
                         </button>}
-                        {this.props.activeReport && <a
+                        {this.props.activeReport && <button
                             className='btn btn-outline-secondary ml-2'
                             type='button'
-                            href={`/reports/print/${this.props.activeReport}`}
-                            target="_blank">
+                            onClick={this.props.printReport} >
                             {gettext('Print report')}
-                        </a>}
+                        </button>}
                     </div>
                 </nav>
             </section>,
@@ -70,19 +82,32 @@ class CompanyReportsApp extends React.Component {
 
 CompanyReportsApp.propTypes = {
     activeReport: PropTypes.string,
-    activeReportData: PropTypes.object,
+    results: PropTypes.array,
     setActiveReport: PropTypes.func,
     runReport: PropTypes.func,
+    companies: PropTypes.array,
+    printReport: PropTypes.func,
+    isLoading: PropTypes.bool,
+    apiEnabled: PropTypes.bool,
+    products: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
     activeReport: state.activeReport,
-    activeReportData: state.activeReportData,
+    results: state.results,
+    companies: state.companies,
+    apiEnabled: state.apiEnabled,
+    reportParams: state.reportParams,
+    isLoading: state.isLoading,
+    resultHeaders: state.resultHeaders,
+    products: state.products,
 });
 
 const mapDispatchToProps = {
     setActiveReport,
     runReport,
+    printReport,
+    toggleFilterAndQuery,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CompanyReportsApp);

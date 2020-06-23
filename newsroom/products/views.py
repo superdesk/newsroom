@@ -8,8 +8,7 @@ from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only
 from newsroom.products import blueprint
-from newsroom.utils import get_json_or_400, get_entity_or_404
-from newsroom.utils import query_resource
+from newsroom.utils import get_json_or_400, get_entity_or_404, set_original_creator, set_version_creator, query_resource
 
 
 def get_settings_data():
@@ -17,7 +16,7 @@ def get_settings_data():
         'products': list(query_resource('products')),
         'navigations': list(query_resource('navigations')),
         'companies': list(query_resource('companies')),
-        'sections': current_app.sections,
+        'sections': [s for s in current_app.sections if s.get('_id') != 'monitoring'],  # monitoring has no products
     }
 
 
@@ -60,6 +59,7 @@ def create():
         product['navigations'] = [str(get_entity_or_404(_id, 'navigations')['_id'])
                                   for _id in product.get('navigations').split(',')]
 
+    set_original_creator(product)
     ids = get_resource_service('products').post([product])
     return jsonify({'success': True, '_id': ids[0]}), 201
 
@@ -83,6 +83,7 @@ def edit(id):
     if validation:
         return validation
 
+    set_version_creator(updates)
     get_resource_service('products').patch(id=ObjectId(id), updates=updates)
     return jsonify({'success': True}), 200
 

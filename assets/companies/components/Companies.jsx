@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import {get} from 'lodash';
+
 import EditCompany from './EditCompany';
 import CompanyList from './CompanyList';
-import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import SearchResults from 'search/components/SearchResults';
+
 import {
     cancelEdit,
     deleteCompany,
@@ -13,6 +16,8 @@ import {
     selectCompany,
     setError,
 } from '../actions';
+import {searchQuerySelector} from 'search/selectors';
+import {companiesSubscriberIdEnabled} from 'ui/selectors';
 import {gettext} from 'utils';
 
 class Companies extends React.Component {
@@ -37,11 +42,13 @@ class Companies extends React.Component {
         return valid;
     }
 
-    save(event) {
-        event.preventDefault();
+    save(externalEvent) {
+        if (externalEvent) {
+            externalEvent.preventDefault();
 
-        if (!this.isFormValid()) {
-            return;
+            if (!this.isFormValid()) {
+                return;
+            }
         }
 
         this.props.saveCompany('companies');
@@ -57,6 +64,8 @@ class Companies extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
+        const originalCompanyEdited = !get(this.props, 'companyToEdit._id') ? this.props.companyToEdit :
+            this.props.companiesById[this.props.companyToEdit._id];
 
         return (
             <div className="flex-row">
@@ -68,21 +77,27 @@ class Companies extends React.Component {
                     </div>
                     :
                     <div className="flex-col flex-column">
-                        {this.props.activeQuery &&
-                        <SearchResultsInfo
-                            totalItems={this.props.totalCompanies}
-                            query={this.props.activeQuery} />
-                        }
+                        {this.props.activeQuery && (
+                            <SearchResults
+                                showTotalItems={true}
+                                showTotalLabel={true}
+                                showSaveTopic={false}
+                                totalItems={this.props.totalCompanies}
+                                totalItemsLabel={this.props.activeQuery}
+                            />
+                        )}
                         <CompanyList
                             companies={this.props.companies}
                             onClick={this.props.selectCompany}
                             activeCompanyId={this.props.activeCompanyId}
                             companyTypes={this.props.companyTypes}
+                            showSubscriberId={this.props.showSubscriberId}
                         />
                     </div>
                 )}
                 {this.props.companyToEdit &&
                     <EditCompany
+                        originalItem={originalCompanyEdited}
                         company={this.props.companyToEdit}
                         onChange={this.props.editCompany}
                         errors={this.props.errors}
@@ -93,6 +108,7 @@ class Companies extends React.Component {
                         fetchCompanyUsers={this.props.fetchCompanyUsers}
                         products={this.props.products}
                         companyTypes={this.props.companyTypes}
+                        apiEnabled={this.props.apiEnabled}
                     />
                 }
             </div>
@@ -119,6 +135,9 @@ Companies.propTypes = {
     dispatch: PropTypes.func,
     products: PropTypes.array,
     companyTypes: PropTypes.array,
+    apiEnabled: PropTypes.bool,
+    showSubscriberId: PropTypes.bool,
+    companiesById: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -127,13 +146,15 @@ const mapStateToProps = (state) => ({
     activeCompanyId: state.activeCompanyId,
     isLoading: state.isLoading,
     products: state.products,
-    activeQuery: state.activeQuery,
+    activeQuery: searchQuerySelector(state),
     totalCompanies: state.totalCompanies,
     companyOptions: state.companyOptions,
     companiesById: state.companiesById,
     companyUsers: state.companyUsers,
     errors: state.errors,
     companyTypes: state.companyTypes,
+    apiEnabled: state.apiEnabled,
+    showSubscriberId: companiesSubscriberIdEnabled(state),
 });
 
 

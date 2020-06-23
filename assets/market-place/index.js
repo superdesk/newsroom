@@ -1,4 +1,4 @@
-import { createStore, render, initWebSocket, getInitData} from '../utils';
+import { createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone } from '../utils';
 
 import {getReadItems} from 'local-store';
 import  MarketPlaceApp from './components/MarketPlaceApp';
@@ -11,7 +11,9 @@ import {
     initData,
     initParams,
     pushNotification,
-    setState
+    setState,
+    openItemDetails,
+    previewItem,
 } from '../wire/actions';
 
 import {
@@ -27,7 +29,10 @@ const handleHistory = () => {
     // handle history
     window.onpopstate = function(event) {
         if (event.state) {
-            store.dispatch(setState(event.state));
+            closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
+            if (!isMobilePhone()) {
+                store.dispatch(setState(event.state));
+            }
         }
     };
 };
@@ -35,13 +40,13 @@ const handleHistory = () => {
 let store;
 
 if (window.marketPlaceData.home_page) {
-    store = createStore(marketPlaceHomeReducer);
+    store = createStore(marketPlaceHomeReducer, 'aapX');
     store.dispatch(homeInitData(getInitData(window.marketPlaceData)));
     handleHistory();
     render(store, MarketPlaceApp, document.getElementById('market-place-app'));
 
 } else {
-    store = createStore(wireReducer);
+    store = createStore(wireReducer, 'MarketPlace');
     // init data
     store.dispatch(initData(getInitData(window.marketPlaceData), getReadItems(), false));
 

@@ -28,7 +28,7 @@ export function getIntVersion(item) {
  * @return {Array}
  */
 export function getVideos(item) {
-    return item.type === 'video' ? [item] : Object.values(get(item, 'associations', {})).filter((assoc) => get(assoc, 'type') === 'video');
+    return item.type === 'video' ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'video');
 }
 
 
@@ -41,11 +41,13 @@ export function getVideos(item) {
  * @return {Object}
  */
 export function getPicture(item) {
-    return item.type === 'picture' ? item : getBodyPicture(item);
+    return item.type === 'picture' ? item : (
+        get(item, 'associations.featuremedia') || getBodyPicture(item)
+    );
 }
 
 function getBodyPicture(item) {
-    const pictures = Object.values(get(item, 'associations', {})).filter((assoc) => get(assoc, 'type') === 'picture');
+    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'picture');
 
     return pictures.length ? pictures[0] : null;
 }
@@ -161,7 +163,7 @@ export function shortText(item, length=40, useBody=false) {
  * @return {String}
  */
 export function getCaption(picture) {
-    return getTextFromHtml(picture.body_text || picture.description_text || '').trim();
+    return getTextFromHtml(picture.description_text || picture.body_text || '').trim();
 }
 
 export function getActiveQuery(query, activeFilter, createdFilter) {

@@ -1,17 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
+
+import {gettext} from 'utils';
+
 import {
     newSectionFilter,
-    setQuery,
     fetchSectionFilters,
 } from '../actions';
-import SectionFilters from './SectionFilters';
-import ListBar from 'components/ListBar';
-import { gettext } from 'utils';
+import {setSearchQuery} from 'search/actions';
 
 import SectionSwitch from 'features/sections/SectionSwitch';
-import { sectionsPropType } from 'features/sections/types';
+import {sectionsPropType} from 'features/sections/types';
+import {sectionsSelector, activeSectionSelector} from 'features/sections/selectors';
+
+import SectionFilters from './SectionFilters';
+import ListBar from 'components/ListBar';
 
 class SectionFiltersApp extends React.Component {
     constructor(props, context) {
@@ -50,13 +54,13 @@ SectionFiltersApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    sections: state.sections.list,
-    activeSection: state.sections.active,
+    sections: sectionsSelector(state),
+    activeSection: activeSectionSelector(state),
 });
 
 const mapDispatchToProps = {
     fetchSectionFilters,
-    setQuery,
+    setQuery: setSearchQuery,
     newSectionFilter,
 };
 

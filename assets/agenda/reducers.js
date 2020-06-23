@@ -8,9 +8,12 @@ import {
     UPDATE_ITEMS,
     TOGGLE_FEATURED_FILTER,
     TOGGLE_EVENTS_ONLY_FILTER,
+    AGENDA_WIRE_ITEMS,
+    WATCH_COVERAGE,
+    STOP_WATCHING_COVERAGE,
 } from './actions';
 
-import { get, isEmpty, uniqBy } from 'lodash';
+import { get, isEmpty, uniqBy, uniq } from 'lodash';
 import { getActiveDate } from 'local-store';
 import { EXTENDED_VIEW } from 'wire/defaults';
 import { searchReducer } from 'search/reducers';
@@ -48,11 +51,13 @@ const initialState = {
         eventsOnlyAccess: false,
         eventsOnlyView: false,
         featuredOnly: false,
+        agendaWireItems: [],
     },
     search: searchReducer(),
     detail: false,
     userSections: {},
     searchInitiated: false,
+    uiConfig: {},
 };
 
 function processAggregations(aggregations) {
@@ -154,7 +159,37 @@ export default function agendaReducer(state = initialState, action) {
         action.items.forEach((_id) => {
             const watches = get(itemsById[_id], 'watches', []).concat(state.user);
             itemsById[_id] = Object.assign({}, itemsById[_id], {watches});
+            (get(itemsById[_id], 'coverages') || []).forEach((c) => {
+                if (get(c, 'watches.length', 0) > 0) {
+                    c.watches = [];
+                }
+            });
         });
+
+        return {...state, itemsById};
+    }
+
+    case WATCH_COVERAGE: {
+        const itemsById = Object.assign({}, state.itemsById);
+        const item = itemsById[get(action, 'item._id')];
+        const coverage = (get(item, 'coverages') || []).find((c) => c.coverage_id === action.coverage.coverage_id);
+        if (coverage) {
+            coverage['watches'] = uniq([
+                ...(get(coverage, 'watches') || []),
+                state.user
+            ]);
+        }
+
+        return {...state, itemsById};
+    }
+
+    case STOP_WATCHING_COVERAGE: {
+        const itemsById = Object.assign({}, state.itemsById);
+        const item = itemsById[get(action, 'item._id')];
+        const coverage = (get(item, 'coverages') || []).find((c) => c.coverage_id === action.coverage.coverage_id);
+        if (coverage) {
+            coverage['watches'] = (get(coverage, 'watches') || []).filter((u) => u !== state.user);
+        }
 
         return {...state, itemsById};
     }
@@ -201,7 +236,7 @@ export default function agendaReducer(state = initialState, action) {
             eventsOnlyAccess: action.agendaData.events_only,
             featuredOnly: action.featuredOnly,
         };
-        
+
         return {
             ...state,
             readItems: action.readData || {},
@@ -216,7 +251,9 @@ export default function agendaReducer(state = initialState, action) {
             detail: !!openItem,
             agenda,
             savedItemsCount: action.agendaData.saved_items || null,
-            userSections: action.agendaData.userSections || {}
+            userSections: action.agendaData.userSections || {},
+            locators: action.agendaData.locators || null,
+            uiConfig: action.agendaData.ui_config || {},
         };
     }
 
@@ -244,6 +281,16 @@ export default function agendaReducer(state = initialState, action) {
                 eventsOnlyView: action.value,
             }
         };
+
+    case AGENDA_WIRE_ITEMS:
+        return {
+            ...state,
+            agenda: {
+                ...state.agenda,
+                agendaWireItems: action.items
+            }
+        };
+
     default:
         return defaultReducer(state || initialState, action);
     }

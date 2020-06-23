@@ -9,7 +9,8 @@ export function getItemActions(dispatch, actions) {
         previewAndCopy,
         downloadItems,
         bookmarkItems,
-        removeBookmarks
+        removeBookmarks,
+        removeItems,
     } = actions;
 
 
@@ -22,6 +23,7 @@ export function getItemActions(dispatch, actions) {
             action: (item, group, plan) => dispatch(openItem(item, group, plan)),
         },
         {
+            id: 'share',
             name: gettext('Share'),
             icon: 'share',
             multi: true,
@@ -31,18 +33,21 @@ export function getItemActions(dispatch, actions) {
             action: (items) => dispatch(shareItems(items)),
         },
         {
+            id: 'print',
             name: gettext('Print'),
             icon: 'print',
             visited: (user, item) => user && item && item.prints &&  item.prints.includes(user),
             action: (item) => dispatch(printItem(item)),
         },
         {
+            id: 'copy',
             name: gettext('Copy'),
             icon: 'copy',
             visited: (user, item) => user && item && item.copies &&  item.copies.includes(user),
             action: (item) => dispatch(previewAndCopy(item)),
         },
         {
+            id: 'download',
             name: gettext('Download'),
             icon: 'download',
             multi: true,
@@ -51,6 +56,7 @@ export function getItemActions(dispatch, actions) {
             action: (items) => dispatch(downloadItems(items)),
         },
         {
+            id: 'save',
             name: gettext('Save'),
             icon: 'bookmark-add',
             multi: true,
@@ -59,6 +65,7 @@ export function getItemActions(dispatch, actions) {
             action: (items) => dispatch(bookmarkItems(items)),
         },
         {
+            id: 'unsave',
             name: gettext('Unsave'),
             icon: 'bookmark-remove',
             multi: true,
@@ -66,5 +73,13 @@ export function getItemActions(dispatch, actions) {
             when: (state, item) => state.user && item && item.bookmarks && item.bookmarks.includes(state.user),
             action: (items) => dispatch(removeBookmarks(items)),
         },
+        {
+            id: 'remove',
+            name: gettext('Remove'),
+            icon: 'trash',
+            multi: true,
+            when: (state) => state.user && state.userType === 'administrator',
+            action: (items) => removeItems(items),
+        }
     ];
 }

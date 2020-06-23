@@ -4,7 +4,7 @@ import SectionFiltersApp from './components/SectionFiltersApp';
 import { initViewData } from './actions';
 
 
-const store = createStore(sectionFiltersReducer);
+const store = createStore(sectionFiltersReducer, 'SectionFilters');
 
 
 if (window.viewData) {

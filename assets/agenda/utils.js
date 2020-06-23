@@ -1,6 +1,16 @@
-import { get, isEmpty, includes, keyBy, sortBy } from 'lodash';
+import { get, isEmpty, includes, keyBy, sortBy, partition } from 'lodash';
 import moment from 'moment/moment';
-import {formatDate, formatMonth, formatWeek, getConfig, gettext, DATE_FORMAT, COVERAGE_DATE_FORMAT} from '../utils';
+import {
+    formatDate,
+    formatMonth,
+    formatWeek,
+    getConfig,
+    gettext,
+    DATE_FORMAT,
+    COVERAGE_DATE_TIME_FORMAT,
+    COVERAGE_DATE_FORMAT,
+    parseDate
+} from '../utils';
 
 const STATUS_KILLED = 'killed';
 const STATUS_CANCELED = 'cancelled';
@@ -38,16 +48,19 @@ export function getCoverageStatusText(coverage) {
     }
 
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
-        if (get(coverage, 'deliveries.length', 0) > 1) {
-            return `updated ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;    
+        if ((get(coverage, 'deliveries.length', 0) === 2 && coverage.deliveries[0].publish_time) ||
+            get(coverage, 'deliveries.length', 0) > 2) {
+            return gettext('updated {{ at }}', {at: moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)});
         }
 
-        return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_FORMAT)}`;
+        return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)}`;
     }
 
     return get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '');
 }
 
+export const TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed';
+export const TO_BE_CONFIRMED_TEXT = gettext('Time to be confirmed');
 export const WORKFLOW_STATUS = {
     DRAFT: 'draft',
     ASSIGNED: 'assigned',
@@ -276,7 +289,7 @@ export function getCalendars(item) {
  * @return {String}
  */
 export function getEventLinks(item) {
-    return get(item, 'event.links', []);
+    return get(item, 'event.links') || [];
 }
 
 
@@ -407,7 +420,7 @@ export function getPrevious(dateString, grouping) {
 
 /**
  * Get agenda item attachments
- * 
+ *
  * @param {Object} item
  * @return {Array}
  */
@@ -431,19 +444,75 @@ export function getInternalNote(item, plan) {
  * @param {Object} item
  * @return {Object}
  */
-export function getNotesFromCoverages(item, field = 'internal_note') {
-    const notes = {};
+export function getDataFromCoverages(item) {
     const planningItems = get(item, 'planning_items', []);
+    let data = {
+        'internal_note': {},
+        'ednote': {},
+        'workflow_status_reason': {},
+        'scheduled_update_status': {},
+    };
+
     planningItems.forEach(p => {
-        const planning_note = p[field];
-        get(p, 'coverages', []).forEach((c) => {
-            if (get(c, `planning.${field}`, '') && c.planning[field] !== planning_note) {
-                notes[c.coverage_id] = c.planning[field];
+        (get(p, 'coverages') || []).forEach((c) => {
+            ['internal_note', 'ednote', 'workflow_status_reason'].forEach((field) => {
+
+                // Don't populate if the value is same as the field in upper level planning_item
+                // Don't populate workflow_status_reason is planning_item is cancelled to avoid UI duplication
+                if (!get(c, `planning.${field}`, '') || c.planning[field] === p[field] ||
+                        (field === 'workflow_status_reason' && p['state'] === STATUS_CANCELED)) {
+                    return;
+                }
+
+                data[field][c.coverage_id] = c.planning[field];
+            });
+
+            if (get(c, 'scheduled_updates.length', 0) > 0 && c['workflow_status'] === WORKFLOW_STATUS.COMPLETED) {
+                // Get latest appropriate scheduled_update
+                const schedUpdate = getNextPendingScheduledUpdate(c);
+                if (schedUpdate) {
+                    const dateString = `${moment(schedUpdate.planning.scheduled).format(COVERAGE_DATE_TIME_FORMAT)}`;
+                    data['scheduled_update_status'][c.coverage_id] = gettext(`Update expected @ ${dateString}`);
+                }
             }
+
         });
     });
-    return notes;
+    return data;
 }
+
+const getNextPendingScheduledUpdate = (coverage) => {
+    // No scheduled_updates or deliveries
+    if (get(coverage, 'scheduled_updates.length', 0) === 0 ||
+            get(coverage, 'deliveries.length', 0) === 0) {
+        return null;
+    }
+
+    // Only one delivery: no scheduled_update was published
+    if (get(coverage, 'deliveries.length', 0) === 1) {
+        return coverage.scheduled_updates[0];
+    }
+
+
+    const lastScheduledDelivery = (coverage.deliveries.reverse()).find((d) => d.scheduled_update_id);
+    // More deliveries, but no scheduled_update was published
+    if (!lastScheduledDelivery) {
+        return coverage.scheduled_updates[0];
+    }
+
+    const lastPublishedShceduledUpdateIndex = coverage.scheduled_updates.findIndex((s) =>
+        s.scheduled_update_id === lastScheduledDelivery.scheduled_update_id);
+
+    if (lastPublishedShceduledUpdateIndex === coverage.scheduled_updates.length - 1) {
+        // Last scheduled_update was published, nothing pending
+        return;
+    } 
+
+    if (lastPublishedShceduledUpdateIndex < coverage.scheduled_updates.length - 1){
+        // There is a pending scheduled_update
+        return coverage.scheduled_updates[lastPublishedShceduledUpdateIndex + 1];
+    }
+};
 
 /**
  * Get list of subjects
@@ -457,7 +526,7 @@ export function getSubjects(item) {
 
 /**
  * Test if item has any attachments
- * 
+ *
  * @param {Object} item
  * @return {Boolean}
  */
@@ -515,7 +584,7 @@ export function containsExtraDate(item, dateToCheck) {
  * @param activeDate: date that the grouping will start from
  * @param activeGrouping: type of grouping i.e. day, week, month
  */
-export function groupItems (items, activeDate, activeGrouping) {
+export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
     const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
     const groupedItems = {};
     const grouper = Groupers[activeGrouping];
@@ -546,9 +615,21 @@ export function groupItems (items, activeDate, activeGrouping) {
             if (grouper(day) !== key && addGroupItem) {
                 key = grouper(day);
                 const groupList = groupedItems[key] || [];
-                groupList.push(item._id);
+                groupList.push(item);
                 groupedItems[key] = groupList;
             }
+        }
+    });
+
+    Object.keys(groupedItems).forEach((k) => {
+        if (featuredOnly) {
+            groupedItems[k] = groupedItems[k].map((i) => i._id);
+        } else {
+            const tbcPartitioned = partition(groupedItems[k], (i) => isItemTBC(i));
+            groupedItems[k] = [
+                ...tbcPartitioned[0],
+                ...tbcPartitioned[1],
+            ].map((i) => i._id);
         }
     });
 
@@ -608,11 +689,13 @@ export function getCoveragesForDisplay(item, plan, group) {
     // get current and preview coverages
     (get(item, 'coverages') || [])
         .forEach((coverage) => {
-            if (coverage.planning_id === get(plan, 'guid')) {
+            if (!get(plan, 'guid') || coverage.planning_id === get(plan, 'guid')) {
                 if (isCoverageForExtraDay(coverage, group)) {
                     currentCoverage.push(coverage);
                 } else if (isCoverageOnPreviousDay(coverage, group)) {
                     previousCoverage.push(coverage);
+                } else {
+                    currentCoverage.push(coverage);
                 }
             }
         });
@@ -626,7 +709,6 @@ export function getListItems(groups, itemsById) {
     groups.forEach((group) => {
         group.items.forEach((_id) => {
             const plans = getPlanningItemsByGroup(itemsById[_id], group.date);
-            // console.log(plans);
             if (plans.length > 0) {
                 plans.forEach((plan) => {
                     listItems.push({_id, group: group.date, plan});
@@ -640,5 +722,45 @@ export function getListItems(groups, itemsById) {
 }
 
 export function isCoverageBeingUpdated(coverage) {
-    return get(coverage, 'deliveries[0].delivery_state', null) && coverage.deliveries[0].delivery_state !== 'published';
+    return get(coverage, 'deliveries[0].delivery_state', null) &&
+        !['published', 'corrected'].includes(coverage.deliveries[0].delivery_state);
 }
+
+export const groupRegions = (filter, aggregations, props) => {
+    if (props.locators && Object.keys(props.locators).length > 0) {
+        let regions = sortBy(props.locators.filter((l) => l.state).map((l) => ({...l, 'key': l.name, 'label': l.state})), 'label');
+        const others = props.locators.filter((l) => !l.state).map((l) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
+        const separator = { 'key': 'divider'};
+
+        if (others.length > 0) {
+            if (regions.length > 0) {
+                regions.push(separator);
+            }
+            regions = [...regions, ...sortBy(others, 'label')];
+        }
+
+        return regions;
+    }
+
+    return aggregations[filter.field].buckets;
+};
+
+export const getRegionName = (key, locator) => locator.label || key;
+
+export const isItemTBC = (item) => (
+    !get(item, 'event') ? get(item, `planning_items[0].${TO_BE_CONFIRMED_FIELD}`) : get(item, `event.${TO_BE_CONFIRMED_FIELD}`)
+);
+
+
+/**
+ * Format coverage date ('HH:mm DD/MM')
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatCoverageDate(coverage) {
+    return get(coverage, TO_BE_CONFIRMED_FIELD) ?
+        `${parseDate(coverage.scheduled).format(COVERAGE_DATE_FORMAT)} ${TO_BE_CONFIRMED_TEXT}` :
+        parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
+}
+

@@ -1,4 +1,6 @@
 import React from 'react';
+import server from 'server';
+import analytics from 'analytics';
 import { get, isInteger, keyBy, isEmpty, cloneDeep, throttle } from 'lodash';
 import { Provider } from 'react-redux';
 import { createStore as _createStore, applyMiddleware } from 'redux';
@@ -6,32 +8,80 @@ import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
 import alertify from 'alertifyjs';
-import moment from 'moment';
-import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE} from './agenda/utils';
+import moment from 'moment-timezone';
+import {
+    hasCoverages,
+    isCoverageForExtraDay,
+    SCHEDULE_TYPE,
+    isItemTBC,
+    TO_BE_CONFIRMED_TEXT
+} from './agenda/utils';
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
 const CLIENT_CONFIG = 'client_config';
 
-export const TIME_FORMAT = getConfig('time_format');
-export const DATE_FORMAT = getConfig('date_format', 'DD-MM-YYYY');
-export const COVERAGE_DATE_FORMAT = getConfig('coverage_date_format');
+function getLocaleFormat(formatType) {
+    const formats = getConfig('locale_formats', {});
+    const locale = getLocale();
+
+    if (formats[locale] && formats[locale][formatType]) {
+        return formats[locale][formatType];
+    }
+
+    const defaultLanguage = getConfig('default_language', 'en');
+
+    if (formats[defaultLanguage] && formats[defaultLanguage][formatType]) {
+        return formats[defaultLanguage][formatType];
+    }
+
+    return 'DD-MM-YYYY';
+}
+
+const getTimeFormat = () => getLocaleFormat('TIME_FORMAT');
+const getDateFormat = () => getLocaleFormat('DATE_FORMAT');
+const getCoverageDateTimeFormat = () =>
+    getLocaleFormat('COVERAGE_DATE_TIME_FORMAT');
+const getCoverageDateFormat = () => getLocaleFormat('COVERAGE_DATE_FORMAT');
+
+export const TIME_FORMAT = getTimeFormat();
+export const DATE_FORMAT = getDateFormat();
+export const COVERAGE_DATE_TIME_FORMAT = getCoverageDateTimeFormat();
+export const COVERAGE_DATE_FORMAT = getCoverageDateFormat();
 const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
+
+export const SERVER_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss+0000';
 export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
+export const DISPLAY_NEWS_ONLY = getConfig('display_news_only', true);
+export const DEFAULT_TIMEZONE = getConfig('default_timezone', 'Australia/Sydney');
+export const KEYCODES = {
+    ENTER: 13,
+    DOWN: 40,
+};
+
 
 
 /**
  * Create redux store with default middleware
  *
  * @param {func} reducer
+ * @param {String} name
  * @return {Store}
  */
-export function createStore(reducer) {
+export function createStore(reducer, name = 'default') {
     const logger = createLogger({
         duration: true,
         collapsed: true,
         timestamp: false,
+        titleFormatter: (action, time, took) => (
+            // Adds the name of the store to the console logs
+            // derived based on the defaultTitleFormatter from redux-logger
+            // https://github.com/LogRocket/redux-logger/blob/master/src/core.js#L25
+            (action && action.type) ?
+                `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)` :
+                `${name} - action (in ${took.toFixed(2)} ms)`
+        ),
     });
 
     return _createStore(reducer, applyMiddleware(thunk, logger));
@@ -44,10 +94,10 @@ export function createStore(reducer) {
  * @param {Component} App
  * @param {Element} element
  */
-export function render(store, App, element) {
+export function render(store, App, element, props) {
     return _render(
         <Provider store={store}>
-            <App />
+            <App {...props}/>
         </Provider>,
         element
     );
@@ -95,8 +145,19 @@ export function getProductQuery(product) {
  * @param {String} dateString
  * @return {Date}
  */
-function parseDate(dateString) {
+export function parseDate(dateString) {
     return moment(dateString);
+}
+
+/**
+ * Parse the given date string and return moment instance in the timezone provided
+ * If no timezone is provided, then it will default to the browser's timezone
+ * @param {String} dateString - The datetime string to convert
+ * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
+ * @returns {moment}
+ */
+export function parseDateInTimezone(dateString, timezone = null) {
+    return moment.tz(dateString, timezone || moment.tz.guess());
 }
 
 /**
@@ -149,17 +210,21 @@ export function isToday(date) {
 
 /**
  * Test if given day is in the past
+ * If no timezone is provided, then it will default to the browser's timezone
  *
- * @param {Date} date
+ * @param {String} dateString - The datetime string to check
+ * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @return {Boolean}
  */
-export function isInPast(dateString) {
+export function isInPast(dateString, timezone) {
     if(!dateString) {
         return false;
     }
 
-    const parsed = parseDate(dateString);
-    return parsed.format('YYYY-MM-DD') < now.format('YYYY-MM-DD');
+    return parseDateInTimezone(dateString, timezone).isSameOrBefore(
+        now.tz(timezone || moment.tz.guess()),
+        'day'
+    );
 }
 
 /**
@@ -190,6 +255,30 @@ export function formatTime(dateString) {
  */
 export function formatDate(dateString) {
     return parseDate(dateString).format(DATE_FORMAT);
+}
+
+/**
+ * Parse the given date string, setting the time to 23:59:59 (i.e. end of the day).
+ * Ensures that the datetime is for the end of the day in the provided timezone
+ * If no timezone is provided, then it will default to the browser's timezone
+ * @param {String} dateString - The date string to convert (in the format 'YYYY-MM-DD')
+ * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
+ * @returns {moment}
+ */
+export function getEndOfDayFromDate(dateString, timezone = null) {
+    return parseDateInTimezone(dateString + 'T23:59:59', timezone);
+}
+
+/**
+ * Parse the given datetime string and timezone and converts it to utc
+ * If no timezone is provided, then it will default to the browser's timezone
+ * @param {String} datetime - The datetime string
+ * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
+ * @returns {moment}
+ */
+export function convertUtcToTimezone(datetime, timezone) {
+    return parseDateInTimezone(datetime, 'utc')
+        .tz(timezone);
 }
 
 export function getScheduleType(item) {
@@ -233,6 +322,7 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
         return tzStr;
     };
 
+    const isTBCItem = isItemTBC(item);
     let start = parseDate(item.dates.start);
     let end = parseDate(item.dates.end);
     let duration = end.diff(start, 'minutes');
@@ -264,12 +354,20 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
     }
 
     const scheduleType = getScheduleType(item);
+    let regulartTimeStr = `${formatTime(start)} - ${formatTime(end)} `;
+    if (isTBCItem) {
+        regulartTimeStr = localTimeZone ? `${TO_BE_CONFIRMED_TEXT} ` : '';
+    }
     if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
-        dateTimeString.push(`${formatTime(start)}`);
+        dateTimeString.push(isTBCItem ? `${regulartTimeStr}` : `${formatTime(start)}`);
     } else {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
-            dateTimeString.push(`${formatTime(start)} ${formatDate(start)} to ${formatTime(end)} ${formatDate(end)}`);
+            if (isTBCItem) {
+                dateTimeString.push(`${formatDate(start)} to ${formatDate(end)}`);
+            } else {
+                dateTimeString.push(`${formatTime(start)} ${formatDate(start)} to ${formatTime(end)} ${formatDate(end)}`);
+            }
             break;
 
         case SCHEDULE_TYPE.ALL_DAY:
@@ -278,11 +376,11 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
 
         case SCHEDULE_TYPE.REGULAR:
             if (localTimeZone) {
-                dateTimeString.push(`${formatTime(start)} - ${formatTime(end)}`);
+                dateTimeString.push(regulartTimeStr);
             } else {
-                dateTimeString.push(`${formatTime(start)} - ${formatTime(end)} ${formatDate(start)}`);
+                dateTimeString.push(`${regulartTimeStr}${formatDate(start)}`);
             }
-            break;        
+            break;
         }
     }
 
@@ -291,17 +389,6 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
     }
 
     return dateTimeString;
-}
-
-
-/**
- * Format coverage date ('HH:mm DD/MM')
- *
- * @param {String} dateString
- * @return {String}
- */
-export function formatCoverageDate(dateString) {
-    return parseDate(dateString).format(COVERAGE_DATE_FORMAT);
 }
 
 /**
@@ -402,7 +489,7 @@ export function wordCount(item) {
  * @return {number}
  */
 export function characterCount(item) {
-    
+
     if (isInteger(item.charcount)) {
         return item.charcount;
     }
@@ -436,12 +523,12 @@ export function toggleValue(items, value) {
 }
 
 
-export function updateRouteParams(updates, state) {
+export function updateRouteParams(updates, state, deleteEmpty = true) {
     const params = new URLSearchParams(window.location.search);
 
     Object.keys(updates).forEach((key) => {
         let updatedValue = updates[key];
-        if (!isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
+        if (!deleteEmpty || !isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
             if (typeof updatedValue === 'object') {
                 updatedValue = JSON.stringify(updatedValue);
             }
@@ -451,7 +538,6 @@ export function updateRouteParams(updates, state) {
         }
     });
 
-    
     const stateClone = cloneDeep(state);
     stateClone.items = [];
     stateClone.itemsById = {};
@@ -518,6 +604,13 @@ export function getConfig(key, defaultValue) {
     return get(clientConfig, key, defaultValue);
 }
 
+export function getLocale() {
+    const defaultLanguage = getConfig('default_language');
+    const locale = get(window, 'locale', defaultLanguage);
+
+    return locale;
+}
+
 export function getTimezoneOffset() {
     return now.utcOffset() ? now.utcOffset() * -1 : 0; // it's oposite to Date.getTimezoneOffset
 }
@@ -525,6 +618,10 @@ export function getTimezoneOffset() {
 export function isTouchDevice() {
     return 'ontouchstart' in window        // works on most browsers
     || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+}
+
+export function isMobilePhone() {
+    return isTouchDevice() && screen.width < 768;
 }
 
 /**
@@ -549,7 +646,7 @@ const getNow = throttle(moment, 500);
 
 /**
  * Test if item is embargoed, if not returns null, otherwise returns its embargo time
- * @param {String} embargoed 
+ * @param {String} embargoed
  * @return {Moment}
  */
 export function getEmbargo(item) {
@@ -561,4 +658,63 @@ export function getEmbargo(item) {
     const parsed = moment(item.embargoed);
 
     return parsed.isAfter(now) ? parsed : null;
+}
+
+export function getItemFromArray(value, items = [], field = '_id') {
+    return items.find((i) => i[field] === value);
+}
+
+export function upperCaseFirstCharacter(text) {
+    return (text && text.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase()));
+}
+
+export function postHistoryAction(item, action, section='wire') {
+    server.post('/history/new', {
+        item: item,
+        action: action,
+        section: section
+    }).catch((error) => errorHandler(error));
+}
+
+export function recordAction(item, action = 'open', section = 'wire', state = null) {
+    if (item) {
+        analytics.itemEvent(action, item);
+        analytics.itemView(item);
+        postHistoryAction(item, action, section);
+
+        if (action === 'preview') {
+            updateRouteParams({}, {
+                ...state,
+                previewItem: get(item, '_id')
+            });
+        }
+    }
+}
+
+export function closeItemOnMobile(dispatch, state, openItemDetails, previewItem) {
+    if (isMobilePhone()) {
+        dispatch(openItemDetails(null));
+        dispatch(previewItem(null));
+    }
+}
+
+/**
+ * Get the slugline appended by the takekey if one is defined
+ * @param {Object} item - The wire item to get the slugline from
+ * @param {boolean} withTakeKey - If true, appends the takekey to the response
+ * @returns {String}
+ */
+export function getSlugline(item, withTakeKey = false) {
+    if (!item || !item.slugline) {
+        return '';
+    }
+
+    let slugline = item.slugline.trim();
+    const takeKey = ` | ${item.anpa_take_key}`;
+
+    if (withTakeKey && item.anpa_take_key && !slugline.endsWith(takeKey)) {
+        slugline += takeKey;
+    }
+
+    return slugline;
 }

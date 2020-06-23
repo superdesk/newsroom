@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 
-function CheckboxInput({name, label, onChange, value, labelClass}) {
+function CheckboxInput({name, label, onChange, value, labelClass, readOnly}) {
     if (!name) {
         name = `input-${label}`;
     }
@@ -16,7 +16,8 @@ function CheckboxInput({name, label, onChange, value, labelClass}) {
                     className="custom-control-input"
                     checked={value}
                     id={name}
-                    onChange={onChange} />
+                    onChange={onChange}
+                    disabled={readOnly} />
                 <label className={classNames('custom-control-label', labelClass)} htmlFor={name}>{label}</label>
             </div>
         </div>
@@ -29,6 +30,7 @@ CheckboxInput.propTypes = {
     onChange: PropTypes.func.isRequired,
     value: PropTypes.bool.isRequired,
     labelClass: PropTypes.string,
+    readOnly: PropTypes.bool,
 };
 
 export default CheckboxInput;

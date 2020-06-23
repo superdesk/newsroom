@@ -2,7 +2,6 @@ import {get} from 'lodash';
 import {gettext} from '../utils';
 
 
-export const isDataItem = (item) => ((get(item, 'source') || '').toLowerCase() === 'intelematics');
 export const isFuel = (item) => (get(item, 'slugline') || '').match(/fuel/gi);
 export const isWeather = (item) => (get(item, 'slugline') || '').match(/weather|observation|forecast/gi);
 export const isTraffic = (item) => (get(item, 'slugline') || '').match(/traffic/gi);
@@ -10,6 +9,7 @@ export const isPublicTransport = (item) => (get(item, 'slugline') || '').match(/
 export const isAlert = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/^alert /gi);
 export const isQuote = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/^quote /gi);
 export const isHeadlines = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/headlines/gi);
+export const isDataItem = (item) => (isFuel(item) || isWeather(item));
 
 export const getAMNewsIcon = (item) => {
     let iconType = 'text';

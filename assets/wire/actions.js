@@ -1,21 +1,35 @@
-
-import { get, isEmpty } from 'lodash';
+import {get, isEmpty} from 'lodash';
 import mime from 'mime-types';
+
 import server from 'server';
 import analytics from 'analytics';
-import { gettext, notify, updateRouteParams, getTimezoneOffset, getTextFromHtml, fullDate } from 'utils';
-import { markItemAsRead, toggleNewsOnlyParam } from 'local-store';
-import { renderModal, closeModal, setSavedItemsCount } from 'actions';
 
 import {
-    setQuery,
-    toggleNavigation,
-    setCreatedFilter,
-    toggleNavigationById,
-    initParams as initSearchParams,
-} from 'search/actions';
-import {getLocations, getMapSource} from '../maps/utils';
+    gettext,
+    notify,
+    updateRouteParams,
+    getTimezoneOffset,
+    getTextFromHtml,
+    fullDate,
+    recordAction,
+    errorHandler as notifyErrors,
+    getSlugline,
+} from 'utils';
+import {getNavigationUrlParam} from 'search/utils';
 
+import {searchParamsSelector} from 'search/selectors';
+import {context} from 'selectors';
+
+import {markItemAsRead, toggleNewsOnlyParam} from 'local-store';
+import {renderModal, closeModal, setSavedItemsCount} from 'actions';
+
+import {
+    initParams as initSearchParams,
+    setNewItemsByTopic,
+    loadTopics,
+    setTopics,
+    loadMyTopic,
+} from 'search/actions';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state) {
@@ -48,7 +62,7 @@ export function previewItem(item) {
     return (dispatch, getState) => {
         markItemAsRead(item, getState());
         dispatch(preview(item));
-        item && analytics.itemEvent('preview', item);
+        recordAction(item, 'preview', getState().context, getState());
     };
 }
 
@@ -59,17 +73,18 @@ export function openItemDetails(item) {
 
 export function openItem(item) {
     return (dispatch, getState) => {
-        markItemAsRead(item, getState());
+        const state = getState();
+        markItemAsRead(item, state);
         dispatch(openItemDetails(item));
         updateRouteParams({
             item: item ? item._id : null
-        }, getState());
-        item && analytics.itemEvent('open', item);
-        analytics.itemView(item);
+        },  {
+            ...state,
+            openItem: item,
+        });
+        recordAction(item, 'open', state.context);
     };
 }
-
-
 
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {
@@ -91,15 +106,35 @@ export function initData(wireData, readData, newsOnly) {
     return {type: INIT_DATA, wireData, readData, newsOnly};
 }
 
-export const ADD_TOPIC = 'ADD_TOPIC';
-export function addTopic(topic) {
-    return {type: ADD_TOPIC, topic};
-}
-
 export const TOGGLE_NEWS = 'TOGGLE_NEWS';
 export function toggleNews() {
     toggleNewsOnlyParam();
     return {type: TOGGLE_NEWS};
+}
+
+export function removeItems(items) {
+    if (confirm(gettext('Are you sure you want to permanently remove these item(s)?'))) {
+        return server.del('/wire', {items})
+            .then(() => {
+                if (items.length > 1) {
+                    notify.success(gettext('Items were removed successfully'));
+                } else {
+                    notify.success(gettext('Item wes removed successfully'));
+                }
+            })
+            .catch(notifyErrors);
+    }
+
+    return Promise.resolve();
+}
+
+export const WIRE_ITEM_REMOVED = 'WIRE_ITEM_REMOVED';
+/**
+ * Marks the items as deleted when they're removed from the system
+ * @param {Array<String>} ids - List of ids of items that were removed
+ */
+export function onItemsDeleted(ids) {
+    return {type: WIRE_ITEM_REMOVED, ids: ids};
 }
 
 /**
@@ -113,9 +148,10 @@ export function copyPreviewContents(item) {
         const contents = [];
 
         contents.push(fullDate(item.versioncreated));
-        item.slugline && contents.push(item.slugline);
+        item.slugline && contents.push(getSlugline(item, true));
         item.headline && contents.push(item.headline);
-        item.byline && contents.push(gettext('By: {{ byline }}', {byline: get(item, 'byline')}));
+        item.byline && contents.push(gettext('By: {{ byline }}', {byline: item.byline}));
+        item.located && contents.push(gettext('Location: {{ located }}', {located: item.located}));
         item.source && contents.push(gettext('Source: {{ source }}', {source: item.source}));
 
         contents.push('');
@@ -154,7 +190,13 @@ export function copyPreviewContents(item) {
 
 export function printItem(item) {
     return (dispatch, getState) => {
-        window.open(`/${getState().context}/${item._id}?print`, '_blank');
+        const userContext = context(getState());
+        let uri = `/${userContext}/${item._id}?print`;
+        if (userContext === 'monitoring') {
+            const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
+            uri = `${uri}=true&monitoring_profile=${monitoringProfile}&type=monitoring`;
+        }
+        window.open(uri, '_blank');
         item && analytics.itemEvent('print', item);
         if (getState().user) {
             dispatch(setPrintItem(item._id));
@@ -169,29 +211,30 @@ export function printItem(item) {
  * @param {bool} next
  * @return {Promise}
  */
-function search(state, next) {
-    const activeFilter = get(state, 'search.activeFilter', {});
-    const activeNavigation = get(state, 'search.activeNavigation');
-    const createdFilter = get(state, 'search.createdFilter', {});
-    const newsOnly = !!get(state, 'wire.newsOnly');
-    const context = get(state, 'context', 'wire');
-
+export function search(state, next) {
+    const searchParams = searchParamsSelector(state);
+    const createdFilter = get(searchParams, 'created') || {};
     let created_to = createdFilter.to;
+
     if (createdFilter.from && createdFilter.from.indexOf('now') >= 0) {
         created_to = createdFilter.from;
     }
 
+    const newsOnly = !!get(state, 'wire.newsOnly');
+    const context = get(state, 'context', 'wire');
 
     const params = {
-        q: state.query,
+        q: !searchParams.query ? null : encodeURIComponent(searchParams.query),
         bookmarks: state.bookmarks && state.user,
-        navigation: activeNavigation,
-        filter: !isEmpty(activeFilter) && encodeURIComponent(JSON.stringify(activeFilter)),
+        navigation: getNavigationUrlParam(searchParams.navigation, true, false),
+        filter: !isEmpty(searchParams.filter) && encodeURIComponent(JSON.stringify(searchParams.filter)),
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to,
         timezone_offset: getTimezoneOffset(),
-        newsOnly
+        newsOnly,
+        product: searchParams.product,
+        es_highlight: !searchParams.query ? null : 1,
     };
 
     const queryString = Object.keys(params)
@@ -205,20 +248,13 @@ function search(state, next) {
 /**
  * Fetch items for current query
  */
-export function fetchItems(updateRoute = true) {
+export function fetchItems() {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
         return search(getState())
             .then((data) => dispatch(recieveItems(data)))
             .then(() => {
-                const state = getState();
-                updateRoute && updateRouteParams({
-                    q: state.query,
-                    filter: get(state, 'search.activeFilter'),
-                    navigation: get(state, 'search.activeNavigation'),
-                    created: get(state, 'search.createdFilter'),
-                }, state);
                 analytics.timingComplete('search', Date.now() - start);
             })
             .catch(errorHandler);
@@ -227,21 +263,9 @@ export function fetchItems(updateRoute = true) {
 
 
 export function fetchItem(id) {
-    return (dispatch) => {
-        return server.get(`/wire/${id}?format=json`)
-            .then((data) => dispatch(recieveItem(data)))
-            .catch(errorHandler);
-    };
-}
-
-export function submitFollowTopic(data) {
     return (dispatch, getState) => {
-        const user = getState().user;
-        const url = `/api/users/${user}/topics`;
-        data.timezone_offset = getTimezoneOffset();
-        return server.post(url, data)
-            .then((updates) => dispatch(addTopic(Object.assign(data, updates))))
-            .then(() => dispatch(closeModal()))
+        return server.get(`/${context(getState())}/${id}?format=json&context=wire`)
+            .then((data) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
 }
@@ -258,33 +282,6 @@ export function shareItems(items) {
         return server.get(`/companies/${company}/users`)
             .then((users) => users.filter((u) => u._id !== user))
             .then((users) => dispatch(renderModal('shareItem', {items, users})))
-            .catch(errorHandler);
-    };
-}
-
-/**
- * Submit share item form and close modal if that works
- *
- * @param {Object} data
- */
-export function submitShareItem(data) {
-    return (dispatch, getState) => {
-        const type = getState().context || data.items[0].topic_type;
-        data.maps = [];
-        if (type === 'agenda') {
-            data.items.map((_id) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
-        }
-        return server.post(`/wire_share?type=${getState().context || data.items[0].topic_type}`, data)
-            .then(() => {
-                dispatch(closeModal());
-                dispatch(setShareItems(data.items));
-                if (data.items.length > 1) {
-                    notify.success(gettext('Items were shared successfully.'));
-                } else {
-                    notify.success(gettext('Item was shared successfully.'));
-                }
-            })
-            .then(() => analytics.multiItemEvent('share', data.items.map((_id) => getState().itemsById[_id])))
             .catch(errorHandler);
     };
 }
@@ -312,6 +309,11 @@ export function setShareItems(items) {
 export const DOWNLOAD_ITEMS = 'DOWNLOAD_ITEMS';
 export function setDownloadItems(items) {
     return {type: DOWNLOAD_ITEMS, items};
+}
+
+export const EXPORT_ITEMS = 'EXPORT_ITEMS';
+export function setExportItems(items) {
+    return {type: EXPORT_ITEMS, items};
 }
 
 export const COPY_ITEMS = 'COPY_ITEMS';
@@ -406,20 +408,23 @@ export function downloadItems(items) {
  * Start download - open download view in new window.
  *
  * @param {Array} items
- * @param {String} format
+ * @param {String} params
  */
-export function submitDownloadItems(items, format) {
+export function submitDownloadItems(items, params) {
     return (dispatch, getState) => {
-        window.open(`/download/${items.join(',')}?format=${format}&type=${getState().context}`, '_blank');
+        const {format, secondaryFormat} = params;
+        const userContext = context(getState());
+        let uri = `/download/${items.join(',')}?format=${format}&type=${userContext}`;
+        if (userContext === 'monitoring') {
+            const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
+            uri = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
+            uri = `${uri}&secondary_format=${secondaryFormat}`;
+        }
+        window.open(uri, '_blank');
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
         analytics.multiItemEvent('download', items.map((_id) => getState().itemsById[_id]));
     };
-}
-
-export const SET_NEW_ITEMS_BY_TOPIC = 'SET_NEW_ITEMS_BY_TOPIC';
-export function setNewItemsByTopic(data) {
-    return {type: SET_NEW_ITEMS_BY_TOPIC, data};
 }
 
 
@@ -431,7 +436,7 @@ export function removeNewItems(data) {
 /**
  * Handle server push notification
  *
- * @param {Object} data
+ * @param {Object} push
  */
 export function pushNotification(push) {
     return (dispatch, getState) => {
@@ -446,26 +451,34 @@ export function pushNotification(push) {
         case `topics:${user}`:
             return dispatch(reloadTopics(user));
 
+        case `topic_created:${user}`:
+            return dispatch(reloadTopics(user, true));
+
         case `saved_items:${user}`:
             return dispatch(setSavedItemsCount(push.extra.count));
+
+        case 'items_deleted':
+            return dispatch(onItemsDeleted(push.extra.ids));
         }
     };
 }
 
-function reloadTopics(user) {
+function reloadTopics(user, reloadTopic = false) {
     return function (dispatch) {
-        return server.get(`/users/${user}/topics`)
+        return loadTopics(user)
             .then((data) => {
                 const wireTopics = data._items.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
-                return dispatch(setTopics(wireTopics));
+                dispatch(setTopics(wireTopics));
+
+                if (reloadTopic) {
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('topic')) {
+                        dispatch(loadMyWireTopic(params.get('topic')));
+                    }
+                }
             })
             .catch(errorHandler);
     };
-}
-
-export const SET_TOPICS = 'SET_TOPICS';
-function setTopics(topics) {
-    return {type: SET_TOPICS, topics};
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
@@ -529,6 +542,13 @@ export function fetchMoreItems() {
     };
 }
 
+export function loadMyWireTopic(topicId) {
+    return (dispatch) => {
+        dispatch(loadMyTopic(topicId));
+        return dispatch(fetchItems());
+    };
+}
+
 /**
  * Set state on app init using url params
  *
@@ -544,27 +564,5 @@ export function initParams(params) {
                     dispatch(openItem(item));
                 });
         }
-    };
-}
-
-
-export const RESET_FILTER = 'RESET_FILTER';
-export function resetFilter(filter) {
-    return {type: RESET_FILTER, filter};
-}
-
-/**
- * Set query for given topic
- *
- * @param {Object} topic
- * @return {Promise}
- */
-export function setTopicQuery(topic) {
-    return (dispatch) => {
-        topic.navigation ?  dispatch(toggleNavigationById(topic.navigation)) : dispatch(toggleNavigation());
-        dispatch(setQuery(topic.query || ''));
-        dispatch(resetFilter(topic.filter));
-        dispatch(setCreatedFilter(topic.created));
-        return dispatch(fetchItems());
     };
 }

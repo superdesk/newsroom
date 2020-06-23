@@ -23,7 +23,7 @@
 
 <div class="newsroomWrap">
     {% block topnav %}
-        <nav class="main navbar justify-content-start align-items-stretch">
+        <nav class="main navbar justify-content-start align-items-stretch flex-nowrap">
             {% include 'logo.html' %}
             <div class="navbar-brand d-flex align-items-center ml-0 ml-sm-1 ml-md-2 mr-0 mr-sm-4">
                 <nav>
@@ -32,7 +32,7 @@
             </div>
 
             {% if session.get('name') %}
-            <div class="form-inline my-lg-0 ml-auto">
+            <div class="form-inline my-lg-0 ml-auto flex-shrink-0 flex-grow-0">
                 <div class="mr-2 d-none d-md-block">{{ get_date() | date_header }}</div>
                 <div class="notif" id="header-notification"></div>
                 <div id="header-profile-toggle"></div>
@@ -49,19 +49,19 @@
         </nav>
     {% endblock %}
 
-    <div class="contentWrap flex-column flex-sm-row {% block custom_content_style %}{% endblock %}">
+    <div class="contentWrap flex-column flex-md-p-row flex-lg-l-row {% block custom_content_style %}{% endblock %}">
         {% if session.get('name') %}
         <nav class="sidenav">
             <ul class="sidenav-icons">
                 {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin()%}
-                <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-sm-block {% if request.blueprint == 'settings' %}active{% endif %}">
+                <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-md-p-block d-lg-l-block {% if request.blueprint == 'settings' %}active{% endif %}">
                   <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
                       <i class="icon--cog icon--mid-blue"></i>
                   </a>
                 </li>
                 {% endif %}{% endfor %}
                 {% if is_admin_or_account_manager() %}
-                <li class="sidenav-icons__item sidenav-icons__item--report d-none d-sm-block {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
+                <li class="sidenav-icons__item sidenav-icons__item--report d-none d-md-p-block d-lg-l-block {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
                   <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" data-toggle="tooltip" data-placement="right">
                       <i class="icon--report icon--mid-blue"></i>
                   </a>

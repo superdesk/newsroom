@@ -1,13 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 import DateInput from 'components/DateInput';
 
-import { isEmpty } from 'lodash';
+import { isEmpty, get, sortBy } from 'lodash';
 import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
 import CompanyPermissions from './CompanyPermissions';
+import EditCompanyAPI from './EditCompanyAPI';
+import AuditInformation from 'components/AuditInformation';
 import { countries } from '../utils';
 
 class EditCompany extends React.Component {
@@ -21,6 +25,10 @@ class EditCompany extends React.Component {
             {label: gettext('Users'), name: 'users'},
             {label: gettext('Permissions'), name: 'permissions'},
         ];
+
+        if (this.props.apiEnabled) {
+            this.tabs.push({label: gettext('API'), name: 'api'});
+        }
     }
 
     handleTabClick(event) {
@@ -56,7 +64,10 @@ class EditCompany extends React.Component {
 
     render() {
         return (
-            <div className='list-item__preview'>
+            <div className={classNames(
+                'list-item__preview',
+                {'list-item__preview--large': this.props.apiEnabled}
+            )}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.company.name}</h3>
                     <button
@@ -69,7 +80,7 @@ class EditCompany extends React.Component {
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>
                 </div>
-
+                <AuditInformation item={this.props.company} />
                 <ul className='nav nav-tabs'>
                     {this.tabs.filter((tab, index) => index === 0 || this.props.company._id).map((tab) => (
                         <li key={tab.name} className='nav-item'>
@@ -119,6 +130,13 @@ class EditCompany extends React.Component {
                                         error={this.props.errors ? this.props.errors.sd_subscriber_id : null}/>
 
                                     <TextInput
+                                        name='account_manager'
+                                        label={gettext('Account Manager')}
+                                        value={this.props.company.account_manager}
+                                        onChange={this.props.onChange}
+                                        error={this.props.errors ? this.props.errors.account_manager : null}/>
+
+                                    <TextInput
                                         name='phone'
                                         label={gettext('Telephone')}
                                         value={this.props.company.phone}
@@ -153,6 +171,16 @@ class EditCompany extends React.Component {
                                         value={getDateInputDate(this.props.company.expiry_date)}
                                         onChange={this.props.onChange}
                                         error={this.props.errors ? this.props.errors.expiry_date : null}/>
+
+                                    {get(this.props, 'company.sections.monitoring') && <SelectInput
+                                        name='monitoring_administrator'
+                                        label={gettext('Monitoring Administrator')}
+                                        value={this.props.company.monitoring_administrator}
+                                        options={sortBy(this.props.users || [], 'first_name').map((u) => ({
+                                            text: `${u.first_name} ${u.last_name}`,
+                                            value: u._id}))}
+                                        defaultOption=""
+                                        onChange={this.props.onChange}/>}
 
                                     <CheckboxInput
                                         labelClass={isInPast(this.props.company.expiry_date) ? 'text-danger' : ''}
@@ -189,6 +217,15 @@ class EditCompany extends React.Component {
                             company={this.props.company}
                         />
                     }
+                    {this.props.apiEnabled && this.state.activeTab === 'api' && this.props.company._id && (
+                        <EditCompanyAPI
+                            company={this.props.company}
+                            onEditCompany={this.props.onChange}
+                            onSave={this.props.onSave}
+                            errors={this.props.errors}
+                            originalItem={this.props.originalItem}
+                        />
+                    )}
                 </div>
             </div>
         );
@@ -205,6 +242,8 @@ EditCompany.propTypes = {
     onDelete: PropTypes.func.isRequired,
     fetchCompanyUsers: PropTypes.func.isRequired,
     companyTypes: PropTypes.array,
+    apiEnabled: PropTypes.bool,
+    originalItem: PropTypes.object,
 };
 
 export default EditCompany;

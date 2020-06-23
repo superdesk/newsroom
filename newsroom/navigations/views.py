@@ -9,7 +9,7 @@ from superdesk import get_resource_service
 from newsroom.decorator import admin_only
 from newsroom.navigations import blueprint
 from newsroom.products.products import get_products_by_navigation
-from newsroom.utils import get_json_or_400, get_entity_or_404, query_resource
+from newsroom.utils import get_json_or_400, get_entity_or_404, query_resource, set_original_creator, set_version_creator
 from newsroom.upload import get_file
 
 
@@ -17,7 +17,7 @@ def get_settings_data():
     return {
         'products': list(query_resource('products')),
         'navigations': list(query_resource('navigations')),
-        'sections': app.sections,
+        'sections': [s for s in app.sections if s.get('_id') != 'monitoring'],  # monitoring has no navigation
     }
 
 
@@ -28,7 +28,6 @@ def index():
 
 
 @blueprint.route('/navigations/search', methods=['GET'])
-@admin_only
 def search():
     lookup = None
     if flask.request.args.get('q'):
@@ -44,6 +43,7 @@ def create():
     data = json.loads(flask.request.form['navigation'])
     nav_data = _get_navigation_data(data)
 
+    set_original_creator(nav_data)
     ids = get_resource_service('navigations').post([nav_data])
     return jsonify({'success': True, '_id': ids[0]}), 201
 
@@ -76,6 +76,7 @@ def edit(_id):
     data = json.loads(flask.request.form['navigation'])
     nav_data = _get_navigation_data(data)
 
+    set_version_creator(nav_data)
     get_resource_service('navigations').patch(id=ObjectId(_id), updates=nav_data)
     return jsonify({'success': True}), 200
 

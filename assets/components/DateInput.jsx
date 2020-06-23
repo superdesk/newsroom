@@ -1,20 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import InputWrapper from './InputWrapper';
 
 function DateInput({name, label, onChange, value, error, required}) {
-    let wrapperClass = 'form-group';
-
-    if (error && error.length > 0) {
-        wrapperClass += ' has-error';
-    }
-
-    if (!name) {
-        name = `input-${label}`;
-    }
-
     return (
-        <div className={wrapperClass}>
+        <InputWrapper error={error} name={name}>
             <label htmlFor={name}>{label}</label>
             <div className="field">
                 <input type="date"
@@ -27,7 +18,7 @@ function DateInput({name, label, onChange, value, error, required}) {
                 />
                 {error && <div className="alert alert-danger">{error}</div>}
             </div>
-        </div>
+        </InputWrapper>
     );
 }
 

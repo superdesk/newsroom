@@ -3,6 +3,8 @@ import tzlocal
 
 from kombu import Queue, Exchange
 from celery.schedules import crontab
+from superdesk.default_settings import strtobool, env, local_to_utc_hour
+from datetime import timedelta
 
 from superdesk.default_settings import (   # noqa
     VERSION,
@@ -27,6 +29,7 @@ from superdesk.default_settings import (   # noqa
     MAIL_USE_TLS,
     MAIL_USE_SSL,
     _MAIL_FROM,
+    MAIL_USERNAME,
     MAIL_PASSWORD,
     CELERY_TASK_ALWAYS_EAGER,
     CELERY_TASK_SERIALIZER,
@@ -38,10 +41,8 @@ from superdesk.default_settings import (   # noqa
     CELERY_WORKER_LOG_FORMAT,
     CELERY_WORKER_TASK_LOG_FORMAT,
     CELERY_WORKER_CONCURRENCY,
-    CELERY_TASK_DEFAULT_QUEUE,
-    CELERY_TASK_DEFAULT_EXCHANGE,
-    CELERY_TASK_DEFAULT_ROUTING_KEY,
-    CELERY_BEAT_SCHEDULE_FILENAME
+    CELERY_BEAT_SCHEDULE_FILENAME,
+    LOG_CONFIG_FILE,
 )
 
 XML = False
@@ -57,9 +58,20 @@ X_ALLOW_CREDENTIALS = True
 
 URL_PREFIX = 'api'
 
-# keys for signing, shoudl be binary
+# keys for signing, should be binary
 SECRET_KEY = os.environ.get('SECRET_KEY', '').encode() or os.urandom(32)
 PUSH_KEY = os.environ.get('PUSH_KEY', '').encode()
+
+#: Default TimeZone, will try to guess from server settings if not set
+DEFAULT_TIMEZONE = os.environ.get('DEFAULT_TIMEZONE')
+
+if DEFAULT_TIMEZONE is None:
+    DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
+
+if not DEFAULT_TIMEZONE:
+    raise ValueError("DEFAULT_TIMEZONE is empty")
+
+BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     'newsroom.wire',
@@ -67,6 +79,7 @@ BLUEPRINTS = [
     'newsroom.users',
     'newsroom.companies',
     'newsroom.design',
+    'newsroom.history',
     'newsroom.push',
     'newsroom.topics',
     'newsroom.upload',
@@ -78,11 +91,14 @@ BLUEPRINTS = [
     'newsroom.reports',
     'newsroom.public',
     'newsroom.agenda',
-    'newsroom.settings'
+    'newsroom.settings',
+    'newsroom.news_api.api_tokens',
+    'newsroom.monitoring',
 ]
 
 CORE_APPS = [
     'superdesk.notification',
+    'superdesk.data_updates',
     'content_api.items',
     'content_api.items_versions',
     'content_api.search',
@@ -106,6 +122,11 @@ CORE_APPS = [
     'newsroom.settings',
     'newsroom.photos',
     'newsroom.media_utils',
+    'newsroom.news_api',
+    'newsroom.news_api.api_tokens',
+    'newsroom.news_api.api_audit',
+    'newsroom.monitoring',
+    'newsroom.company_expiry_alerts',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -116,21 +137,15 @@ CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
 PRIVACY_POLICY = 'https://www.aap.com.au/legal/'
 TERMS_AND_CONDITIONS = 'https://www.aap.com.au/legal/'
 SHOW_COPYRIGHT = True
+SHOW_USER_REGISTER = False
 
 TEMPLATES_AUTO_RELOAD = True
 
-DEFAULT_TIMEZONE = os.environ.get('DEFAULT_TIMEZONE')
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S+0000'
-
-if DEFAULT_TIMEZONE is None:
-    DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
-
-BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 WEBPACK_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static', 'dist', 'manifest.json')
 WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL', '/static/dist/')
 WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL', 'http://localhost:8080/')
-
 
 # How many days a new account can stay active before it is approved by admin
 NEW_ACCOUNT_ACTIVE_DAYS = 14
@@ -174,6 +189,8 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 # If false, aggregations will change by filters applied
 FILTER_BY_POST_FILTER = False
 
+FILTER_AGGREGATIONS = True
+
 # List of filters to remove matching stories when news only switch is turned on
 NEWS_ONLY_FILTERS = [
    {'match': {'genre.code': 'Results (sport)'}},
@@ -185,8 +202,6 @@ PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 
 # the time to live value in days for user notifications
 NOTIFICATIONS_TTL = 1
-
-WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
 
 SERVICES = [
     {"name": "Domestic Sport", "code": "t"},
@@ -210,9 +225,6 @@ SERVICES = [
     # {"name": "Special Events (olympics/ Aus elections)", "code": "x"},
 ]
 
-CLIENT_TIME_FORMAT = 'HH:mm'
-CLIENT_DATE_FORMAT = 'DD/MM/YYYY'
-CLIENT_COVERAGE_DATE_FORMAT = 'HH:mm DD/MM'
 
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
@@ -231,24 +243,41 @@ COVERAGE_TYPES = {
     'video': {'name': 'Video', 'icon': 'video'},
     'explainer': {'name': 'Explainer', 'icon': 'explainer'},
     'infographics': {'name': 'Infographics', 'icon': 'infographics'},
+    'graphic': {'name': 'Graphic', 'icon': 'infographics'},
     'live_video': {'name': 'Live Video', 'icon': 'live-video'},
     'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'},
     'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
 }
 
 
+LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
+DEFAULT_LANGUAGE = 'en'
+
+CLIENT_LOCALE_FORMATS = {
+    "en": {  # defaults
+        "TIME_FORMAT": "HH:mm",
+        "DATE_FORMAT": "DD/MM/YYYY",
+        "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
+        "COVERAGE_DATE_FORMAT": "DD/MM",
+    },
+    "fr_CA": {  # example - you can overwrite any format above
+        "DATE_FORMAT": "DD/MM/YYYY",
+    }
+}
+
 # Client configuration
 CLIENT_CONFIG = {
-    'time_format': CLIENT_TIME_FORMAT,
-    'date_format': CLIENT_DATE_FORMAT,
-    'coverage_date_format': CLIENT_COVERAGE_DATE_FORMAT,
+    'default_language': DEFAULT_LANGUAGE,
+    'locale_formats': CLIENT_LOCALE_FORMATS,
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
-    'list_animations': True,  # Enables or disables the animations for list item select boxes
+    'list_animations': True,  # Enables or disables the animations for list item select boxes,
+    'display_news_only': True,  # Displays news only switch in wire,
+    'default_timezone': DEFAULT_TIMEZONE
 }
 
 LANGUAGES = ['en', 'fi', 'cs']
-DEFAULT_LANGUAGE = 'en'
+DEFAULT_LANGUAGE = 'cs'
 
 # Enable iframely support for item body_html
 IFRAMELY = True
@@ -256,11 +285,17 @@ IFRAMELY = True
 COMPANY_TYPES = []
 
 #: celery config
-CELERY_TASK_QUEUES = (Queue(celery_queue('newsroom'), Exchange(celery_queue('newsroom')), routing_key='newsroom.#'),)
+WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
+
+CELERY_TASK_DEFAULT_QUEUE = celery_queue('newsroom')
+CELERY_TASK_QUEUES = (
+    Queue(celery_queue('newsroom'), Exchange(celery_queue('newsroom'), type='topic'), routing_key='newsroom.#'),
+)
+
 CELERY_TASK_ROUTES = {
-    'newsroom.company_expiry': {
+    'newsroom.*': {
         'queue': celery_queue('newsroom'),
-        'routing_key': 'newsroom.company_expiry_alerts.company_expiry'
+        'routing_key': 'newsroom.task',
     }
 }
 
@@ -268,6 +303,19 @@ CELERY_TASK_ROUTES = {
 CELERY_BEAT_SCHEDULE = {
     'newsroom:company_expiry': {
         'task': 'newsroom.company_expiry_alerts.company_expiry',
-        'schedule': crontab(hour=0, minute=0),  # Runs every day at midnight
+        'schedule': crontab(hour=local_to_utc_hour(0), minute=0),  # Runs every day at midnight
+    },
+    'newsroom:monitoring_schedule_alerts': {
+        'task': 'newsroom.monitoring.email_alerts.monitoring_schedule_alerts',
+        'schedule': timedelta(seconds=60),
+    },
+    'newsroom:monitoring_immediate_alerts': {
+        'task': 'newsroom.monitoring.email_alerts.monitoring_immediate_alerts',
+        'schedule': timedelta(seconds=60),
     }
 }
+
+MAX_EXPIRY_QUERY_LIMIT = os.environ.get('MAX_EXPIRY_QUERY_LIMIT', 100)
+CONTENT_API_EXPIRY_DAYS = os.environ.get('CONTENT_API_EXPIRY_DAYS', 180)
+
+NEWS_API_ENABLED = strtobool(env('NEWS_API_ENABLED', 'false'))

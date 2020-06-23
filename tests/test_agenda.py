@@ -1,11 +1,81 @@
 import pytz
 from flask import json
 from datetime import datetime
-from newsroom.wire.utils import get_local_date, get_end_date
-from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts
+from urllib import parse
+from unittest import mock
 
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
+from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts, get_entity_or_404, \
+    get_local_date, get_end_date
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import post_json, delete_json, get_json
+from .utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
+from copy import deepcopy
+from bson import ObjectId
+
+date_time_format = '%Y-%m-%dT%H:%M:%S'
+
+test_planning = {
+    "description_text": "description here",
+    "abstract": "abstract text",
+    "_current_version": 1,
+    "agendas": [],
+    "anpa_category": [
+        {
+            "name": "Entertainment",
+            "subject": "01000000",
+            "qcode": "e"
+        }
+    ],
+    "item_id": "foo",
+    "ednote": "ed note here",
+    "slugline": "Vivid planning item",
+    "headline": "Planning headline",
+    "planning_date": "2018-05-28T10:51:52+0000",
+    "state": "scheduled",
+    "item_class": "plinat:newscoverage",
+    "coverages": [
+        {
+            "planning": {
+                "g2_content_type": "text",
+                "slugline": "Vivid planning item",
+                "internal_note": "internal note here",
+                "genre": [
+                    {
+                        "name": "Article (news)",
+                        "qcode": "Article"
+                    }
+                ],
+                "ednote": "ed note here",
+                "scheduled": "2018-05-28T10:51:52+0000"
+            },
+            "news_coverage_status": {
+                "name": "coverage intended",
+                "label": "Planned",
+                "qcode": "ncostat:int"
+            },
+            "workflow_status": "draft",
+            "firstcreated": "2018-05-28T10:55:00+0000",
+            "coverage_id": "213"
+        }
+    ],
+    "_id": "foo",
+    "urgency": 3,
+    "guid": "foo",
+    "name": "This is the name of the vivid planning item",
+    "subject": [
+        {
+            "name": "library and museum",
+            "qcode": "01009000",
+            "parent": "01000000"
+        }
+    ],
+    "pubstatus": "usable",
+    "type": "planning",
+}
+
+
+def mock_utcnow():
+    return datetime.strptime('2018-11-23T22:00:00', date_time_format)
 
 
 def test_item_detail(client):
@@ -47,7 +117,7 @@ def get_bookmarks_count(client, user):
 
 
 def test_bookmarks(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert user_id
 
     assert 0 == get_bookmarks_count(client, user_id)
@@ -75,11 +145,12 @@ def test_item_copy(client, app):
     data = json.loads(resp.get_data())
     assert 'copies' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['copies']
 
 
-def test_share_items(client, app):
+@mock.patch('newsroom.wire.views.send_email', mock_send_email)
+def test_share_items(client, app, mocker):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
         'first_name': 'Foo',
@@ -96,19 +167,18 @@ def test_share_items(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@sourcefabric.org'
         assert outbox[0].subject == 'From AAP Newsroom: Conference Planning'
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin shared ' in outbox[0].body
+        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert 'Conference Planning' in outbox[0].body
-        assert 'http://localhost:5050/agenda/urn:conference' in outbox[0].body
+        assert 'http://localhost:5050/agenda?item=urn%3Aconference' in outbox[0].body
         assert 'Some info message' in outbox[0].body
 
     resp = client.get('/agenda/{}?format=json'.format('urn:conference'))
     data = json.loads(resp.get_data())
     assert 'shares' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['shares']
 
 
@@ -154,6 +224,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert 'files' not in data['_items'][0]['event']
     assert 'internal_note' not in data['_items'][0]['event']
     assert 'internal_note' not in data['_items'][0]['planning_items'][0]
+    assert 'internal_note' not in data['_items'][0]['planning_items'][0]['coverages'][0]['planning']
     assert 'internal_note' not in data['_items'][0]['coverages'][0]['planning']
     resp = client.get('/agenda/search?navigation=51')
     data = json.loads(resp.get_data())
@@ -161,6 +232,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert '_aggregations' in data
 
 
+@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_coverage_request(client, app):
     post_json(client, '/settings/general_settings', {'coverage_request_recipients': 'admin@bar.com'})
     with app.mail.record_messages() as outbox:
@@ -172,15 +244,15 @@ def test_coverage_request(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['admin@bar.com']
-        assert outbox[0].subject == 'A new coverage request'
+        assert outbox[0].subject == 'Coverage inquiry: Conference Planning'
         assert 'admin admin' in outbox[0].body
         assert 'admin@sourcefabric.org' in outbox[0].body
-        assert 'http://localhost:5050/agenda/urn:conference' in outbox[0].body
+        assert 'http://localhost:5050/agenda?item={}'.format(parse.quote('urn:conference')) in outbox[0].body
         assert 'Some info message' in outbox[0].body
 
 
 def test_watch_event(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert 0 == get_bookmarks_count(client, user_id)
 
     post_json(client, '/agenda_watch', {'items': ['urn:conference']})
@@ -190,34 +262,113 @@ def test_watch_event(client, app):
     assert 0 == get_bookmarks_count(client, user_id)
 
 
+def test_watch_coverages(client, app):
+    user_id = get_admin_user_id(app)
+
+    post_json(client, '/agenda_coverage_watch', {
+        'coverage_id': 'urn:coverage',
+        'item_id': 'urn:conference',
+    })
+
+    after_watch_item = get_entity_or_404('urn:conference', 'agenda')
+    assert after_watch_item['coverages'][0]['watches'] == [user_id]
+
+
+def test_unwatch_coverages(client, app):
+    user_id = get_admin_user_id(app)
+
+    post_json(client, '/agenda_coverage_watch', {
+        'coverage_id': 'urn:coverage',
+        'item_id': 'urn:conference',
+    })
+
+    after_watch_item = get_entity_or_404('urn:conference', 'agenda')
+    assert after_watch_item['coverages'][0]['watches'] == [user_id]
+
+    delete_json(client, '/agenda_coverage_watch', {
+        'coverage_id': 'urn:coverage',
+        'item_id': 'urn:conference',
+    })
+
+    after_watch_item = get_entity_or_404('urn:conference', 'agenda')
+    assert after_watch_item['coverages'][0]['watches'] == []
+
+
+def test_remove_watch_coverages_on_watch_item(client, app):
+    user_id = ObjectId(get_admin_user_id(app))
+    other_user_id = PUBLIC_USER_ID
+
+    test_planning_coverage_watches = deepcopy(test_planning)
+    test_planning_coverage_watches['coverages'][0]['watches'] = [other_user_id]
+    client.post('/push', data=json.dumps(test_planning_coverage_watches), content_type='application/json')
+
+    post_json(client, '/agenda_coverage_watch', {
+        'coverage_id': test_planning_coverage_watches['coverages'][0]['coverage_id'],
+        'item_id': test_planning_coverage_watches['_id'],
+    })
+
+    after_watch_coverage_item = get_entity_or_404(test_planning_coverage_watches['_id'], 'agenda')
+    assert str(other_user_id) in after_watch_coverage_item['coverages'][0]['watches']
+    assert user_id in after_watch_coverage_item['coverages'][0]['watches']
+
+    post_json(client, '/agenda_watch', {'items': [test_planning_coverage_watches['_id']]})
+    after_watch_item = get_entity_or_404(test_planning_coverage_watches['_id'], 'agenda')
+    assert after_watch_item['coverages'][0]['watches'] == [str(other_user_id)]
+    assert after_watch_item['watches'] == [user_id]
+
+
+def test_fail_watch_coverages(client, app):
+    user_id = get_admin_user_id(app)
+
+    post_json(client, '/agenda_watch', {'items': ['urn:conference']})
+    after_watch_item = get_entity_or_404('urn:conference', 'agenda')
+    assert after_watch_item['watches'] == [user_id]
+
+    with client.session_transaction() as session:
+        session['user'] = str(PUBLIC_USER_ID)
+        session['user_type'] = 'public'
+        request = {
+            'coverage_id': 'urn:coverage',
+            'item_id': 'urn:conference',
+        }
+
+        # Add a coverage watch
+        resp = client.post('/agenda_coverage_watch', data=json.dumps(request, indent=2),
+                           content_type='application/json')
+        assert resp.status_code == 403
+
+        # Remove a coverage watch
+        resp = client.delete('/agenda_coverage_watch', data=json.dumps(request, indent=2),
+                             content_type='application/json')
+        assert resp.status_code == 403
+
+
+@mock.patch('newsroom.utils.get_utcnow', mock_utcnow)
 def test_local_time(client, app, mocker):
     # 9 am Sydney Time - day light saving on
-    format = '%Y-%m-%dT%H:%M:%S'
-    test_utcnow = datetime.strptime('2018-11-23T22:00:00', format)
-    mocker.patch('newsroom.wire.utils.get_utcnow', return_value=test_utcnow)
     local_date = get_local_date('now/d', '00:00:00', -660)
-    assert '2018-11-23T13:00:00' == local_date.strftime(format)
+    assert '2018-11-23T13:00:00' == local_date.strftime(date_time_format)
 
     local_date = get_local_date('now/w', '00:00:00', -660)
-    assert '2018-11-18T13:00:00' == local_date.strftime(format)
+    assert '2018-11-18T13:00:00' == local_date.strftime(date_time_format)
 
     local_date = get_local_date('now/M', '00:00:00', -660)
-    assert '2018-10-31T13:00:00' == local_date.strftime(format)
+    assert '2018-10-31T13:00:00' == local_date.strftime(date_time_format)
 
     local_date = get_local_date('2018-11-24', '00:00:00', -660)
-    assert '2018-11-23T13:00:00' == local_date.strftime(format)
+    assert '2018-11-23T13:00:00' == local_date.strftime(date_time_format)
 
     end_local_date = get_local_date('2018-11-24', '23:59:59', -660)
-    assert '2018-11-24T12:59:59' == end_local_date.strftime(format)
+    assert '2018-11-24T12:59:59' == end_local_date.strftime(date_time_format)
 
     end_date = get_end_date('now/d', end_local_date)
-    assert '2018-11-24T12:59:59' == end_date.strftime(format)
+    assert '2018-11-24T12:59:59' == end_date.strftime(date_time_format)
 
     end_date = get_end_date('now/w', end_local_date)
-    assert '2018-11-30T12:59:59' == end_date.strftime(format)
+    assert '2018-11-30T12:59:59' == end_date.strftime(date_time_format)
 
     end_date = get_end_date('now/M', end_local_date)
-    assert '2018-12-23T12:59:59' == end_date.strftime(format)
+    assert '2018-12-23T12:59:59' == end_date.strftime(date_time_format)
 
 
 def test_get_location_string():
@@ -319,65 +470,6 @@ def test_get_agenda_dates():
 
 
 def test_filter_agenda_by_coverage_status(client):
-    test_planning = {
-        "description_text": "description here",
-        "abstract": "abstract text",
-        "_current_version": 1,
-        "agendas": [],
-        "anpa_category": [
-            {
-                "name": "Entertainment",
-                "subject": "01000000",
-                "qcode": "e"
-            }
-        ],
-        "item_id": "foo",
-        "ednote": "ed note here",
-        "slugline": "Vivid planning item",
-        "headline": "Planning headline",
-        "planning_date": "2018-05-28T10:51:52+0000",
-        "state": "scheduled",
-        "item_class": "plinat:newscoverage",
-        "coverages": [
-            {
-                "planning": {
-                    "g2_content_type": "text",
-                    "slugline": "Vivid planning item",
-                    "internal_note": "internal note here",
-                    "genre": [
-                        {
-                            "name": "Article (news)",
-                            "qcode": "Article"
-                        }
-                    ],
-                    "ednote": "ed note here",
-                    "scheduled": "2018-05-28T10:51:52+0000"
-                },
-                "news_coverage_status": {
-                    "name": "coverage intended",
-                    "label": "Planned",
-                    "qcode": "ncostat:int"
-                },
-                "workflow_status": "draft",
-                "firstcreated": "2018-05-28T10:55:00+0000",
-                "coverage_id": "213"
-            }
-        ],
-        "_id": "foo",
-        "urgency": 3,
-        "guid": "foo",
-        "name": "This is the name of the vivid planning item",
-        "subject": [
-            {
-                "name": "library and museum",
-                "qcode": "01009000",
-                "parent": "01000000"
-            }
-        ],
-        "pubstatus": "usable",
-        "type": "planning",
-    }
-
     client.post('/push', data=json.dumps(test_planning), content_type='application/json')
 
     test_planning['guid'] = 'bar'

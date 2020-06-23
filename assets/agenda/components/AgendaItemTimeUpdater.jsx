@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {get} from 'lodash';
+import classNames from 'classnames';
+
 import {bem} from 'ui/utils';
 import {gettext} from 'utils';
 
@@ -90,8 +92,13 @@ class AgendaItemTimeUpdater extends React.Component {
             return null;
         }
 
+        const className = classNames(
+            bem('wire-articles__item', 'meta-time', {'border-right': this.props.borderRight}),
+            {'align-self-center': this.props.alignCenter}
+        );
+
         return(
-            <div className={bem('wire-articles__item', 'meta-time', {'border-right': this.props.borderRight})}>
+            <div className={className}>
                 <div className="label label--yellow2">{this.state.timeText}</div>
             </div>
         );
@@ -101,6 +108,12 @@ class AgendaItemTimeUpdater extends React.Component {
 AgendaItemTimeUpdater.propTypes = {
     item: PropTypes.object,
     borderRight: PropTypes.bool,
+    alignCenter: PropTypes.bool,
+};
+
+AgendaItemTimeUpdater.defaultProps = {
+    alignCenter: false,
+    borderRight: false,
 };
 
 export default AgendaItemTimeUpdater;

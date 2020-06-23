@@ -1,6 +1,7 @@
+/* eslint-env node */
+
 const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const NODE_MODULES = process.env.NODE_MODULES || 'node_modules';
 
@@ -26,6 +27,7 @@ module.exports = {
         'general-settings_js': './assets/general-settings/index.js',
         market_place_js: './assets/market-place/index.js',
         media_releases_js: './assets/media-releases/index.js',
+        monitoring_js: './assets/monitoring/index.js',
         common: [
             'alertifyjs',
             'bootstrap',

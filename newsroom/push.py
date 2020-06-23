@@ -20,7 +20,7 @@ from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
 from newsroom.wire import url_for_wire
 from newsroom.upload import ASSETS_RESOURCE
 from newsroom.signals import publish_item as publish_item_signal
-from newsroom.agenda.utils import get_latest_available_delivery
+from newsroom.agenda.utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
 
 from planning.common import WORKFLOW_STATE
 
@@ -67,7 +67,7 @@ def push():
     assert 'type' in item, {'type': 1}
 
     if item.get('type') == 'event':
-        orig = app.data.find_one('agenda', req=None, _id=item['guid'])
+        orig = app.data.find_one('agenda', req=None, guid=item['guid'])
         id = publish_event(item, orig)
         agenda = app.data.find_one('agenda', req=None, _id=id)
         if agenda:
@@ -80,8 +80,8 @@ def push():
             superdesk.get_resource_service('agenda').enhance_items([agenda])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
-        orig = app.data.find_one('wire_search', req=None, _id=item['guid'])
-        item['_id'] = publish_item(item, is_new=orig is None)
+        orig = superdesk.get_resource_service('items').find_one(req=None, _id=item['guid'])
+        item['_id'] = publish_item(item, orig)
         notify_new_item(item, check_topics=orig is None)
     elif item['type'] == 'planning_featured':
         publish_planning_featured(item)
@@ -101,10 +101,11 @@ def set_dates(doc):
     doc.setdefault(app.config['VERSION'], 1)
 
 
-def publish_item(doc, is_new):
+def publish_item(doc, original):
     """Duplicating the logic from content_api.publish service."""
     set_dates(doc)
     doc['firstpublished'] = parse_date_str(doc.get('firstpublished'))
+    doc['publish_schedule'] = parse_date_str(doc.get('publish_schedule'))
     doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
     doc.setdefault('charcount', get_char_count(doc.get('body_html', '')))
     service = superdesk.get_resource_service('content_api')
@@ -129,8 +130,10 @@ def publish_item(doc, is_new):
         agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
         if agenda_items:
             [notify_new_item(item, check_topics=False) for item in agenda_items]
-    publish_item_signal.send(app._get_current_object(), item=doc, is_new=is_new)
+    publish_item_signal.send(app._get_current_object(), item=doc, is_new=original is None)
     _id = service.create([doc])[0]
+    if 'associations' not in doc and original is not None and bool(original.get('associations', {})):
+        service.patch(_id, updates={'associations': None})
     if 'evolvedfrom' in doc and parent_item:
         service.system_update(parent_item['_id'], {'nextversion': _id}, parent_item)
     return _id
@@ -148,12 +151,9 @@ def publish_event(event, orig):
     _id = event['guid']
     service = superdesk.get_resource_service('agenda')
 
-    event_created_after_planning = False
-    if not orig and event.get('plans'):
+    if event.get('plans') and not orig:
         # event is created planning item
         orig = superdesk.get_resource_service('agenda').find_one(req=None, guid=event.get('plans')[0])
-        if orig:
-            event_created_after_planning = True
 
     event.pop('plans', None)
 
@@ -165,6 +165,7 @@ def publish_event(event, orig):
         _id = service.post([agenda])[0]
     else:
         # replace the original document
+        updates = None
         if event.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
                 event.get('pubstatus') == 'cancelled':
 
@@ -174,21 +175,25 @@ def publish_event(event, orig):
                 'event': event,
                 'version': event.get('version', event.get(app.config['VERSION'])),
                 'state': event['state'],
-                'state_reason': event.get('state_reason')
+                'state_reason': event.get('state_reason'),
+                'planning_items': orig.get('planning_items'),
+                'coverages': orig.get('coverages')
             }
 
-            service.patch(event['guid'], updates)
-            superdesk.get_resource_service('agenda').notify_agenda_update('event_unposted', orig)
+            if event.get('pubstatus') == 'cancelled':
+                # item removed, reset watches on the item
+                updates['watches'] = []
+
+            service.patch(orig['_id'], updates)
 
         elif event.get('state') in [WORKFLOW_STATE.RESCHEDULED, WORKFLOW_STATE.POSTPONED]:
             # schedule is changed, recalculate the dates, planning id and coverages from dates will be removed
             updates = {}
-            set_agenda_metadata_from_event(updates, event)
+            set_agenda_metadata_from_event(updates, event, False)
             updates['dates'] = get_event_dates(event)
             updates['coverages'] = None
             updates['planning_items'] = None
-            service.patch(event['guid'], updates)
-            superdesk.get_resource_service('agenda').notify_agenda_update('event_updated', orig)
+            service.patch(orig['_id'], updates)
 
         elif event.get('state') == WORKFLOW_STATE.SCHEDULED:
             # event is reposted (possibly after a cancel)
@@ -197,11 +202,15 @@ def publish_event(event, orig):
                 'version': event.get('version', event.get(app.config['VERSION'])),
                 'state': event['state'],
                 'dates': get_event_dates(event),
+                'planning_items': orig.get('planning_items'),
+                'coverages': orig.get('coverages')
             }
 
             set_agenda_metadata_from_event(updates, event, False)
-            service.patch(orig['_id'] if event_created_after_planning else event['guid'], updates)
-            superdesk.get_resource_service('agenda').notify_agenda_update('event_updated', orig)
+            service.patch(orig['_id'], updates)
+        if updates:
+            updates['_id'] = orig['_id']
+            superdesk.get_resource_service('agenda').notify_agenda_update(updates, orig)
 
     return _id
 
@@ -230,31 +239,39 @@ def publish_planning(planning):
     if planning.get('event_item'):
         # this is a planning for an event item
         # if there's an event then _id field will have the same value as event_id
-        agenda = app.data.find_one('agenda', req=None, guid=planning['event_item'])
+        orig_agenda = None
+        orig_agendas = superdesk.get_resource_service('agenda').find(where={'_id': {'$in': [planning['event_item'],
+                                                                                            planning['guid']]}})
+        if orig_agendas.count() > 0:
+            orig_agenda = orig_agendas[0]
 
+        agenda = deepcopy(orig_agenda)
         if not agenda:
             # event id exists in planning item but event is not in the system
             logger.warning('Event {} for planning {} couldn\'t be found'.format(planning['event_item'], planning))
             # create new agenda
-            agenda = init_adhoc_agenda(planning)
+            agenda = {}
+            init_adhoc_agenda(planning, agenda)
         else:
             if planning.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
                     planning.get('pubstatus') == 'cancelled':
                 # remove the planning item from the list
-                set_agenda_planning_items(agenda, planning, action='remove')
+                set_agenda_planning_items(agenda, orig_agenda, planning, action='remove')
 
                 service.patch(agenda['_id'], agenda)
                 return agenda
 
     else:
         # there's no event item (ad-hoc planning item)
-        agenda = init_adhoc_agenda(planning)
+        orig_agenda = app.data.find_one('agenda', req=None, _id=planning['guid']) or {}
+        agenda = deepcopy(orig_agenda)
+        init_adhoc_agenda(planning, agenda)
 
     # update agenda metadata
     new_plan = set_agenda_metadata_from_planning(agenda, planning)
 
     # add the planning item to the list
-    set_agenda_planning_items(agenda, planning, action='add' if new_plan else 'update')
+    set_agenda_planning_items(agenda, orig_agenda, planning, action='add' if new_plan else 'update')
 
     if not agenda.get('_id'):
         # setting _id of agenda to be equal to planning if there's no event id
@@ -267,13 +284,12 @@ def publish_planning(planning):
     return agenda
 
 
-def init_adhoc_agenda(planning):
+def init_adhoc_agenda(planning, agenda):
     """
     Inits an adhoc agenda item
     """
 
     # check if there's an existing ad-hoc
-    agenda = app.data.find_one('agenda', req=None, _id=planning['guid']) or {}
 
     # planning dates is saved as the dates of the new agenda
     agenda['dates'] = {
@@ -282,6 +298,8 @@ def init_adhoc_agenda(planning):
     }
 
     agenda['state'] = planning['state']
+    if planning.get('pubstatus') == 'cancelled':
+        agenda['watches'] = []
 
     return agenda
 
@@ -378,6 +396,7 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
     plan['state_reason'] = planning_item.get('state_reason')
     plan['products'] = planning_item.get('products')
     plan['agendas'] = planning_item.get('agendas')
+    plan[TO_BE_CONFIRMED_FIELD] = planning_item.get(TO_BE_CONFIRMED_FIELD)
 
     if new_plan:
         agenda['planning_items'].append(plan)
@@ -385,24 +404,28 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
     return new_plan
 
 
-def set_agenda_planning_items(agenda, planning_item, action='add'):
+def set_agenda_planning_items(agenda, orig_agenda, planning_item, action='add'):
     """
     Updates the list of planning items of agenda. If action is 'add' then adds the new one.
     And updates the list of coverages
     """
-    if action == 'add':
-        # planning item is newly added
-        superdesk.get_resource_service('agenda').notify_agenda_update('planning_added', agenda, True)
 
     if action == 'remove':
-        existing_planning_items = deepcopy(agenda.get('planning_items', []))
+        existing_planning_items = agenda.get('planning_items') or []
         agenda['planning_items'] = [p for p in existing_planning_items if p['guid'] != planning_item['guid']] or []
-        superdesk.get_resource_service('agenda').notify_agenda_update('planning_cancelled', agenda, True)
+        if len(agenda['planning_items']) < len(existing_planning_items) and \
+                len(planning_item.get('coverages') or []) > 0:
+            superdesk.get_resource_service('agenda').notify_agenda_update(agenda,
+                                                                          orig_agenda,
+                                                                          planning_item, True, planning_item)
 
-    agenda['coverages'], coverage_changes = get_coverages(agenda['planning_items'], (agenda.get('coverages') or []))
+    agenda['coverages'], coverage_changes = get_coverages(agenda['planning_items'],
+                                                          (orig_agenda or {}).get('coverages') or [],
+                                                          planning_item if action == 'add' else None)
 
-    if coverage_changes.get('coverage_added'):
-        superdesk.get_resource_service('agenda').notify_agenda_update('coverage_added', agenda, True)
+    if action != 'remove' and (coverage_changes.get('coverage_added') or coverage_changes.get('coverage_cancelled') or
+                               coverage_changes.get('coverage_modified')):
+        superdesk.get_resource_service('agenda').notify_agenda_update(agenda, orig_agenda, planning_item, True)
 
     agenda['display_dates'] = get_display_dates(agenda['dates'], agenda['planning_items'])
     agenda.pop('_updated', None)
@@ -431,7 +454,7 @@ def get_display_dates(agenda_date, planning_items):
     return display_dates
 
 
-def get_coverages(planning_items, original_coverages=[]):
+def get_coverages(planning_items, original_coverages, new_plan):
     """
     Returns list of coverages for given planning items
     """
@@ -439,7 +462,7 @@ def get_coverages(planning_items, original_coverages=[]):
     def get_existing_coverage(id):
         return next((o for o in original_coverages if o['coverage_id'] == id), {})
 
-    def set_delivery(coverage, deliveries):
+    def set_delivery(coverage, deliveries, orig_coverage=None):
         cov_deliveries = []
         if coverage['coverage_type'] == 'text':
             for d in (deliveries or []):
@@ -447,16 +470,32 @@ def get_coverages(planning_items, original_coverages=[]):
                     'delivery_id': d.get('item_id'),
                     'delivery_href': url_for_wire(None, _external=False, section='wire.item', _id=d.get('item_id')),
                     'delivery_state': d.get('item_state'),
-                    'sequence_no': d.get('sequence_no', 0),
+                    'sequence_no': d.get('sequence_no') or 0,
                     'publish_time': parse_date_str(d.get('publish_time'))
                 })
         else:
             if coverage.get('workflow_status') == 'completed':
-                cov_deliveries.append({
-                    'delivery_href': app.set_photo_coverage_href(coverage, planning_item),
-                    'sequence_no': 0,
-                    'delivery_state': 'published'
-                })
+                if orig_coverage.get('workflow_status') != coverage['workflow_status']:
+                    cov_deliveries.append({
+                        'sequence_no': 0,
+                        'delivery_state': 'published',
+                        'publish_time': (next((parse_date_str(d.get('publish_time')) for d in deliveries), None) or
+                                         utcnow())
+                    })
+
+                    try:
+                        cov_deliveries[0]['delivery_href'] = app.set_photo_coverage_href(
+                            coverage,
+                            planning_item,
+                            cov_deliveries
+                        )
+                    except Exception as e:
+                        logger.exception(e)
+                        logger.error('Failed to generate delivery_href for coverage={}'.format(
+                            coverage.get('coverage_id')
+                        ))
+                elif (len((orig_coverage or {}).get('deliveries') or []) > 0):
+                    cov_deliveries.append(orig_coverage['deliveries'][0])
 
         coverage['deliveries'] = cov_deliveries
         # Sort the deliveries in reverse sequence order here, so sorting required anywhere else
@@ -471,24 +510,45 @@ def get_coverages(planning_items, original_coverages=[]):
     coverages = []
     coverage_changes = {}
     for planning_item in planning_items:
-        for coverage in planning_item.get('coverages') or []:
-            existing_coverage = get_existing_coverage(coverage['coverage_id'])
-            new_coverage = {
-                'planning_id': planning_item['guid'],
-                'coverage_id': coverage['coverage_id'],
-                'scheduled': coverage['planning']['scheduled'],
-                'coverage_type': coverage['planning']['g2_content_type'],
-                'workflow_status': coverage['workflow_status'],
-                'coverage_status': coverage.get('news_coverage_status', {}).get('name'),
-                'slugline': coverage['planning']['slugline'],
-                'coverage_provider': (coverage.get('coverage_provider') or {}).get('name')
-            }
+        if planning_item.get('state') != WORKFLOW_STATE.KILLED:
+            for coverage in planning_item.get('coverages') or []:
+                existing_coverage = get_existing_coverage(coverage['coverage_id'])
+                coverage_planning = coverage.get('planning') or {}
 
-            set_delivery(new_coverage, coverage.get('deliveries'))
-            coverages.append(new_coverage)
+                new_coverage = {
+                    'planning_id': planning_item.get('guid'),
+                    'coverage_id': coverage.get('coverage_id'),
+                    'scheduled': coverage_planning.get('scheduled'),
+                    'coverage_type': coverage_planning.get('g2_content_type'),
+                    'workflow_status': coverage.get('workflow_status'),
+                    'coverage_status': coverage.get('news_coverage_status', {}).get('name'),
+                    'slugline': coverage_planning.get('slugline'),
+                    'coverage_provider': (coverage.get('coverage_provider') or {}).get('name'),
+                    'watches': existing_coverage.get('watches') or coverage.get('watches', []),
+                }
 
-            if original_coverages and not existing_coverage:
-                coverage_changes['coverage_added'] = True
+                if TO_BE_CONFIRMED_FIELD in coverage:
+                    new_coverage[TO_BE_CONFIRMED_FIELD] = coverage[TO_BE_CONFIRMED_FIELD]
+
+                set_delivery(new_coverage, coverage.get('deliveries'), existing_coverage)
+                coverages.append(new_coverage)
+
+                if ((coverage and not existing_coverage) or ((new_plan or {}).get('_id')) == planning_item.get('_id')):
+                    coverage_changes['coverage_added'] = True
+                else:
+                    if coverage['workflow_status'] != existing_coverage['workflow_status']:
+                        if coverage.get('workflow_status') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.DRAFT]:
+                            coverage_changes['coverage_cancelled'] = True
+
+                        if new_coverage.get('workflow_status') == 'completed':
+                            coverage_changes['coverage_modified'] = True
+
+                    if existing_coverage.get('scheduled') != new_coverage.get('scheduled') and \
+                            existing_coverage.get('workflow_status') != 'completed':
+                        coverage_changes['coverage_modified'] = True
+
+    if len(original_coverages or []) > len(coverages):
+        coverage_changes['coverage_cancelled'] = True
 
     return coverages, coverage_changes
 
@@ -585,8 +645,12 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
     # (in case items appear in multiple sections)
     _send_notification('wire', _get_users('wire'))
 
-    # Next iterate over the registered sections (excluding wire)
-    for section_id in [section['_id'] for section in app.sections if section['_id'] != 'wire']:
+    # Next iterate over the registered sections (excluding wire and api)
+    for section_id in [
+        section['_id']
+        for section in app.sections
+        if section['_id'] != 'wire' and section['group'] not in ['api', 'monitoring']
+    ]:
         # Add the users for those sections and send the notification
         _send_notification(section_id, _get_users(section_id))
 

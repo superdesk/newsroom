@@ -15,6 +15,10 @@ import {
     toggleFilter,
     setCreatedFilter,
 } from 'search/actions';
+import {
+    searchFilterSelector,
+    searchCreatedSelector,
+} from 'search/selectors';
 
 import {
     selectDate
@@ -84,23 +88,26 @@ class FiltersTab extends React.Component {
                 createdFilter={createdFilter}
                 setCreatedFilter={this.setCreatedFilterAndSearch}
             />),
-            isResetActive || this.props.resultsFiltered ? (
-                [<div key="reset-buffer" id="reset-filter-buffer"></div>,
-                    <FilterButton
-                        key='search'
-                        label={gettext('Search')}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            this.props.fetchItems();
-                        }}
-                        className='search'/>,
-                    <FilterButton
-                        key='reset'
-                        label={gettext('Clear filters')}
-                        onClick={this.reset}
-                        className='reset'/>,
-                ]
-            ) : null,
+            !isResetActive && !this.props.resultsFiltered ? null : ([
+                <div key="reset-buffer" id="reset-filter-buffer" />,
+                <FilterButton
+                    key='search'
+                    label={gettext('Search')}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        this.props.fetchItems();
+                    }}
+                    className='search filter-button--border'
+                    primary={true}
+                />,
+                <FilterButton
+                    key='reset'
+                    label={gettext('Clear filters')}
+                    onClick={this.reset}
+                    className='reset'
+                    primary={false}
+                />,
+            ]),
         ]);
     }
 }
@@ -121,8 +128,8 @@ FiltersTab.propTypes = {
 
 const mapStateToProps = (state) => ({
     aggregations: state.aggregations,
-    activeFilter: state.search.activeFilter,
-    createdFilter: state.search.createdFilter,
+    activeFilter: searchFilterSelector(state),
+    createdFilter: searchCreatedSelector(state),
     resultsFiltered: resultsFilteredSelector(state),
 });
 

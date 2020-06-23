@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { connect } from 'react-redux';
-import { get, isEmpty } from 'lodash';
-import { gettext } from 'utils';
+import {connect} from 'react-redux';
+import {get, isEmpty} from 'lodash';
+
+import {getItemFromArray, gettext} from 'utils';
+import {noNavigationSelected} from 'search/utils';
 
 import {
     fetchItems,
@@ -18,33 +20,43 @@ import {
 
 import {
     setView,
+    setQuery,
+    saveMyTopic,
 } from 'search/actions';
 
 import {
+    searchQuerySelector,
+    activeViewSelector,
+    searchFilterSelector,
+    searchCreatedSelector,
+    searchNavigationSelector,
+    navigationsSelector,
+    topicsSelector,
     activeTopicSelector,
+    searchParamsSelector,
+    showSaveTopicSelector,
 } from 'search/selectors';
 
 import BaseApp from 'layout/components/BaseApp';
 import AgendaPreview from './AgendaPreview';
 import AgendaList from './AgendaList';
-import SearchBar from 'components/SearchBar';
+import SearchBar from 'search/components/SearchBar';
 import SearchSidebar from 'wire/components/SearchSidebar';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import AgendaListViewControls from './AgendaListViewControls';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import AgendaItemDetails from 'agenda/components/AgendaItemDetails';
-import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import SearchResultsInfo from 'search/components/SearchResultsInfo';
 
-import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
-import getItemActions from '../item-actions';
+import {getAgendaItemActions, getCoverageItemActions} from '../item-actions';
 import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
+import {previewConfigSelector} from 'ui/selectors';
 
 const modals = {
-    followTopic: FollowTopicModal,
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
 };
@@ -53,8 +65,6 @@ class AgendaApp extends BaseApp {
     constructor(props) {
         super(props);
         this.modals = modals;
-        this.tabs[0].label = gettext('Events');
-        this.tabs[1].label = gettext('My Events');
 
         this.fetchItemsOnNavigation = this.fetchItemsOnNavigation.bind(this);
     }
@@ -72,7 +82,6 @@ class AgendaApp extends BaseApp {
 
 
         this.props.fetchItems();
-
     }
 
     render() {
@@ -86,7 +95,7 @@ class AgendaApp extends BaseApp {
         });
 
         const onDetailClose = this.props.detail ? null :
-            () => this.props.actions.filter(a => a.id == 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
+            () => this.props.actions.filter(a => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
 
         const groups = [
             {
@@ -107,123 +116,167 @@ class AgendaApp extends BaseApp {
             },
         ];
         const eventsOnly = this.props.eventsOnlyView || this.props.eventsOnlyAccess;
-        const hideFeaturedToggle = this.props.activeNavigation ||
-            this.props.bookmarks || this.props.activeTopic || eventsOnly;
+        const hideFeaturedToggle = !noNavigationSelected(this.props.activeNavigation) ||
+            this.props.bookmarks ||
+            this.props.activeTopic ||
+            eventsOnly;
+
+        const numNavigations = get(this.props, 'searchParams.navigation.length', 0);
+        let showSaveTopic = this.props.showSaveTopic &&
+            !this.props.bookmarks &&
+            !this.props.featuredOnly;
+        let showTotalItems = false;
+        let showTotalLabel = false;
+        let totalItemsLabel;
+
+        if (get(this.props, 'activeTopic.label')) {
+            totalItemsLabel = this.props.activeTopic.label;
+            showTotalItems = showTotalLabel = true;
+        } else if (numNavigations === 1) {
+            totalItemsLabel = get(getItemFromArray(
+                this.props.searchParams.navigation[0],
+                this.props.navigations
+            ), 'name') || '';
+            showTotalItems = showTotalLabel = true;
+        } else if (numNavigations > 1) {
+            totalItemsLabel = gettext('Custom View');
+            showTotalItems = showTotalLabel = true;
+        } else if (this.props.showSaveTopic) {
+            showTotalItems = showTotalLabel = true;
+            if (this.props.bookmarks && get(this.props, 'searchParams.query.length', 0) > 0) {
+                totalItemsLabel = this.props.searchParams.query;
+            }
+        }
 
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
-                actions={this.filterActions(this.props.itemToOpen)}
+                actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig, true)}
                 onClose={onDetailClose}
                 requestCoverage={this.props.requestCoverage}
                 group={this.props.previewGroup}
                 planningId={this.props.previewPlan}
                 eventsOnly={eventsOnly}
+                wireItems={this.props.wireItems}
+                coverageActions={this.props.coverageActions}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />
                     <nav className='content-bar navbar justify-content-start flex-nowrap flex-sm-wrap'>
-                        {this.state.withSidebar && <span
-                            className='content-bar__menu content-bar__menu--nav--open'
-                            ref={(elem) => this.elemOpen = elem}
-                            title={gettext('Close filter panel')}
-                            onClick={this.toggleSidebar}>
-                            <i className='icon--close-thin icon--white'></i>
-                        </span>}
-                        {!this.state.withSidebar && !this.props.bookmarks && <span
-                            className='content-bar__menu content-bar__menu--nav'
-                            ref={(elem) => this.elemClose = elem}
-                            title={gettext('Open filter panel')}
-                            onClick={this.toggleSidebar}>
-                            <i className='icon--hamburger'></i>
-                        </span>}
+                        {this.state.withSidebar && (
+                            <span
+                                className='content-bar__menu content-bar__menu--nav--open'
+                                ref={this.setOpenRef}
+                                title={gettext('Close filter panel')}
+                                onClick={this.toggleSidebar}>
+                                <i className='icon--close-thin icon--white' />
+                            </span>
+                        )}
 
-                        {this.props.bookmarks &&
+                        {!this.state.withSidebar && !this.props.bookmarks && (
+                            <span
+                                className='content-bar__menu content-bar__menu--nav'
+                                ref={this.setCloseRef}
+                                title={gettext('Open filter panel')}
+                                onClick={this.toggleSidebar}>
+                                <i className='icon--hamburger' />
+                            </span>
+                        )}
+
+                        {this.props.bookmarks && (
                             <BookmarkTabs active="agenda" sections={this.props.userSections}/>
-                        }
+                        )}
 
                         <SearchBar
                             fetchItems={this.props.fetchItems}
+                            setQuery={this.props.setQuery}
                         />
 
-                        {showDatePicker && <AgendaDateNavigation
-                            selectDate={this.props.selectDate}
-                            activeDate={this.props.activeDate}
-                            createdFilter={this.props.createdFilter}
-                            activeGrouping={this.props.activeGrouping}
-                            displayCalendar={true}
-                        />}
+                        {showDatePicker && (
+                            <AgendaDateNavigation
+                                selectDate={this.props.selectDate}
+                                activeDate={this.props.activeDate}
+                                createdFilter={this.props.createdFilter}
+                                activeGrouping={this.props.activeGrouping}
+                                displayCalendar={true}
+                            />
+                        )}
 
                         <AgendaListViewControls
                             activeView={this.props.activeView}
                             setView={this.props.setView}
-                            hideFeaturedToggle={hideFeaturedToggle}
+                            hideFeaturedToggle={!!hideFeaturedToggle}
                             toggleFeaturedFilter={this.props.toggleFeaturedFilter}
                             featuredFilter={this.props.featuredOnly}
                         />
                     </nav>
                 </section>,
                 <section key="contentMain" className='content-main'>
-                    <div className='wire-column--3'>
+                    <div className={`wire-column--3 ${this.state.withSidebar?'nav--open':''}`}>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
-                            {this.state.withSidebar &&
+                            {this.state.withSidebar && (
                                 <SearchSidebar
                                     tabs={this.getTabs()}
-                                    props={{ 
+                                    props={{
                                         ...this.props,
                                         groups,
-                                        fetchItems: this.fetchItemsOnNavigation }} />
-                            }
+                                        fetchItems: this.fetchItemsOnNavigation }}
+                                />
+                            )}
                         </div>
                         <div className={mainClassName}>
-                            {!this.props.bookmarks &&
+                            {!this.props.bookmarks && (
                                 <AgendaFilters
                                     aggregations={this.props.aggregations}
                                     toggleFilter={this.props.toggleDropdownFilter}
                                     activeFilter={this.props.activeFilter}
                                     eventsOnlyAccess={this.props.eventsOnlyAccess}
                                     eventsOnlyView={this.props.eventsOnlyView}
+                                    locators={this.props.locators}
                                 />
-                            }
+                            )}
 
                             <SearchResultsInfo
-                                user={this.props.user}
-                                query={this.props.activeQuery}
-                                bookmarks={this.props.bookmarks}
+                                scrollClass={this.state.scrollClass}
+
+                                showTotalItems={showTotalItems}
+                                showTotalLabel={showTotalLabel}
+                                showSaveTopic={showSaveTopic}
+
                                 totalItems={this.props.totalItems}
-                                topicType='agenda'
+                                totalItemsLabel={totalItemsLabel}
+
+                                saveMyTopic={saveMyTopic}
+                                activeTopic={this.props.activeTopic}
+                                topicType="agenda"
+
                                 newItems={this.props.newItems}
                                 refresh={this.props.fetchItems}
-                                activeTopic={this.props.activeTopic}
-                                toggleNews={this.props.toggleNews}
-                                activeNavigation={this.props.activeNavigation}
-                                newsOnly={this.props.newsOnly}
-                                scrollClass={this.state.scrollClass}
-                                hideTotalItems={false}
-                                featuredOnly={this.props.featuredOnly}
                             />
 
                             <AgendaList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
                                 onScroll={this.onListScroll}
-                                refNode={(node) => this.elemList = node}
+                                refNode={this.setListRef}
                             />
                         </div>
 
                         <AgendaPreview
                             item={this.props.itemToPreview}
                             user={this.props.user}
-                            actions={this.filterActions(this.props.itemToPreview)}
+                            actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig, true)}
+                            coverageActions={this.props.coverageActions}
                             closePreview={this.props.closePreview}
                             openItemDetails={this.props.openItemDetails}
                             requestCoverage={this.props.requestCoverage}
                             previewGroup={this.props.previewGroup}
                             previewPlan={this.props.previewPlan}
                             eventsOnly={eventsOnly}
+                            wireItems={this.props.wireItems}
                         />
                     </div>
                 </section>
@@ -267,7 +320,7 @@ AgendaApp.propTypes = {
     newItems: PropTypes.array,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
-    activeNavigation: PropTypes.string,
+    activeNavigation: PropTypes.arrayOf(PropTypes.string),
     aggregations: PropTypes.object,
     toggleDropdownFilter: PropTypes.func,
     selectDate: PropTypes.func,
@@ -282,15 +335,20 @@ AgendaApp.propTypes = {
     context: PropTypes.string,
     eventsOnlyAccess: PropTypes.bool,
     eventsOnlyView: PropTypes.bool,
+    locators: PropTypes.array,
+    wireItems: PropTypes.array,
+    searchParams: PropTypes.object,
+    showSaveTopic: PropTypes.bool,
+    previewConfig: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
-    activeQuery: state.activeQuery,
-    activeFilter: get(state, 'search.activeFilter'),
-    createdFilter: get(state, 'search.createdFilter'),
+    activeQuery: searchQuerySelector(state),
+    activeFilter: searchFilterSelector(state),
+    createdFilter: searchCreatedSelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     previewGroup: state.previewGroup,
     previewPlan: state.previewPlan,
@@ -299,12 +357,12 @@ const mapStateToProps = (state) => ({
     modal: state.modal,
     user: state.user,
     company: state.company,
-    topics: state.topics || [],
-    activeView: get(state, 'search.activeView'),
+    topics: topicsSelector(state),
+    activeView: activeViewSelector(state),
     newItems: state.newItems,
-    navigations: get(state, 'search.navigations', []),
+    navigations: navigationsSelector(state),
     activeTopic: activeTopicSelector(state),
-    activeNavigation: get(state, 'search.activeNavigation', null),
+    activeNavigation: searchNavigationSelector(state),
     bookmarks: state.bookmarks,
     aggregations: state.aggregations,
     activeDate: get(state, 'agenda.activeDate'),
@@ -316,11 +374,18 @@ const mapStateToProps = (state) => ({
     userSections: state.userSections,
     featuredOnly: get(state, 'agenda.featuredOnly'),
     context: state.context,
+    locators: get(state, 'locators.items', []),
+    wireItems: get(state, 'agenda.agendaWireItems'),
+    setQuery: PropTypes.func.isRequired,
+    searchParams: searchParamsSelector(state),
+    showSaveTopic: showSaveTopicSelector(state),
+    previewConfig: previewConfigSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
     fetchItems: () => dispatch(fetchItems()),
-    actions: getItemActions(dispatch),
+    actions: getAgendaItemActions(dispatch),
+    coverageActions: getCoverageItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
@@ -336,6 +401,7 @@ const mapDispatchToProps = (dispatch) => ({
     openItemDetails: (item) => dispatch(openItemDetails(item)),
     requestCoverage: (item, message) => dispatch(requestCoverage(item, message)),
     toggleFeaturedFilter: (fetch) => dispatch(toggleFeaturedFilter(fetch)),
+    setQuery: (query) => dispatch(setQuery(query)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

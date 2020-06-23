@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import EditNavigation from './EditNavigation';
-import NavigationList from './NavigationList';
-import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
+
+import {gettext} from 'utils';
+
 import {
     cancelEdit,
     deleteNavigation,
@@ -15,9 +16,14 @@ import {
     fetchProducts,
     saveProducts,
 } from '../actions';
-import {gettext} from 'utils';
-import { sectionsPropType } from 'features/sections/types';
-import { get } from 'lodash';
+import {sectionsPropType} from 'features/sections/types';
+import {uiSectionsSelector} from 'features/sections/selectors';
+import {searchQuerySelector} from 'search/selectors';
+
+import EditNavigation from './EditNavigation';
+import NavigationList from './NavigationList';
+import SearchResults from 'search/components/SearchResults';
+
 
 class Navigations extends React.Component {
     constructor(props, context) {
@@ -73,11 +79,15 @@ class Navigations extends React.Component {
                     </div>
                     :
                     <div className="flex-col flex-column">
-                        {this.props.activeQuery &&
-                        <SearchResultsInfo
-                            totalItems={this.props.totalNavigations}
-                            query={this.props.activeQuery} />
-                        }
+                        {this.props.activeQuery && (
+                            <SearchResults
+                                showTotalItems={true}
+                                showTotalLabel={true}
+                                showSaveTopic={false}
+                                totalItems={this.props.navigations.length}
+                                totalItemsLabel={this.props.activeQuery}
+                            />
+                        )}
                         <NavigationList
                             navigations={this.props.navigations.filter(sectionFilter)}
                             onClick={this.props.selectNavigation}
@@ -130,11 +140,11 @@ const mapStateToProps = (state) => ({
     navigationToEdit: state.navigationToEdit,
     activeNavigationId: state.activeNavigationId,
     isLoading: state.isLoading,
-    activeQuery: state.activeQuery,
+    activeQuery: searchQuerySelector(state),
     totalNavigations: state.totalNavigations,
     errors: state.errors,
     products: state.products,
-    sections: state.sections.list,
+    sections: uiSectionsSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

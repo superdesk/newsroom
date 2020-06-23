@@ -1,4 +1,3 @@
+from newsroom.web import NewsroomWebApp
 
-from .flaskapp import Newsroom
-
-app = Newsroom(__name__)
+app = NewsroomWebApp(__name__)

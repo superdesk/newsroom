@@ -1,17 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
+
+import {gettext} from 'utils';
+
 import {
     newProduct,
-    setQuery,
     fetchProducts,
 } from '../actions';
-import Products from './Products';
-import ListBar from 'components/ListBar';
-import { gettext } from 'utils';
+import {setSearchQuery} from 'search/actions';
 
 import SectionSwitch from 'features/sections/SectionSwitch';
-import { sectionsPropType } from 'features/sections/types';
+import {sectionsPropType} from 'features/sections/types';
+import {sectionsSelector, activeSectionSelector} from 'features/sections/selectors';
+
+import Products from './Products';
+import ListBar from 'components/ListBar';
 
 class ProductsApp extends React.Component {
     constructor(props, context) {
@@ -46,13 +50,13 @@ ProductsApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    sections: state.sections.list,
-    activeSection: state.sections.active,
+    sections: sectionsSelector(state),
+    activeSection: activeSectionSelector(state),
 });
 
 const mapDispatchToProps = {
     fetchProducts,
-    setQuery,
+    setQuery: setSearchQuery,
     newProduct,
 };
 

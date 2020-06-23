@@ -8,7 +8,7 @@ from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only
 from newsroom.section_filters import blueprint
-from newsroom.utils import get_json_or_400, get_entity_or_404
+from newsroom.utils import get_json_or_400, get_entity_or_404, set_original_creator, set_version_creator
 from newsroom.utils import query_resource
 
 
@@ -59,6 +59,12 @@ def create():
     if validation:
         return validation
 
+    section = next((s for s in current_app.sections if s['_id'] == section_filter.get('filter_type')),
+                   None)
+    if section and section.get('search_type'):
+        section_filter['search_type'] = section['search_type']
+
+    set_original_creator(section_filter)
     ids = get_resource_service('section_filters').post([section_filter])
     return jsonify({'success': True, '_id': ids[0]}), 201
 
@@ -81,6 +87,7 @@ def edit(id):
     if validation:
         return validation
 
+    set_version_creator(updates)
     get_resource_service('section_filters').patch(id=ObjectId(id), updates=updates)
     return jsonify({'success': True}), 200
 

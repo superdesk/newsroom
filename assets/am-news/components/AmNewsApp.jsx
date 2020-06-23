@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { connect } from 'react-redux';
-import { get } from 'lodash';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
 
-
+import {noNavigationSelected} from 'search/utils';
 
 import BaseApp from '../../layout/components/BaseApp';
-import SearchBar from '../../components/SearchBar';
-import SearchResultsInfo from '../../wire/components/SearchResultsInfo';
+import SearchBar from 'search/components/SearchBar';
+import SearchResultsInfo from 'search/components/SearchResultsInfo';
 import DownloadItemsModal from '../../wire/components/DownloadItemsModal';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import ShareItemModal from '../../components/ShareItemModal';
@@ -31,6 +31,17 @@ import {
 import Navigations from './Navigations';
 import AmNewsList from './AmNewsList';
 
+import {
+    previewConfigSelector,
+    detailsConfigSelector,
+    advancedSearchTabsConfigSelector,
+} from 'ui/selectors';
+import {
+    searchQuerySelector,
+    navigationsSelector,
+    searchNavigationSelector,
+} from 'search/selectors';
+
 
 const modals = {
     shareItem: ShareItemModal,
@@ -44,6 +55,15 @@ class AmNewsApp extends BaseApp {
         this.state = { isMobile: false };    // to cater for responsive behaviour during widnow resize
         this.setIsMobile = this.setIsMobile.bind(this);
         this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
+    }
+
+    getSnapshotBeforeUpdate(prevProps) {
+        if (prevProps.itemToOpen && !this.props.itemToOpen && noNavigationSelected(this.props.activeNavigation)) {
+            // enable first navigation
+            this.props.toggleNavigation(get(this.props, 'navigations[0]'));
+        }
+
+        return null;
     }
 
     componentDidMount() {
@@ -67,7 +87,7 @@ class AmNewsApp extends BaseApp {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
                 detailsConfig={this.props.detailsConfig}
-                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}/>
+                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)} />
         ]);
     }
 
@@ -85,6 +105,10 @@ class AmNewsApp extends BaseApp {
             });
         }
 
+        const searchResultsLabel = !this.props.activeQuery ?
+            null :
+            this.props.activeQuery;
+
         return (
             [
                 <section key="contentHeader" className="content-header">
@@ -94,14 +118,14 @@ class AmNewsApp extends BaseApp {
                     <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
                         {this.state.isMobile && this.state.withSidebar && <span
                             className='content-bar__menu content-bar__menu--nav--open'
-                            ref={(elem) => this.elemOpen = elem}
+                            ref={this.setOpenRef}
                             title={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--close-thin icon--white"></i>
                         </span>}
                         {this.state.isMobile && !this.state.withSidebar && !this.props.bookmarks && <span
                             className='content-bar__menu content-bar__menu--nav'
-                            ref={(elem) => this.elemClose = elem}
+                            ref={this.setCloseRef}
                             title={gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--hamburger"></i>
@@ -135,22 +159,27 @@ class AmNewsApp extends BaseApp {
                                         fetchItems={this.props.fetchItems}/>
                                 </div>
                             }
-                            <SearchResultsInfo
-                                user={this.props.user}
-                                query={this.props.activeQuery}
-                                bookmarks={this.props.bookmarks}
-                                totalItems={this.props.totalItems}
-                                newItems={this.props.newItems}
-                                refresh={this.props.fetchItems}
-                                activeNavigation={this.props.activeNavigation}
-                                scrollClass={this.state.scrollClass}
-                            />
+
+                            {(this.props.activeQuery || get(this.props, 'newItems.length', 0) > 0) && (
+                                <SearchResultsInfo
+                                    user={this.props.user}
+                                    query={this.props.activeQuery}
+                                    bookmarks={this.props.bookmarks}
+                                    totalItems={this.props.totalItems}
+                                    newItems={this.props.newItems}
+                                    refresh={this.props.fetchItems}
+                                    activeNavigation={this.props.activeNavigation}
+                                    scrollClass={this.state.scrollClass}
+                                    displayTotalItems={this.props.activeQuery}
+                                    resultsLabel={searchResultsLabel}
+                                />
+                            )}
 
                             <AmNewsList
                                 actions={this.props.actions}
                                 activeView={'list-view'}
                                 onScroll={this.onListScroll}
-                                refNode={(elem) => this.elemList = elem}
+                                refNode={this.setListRef}
                             />
                         </div>
 
@@ -199,21 +228,17 @@ AmNewsApp.propTypes = {
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
     modal: PropTypes.object,
-    user: PropTypes.string,
     company: PropTypes.string,
     topics: PropTypes.array,
-    fetchItems: PropTypes.func,
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         action: PropTypes.func,
     })),
     setQuery: PropTypes.func.isRequired,
-    bookmarks: PropTypes.bool,
     fetchMoreItems: PropTypes.func,
     newItems: PropTypes.array,
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
-    activeNavigation: PropTypes.string,
     savedItemsCount: PropTypes.number,
     userSections: PropTypes.object,
     previewConfig: PropTypes.object,
@@ -226,7 +251,7 @@ const mapStateToProps = (state) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
-    activeQuery: state.activeQuery,
+    activeQuery: searchQuerySelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -235,14 +260,14 @@ const mapStateToProps = (state) => ({
     company: state.company,
     topics: state.topics || [],
     newItems: state.newItems,
-    navigations: get(state, 'search.navigations', []),
-    activeNavigation: get(state, 'search.activeNavigation', null),
+    navigations: navigationsSelector(state),
+    activeNavigation: searchNavigationSelector(state),
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
-    previewConfig: get(state.uiConfig, 'preview') || {},
-    detailsConfig: get(state.uiConfig, 'details') || {},
-    advancedSearchTabConfig: get(state.uiConfig, 'advanced_search_tabs') || {},
+    previewConfig: previewConfigSelector(state),
+    detailsConfig: detailsConfigSelector(state),
+    advancedSearchTabConfig: advancedSearchTabsConfigSelector(state),
     context: state.context,
 });
 
@@ -252,7 +277,7 @@ const mapDispatchToProps = (dispatch) => ({
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     closePreview: () => dispatch(previewItem(null)),
-    toggleNavigation: (navigation) => dispatch(toggleNavigation(navigation))
+    toggleNavigation: (navigation) => dispatch(toggleNavigation(navigation)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AmNewsApp);

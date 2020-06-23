@@ -1,617 +1,2178 @@
 # Translations template for Newsroom.
-# Copyright (C) 2018 ORGANIZATION
+# Copyright (C) 2019 ORGANIZATION
 # This file is distributed under the same license as the Newsroom project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
 # 
 # Translators:
-# Karel Petrak <karel.petrak@sourcefabric.org>, 2018
+# Alena Vojtekova <alenalikestotravel@gmail.com>, 2019
+# Iva Heilova <iva.heilova@sourcefabric.org>, 2019
+# localizer <omniton@sourcefabric.org>, 2019
+# pavlac <pavla.ciharova@sourcefabric.org>, 2019
+# Karel Petrak <karel.petrak@sourcefabric.org>, 2019
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-10-23 14:18+0200\n"
-"PO-Revision-Date: 2018-09-24 11:22+0000\n"
-"Last-Translator: Karel Petrak <karel.petrak@sourcefabric.org>, 2018\n"
+"POT-Creation-Date: 2019-11-28 11:25+0100\n"
+"PO-Revision-Date: 2019-11-27 15:02+0000\n"
+"Last-Translator: Karel Petrak <karel.petrak@sourcefabric.org>, 2019\n"
 "Language-Team: Czech (https://www.transifex.com/sourcefabric/teams/6584/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"Generated-By: Babel 2.7.0\n"
 "Language: cs\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
-#: newsroom/email.py:31
+#: newsroom/email.py:45
 msgid "A new newsroom signup request"
 msgstr "Nový požadavek na zřízení uživatelského účtu"
 
-#: newsroom/email.py:53 newsroom/email.py:74
+#: newsroom/email.py:67 newsroom/email.py:88
 msgid "{} account created"
 msgstr "{} účet vytvořen"
 
-#: newsroom/email.py:93
+#: newsroom/email.py:107
 msgid "{} password reset"
 msgstr "{} heslo resetováno"
 
-#: newsroom/email.py:112
+#: newsroom/email.py:126
 msgid "New story for followed topic: {}"
 msgstr "Nová zpráva ze sledovaného tématu: {}"
 
-#: newsroom/email.py:130
+#: newsroom/email.py:145
 msgid "New update for followed agenda: {}"
 msgstr "Aktualizace sledované události: {}"
 
-#: newsroom/email.py:156
+#: newsroom/email.py:177
 msgid "New update for your previously accessed story: {}"
 msgstr "Aktualizace zprávy, kterou jste navštívili: {}"
 
-#: newsroom/email.py:174
+#: newsroom/email.py:196
 msgid "New update for your previously accessed agenda: {}"
 msgstr "Aktualizace události, kterou jste navštívili: {}"
 
-#: newsroom/email.py:198
+#: newsroom/email.py:226
 msgid "Kill/Takedown notice"
 msgstr "Upozornění na storno"
 
-#: newsroom/email.py:207
+#: newsroom/email.py:235
 msgid "Agenda cancelled notice"
 msgstr "Upozornění na zrušení události"
 
-#: newsroom/push.py:86
+#: newsroom/history.py:134
+msgid "Activity History: Inavlid request"
+msgstr ""
+
+#: newsroom/push.py:89
 msgid "Unknown type {}"
 msgstr "Neznámý typ {}"
 
-#: newsroom/settings.py:52
+#: newsroom/settings.py:73 newsroom/settings.py:88
+msgid "Company expiry alert recipients"
+msgstr ""
+
+#: newsroom/settings.py:74 newsroom/settings.py:90
+msgid "Coverage request recipients"
+msgstr ""
+
+#: newsroom/settings.py:78
+msgid "{}: Email IDs not in proper format"
+msgstr ""
+
+#: newsroom/settings.py:82
 msgid "General Settings"
 msgstr "Obecná nastavení"
 
-#: newsroom/settings.py:56
+#: newsroom/settings.py:87
 msgid "Google Analytics ID"
 msgstr "Google Analytics ID"
 
-#: newsroom/agenda/agenda.py:33
-msgid "An event you have been watching has been updated"
+#: newsroom/settings.py:89
+msgid ""
+"Comma separated list of email addresses to which the expiration alerts of "
+"companies will be sent to."
 msgstr ""
 
-#: newsroom/agenda/agenda.py:34
-msgid "Event updated"
+#: newsroom/settings.py:91
+msgid ""
+"Comma separated list of email addresses who will receive the coverage "
+"request emails."
 msgstr ""
 
-#: newsroom/agenda/agenda.py:37
-msgid "An event you have been watching has been cancelled"
+#: newsroom/agenda/utils.py:31 newsroom/utils.py:161
+msgid "ALL DAY"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:38
-msgid "Event cancelled"
+#: newsroom/utils.py:237 newsroom/utils.py:306
+msgid "Account is disabled"
+msgstr "Účet je neaktivní"
+
+#: newsroom/utils.py:244
+msgid "Account has not been approved"
+msgstr "Účet nebyl schválen"
+
+#: newsroom/auth/views.py:41 newsroom/auth/views.py:147 newsroom/utils.py:311
+msgid "Company account has been disabled."
+msgstr "Firma byla deaktivována"
+
+#: assets/wire/components/AgendaLinks.jsx:46 newsroom/agenda/__init__.py:21
+#: newsroom/templates/agenda_index.html:3
+#: newsroom/templates/agenda_index.html:6
+msgid "Agenda"
+msgstr "Události"
+
+#: newsroom/agenda/__init__.py:22 newsroom/am_news/__init__.py:17
+#: newsroom/market_place/__init__.py:27 newsroom/media_releases/__init__.py:22
+#: newsroom/templates/bookmark_layout.html:3
+#: newsroom/templates/bookmark_layout.html:6
+#: newsroom/watch_lists/__init__.py:18 newsroom/wire/__init__.py:65
+msgid "Saved/Watched Items"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:41
-msgid "An event you have been watching has a new planning"
+#: newsroom/agenda/__init__.py:30
+msgid "Google Maps Styles"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:42
-msgid "Planning added"
+#: newsroom/agenda/__init__.py:32
+msgid ""
+"Provide styles delimited by &(ampersand). For example, "
+"feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to "
+"https://developers.google.com/maps/documentation/maps-static/styling for "
+"more details"
 msgstr ""
 
 #: newsroom/agenda/agenda.py:45
-msgid "An event you have been watching has a planning cancelled"
-msgstr ""
+msgid "An event you have been watching has been updated"
+msgstr "Vámi sledovaná událost byla aktualizována"
 
 #: newsroom/agenda/agenda.py:46
-msgid "Planning cancelled"
-msgstr ""
+msgid "Event updated"
+msgstr "Událost aktualizována"
 
 #: newsroom/agenda/agenda.py:49
-msgid "An event you have been watching has a new coverage added"
-msgstr ""
+msgid "An event you have been watching has been cancelled"
+msgstr "Vámi sledovaná událost byla zrušena"
 
 #: newsroom/agenda/agenda.py:50
+msgid "Event cancelled"
+msgstr "Událost zrušena"
+
+#: newsroom/agenda/agenda.py:53
+msgid "An event you have been watching has a new planning"
+msgstr "Vámi sledovaná událost má novou plánovací položku"
+
+#: newsroom/agenda/agenda.py:54
+msgid "Planning added"
+msgstr "Plánovací položka přidána"
+
+#: newsroom/agenda/agenda.py:57
+msgid "An event you have been watching has a planning cancelled"
+msgstr "U vámi sledované události došlo ke zrušení planovaného krytí"
+
+#: newsroom/agenda/agenda.py:58
+msgid "Planning cancelled"
+msgstr "Krytí zrušeno"
+
+#: newsroom/agenda/agenda.py:61
+msgid "An event you have been watching has a new coverage added"
+msgstr "Vámi sledovaná událost má nové krytí"
+
+#: newsroom/agenda/agenda.py:62
 msgid "Coverage added"
-msgstr ""
+msgstr "Krytí přidáno"
 
-#: newsroom/agenda/email.py:11
+#: newsroom/agenda/email.py:19
 msgid "New coverage"
-msgstr ""
+msgstr "Nové krytí"
 
-#: newsroom/agenda/email.py:42
+#: newsroom/agenda/email.py:70
 msgid "A new coverage request"
-msgstr ""
+msgstr "Požádat o krytí"
 
 #: newsroom/auth/forms.py:9
 msgid "Editor"
-msgstr ""
+msgstr "Editor"
 
 #: newsroom/auth/forms.py:10
 msgid "Journalist"
-msgstr ""
+msgstr "Novinář"
 
 #: newsroom/auth/forms.py:11
 msgid "Sales"
-msgstr ""
+msgstr "Obchodník"
 
 #: newsroom/auth/forms.py:12
 msgid "CTO"
-msgstr ""
+msgstr "CTO"
 
 #: newsroom/auth/forms.py:13
 msgid "CEO"
-msgstr ""
+msgstr "CEO"
 
 #: newsroom/auth/forms.py:14
 msgid "Other"
-msgstr ""
+msgstr "Ostatní"
 
 #: newsroom/auth/forms.py:16
 msgid "Your email"
-msgstr ""
+msgstr "Váš email"
 
 #: newsroom/auth/forms.py:17
 msgid "Your First Name"
-msgstr ""
+msgstr "Křestní jméno"
 
 #: newsroom/auth/forms.py:18
 msgid "Your Last Name"
-msgstr ""
+msgstr "Příjmení"
 
 #: newsroom/auth/forms.py:19
 msgid "Your telephone number"
-msgstr ""
+msgstr "Telefonní číslo"
 
 #: newsroom/auth/forms.py:20
 msgid "Your company"
-msgstr ""
+msgstr "Firma"
 
 #: newsroom/auth/forms.py:21
 msgid "Your country"
-msgstr ""
+msgstr "Země"
 
 #: newsroom/auth/forms.py:22
 msgid "Your position"
-msgstr ""
+msgstr "Pracovní pozice"
 
 #: newsroom/auth/forms.py:23
 msgid "Size of your company"
-msgstr ""
+msgstr "Velikost organizace"
 
-#: newsroom/auth/forms.py:28 newsroom/auth/forms.py:34
-#: newsroom/users/forms.py:21
+#: assets/user-profile/components/profile/UserProfile.jsx:83
+#: assets/users/components/EditUser.jsx:46
+#: assets/users/components/UsersList.jsx:24 newsroom/auth/forms.py:28
+#: newsroom/auth/forms.py:34 newsroom/users/forms.py:22
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: newsroom/auth/forms.py:29
 msgid "Password"
-msgstr ""
+msgstr "Heslo"
 
 #: newsroom/auth/forms.py:30
 msgid "Remember Me"
-msgstr ""
+msgstr "Pamatuj si mě"
 
 #: newsroom/auth/forms.py:41
 msgid "Passwords must match."
-msgstr ""
+msgstr "Hesla musí být stejná"
 
 #: newsroom/auth/forms.py:42
 msgid "Old password"
-msgstr ""
+msgstr "Staré heslo"
 
 #: newsroom/auth/forms.py:43
 msgid "New password"
-msgstr ""
+msgstr "Nové heslo"
 
 #: newsroom/auth/forms.py:44
 msgid "Confirm new password"
+msgstr "Potvrdit nové heslo"
+
+#: newsroom/auth/views.py:37
+msgid "Insufficient Permissions. Access denied."
 msgstr ""
 
-#: newsroom/auth/views.py:37 newsroom/auth/views.py:182
-msgid "Company account has been disabled."
-msgstr ""
-
-#: newsroom/auth/views.py:48 newsroom/auth/views.py:190
-msgid "Account is disabled."
-msgstr ""
-
-#: newsroom/auth/views.py:50 newsroom/auth/views.py:192
+#: newsroom/auth/views.py:55 newsroom/auth/views.py:155
 msgid "Invalid username or password."
-msgstr ""
+msgstr "Neplatné uživatelské jméno nebo heslo"
 
-#: newsroom/auth/views.py:140
-msgid "Account is disabled"
-msgstr ""
-
-#: newsroom/auth/views.py:147
-msgid "Account has not been approved"
-msgstr ""
-
-#: newsroom/auth/views.py:174
+#: newsroom/auth/views.py:139
 msgid "Exceeded number of allowed login attempts"
-msgstr ""
+msgstr "Překročen počet pokusů o přihlášení"
 
-#: newsroom/auth/views.py:198 newsroom/auth/views.py:202
+#: newsroom/auth/views.py:161 newsroom/auth/views.py:165
 msgid "Invalid token"
+msgstr "Neplatný token"
+
+#: newsroom/auth/views.py:192
+msgid "Account already exists."
 msgstr ""
 
-#: newsroom/auth/views.py:242
+#: newsroom/auth/views.py:212
 msgid "Your account has been validated."
-msgstr ""
+msgstr "Váš účet byl schválen"
+
+#: newsroom/auth/views.py:215
+msgid "Token has expired. Please create a new token"
+msgstr "Token vypršel. Prosím, vytvořte si nový."
+
+#: newsroom/auth/views.py:229
+msgid "Your password has been changed. Please login again."
+msgstr "Vaše heslo bylo změněno. Znovu se přihlašte."
 
 #: newsroom/auth/views.py:245
-msgid "Token has expired. Please create a new token"
-msgstr ""
-
-#: newsroom/auth/views.py:259
-msgid "Your password has been changed. Please login again."
-msgstr ""
-
-#: newsroom/auth/views.py:275
 msgid "A reset password token has been sent to your email address."
-msgstr ""
+msgstr "Token k obnovení hesla byl zaslán na vaši emailovou adresu."
 
 #: newsroom/cards/__init__.py:14
-msgid "Home Page Cards"
+msgid "Dashboards"
 msgstr ""
 
-#: newsroom/cards/views.py:53
+#: newsroom/cards/views.py:55
 msgid "Label not found"
-msgstr ""
+msgstr "Název nenalezen"
 
-#: newsroom/cards/views.py:56
+#: newsroom/cards/views.py:58
 msgid "Type not found"
+msgstr "Typ nenalezen"
+
+#: newsroom/cards/views.py:61
+msgid "Dashboard type not found"
 msgstr ""
 
-#: newsroom/companies/__init__.py:72
+#: newsroom/companies/__init__.py:64
 msgid "Company Management"
-msgstr ""
+msgstr "Správa firem"
 
-#: newsroom/companies/views.py:48 newsroom/navigations/views.py:45
-#: newsroom/navigations/views.py:57 newsroom/products/views.py:47
+#: newsroom/companies/views.py:57 newsroom/navigations/views.py:52
+#: newsroom/products/views.py:47 newsroom/section_filters/views.py:50
 msgid "Name not found"
-msgstr ""
+msgstr "Jméno nenalezeno"
 
-#: newsroom/companies/views.py:54
+#: newsroom/companies/views.py:63
 msgid "Wrong date format"
-msgstr ""
+msgstr "Chybný formát data"
 
-#: newsroom/companies/views.py:83
+#: newsroom/companies/views.py:95
 msgid "Company not found"
+msgstr "Firma nenalezena"
+
+#: newsroom/market_place/__init__.py:6
+msgid "aapX"
 msgstr ""
 
+#: newsroom/market_place/__init__.py:32
+msgid "Time limit for aapX items (in days)"
+msgstr ""
+
+#: newsroom/market_place/__init__.py:36 newsroom/news_api/__init__.py:16
+#: newsroom/wire/__init__.py:91
+msgid ""
+"You can create an additional filter on top of the product definition. The "
+"time limit can be enabled for each company in the Permissions."
+msgstr ""
+
+#: assets/navigations/components/EditNavigation.jsx:21
+#: assets/navigations/components/NavigationsApp.jsx:29
+#: assets/products/components/EditProduct.jsx:27
 #: newsroom/navigations/__init__.py:14
 msgid "Navigation"
+msgstr "Navigace"
+
+#: newsroom/news_api/__init__.py:12
+msgid "Time limit for News API products (in days)"
 msgstr ""
 
+#: assets/companies/components/CompanyPermissions.jsx:100
+#: assets/company-reports/components/Company.jsx:24
+#: assets/navigations/components/EditNavigation.jsx:22
 #: newsroom/products/__init__.py:14
 msgid "Products"
-msgstr ""
+msgstr "Produkty"
 
-#: newsroom/reports/reports.py:32
+#: assets/company-reports/components/CompanyReportsApp.jsx:13
+#: newsroom/reports/reports.py:39
 msgid "Saved searches per company"
-msgstr ""
+msgstr "Uložené dotazy za firmu"
 
-#: newsroom/reports/reports.py:58
+#: assets/company-reports/components/CompanyReportsApp.jsx:14
+#: newsroom/reports/reports.py:65
 msgid "Saved searches per user"
-msgstr ""
+msgstr "Uložené dotazy podle uživatele"
 
-#: newsroom/reports/reports.py:86
+#: assets/company-reports/components/CompanyReportsApp.jsx:15
+#: newsroom/reports/reports.py:93
 msgid "Products per company"
-msgstr ""
+msgstr "Produkty na firmu"
 
-#: newsroom/reports/reports.py:108
+#: assets/company-reports/components/CompanyReportsApp.jsx:16
+#: newsroom/reports/reports.py:116
 msgid "Stories per product"
+msgstr "Zprávy podle produktu"
+
+#: assets/companies/components/CompaniesApp.jsx:25
+#: assets/companies/components/EditCompany.jsx:23
+#: assets/company-reports/components/Company.jsx:78
+#: assets/company-reports/components/CompanyProducts.jsx:32
+#: assets/company-reports/components/CompanyReportsApp.jsx:17
+#: assets/company-reports/components/CompanySavedSearches.jsx:17
+#: assets/company-reports/components/SubscriberActivity.jsx:129
+#: assets/company-reports/components/UserSavedSearches.jsx:21
+#: assets/users/components/EditUser.jsx:82
+#: assets/users/components/UsersList.jsx:29
+#: assets/watch-lists/components/EditWatchList.jsx:132
+#: assets/watch-lists/components/WatchList.jsx:27
+#: newsroom/reports/reports.py:147 newsroom/users/forms.py:27
+#: newsroom/watch_lists/forms.py:22
+msgid "Company"
+msgstr "Firmy"
+
+#: newsroom/reports/reports.py:237
+msgid "SubscriberActivity"
 msgstr ""
 
-#: newsroom/reports/views.py:15 newsroom/reports/views.py:36
+#: newsroom/reports/views.py:16 newsroom/reports/views.py:42
 msgid "Unknown report {}"
+msgstr "Neznámý report {}"
+
+#: newsroom/section_filters/__init__.py:16
+msgid "Section Filters"
 msgstr ""
 
 #: newsroom/templates/403.html:6
 msgid "403. Forbidden"
-msgstr ""
+msgstr "403. Zakázáno"
 
 #: newsroom/templates/403.html:7
 msgid "The requested resource is not available for your subscription."
-msgstr ""
+msgstr "Požadovaný obsah není součástí vašeho předplatného."
 
 #: newsroom/templates/404.html:6
 msgid "404. That's an error."
-msgstr ""
+msgstr "404. Nenalezeno."
 
 #: newsroom/templates/404.html:7
 #, python-format
 msgid "The requested url <code>%(url)s</code> was not found on the server."
-msgstr ""
+msgstr "Stránka <code>%(url)s</code> nenalezena."
 
 #: newsroom/templates/account_locked.html:12
 msgid "Your account has been locked"
-msgstr ""
+msgstr "Váš účet byl uzamčen."
 
 #: newsroom/templates/account_locked.html:15
 msgid ""
 "We have detected suspicious activity on your account and have locked it."
-msgstr ""
+msgstr "Objevili jsme podezřelou aktivitu na vašem účtu a uzamkli jsme jej."
 
 #: newsroom/templates/account_locked.html:16
 msgid "Please contact Newsroom administrator to unlock your account"
-msgstr ""
+msgstr "Prosím, kontaktujte administrátora."
 
-#: newsroom/templates/account_locked.html:17 newsroom/templates/home.html:3
-#: newsroom/templates/home.html:6 newsroom/templates/signup_success.html:18
+#: newsroom/templates/account_locked.html:17 newsroom/templates/home.html:4
+#: newsroom/templates/home_default.html:3
+#: newsroom/templates/signup_success.html:18
 msgid "Home"
+msgstr "Domů"
+
+#: newsroom/templates/agenda_item_print.html:18
+msgid "Where"
 msgstr ""
 
-#: newsroom/templates/agenda_index.html:3
-#: newsroom/templates/agenda_index.html:6
-msgid "Agenda"
-msgstr ""
-
-#: newsroom/templates/agenda_item_print.html:11
-#: newsroom/templates/wire_item_print.html:10
-msgid "On:"
-msgstr ""
-
-#: newsroom/templates/agenda_item_print.html:20
-msgid "Coverages:"
-msgstr ""
-
-#: newsroom/templates/agenda_item_print.html:23
-msgid "On"
-msgstr ""
-
-#: newsroom/templates/agenda_item_print.html:25
-msgid "Coverage Type"
-msgstr ""
-
-#: newsroom/templates/agenda_item_print.html:27
-msgid "Workflow Status"
-msgstr ""
-
-#: newsroom/templates/agenda_item_print.html:29
-msgid "Coverage Status"
-msgstr ""
-
-#: newsroom/templates/agenda_item_print.html:37
-#: newsroom/templates/wire_item.html:70
-#: newsroom/templates/wire_item_print.html:21
-msgid "Metadata"
-msgstr ""
-
-#: newsroom/templates/agenda_item_print.html:40
-#: newsroom/templates/wire_item.html:73
-#: newsroom/templates/wire_item_print.html:24
-msgid "Category"
-msgstr ""
+#: assets/companies/components/CompanyList.jsx:29
+#: assets/company-reports/components/Company.jsx:37
+#: newsroom/templates/agenda_item_print.html:30
+msgid "Contact"
+msgstr "Kontakt"
 
 #: newsroom/templates/agenda_item_print.html:44
-#: newsroom/templates/wire_item.html:83
-#: newsroom/templates/wire_item_print.html:28
-msgid "Content Type"
+msgid "Web"
 msgstr ""
 
-#: newsroom/templates/agenda_item_print.html:48
-msgid "Place"
+#: assets/agenda/components/AgendaEdNote.jsx:15
+#: newsroom/templates/agenda_item_print.html:59
+msgid "Editorial Note"
 msgstr ""
 
-#: newsroom/templates/am_news_bookmarks.html:3
-#: newsroom/templates/am_news_bookmarks.html:10
-#: newsroom/templates/wire_bookmarks.html:3
-#: newsroom/templates/wire_bookmarks.html:6
-msgid "Saved Items"
-msgstr ""
+#: newsroom/templates/agenda_item_print.html:64
+msgid "Coverages:"
+msgstr "Krytí:"
 
+#: assets/company-reports/components/Company.jsx:12
 #: newsroom/templates/am_news_index.html:3
 #: newsroom/templates/am_news_index.html:10
-msgid "AM News"
+msgid "AM"
 msgstr ""
 
-#: newsroom/templates/company_reports.html:6 newsroom/templates/layout.html:63
+#: newsroom/templates/base_layout.html:43 newsroom/templates/login.html:13
+#: newsroom/templates/login.html:36
+msgid "Login"
+msgstr "Přihlášení"
+
+#: newsroom/templates/base_layout.html:46 newsroom/templates/footer.html:4
+msgid "Contact Us"
+msgstr "Kontakt"
+
+#: newsroom/templates/base_layout.html:58 newsroom/templates/settings.html:3
+#: newsroom/templates/settings.html:6
+msgid "Settings"
+msgstr "Nastavení"
+
+#: newsroom/templates/base_layout.html:65
+#: newsroom/templates/company_reports.html:3
+#: newsroom/templates/company_reports.html:6
 msgid "Reports"
-msgstr ""
+msgstr "Přehledy"
 
 #: newsroom/templates/copyright.html:3 newsroom/templates/footer.html:5
 msgid "Copyright"
-msgstr ""
+msgstr "Copyright"
 
 #: newsroom/templates/footer.html:2
 msgid "Privacy Policy"
-msgstr ""
+msgstr "Ochrana osobních údajů"
 
 #: newsroom/templates/footer.html:3
 msgid "Terms and Conditions"
-msgstr ""
+msgstr "Podmínky užití"
 
-#: newsroom/templates/footer.html:4 newsroom/templates/layout.html:45
-msgid "Contact Us"
-msgstr ""
-
-#: newsroom/templates/layout.html:42 newsroom/templates/login.html:13
-#: newsroom/templates/login.html:36
-msgid "Login"
-msgstr ""
-
-#: newsroom/templates/layout.html:57 newsroom/templates/settings.html:3
-#: newsroom/templates/settings.html:6
-msgid "Settings"
-msgstr ""
-
-#: newsroom/templates/login.html:40
+#: newsroom/templates/login.html:41
 msgid "Forgot your password?"
+msgstr "Zapomenuté heslo?"
+
+#: newsroom/templates/login.html:41
+msgid "Click here to reset."
+msgstr "Klikněte sem pro obnovení."
+
+#: newsroom/templates/login.html:42
+msgid "Or you can"
 msgstr ""
 
-#: newsroom/templates/login.html:40
-msgid "Click here to reset."
+#: newsroom/templates/login.html:42
+msgid "click here to register."
+msgstr ""
+
+#: assets/user-profile/components/profile/UserProfile.jsx:127
+#: newsroom/templates/login.html:50
+msgid "Language"
+msgstr "Jazyk"
+
+#: newsroom/templates/media_releases_index.html:3
+#: newsroom/templates/media_releases_index.html:6
+msgid "Media Releases"
 msgstr ""
 
 #: newsroom/templates/request_token.html:12
 msgid "Password Reset"
-msgstr ""
+msgstr "Obnovení hesla"
 
 #: newsroom/templates/request_token.html:27
 msgid "Validate"
-msgstr ""
+msgstr "Ověřit"
 
+#: assets/users/components/EditUser.jsx:114
 #: newsroom/templates/request_token.html:29
 msgid "Reset Password"
-msgstr ""
+msgstr "Obnovit heslo"
 
 #: newsroom/templates/reset_password.html:12
 msgid "Reset password"
-msgstr ""
+msgstr "Obnovit heslo"
 
 #: newsroom/templates/reset_password.html:30
 msgid "Please use 8 or more characters."
-msgstr ""
+msgstr "Použite 8 nebo více znaků"
 
 #: newsroom/templates/reset_password.html:37
 msgid "Change Password"
-msgstr ""
+msgstr "Změnit heslo"
 
+#: assets/agenda/components/AgendaCoverageRequest.jsx:56
+#: assets/components/EditPanel.jsx:99 assets/components/Modal.jsx:156
+#: assets/news-api/components/EditAPIToken.jsx:197
+#: assets/search/components/TopicEditor.jsx:186
+#: assets/search/components/WatchListEditor.jsx:202
+#: assets/user-profile/components/profile/UserProfile.jsx:143
+#: assets/wire/components/SelectedItemsBar.jsx:41
 #: newsroom/templates/reset_password.html:38
 msgid "Cancel"
-msgstr ""
+msgstr "Zrušit"
 
 #: newsroom/templates/signup.html:13 newsroom/templates/signup.html:60
 msgid "Sign up"
-msgstr ""
+msgstr "Registrace"
 
 #: newsroom/templates/signup_success.html:12
 msgid "Newsroom sign up"
-msgstr ""
+msgstr "Registrace"
 
 #: newsroom/templates/signup_success.html:15
 msgid "Thank you for your interest in Newsroom"
-msgstr ""
+msgstr "Děkujeme za váš zájem"
 
 #: newsroom/templates/signup_success.html:16
 msgid "Your sign up request has been sent successfully"
-msgstr ""
+msgstr "Váš požadavek na registraci byl úspěšně odeslán"
 
 #: newsroom/templates/signup_success.html:17
 msgid "One of our team members will be in touch with you shortly"
+msgstr "Budeme vás brzy kontaktovat"
+
+#: newsroom/templates/user_profile.html:3
+msgid "User Profile"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListApp.jsx:28
+#: assets/wire/components/WireApp.jsx:69
+#: newsroom/templates/watch_lists_index.html:3
+#: newsroom/templates/watch_lists_index.html:6
+#: newsroom/watch_lists/__init__.py:16
+msgid "Watch Lists"
 msgstr ""
 
 #: newsroom/templates/wire_index.html:3 newsroom/templates/wire_index.html:6
 msgid "Wire"
-msgstr ""
+msgstr "Zprávy"
 
 #: newsroom/templates/wire_item.html:40
 #: newsroom/templates/wire_item_print.html:10
 msgid "By:"
-msgstr ""
+msgstr "Od:"
 
-#: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:105
+#: assets/components/cards/render/CardMeta.jsx:20
+#: assets/wire/components/ItemVersion.jsx:17
+#: assets/wire/components/WireListItem.jsx:102
+#: assets/wire/components/WireListItem.jsx:117
+#: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:108
 msgid "words"
+msgstr "slov"
+
+#: assets/wire/components/ItemVersion.jsx:21
+#: newsroom/templates/wire_item.html:64 newsroom/templates/wire_item.html:110
+msgid "characters"
 msgstr ""
 
-#: newsroom/templates/wire_item.html:63
+#: newsroom/templates/wire_item.html:66
 msgid "Source:"
-msgstr ""
+msgstr "Zdroj:"
 
-#: newsroom/templates/wire_item.html:95
+#: assets/agenda/components/AgendaTags.jsx:24
+#: assets/wire/components/PreviewTags.jsx:25
+#: newsroom/templates/wire_item.html:73
+#: newsroom/templates/wire_item_print.html:21
+msgid "Metadata"
+msgstr "Metadata"
+
+#: assets/agenda/components/AgendaApp.jsx:104
+#: assets/agenda/components/AgendaTags.jsx:25
+#: assets/search/components/TopicParameters.jsx:68
+#: assets/wire/components/PreviewTags.jsx:32
+#: newsroom/templates/wire_item.html:76
+#: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:106
+msgid "Category"
+msgstr "Kategorie"
+
+#: assets/search/components/TopicParameters.jsx:70
+#: assets/wire/components/PreviewTags.jsx:38
+#: newsroom/templates/wire_item.html:86
+#: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:114
+msgid "Content Type"
+msgstr "Typ obsahu"
+
+#: assets/wire/components/ListItemPreviousVersions.jsx:59
+#: newsroom/templates/wire_item.html:98
 msgid "Previous versions"
+msgstr "Předchozí verze"
+
+#: newsroom/templates/wire_item_print.html:10
+msgid "On:"
+msgstr "Kdy:"
+
+#: newsroom/topics/views.py:29
+msgid ""
+"Please enable 'Receive notifications via email' option in your profile to "
+"receive topic notifications"
 msgstr ""
 
-#: newsroom/topics/views.py:80 newsroom/wire/views.py:218
+#: newsroom/topics/views.py:114 newsroom/wire/views.py:234
 #, python-format
 msgid "From %s: %s"
 msgstr "Od %s: %s"
 
 #: newsroom/users/__init__.py:14
 msgid "User Management"
-msgstr ""
+msgstr "Uživatelé"
 
 #: newsroom/users/forms.py:14
 msgid "Administrator"
-msgstr ""
+msgstr "Administrátor"
 
 #: newsroom/users/forms.py:15
 msgid "Public"
-msgstr ""
+msgstr "Zákazní"
 
 #: newsroom/users/forms.py:16
 msgid "Internal"
+msgstr "Interní uživatel"
+
+#: newsroom/users/forms.py:17
+msgid "Account Management"
 msgstr ""
 
-#: newsroom/users/forms.py:19
+#: assets/user-profile/components/profile/UserProfile.jsx:65
+#: assets/users/components/EditUser.jsx:32 newsroom/users/forms.py:20
 msgid "First Name"
-msgstr ""
+msgstr "Křestní jméno"
 
-#: newsroom/users/forms.py:20
+#: assets/user-profile/components/profile/UserProfile.jsx:74
+#: assets/users/components/EditUser.jsx:39 newsroom/users/forms.py:21
 msgid "Last Name"
-msgstr ""
+msgstr "Příjmení"
 
-#: newsroom/users/forms.py:22
+#: assets/companies/components/CompanyList.jsx:30
+#: assets/companies/components/EditCompany.jsx:140 newsroom/users/forms.py:23
 msgid "Telephone"
-msgstr ""
+msgstr "Telefon"
 
-#: newsroom/users/forms.py:23
+#: assets/user-profile/components/profile/UserProfile.jsx:101
+#: assets/users/components/EditUser.jsx:60
+#: assets/users/components/UsersList.jsx:26 newsroom/users/forms.py:24
 msgid "Mobile"
-msgstr ""
+msgstr "Mobil"
 
-#: newsroom/users/forms.py:24
+#: assets/user-profile/components/profile/UserProfile.jsx:110
+#: assets/users/components/EditUser.jsx:67
+#: assets/users/components/UsersList.jsx:27 newsroom/users/forms.py:25
 msgid "Role"
-msgstr ""
+msgstr "Pozice"
 
-#: newsroom/users/forms.py:25
+#: assets/users/components/EditUser.jsx:74
+#: assets/users/components/UsersList.jsx:28 newsroom/users/forms.py:26
 msgid "User Type"
-msgstr ""
-
-#: newsroom/users/forms.py:26
-msgid "Company"
-msgstr ""
-
-#: newsroom/users/forms.py:27
-msgid "Sign Up Details"
-msgstr ""
+msgstr "Typ"
 
 #: newsroom/users/forms.py:28
-msgid "Email Validated"
-msgstr ""
+msgid "Sign Up Details"
+msgstr "Registrační detaily"
 
 #: newsroom/users/forms.py:29
-msgid "Account Enabled"
-msgstr ""
+msgid "Email Validated"
+msgstr "Email ověřen"
 
 #: newsroom/users/forms.py:30
-msgid "Account Approved"
-msgstr ""
+msgid "Account Enabled"
+msgstr "Aktivní účet"
 
 #: newsroom/users/forms.py:31
+msgid "Account Approved"
+msgstr "Schválený účet"
+
+#: assets/users/components/EditUser.jsx:103 newsroom/users/forms.py:32
+msgid "Company Expiry Alert"
+msgstr ""
+
+#: assets/user-profile/components/profile/UserProfile.jsx:119
+#: newsroom/users/forms.py:33
 msgid "Receive notifications via email"
-msgstr ""
+msgstr "Dostávat upozornění emailem"
 
-#: newsroom/users/forms.py:32
+#: newsroom/users/forms.py:34
 msgid "Locale"
-msgstr ""
+msgstr "Prostředí"
 
-#: newsroom/users/views.py:89 newsroom/users/views.py:133
+#: newsroom/users/views.py:102 newsroom/users/views.py:147
 msgid "User not found"
-msgstr ""
+msgstr "Uživatel nenalezen"
 
-#: newsroom/users/views.py:128
+#: newsroom/users/views.py:142
 msgid "User id not provided"
+msgstr "ID uživatele neposkytnuto"
+
+#: newsroom/watch_lists/__init__.py:21
+msgid "Watch List Format"
 msgstr ""
 
-#: newsroom/wire/__init__.py:46
+#: newsroom/watch_lists/forms.py:14
+msgid "Linked extract(s)"
+msgstr ""
+
+#: newsroom/watch_lists/forms.py:15
+msgid "Full text"
+msgstr ""
+
+#: assets/companies/components/CompanyList.jsx:24
+#: assets/companies/components/EditCompany.jsx:103
+#: assets/navigations/components/EditNavigation.jsx:82
+#: assets/navigations/components/NavigationList.jsx:22
+#: assets/products/components/EditProduct.jsx:106
+#: assets/products/components/ProductList.jsx:22
+#: assets/search/components/TopicForm.jsx:15
+#: assets/section-filters/components/EditSectionFilter.jsx:34
+#: assets/section-filters/components/SectionFilterList.jsx:22
+#: assets/users/components/UsersList.jsx:23
+#: assets/watch-lists/components/EditWatchList.jsx:111
+#: assets/watch-lists/components/WatchList.jsx:23
+#: newsroom/watch_lists/forms.py:18
+msgid "Name"
+msgstr "Název"
+
+#: assets/agenda/components/AgendaApp.jsx:108
+#: assets/search/components/TopicParameters.jsx:69
+#: assets/watch-lists/components/WatchList.jsx:24
+#: newsroom/watch_lists/forms.py:19 newsroom/wire/__init__.py:110
+msgid "Subject"
+msgstr "Předmět"
+
+#: assets/navigations/components/EditNavigation.jsx:89
+#: assets/navigations/components/NavigationList.jsx:23
+#: assets/products/components/EditProduct.jsx:113
+#: assets/search/components/WatchListEditor.jsx:172
+#: assets/section-filters/components/EditSectionFilter.jsx:41
+#: assets/watch-lists/components/EditWatchList.jsx:125
+#: assets/watch-lists/components/WatchList.jsx:25
+#: newsroom/watch_lists/forms.py:20
+msgid "Description"
+msgstr "Popis"
+
+#: newsroom/watch_lists/forms.py:21
+msgid "Alert Type"
+msgstr ""
+
+#: assets/companies/components/CompanyListItem.jsx:17
+#: assets/companies/components/EditCompany.jsx:187
+#: assets/navigations/components/EditNavigation.jsx:96
+#: assets/navigations/components/NavigationListItem.jsx:13
+#: assets/news-api/components/EditAPIToken.jsx:179
+#: assets/products/components/EditProduct.jsx:162
+#: assets/products/components/ProductListItem.jsx:12
+#: assets/search/components/WatchListEditor.jsx:194
+#: assets/section-filters/components/EditSectionFilter.jsx:76
+#: assets/section-filters/components/SectionFilterListItem.jsx:12
+#: assets/users/components/EditUser.jsx:97
+#: assets/users/components/UserListItem.jsx:23
+#: assets/watch-lists/components/EditWatchList.jsx:170
+#: assets/watch-lists/components/WatchListItem.jsx:18
+#: newsroom/watch_lists/forms.py:23
+msgid "Enabled"
+msgstr "Aktivní"
+
+#: assets/company-reports/components/CompanyProducts.jsx:12
+#: assets/products/components/EditProduct.jsx:133
+#: assets/products/components/ProductList.jsx:25
+#: assets/section-filters/components/EditSectionFilter.jsx:61
+#: assets/section-filters/components/SectionFilterList.jsx:25
+#: assets/watch-lists/components/EditWatchList.jsx:141
+#: assets/watch-lists/components/WatchList.jsx:26
+#: newsroom/watch_lists/forms.py:24
+msgid "Query"
+msgstr "Dotaz"
+
+#: newsroom/watch_lists/views.py:132
+msgid "Watch List not found"
+msgstr ""
+
+#: newsroom/wire/__init__.py:48
+msgid "Newsroom"
+msgstr ""
+
+#: newsroom/wire/__init__.py:69
 msgid "Plain Text"
-msgstr ""
+msgstr "Prostý text"
 
-#: newsroom/wire/__init__.py:57
+#: newsroom/wire/__init__.py:80
 msgid "News only filter"
-msgstr ""
+msgstr "Filtr pro \"pouze zprávy\""
 
-#: newsroom/wire/__init__.py:59
+#: newsroom/wire/__init__.py:82
 msgid ""
-"\n"
-"This query defines what is NOT considered \"news\" content.\n"
-"It is used by the News only switch to filter the view.\n"
-"When switched on, stories matching this filter will not be displayed.\n"
-"        "
+"This query defines what is NOT considered 'news' content. It is used by the "
+"News only switch to filter the view. When switched on, stories matching this"
+" filter will not be displayed."
 msgstr ""
 
-#: newsroom/wire/search.py:114
+#: newsroom/wire/__init__.py:87
+msgid "Time limit for Wire products (in days)"
+msgstr ""
+
+#: assets/agenda/components/AgendaApp.jsx:112 newsroom/wire/__init__.py:118
+msgid "News Value"
+msgstr "Důležitost"
+
+#: assets/agenda/components/AgendaApp.jsx:116
+#: assets/search/components/TopicParameters.jsx:60
+#: newsroom/wire/__init__.py:122
+msgid "Place"
+msgstr "Místo"
+
+#: newsroom/wire/search.py:84
 msgid "User does not belong to a company."
+msgstr "Uživatel nepatří k žádné firmě"
+
+#: newsroom/wire/search.py:152
+msgid "Your company doesn't have any products defined."
+msgstr "Vaše firma nemá definovány žádné produkty"
+
+#: assets/agenda/components/AgendaApp.jsx:143
+#: assets/layout/components/BaseApp.jsx:53
+#: assets/wire/components/WireApp.jsx:103
+msgid "Custom View"
 msgstr ""
 
-#: newsroom/wire/search.py:132
-msgid "Your company doesn't have any products defined."
+#: assets/agenda/components/AgendaApp.jsx:173
+#: assets/am-news/components/AmNewsApp.jsx:122
+#: assets/wire/components/WireApp.jsx:139
+msgid "Close filter panel"
+msgstr "Zavřít filtry"
+
+#: assets/agenda/components/AgendaApp.jsx:183
+#: assets/am-news/components/AmNewsApp.jsx:129
+#: assets/wire/components/WireApp.jsx:151
+msgid "Open filter panel"
+msgstr "Otevřít filtry"
+
+#: assets/agenda/components/AgendaAttachments.jsx:35
+msgid "Size:"
+msgstr "Velikost:"
+
+#: assets/agenda/components/AgendaAttachments.jsx:37
+msgid "MIME type:"
+msgstr "Typ souboru:"
+
+#: assets/agenda/components/AgendaCalendarButton.jsx:33
+#: assets/agenda/components/AgendaDateButtons.jsx:15
+#: assets/agenda/components/AgendaList.jsx:208
+#: assets/company-reports/components/ProductStories.jsx:26
+#: assets/components/CalendarButton.jsx:33
+#: assets/components/ExpiryDateInput.jsx:90
+#: assets/search/components/TopicParameters.jsx:24
+#: assets/wire/components/filters/NavCreatedPicker.jsx:9
+msgid "Today"
+msgstr "Dnes"
+
+#: assets/agenda/components/AgendaCoverageExistsFilter.jsx:7
+msgid "Any coverage status"
 msgstr ""
+
+#: assets/agenda/components/AgendaCoverageExistsFilter.jsx:30
+msgid "Coverage is planned"
+msgstr ""
+
+#: assets/agenda/components/AgendaCoverageExistsFilter.jsx:36
+msgid "Coverage not planned"
+msgstr ""
+
+#: assets/agenda/components/AgendaCoverageRequest.jsx:39
+msgid "Coverage inquiries"
+msgstr ""
+
+#: assets/agenda/components/AgendaCoverageRequest.jsx:46
+msgid "your inquiry"
+msgstr ""
+
+#: assets/agenda/components/AgendaCoverageRequest.jsx:62
+msgid "Submit inquiry"
+msgstr ""
+
+#: assets/agenda/components/AgendaCoverages.jsx:31
+msgid "expected"
+msgstr ""
+
+#: assets/agenda/components/AgendaCoverages.jsx:36
+msgid "Source"
+msgstr "Zdroj"
+
+#: assets/agenda/components/AgendaDateButtons.jsx:36
+msgid "D"
+msgstr "D"
+
+#: assets/agenda/components/AgendaDateButtons.jsx:43
+msgid "W"
+msgstr "T"
+
+#: assets/agenda/components/AgendaDateButtons.jsx:50
+msgid "M"
+msgstr "M"
+
+#: assets/agenda/components/AgendaDetailCoverages.jsx:14
+#: assets/agenda/components/AgendaPreviewCoverages.jsx:15
+msgid "Coverages"
+msgstr "Způsob krytí"
+
+#: assets/agenda/components/AgendaEdNote.jsx:15
+msgid "Reason"
+msgstr ""
+
+#: assets/agenda/components/AgendaEventsOnlyFilter.jsx:7
+msgid "Show Events Only"
+msgstr ""
+
+#: assets/agenda/components/AgendaEventsOnlyFilter.jsx:9
+msgid "Events & Coverages"
+msgstr ""
+
+#: assets/agenda/components/AgendaFeaturedStoriesToogle.jsx:10
+msgid "Top/Featured Stories"
+msgstr ""
+
+#: assets/agenda/components/AgendaFeaturedStoriesToogle.jsx:11
+msgid "Top Stories"
+msgstr ""
+
+#: assets/agenda/components/AgendaFilters.jsx:21
+msgid "Any calendar"
+msgstr "Všechny kalendáře"
+
+#: assets/agenda/components/AgendaFilters.jsx:26
+msgid "Any location"
+msgstr "Všechna místa"
+
+#: assets/agenda/components/AgendaFilters.jsx:32
+msgid "Any region"
+msgstr "Všechny regiony"
+
+#: assets/agenda/components/AgendaFilters.jsx:52
+msgid "Any coverage type"
+msgstr ""
+
+#: assets/agenda/components/AgendaInternalNote.jsx:11
+msgid "Internal Note"
+msgstr ""
+
+#: assets/agenda/components/AgendaItemDetails.jsx:91
+#: assets/agenda/components/AgendaPreviewAttachments.jsx:16
+msgid "Attachments"
+msgstr "Přílohy"
+
+#: assets/agenda/components/AgendaItemTimeUpdater.jsx:75
+msgid "Posted"
+msgstr ""
+
+#: assets/agenda/components/AgendaItemTimeUpdater.jsx:79
+msgid "Updated"
+msgstr "Aktualizováno"
+
+#: assets/agenda/components/AgendaList.jsx:212
+msgid "Tomorrow"
+msgstr ""
+
+#: assets/agenda/components/AgendaList.jsx:305
+#: assets/am-news/components/AmNewsList.jsx:190
+#: assets/wire/components/ItemsList.jsx:168
+msgid "No items found."
+msgstr "Žádné položky"
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:31
+msgid " '${slugline}'"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:37
+msgid "{{ type }}{{ slugline }} {{ status_text }}"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:46
+msgid "Planned {{ type }} {{ slugline }}, expected {{date}} at {{time}}"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:55
+msgid "{{ type }} {{ slugline }} in progress, expected {{date}} at {{time}}"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:61
+msgid "{{ type }} {{slugline}} cancelled"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:69
+msgid " (update to come)"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:69
+msgid " (updated)"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:73
+msgid "{{ type }} {{ slugline }} available{{deliveryState}}"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:126
+msgid "{{ attachments }} file(s) attached"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemLabels.jsx:15
+msgid "postponed"
+msgstr "odloženo"
+
+#: assets/agenda/components/AgendaListItemLabels.jsx:19
+msgid "cancelled"
+msgstr "zrušeno"
+
+#: assets/agenda/components/AgendaListItemLabels.jsx:23
+msgid "rescheduled"
+msgstr "přeloženo"
+
+#: assets/agenda/components/AgendaListItemLabels.jsx:27
+msgid "event completed"
+msgstr ""
+
+#: assets/agenda/components/AgendaMetaTime.jsx:65
+#: assets/agenda/components/AgendaMetaTime.jsx:70
+#: assets/components/cards/render/EventsTwoByTwoCard.jsx:33
+msgid "to"
+msgstr "do"
+
+#: assets/agenda/components/AgendaPreviewCoverages.jsx:19
+msgid "Previous Coverages"
+msgstr ""
+
+#: assets/agenda/components/AgendaPreviewImage.jsx:24
+msgid "Show Map"
+msgstr ""
+
+#: assets/agenda/components/AgendaPreviewImage.jsx:25
+msgid "Hide Map"
+msgstr ""
+
+#: assets/agenda/components/AgendaTypeAheadFilter.jsx:80
+msgid "Choose a location..."
+msgstr "Vyberte místo"
+
+#: assets/agenda/components/CoverageItemStatus.jsx:61
+#: assets/companies/components/CompanyList.jsx:28
+#: assets/navigations/components/NavigationList.jsx:24
+#: assets/products/components/ProductList.jsx:23
+#: assets/section-filters/components/SectionFilterList.jsx:23
+#: assets/users/components/UsersList.jsx:30
+#: assets/watch-lists/components/WatchList.jsx:28
+msgid "Status"
+msgstr "Status"
+
+#: assets/agenda/components/CoverageItemStatus.jsx:63
+msgid "coverage {{ state }} "
+msgstr ""
+
+#: assets/agenda/components/CoverageItemStatus.jsx:74
+#: assets/agenda/components/CoverageItemStatus.jsx:89
+msgid "Open in new tab"
+msgstr ""
+
+#: assets/agenda/components/CoverageItemStatus.jsx:75
+#: assets/agenda/components/CoverageItemStatus.jsx:90
+#: assets/agenda/components/CoverageItemStatus.jsx:95
+msgid "View Content"
+msgstr ""
+
+#: assets/agenda/components/CoverageItemStatus.jsx:125
+msgid "Update coming"
+msgstr ""
+
+#: assets/cards/components/CardList.jsx:23
+#: assets/cards/components/EditCard.jsx:61
+msgid "Label"
+msgstr "Název"
+
+#: assets/cards/components/CardList.jsx:24
+#: assets/cards/components/EditCard.jsx:68
+#: assets/companies/components/CompanyList.jsx:25
+msgid "Type"
+msgstr "Typ"
+
+#: assets/cards/components/CardList.jsx:25
+#: assets/company-reports/components/ProductStories.jsx:24
+#: assets/components/cards/edit/ConfigProduct.jsx:28
+#: assets/products/components/EditProduct.jsx:25
+#: assets/products/components/ProductsApp.jsx:31
+msgid "Product"
+msgstr "Produkt"
+
+#: assets/cards/components/CardList.jsx:26
+#: assets/cards/components/EditCard.jsx:77
+msgid "Order"
+msgstr "Pořadí"
+
+#: assets/cards/components/CardList.jsx:27
+#: assets/companies/components/CompanyList.jsx:32
+#: assets/navigations/components/NavigationList.jsx:25
+#: assets/products/components/ProductList.jsx:27
+#: assets/section-filters/components/SectionFilterList.jsx:26
+#: assets/users/components/UsersList.jsx:31
+msgid "Created On"
+msgstr "Vytvořeno"
+
+#: assets/cards/components/Cards.jsx:39
+msgid "Please provide card label"
+msgstr "Prosím, vyplňte název"
+
+#: assets/cards/components/Cards.jsx:45
+msgid "Please provide start date"
+msgstr "Prosím, vyplňte počáteční datum"
+
+#: assets/cards/components/Cards.jsx:66
+msgid "Would you like to delete card: {{label}}"
+msgstr "Chcete smazat kartu: {{label}}"
+
+#: assets/cards/components/CardsApp.jsx:28
+msgid "Card"
+msgstr ""
+
+#: assets/cards/components/EditCard.jsx:88
+#: assets/companies/components/CompanyPermissions.jsx:121
+#: assets/companies/components/EditCompany.jsx:196
+#: assets/components/EditPanel.jsx:107 assets/components/Modal.jsx:155
+#: assets/general-settings/components/GeneralSettingsApp.jsx:65
+#: assets/navigations/components/EditNavigation.jsx:118
+#: assets/news-api/components/EditAPIToken.jsx:190
+#: assets/products/components/EditProduct.jsx:172
+#: assets/search/components/TopicEditor.jsx:193
+#: assets/search/components/WatchListEditor.jsx:209
+#: assets/section-filters/components/EditSectionFilter.jsx:85
+#: assets/users/components/EditUser.jsx:121
+#: assets/watch-lists/components/EditWatchList.jsx:179
+#: assets/watch-lists/components/WatchListSchedule.jsx:129
+msgid "Save"
+msgstr "Uložit"
+
+#: assets/cards/components/EditCard.jsx:93
+#: assets/companies/components/EditCompany.jsx:201
+#: assets/navigations/components/EditNavigation.jsx:123
+#: assets/products/components/EditProduct.jsx:177
+#: assets/search/components/FollowedTopics.jsx:49
+#: assets/section-filters/components/EditSectionFilter.jsx:90
+#: assets/users/components/EditUser.jsx:127
+#: assets/watch-lists/components/EditWatchList.jsx:185
+msgid "Delete"
+msgstr "Smazat"
+
+#: assets/companies/components/Companies.jsx:55
+msgid "Would you like to delete company: {{name}}"
+msgstr "Chcete smazat firmu: {{name}}"
+
+#: assets/companies/components/CompanyList.jsx:26
+#: assets/companies/components/EditCompany.jsx:126
+msgid "Superdesk Subscriber Id"
+msgstr "Subscriber ID v Superdesku"
+
+#: assets/companies/components/CompanyList.jsx:27
+#: assets/companies/components/EditCompany.jsx:133
+msgid "Account Manager"
+msgstr ""
+
+#: assets/companies/components/CompanyList.jsx:31
+#: assets/companies/components/EditCompany.jsx:161
+msgid "Country"
+msgstr "Země"
+
+#: assets/companies/components/CompanyList.jsx:33
+msgid "Expires On"
+msgstr "Platí do"
+
+#: assets/companies/components/CompanyListItem.jsx:17
+#: assets/company-reports/components/Company.jsx:57
+#: assets/navigations/components/NavigationListItem.jsx:13
+#: assets/products/components/ProductListItem.jsx:12
+#: assets/section-filters/components/SectionFilterListItem.jsx:12
+#: assets/users/components/UserListItem.jsx:23
+#: assets/watch-lists/components/WatchListItem.jsx:18
+msgid "Disabled"
+msgstr "Deaktivovaná"
+
+#: assets/companies/components/CompanyPermissions.jsx:62
+msgid "General"
+msgstr "Obecné"
+
+#: assets/companies/components/CompanyPermissions.jsx:67
+msgid "Grant Access To Archived Wire"
+msgstr ""
+
+#: assets/companies/components/CompanyPermissions.jsx:75
+msgid "Events Only Access"
+msgstr ""
+
+#: assets/companies/components/CompanyPermissions.jsx:84
+msgid "Sections"
+msgstr "Sekce"
+
+#: assets/companies/components/EditCompany.jsx:24
+#: assets/search/components/WatchListEditor.jsx:31
+#: assets/watch-lists/components/EditWatchList.jsx:26
+msgid "Users"
+msgstr "Uživatelé"
+
+#: assets/companies/components/EditCompany.jsx:25
+msgid "Permissions"
+msgstr "Oprávnění"
+
+#: assets/companies/components/EditCompany.jsx:29
+msgid "API"
+msgstr "API"
+
+#: assets/companies/components/EditCompany.jsx:44
+msgid "There are no users in the company."
+msgstr "Firma nemá žádné uživatele."
+
+#: assets/companies/components/EditCompany.jsx:110
+msgid "Company Type"
+msgstr ""
+
+#: assets/companies/components/EditCompany.jsx:119
+msgid "Company Url"
+msgstr "firemní web"
+
+#: assets/companies/components/EditCompany.jsx:147
+msgid "Contact Name"
+msgstr "Kontaktní osoba"
+
+#: assets/companies/components/EditCompany.jsx:154
+msgid "Contact Email"
+msgstr "kontaktní email"
+
+#: assets/companies/components/EditCompany.jsx:169
+#: assets/company-reports/components/Company.jsx:78
+msgid "Expiry Date"
+msgstr "Přístup platný do:"
+
+#: assets/companies/components/EditCompany.jsx:176
+msgid "Watch List Administrator"
+msgstr ""
+
+#: assets/company-reports/components/Company.jsx:38
+msgid "Tel"
+msgstr ""
+
+#: assets/company-reports/components/Company.jsx:48
+msgid "User Accounts"
+msgstr ""
+
+#: assets/company-reports/components/Company.jsx:57
+msgid "Active"
+msgstr "Aktivovat"
+
+#: assets/company-reports/components/Company.jsx:59
+msgid "Unspecified"
+msgstr ""
+
+#: assets/company-reports/components/Company.jsx:78
+msgid "Is Active"
+msgstr ""
+
+#: assets/company-reports/components/Company.jsx:78
+msgid "Created"
+msgstr "Vytvořeno"
+
+#: assets/company-reports/components/CompanyProducts.jsx:10
+msgid "Product name"
+msgstr "Název produktu"
+
+#: assets/company-reports/components/CompanyProducts.jsx:11
+msgid "Is enabled"
+msgstr "Je aktivní"
+
+#: assets/company-reports/components/CompanyProducts.jsx:13
+msgid "sd_product_id"
+msgstr "sd_product_id"
+
+#: assets/company-reports/components/CompanyProducts.jsx:32
+#: assets/company-reports/components/CompanySavedSearches.jsx:17
+#: assets/company-reports/components/ProductStories.jsx:25
+#: assets/company-reports/components/UserSavedSearches.jsx:20
+msgid "Is Enabled"
+msgstr "Je aktivní"
+
+#: assets/company-reports/components/CompanyProducts.jsx:32
+msgid "Number Of Products"
+msgstr "Počet produktů"
+
+#: assets/company-reports/components/CompanyReportsApp.jsx:18
+msgid "Subscriber activity"
+msgstr ""
+
+#: assets/company-reports/components/CompanyReportsApp.jsx:54
+msgid "Run report"
+msgstr "Vytvoř report"
+
+#: assets/company-reports/components/CompanyReportsApp.jsx:61
+msgid "Print report"
+msgstr "Vytisknout report"
+
+#: assets/company-reports/components/CompanySavedSearches.jsx:17
+#: assets/company-reports/components/UserSavedSearches.jsx:22
+msgid "Number Of Saved Searches"
+msgstr "Počet uložených dotazů"
+
+#: assets/company-reports/components/ProductStories.jsx:27
+msgid "Last 24 hours"
+msgstr "Posledních 24 hodin"
+
+#: assets/company-reports/components/ProductStories.jsx:28
+#: assets/search/components/TopicParameters.jsx:26
+#: assets/wire/components/filters/NavCreatedPicker.jsx:10
+msgid "This week"
+msgstr "Tento týden"
+
+#: assets/company-reports/components/ProductStories.jsx:29
+msgid "Last 7 days"
+msgstr "Posledních 7 dní"
+
+#: assets/company-reports/components/ProductStories.jsx:30
+#: assets/search/components/TopicParameters.jsx:28
+#: assets/wire/components/filters/NavCreatedPicker.jsx:11
+msgid "This month"
+msgstr "Tento měsíc"
+
+#: assets/company-reports/components/ProductStories.jsx:31
+msgid "Previous month"
+msgstr "Předchozí měsíc"
+
+#: assets/company-reports/components/ProductStories.jsx:32
+msgid "Last 6 months"
+msgstr "Posledních 6 měsíců"
+
+#: assets/company-reports/components/SubscriberActivity.jsx:20
+#: assets/users/components/UsersApp.jsx:31
+#: assets/watch-lists/components/WatchListApp.jsx:35
+#: assets/watch-lists/components/WatchListApp.jsx:51
+msgid "All Companies"
+msgstr ""
+
+#: assets/company-reports/components/SubscriberActivity.jsx:24
+msgid "All Actions"
+msgstr ""
+
+#: assets/company-reports/components/SubscriberActivity.jsx:28
+msgid "All Sections"
+msgstr "Všechny Rubriky"
+
+#: assets/company-reports/components/SubscriberActivity.jsx:129
+msgid "Section"
+msgstr "Rubrika"
+
+#: assets/company-reports/components/SubscriberActivity.jsx:129
+msgid "Item"
+msgstr "Položka"
+
+#: assets/company-reports/components/SubscriberActivity.jsx:129
+msgid "Action"
+msgstr "Činnost"
+
+#: assets/company-reports/components/SubscriberActivity.jsx:129
+#: assets/company-reports/components/UserSavedSearches.jsx:19
+#: assets/users/components/UsersApp.jsx:77
+msgid "User"
+msgstr "Uživatel"
+
+#: assets/company-reports/components/SubscriberActivity.jsx:129
+#: assets/watch-lists/components/WatchListSchedule.jsx:104
+msgid "Time"
+msgstr "Čas"
+
+#: assets/company-reports/components/SubscriberActivity.jsx:146
+msgid "No Data"
+msgstr ""
+
+#: assets/company-reports/components/SubscriberActivity.jsx:167
+msgid "FROM:"
+msgstr ""
+
+#: assets/company-reports/components/SubscriberActivity.jsx:173
+msgid "TO:"
+msgstr ""
+
+#: assets/components/ExpiryDateInput.jsx:19
+msgid "on"
+msgstr "v"
+
+#: assets/components/ExpiryDateInput.jsx:20
+msgid "in 1 week"
+msgstr ""
+
+#: assets/components/ExpiryDateInput.jsx:21
+msgid "in 2 weeks"
+msgstr ""
+
+#: assets/components/ExpiryDateInput.jsx:22
+msgid "in 1 month"
+msgstr ""
+
+#: assets/components/ExpiryDateInput.jsx:23
+msgid "in 6 months"
+msgstr ""
+
+#: assets/components/ExpiryDateInput.jsx:24
+msgid "in 1 year"
+msgstr ""
+
+#: assets/components/ExpiryDateInput.jsx:25
+#: assets/news-api/components/EditAPIToken.jsx:211
+msgid "Never"
+msgstr ""
+
+#: assets/components/KeywordInput.jsx:72
+msgid "Keywords (Type and press ENTER to add a keyword)"
+msgstr ""
+
+#: assets/components/ListBar.jsx:22
+msgid "New {{ buttonName }}"
+msgstr "Nový {{ buttonName }}"
+
+#: assets/components/ListViewOptions.jsx:14
+msgid "Large list"
+msgstr "Rozšířený seznam"
+
+#: assets/components/ListViewOptions.jsx:15
+msgid "Compact list"
+msgstr "Kompaktní seznam"
+
+#: assets/components/ListViewOptions.jsx:57
+#: assets/components/ListViewOptions.jsx:62
+msgid "Change view"
+msgstr "Změň zobrazení"
+
+#: assets/components/NotificationList.jsx:53
+#: assets/components/NotificationList.jsx:60
+msgid "Notifications"
+msgstr "Upozornění"
+
+#: assets/components/NotificationList.jsx:63
+msgid "Clear All"
+msgstr "Zruš vše"
+
+#: assets/components/NotificationListItem.jsx:9
+msgid "An event you are watching has been updated"
+msgstr ""
+
+#: assets/components/NotificationListItem.jsx:15
+msgid "A story you downloaded has been updated"
+msgstr "Článek, který jste si stáhli, byl aktualizován"
+
+#: assets/components/NotificationListItem.jsx:27
+#: assets/search/components/TopicList.jsx:37
+msgid "Created on"
+msgstr "Vytvořeno"
+
+#: assets/components/ShareItemModal.jsx:76
+msgid "Deselect All"
+msgstr ""
+
+#: assets/components/ShareItemModal.jsx:77
+#: assets/wire/components/SelectedItemsBar.jsx:44
+msgid "Select All"
+msgstr "Vyber všechny"
+
+#: assets/components/ShareItemModal.jsx:94
+msgid "Share Item"
+msgstr "Sdílej"
+
+#: assets/components/ShareItemModal.jsx:95
+#: assets/search/components/FollowedTopics.jsx:45
+msgid "Share"
+msgstr "Sdílej"
+
+#: assets/components/ShareItemModal.jsx:103
+msgid "People"
+msgstr "Lidé"
+
+#: assets/components/ShareItemModal.jsx:124
+msgid "Message"
+msgstr "Vzkaz"
+
+#: assets/components/cards/edit/ConfigEvent.jsx:26
+msgid "Headline"
+msgstr "Titulek"
+
+#: assets/components/cards/edit/ConfigEvent.jsx:33
+msgid "Abstract"
+msgstr "Popis"
+
+#: assets/components/cards/edit/ConfigEvent.jsx:40
+msgid "Start Date"
+msgstr "Začátek"
+
+#: assets/components/cards/edit/ConfigEvent.jsx:48
+msgid "End Date"
+msgstr "Konec"
+
+#: assets/components/cards/edit/ConfigEvent.jsx:56
+#: assets/search/components/TopicParameters.jsx:76
+msgid "Location"
+msgstr "Místo"
+
+#: assets/components/cards/edit/ConfigExternalMedia.jsx:16
+msgid "More button label"
+msgstr ""
+
+#: assets/components/cards/edit/ConfigExternalMedia.jsx:23
+msgid "More button url"
+msgstr ""
+
+#: assets/components/cards/edit/ConfigExternalMedia.jsx:28
+msgid "Total media count across all media config should be between 1 and 4."
+msgstr ""
+
+#: assets/components/cards/edit/ConfigExternalMedia.jsx:40
+msgid "External url to fetch media"
+msgstr ""
+
+#: assets/components/cards/edit/ConfigExternalMedia.jsx:48
+msgid "Media Count"
+msgstr ""
+
+#: assets/components/cards/edit/ConfigNavigation.jsx:55
+msgid "Select a navigation."
+msgstr ""
+
+#: assets/components/cards/edit/ConfigNavigation.jsx:60
+msgid "Navigation is already added."
+msgstr ""
+
+#: assets/components/cards/edit/ConfigNavigation.jsx:91
+msgid "Select Navigation"
+msgstr ""
+
+#: assets/components/cards/edit/ConfigNavigation.jsx:99
+msgid "Add"
+msgstr "Přidat"
+
+#: assets/components/cards/render/EventsTwoByTwoCard.jsx:26
+msgid "all"
+msgstr "vše"
+
+#: assets/components/cards/render/MoreNewsButton.jsx:12
+msgid "More news"
+msgstr "Více zpráv"
+
+#: assets/components/cards/render/NavigationCard.jsx:34
+msgid "Stories"
+msgstr ""
+
+#: assets/home/components/HomeApp.jsx:120
+#: assets/market-place/components/MarketPlaceApp.jsx:34
+msgid "Warning"
+msgstr "Upozornění"
+
+#: assets/home/components/HomeApp.jsx:120
+msgid "There's no card defined for home page!"
+msgstr "Pro homepage není definována žádná karta!"
+
+#: assets/layout/components/BaseApp.jsx:26
+#: assets/search/components/TopicParameters.jsx:67
+msgid "Topics"
+msgstr "Témata"
+
+#: assets/layout/components/BaseApp.jsx:27
+msgid "My Topics"
+msgstr "Moje témata"
+
+#: assets/layout/components/BaseApp.jsx:28
+msgid "Filters"
+msgstr "Filtry"
+
+#: assets/market-place/components/MarketPlaceApp.jsx:34
+msgid "There's no navigations defined!"
+msgstr ""
+
+#: assets/navigations/actions.jsx:94 assets/navigations/actions.jsx:150
+msgid "Navigation updated successfully"
+msgstr "Navigace aktualizována"
+
+#: assets/navigations/actions.jsx:96
+msgid "Navigation created successfully"
+msgstr "Navigace vytvořena"
+
+#: assets/navigations/actions.jsx:118
+msgid "Navigation deleted successfully"
+msgstr "Navigace smazána"
+
+#: assets/navigations/components/EditNavigation.jsx:101
+msgid "Tile Images"
+msgstr ""
+
+#: assets/navigations/components/Navigations.jsx:63
+msgid "Would you like to delete navigation: {{name}}"
+msgstr "Chcete smazat navigaci: {{name}}"
+
+#: assets/news-api/components/EditAPIToken.jsx:93
+msgid "Cannot be in the past"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:131
+msgid "Are you sure you want to delete this Company's API Token?"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:159
+msgid "Edit API Token"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:160
+msgid "Create New API Token"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:171
+msgid "Expires:"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:190
+msgid "Generate Token"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:215
+msgid "Expired On:"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:216
+msgid "Expires On:"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:225
+msgid "API Token - Disabled"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:227
+msgid "API Token"
+msgstr ""
+
+#: assets/news-api/components/EditAPIToken.jsx:245
+msgid "Token:"
+msgstr ""
+
+#: assets/products/components/EditProduct.jsx:26
+msgid "Companies"
+msgstr "Firmy"
+
+#: assets/products/components/EditProduct.jsx:57
+msgid "Test product"
+msgstr "Otestuj produkt"
+
+#: assets/products/components/EditProduct.jsx:119
+#: assets/products/components/ProductList.jsx:24
+#: assets/section-filters/components/EditSectionFilter.jsx:47
+#: assets/section-filters/components/SectionFilterList.jsx:24
+msgid "Superdesk Product Id"
+msgstr "Product ID ze Superdesku"
+
+#: assets/products/components/EditProduct.jsx:128
+msgid "Test product id"
+msgstr "Otestuj Product ID"
+
+#: assets/products/components/EditProduct.jsx:142
+#: assets/section-filters/components/EditSectionFilter.jsx:70
+msgid "Test query"
+msgstr "Vyzkoušej dotaz"
+
+#: assets/products/components/EditProduct.jsx:147
+#: assets/products/components/ProductList.jsx:26
+msgid "Planning Item Query"
+msgstr ""
+
+#: assets/products/components/EditProduct.jsx:156
+msgid "Test Planning Item query"
+msgstr ""
+
+#: assets/products/components/Products.jsx:66
+msgid "Would you like to delete product: {{name}}"
+msgstr "Chcete smazat produkt: {{name}}"
+
+#: assets/search/components/FollowedTopics.jsx:36
+msgid "Edit"
+msgstr "Upravit"
+
+#: assets/search/components/FollowedTopics.jsx:77
+msgid "Would you like to delete topic {{name}}?"
+msgstr "Chcete smazat téma: {{name}}?"
+
+#: assets/search/components/NewItemsIcon.jsx:41
+msgid "New events to load"
+msgstr ""
+
+#: assets/search/components/NewItemsIcon.jsx:42
+msgid "New stories available to load"
+msgstr "Jsou k dispozici nové články"
+
+#: assets/search/components/SearchBar.jsx:59
+#: assets/search/components/SearchBar.jsx:60
+msgid "Search for..."
+msgstr "Najdi..."
+
+#: assets/search/components/SearchBar.jsx:69
+#: assets/search/components/TopicParameters.jsx:65
+#: assets/wire/components/filters/FiltersTab.jsx:95
+msgid "Search"
+msgstr "Hledej"
+
+#: assets/search/components/SearchResults.jsx:32
+msgid "search results found"
+msgstr ""
+
+#: assets/search/components/SearchResults.jsx:35
+msgid "search results for:"
+msgstr "Výsledky vyhledávání:"
+
+#: assets/search/components/SearchResultsInfo.jsx:34
+msgid "Update my topic"
+msgstr ""
+
+#: assets/search/components/SearchResultsInfo.jsx:35
+msgid "Create my topic"
+msgstr ""
+
+#: assets/search/components/TopicEditor.jsx:103
+msgid "Agenda Topic updated successfully"
+msgstr ""
+
+#: assets/search/components/TopicEditor.jsx:104
+msgid "Wire Topic updated successfully"
+msgstr ""
+
+#: assets/search/components/TopicEditor.jsx:108
+msgid "Agenda Topic created successfully"
+msgstr ""
+
+#: assets/search/components/TopicEditor.jsx:109
+msgid "Wire Topic created successfully"
+msgstr ""
+
+#: assets/search/components/TopicEditor.jsx:133
+msgid "Create new Agenda Topic"
+msgstr ""
+
+#: assets/search/components/TopicEditor.jsx:134
+msgid "Create new Wire Topic"
+msgstr ""
+
+#: assets/search/components/TopicEditor.jsx:137
+msgid "Save Agenda Topic"
+msgstr ""
+
+#: assets/search/components/TopicEditor.jsx:138
+msgid "Save Wire Topic"
+msgstr ""
+
+#: assets/search/components/TopicForm.jsx:23
+msgid "Send me notifications"
+msgstr "Posílej mi upozornění"
+
+#: assets/search/components/TopicParameters.jsx:19
+msgid "From: {{date}}"
+msgstr ""
+
+#: assets/search/components/TopicParameters.jsx:20
+msgid "To: {{date}}"
+msgstr ""
+
+#: assets/search/components/TopicParameters.jsx:66
+msgid "Date Created"
+msgstr "Datum vytvořeno"
+
+#: assets/search/components/TopicParameters.jsx:71
+msgid "Urgency"
+msgstr ""
+
+#: assets/search/components/TopicParameters.jsx:73
+msgid "Calendar"
+msgstr ""
+
+#: assets/search/components/TopicParameters.jsx:74
+msgid "Coverage Type"
+msgstr "Typ krytí"
+
+#: assets/search/components/TopicParameters.jsx:75
+msgid "Coverage Status"
+msgstr "Status"
+
+#: assets/search/components/TopicsTab.jsx:36
+msgid "No {{name}} created."
+msgstr "{{name}} nevytvořena"
+
+#: assets/search/components/TopicsTab.jsx:58
+msgid "Manage my {{name}}"
+msgstr "Spravovat"
+
+#: assets/search/components/WatchListEditor.jsx:27
+#: assets/watch-lists/components/EditWatchList.jsx:25
+#: assets/watch-lists/components/WatchListApp.jsx:83
+msgid "Watch List"
+msgstr ""
+
+#: assets/search/components/WatchListEditor.jsx:78
+msgid "Unsubscribed"
+msgstr ""
+
+#: assets/search/components/WatchListEditor.jsx:81
+msgid "Subscribed"
+msgstr ""
+
+#: assets/search/components/WatchListEditor.jsx:96
+msgid "{{ msg }} successfully"
+msgstr ""
+
+#: assets/search/components/WatchListEditor.jsx:159
+msgid "Unsubscribe"
+msgstr ""
+
+#: assets/search/components/WatchListEditor.jsx:159
+msgid "Subscribe"
+msgstr ""
+
+#: assets/search/components/WatchListEditor.jsx:166
+#: assets/watch-lists/components/EditWatchList.jsx:118
+msgid "Subject line"
+msgstr ""
+
+#: assets/search/components/WatchListEditor.jsx:178
+#: assets/watch-lists/components/EditWatchList.jsx:159
+msgid "Alert type"
+msgstr ""
+
+#: assets/section-filters/components/EditSectionFilter.jsx:19
+msgid "New Filter"
+msgstr ""
+
+#: assets/section-filters/components/EditSectionFilter.jsx:56
+msgid "Test Superdesk Product id"
+msgstr ""
+
+#: assets/section-filters/components/SectionFilters.jsx:61
+msgid "Would you like to delete Section Filter: {{name}}"
+msgstr ""
+
+#: assets/section-filters/components/SectionFiltersApp.jsx:31
+msgid "Section Filter"
+msgstr ""
+
+#: assets/ui/components/ArticleAuthor.jsx:6
+msgid "in "
+msgstr ""
+
+#: assets/ui/components/ArticleAuthor.jsx:11
+msgid "By "
+msgstr ""
+
+#: assets/ui/components/ArticleAuthor.jsx:16
+msgid "{{inStr}}{{ located}}"
+msgstr ""
+
+#: assets/ui/components/ArticleEmbargoed.jsx:14
+msgid "Embargo: {{ date }}"
+msgstr ""
+
+#: assets/ui/components/ArticleVideo.jsx:12
+msgid "Your browser does not support HTML5 video"
+msgstr ""
+
+#: assets/ui/components/ArticleVideo.jsx:16
+#: assets/wire/components/DownloadItemsModal.jsx:44
+msgid "Download"
+msgstr "Stáhnout"
+
+#: assets/ui/components/Preview.jsx:10
+#: assets/wire/components/ItemDetails.jsx:63
+#: assets/wire/components/filters/NavCreatedPicker.jsx:27
+msgid "Published"
+msgstr "Publikováno"
+
+#: assets/user-profile/components/UserProfileApp.jsx:38
+msgid "My Profile"
+msgstr "Můj profil"
+
+#: assets/user-profile/components/UserProfileApp.jsx:46
+msgid "My Wire Topics"
+msgstr ""
+
+#: assets/user-profile/components/UserProfileApp.jsx:55
+msgid "My Agenda Topics"
+msgstr ""
+
+#: assets/user-profile/components/UserProfileApp.jsx:64
+msgid "My Watch Lists"
+msgstr ""
+
+#: assets/user-profile/components/UserProfileApp.jsx:164
+msgid "Logout"
+msgstr "Odhlásit se"
+
+#: assets/user-profile/components/profile/UserProfile.jsx:28
+msgid "Please provide first name"
+msgstr "Prosím vyplň křestní jméno"
+
+#: assets/user-profile/components/profile/UserProfile.jsx:33
+msgid "Please provide last name"
+msgstr "Prosím vyplň příjmení"
+
+#: assets/user-profile/components/profile/UserProfile.jsx:92
+#: assets/users/components/EditUser.jsx:53
+#: assets/users/components/UsersList.jsx:25
+msgid "Phone"
+msgstr "Telefon"
+
+#: assets/user-profile/components/profile/UserProfile.jsx:149
+msgid "Save Changes"
+msgstr "Uložit změny"
+
+#: assets/users/components/EditUser.jsx:16
+msgid "Add/Edit User"
+msgstr ""
+
+#: assets/users/components/EditUser.jsx:91
+#: assets/users/components/UserListItem.jsx:22
+msgid "Approved"
+msgstr "Schválen"
+
+#: assets/users/components/UserListItem.jsx:22
+msgid "Needs Approval"
+msgstr "Vyžaduje schválení"
+
+#: assets/users/components/Users.jsx:59
+msgid "Would you like to delete user: {{name}}?"
+msgstr "Chcete smazat uživatele: {{name}}?"
+
+#: assets/users/components/UsersApp.jsx:35
+msgid "Sort By"
+msgstr ""
+
+#: assets/users/components/UsersList.jsx:32
+msgid "Last Active"
+msgstr ""
+
+#: assets/watch-lists/components/EditWatchList.jsx:27
+msgid "Schedule"
+msgstr "Rozvrh"
+
+#: assets/watch-lists/components/EditWatchList.jsx:42
+msgid "There are no users for this watch list."
+msgstr ""
+
+#: assets/watch-lists/components/EditWatchList.jsx:79
+msgid "Add/Edit Watch List"
+msgstr ""
+
+#: assets/watch-lists/components/EditWatchList.jsx:147
+msgid "Test Watch List query"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListApp.jsx:29
+msgid "Schedules"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListApp.jsx:50
+msgid "Companies with schedules"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListSchedule.jsx:19
+msgid "Immediate"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListSchedule.jsx:23
+msgid "Every Two Hours"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListSchedule.jsx:27
+msgid "Every Four Hours"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListSchedule.jsx:31
+msgid "Every day at"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListSchedule.jsx:35
+msgid "Every week at"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListSchedule.jsx:96
+msgid "Schedule type"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListsPanel.jsx:36
+msgid "Please provide a name"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListsPanel.jsx:41
+msgid "Please provide a company"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListsPanel.jsx:46
+msgid "Please provide a query"
+msgstr ""
+
+#: assets/watch-lists/components/WatchListsPanel.jsx:67
+msgid "Would you like to delete the watch list: {{name}}?"
+msgstr ""
+
+#: assets/wire/components/AgendaLinks.jsx:49
+msgid "Open agenda item \"{{ name }}\""
+msgstr "Zobrazit \"{{ name }}\" v Kalendáři"
+
+#: assets/wire/components/DownloadItemsModal.jsx:43
+msgid "Download Items"
+msgstr "Stáhnout"
+
+#: assets/wire/components/DownloadItemsModal.jsx:49
+msgid "Format"
+msgstr "Formát"
+
+#: assets/wire/components/ListItemNextVersion.jsx:44
+msgid "Next version"
+msgstr "Novější verze"
+
+#: assets/wire/components/ListItemPreviousVersions.jsx:40
+msgid "Loading"
+msgstr "Načítám"
+
+#: assets/wire/components/NewsOnlyControl.jsx:11
+msgid "News only"
+msgstr "Jen zprávy"
+
+#: assets/wire/components/PreviewEdnote.jsx:9
+msgid "Note"
+msgstr ""
+
+#: assets/wire/components/PreviewMeta.jsx:33
+msgid "News Value: {{ value }}"
+msgstr "Důležitost: {{ value }}"
+
+#: assets/wire/components/PreviewMeta.jsx:34
+msgid "Words:"
+msgstr "Slov:"
+
+#: assets/wire/components/PreviewMeta.jsx:35
+msgid "Characters:"
+msgstr ""
+
+#: assets/wire/components/PreviewMeta.jsx:36
+msgid "Source: {{ source }}"
+msgstr "Zdroj: {{ source }}"
+
+#: assets/wire/components/PreviewMeta.jsx:39
+msgid "{{ count }} previous versions"
+msgstr "{{ count }} starších verzí"
+
+#: assets/wire/components/PreviewTags.jsx:27
+msgid "Slugline"
+msgstr ""
+
+#: assets/wire/components/SelectedItemsBar.jsx:47
+msgid "{{ count }} item(s) selected"
+msgstr "vybráno {{ count }} článků"
+
+#: assets/wire/components/WireListItem.jsx:137
+msgid "Show previous versions ({{ count }})"
+msgstr "Zobrazit starší verze ({{ count }})"
+
+#: assets/wire/components/WireListItemEmbargoed.jsx:32
+msgid "embargo"
+msgstr ""
+
+#: assets/wire/components/WirePreview.jsx:64
+msgid "Follow story"
+msgstr "Sleduj článek"
+
+#: assets/wire/components/filters/FilterGroup.jsx:20
+msgid "Show more"
+msgstr "Zobraz více"
+
+#: assets/wire/components/filters/FilterGroup.jsx:28
+msgid "Show less"
+msgstr "Zobraz méně"
+
+#: assets/wire/components/filters/FiltersTab.jsx:105
+msgid "Clear filters"
+msgstr "Vymaž filtry"
+
+#: assets/wire/components/filters/NavCreatedPicker.jsx:36
+msgid "From"
+msgstr "Od"
+
+#: assets/wire/components/filters/NavCreatedPicker.jsx:44
+msgid "To"
+msgstr "Do"
+
+#: assets/wire/components/filters/NavigationTab.jsx:39
+msgid "All"
+msgstr "Vše"

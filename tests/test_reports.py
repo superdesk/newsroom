@@ -1,6 +1,7 @@
 from flask import json
 from pytest import fixture
 from bson import ObjectId
+from datetime import datetime, timedelta
 from .test_users import test_login_succeeds_for_admin, init as user_init  # noqa
 
 
@@ -118,3 +119,48 @@ def test_company_products(client, app):
     assert len(report['results'][0]['products']) == 1
     assert report['results'][1]['name'] == 'Press Co.'
     assert len(report['results'][1]['products']) == 2
+
+
+def test_product_companies(client, app):
+    app.data.insert('products', [{
+        '_id': 'p-1',
+        'name': 'Sport',
+        'description': 'sport product',
+        'companies': ['59bc460f1d41c8fa815cc2c2'],
+        'is_enabled': True,
+    }, {
+        '_id': 'p-2',
+        'name': 'News',
+        'description': 'news product',
+        'companies': ['59bc460f1d41c8fa815cc2c2', '59c38b965057fb87d7eda9ab'],
+        'is_enabled': True,
+    }])
+
+    test_login_succeeds_for_admin(client)
+    resp = client.get('reports/product-companies')
+    report = json.loads(resp.get_data())
+    assert report['name'] == 'Companies permissioned per product'
+    assert len(report['results']) == 2
+    assert report['results'][0]['product'] == 'News'
+    assert len(report['results'][0]['enabled_companies']) == 2
+    assert report['results'][1]['product'] == 'Sport'
+    assert len(report['results'][1]['enabled_companies']) == 1
+
+
+def test_expired_companies(client, app):
+    app.data.insert('companies', [{
+        '_id': ObjectId('5cd0e0b35f627d400e8b7566'),
+        'name': 'Expired and enabled Co.',
+        'is_enabled': True,
+        'expiry_date': datetime.utcnow() - timedelta(days=1)
+    }, {
+        '_id': ObjectId('5b504318975bd5227e5ea0b9'),
+        'name': 'Expired disabled Co.',
+        'expiry_date': datetime.utcnow() - timedelta(days=10),
+        'is_enabled': False,
+    }])
+    test_login_succeeds_for_admin(client)
+    resp = client.get('reports/expired-companies')
+    report = json.loads(resp.get_data())
+    assert report['name'] == 'Expired companies'
+    assert len(report['results']) == 2

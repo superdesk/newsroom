@@ -1,140 +1,110 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {get} from 'lodash';
+import {get, isEqual} from 'lodash';
 import {bem} from 'ui/utils';
-import classNames from 'classnames';
 import {
     hasCoverages,
     isCoverageForExtraDay,
-    hasLocation,
-    getLocationString,
-    getCoverageIcon,
     isRecurring,
     getInternalNote,
-    WORKFLOW_COLORS,
-    WORKFLOW_STATUS,
-    getCoverageDisplayName,
     getAttachments,
-    isCoverageBeingUpdated,
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
 import AgendaMetaTime from './AgendaMetaTime';
 import AgendaInternalNote from './AgendaInternalNote';
-import {gettext, formatDate, formatTime} from 'utils';
+import AgendaListCoverageItem from './AgendaListCoverageItem';
+import AgendaLocation from './AgendaLocation';
+
+import {gettext} from 'utils';
 
 
-function AgendaListItemIcons({item, planningItem, group, hideCoverages, row}) {
-    const className = bem('wire-articles', 'item__meta', {
-        row,
-    });
+class AgendaListItemIcons extends React.Component {
+    constructor(props) {
+        super(props);
 
-    const getCoverageTootip = (coverage, beingUpdated) => {
-        let slugline = coverage.item_slugline || coverage.slugline;
+        this.state = this.getUpdatedState(props);
+    }
 
-        slugline =  gettext('coverage{{slugline}}', {slugline: slugline ? ` '${slugline}'` : ''}) ;
+    itemChanged(nextProps) {
+        return get(this.props, 'item._id') !== get(nextProps, 'item._id') ||
+            get(this.props, 'item._etag') !== get(nextProps, 'item._etag') ||
+            !isEqual(get(this.props, 'item.coverages'), get(nextProps, 'item.coverages'));
+    }
 
-        if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
-            return gettext('Planned {{ type }} {{ slugline }}', {
-                type: getCoverageDisplayName(coverage.coverage_type),
-                slugline: slugline,
-            });
+    shouldComponentUpdate(nextProps) {
+        return this.itemChanged(nextProps);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.itemChanged(nextProps)) {
+            this.setState(this.getUpdatedState(nextProps));
         }
+    }
 
-        if (['assigned'].includes(coverage.workflow_status)) {
-            return gettext('Planned {{ type }} {{ slugline }}, expected {{date}} at {{time}}', {
-                type: getCoverageDisplayName(coverage.coverage_type),
-                slugline: slugline,
-                date: formatDate(coverage.scheduled),
-                time: formatTime(coverage.scheduled)
-            });
-        }
+    getUpdatedState(props) {
+        return {
+            internalNote: getInternalNote(props.item, props.planningItem),
+            coveragesToDisplay: !hasCoverages(props.item) || props.hideCoverages ?
+                [] :
+                props.item.coverages.filter(
+                    (c) => !props.group || (isCoverageForExtraDay(c, props.group) && c.planning_id === get(props, 'planningItem.guid'))
+                ),
+            attachments: (getAttachments(props.item)).length,
+            isRecurring: isRecurring(props.item),
+        };
+    }
 
-        if (['active'].includes(coverage.workflow_status)) {
-            return gettext('{{ type }} {{ slugline }} in progress, expected {{date}} at {{time}}', {
-                type: getCoverageDisplayName(coverage.coverage_type),
-                slugline: slugline,
-                date: formatDate(coverage.scheduled),
-                time: formatTime(coverage.scheduled)
-            });
-        }
+    render() {
+        const props = this.props;
+        const state = this.state;
+        const className = bem('wire-articles', 'item__meta', {row: props.row});
 
-        if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
-            return gettext('{{ type }} {{slugline}} cancelled', {
-                type: getCoverageDisplayName(coverage.coverage_type),
-                slugline: slugline,
-            });
-        }
+        return (
+            <div className={className}>
+                <AgendaMetaTime
+                    item={props.item}
+                    borderRight={!props.isMobilePhone}
+                    isRecurring={state.isRecurring}
+                    group={props.group}
+                    isMobilePhone={props.isMobilePhone}
+                />
 
-        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
-            let deliveryState;
-            if (get(coverage, 'deliveries.length', 0) > 1) {
-                deliveryState = beingUpdated ? gettext(' (update to come)') : gettext(' (updated)');
-            }
+                {state.coveragesToDisplay.length > 0 && (
+                    <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
+                        {state.coveragesToDisplay.map((coverage, index) => (
+                            <AgendaListCoverageItem
+                                key={index}
+                                planningItem={props.planningItem}
+                                user={props.user}
+                                coverage={coverage}
+                                showBorder={props.isMobilePhone && index === state.coveragesToDisplay.length - 1}
+                                group={props.group}
+                            />
+                        ))}
+                    </div>
+                )}
 
-            return gettext('{{ type }} {{ slugline }} available{{deliveryState}}', {
-                type: getCoverageDisplayName(coverage.coverage_type),
-                slugline: slugline,
-                deliveryState: deliveryState
-            });
-        }
+                {state.attachments > 0 && (
+                    <div className='wire-articles__item__icons--dashed-border align-self-start'>
+                        <i className='icon-small--attachment'
+                            title={gettext('{{ attachments }} file(s) attached', {attachments: state.attachments})}
+                        />
+                    </div>
+                )}
 
-        return '';
-    };
+                <div className='wire-articles__item__meta-info flex-row align-items-start'>
+                    <AgendaLocation item={props.item} isMobilePhone={props.isMobilePhone} border={state.internalNote} />
 
-    const internalNote = getInternalNote(item, planningItem);
-    const coveragesToDisplay = !hasCoverages(item) || hideCoverages ? [] :
-        item.coverages.filter((c) =>!group || (isCoverageForExtraDay(c, group) && c.planning_id === get(planningItem, 'guid')));
-    const attachments = (getAttachments(item)).length;
+                    {!props.isMobilePhone && (
+                        <AgendaInternalNote internalNote={state.internalNote} onlyIcon={true}/>
+                    )}
 
-    return (
-        <div className={className}>
-            <AgendaMetaTime
-                item={item}
-                borderRight={true}
-                isRecurring={isRecurring(item)}
-                group={group}
-            />
-
-            {coveragesToDisplay.length > 0 &&
-                <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
-                    {coveragesToDisplay.map((coverage) => {
-                        const coverageClass = `icon--coverage-${getCoverageIcon(coverage.coverage_type)}`;
-                        const beingUpdated = isCoverageBeingUpdated(coverage);
-
-                        return (!group || (isCoverageForExtraDay(coverage, group) &&
-                            coverage.planning_id === get(planningItem, 'guid')) &&
-                          <span
-                              className='wire-articles__item__icon'
-                              key={coverage.coverage_id}
-                              title={getCoverageTootip(coverage, beingUpdated)}>
-                              <i className={`${coverageClass} ${WORKFLOW_COLORS[coverage.workflow_status]}`}>
-                                  {beingUpdated && <i className="blue-circle" />}
-                              </i>
-                          </span>);
-                    })
-                    }
+                    <AgendaListItemLabels item={props.item} />
                 </div>
-            }
-            {attachments > 0 && <div className='wire-articles__item__icons--dashed-border align-self-start'>
-                <i className='icon-small--attachment' title={gettext('{{ attachments }} file(s) attached', {attachments: attachments})} />
-            </div>}
-            <div className='wire-articles__item__meta-info flex-row align-items-start'>
-                {hasLocation(item) && <span className='mr-2'>
-                    <i className='icon-small--location icon--gray'></i>
-                </span>}
-                {hasLocation(item) &&
-                    <span className={classNames({'wire-articles__item__icons--dashed-border' :internalNote})}>
-                        {getLocationString(item)}
-                    </span>}
-                <AgendaInternalNote
-                    internalNote={internalNote}
-                    onlyIcon={true} />
-
-                <AgendaListItemLabels item={item} />
             </div>
-        </div>
-    );
+        );
+    }
 }
 
 AgendaListItemIcons.propTypes = {
@@ -143,6 +113,10 @@ AgendaListItemIcons.propTypes = {
     group: PropTypes.string,
     hideCoverages: PropTypes.bool,
     row: PropTypes.bool,
+    isMobilePhone: PropTypes.bool,
+    user: PropTypes.string,
 };
+
+AgendaListItemIcons.defaultProps = {isMobilePhone: false};
 
 export default AgendaListItemIcons;

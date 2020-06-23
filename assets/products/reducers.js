@@ -1,10 +1,8 @@
-
 import {
     GET_PRODUCTS,
     SELECT_PRODUCT,
     EDIT_PRODUCT,
     QUERY_PRODUCTS,
-    SET_QUERY,
     CANCEL_EDIT,
     NEW_PRODUCT,
     SET_ERROR,
@@ -13,9 +11,11 @@ import {
     UPDATE_PRODUCT_COMPANIES,
     UPDATE_PRODUCT_NAVIGATIONS,
 } from './actions';
+import {ADD_EDIT_USERS} from 'actions';
 
-import { INIT_SECTIONS, SELECT_SECTION } from 'features/sections/actions';
-import { sectionsReducer } from 'features/sections/reducers';
+import {INIT_SECTIONS, SELECT_SECTION} from 'features/sections/actions';
+import {sectionsReducer} from 'features/sections/reducers';
+import {searchReducer} from 'search/reducers';
 
 const initialState = {
     query: null,
@@ -28,6 +28,7 @@ const initialState = {
     companies: [],
     navigations: [],
     sections: sectionsReducer(),
+    search: searchReducer(),
 };
 
 export default function productReducer(state = initialState, action) {
@@ -71,9 +72,6 @@ export default function productReducer(state = initialState, action) {
         return {...state, productToEdit: null, errors: null};
     }
 
-    case SET_QUERY:
-        return {...state, query: action.query};
-
     case SET_ERROR:
         return {...state, errors: action.errors};
 
@@ -91,7 +89,13 @@ export default function productReducer(state = initialState, action) {
             return product._id;
         });
 
-        return {...state, products, productsById, isLoading: false, totalProducts: products.length};
+        return {
+            ...state,
+            products,
+            productsById,
+            isLoading: false,
+            totalProducts: products.length,
+        };
     }
 
     case GET_COMPANIES: {
@@ -128,7 +132,24 @@ export default function productReducer(state = initialState, action) {
     case SELECT_SECTION:
         return {...state, sections: sectionsReducer(state.sections, action)};
 
-    default:
+    case ADD_EDIT_USERS: {
+        return {
+            ...state,
+            editUsers: [
+                ...(state.editUsers || []),
+                ...action.data,
+            ]
+        };
+    }
+
+    default: {
+        const search = searchReducer(state.search, action);
+
+        if (search !== state.search) {
+            return {...state, search};
+        }
+
         return state;
+    }
     }
 }

@@ -3,9 +3,10 @@ import {
     INIT_DATA,
     OPEN_ITEM,
     SET_ACTIVE,
+    SET_CARD_ITEMS,
 } from './actions';
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
-import {CLOSE_MODAL, RENDER_MODAL} from '../actions';
+import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from '../actions';
 import {modalReducer} from '../reducers';
 
 const initialState = {
@@ -25,6 +26,7 @@ export default function homeReducer(state = initialState, action) {
             itemsByCard: action.data.itemsByCard,
             products: action.data.products,
             user: action.data.user,
+            userType: action.data.userType,
             company: action.data.company,
             formats: action.data.formats || [],
             userSections: action.data.userSections,
@@ -64,7 +66,18 @@ export default function homeReducer(state = initialState, action) {
         };
     }
 
+    case SET_CARD_ITEMS: {
+        return {
+            ...state,
+            itemsByCard: {
+                ...state.itemsByCard,
+                [action.payload.card]: action.payload.items,
+            },
+        };
+    }
+
     case RENDER_MODAL:
+    case MODAL_FORM_VALID:
     case CLOSE_MODAL:
         return {...state, modal: modalReducer(state.modal, action)};
 

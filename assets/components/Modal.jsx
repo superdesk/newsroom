@@ -1,6 +1,7 @@
 import 'bootstrap';
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import { gettext } from 'utils';
 import { connect } from 'react-redux';
 import { closeModal } from 'actions';
@@ -14,12 +15,13 @@ import CloseButton from './CloseButton';
  * @param {string} type
  * @param {func} onClick
  */
-export function ModalPrimaryButton({label, type, onClick}) {
+export function ModalPrimaryButton({label, type, onClick, disabled}) {
     assertButtonHandler(label, type, onClick);
     return (
         <button type={type || 'button'}
             onClick={onClick}
             className="btn btn-outline-primary"
+            disabled={disabled}
         >{label}</button>
     );
 }
@@ -28,6 +30,7 @@ ModalPrimaryButton.propTypes = {
     label: PropTypes.string.isRequired,
     type: PropTypes.string,
     onClick: PropTypes.func,
+    disabled: PropTypes.bool,
 };
 
 /**
@@ -69,8 +72,20 @@ function assertButtonHandler(label, type, onClick) {
 }
 
 class Modal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onSubmit = this.onSubmit.bind(this);
+        this.state = { submitting: false };
+    }
+
     componentDidMount() {
-        $(this.elem).modal();
+        const options = {};
+
+        if (!this.props.clickOutsideToClose) {
+            options.backdrop = 'static';
+        }
+
+        $(this.elem).modal(options);
         $(this.elem).on('hidden.bs.modal', () => {
             this.props.closeModal();
         });
@@ -78,6 +93,16 @@ class Modal extends React.Component {
 
     componentWillUnmount() {
         $(this.elem).modal('hide'); // make sure it's gone
+    }
+
+    onSubmit(e) {
+        if (this.props.disableButtonOnSubmit) {
+            this.setState({ submitting: true });
+            this.props.onSubmit(e);
+            return;
+        }
+
+        this.props.onSubmit(e);
     }
 
     render() {
@@ -103,7 +128,8 @@ class Modal extends React.Component {
                             <ModalPrimaryButton
                                 type="submit"
                                 label={this.props.onSubmitLabel}
-                                onClick={this.props.onSubmit}
+                                onClick={this.onSubmit}
+                                disabled={this.state.submitting || !this.props.formValid}
                             />
                         </div>
                     </div>
@@ -120,11 +146,17 @@ Modal.propTypes = {
     onSubmitLabel: PropTypes.string,
     onCancelLabel: PropTypes.string,
     closeModal: PropTypes.func.isRequired,
+    disableButtonOnSubmit: PropTypes.bool,
+    formValid: PropTypes.bool,
+    clickOutsideToClose: PropTypes.bool,
 };
 
 Modal.defaultProps = {
     onSubmitLabel: gettext('Save'),
     onCancelLabel: gettext('Cancel'),
+    clickOutsideToClose: false,
 };
 
-export default connect(null, {closeModal})(Modal);
+const mapStateToProps = (state) => ({ formValid: get(state, 'modal.formValid') });
+
+export default connect(mapStateToProps, {closeModal})(Modal);

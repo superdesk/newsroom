@@ -1,16 +1,20 @@
-
 import {
     GET_USERS,
     SELECT_USER,
     EDIT_USER,
     QUERY_USERS,
-    SET_QUERY,
     CANCEL_EDIT,
     NEW_USER,
     SET_ERROR,
     GET_COMPANIES,
     SET_COMPANY,
+    SET_SORT,
+    TOGGLE_SORT_DIRECTION,
 } from './actions';
+
+import {ADD_EDIT_USERS} from 'actions';
+
+import {searchReducer} from 'search/reducers';
 
 const initialState = {
     query: null,
@@ -22,6 +26,9 @@ const initialState = {
     activeQuery: null,
     companies: [],
     company: null,
+    sort: null,
+    sortDirection: 1,
+    search: searchReducer(),
 };
 
 export default function userReducer(state = initialState, action) {
@@ -76,9 +83,6 @@ export default function userReducer(state = initialState, action) {
         return {...state, userToEdit: null, errors: null};
     }
 
-    case SET_QUERY:
-        return {...state, query: action.query};
-
     case SET_ERROR:
         return {...state, errors: action.errors};
 
@@ -96,7 +100,13 @@ export default function userReducer(state = initialState, action) {
             return user._id;
         });
 
-        return {...state, users, usersById, isLoading: false, totalUsers: users.length};
+        return {
+            ...state,
+            users,
+            usersById,
+            isLoading: false,
+            totalUsers: users.length,
+        };
     }
 
     case GET_COMPANIES: {
@@ -111,7 +121,36 @@ export default function userReducer(state = initialState, action) {
         return {...state, company: action.company};
     }
 
-    default:
+    case SET_SORT: {
+        return {
+            ...state,
+            sort: action.param,
+            sortDirection: 1
+        };
+    }
+
+    case TOGGLE_SORT_DIRECTION: {
+        return {...state, sortDirection: state.sortDirection === 1 ? -1 : 1};
+    }
+
+    case ADD_EDIT_USERS: {
+        return {
+            ...state,
+            editUsers: [
+                ...(state.editUsers || []),
+                ...action.data,
+            ]
+        };
+    }
+
+    default: {
+        const search = searchReducer(state.search, action);
+
+        if (search !== state.search) {
+            return {...state, search};
+        }
+
         return state;
+    }
     }
 }

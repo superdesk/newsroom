@@ -1,4 +1,3 @@
-
 import {
     EDIT_COMPANY,
     NEW_COMPANY,
@@ -9,9 +8,12 @@ import {
     GET_COMPANY_USERS,
     INIT_VIEW_DATA,
     SET_ERROR,
-    SET_QUERY,
     GET_PRODUCTS
 } from './actions';
+
+import {ADD_EDIT_USERS} from 'actions';
+
+import {searchReducer} from 'search/reducers';
 
 const initialState = {
     query: null,
@@ -24,6 +26,8 @@ const initialState = {
     services: [],
     sections: [],
     companyTypes: [],
+    apiEnabled: false,
+    search: searchReducer(),
 };
 
 function setupCompanies(companyList, state) {
@@ -35,7 +39,14 @@ function setupCompanies(companyList, state) {
         return company._id;
     });
 
-    return {...state, companiesById, companyOptions, companies, isLoading: false};
+    return {
+        ...state,
+        companiesById,
+        companyOptions,
+        companies,
+        isLoading: false,
+        totalCompanies: companyList.length,
+    };
 }
 
 export default function companyReducer(state = initialState, action) {
@@ -48,6 +59,7 @@ export default function companyReducer(state = initialState, action) {
             name: '',
             phone: '',
             sd_subscriber_id: '',
+            account_manager: '',
             contact_name: '',
             country: '',
             contact_email: '',
@@ -85,6 +97,7 @@ export default function companyReducer(state = initialState, action) {
         const newCompany = {
             name: '',
             sd_subscriber_id: '',
+            account_manager: '',
             phone: '',
             contact_name: '',
             country: '',
@@ -100,9 +113,6 @@ export default function companyReducer(state = initialState, action) {
         return {...state, companyToEdit: null, errors: null};
     }
 
-    case SET_QUERY:
-        return {...state, query: action.query};
-
     case SET_ERROR:
         return {...state, errors: action.errors};
 
@@ -110,7 +120,6 @@ export default function companyReducer(state = initialState, action) {
         return {...state,
             isLoading: true,
             totalCompanies: null,
-            companyToEdit: null,
             activeQuery: state.query};
 
     case GET_COMPANIES:
@@ -129,12 +138,31 @@ export default function companyReducer(state = initialState, action) {
             products: action.data.products,
             sections: action.data.sections,
             companyTypes: action.data.company_types || [],
+            apiEnabled: action.data.api_enabled || false,
+            ui_config: action.data.ui_config,
         };
 
         return setupCompanies(action.data.companies, nextState);
     }
 
-    default:
+    case ADD_EDIT_USERS: {
+        return {
+            ...state,
+            editUsers: [
+                ...(state.editUsers || []),
+                ...action.data,
+            ]
+        };
+    }
+
+    default: {
+        const search = searchReducer(state.search, action);
+
+        if (search !== state.search) {
+            return {...state, search};
+        }
+
         return state;
+    }
     }
 }

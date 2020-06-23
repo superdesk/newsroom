@@ -49,9 +49,9 @@ function getUsers(users = []) {
         </div>);
 }
 
-function Company({data, print}) {
+function Company({results, print}) {
 
-    const list = data.results && data.results.map((item) =>
+    const list = results && results.map((item) =>
         [<tr key={item._id} className="table-secondary">
             <td>{item.name}</td>
             <td className='font-weight-bold'>{item.is_enabled ? gettext('Active') : gettext('Disabled')}</td>
@@ -61,6 +61,14 @@ function Company({data, print}) {
         <tr key={`${item._id}-contact`}>
             <td colSpan="4">
                 {getContactDetails(item.company)}
+            </td>
+        </tr>,
+        <tr key={`${item._id}-account_manager`}>
+            <td colSpan="4">
+                <div className="d-flex align-items-center m-2">
+                    <div><span className="font-italic">{gettext('Account Manager')}: </span>
+                        {item.account_manager}</div>
+                </div>
             </td>
         </tr>,
         <tr key={`${item._id}-users`}>
@@ -76,11 +84,11 @@ function Company({data, print}) {
     );
 
     const headers = [gettext('Company'), gettext('Is Active'), gettext('Created'), gettext('Expiry Date')];
-    return data.results ? (<ReportsTable headers={headers} rows={list} print={print} />) : null;
+    return results ? (<ReportsTable headers={headers} rows={list} print={print} />) : null;
 }
 
 Company.propTypes = {
-    data: PropTypes.object.isRequired,
+    results: PropTypes.array,
     print: PropTypes.bool,
 };
 

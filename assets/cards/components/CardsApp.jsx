@@ -4,9 +4,10 @@ import { connect } from 'react-redux';
 import { gettext } from 'utils';
 import {
     newCard,
-    setQuery,
     fetchCards,
 } from '../actions';
+import {setSearchQuery} from 'search/actions';
+
 import Cards from './Cards';
 import ListBar from 'components/ListBar';
 import DashboardSwitch from 'features/dashboard/DashboardSwitch';
@@ -52,7 +53,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
     newCard,
     fetchCards,
-    setQuery,
+    setQuery: setSearchQuery,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CardsApp);

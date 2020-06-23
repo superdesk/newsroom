@@ -48,7 +48,9 @@ class AgendaPreview extends React.PureComponent {
             requestCoverage,
             previewGroup,
             previewPlan,
-            eventsOnly
+            eventsOnly,
+            wireItems,
+            coverageActions,
         } = this.props;
 
         const isWatching = get(item, 'watches', []).includes(user);
@@ -74,7 +76,7 @@ class AgendaPreview extends React.PureComponent {
                             <PreviewActionButtons item={item} user={user} actions={actions} plan={previewPlan} group={previewGroup} />
                         </div>
 
-                        <div id='preview-article' className='wire-column__preview__content pt-0' ref={(preview) => this.preview = preview}>
+                        <div id='preview-article' className='wire-column__preview__content pt-0 noselect' ref={(preview) => this.preview = preview}>
                             <AgendaName item={item} />
                             <AgendaTime item={item} group={previewGroup} />
                             <AgendaPreviewImage item={item} onClick={openItemDetails} />
@@ -83,6 +85,9 @@ class AgendaPreview extends React.PureComponent {
                             <AgendaPreviewCoverages item={item}
                                 currentCoverage={displayCoverages.current}
                                 previousCoverage={displayCoverages.previous}
+                                wireItems={wireItems}
+                                actions={coverageActions}
+                                user={user}
                             />
                             <AgendaPreviewAttachments item={item} />
                             <AgendaTags item={item} plan={plan} isItemDetail={false} />
@@ -113,6 +118,8 @@ AgendaPreview.propTypes = {
     previewGroup: PropTypes.string,
     previewPlan: PropTypes.string,
     eventsOnly: PropTypes.bool,
+    wireItems: PropTypes.array,
+    coverageActions: PropTypes.array,
 };
 
 AgendaPreview.defaultProps = {eventsOnly: false};

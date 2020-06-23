@@ -1,7 +1,5 @@
 language: python
 
-dist: trusty
-
 python:
     - "3.5"
 
@@ -35,7 +33,8 @@ install:
 
 script:
     - flake8
-    - pytest --cov=newsroom
+    - pytest --disable-pytest-warnings --cov=newsroom
     - npm run lint
     - npm run test
     - npm run build
+    - behave --format progress2 --logging-level=ERROR

@@ -11,12 +11,14 @@ from newsroom.auth import get_user, get_user_by_email
 from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user
 from newsroom.decorator import admin_only, login_required
-from newsroom.companies import get_user_company_name, get_company_sections
+from newsroom.companies import get_user_company_name, get_company_sections_monitoring_data
 from newsroom.notifications.notifications import get_user_notifications
+from newsroom.notifications import push_user_notification
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
-from newsroom.utils import query_resource, find_one
+from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
+from newsroom.monitoring.views import get_monitoring_for_company
 
 
 def get_settings_data():
@@ -28,13 +30,19 @@ def get_settings_data():
 
 def get_view_data():
     user = get_user()
-    return {
+    company = user['company'] if user and user.get('company') else None
+    rv = {
         'user': user if user else None,
-        'company': str(user['company']) if user and user.get('company') else None,
+        'company': str(company),
         'topics': get_user_topics(user['_id']) if user else [],
         'companyName': get_user_company_name(user),
-        'userSections': get_company_sections(user['company'] if user and user.get('company') else None)
+        'locators': get_vocabulary('locators'),
+        'monitoring_list': get_monitoring_for_company(user),
     }
+
+    rv.update(get_company_sections_monitoring_data(company))
+
+    return rv
 
 
 @blueprint.route('/myprofile', methods=['GET'])
@@ -50,6 +58,10 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'$or': [{'first_name': regex}, {'last_name': regex}]}
+
+    if flask.request.args.get('ids'):
+        lookup = {'_id': {'$in': (flask.request.args.get('ids') or '').split(',')}}
+
     users = list(query_resource('users', lookup=lookup))
     return jsonify(users), 200
 
@@ -159,6 +171,21 @@ def get_topics(_id):
     if flask.session['user'] != str(_id):
         flask.abort(403)
     return jsonify({'_items': get_user_topics(_id)}), 200
+
+
+@blueprint.route('/users/<_id>/topics', methods=['POST'])
+@login_required
+def post_topic(_id):
+    """Creates a user topic"""
+    if flask.session['user'] != str(_id):
+        flask.abort(403)
+
+    topic = get_json_or_400()
+    topic['user'] = ObjectId(_id)
+
+    ids = get_resource_service('topics').post([topic])
+    push_user_notification('topic_created')
+    return jsonify({'success': True, '_id': ids[0]}), 201
 
 
 @blueprint.route('/users/<user_id>/notifications', methods=['GET'])

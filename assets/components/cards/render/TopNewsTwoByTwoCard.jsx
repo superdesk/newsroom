@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { wordCount } from 'utils';
+import {wordCount, getSlugline} from 'utils';
 import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
@@ -28,7 +28,7 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
                     source={item.source}
                     versioncreated={item.versioncreated}
                     displayDivider={false}
-                    slugline={item.slugline}
+                    slugline={getSlugline(item, true)}
                 />
                 <div className='wire-articles__item__text'>
                     <p className='card-text'>{shortText(item, 40, true)}</p>

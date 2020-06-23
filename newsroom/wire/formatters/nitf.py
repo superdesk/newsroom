@@ -2,12 +2,12 @@
 from lxml import etree
 from superdesk.publish.formatters.nitf_formatter import NITFFormatter as SuperdeskNITFFormatter
 
-from newsroom.formatter import BaseFormatter
+from .base import BaseFormatter
 
 
 class NITFFormatter(BaseFormatter):
 
-    MIMETYPE = 'application/vnd.nitf'
+    MIMETYPE = 'application/xml'
     FILE_EXTENSION = 'xml'
 
     encoding = 'utf-8'

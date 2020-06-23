@@ -6,9 +6,13 @@ import bson
 from bson import ObjectId
 from flask import json
 from datetime import datetime
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from superdesk import get_resource_service
+import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
 from .fixtures import init_auth  # noqa
+from .utils import mock_send_email
+from unittest import mock
 
 
 def get_signature_headers(data, key):
@@ -156,6 +160,55 @@ def test_push_featuremedia_generates_renditions(client):
         assert 200 == resp.status_code
 
 
+def test_push_update_removes_featuremedia(client):
+    media_id = str(bson.ObjectId())
+    upload_binary('picture.jpg', client, media_id=media_id)
+    item = {
+        'guid': 'test',
+        'type': 'text',
+        'version': 1,
+        'associations': {
+            'featuremedia': {
+                'type': 'picture',
+                'mimetype': 'image/jpeg',
+                'renditions': {
+                    '4-3': {
+                        'media': media_id,
+                    },
+                    'baseImage': {
+                        'media': media_id,
+                    },
+                    'viewImage': {
+                        'media': media_id,
+                    }
+                }
+            }
+        }
+    }
+
+    resp = client.post('/push', data=json.dumps(item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    resp = client.get('/wire/test?format=json')
+    data = json.loads(resp.get_data())
+    assert 200 == resp.status_code
+    assert data['associations'] is not None
+
+    item = {
+        'guid': 'test',
+        'type': 'text',
+        'version': 2,
+    }
+
+    resp = client.post('/push', data=json.dumps(item), content_type='application/json')
+    assert 200 == resp.status_code
+
+    resp = client.get('/wire/test?format=json')
+    data = json.loads(resp.get_data())
+    assert 200 == resp.status_code
+    assert data['associations'] is None
+
+
 def test_push_featuremedia_has_renditions_for_existing_media(client):
     media_id = str(bson.ObjectId())
     upload_binary('picture.jpg', client, media_id=media_id)
@@ -239,6 +292,7 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
     assert len(push_mock.call_args[1]['topics']) == 1
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -279,6 +333,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
         'name': 'Press co.',
@@ -324,6 +379,7 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     assert notification['item'] == 'bar'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     app.data.insert('companies', [{
         '_id': '2',
@@ -414,6 +470,7 @@ def test_do_not_notify_inactive_user(client, app, mocker):
     assert push_mock.call_args[1]['_items'][0]['_id'] == 'foo'
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_checks_service_subscriptions(client, app, mocker):
     app.data.insert('companies', [{
         '_id': 1,
@@ -458,6 +515,7 @@ def test_notify_checks_service_subscriptions(client, app, mocker):
     assert len(outbox) == 0
 
 
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_send_notification_emails(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -559,8 +617,9 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         {'_id': 'filter', 'filter': {'genre': ['other']}, 'user': 'bar'},
         {'_id': 'query', 'query': 'Foo', 'user': 'foo'},
     ]
-    matching = search.get_matching_topics(item['guid'], topics, users, companies)
-    assert ['created_from_future', 'query'] == matching
+    with app.test_request_context():
+        matching = search.get_matching_topics(item['guid'], topics, users, companies)
+        assert ['created_from_future', 'query'] == matching
 
 
 def test_push_parsed_item(client, app):

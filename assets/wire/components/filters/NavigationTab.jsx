@@ -1,18 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
+
+import {gettext} from 'utils';
 import NavLink from './NavLink';
 
-import { toggleNavigation } from 'search/actions';
+import {toggleNavigation} from 'search/actions';
+import {noNavigationSelected} from 'search/utils';
 
-function NavigationTab({navigations, activeNavigation, toggleNavigation, fetchItems, addAllOption}) {
+function NavigationTab({
+    navigations,
+    activeNavigation,
+    toggleNavigation,
+    fetchItems,
+    addAllOption,
+    disableSameNavigationDeselect,
+}) {
     const navLinks = navigations.map((navigation) => (
         <NavLink key={navigation.name}
-            isActive={activeNavigation === navigation._id || navigations.length === 1}
+            isActive={activeNavigation.includes(navigation._id) || navigations.length === 1}
             onClick={(event) => {
                 event.preventDefault();
-                toggleNavigation(navigation);
+                toggleNavigation(navigation, disableSameNavigationDeselect);
                 fetchItems();
             }}
             label={navigation.name}
@@ -21,7 +30,7 @@ function NavigationTab({navigations, activeNavigation, toggleNavigation, fetchIt
 
     const all = (
         <NavLink key="all"
-            isActive={!activeNavigation}
+            isActive={noNavigationSelected(activeNavigation)}
             onClick={(event) => {
                 event.preventDefault();
                 toggleNavigation();
@@ -36,7 +45,7 @@ function NavigationTab({navigations, activeNavigation, toggleNavigation, fetchIt
 
 NavigationTab.propTypes = {
     navigations: PropTypes.arrayOf(PropTypes.object),
-    activeNavigation: PropTypes.string,
+    activeNavigation: PropTypes.arrayOf(PropTypes.string),
     toggleNavigation: PropTypes.func.isRequired,
     fetchItems: PropTypes.func.isRequired,
     addAllOption: PropTypes.bool,

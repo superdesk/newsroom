@@ -1,13 +1,44 @@
 from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
+from newsroom.celery_app import celery
+from flask_mail import Attachment
 
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
     get_public_contacts
 from newsroom.template_filters import is_admin_or_internal
+from newsroom.utils import url_for_agenda
+from superdesk.logging import logger
+import base64
 
 
-def send_email(to, subject, text_body, html_body=None, sender=None, connection=None):
+@celery.task(bind=True, soft_time_limit=120)
+def _send_email(self, to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
+    if sender is None:
+        sender = current_app.config['MAIL_DEFAULT_SENDER']
+
+    decoded_attachments = []
+    for a in attachments_info:
+        try:
+            content = base64.b64decode(a['file'])
+            decoded_attachments.append(Attachment(a['file_name'],
+                                                  a['content_type'], data=content))
+        except Exception as e:
+            logger.error('Error attaching {} file to mail. Receipient(s): {}. Error: {}'.format(
+                a['file_desc'], to, e))
+
+    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
+    msg.body = text_body
+    msg.html = html_body
+    app = current_app._get_current_object()
+    with app.mail.connect() as connection:
+        if connection:
+            return connection.send(msg)
+
+        return app.mail.send(msg)
+
+
+def send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
     """
     Sends the email
     :param to: List of recipients
@@ -17,15 +48,15 @@ def send_email(to, subject, text_body, html_body=None, sender=None, connection=N
     :param sender: Sender
     :return:
     """
-    if sender is None:
-        sender = current_app.config['MAIL_DEFAULT_SENDER']
-    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to)
-    msg.body = text_body
-    msg.html = html_body
-    app = current_app._get_current_object()
-    if connection:
-        return connection.send(msg)
-    return app.mail.send(msg)
+    kwargs = {
+        'to': to,
+        'subject': subject,
+        'text_body': text_body,
+        'html_body': html_body,
+        'sender': sender,
+        'attachments_info': attachments_info,
+    }
+    _send_email.apply_async(kwargs=kwargs)
 
 
 def send_new_signup_email(user):
@@ -130,7 +161,7 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
 
 
 def _send_new_agenda_notification_email(user, topic_name, item):
-    url = url_for('agenda.item', _id=item['guid'], _external=True)
+    url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
     subject = gettext('New update for followed agenda: {}').format(topic_name)
     kwargs = dict(
@@ -181,7 +212,7 @@ def _send_history_match_wire_notification_email(user, item, section):
 
 def _send_history_match_agenda_notification_email(user, item):
     app_name = current_app.config['SITE_NAME']
-    url = url_for('agenda.item', _id=item['guid'], _external=True)
+    url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
     subject = gettext('New update for your previously accessed agenda: {}').format(item['name'])
     text_body = render_template(

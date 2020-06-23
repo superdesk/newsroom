@@ -1,29 +1,33 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { get } from 'lodash';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
+
+import { gettext } from 'utils';
 
 import {
     hideModal,
     toggleDropdown,
     selectMenu,
 } from '../actions';
-import FollowedTopics from './topics/FollowedTopics';
+import {
+    userSelector,
+    selectedMenuSelector,
+    displayModelSelector,
+    userSectionsSelector,
+} from '../selectors';
+
+import FollowedTopics from 'search/components/FollowedTopics';
 import UserProfileMenu from './UserProfileMenu';
 import UserProfileAvatar from './UserProfileAvatar';
-import { gettext } from 'utils';
-import FollowTopicModal from 'components/FollowTopicModal';
 import ShareItemModal from 'components/ShareItemModal';
 import UserProfile from './profile/UserProfile';
 import ProfileToggle from './ProfileToggle';
 
-const modals = {
-    followTopic: FollowTopicModal,
-    shareItem: ShareItemModal,
-};
+import '../style';
 
-
+const modals = { shareItem: ShareItemModal };
 
 class UserProfileApp extends React.Component {
     constructor(props, context) {
@@ -39,7 +43,7 @@ class UserProfileApp extends React.Component {
         if (this.isSectionEnabled('wire')) {
             this.links.push({
                 name: 'topics',
-                label: gettext('My Topics'),
+                label: gettext('My Wire Topics'),
                 content: FollowedTopics,
                 type: 'wire',
             });
@@ -48,9 +52,18 @@ class UserProfileApp extends React.Component {
         if (this.isSectionEnabled('agenda')) {
             this.links.push({
                 name: 'events',
-                label: gettext('My Events'),
+                label: gettext('My Agenda Topics'),
                 content: FollowedTopics,
                 type: 'agenda',
+            });
+        }
+
+        if (this.isSectionEnabled('monitoring')) {
+            this.links.push({
+                name: 'monitoring',
+                label: gettext('My Monitoring'),
+                content: FollowedTopics,
+                type: 'monitoring',
             });
         }
     }
@@ -84,7 +97,8 @@ class UserProfileApp extends React.Component {
                 <div className="profileWrap">
                     <div className="profile__mobile-close d-md-none">
                         <button className="icon-button" onClick={this.props.hideModal}>
-                            <i className="icon--close-thin icon--gray-light"></i></button>
+                            <i className="icon--close-thin icon--gray-light" />
+                        </button>
                     </div>
                     <nav className='profile-side-navigation' id='profile-menu'>
                         <UserProfileAvatar
@@ -124,12 +138,20 @@ class UserProfileApp extends React.Component {
             document.getElementById('user-profile-app')
         );
 
+        const overlay = this.props.dropdown && (
+            <div
+                key="overlay"
+                className="user-profile__app--overlay"
+                onClick={this.props.toggleDropdown}
+            />
+        );
+
         const dropdown = this.props.dropdown && (
             <div key="dropdown" className="dropdown-menu dropdown-menu-right show">
                 <div className="card card--inside-dropdown">
                     <div className="card-header">
                         {`${this.props.user.first_name} ${this.props.user.last_name}`}
-                    </div>               
+                    </div>
                     <ul className="list-group list-group-flush">
                         {this.links.map((link) => (
                             <li key={link.name} className="list-group-item list-group-item--link">
@@ -154,6 +176,7 @@ class UserProfileApp extends React.Component {
         }
 
         return [
+            overlay,
             <ProfileToggle key="toggle"
                 user={this.props.user}
                 onClick={this.props.toggleDropdown}
@@ -176,12 +199,12 @@ UserProfileApp.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    user: state.user,
+    user: userSelector(state),
     modal: state.modal,
     dropdown: state.dropdown,
-    selectedMenu: state.selectedMenu,
-    displayModal: state.displayModal,
-    userSections: state.userSections,
+    selectedMenu: selectedMenuSelector(state),
+    displayModal: displayModelSelector(state),
+    userSections: userSectionsSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -47,7 +47,7 @@ def date_short(datetime):
 
 
 def plain_text(html):
-    return get_text(html, lf_on_block=True) if html else ''
+    return get_text(html, content='html', lf_on_block=True) if html else ''
 
 
 def word_count(html):
@@ -125,3 +125,8 @@ def is_admin_or_account_manager(user=None):
     if user:
         return user.get('user_type') in allowed_user_types
     return flask.session.get('user_type') in allowed_user_types
+
+
+def get_multi_line_message(message):
+    new_message = message.replace('\r', '')
+    return new_message.replace('\n', '\r\n')

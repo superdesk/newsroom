@@ -1,15 +1,18 @@
 import superdesk
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from uuid import uuid4
+import pytz
 
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from bson import ObjectId
 from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date
-from flask import current_app as app, json, abort, request, g, flash, session
+from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
 from newsroom.template_filters import time_short, parse_date as parse_short_date, format_datetime, is_admin
+from newsroom.auth import get_user_id
 
 
 DAY_IN_MINUTES = 24 * 60 - 1
@@ -81,6 +84,23 @@ def get_entity_or_404(_id, resource):
     return item
 
 
+def get_entities_elastic_or_mongo_or_404(_ids, resource):
+    '''Finds item in elastic search as fist preference. If not configured, finds from mongo'''
+    elastic = app.data._search_backend(resource)
+    items = []
+    if elastic:
+        for id in _ids:
+            item = elastic.find_one('items', req=None, _id=id)
+            if not item:
+                item = get_entity_or_404(id, resource)
+
+            items.append(item)
+    else:
+        items = [get_entity_or_404(i, resource) for i in _ids]
+
+    return items
+
+
 def get_json_or_400():
     data = request.get_json()
     if not isinstance(data, dict):
@@ -96,6 +116,7 @@ def get_type():
         'am_news': 'items',
         'aapX': 'items',
         'media_releases': 'items',
+        'monitoring': 'items',
     }
     return types[item_type]
 
@@ -112,7 +133,10 @@ def parse_dates(item):
             item[field] = parse_date_str(item[field])
 
 
-def get_entity_dict(items):
+def get_entity_dict(items, str_id=False):
+    if (str_id):
+        return {str(item['_id']): item for item in items}
+
     return {item['_id']: item for item in items}
 
 
@@ -139,7 +163,7 @@ def date_short(datetime):
         return format_datetime(parse_short_date(datetime), "dd/MM/yyyy")
 
 
-def get_agenda_dates(agenda):
+def get_agenda_dates(agenda, date_paranthesis=False):
     start = agenda.get('dates', {}).get('start')
     end = agenda.get('dates', {}).get('end')
 
@@ -160,6 +184,9 @@ def get_agenda_dates(agenda):
         # start and end dates are the same
         return '{} {}'.format(time_short(start), date_short(start))
 
+    if date_paranthesis:
+        return '{} - {} ({})'.format(time_short(start), time_short(end), date_short(start))
+
     return '{} - {}, {}'.format(time_short(start), time_short(end), date_short(start))
 
 
@@ -178,7 +205,7 @@ def get_location_string(agenda):
         location[0].get('address', {}).get('country'),
     ]
 
-    return ', '.join([l for l in location_items if l])
+    return ', '.join([location_part for location_part in location_items if location_part])
 
 
 def get_public_contacts(agenda):
@@ -212,7 +239,7 @@ def is_company_enabled(user, company=None):
     if not user_company:
         return False
 
-    return user_company.get('is_enabled', False) and not is_company_expired(user_company)
+    return user_company.get('is_enabled', False)
 
 
 def is_company_expired(company):
@@ -314,3 +341,83 @@ def is_valid_login(user_id):
         superdesk.get_resource_service('users').system_update(ObjectId(user_id), {'last_active': current_time}, user)
 
     return True
+
+
+def get_items_by_id(ids, resource):
+    return list(superdesk.get_resource_service(resource).find(where={'_id': {'$in': ids}}))
+
+
+def get_vocabulary(id):
+    vocabularies = app.data.pymongo('items').db.vocabularies
+    if vocabularies and vocabularies.count() > 0 and id:
+        return vocabularies.find_one({'_id': id})
+
+    return None
+
+
+def url_for_agenda(item, _external=True):
+    """Get url for agenda item."""
+    return url_for('agenda.index', item=item['_id'], _external=_external)
+
+
+def set_original_creator(doc):
+    doc['original_creator'] = get_user_id()
+
+
+def set_version_creator(doc):
+    doc['version_creator'] = get_user_id()
+
+
+def get_items_for_user_action(_ids, item_type):
+    # Getting entities from elastic first so that we get all fields
+    # even those which are not a part of ItemsResource(content_api) schema.
+    items = get_entities_elastic_or_mongo_or_404(_ids, item_type)
+
+    if not items or items[0].get('type') != 'text':
+        return items
+
+    for item in items:
+        if item.get('slugline') and item.get('anpa_take_key'):
+            item['slugline'] = '{0} | {1}'.format(item['slugline'], item['anpa_take_key'])
+
+    return items
+
+
+def get_utcnow():
+    """ added for unit tests """
+    return datetime.utcnow()
+
+
+def today(time, offset):
+    user_local_date = get_utcnow() - timedelta(minutes=offset)
+    local_start_date = datetime.strptime('%sT%s' % (user_local_date.strftime('%Y-%m-%d'), time),
+                                         '%Y-%m-%dT%H:%M:%S')
+    return local_start_date
+
+
+def format_date(date, time, offset):
+    if date == 'now/d':
+        return today(time, offset)
+    if date == 'now/w':
+        _today = today(time, offset)
+        monday = _today - timedelta(days=_today.weekday())
+        return monday
+    if date == 'now/M':
+        month = today(time, offset).replace(day=1)
+        return month
+    return datetime.strptime('%sT%s' % (date, time), '%Y-%m-%dT%H:%M:%S')
+
+
+def get_local_date(date, time, offset):
+    local_dt = format_date(date, time, offset)
+    return pytz.utc.normalize(local_dt.replace(tzinfo=pytz.utc) + timedelta(minutes=offset))
+
+
+def get_end_date(date_range, start_date):
+    if date_range == 'now/d':
+        return start_date
+    if date_range == 'now/w':
+        return start_date + timedelta(days=6)
+    if date_range == 'now/M':
+        return start_date + relativedelta(months=+1) - timedelta(days=1)
+    return start_date

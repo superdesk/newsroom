@@ -1,8 +1,9 @@
 {% extends "email_layout.txt" %}
 
 {% block content %}
-{{ message }}
 
-{% include "email_agenda.txt" %}
+{{ get_multi_line_message(message) }}
+
+{% include "email_watched_agenda.txt" %}
 
 {% endblock %}

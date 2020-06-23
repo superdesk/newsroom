@@ -19,12 +19,13 @@ class ActionButton extends React.Component {
         const classes = classNames(`icon--${this.props.action.icon}`, {
             'icon--gray': this.props.isVisited,
         });
-        const {item, group, plan, action} = this.props;
+        const {item, group, plan, action, disabled} = this.props;
 
         return (
             <button
                 type='button'
                 className={this.props.className}
+                disabled={disabled}
                 onClick={
                     () => {
                         if (action.multi) {
@@ -35,7 +36,7 @@ class ActionButton extends React.Component {
                     }
                 }
                 ref={(elem) => this.elem = elem}
-                title={!this.props.displayName ? this.props.action.name : ''}>
+                title={!this.props.displayName ? this.props.action.tooltip || this.props.action.name : ''}>
                 <i className={classes}></i>
                 {this.props.displayName && this.props.action.name}</button>
         );
@@ -54,7 +55,9 @@ ActionButton.propTypes = {
         icon: PropTypes.string.isRequired,
         action: PropTypes.func.isRequired,
         multi: PropTypes.bool,
-    })
+        tooltip: PropTypes.string,
+    }),
+    disabled: PropTypes.bool,
 };
 
 export default ActionButton;

@@ -12,8 +12,7 @@ from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock, remove_locks
-from flask import render_template, current_app as app
-from flask_babel import gettext
+from flask import render_template
 from newsroom.celery_app import celery
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from superdesk import config
@@ -48,10 +47,17 @@ class CompanyExpiryAlerts():
 
         # Check if there are any recipients
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
-        recipients = general_settings['values']['company_expiry_alert_recipients'].split(',')
+        try:
+            recipients = general_settings['values']['company_expiry_alert_recipients'].split(',')
+        except KeyError:
+            logger.warning('there are no alert expiry recipients')
+            return
         expiry_time = (utcnow() + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
         companies_service = get_resource_service('companies')
-        companies = list(companies_service.find({'expiry_date': {'$lte': expiry_time}}))
+        companies = list(companies_service.find({
+                'expiry_date': {'$lte': expiry_time},
+                'is_enabled': True
+                }))
 
         if len(companies) > 0:
             # Send notifications to users who are nominated to receive expiry alerts
@@ -62,32 +68,31 @@ class CompanyExpiryAlerts():
                     template_kwargs = {'expiry_date': company.get('expiry_date')}
                     logger.info('{} Sending to following users of company {}: {}'
                                 .format(self.log_msg, company.get('name'), recipients))
-                    with app.mail.connect() as connection:
-                        send_email(
-                            [u['email'] for u in users],
-                            gettext('Your Company\'s account is expiring on ({})').format(company.get('expiry_date')
-                                                                                          .strftime('%Y-%m-%d')),
-                            text_body=render_template('company_expiry_alert_user.txt', **template_kwargs),
-                            html_body=render_template('company_expiry_alert_user.html', **template_kwargs),
-                            connection=connection
-                        )
+                    send_email(
+                        [u['email'] for u in users],
+                        'Your Company\'s account is expiring on {}'.format(
+                            company.get('expiry_date').strftime('%d-%m-%Y')
+                        ),
+                        text_body=render_template('company_expiry_alert_user.txt', **template_kwargs),
+                        html_body=render_template('company_expiry_alert_user.html', **template_kwargs),
+                    )
 
             if not (general_settings.get('values') or {}).get('company_expiry_alert_recipients'):
                 return  # No one else to send
 
             template_kwargs = {
-                'companies': companies,
+                'companies': sorted(companies, key=lambda k: k['expiry_date']),
                 'expiry_date': expiry_time
             }
             logger.info('{} Sending to following expiry administrators: {}'.format(self.log_msg, recipients))
-            with app.mail.connect() as connection:
-                send_email(
-                    recipients,
-                    gettext('Companies expiring within next 7 days ({})').format(expiry_time.strftime('%Y-%m-%d')),
-                    text_body=render_template('company_expiry_email.txt', **template_kwargs),
-                    html_body=render_template('company_expiry_email.html', **template_kwargs),
-                    connection=connection
-                )
+            send_email(
+                recipients,
+                'Companies expired or due to expire within the next 7 days ({})'.format(
+                    expiry_time.strftime('%d-%m-%Y')
+                ),
+                text_body=render_template('company_expiry_email.txt', **template_kwargs),
+                html_body=render_template('company_expiry_email.html', **template_kwargs),
+            )
 
 
 @celery.task(soft_time_limit=600)

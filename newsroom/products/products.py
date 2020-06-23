@@ -1,3 +1,5 @@
+from bson import ObjectId
+
 import newsroom
 import superdesk
 
@@ -40,6 +42,8 @@ class ProductsResource(newsroom.Resource):
             'type': 'string',
             'default': 'wire'
         },
+        'original_creator': newsroom.Resource.rel('users'),
+        'version_creator': newsroom.Resource.rel('users'),
     }
     datasource = {
         'source': 'products',
@@ -48,16 +52,44 @@ class ProductsResource(newsroom.Resource):
     item_methods = ['GET', 'PATCH', 'DELETE']
     resource_methods = ['GET', 'POST']
     query_objectid_as_string = True  # needed for companies/navigations lookup to work
+    internal_resource = True
 
 
 class ProductsService(newsroom.Service):
     pass
 
 
-def get_products_by_navigation(navigation_id):
-    return list(superdesk.get_resource_service('products').
-                get(req=None, lookup={'navigations': str(navigation_id),
-                                      'is_enabled': True}))
+def _get_navigation_query(ids):
+    return {'$in': [str(oid) for oid in ids]} \
+        if type(ids) is list \
+        else str(ids)
+
+
+def get_products_by_navigation(navigation_id, product_type=None):
+    lookup = {
+        'is_enabled': True,
+        'navigations': _get_navigation_query(navigation_id)
+    }
+
+    if product_type is not None:
+        lookup['product_type'] = product_type
+
+    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
+
+
+def get_product_by_id(product_id, product_type=None, company_id=None):
+    lookup = {
+        '_id': ObjectId(product_id),
+        'is_enabled': True
+    }
+
+    if company_id is not None:
+        lookup['companies'] = str(company_id)
+
+    if product_type is not None:
+        lookup['product_type'] = product_type
+
+    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
 
 
 def get_products_by_company(company_id, navigation_id=None, product_type=None):
@@ -69,7 +101,7 @@ def get_products_by_company(company_id, navigation_id=None, product_type=None):
     """
     lookup = {'is_enabled': True, 'companies': str(company_id)}
     if navigation_id:
-        lookup['navigations'] = str(navigation_id)
+        lookup['navigations'] = _get_navigation_query(navigation_id)
     if product_type:
         lookup['product_type'] = product_type
 

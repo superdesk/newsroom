@@ -8,7 +8,7 @@ function AgendaEventsOnlyFilter ({toggleFilter, eventsOnlyView}) {
     const filter = {
         label: gettext('Events & Coverages'),
         field: 'eventsOnly',
-        icon: 'icon-small--calendar',
+        icon: 'icon-small--coverage-infographics'
     };
 
     return (<div className="btn-group" key={filter.field}>

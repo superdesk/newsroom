@@ -1,23 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import InputWrapper from './InputWrapper';
 
-function TextInput({type, name, label, onChange, value, error, required, readOnly, maxLength, placeholder, description, min}) {
-    let wrapperClass = 'form-group';
-
-    if (error && error.length > 0) {
-        wrapperClass += ' has-error';
-    }
-
-    if (!name) {
-        name = `input-${label}`;
-    }
-
+function TextInput({
+    type,
+    name,
+    label,
+    onChange,
+    value,
+    error,
+    required,
+    readOnly,
+    maxLength,
+    placeholder,
+    description,
+    min,
+    autoFocus,
+    ...props
+}) {
     return (
-        <div className={wrapperClass}>
-            <label htmlFor={name}>{label}</label>
+        <InputWrapper error={error} name={name}>
+            {label && (
+                <label htmlFor={name}>{label}</label>
+            )}
             <div className="field">
-                <input 
+                <input
                     type={type || 'text'}
                     id={name}
                     name={name}
@@ -26,20 +34,22 @@ function TextInput({type, name, label, onChange, value, error, required, readOnl
                     onChange={onChange}
                     required={required}
                     maxLength={maxLength}
-                    readOnly={readOnly}
+                    disabled={readOnly}
                     placeholder={placeholder}
                     min={min}
+                    autoFocus={autoFocus}
+                    {...props}
                 />
                 {error && <div className="alert alert-danger">{error}</div>}
                 {description && <small className="form-text text-muted">{description}</small>}
             </div>
-        </div>
+        </InputWrapper>
     );
 }
 
 TextInput.propTypes = {
     type: PropTypes.string,
-    label: PropTypes.string.isRequired,
+    label: PropTypes.string,
     name: PropTypes.string,
     value: PropTypes.string,
     error: PropTypes.arrayOf(PropTypes.string),
@@ -50,6 +60,9 @@ TextInput.propTypes = {
     placeholder: PropTypes.string,
     description: PropTypes.string,
     min: PropTypes.number,
+    autoFocus: PropTypes.bool,
 };
+
+TextInput.defaultProps = {autoFocus: false};
 
 export default TextInput;

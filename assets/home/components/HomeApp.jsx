@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {gettext} from 'utils';
-import { get } from 'lodash';
+import {gettext, isDisplayed, isMobilePhone} from 'utils';
+import {get} from 'lodash';
 import {
     getCardDashboardComponent,
 } from 'components/cards/utils';
@@ -10,13 +10,15 @@ import {
 
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
-import {openItemDetails, setActive} from '../actions';
-import FollowTopicModal from 'components/FollowTopicModal';
+import {openItemDetails, setActive, fetchCardExternalItems} from '../actions';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
+import WirePreview from 'wire/components/WirePreview';
+import {followStory} from 'search/actions';
+import {downloadVideo} from 'wire/actions';
+import {previewConfigSelector} from 'ui/selectors';
 
 const modals = {
-    followTopic: FollowTopicModal,
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
 };
@@ -34,6 +36,13 @@ class HomeApp extends React.Component {
     componentDidMount() {
         document.getElementById('footer').className = 'footer footer--home';
         this.height = this.elem.offsetHeight;
+
+        // Load any external media items for cards
+        this.props.cards
+            .filter((card) => card.dashboard === 'newsroom' && card.type === '4-photo-gallery')
+            .forEach((card) => {
+                this.props.fetchCardExternalItems(get(card, '_id'), get(card, 'label'));
+            });
     }
 
     renderModal(specs) {
@@ -92,35 +101,74 @@ class HomeApp extends React.Component {
         />;
     }
 
-    filterActions(item) {
-        return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
+    filterActions(item, config) {
+        return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
+          (!action.when || action.when(this.props, item)));
     }
 
-    render() {
+    renderContent(children) {
+        return (
+            <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
+                onScroll={this.onHomeScroll}
+                ref={(elem) => this.elem = elem}
+            >
+                <div className="container-fluid">
+                    {this.props.cards.length > 0 &&
+                    this.props.cards.filter((c) => c.dashboard === 'newsroom').map((card) => this.getPanels(card))}
+                    {this.props.cards.length === 0 &&
+                    <div className="alert alert-warning" role="alert">
+                        <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for home page!')}
+                    </div>
+                    }
+                </div>
+                {children}
+            </section>
+        );
+    }
+
+    renderNonMobile() {
         const modal = this.renderModal(this.props.modal);
 
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
-                actions={this.filterActions(this.props.itemToOpen)}
-                onClose={() => this.props.actions.filter(a => a.id == 'open')[0].action(null)}
+                actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
+                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />, modal] :
-                <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
-                    onScroll={this.onHomeScroll}
-                    ref={(elem) => this.elem = elem}
-                >
-                    <div className="container-fluid">
-                        {this.props.cards.length > 0 &&
-                        this.props.cards.filter((c) => c.dashboard === 'newsroom').map((card) => this.getPanels(card))}
-                        {this.props.cards.length === 0 &&
-                        <div className="alert alert-warning" role="alert">
-                            <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for home page!')}
-                        </div>
-                        }
-                    </div>
-                </section>)
+                this.renderContent()
+            )
         );
+    }
+
+    renderMobile() {
+        const modal = this.renderModal(this.props.modal);
+        const isFollowing = get(this.props, 'itemToOpen.slugline') && this.props.topics &&
+            this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToOpen.slugline}"`);
+
+        return this.renderContent([
+            <div key='preview_test' className={`wire-column__preview ${this.props.itemToOpen ? 'wire-column__preview--open' : ''}`}>
+                {this.props.itemToOpen && (
+                    <WirePreview
+                        item={this.props.itemToOpen}
+                        user={this.props.user}
+                        actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
+                        followStory={this.props.followStory}
+                        isFollowing={!!isFollowing}
+                        closePreview={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
+                        previewConfig={this.props.previewConfig}
+                        downloadVideo={this.props.downloadVideo}
+                    />
+                )}
+            </div>,
+            modal
+        ]);
+    }
+
+    render() {
+        return isMobilePhone() ?
+            this.renderMobile() :
+            this.renderNonMobile();
     }
 }
 
@@ -129,6 +177,7 @@ HomeApp.propTypes = {
     itemsByCard: PropTypes.object,
     products: PropTypes.array,
     user: PropTypes.string,
+    userType: PropTypes.string,
     company: PropTypes.string,
     format: PropTypes.array,
     itemToOpen: PropTypes.object,
@@ -139,6 +188,11 @@ HomeApp.propTypes = {
         name: PropTypes.string,
         action: PropTypes.func,
     })),
+    fetchCardExternalItems: PropTypes.func,
+    followStory: PropTypes.func,
+    previewConfig: PropTypes.object,
+    downloadVideo: PropTypes.func,
+    topics: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -146,11 +200,14 @@ const mapStateToProps = (state) => ({
     itemsByCard: state.itemsByCard,
     products: state.products,
     user: state.user,
+    userType: state.userType,
     company: state.company,
     format: PropTypes.format,
     itemToOpen: state.itemToOpen,
     modal: state.modal,
     activeCard: state.activeCard,
+    previewConfig: previewConfigSelector(state),
+    topics: state.topics || [],
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -159,6 +216,9 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(setActive(cardId));
     },
     actions: getItemActions(dispatch),
+    fetchCardExternalItems: (cardId, cardLabel) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
+    followStory: (item) => followStory(item, 'wire'),
+    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType)),
 });
 
 

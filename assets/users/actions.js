@@ -1,6 +1,6 @@
-import { gettext, notify, errorHandler } from 'utils';
+import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
-
+import {searchQuerySelector} from 'search/selectors';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id) {
@@ -28,11 +28,6 @@ export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
 }
 
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    return {type: SET_QUERY, query};
-}
-
 export const QUERY_USERS = 'QUERY_USERS';
 export function queryUsers() {
     return {type: QUERY_USERS};
@@ -58,6 +53,16 @@ export function setCompany(company) {
     return {type: SET_COMPANY, company};
 }
 
+export const SET_SORT = 'SET_SORT';
+export function setSort(param) {
+    return {type: SET_SORT, param};
+}
+
+export const TOGGLE_SORT_DIRECTION = 'TOGGLE_SORT_DIRECTION';
+export function toggleSortDirection() {
+    return {type: TOGGLE_SORT_DIRECTION};
+}
+
 /**
  * Fetches users
  *
@@ -65,11 +70,13 @@ export function setCompany(company) {
 export function fetchUsers() {
     return function (dispatch, getState) {
         dispatch(queryUsers());
-        const query = getState().query || '';
+        const query = searchQuerySelector(getState()) || '';
         const filter = getState().company &&
             getState().company !== '' ? '&where={"company":"' + getState().company + '"}' : '';
+        const sort = !getState().sort ? '' :
+            `&sort=[("${getState().sort}", ${getState().sortDirection}), ("last_name", 1)]`;
 
-        return server.get(`/users/search?q=${query}${filter}`)
+        return server.get(`/users/search?q=${query}${filter}${sort}`)
             .then((data) => dispatch(getUsers(data)))
             .catch((error) => errorHandler(error, dispatch, setError));
     };

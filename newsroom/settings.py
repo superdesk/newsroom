@@ -4,7 +4,8 @@ import re
 import copy
 import flask
 from flask_babel import gettext
-from newsroom.utils import get_json_or_400
+from superdesk.utc import utcnow
+from newsroom.utils import get_json_or_400, set_version_creator
 from newsroom.template_filters import newsroom_config
 from newsroom.decorator import admin_only
 
@@ -36,22 +37,35 @@ def update_values():
     if error:
         return "", error
 
-    get_settings_collection().update_one(GENERAL_SETTINGS_LOOKUP, {'$set': {'values': values}}, upsert=True)
+    updates = {'values': values}
+    set_version_creator(updates)
+    updates['_updated'] = utcnow()
+
+    get_settings_collection().update_one(GENERAL_SETTINGS_LOOKUP, {'$set': updates}, upsert=True)
     flask.g.settings = None  # reset cache on update
-    return flask.jsonify(values)
+    return flask.jsonify(updates)
 
 
-def get_setting(setting_key=None):
+def get_initial_data(setting_key=None):
+    data = get_setting(setting_key=setting_key, include_audit=True)
+    return data
+
+
+def get_setting(setting_key=None, include_audit=False):
     if not getattr(flask.g, 'settings', None):
         values = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         settings = copy.deepcopy(flask.current_app._general_settings)
         if values:
             for key, val in values.get('values', {}).items():
-                if val:
+                if val and settings.get(key):
                     settings[key]['value'] = val
+            if include_audit:
+                settings['_updated'] = values.get('_updated')
+                settings['version_creator'] = values.get('version_creator')
+
         flask.g.settings = settings
     if setting_key:
-        setting_dict = flask.g.settings[setting_key]
+        setting_dict = flask.g.settings.get(setting_key) or {}
         return setting_dict.get('value', setting_dict.get('default'))
     return flask.g.settings
 
@@ -59,16 +73,17 @@ def get_setting(setting_key=None):
 def get_client_config():
     config = newsroom_config()
     for key, setting in (get_setting() or {}).items():
-        value = setting.get('value', setting.get('default'))
-        if value:
-            config['client_config'][key] = value
+        if key not in ['_updated', 'version_creator']:
+            value = setting.get('value', setting.get('default'))
+            if value:
+                config['client_config'][key] = value
     return config
 
 
 def validate_general_settings(values):
     # validate email formats for company_expiry_alert_recipients
     email_regex = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
-    fields = ['company_expiry_alert_recipients', 'coverage_request_recipients']
+    fields = ['company_expiry_alert_recipients', 'coverage_request_recipients', 'system_alerts_recipients']
     for field in fields:
         field_txt = gettext('Company expiry alert recipients') if field == 'company_expiry_alert_recipients'\
                 else gettext('Coverage request recipients')
@@ -79,7 +94,7 @@ def validate_general_settings(values):
 
 
 def init_app(app):
-    app.settings_app('general-settings', gettext('General Settings'), weight=800, data=get_setting)
+    app.settings_app('general-settings', gettext('General Settings'), weight=800, data=get_initial_data)
     app.add_template_global(get_setting)
     app.add_template_global(get_client_config)
 
@@ -90,6 +105,9 @@ def init_app(app):
     app.general_setting('coverage_request_recipients', gettext('Coverage request recipients'),
                         description=gettext(
                             'Comma separated list of email addresses who will receive the coverage request emails.'))  # noqa
+    app.general_setting('system_alerts_recipients', gettext('System alerts recipients'),
+                        description=gettext(
+                            'Comma separated list of email addresses who will receive system alerts.'))
 
 
 class SettingsApp():

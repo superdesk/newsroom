@@ -185,9 +185,19 @@ def signup():
     if form.validate_on_submit():
         new_user = form.data
         new_user.pop('csrf_token', None)
+
+        user = get_auth_user_by_email(form.email.data)
+
+        if user is not None:
+            flask.flash(gettext('Account already exists.'), 'danger')
+            return flask.redirect(flask.url_for('auth.login'))
+
         send_new_signup_email(user=new_user)
         return flask.render_template('signup_success.html'), 200
-    return flask.render_template('signup.html', form=form, sitekey=app.config['RECAPTCHA_PUBLIC_KEY'])
+    return flask.render_template('signup.html',
+                                 form=form,
+                                 sitekey=app.config['RECAPTCHA_PUBLIC_KEY'],
+                                 terms=app.config['TERMS_AND_CONDITIONS'])
 
 
 @blueprint.route('/validate/<token>')

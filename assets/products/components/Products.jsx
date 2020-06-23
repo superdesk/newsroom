@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import EditProduct from './EditProduct';
-import ProductList from './ProductList';
-import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
+
+import {gettext} from 'utils';
+
 import {
     setError,
     saveCompanies,
@@ -17,9 +18,15 @@ import {
     newProduct,
     cancelEdit
 } from '../actions';
-import {gettext} from 'utils';
-import { get } from 'lodash';
-import {sectionsPropType} from '../../features/sections/types';
+
+import {sectionsPropType} from 'features/sections/types';
+import {sectionsSelector} from 'features/sections/selectors';
+import {searchQuerySelector} from 'search/selectors';
+
+import EditProduct from './EditProduct';
+import ProductList from './ProductList';
+
+import SearchResults from 'search/components/SearchResults';
 
 class Products extends React.Component {
     constructor(props, context) {
@@ -76,11 +83,15 @@ class Products extends React.Component {
                     </div>
                     :
                     <div className="flex-col flex-column">
-                        {this.props.activeQuery &&
-                        <SearchResultsInfo
-                            totalItems={this.props.totalProducts}
-                            query={this.props.activeQuery} />
-                        }
+                        {this.props.activeQuery && (
+                            <SearchResults
+                                showTotalItems={true}
+                                showTotalLabel={true}
+                                showSaveTopic={false}
+                                totalItems={this.props.totalProducts}
+                                totalItemsLabel={this.props.activeQuery}
+                            />
+                        )}
                         <ProductList
                             products={this.props.products.filter(sectionFilter)}
                             onClick={this.props.selectProduct}
@@ -141,13 +152,13 @@ const mapStateToProps = (state) => ({
     productToEdit: state.productToEdit,
     activeProductId: state.activeProductId,
     isLoading: state.isLoading,
-    activeQuery: state.activeQuery,
+    activeQuery: searchQuerySelector(state),
     totalProducts: state.totalProducts,
     companies: state.companies,
     companiesById: state.companiesById,
     navigations: state.navigations,
     errors: state.errors,
-    sections: state.sections.list,
+    sections: sectionsSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

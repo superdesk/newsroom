@@ -96,16 +96,15 @@ npm run test start
 
 ### Extract messages
 
-Extract client messages to `newsroom-client.pot`:
-
-```
-$ npm run extract_messages
-```
-
-Extract server messages to `newsroom-server.pot`:
-
 ```
 $ python setup.py extract_messages
+```
+
+Will create `messages.pot` file in root folder. You can use it to update
+strings on transifex or init a new language:
+
+```
+$ python setup.py init_catalog -l <locale>
 ```
 
 ### Translate
@@ -114,20 +113,13 @@ We translate on [transifex](https://www.transifex.com/sourcefabric/superdesk-new
 
 ### Adding translated po files
 
-Copy server po file to `newsroom/translations/<locale>/LC_MESSAGES/messages.po`
-and client po file to `newsroom/translations/<locale>/LC_MESSAGES/client.po`.
+Download translated messages file from transifex and save it
+in locale dir: `newsroom/translations/<locale>/LC_MESSAGES/messages.po`.
 
 Then run compile to generate mo files for server messages:
 
 ```
-$ pybabel compile -l <locale> -d newsroom/translations/
-```
-
-And client messages:
-
-```
-$ pybabel compile -l <locale> -d newsroom/translations/ -D client
+$ python setup.py compile_catalog -l <locale>
 ```
 
 When compiled you can add locale to `settings.LANGUAGES` to enable it.
-

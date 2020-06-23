@@ -1,6 +1,8 @@
 import { gettext, notify, errorHandler } from 'utils';
 import server from 'server';
-import { initSections } from 'features/sections/actions';
+import {initSections} from 'features/sections/actions';
+import {activeSectionSelector} from 'features/sections/selectors';
+import {searchQuerySelector} from 'search/selectors';
 
 // number of image that a navigation can have
 export const MAX_TILE_IMAGES = 4;
@@ -23,11 +25,6 @@ export function newNavigation() {
 export const CANCEL_EDIT = 'CANCEL_EDIT';
 export function cancelEdit(event) {
     return {type: CANCEL_EDIT, event};
-}
-
-export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
-    return {type: SET_QUERY, query};
 }
 
 export const QUERY_NAVIGATIONS = 'QUERY_NAVIGATIONS';
@@ -58,7 +55,7 @@ export function setError(errors) {
 export function fetchNavigations() {
     return function (dispatch, getState) {
         dispatch(queryNavigations());
-        const query = getState().query || '';
+        const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/navigations/search?q=${query}`)
             .then((data) => dispatch(getNavigations(data)))
@@ -77,7 +74,7 @@ export function postNavigation() {
         const navigation = getState().navigationToEdit;
         if (!navigation._id) {
             // set the action section for new navigation
-            navigation.product_type = getState().sections.active;
+            navigation.product_type = activeSectionSelector(getState());
         }
 
         const url = `/navigations/${navigation._id ? navigation._id : 'new'}`;

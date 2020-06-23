@@ -1,4 +1,4 @@
-import { createStore, render, initWebSocket, getInitData} from '../utils';
+import { createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone } from '../utils';
 
 import {getReadItems} from 'local-store';
 import WireApp from '../wire/components/WireApp';
@@ -8,7 +8,9 @@ import {
     initData,
     initParams,
     pushNotification,
-    setState
+    setState,
+    openItemDetails,
+    previewItem,
 } from '../wire/actions';
 import {
     toggleNavigationById,
@@ -16,7 +18,7 @@ import {
 } from 'search/actions';
 
 
-const store = createStore(wireReducer);
+const store = createStore(wireReducer, 'MediaReleases');
 
 // init data
 store.dispatch(initData(getInitData(window.mediaReleasesData), getReadItems(), false));
@@ -28,7 +30,10 @@ store.dispatch(initParams(params));
 // handle history
 window.onpopstate = function(event) {
     if (event.state) {
-        store.dispatch(setState(event.state));
+        closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
+        if (!isMobilePhone()) {
+            store.dispatch(setState(event.state));
+        }
     }
 };
 

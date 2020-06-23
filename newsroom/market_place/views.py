@@ -26,9 +26,10 @@ def get_view_data():
     topics = get_user_topics(user['_id']) if user else []
     navigations = get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                              product_type=SECTION_ID)
-    get_resource_service(search_endpoint_name).get_navigation_story_count(navigations)
+    get_story_count(navigations, user)
     return {
         'user': str(user['_id']) if user else None,
+        'user_type': (user or {}).get('user_type') or 'public',
         'company': str(user['company']) if user and user.get('company') else None,
         'topics': [t for t in topics if t.get('topic_type') == SECTION_ID],
         'navigations': navigations,
@@ -42,12 +43,18 @@ def get_view_data():
     }
 
 
+def get_story_count(navigations, user):
+    company_id = user['company'] if user and user.get('company') else None
+    company = get_resource_service('companies').find_one(req=None, _id=company_id) if company_id else None
+    get_resource_service(search_endpoint_name).get_navigation_story_count(navigations, SECTION_ID, company, user)
+
+
 def get_home_page_data():
     """Get home page data for market place"""
     user = get_user()
     navigations = get_navigations_by_company(str(user['company']) if user and user.get('company') else None,
                                              product_type=SECTION_ID)
-    get_resource_service(search_endpoint_name).get_navigation_story_count(navigations)
+    get_story_count(navigations, user)
     return {
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,

@@ -2,9 +2,12 @@ import pytz
 from flask import json, g
 from datetime import datetime, timedelta
 from urllib import parse
+from bson import ObjectId
+from copy import deepcopy
 
 from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import get_json
+from .utils import get_json, get_admin_user_id, mock_send_email
+from unittest import mock
 from tests.test_users import ADMIN_USER_ID
 from superdesk import get_resource_service
 
@@ -22,6 +25,7 @@ def test_item_json(client):
     assert 'headline' in data
 
 
+@mock.patch('newsroom.wire.views.send_email', mock_send_email)
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -39,10 +43,10 @@ def test_share_items(client, app):
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
         assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].sender == 'admin@sourcefabric.org'
+        assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin' in outbox[0].body
+        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
         assert items[1]['headline'] in outbox[0].body
         assert 'http://localhost:5050/wire?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body
@@ -53,7 +57,7 @@ def test_share_items(client, app):
     data = json.loads(resp.get_data())
     assert 'shares' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['shares']
 
 
@@ -65,7 +69,7 @@ def get_bookmarks_count(client, user):
 
 
 def test_bookmarks(client, app):
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert user_id
 
     assert 0 == get_bookmarks_count(client, user_id)
@@ -132,7 +136,7 @@ def test_item_copy(client, app):
     data = json.loads(resp.get_data())
     assert 'copies' in data
 
-    user_id = app.data.find_all('users')[0]['_id']
+    user_id = get_admin_user_id(app)
     assert str(user_id) in data['copies']
 
 
@@ -276,6 +280,7 @@ def test_search_filter_by_individual_navigation(client, app):
 
     # test admin user filtering
     with client.session_transaction() as session:
+        session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
     resp = client.get('/wire/search')
@@ -580,7 +585,8 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
         'embargoed': (datetime.now() + timedelta(days=10)).replace(tzinfo=pytz.UTC),
         'products': [{'code': '10'}]
     }])
-    items = get_resource_service('wire_search').get_product_items(10, 20, 1)
+
+    items = get_resource_service('wire_search').get_product_items(10, 20)
     assert 1 == len(items)
 
     app.config['COMPANY_TYPES'] = [
@@ -589,8 +595,7 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
 
     company = app.data.find_one('companies', req=None, _id=1)
     app.data.update('companies', 1, {'company_type': 'test'}, company)
-
-    items = get_resource_service('wire_search').get_product_items(10, 20, 1)
+    items = get_resource_service('wire_search').get_product_items(10, 20)
     assert 0 == len(items)
 
     # ex-embargoed item is fetched
@@ -600,6 +605,55 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
         'embargoed': (datetime.now() - timedelta(days=10)).replace(tzinfo=pytz.UTC),
         'products': [{'code': '10'}]
     }])
-    items = get_resource_service('wire_search').get_product_items(10, 20, 1)
+    items = get_resource_service('wire_search').get_product_items(10, 20)
     assert 1 == len(items)
     assert items[0]['headline'] == 'china story'
+
+
+def test_wire_delete(client, app):
+    docs = [
+        items[1],
+        items[3],
+        items[4],
+    ]
+    versions = [
+        deepcopy(items[1]),
+        deepcopy(items[3]),
+        deepcopy(items[4]),
+    ]
+
+    versions[0].update({
+        '_id': ObjectId(),
+        '_id_document': docs[0]['_id'],
+    })
+    versions[1].update({
+        '_id': ObjectId(),
+        '_id_document': docs[1]['_id'],
+    })
+    versions[2].update({
+        '_id': ObjectId(),
+        '_id_document': docs[2]['_id'],
+    })
+
+    app.data.insert('items_versions', versions)
+
+    for doc in docs:
+        assert get_resource_service('items').find_one(req=None, _id=doc['_id']) is not None
+        assert get_resource_service('items_versions').find_one(req=None, _id_document=doc['_id']) is not None
+
+    resp = client.delete('/wire', data=json.dumps({
+        'items': [docs[0]['_id']],
+    }), content_type='application/json')
+    assert resp.status_code == 200
+
+    for doc in docs:
+        assert get_resource_service('items').find_one(req=None, _id=doc['_id']) is None
+        assert get_resource_service('items_versions').find_one(req=None, _id_document=doc['_id']) is None
+
+
+def test_highlighting(client, app):
+    app.data.insert('items', [{'_id': 'foo', 'body_html': 'Story that involves cheese and onions'}])
+    resp = client.get('/wire/search?q=cheese&es_highlight=1')
+    data = json.loads(resp.get_data())
+    assert data['_items'][0]['es_highlight']['body_html'][0] == 'Story that involves <span class="es-highlight">' \
+                                                                'cheese</span> and onions'

@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import EditSectionFilter from './EditSectionFilter';
-import SectionFilterList from './SectionFilterList';
-import SearchResultsInfo from 'wire/components/SearchResultsInfo';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
+
+import {gettext} from 'utils';
+
 import {
     setError,
     postSectionFilter,
@@ -13,9 +14,14 @@ import {
     newSectionFilter,
     cancelEdit
 } from '../actions';
-import {gettext} from 'utils';
-import { get } from 'lodash';
-import {sectionsPropType} from '../../features/sections/types';
+
+import {sectionsPropType} from 'features/sections/types';
+import {sectionsSelector} from 'features/sections/selectors';
+import {searchQuerySelector} from 'search/selectors';
+
+import EditSectionFilter from './EditSectionFilter';
+import SectionFilterList from './SectionFilterList';
+import SearchResults from 'search/components/SearchResults';
 
 class SectionFilters extends React.Component {
     constructor(props, context) {
@@ -72,11 +78,15 @@ class SectionFilters extends React.Component {
                     </div>
                     :
                     <div className="flex-col flex-column">
-                        {this.props.activeQuery &&
-                        <SearchResultsInfo
-                            totalItems={this.props.totalSectionFilters}
-                            query={this.props.activeQuery} />
-                        }
+                        {this.props.activeQuery && (
+                            <SearchResults
+                                showTotalItems={true}
+                                showTotalLabel={true}
+                                showSaveTopic={false}
+                                totalItems={this.props.totalSectionFilters}
+                                totalItemsLabel={this.props.activeQuery}
+                            />
+                        )}
                         <SectionFilterList
                             sectionFilters={this.props.sectionFilters.filter(sectionFilter)}
                             onClick={this.props.selectSectionFilter}
@@ -123,10 +133,10 @@ const mapStateToProps = (state) => ({
     sectionFilterToEdit: state.sectionFilterToEdit,
     activeSectionFilterId: state.activeSectionFilterId,
     isLoading: state.isLoading,
-    activeQuery: state.activeQuery,
+    activeQuery: searchQuerySelector(state),
     totalSectionFilters: state.totalSectionFilters,
     errors: state.errors,
-    sections: state.sections.list,
+    sections: sectionsSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

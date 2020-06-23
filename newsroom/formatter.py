@@ -12,10 +12,13 @@ class BaseFormatter():
     #: Response mime type when downloading single file (eg. ``text/plain``).
     MIMETYPE = None
 
+    #: Tyoe of the output content ['text', 'picture']
+    MEDIATYPE = None
+
     #: File extension to use for downloaded file.
     FILE_EXTENSION = None
 
-    def format_item(self, item, item_type=None):
+    def format_item(self, item, item_type=None, items=[]):
         raise NotImplementedError
 
     def format_filename(self, item):
@@ -29,3 +32,6 @@ class BaseFormatter():
 
     def get_mimetype(self, item):
         return self.MIMETYPE
+
+    def get_mediatype(self):
+        return self.MEDIATYPE
