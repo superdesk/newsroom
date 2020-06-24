@@ -33,7 +33,7 @@ install:
 
 script:
     - flake8
-    - pytest --disable-pytest-warnings --cov=newsroom
+    - pytest --ignore=tests/aap/ --disable-pytest-warnings --cov=newsroom
     - npm run lint
     - npm run test
     - npm run build

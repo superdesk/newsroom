@@ -49,7 +49,7 @@ def on_publish_item(app, item, is_new, **kwargs):
         original = get_previous_version(app, item['guid'], item['version'])
 
         if original:
-            if original['version'] == item['version']:
+            if original.get('version') == item['version']:
                 # the same version of the story been sent again so no need to create new version
                 return
 

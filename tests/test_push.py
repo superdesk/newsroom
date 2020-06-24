@@ -13,6 +13,7 @@ from newsroom.utils import get_entity_or_404
 from .fixtures import init_auth  # noqa
 from .utils import mock_send_email
 from unittest import mock
+import pytest
 
 
 def get_signature_headers(data, key):
@@ -160,6 +161,7 @@ def test_push_featuremedia_generates_renditions(client):
         assert 200 == resp.status_code
 
 
+@pytest.mark.skip(reason="STT is saving new versions as a separate item so this test won't work")
 def test_push_update_removes_featuremedia(client):
     media_id = str(bson.ObjectId())
     upload_binary('picture.jpg', client, media_id=media_id)
@@ -439,7 +441,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         assert push_mock.call_args_list[1][0][0] == 'history_matches'
         assert push_mock.call_args[1]['item']['_id']
         notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-        assert notification['item'] == 'bar'
+        assert notification['item'] == 'bar:1'
 
     assert len(outbox) == 1
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
