@@ -13,7 +13,10 @@ import base64
 
 
 @celery.task(bind=True, soft_time_limit=120)
-def _send_email(self, to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
+def _send_email(self, to, subject, text_body, html_body=None, sender=None, attachments_info=None):
+    if attachments_info is None:
+        attachments_info = []
+
     if sender is None:
         sender = current_app.config['MAIL_DEFAULT_SENDER']
 
