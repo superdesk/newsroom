@@ -69,7 +69,7 @@ flake8 newsroom
 And tests:
 
 ```
-python newsroom_tests.py
+pytest
 ```
 
 ## Test Javascript code
