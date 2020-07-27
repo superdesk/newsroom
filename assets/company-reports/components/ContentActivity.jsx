@@ -64,6 +64,7 @@ class ContentActivity extends React.Component {
                     {label: gettext('Print'), value: 'print'},
                     {label: gettext('Open'), value: 'open'},
                     {label: gettext('Preview'), value: 'preview'},
+                    {label: gettext('Clipboard'), value: 'clipboard'},
                 ],
                 onChange: this.props.toggleFilter,
                 showAllButton: true,
@@ -92,7 +93,7 @@ class ContentActivity extends React.Component {
         let actions = get(this.props, 'reportParams.action');
 
         if (!get(actions, 'length', 0)) {
-            actions = ['download', 'copy', 'share', 'print', 'open', 'preview'];
+            actions = ['download', 'copy', 'share', 'print', 'open', 'preview', 'clipboard'];
         }
 
         return actions;
@@ -117,6 +118,7 @@ class ContentActivity extends React.Component {
         actions.includes('print') && headers.push(gettext('Print'));
         actions.includes('open') && headers.push(gettext('Open'));
         actions.includes('preview') && headers.push(gettext('Preview'));
+        actions.includes('clipboard') && headers.push(gettext('Clipboard'));
 
         return headers;
     }
@@ -173,6 +175,7 @@ class ContentActivity extends React.Component {
                     print: get(item, 'aggs.actions.print') || 0,
                     open: get(item, 'aggs.actions.open') || 0,
                     preview: get(item, 'aggs.actions.preview') || 0,
+                    clipboard: get(item, 'aggs.actions.clipboard') || 0,
                 }
             })
         );
@@ -234,6 +237,7 @@ class ContentActivity extends React.Component {
                     {actions.includes('print') && <td>{item.actions.print}</td>}
                     {actions.includes('open') && <td>{item.actions.open}</td>}
                     {actions.includes('preview') && <td>{item.actions.preview}</td>}
+                    {actions.includes('clipboard') && <td>{item.actions.clipboard}</td>}
                 </tr>
             );
         }
