@@ -17,7 +17,7 @@ function formatCredits(picture) {
                 {copyrightholder && <b>{copyrightholder} </b>}
                 {copyrightnotice && copyrightnotice}
             </span>
-        )
+        );
     }
     return null;
 }

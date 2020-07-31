@@ -76,7 +76,7 @@ export function createStore(reducer, name = 'default') {
         thunk
     ];
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (getConfig('debug')) {
         // activate logs actions for non production instances.
         // (this should always be the last middleware)
         middlewares.push(

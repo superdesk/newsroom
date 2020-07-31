@@ -7,6 +7,7 @@ from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
 
 from superdesk.default_settings import (   # noqa
+    DEBUG,
     VERSION,
     MONGO_URI,
     REDIS_URL,
@@ -267,6 +268,7 @@ CLIENT_LOCALE_FORMATS = {
 
 # Client configuration
 CLIENT_CONFIG = {
+    'debug': DEBUG,
     'default_language': DEFAULT_LANGUAGE,
     'locale_formats': CLIENT_LOCALE_FORMATS,
     'coverage_types': COVERAGE_TYPES,
