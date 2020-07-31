@@ -37,8 +37,10 @@ export default function ArticlePicture({isKilled, picture, isItemDetails, isCust
         null;
     const searchUrl = getConfig('multimedia_website_search_url', '');
     const bylineHref = searchUrl && byline ? `${searchUrl}${get(picture, 'guid')}` : '';
-    const credits = formatCredits(picture)
-
+    let credits = null;
+    if (getConfig('display_credits')) {
+        credits = formatCredits(picture);
+    }
 
     return (<figure className='wire-column__preview__image'>
         {isItemDetails &&
