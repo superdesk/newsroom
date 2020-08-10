@@ -3,7 +3,7 @@ import server from 'server';
 import analytics from 'analytics';
 import { get, isInteger, keyBy, isEmpty, cloneDeep, throttle } from 'lodash';
 import { Provider } from 'react-redux';
-import { createStore as _createStore, applyMiddleware } from 'redux';
+import { createStore as _createStore, applyMiddleware, compose } from 'redux';
 import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import { render as _render } from 'react-dom';
@@ -70,21 +70,39 @@ export const KEYCODES = {
  * @return {Store}
  */
 export function createStore(reducer, name = 'default') {
-    const logger = createLogger({
-        duration: true,
-        collapsed: true,
-        timestamp: false,
-        titleFormatter: (action, time, took) => (
-            // Adds the name of the store to the console logs
-            // derived based on the defaultTitleFormatter from redux-logger
-            // https://github.com/LogRocket/redux-logger/blob/master/src/core.js#L25
-            (action && action.type) ?
-                `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)` :
-                `${name} - action (in ${took.toFixed(2)} ms)`
-        ),
-    });
+    // https://redux.js.org/api-reference/compose
+    let _compose = compose;
+    const middlewares = [
+        thunk
+    ];
 
-    return _createStore(reducer, applyMiddleware(thunk, logger));
+    if (getConfig('debug')) {
+        // activate logs actions for non production instances.
+        // (this should always be the last middleware)
+        middlewares.push(
+            createLogger({
+                duration: true,
+                collapsed: true,
+                timestamp: false,
+                titleFormatter: (action, time, took) => (
+                    // Adds the name of the store to the console logs
+                    // derived based on the defaultTitleFormatter from redux-logger
+                    // https://github.com/LogRocket/redux-logger/blob/master/src/core.js#L25
+                    (action && action.type) ?
+                        `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)` :
+                        `${name} - action (in ${took.toFixed(2)} ms)`
+                ),
+            })
+        );
+        // activate redux devtools for non production instances,
+        // if it's available in the browser
+        // https://github.com/zalmoxisus/redux-devtools-extension
+        if (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) {
+            _compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__;
+        }
+    }
+
+    return _createStore(reducer, _compose(applyMiddleware(...middlewares)));
 }
 
 /**
