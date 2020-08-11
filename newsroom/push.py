@@ -542,6 +542,7 @@ def get_coverages(planning_items, original_coverages, new_plan):
 
                         if new_coverage.get('workflow_status') == 'completed':
                             coverage_changes['coverage_modified'] = True
+                            set_item_reference(new_coverage)
 
                     if existing_coverage.get('scheduled') != new_coverage.get('scheduled') and \
                             existing_coverage.get('workflow_status') != 'completed':
@@ -551,6 +552,24 @@ def get_coverages(planning_items, original_coverages, new_plan):
         coverage_changes['coverage_cancelled'] = True
 
     return coverages, coverage_changes
+
+
+def set_item_reference(coverage):
+    """
+    Check if the delivery in the passed coverage refers back to the agenda item and coverage.
+    If the item is fulfilled after the item is published it will not have this reference
+    :param coverage:
+    :return:
+    """
+    item = superdesk.get_resource_service('items').find_one(req=None, _id=coverage.get('delivery_id'))
+    if item:
+        if 'planning_id' not in item and 'coverage_id' not in item:
+            service = superdesk.get_resource_service('content_api')
+            service.patch(item.get('_id'), updates={'planning_id': coverage.get('planning_id'),
+                                                    'coverage_id': coverage.get('coverage_id')})
+            item['planning_id'] = coverage.get('planning_id')
+            item['coverage_id'] = coverage.get('coverage_id')
+            notify_new_item(item, check_topics=False)
 
 
 def notify_new_item(item, check_topics=True):
