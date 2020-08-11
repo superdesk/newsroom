@@ -108,6 +108,8 @@ def init_app(app):
     app.general_setting('system_alerts_recipients', gettext('System alerts recipients'),
                         description=gettext(
                             'Comma separated list of email addresses who will receive system alerts.'))
+    app.general_setting('monitoring_report_logo_path', gettext('Monitoring report logo image'),
+                        description=gettext('Monitoring report logo image (jpg or png) for RTF reports.'))
 
 
 class SettingsApp():
