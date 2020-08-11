@@ -2,14 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { formatHTML } from 'utils';
+import {connect} from 'react-redux';
+import { selectCopy } from '../../wire/actions';
 
 /**
  * using component to fix iframely loading
  * https://iframely.com/docs/reactjs
  */
-export default class ArticleBodyHtml extends React.PureComponent {
+class ArticleBodyHtml extends React.PureComponent {
+    constructor(props) {
+        super(props);
+        this.copyClicked = this.copyClicked.bind(this);
+    }
+
     componentDidMount() {
         this.loadIframely();
+        document.addEventListener('copy', this.copyClicked);
     }
 
     componentDidUpdate() {
@@ -22,6 +30,14 @@ export default class ArticleBodyHtml extends React.PureComponent {
         if (window.iframely && html && html.includes('iframely')) {
             window.iframely.load();
         }
+    }
+
+    copyClicked() {
+        this.props.reportCopy(this.props.item);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('copy', this.copyClicked);
     }
 
     render() {
@@ -52,4 +68,11 @@ ArticleBodyHtml.propTypes = {
     item: PropTypes.shape({
         body_html: PropTypes.string,
     }).isRequired,
+    reportCopy: PropTypes.func,
 };
+
+const mapDispatchToProps = (dispatch) => ({
+    reportCopy: (item) => dispatch(selectCopy(item))
+});
+
+export default connect(null, mapDispatchToProps)(ArticleBodyHtml);
