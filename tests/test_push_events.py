@@ -174,6 +174,21 @@ test_planning = {
     "event_item": "foo",
 }
 
+text_item = {'byline': 'A Smith', 'copyrightholder': 'Australian Associated Press', 'pubstatus': 'usable',
+             'readtime': 0, 'description_text': 'Abstract', 'profile': 'ContentProfile',
+             'guid': 'urn:newsml:localhost:2020-08-06T15:59:39.183090:1f02e9bb-3007-48f3-bfad-ffa6107f87bd',
+             'type': 'text',
+             'place': [{'code': 'CIS', 'name': 'Commonwealth of Independent States'}],
+             'description_html': '<p>Abstract</p>',
+             'wordcount': 1, 'slugline': 'something', 'firstpublished': '2020-08-06T06:00:59+0000', 'language': 'en',
+             'priority': 6,
+             'version': '2', 'body_html': '<p>Body</p>', 'charcount': 4, 'versioncreated': '2020-08-06T06:00:24+0000',
+             'genre': [{'code': 'Backgrounder', 'name': 'Backgrounder'}], 'firstcreated': '2020-08-06T05:59:39+0000',
+             'service': [{'code': 'i', 'name': 'International News'}],
+             'headline': 'Headline', 'source': 'AAP',
+             'subject': [{'code': '01000000', 'name': 'arts, culture and entertainment'}], 'located': 'Wagga Wagga',
+             'urgency': 3}
+
 
 def test_push_parsed_event(client, app):
     event = deepcopy(test_event)
@@ -1174,3 +1189,30 @@ def test_coverages_delivery_sequence_has_default(client, app):
     assert parsed['coverages'][0]['delivery_id'] == 'item7'
     assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
     assert parsed['coverages'][0]['deliveries'][0]['sequence_no'] == 0
+
+
+def test_item_planning_reference_set_on_fulfill(client, app):
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar1'
+    planning['event_item'] = None
+    post_json(client, '/push', planning)
+
+    item = deepcopy(text_item)
+    post_json(client, '/push', item)
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar1'
+    planning['event_item'] = None
+    planning['coverages'][0]['deliveries'] = [{
+        'item_id': 'urn:newsml:localhost:2020-08-06T15:59:39.183090:1f02e9bb-3007-48f3-bfad-ffa6107f87bd',
+        'item_state': 'published',
+    }]
+    planning['coverages'][0]['workflow_status'] = 'completed'
+
+    post_json(client, '/push', planning)
+
+    parsed = get_entity_or_404('urn:newsml:localhost:2020-08-06T15:59:39.183090:1f02e9bb-3007-48f3-bfad-ffa6107f87bd',
+                               'content_api')
+    assert parsed['planning_id'] == 'bar1'
+    assert parsed['coverage_id'] == 'urn:newsml:localhost:5000:2018-05-28T20:55:' \
+                                    '00.496765:197d3430-9cd1-4b93-822f-c3c050b5b6ab'
