@@ -1,54 +1,36 @@
 # Newsroom Changelog
 
-## [1.13] 2019-07-16
-- [SDAN-529] Fix incorrect coverage scheduled date in Agenda notification email
-- [SDAN-514] Changes to Watched Agenda Emails (#808)
-- [SDAN-526] Draft coverage tooltip change and display all regions in filter if vocabulary is present (#807)
-- [SDAN-527] null delivery sequence_no in coverage was causing push error
-- [SDAN-512] Grey fill companies which are disabled in Company Management List
-- [SDAN-525] Disable user text selection in item preview
-- [SDAN-502] Bug fix when using locators vocabularies for Region filter in Agenda
-- [SDAN-514] Notification Email restructure for watched Agenda items
-- [SDAN-518] Coverage's ednote should be overwritten by news item's ednote
-- [SDAN-502] Add 'locators' vocabulary and use it to group and detail regions dropdown in agenda
-- [SDAN-511] Apply sorting to user management
-- [SDAN-512] Grey fill rows of a disabled company in company reports
-- [SDAN-513] In subscriber Activity report, remove the background fill from the list
-- [SDAN-517] Displayed agenda_links should open Agenda in a new tab when opened in Wire
-- [SDAN-501] Publish time in delivery record is not taking content item's publish schedule into account
-- [SDAN-510] Event created from adhoc planning item was creating new event in Agenda
-- [SDESK-506] Add mapping for graphic name
-- [SDAN-497] Change label for archive acccess
-- [SDAN-508] Pagination problems in subscriber activity report
-- [SDAN-499] Add Headline to Planning not linked to an Event
-- [SDAN-505] Alphabetically sort Users in User Management based on last_name
-- [SDAN-500] 'Sections' filter for subscriber activity report
-
-## [1.12] 2019-05-27
-- fix(User Management) fix layout for company dropdown in user management
-- [SDAN-481] Subscriber Activity Report
-- [SDAN-496] Availability value for aapX content
-- [STTNHUB-65] - Embargoed items should not appear in cards
-- [SDAN-480, SDAN-483] Add last active time for user and filter user list by company Using MAIL_FROM for the from address
-- [SDAN-498] Item URL in coverage requests form was not working when top-stories feature was turned on
-- [SDAN-503] Remove user_ids from elastic query when getting list of item history on push
-- [SDAN-504] Add timestamp and direction options to index_from_mongo
-
-
-## [1.11] 2019-05-09
-- [SDAN-493] Update planning tile and coverage icon when update is coming
-- [SDAN-494] 'View Content' link was not available for completed media coverages
-- Logout user if the company or user is disabled.
-- [SDAN-492] Coverage with linked updates UI bugs
-- [SDAN-491] Changes to labelling for the 'All Events & Coverages' Filter in Agenda.
-- Added notes to preview panel
-- Using agenda resource only for planning items
-- [SDAN-403] Adding toggle filter for events only view.
-- [SDAN-488] Add COVERAGE_REQUEST_RECIPIENTS to Newsroom general setting
-- [SDAN-464] Extend the Coverage concept to include iterations/updates to the original text coverage item
-- [SDAN-490] New agenda and story notifications were not working. And unpost was not removing item from list
-- [SDAN-476] Adding Newsroom section for Media Release content.
-- [SDAN-479] Minor changes to date shown in Agenda list view section headers
-- [STTNHUB-58] - Display notes in details
-- [SDAN-494] View Content was not visible for media coverages
-- [SDAN-476] Adding Newsroom section for Media Release content.
+## [1.19] 2020-08-17
+- [SDAN-672] Associate item with planning if published then fulfilled (#1064)
+- [SDAN-564] Track copy event on body text (#1061)
+- [SDAN-642] Embed logo into RTF monitoring reports (#1055)
+- Display credits info on picture view/preview (#1062)
+- Update readme & gitignore (#1060)
+- [SDESK-5339] (fix): Incorrect Company id for product searches (#1057)
+- [SDAN-275] Highlighting wire searches (#1054)
+- [SDESK-482] Add expired companies report (#1052)
+- [SDCP-221] Add product to url filters (#1053)
+- [SDAN-669] Add product subscription report (#1051)
+- fix(textformatter) None breaking spaces where missing (#1050)
+- fix(news api) text formatter was not working (#1049)
+- News API, Add the evolvedfrom field to search and feed response (#1048)
+- fix: Missing userType to add remove action (#1045)
+- fix(news-api) remove unwanted fields (#1047)
+- [SDAN-657] Make HATOAS consistant (#1042)
+- use featuremedia for story picture if available (#1041)
+- fix(build) Pin the version of WTForms and fix failing tests (#1039)
+- Allow date format override depending on language (#1033)
+- [SDAN-668] (fix): Attribute error when accessing app.settings (#1026)
+- TBC Planning Items were shown in wrong order when Feature/Top story filter was ON (#1022)
+- [SDCP-201] - Removing image if the update doesn't have it (#1025)
+- [SD-149] - image downloads for stories (#1011)
+- [SDAN-666] Sort field for agenda should be dates.start (#1002)
+- [SDAN-666] Use 'must' instead of 'should' for Agenda date queries (#999)
+- [SDAN-667]  Cannot unwatch coverages/Agenda for historic data (#1000)
+- [SDAN-661] Use Newsroom.Resource|Service for resource classes (#997)
+- [SDAN-660] Cannot set News API expiry to 'Never' (#995)
+- [SDAN-652] View and manage Watched Coverages (#993)
+- [SDAN-659] Hourly monitoring alerts should send emails on the hour (#991)
+- fix generating renditions for png images (#994)
+- [SDAN-558] News API NewsFeed endpoint (#990)
+- [SDAN-653] Improve product query generation for endpoint services (#974)
