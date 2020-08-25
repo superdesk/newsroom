@@ -561,6 +561,8 @@ def set_item_reference(coverage):
     :param coverage:
     :return:
     """
+    if coverage.get('delivery_id') is None:
+        return
     item = superdesk.get_resource_service('items').find_one(req=None, _id=coverage.get('delivery_id'))
     if item:
         if 'planning_id' not in item and 'coverage_id' not in item:
