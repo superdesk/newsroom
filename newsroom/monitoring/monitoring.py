@@ -54,6 +54,10 @@ class MonitoringResource(newsroom.Resource):
         'always_send': {
             'type': 'boolean',
         },
+        'headline_subject': {
+            'type': 'boolean',
+            'default': False
+        }
     }
     datasource = {
         'source': 'monitoring',
