@@ -166,8 +166,8 @@ class MonitoringRTFFormatter(BaseFormatter):
             p3.append(line, LINE, LINE)
 
         if monitoring_profile['alert_type'] == 'linked_text':
-            p3.append(LINE, LINE, 'View article: {}'.format(url_for_wire(item, True, section='monitoring')))
-
+            p3.append(LINE, LINE, RawCode(r'{\field {\*\fldinst HYPERLINK "'
+                      + url_for_wire(item, True, section='monitoring') + r'"}{\fldrslt{\ul View Article}}}'))
         section.append(p2)
         section.append(p3)
 
