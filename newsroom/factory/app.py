@@ -143,8 +143,17 @@ class NewsroomApp(eve.Eve):
 
     def setup_cache(self):
         # configuring for in-memory cache for now
-        # self.cache = Cache(self)
-        pass
+        class FakeCache:
+            def get(self, *args, **kwargs):
+                return None
+
+            def set(self, *args, **kwargs):
+                return None
+
+            def delete(self, *args, **kwargs):
+                return None
+
+        self.cache = FakeCache()
 
     def setup_error_handlers(self):
         def assertion_error(err):
