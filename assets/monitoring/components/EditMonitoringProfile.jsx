@@ -121,6 +121,12 @@ class EditMonitoringProfile extends React.Component {
                                         onChange={onChange}
                                         error={getError('subject')} />
 
+                                    <CheckboxInput
+                                        name='headline_subject'
+                                        label={gettext('Use Headline as Subject of emails containing a single item')}
+                                        value={item.headline_subject}
+                                        onChange={onChange}/>
+
                                     <TextInput
                                         name='description'
                                         label={gettext('Description')}
