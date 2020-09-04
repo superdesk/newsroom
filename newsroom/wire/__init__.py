@@ -66,7 +66,8 @@ def init_app(app):
     app.download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'], ['text'])
     app.download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'], ['text'])
     app.download_formatter('json', JsonFormatter(), 'Json', ['agenda'], ['text'])
-    app.download_formatter('picture', PictureFormatter(), gettext('Story Image'), ['wire'], ['picture'])
+    if app.config.get('ALLOW_PICTURE_DOWNLOAD', True):
+        app.download_formatter('picture', PictureFormatter(), gettext('Story Image'), ['wire'], ['picture'])
 
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')
