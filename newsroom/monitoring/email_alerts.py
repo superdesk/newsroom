@@ -211,9 +211,15 @@ class MonitoringEmailAlerts(Command):
                         attachment = base64.b64encode(_file.read())
                         formatter = app.download_formatters[m['format_type']]['formatter']
 
+                        # If there is only one story to send and the headline is to be used as the subject
+                        if m.get('headline_subject', False) and len(items) == 1:
+                            subject = items[0].get('headline', m.get('subject') or m['name'])
+                        else:
+                            subject = m.get('subject') or m['name']
+
                         send_email(
                             [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
-                            m.get('subject') or m['name'],
+                            subject,
                             text_body=render_template('monitoring_email.txt', **template_kwargs),
                             html_body=render_template('monitoring_email.html', **template_kwargs),
                             attachments_info=[{

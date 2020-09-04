@@ -23,4 +23,6 @@ class MonitoringForm(FlaskForm):
     company = StringField(gettext('Company'), validators=[DataRequired()])
     is_enabled = BooleanField(gettext('Enabled'), default=True, validators=[])
     always_send = BooleanField(gettext('Always Send'), default=False, validators=[])
+    headline_subject = BooleanField(gettext('Use Headline as Subject of emails containing a single item'),
+                                    default=False, validators=[])
     query = TextAreaField(gettext('Query'))

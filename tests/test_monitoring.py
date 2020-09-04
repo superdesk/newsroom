@@ -797,3 +797,26 @@ def test_send_immediate_rtf_attachment_alerts(client, app):
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
         assert 'monitoring-export.rtf' in outbox[0].attachments[0]
+
+
+@mock.patch('newsroom.monitoring.email_alerts.utcnow', mock_utcnow)
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_send_immediate_headline_subject_alerts(client, app):
+    test_login_succeeds_for_admin(client)
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'Article headline about product',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow(),
+    }])
+    w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
+    assert w is not None
+    app.data.update('monitoring', ObjectId('5db11ec55f627d8aa0b545fb'),
+                    {"headline_subject": True}, w)
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert outbox[0].sender == 'newsroom@localhost'
+        assert outbox[0].subject == 'Article headline about product'
+        assert 'Newsroom Monitoring: W1' in outbox[0].body
