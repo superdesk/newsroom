@@ -1,3 +1,4 @@
+import os
 from flask import json
 from pytest import fixture
 from bson import ObjectId
@@ -5,7 +6,7 @@ from .test_users import test_login_succeeds_for_admin, init as user_init  # noqa
 from .fixtures import PUBLIC_USER_ID
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from unittest import mock
-from .utils import mock_send_email
+from .utils import mock_send_email, post_json
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from datetime import timedelta
 from superdesk import get_resource_service
@@ -17,6 +18,10 @@ even_now = utcnow().replace(hour=4, minute=0)
 
 def mock_utcnow():
     return utcnow().replace(minute=0)
+
+
+def get_fixture_path(fixture):
+    return os.path.join(os.path.dirname(__file__), 'fixtures', fixture)
 
 
 @fixture(autouse=True)
@@ -762,3 +767,56 @@ def test_wont_send_four_hour_alerts_on_odd_hours(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().scheduled_worker(now)
         assert len(outbox) == 0
+
+
+@mock.patch('newsroom.monitoring.email_alerts.utcnow', mock_utcnow)
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_send_immediate_rtf_attachment_alerts(client, app):
+    test_login_succeeds_for_admin(client)
+    post_json(client, '/settings/general_settings',
+              {"monitoring_report_logo_path": get_fixture_path('thumbnail.jpg')})
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'product immediate',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow(),
+        'byline': 'Testy McTestface',
+        'body_html': '<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>',
+        'source': 'AAAA'
+    }])
+    w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
+    assert w is not None
+    app.data.update('monitoring', ObjectId('5db11ec55f627d8aa0b545fb'),
+                    {"format_type": "monitoring_rtf", "alert_type": "linked_text",
+                     'keywords': ['text']}, w)
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert outbox[0].sender == 'newsroom@localhost'
+        assert outbox[0].subject == 'Monitoring Subject'
+        assert 'Newsroom Monitoring: W1' in outbox[0].body
+        assert 'monitoring-export.rtf' in outbox[0].attachments[0]
+
+
+@mock.patch('newsroom.monitoring.email_alerts.utcnow', mock_utcnow)
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_send_immediate_headline_subject_alerts(client, app):
+    test_login_succeeds_for_admin(client)
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'Article headline about product',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow(),
+    }])
+    w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
+    assert w is not None
+    app.data.update('monitoring', ObjectId('5db11ec55f627d8aa0b545fb'),
+                    {"headline_subject": True}, w)
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert outbox[0].sender == 'newsroom@localhost'
+        assert outbox[0].subject == 'Article headline about product'
+        assert 'Newsroom Monitoring: W1' in outbox[0].body

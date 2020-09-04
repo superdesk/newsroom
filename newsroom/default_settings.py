@@ -7,6 +7,7 @@ from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
 
 from superdesk.default_settings import (   # noqa
+    DEBUG,
     VERSION,
     MONGO_URI,
     REDIS_URL,
@@ -267,10 +268,12 @@ CLIENT_LOCALE_FORMATS = {
 
 # Client configuration
 CLIENT_CONFIG = {
+    'debug': DEBUG,
     'default_language': DEFAULT_LANGUAGE,
     'locale_formats': CLIENT_LOCALE_FORMATS,
     'coverage_types': COVERAGE_TYPES,
     'display_abstract': DISPLAY_ABSTRACT,
+    'display_credits': False,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
     'display_news_only': True,  # Displays news only switch in wire,
     'default_timezone': DEFAULT_TIMEZONE

@@ -231,7 +231,7 @@ def export_csv(args, results):
         gettext('Actions'),
     ]]
 
-    actions = args.get('action') or ['download', 'copy', 'share', 'print', 'open', 'preview']
+    actions = args.get('action') or ['download', 'copy', 'share', 'print', 'open', 'preview', 'clipboard']
 
     if 'download' in actions:
         rows[0].append(gettext('Download'))
@@ -250,6 +250,9 @@ def export_csv(args, results):
 
     if 'preview' in actions:
         rows[0].append(gettext('Preview'))
+
+    if 'clipboard' in actions:
+        rows[0].append(gettext('Clipboard'))
 
     for item in results:
         aggs = item.get('aggs') or {}
@@ -287,6 +290,9 @@ def export_csv(args, results):
 
         if 'preview' in actions:
             row.append((aggs.get('actions') or {}).get('preview') or 0)
+
+        if 'clipboard' in actions:
+            row.append((aggs.get('actions') or {}).get('clipboard') or 0)
 
         rows.append(row)
 

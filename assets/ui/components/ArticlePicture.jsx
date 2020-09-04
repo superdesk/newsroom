@@ -3,8 +3,24 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
-import {getConfig} from 'utils';
+import {getConfig, gettext} from 'utils';
 import {getDetailRendition, getPreviewRendition, getCaption} from 'wire/utils';
+
+
+function formatCredits(picture) {
+    const copyrightholder = get(picture, 'copyrightholder', '');
+    const copyrightnotice = get(picture, 'copyrightnotice', '');
+
+    if (copyrightholder || copyrightnotice) {
+        return (
+            <span>
+                {copyrightholder && <b>{copyrightholder} </b>}
+                {copyrightnotice && copyrightnotice}
+            </span>
+        );
+    }
+    return null;
+}
 
 
 export default function ArticlePicture({isKilled, picture, isItemDetails, isCustomRendition}) {
@@ -21,6 +37,10 @@ export default function ArticlePicture({isKilled, picture, isItemDetails, isCust
         null;
     const searchUrl = getConfig('multimedia_website_search_url', '');
     const bylineHref = searchUrl && byline ? `${searchUrl}${get(picture, 'guid')}` : '';
+    let credits = null;
+    if (getConfig('display_credits')) {
+        credits = formatCredits(picture);
+    }
 
     return (<figure className='wire-column__preview__image'>
         {isItemDetails &&
@@ -29,6 +49,7 @@ export default function ArticlePicture({isKilled, picture, isItemDetails, isCust
         <figcaption className='wire-column__preview__caption'>
             {caption}
             {bylineHref && <a href={bylineHref} target='_blank'> {byline}</a>}
+            {credits && <p>{`${gettext('Credits ')} `}{credits}</p>}
         </figcaption>
     </figure>);
 }
