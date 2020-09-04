@@ -17,7 +17,7 @@ from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from newsroom.auth import SessionAuth
 from flask_mail import Mail
-from flask_cache import Cache
+# from flask_cache import Cache
 
 from newsroom.utils import is_json_request
 from newsroom.gettext import setup_babel
@@ -143,7 +143,8 @@ class NewsroomApp(eve.Eve):
 
     def setup_cache(self):
         # configuring for in-memory cache for now
-        self.cache = Cache(self)
+        # self.cache = Cache(self)
+        pass
 
     def setup_error_handlers(self):
         def assertion_error(err):
