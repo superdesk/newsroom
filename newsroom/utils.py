@@ -22,7 +22,8 @@ def query_resource(resource, lookup=None, max_results=0, projection=None):
     req = parse_request(resource)
     req.max_results = max_results
     req.projection = json.dumps(projection) if projection else None
-    return app.data.find(resource, req, lookup)
+    cursor, count = app.data.find(resource, req, lookup)
+    return cursor, count
 
 
 def find_one(resource, **lookup):
