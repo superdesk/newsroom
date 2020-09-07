@@ -106,7 +106,7 @@ def get_items_by_card(cards):
 
 def get_home_data():
     user = get_user()
-    cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
+    cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'})[0])
     company_id = str(user['company']) if user and user.get('company') else None
     items_by_card = get_items_by_card(cards)
 
