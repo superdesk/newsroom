@@ -20,6 +20,17 @@ manager = Manager(app)
 
 @manager.command
 def create_user(email, password, first_name, last_name, is_admin):
+    """Create a user with given email, password, first_name, last_name and is_admin flag.
+
+    If user with given username exists it's noop.
+
+    Example:
+    ::
+
+        $ python manage.py create_user admin@admin.com adminadmin admin admin True
+
+    """
+
     new_user = {
         'email': email,
         'password': password,
@@ -47,7 +58,13 @@ def create_user(email, password, first_name, last_name, is_admin):
 @manager.command
 def elastic_rebuild():
     """
-    It removes elastic index, creates a new one and index it from mongo.
+    It removes elastic index, creates a new one(s) and index it from mongo.
+
+    Example:
+    ::
+
+        $ python manage.py elastic_rebuild
+
     """
     FlushElasticIndex().run(sd_index=True, capi_index=True)
 
@@ -58,6 +75,12 @@ def elastic_init():
 
     It will create index and put mapping. It should run only once so locks are in place.
     Thus mongo must be already setup before running this.
+
+    Example:
+    ::
+
+        $ python manage.py elastic_init
+
     """
     app.data.init_elastic(app)
 
@@ -67,6 +90,9 @@ def elastic_init():
 @manager.option('-t', '--timestamp', dest='timestamp', default=None)
 @manager.option('-d', '--direction', dest='direction', choices=['older', 'newer'], default='older')
 def index_from_mongo(hours, collection, timestamp, direction):
+    """
+    It allows to reindex up to a certain period.
+    """
     print('Checking if elastic index exists, a new one will be created if not')
     app.data.init_elastic(app)
     print('Elastic index check has been completed')
@@ -79,27 +105,72 @@ def index_from_mongo(hours, collection, timestamp, direction):
 
 @manager.command
 def content_reset():
+    """Removes all data from 'items' and 'items_versions' indexes/collections.
+
+    Example:
+    ::
+
+        $ python manage.py content_reset
+
+    """
     app.data.remove('items')
     app.data.remove('items_versions')
 
 
 @manager.command
 def send_company_expiry_alerts():
+    """
+    Send expiry alerts for companies which are close to be expired (now + 7 days)
+
+    Example:
+    ::
+
+        $ python manage.py content_reset
+
+    """
     CompanyExpiryAlerts().send_alerts()
 
 
 @manager.command
 def send_monitoring_schedule_alerts():
+    """
+    Send monitoring schedule alerts.
+
+    Example:
+    ::
+
+        $ python manage.py send_monitoring_schedule_alerts
+
+    """
     MonitoringEmailAlerts().run()
 
 
 @manager.command
 def send_monitoring_immediate_alerts():
+    """
+    Send monitoring immediate alerts.
+
+    Example:
+    ::
+
+        $ python manage.py send_monitoring_immediate_alerts
+
+    """
     MonitoringEmailAlerts().run(True)
 
 
 @manager.option('-m', '--expiry', dest='expiry_days', required=False)
 def remove_expired(expiry_days):
+    """Remove expired items from the content_api items collection.
+
+    By default no items expire there, you can change it using ``CONTENT_API_EXPIRY_DAYS`` config.
+
+    Example:
+    ::
+
+        $ python manage.py remove_expired
+
+    """
     exp = content_api.RemoveExpiredItems()
     exp.run(expiry_days)
 
