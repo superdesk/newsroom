@@ -3,9 +3,9 @@
 from flask_script import Manager
 
 from superdesk import get_resource_service
+from superdesk.commands.flush_elastic_index import FlushElasticIndex
 
 from newsroom.web import NewsroomWebApp
-from newsroom.elastic_utils import rebuild_elastic_index
 from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_timestamp
 from newsroom.auth import get_user_by_email
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
@@ -46,11 +46,19 @@ def create_user(email, password, first_name, last_name, is_admin):
 
 @manager.command
 def elastic_rebuild():
-    rebuild_elastic_index()
+    """
+    It removes elastic index, creates a new one and index it from mongo.
+    """
+    FlushElasticIndex().run(sd_index=True, capi_index=True)
 
 
 @manager.command
 def elastic_init():
+    """Init elastic index.
+
+    It will create index and put mapping. It should run only once so locks are in place.
+    Thus mongo must be already setup before running this.
+    """
     app.data.init_elastic(app)
 
 
