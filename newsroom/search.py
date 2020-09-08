@@ -4,6 +4,7 @@ from eve.utils import ParsedRequest
 import logging
 
 from superdesk import get_resource_service
+from superdesk.metadata.utils import get_elastic_highlight_query
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
@@ -322,20 +323,15 @@ class BaseSearchService(Service):
 
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get('q')
-        if app.data.elastic.should_highlight(req) and query_string:
-            field_settings = {'highlight_query': {'query_string': {"query": query_string,
-                                                                   "default_operator": "AND",
-                                                                   "lenient": False}},
-                              'number_of_fragments': 0}
 
-            elastic_highlight_query = {
-                'require_field_match': False,
-                'pre_tags': ['<span class=\"es-highlight\">'],
-                'post_tags': ['</span>'],
-                'fields': {
-                    'body_html': field_settings
-                }
+        if app.data.elastic.should_highlight(req) and query_string:
+            elastic_highlight_query = get_elastic_highlight_query(
+                query_string={"query": query_string, "default_operator": "AND", "lenient": True}
+            )
+            elastic_highlight_query['fields'] = {
+                'body_html': elastic_highlight_query['fields']['body_html']
             }
+
             search.highlight = elastic_highlight_query
 
     def validate_request(self, search):
