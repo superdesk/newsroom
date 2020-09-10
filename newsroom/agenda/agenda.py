@@ -378,8 +378,8 @@ def _set_event_date_range(search):
 
 
 aggregations = {
-    'calendar': {'terms': {'field': 'calendars.name', 'size': 0}},
-    'location': {'terms': {'field': 'location.name', 'size': 0}},
+    'calendar': {'terms': {'field': 'calendars.name', 'size': 100}},
+    'location': {'terms': {'field': 'location.name', 'size': 10000}},
     'service': {'terms': {'field': 'service.name', 'size': 50}},
     'subject': {'terms': {'field': 'subject.name', 'size': 20}},
     'urgency': {'terms': {'field': 'urgency'}},
