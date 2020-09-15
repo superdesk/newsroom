@@ -126,7 +126,11 @@ class AgendaResource(newsroom.Resource):
     schema['subject'] = planning_schema['subject']
     schema['urgency'] = planning_schema['urgency']
     schema['place'] = planning_schema['place']
-    schema['service'] = code_mapping
+    schema['service'] = {
+        'type': 'dict',
+        'mapping': code_mapping
+
+    }
     schema['state_reason'] = {'type': 'string'}
 
     # dates
@@ -153,7 +157,7 @@ class AgendaResource(newsroom.Resource):
 
     # coverages
     schema['coverages'] = {
-        'type': 'object',
+        'type': 'dict',
         'mapping': {
             'type': 'nested',
             'properties': {
@@ -203,7 +207,7 @@ class AgendaResource(newsroom.Resource):
 
     # event details
     schema['event'] = {
-        'type': 'object',
+        'type': 'dict',
         'mapping': not_enabled,
     }
 
