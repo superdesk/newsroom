@@ -286,8 +286,7 @@ def _agenda_query():
         'bool': {
             'must': [{'term': {'_type': 'agenda'}}],
             'should': [],
-            'must_not': [{'term': {'state': 'killed'}}],
-            'minimum_should_match': 1,
+            'must_not': [{'term': {'state': 'killed'}}]
         }
     }
 
@@ -678,8 +677,7 @@ class AgendaService(BaseSearchService):
                     name='products'
                 )
             )
-
-        search.query['bool']['minimum_should_match'] = 1
+            search.query['bool']['minimum_should_match'] = 1
 
         # Append the product query to the agenda query
         agenda_query = _agenda_query()
