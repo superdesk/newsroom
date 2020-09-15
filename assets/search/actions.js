@@ -109,18 +109,22 @@ export function toggleNavigation(navigation, disableSameNavigationDeselect) {
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
 export function toggleFilter(key, value, single) {
-    return function(dispatch, getState) {
+    return function (dispatch, getState) {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
 
-        currentFilters[key] = toggleValue(currentFilters[key], value);
+        // the `value` can be an Array
+        let values = Array.isArray(value) ? value : [value]
 
-        if (!value || !currentFilters[key] || currentFilters[key].length === 0) {
-            delete currentFilters[key];
-        } else if (single) {
-            currentFilters[key] = currentFilters[key].filter(
-                (val) => val === value
-            );
+        for (let _value of values) {
+            currentFilters[key] = toggleValue(currentFilters[key], _value);
+            if (!_value || !currentFilters[key] || currentFilters[key].length === 0) {
+                delete currentFilters[key];
+            } else if (single) {
+                currentFilters[key] = currentFilters[key].filter(
+                    (val) => val === _value
+                );
+            }
         }
 
         dispatch(setSearchFilters(currentFilters));
