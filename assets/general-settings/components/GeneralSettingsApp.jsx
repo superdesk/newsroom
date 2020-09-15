@@ -57,7 +57,7 @@ class GeneralSettingsApp extends React.Component {
                         name={_id}
                         label={gettext(field.label)}
                         value={this.state.values[_id]}
-                        placeholder={field.default}
+                        placeholder={field.default ? field.default.toString() : ''}
                         onChange={(event) => this.onChange(_id, event.target.value)}
                         description={gettext(field.description)}
                         min={field.min}
