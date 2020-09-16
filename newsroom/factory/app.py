@@ -9,10 +9,9 @@ import os
 import importlib
 
 import eve
-from eve.io.mongo import MongoJSONEncoder
 import flask
 from flask_mail import Mail
-# from flask_cache import Cache
+from flask_caching import Cache
 from superdesk.validator import SuperdeskValidator
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
@@ -142,18 +141,7 @@ class NewsroomApp(eve.Eve):
         self.mail = Mail(self)
 
     def setup_cache(self):
-        # configuring for in-memory cache for now
-        class FakeCache:
-            def get(self, *args, **kwargs):
-                return None
-
-            def set(self, *args, **kwargs):
-                return None
-
-            def delete(self, *args, **kwargs):
-                return None
-
-        self.cache = FakeCache()
+        self.cache = Cache(self)
 
     def setup_error_handlers(self):
         def assertion_error(err):

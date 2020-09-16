@@ -175,6 +175,7 @@ RATELIMIT_ENABLED = True
 RATELIMIT_STRATEGY = 'fixed-window'
 
 # Cache Settings
+# https://flask-caching.readthedocs.io/en/latest/#configuring-flask-caching
 CACHE_TYPE = os.environ.get('CACHE_TYPE', 'simple')  # in-memory cache
 # The default timeout that is used if no timeout is specified in sec
 CACHE_DEFAULT_TIMEOUT = 3600
