@@ -215,7 +215,7 @@ def test_login_fails_for_many_times_gets_limited(client):
         if i <= 60:
             assert 'Invalid username or password' in response.get_data(as_text=True)
         else:
-            assert '429 Too Many Requests' in response.get_data(as_text=True)
+            assert response.status_code == 429
             break
 
 
@@ -527,3 +527,22 @@ def test_access_for_disabled_company(app, client):
         session['name'] = 'public'
     resp = client.get('/bookmarks_wire')
     assert 302 == resp.status_code
+
+
+def test_access_for_not_approved_user(client, app):
+    user_ids = app.data.insert('users', [{
+        'email': 'foo@bar.com',
+        'first_name': 'Foo',
+        'is_enabled': True,
+        'receive_email': True,
+        'user_type': 'administrator'
+    }])
+
+    with client as cli:
+        with client.session_transaction() as session:
+            user = str(user_ids[0])
+            session['user'] = user
+
+        resp = cli.post('/users/%s/topics' % user,
+                        data={'label': 'bar', 'query': 'test', 'notifications': True, 'topic_type': 'wire'})
+        assert 302 == resp.status_code

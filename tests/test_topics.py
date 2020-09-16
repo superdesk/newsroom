@@ -1,7 +1,8 @@
-from flask import json
-from newsroom.topics.views import get_topic_url
-from .fixtures import init_company, PUBLIC_USER_ID, TEST_USER_ID  # noqa
 from unittest import mock
+from flask import json
+
+from newsroom.topics.views import get_topic_url
+from .fixtures import init_company, PUBLIC_USER_ID, PUBLIC_USER_NAME, TEST_USER_ID  # noqa
 from .utils import mock_send_email
 
 topic = {
@@ -22,41 +23,35 @@ agenda_topic = {
 
 user_id = str(PUBLIC_USER_ID)
 test_user_id = str(TEST_USER_ID)
-topics_url = 'api/users/%s/topics' % user_id
+topics_url = 'users/%s/topics' % user_id
 
 
 def test_topics_no_session(client):
     resp = client.get(topics_url)
-    assert 401 == resp.status_code
+    assert 302 == resp.status_code
     resp = client.post(topics_url, data=topic)
-    assert 401 == resp.status_code
+    assert 302 == resp.status_code
 
 
 def test_post_topic_user(client):
-    with client as app:
+    with client as cli:
         with client.session_transaction() as session:
             session['user'] = user_id
-        resp = app.post(
-            topics_url,
-            data=json.dumps(topic),
-            content_type='application/json'
-        )
+            session['name'] = PUBLIC_USER_NAME
+        resp = cli.post(topics_url, json=topic)
         assert 201 == resp.status_code
-        resp = app.get(topics_url)
+        resp = cli.get(topics_url)
         assert 200 == resp.status_code
         data = json.loads(resp.get_data())
-        assert 1 == data['_meta']['total']
+        assert 1 == len(data['_items'])
 
 
 def test_update_topic_fails_for_different_user(client):
     with client as app:
         with client.session_transaction() as session:
             session['user'] = user_id
-        resp = app.post(
-            topics_url,
-            data=json.dumps(topic),
-            content_type='application/json'
-        )
+            session['name'] = PUBLIC_USER_NAME
+        resp = app.post(topics_url, json=topic)
         assert 201 == resp.status_code
 
         resp = app.get(topics_url)
@@ -66,7 +61,7 @@ def test_update_topic_fails_for_different_user(client):
         with client.session_transaction() as session:
             session['name'] = test_user_id
             session['user'] = test_user_id
-        resp = app.post('topics/{}'.format(_id), data=json.dumps({'label': 'test123'}), content_type='application/json')
+        resp = app.post('topics/{}'.format(_id), json={'label': 'test123'})
         assert 403 == resp.status_code
 
 
@@ -74,19 +69,14 @@ def test_update_topic(client):
     with client as app:
         with client.session_transaction() as session:
             session['user'] = user_id
-        resp = app.post(
-            topics_url,
-            data=json.dumps(topic),
-            content_type='application/json'
-        )
+            session['name'] = PUBLIC_USER_NAME
+        resp = app.post(topics_url, json=topic)
         assert 201 == resp.status_code
 
         resp = app.get(topics_url)
         data = json.loads(resp.get_data())
         _id = data['_items'][0]['_id']
 
-        with client.session_transaction() as session:
-            session['name'] = user_id
         resp = app.post('topics/{}'.format(_id), data=json.dumps({'label': 'test123'}), content_type='application/json')
         assert 200 == resp.status_code
 
@@ -99,19 +89,14 @@ def test_delete_topic(client):
     with client as app:
         with client.session_transaction() as session:
             session['user'] = user_id
-        resp = app.post(
-            topics_url,
-            data=json.dumps(topic),
-            content_type='application/json'
-        )
+            session['name'] = PUBLIC_USER_NAME
+        resp = app.post(topics_url, json=topic, content_type='application/json')
         assert 201 == resp.status_code
 
         resp = app.get(topics_url)
         data = json.loads(resp.get_data())
         _id = data['_items'][0]['_id']
 
-        with client.session_transaction() as session:
-            session['name'] = user_id
         resp = app.delete('topics/{}'.format(_id))
         assert 200 == resp.status_code
 
@@ -129,11 +114,11 @@ def test_share_wire_topics(client, app):
         with client.session_transaction() as session:
             session['user'] = user_id
             session['name'] = 'tester'
-        resp = client.post('/topic_share', data=json.dumps({
+        resp = client.post('/topic_share', json={
             'items': topic,
             'users': [test_user_id],
             'message': 'Some info message',
-        }), content_type='application/json')
+        })
 
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
@@ -156,11 +141,11 @@ def test_share_agenda_topics(client, app):
         with client.session_transaction() as session:
             session['user'] = user_id
             session['name'] = 'tester'
-        resp = client.post('/topic_share', data=json.dumps({
+        resp = client.post('/topic_share', json={
             'items': agenda_topic,
             'users': [test_user_id],
             'message': 'Some info message',
-        }), content_type='application/json')
+        })
 
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
@@ -174,7 +159,7 @@ def test_share_agenda_topics(client, app):
         assert '/agenda' in outbox[0].body
 
 
-def test_get_topic_share_url(client, app):
+def test_get_topic_share_url(app):
     app.config['CLIENT_URL'] = 'http://newsroom.com'
 
     topic = {'topic_type': 'wire', 'query': 'art exhibition'}

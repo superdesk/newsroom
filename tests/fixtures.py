@@ -6,6 +6,9 @@ from superdesk.utc import utcnow
 from tests.test_users import test_login_succeeds_for_admin, init as users_init
 
 PUBLIC_USER_ID = ObjectId('59b4c5c61d41c8d736852fbf')
+PUBLIC_USER_FIRSTNAME = 'Foo'
+PUBLIC_USER_LASTNAME = 'Bar'
+PUBLIC_USER_NAME = '{} {}'.format(PUBLIC_USER_FIRSTNAME, PUBLIC_USER_LASTNAME)
 TEST_USER_ID = ObjectId('5cc94454bc43165c045ffec9')
 
 items = [
@@ -195,8 +198,8 @@ def setup_user_company(app):
     app.data.insert('users', [{
         '_id': PUBLIC_USER_ID,
         'email': 'foo@bar.com',
-        'first_name': 'Foo',
-        'last_name': 'Bar',
+        'first_name': PUBLIC_USER_FIRSTNAME,
+        'last_name': PUBLIC_USER_LASTNAME,
         'company': 1,
         'is_enabled': True,
         'is_approved': True,

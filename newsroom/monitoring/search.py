@@ -102,7 +102,7 @@ class MonitoringSearchService(WireSearchService):
                         "query_string": {
                             "query": ' '.join(monitoring_list[0]['keywords']),
                             "default_operator": "AND",
-                            "lenient": False
+                            "lenient": True
                         }
                     }
                 }

@@ -429,16 +429,15 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
             session['user'] = user
 
         topic = {'label': 'bar', 'query': 'foo', 'notifications': True, 'topic_type': 'agenda'}
-        resp = cli.post('api/users/%s/topics' % user, data=topic)
+        resp = cli.post('users/%s/topics' % user, json=topic)
         assert 201 == resp.status_code
 
     key = b'something random'
     app.config['PUSH_KEY'] = key
     event['dates']['start'] = '2018-05-29T04:00:00+0000'
-    data = json.dumps(event)
     push_mock = mocker.patch('newsroom.push.push_notification')
-    headers = get_signature_headers(data, key)
-    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    headers = get_signature_headers(json.dumps(event), key)
+    resp = client.post('/push', json=event, headers=headers)
     assert 200 == resp.status_code
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['topics']) == 1
@@ -447,7 +446,7 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     event = deepcopy(test_event)
-    client.post('/push', data=json.dumps(event), content_type='application/json')
+    client.post('/push', json=event)
 
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -463,7 +462,7 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
             session['user'] = user
 
         topic = {'label': 'bar', 'query': 'foo', 'notifications': True, 'topic_type': 'agenda'}
-        resp = cli.post('api/users/%s/topics' % user, data=topic)
+        resp = cli.post('users/%s/topics' % user, json=topic)
         assert 201 == resp.status_code
 
     key = b'something random'
@@ -475,7 +474,7 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     data = json.dumps(planning)
     push_mock = mocker.patch('newsroom.push.push_notification')
     headers = get_signature_headers(data, key)
-    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    resp = client.post('/push', json=planning, headers=headers)
     assert 200 == resp.status_code
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['topics']) == 1
@@ -487,7 +486,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     planning = deepcopy(test_planning)
     planning['guid'] = 'bar3'
     planning['event_item'] = None
-    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    client.post('/push', json=planning)
 
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -503,7 +502,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
             session['user'] = user
 
         topic = {'label': 'bar', 'query': 'bar3', 'notifications': True, 'topic_type': 'agenda'}
-        resp = cli.post('api/users/%s/topics' % user, data=topic)
+        resp = cli.post('users/%s/topics' % user, json=topic)
         assert 201 == resp.status_code
 
     key = b'something random'
@@ -513,7 +512,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     data = json.dumps(planning)
     push_mock = mocker.patch('newsroom.push.push_notification')
     headers = get_signature_headers(data, key)
-    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    resp = client.post('/push', json=planning, headers=headers)
     assert 200 == resp.status_code
     assert push_mock.call_args[1]['item']['_id'] == 'bar3'
     assert len(push_mock.call_args[1]['topics']) == 1

@@ -273,12 +273,12 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
     }])
 
     with client as cli:
-        with client.session_transaction() as session:
+        with cli.session_transaction() as session:
             user = str(user_ids[0])
             session['user'] = user
 
-        resp = cli.post('api/users/%s/topics' % user,
-                        data={'label': 'bar', 'query': 'test', 'notifications': True, 'topic_type': 'wire'})
+        resp = cli.post('users/%s/topics' % user,
+                        json={'label': 'bar', 'query': 'test', 'notifications': True, 'topic_type': 'wire'})
         assert 201 == resp.status_code
 
     key = b'something random'
@@ -445,20 +445,33 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
 
 
-def test_do_not_notify_inactive_user(client, app, mocker):
+def test_do_not_notify_disabled_user(client, app, mocker):
+    app.data.insert('companies', [{
+        '_id': 1,
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
         'first_name': 'Foo',
-        'is_enabled': False,
+        'is_enabled': True,
         'receive_email': True,
+        'company': 1
     }])
 
     with client as cli:
-        with client.session_transaction() as session:
+        with cli.session_transaction() as session:
             user = str(user_ids[0])
             session['user'] = user
-        resp = cli.post('api/users/%s/topics' % user, data={'label': 'bar', 'query': 'test', 'notifications': True})
+        resp = cli.post('users/%s/topics' % user, json={'label': 'bar', 'query': 'test', 'notifications': True})
         assert 201 == resp.status_code
+
+    # disable user
+    user = app.data.find_one('users', req=None, _id=user_ids[0])
+    app.data.update('users', user_ids[0], {'is_enabled': False}, user)
+    # clean cache
+    app.cache.delete(str(user_ids[0]))
 
     key = b'something random'
     app.config['PUSH_KEY'] = key
@@ -551,8 +564,8 @@ def test_send_notification_emails(client, app):
     assert 'http://localhost:5050/wire?item=foo' in outbox[0].body
 
 
-def test_matching_topics(client, app):
-    client.post('/push', data=json.dumps(item), content_type='application/json')
+def test_matching_topics(client):
+    client.post('/push', json=item)
     search = get_resource_service('wire_search')
 
     users = {'foo': {'company': '1', 'user_type': 'administrator'}}
@@ -579,7 +592,7 @@ def test_matching_topics_for_public_user(client, app):
     }])
 
     item['products'] = [{'code': 'p-1'}]
-    client.post('/push', data=json.dumps(item), content_type='application/json')
+    client.post('/push', json=item)
     search = get_resource_service('wire_search')
 
     users = {'foo': {'company': '1', 'user_type': 'public'}}
@@ -606,7 +619,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
     }])
 
     item['products'] = [{'code': 'p-1'}]
-    client.post('/push', data=json.dumps(item), content_type='application/json')
+    client.post('/push', json=item)
     search = get_resource_service('wire_search')
 
     users = {'foo': {'company': '1', 'user_type': 'public'}, 'bar': {'company': '2', 'user_type': 'public'}}

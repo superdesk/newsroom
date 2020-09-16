@@ -261,7 +261,8 @@ def is_account_enabled(user):
     if not user.get('is_approved'):
         account_created = user.get('_created')
 
-        if account_created < utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14)):
+        approve_expiration = utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14))
+        if not account_created or account_created < approve_expiration:
             flash(gettext('Account has not been approved'), 'danger')
             return False
 
@@ -310,8 +311,8 @@ def get_cached_resource_by_id(resource, _id, black_list_keys=None):
     item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
     if item:
         if not black_list_keys:
-            black_list_keys = {'password', 'token', 'token_expiry'}
-        item = {key: item[key] for key in item.keys() if key not in black_list_keys and not key.startswith('_')}
+            black_list_keys = {'password', 'token', 'token_expiry', '_id', '_updated', '_etag'}
+        item = {key: item[key] for key in item.keys() if key not in black_list_keys}
         app.cache.set(str(_id), json.dumps(item, default=json_serialize_datetime_objectId))
         return item
     return None

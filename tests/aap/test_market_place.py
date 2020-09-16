@@ -584,8 +584,8 @@ def test_download(client, app):
             content = zf.open(_format['filename']).read()
             if _format.get('test_content'):
                 _format['test_content'](content)
-    history = app.data.find('history', None, None)
-    assert (len(wire_formats) * len(items_ids)) == history.count()
+    history, count = app.data.find('history', None, None)
+    assert (len(wire_formats) * len(items_ids)) == count
     assert 'download' == history[0]['action']
     assert history[0].get('user')
     assert history[0].get('versioncreated') + timedelta(seconds=2) >= utcnow()
