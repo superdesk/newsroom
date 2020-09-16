@@ -350,7 +350,7 @@ def get_items_by_id(ids, resource):
 
 def get_vocabulary(id):
     vocabularies = app.data.pymongo('items').db.vocabularies
-    if vocabularies and vocabularies.count() > 0 and id:
+    if vocabularies and vocabularies.count_documents({}) > 0 and id:
         return vocabularies.find_one({'_id': id})
 
     return None
