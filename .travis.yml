@@ -1,19 +1,14 @@
 language: python
 
-python:
-    - "3.5"
+python: 3.6
+
+dist: bionic
 
 services:
-    - mongodb
-    - redis-server
+    - docker
 
 addons:
-    apt:
-        sources:
-            - elasticsearch-2.x
-            - google-chrome
-        packages:
-            - elasticsearch
+    chrome: stable
 
 cache:
   - pip
@@ -21,10 +16,7 @@ cache:
   - yarn
 
 before_install:
-    - sudo apt-get purge elasticsearch
-    - sudo apt-get install -y -t stable --allow-unauthenticated elasticsearch
-    - sudo apt-get install -y --allow-unauthenticated google-chrome-stable
-    - sudo service elasticsearch restart
+    - docker-compose -f .travis-docker-compose.yml up -d
 
 install:
     - pip install -r requirements.txt
