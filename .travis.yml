@@ -11,22 +11,47 @@ addons:
     chrome: stable
 
 cache:
-  - pip
-  - npm
-  - yarn
+    - pip
+    - npm
+    - yarn
 
 before_install:
-    - docker-compose -f .travis-docker-compose.yml up -d
+    - |
+      if [ "$SKIP_SERVER_INSTALL" != "true" ]; then
+        docker-compose -f .travis-docker-compose.yml up -d
+      fi
 
 install:
-    - pip install -r requirements.txt
-    - pip install -r dev-requirements.txt
-    - yarn install
+    - |
+      if [ "$SKIP_SERVER_REQUIREMENTS_INSTALL" != "true" ]; then
+        pip install -r requirements.txt
+      fi
+    - |
+      if [ "$SKIP_SERVER_REQUIREMENTS_INSTALL" != "true" ]; then
+        pip install -r dev-requirements.txt
+      fi
+    - |
+      if [ "$SKIP_CLIENT_REQUIREMENTS_INSTALL" != "true" ]; then
+        yarn install
+      fi
 
-script:
-    - flake8
-    - pytest --disable-pytest-warnings --cov=newsroom
-    - npm run lint
-    - npm run test
-    - npm run build
-    - behave --format progress2 --logging-level=ERROR
+jobs:
+    include:
+        - script: flake8
+          name: "flake8"
+          env: SKIP_SERVER_INSTALL=true SKIP_CLIENT_REQUIREMENTS_INSTALL=true
+        - script: pytest --disable-pytest-warnings --cov=newsroom
+          name: "pytest"
+          env: SKIP_CLIENT_REQUIREMENTS_INSTALL=true
+        - script: behave --format progress2 --logging-level=ERROR
+          name: "behave"
+          env: SKIP_CLIENT_REQUIREMENTS_INSTALL=true
+        - script: npm run lint
+          name: "lint"
+          env: SKIP_SERVER_INSTALL=true SKIP_SERVER_REQUIREMENTS_INSTALL=true
+        - script: npm run test
+          name: "karma"
+          env: SKIP_SERVER_INSTALL=true SKIP_SERVER_REQUIREMENTS_INSTALL=true
+        - script: npm run build
+          name: "build"
+          env: SKIP_SERVER_INSTALL=true SKIP_SERVER_REQUIREMENTS_INSTALL=true
