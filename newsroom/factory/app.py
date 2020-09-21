@@ -64,6 +64,7 @@ class NewsroomApp(eve.Eve):
             **kwargs
         )
         self.json_encoder = SuperdeskJSONEncoder
+        self.data.json_encoder_class = SuperdeskJSONEncoder
 
         if config:
             try:
