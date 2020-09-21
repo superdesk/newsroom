@@ -1,7 +1,7 @@
 Feature: News API Products
 
   Scenario: Retrieve the permissioned products
-     Given "companies"
+    Given "companies"
         """
         [
         {
@@ -10,15 +10,15 @@ Feature: News API Products
         }
         ]
         """
-     Given "news_api_tokens"
+    Given "news_api_tokens"
         """
         [{
           "company" : "#companies._id#",
           "enabled" : true
         }]
         """
-     When we save API token
-     Given "products"
+    When we save API token
+    Given "products"
         """
         [{"name": "Sample Product",
         "decsription": "a description",
@@ -47,19 +47,19 @@ Feature: News API Products
         """
 
   Scenario: Retrieve a single product
-     Given "companies"
+    Given "companies"
         """
         [{"name": "Test Company", "is_enabled" : true}]
         """
-     Given "news_api_tokens"
+    Given "news_api_tokens"
         """
         [{
           "company" : "#companies._id#",
           "enabled" : true
         }]
         """
-     When we save API token
-     Given "products"
+    When we save API token
+    Given "products"
         """
         [{"name": "Sample Product X",
         "decsription": "a description",
@@ -84,11 +84,11 @@ Feature: News API Products
         """
 
   Scenario: Can not retrieve a single product without a token
-     Given "companies"
+    Given "companies"
         """
         [{"name": "Test Company", "is_enabled" : true}]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "Sample Product X",
         "decsription": "a description",
