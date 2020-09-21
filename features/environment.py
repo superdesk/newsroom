@@ -16,6 +16,7 @@ from newsroom.news_api.settings import CORE_APPS
 def before_all(context):
     config = {
         'CORE_APPS': CORE_APPS,
+        'INSTALLED_APPS': [],
         'ELASTICSEARCH_FORCE_REFRESH': True,
         'NEWS_API_ENABLED': True,
         'NEWS_API_TIME_LIMIT_DAYS': 100
@@ -26,6 +27,7 @@ def before_all(context):
 def before_scenario(context, scenario):
     config = {
         'CORE_APPS': CORE_APPS,
+        'INSTALLED_APPS': [],
         'ELASTICSEARCH_FORCE_REFRESH': True,
         'NEWS_API_ENABLED': True,
         'NEWS_API_TIME_LIMIT_DAYS': 100

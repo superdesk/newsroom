@@ -22,7 +22,7 @@ Feature: News API Authorization
           "company" : "#companies._id#",
           "enabled" : true
         }]
-        """+
+        """
      When we save API token
      Given "products"
         """
