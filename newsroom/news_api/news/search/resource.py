@@ -8,3 +8,4 @@ class NewsAPISearchResource(Resource):
         'source': 'items',
     }
     resource_methods = ['GET']
+    projection = False
