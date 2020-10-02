@@ -19,12 +19,15 @@ CORE_APPS = [
     'newsroom.news_api.news.feed',
     'newsroom.products',
     'newsroom.news_api.api_audit',
+    'newsroom.news_api.news.assets',
+    'newsroom.upload',
 ]
 
 INSTALLED_APPS = []
 
 BLUEPRINTS = [
-    'newsroom.news_api.news.item.item'
+    'newsroom.news_api.news.item.item',
+    'newsroom.news_api.news.assets.assets',
 ]
 
 #: mongo db name, only used when mongo_uri is not set

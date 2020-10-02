@@ -103,3 +103,42 @@ Feature: News API Item
     Then we get OK response
     Then we get "test test" in text response
 
+  Scenario: Retrieve an item with associations
+    Given "items"
+    """
+    [{
+      "_id": "111",
+      "pubstatus": "usable",
+      "headline": "Headline of the story",
+      "body_html": "<p>test&nbsp;test</p>",
+      "associations": {
+        "featuremedia": {
+          "renditions": {
+            "16-9": {
+              "href": "/assets/1234567"
+            },
+            "_newsroom_thumbnail": {
+              "href": "/assets/987654"
+            }
+          }
+        }
+      }
+    }]
+    """
+    When we get "v1/news/item/#items._id#?format=NINJSFormatter2"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "Headline of the story",
+      "associations": {
+        "featuremedia": {
+          "renditions": {
+            "16-9": {
+              "href": "/assets/1234567"
+            }
+          }
+        }
+      }
+    }
+    """
