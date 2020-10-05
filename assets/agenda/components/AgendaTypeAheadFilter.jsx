@@ -9,7 +9,7 @@ import AgendaFilterButton from './AgendaFilterButton';
 
 
 const getActiveTypeahead = (filter, activeFilter) => {
-    return activeFilter[filter.field] ? activeFilter[filter.field][0] : [];
+    return activeFilter[filter.field] ? activeFilter[filter.field] : [];
 };
 const processBuckets = (buckets) => buckets.map((bucket) => bucket.key).sort();
 

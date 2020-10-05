@@ -3,6 +3,7 @@ import logging
 import flask
 import jinja2
 
+from elasticsearch.exceptions import RequestError as ElasticRequestError
 from werkzeug.exceptions import HTTPException
 from superdesk.errors import SuperdeskApiError
 
@@ -79,7 +80,7 @@ class NewsroomNewsAPI(NewsroomApp):
             })
 
         def base_exception_error(err):
-            if err.error == 'search_phase_execution_exception':
+            if type(err) is ElasticRequestError and err.error == 'search_phase_execution_exception':
                 return json_error({
                     'error': 1,
                     'message': 'Invalid search query',

@@ -46,7 +46,10 @@ class ActionButton extends React.Component {
 ActionButton.propTypes = {
     item: PropTypes.object,
     group: PropTypes.string,
-    plan: PropTypes.object,
+    plan: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.object
+    ]),
     className: PropTypes.string,
     displayName: PropTypes.bool,
     isVisited: PropTypes.bool,

@@ -1,23 +1,23 @@
 Feature: News API News Search
 
-    Background: Initial setup
-        Given "companies"
+  Background: Initial setup
+    Given "companies"
         """
         [{"name": "Test Company", "is_enabled" : true}]
         """
-        Given "news_api_tokens"
+    Given "news_api_tokens"
         """
         [{"company" : "#companies._id#", "enabled" : true}]
         """
-        When we save API token
+    When we save API token
 
   Scenario: Simple query string request for fish
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A fishy Product",
         "decsription": "a product for those interested in fish",
@@ -37,12 +37,12 @@ Feature: News API News Search
      """
 
   Scenario: Simple start date query
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE-5#" },
         {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE-1#" }]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -62,13 +62,13 @@ Feature: News API News Search
      """
 
   Scenario: Simple start and end date query
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE-5#" },
         {"body_html": "Once upon a time there was a quokka who could swim", "versioncreated": "#DATE-3#" },
         {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE-1#" }]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -88,13 +88,13 @@ Feature: News API News Search
      """
 
   Scenario: Absolute start and end date query
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "2018-11-09 03:48:39.000Z" },
         {"body_html": "Once upon a time there was a quokka who could swim", "versioncreated": "2018-11-11 03:48:39.000Z" },
         {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "2018-11-13 03:48:39.000Z" }]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -120,7 +120,7 @@ Feature: News API News Search
         {"body_html": "Once upon a time there was a aardvark that could not swim"}
      ]}
      """
-   When we get "news/search?start_date=2018-11-09T10:48:39&timezone=Australia/Sydney&include_fields=body_html"
+    When we get "news/search?start_date=2018-11-09T10:48:39&timezone=Australia/Sydney&include_fields=body_html"
     Then we get list with 3 items
     """
      {"_items": [
@@ -136,14 +136,14 @@ Feature: News API News Search
      ]}
      """
 
- Scenario: Can sort results
-     Given "items"
+  Scenario: Can sort results
+    Given "items"
         """
         [{"body_html": "Three", "versioncreated": "#DATE-3#" },
         {"body_html": "Five", "versioncreated": "#DATE-5#" },
         {"body_html": "One", "versioncreated": "#DATE-1#" }]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -154,7 +154,7 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&sort=versioncreated:asc&include_fields=body_html"
+    When we get "news/search?start_date=now-10d&sort=versioncreated:asc&include_fields=body_html"
     Then we get list ordered by versioncreated with 3 items
     """
      {"_items": [
@@ -164,14 +164,14 @@ Feature: News API News Search
      ]}
      """
 
- Scenario: include fields
-     Given "items"
+  Scenario: include fields
+    Given "items"
         """
         [{"body_html": "Three", "versioncreated": "#DATE-3#", "headline": "Headline 1" },
         {"body_html": "Five", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
         {"body_html": "One", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -182,7 +182,7 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&include_fields=body_html"
+    When we get "news/search?start_date=now-10d&include_fields=body_html"
     Then we get list with 3 items
     """
      {"_items": [
@@ -193,13 +193,13 @@ Feature: News API News Search
      """
 
   Scenario: unkown include fields
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Three", "versioncreated": "#DATE-3#", "headline": "Headline 1" },
         {"body_html": "Five", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
         {"body_html": "One", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -210,17 +210,17 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&include_fields=headline"
-   Then we get response code 400
+    When we get "news/search?start_date=now-10d&include_fields=headline"
+    Then we get response code 400
 
- Scenario: exclude fields
-     Given "items"
+  Scenario: exclude fields
+    Given "items"
         """
         [{"body_html": "Three", "versioncreated": "#DATE-3#", "pubstatus": "usable1" },
         {"body_html": "Five", "versioncreated": "#DATE-5#", "pubstatus": "usable2"  },
         {"body_html": "One", "versioncreated": "#DATE-1#", "pubstatus": "usable3"  }]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -231,7 +231,7 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&exclude_fields=versioncreated"
+    When we get "news/search?start_date=now-10d&exclude_fields=versioncreated"
     Then we get list with 3 items
     """
      {"_items": [
@@ -242,14 +242,14 @@ Feature: News API News Search
      """
 
 
- Scenario: max results
-     Given "items"
+  Scenario: max results
+    Given "items"
         """
         [{"body_html": "Three", "versioncreated": "#DATE-3#", "headline": "Headline 1" },
         {"body_html": "Five", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
         {"body_html": "One", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -260,7 +260,7 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&page_size=2&page=1&sort=versioncreated:asc"
+    When we get "news/search?start_date=now-10d&page_size=2&page=1&sort=versioncreated:asc"
     Then we get list with 3 items
     """
      {"_items": [
@@ -276,8 +276,8 @@ Feature: News API News Search
      ]}
      """
 
-    Scenario: search by service
-     Given "items"
+  Scenario: search by service
+    Given "items"
         """
         [
             {
@@ -315,7 +315,7 @@ Feature: News API News Search
             }
         ]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -326,7 +326,7 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&service=a"
+    When we get "news/search?start_date=now-10d&service=a"
     Then we get list with 1 items
     """
      {"_items": [
@@ -335,7 +335,7 @@ Feature: News API News Search
      """
 
   Scenario: search by genre
-     Given "items"
+    Given "items"
         """
         [
             {
@@ -373,7 +373,7 @@ Feature: News API News Search
             }
         ]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -384,7 +384,7 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&genre=Article"
+    When we get "news/search?start_date=now-10d&genre=Article"
     Then we get list with 1 items
     """
      {"_items": [
@@ -392,8 +392,8 @@ Feature: News API News Search
      ]}
      """
 
-     Scenario: search by product
-     Given "products"
+  Scenario: search by product
+    Given "products"
         """
         [{"name": "A Product",
         "decsription": "a product for text",
@@ -404,7 +404,7 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-     Given "items"
+    Given "items"
         """
         [
             {
@@ -446,7 +446,7 @@ Feature: News API News Search
             }
         ]
         """
-   When we get "news/search?start_date=now-10d&products=#products._id#"
+    When we get "news/search?start_date=now-10d&products=#products._id#"
     Then we get list with 1 items
     """
      {"_items": [
@@ -455,14 +455,14 @@ Feature: News API News Search
      """
 
   @rate_limit
-  @notification  
+  @notification
   Scenario: X-RateLimit-Remaining header is set in response
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A fishy Product",
         "decsription": "a product for those interested in fish",
@@ -482,12 +482,12 @@ Feature: News API News Search
   @rate_limit
   @notification
   Scenario: X-RateLimit-Reset header is set in response
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "products"
+    Given "products"
         """
         [{"name": "A fishy Product",
         "decsription": "a product for those interested in fish",
@@ -504,49 +504,49 @@ Feature: News API News Search
       [{ "X-RateLimit-Reset":  "__any_value__"}]
       """
 
-    Scenario: Parameter validation
-        When we get "/news/search?q=[[h.ldofdjsafalkjsdfkjlsdf\\[[**@#"
-        Then we get error 400
+  Scenario: Parameter validation
+    When we get "/news/search?q=[[h.ldofdjsafalkjsdfkjlsdf\\[[**@#"
+    Then we get error 400
         """
         {"code": 400, "message": "Invalid search query"}
         """
-        When we get "/news/search?include_fields=secret"
-        Then we get error 400
+    When we get "/news/search?include_fields=secret"
+    Then we get error 400
         """
         {"code": 400, "message": "Include fields contains a non-allowed value"}
         """
-        When we get "/news/search?exclude_fields=copyrightnotice"
-        Then we get error 400
+    When we get "/news/search?exclude_fields=copyrightnotice"
+    Then we get error 400
         """
         {"code": 400, "message": "Exclude fields contains a non-allowed value"}
         """
-        When we get "/news/search?include_fields=type&include_fields=genre"
-        Then we get error 400
+    When we get "/news/search?include_fields=type&include_fields=genre"
+    Then we get error 400
         """
         {"code": 400, "message": "Multiple values received for parameter (include_fields)"}
         """
-        When we get "/news/search?filter=123,456"
-        Then we get error 400
+    When we get "/news/search?filter=123,456"
+    Then we get error 400
         """
         {"code": 400, "message": "Bad parameter value for Parameter (filter)"}
         """
-        When we get "/news/search?genre=null"
-        Then we get error 400
+    When we get "/news/search?genre=null"
+    Then we get error 400
         """
         {"code": 400, "message": "Bad parameter value for Parameter (genre)"}
         """
-        When we get "/news/search?start_date=2015abcd"
-        Then we get error 400
+    When we get "/news/search?start_date=2015abcd"
+    Then we get error 400
         """
         {"code": 400, "message": "start_date parameter must be a valid ISO 8601 date (YYYY-MM-DD) with optional the time part"}
         """
-        When we get "/news/search?end_date=2015abcd"
-        Then we get error 400
+    When we get "/news/search?end_date=2015abcd"
+    Then we get error 400
         """
         {"code": 400, "message": "end_date parameter must be a valid ISO 8601 date (YYYY-MM-DD) with optional the time part"}
         """
-        When we get "/news/search?start_date=2015-06-01&end_date=2015-06-30&timezone=123"
-        Then we get error 400
+    When we get "/news/search?start_date=2015-06-01&end_date=2015-06-30&timezone=123"
+    Then we get error 400
         """
         {"code": 400, "message": "Bad parameter value for Parameter (timezone)"}
         """

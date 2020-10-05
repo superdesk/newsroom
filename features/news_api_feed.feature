@@ -1,16 +1,16 @@
 Feature: News API News Feed
 
-    Background: Initial setup
-        Given "companies"
+  Background: Initial setup
+    Given "companies"
         """
         [{"name": "Test Company", "is_enabled": true}]
         """
-        Given "news_api_tokens"
+    Given "news_api_tokens"
         """
         [{"company": "#companies._id#", "enabled": true}]
         """
-        When we save API token
-        Given "products"
+    When we save API token
+    Given "products"
         """
         [{
             "name": "A fishy product",
@@ -21,8 +21,8 @@ Feature: News API News Feed
         }]
         """
 
-    Scenario: Filter feed by products
-        Given "products"
+  Scenario: Filter feed by products
+    Given "products"
         """
         [{
             "_id": "5e4cade4d69954b6d55ac09a",
@@ -40,7 +40,7 @@ Feature: News API News Feed
             "product_type": "news_api"
         }]
         """
-        Given "items"
+    Given "items"
         """
         [
             {
@@ -58,25 +58,25 @@ Feature: News API News Feed
             }
         ]
         """
-        When we get "news/feed"
-        Then we get list with 4 items
+    When we get "news/feed"
+    Then we get list with 4 items
         """
         {"_items": [{"_id": "urn:test1"}, {"_id": "urn:test2"}, {"_id": "urn:test3"}, {"_id": "urn:test4"}]}
         """
-        When we get "news/feed?products=5e4cade4d69954b6d55ac09a"
-        Then we get list with 2 items
+    When we get "news/feed?products=5e4cade4d69954b6d55ac09a"
+    Then we get list with 2 items
         """
         {"_items": [{"_id": "urn:test1"}, {"_id": "urn:test3"}]}
         """
-        When we get "news/feed?products=5e4cade4d69954b6d55ac09b"
-        Then we get list with 2 items
+    When we get "news/feed?products=5e4cade4d69954b6d55ac09b"
+    Then we get list with 2 items
         """
         {"_items": [{"_id": "urn:test2"}, {"_id": "urn:test4"}]}
         """
 
-    @wip
-    Scenario: Response provides a link to the next page
-        Given "items"
+  @wip
+  Scenario: Response provides a link to the next page
+    Given "items"
         """
         [
             {
@@ -97,8 +97,8 @@ Feature: News API News Feed
             }
         ]
         """
-        When we get "news/feed?include_fields=body_html&max_results=2&products=#products._id#"
-        Then we get list with 5 items
+    When we get "news/feed?include_fields=body_html&max_results=2&products=#products._id#"
+    Then we get list with 5 items
         """
         {
             "_items": [
@@ -113,9 +113,9 @@ Feature: News API News Feed
             }
         }
         """
-        Then we store NEXT_PAGE from HATEOAS
-        When we get "#NEXT_PAGE#"
-        Then we get list with 3 items
+    Then we store NEXT_PAGE from HATEOAS
+    When we get "#NEXT_PAGE#"
+    Then we get list with 3 items
         """
         {
             "_items": [
@@ -130,9 +130,9 @@ Feature: News API News Feed
             }
         }
         """
-        Then we store NEXT_PAGE from HATEOAS
-        When we get "#NEXT_PAGE#"
-        Then we get list with 1 items
+    Then we store NEXT_PAGE from HATEOAS
+    When we get "#NEXT_PAGE#"
+    Then we get list with 1 items
         """
         {
             "_items": [
@@ -146,9 +146,9 @@ Feature: News API News Feed
             }
         }
         """
-        Then we store NEXT_PAGE from HATEOAS
-        When we get "#NEXT_PAGE#"
-        Then we get list with 0 items
+    Then we store NEXT_PAGE from HATEOAS
+    When we get "#NEXT_PAGE#"
+    Then we get list with 0 items
         """
         {
             "_items": [],
@@ -161,8 +161,8 @@ Feature: News API News Feed
         }
         """
 
-    Scenario: Href is generated for each item
-        Given "items"
+  Scenario: Href is generated for each item
+    Given "items"
         """
         [
             {
@@ -174,8 +174,8 @@ Feature: News API News Feed
             }
         ]
         """
-        When we get "news/feed?include_fields=body_html&max_results=2&products=#products._id#"
-        Then we get list with 2 items
+    When we get "news/feed?include_fields=body_html&max_results=2&products=#products._id#"
+    Then we get list with 2 items
         """
         {
             "_items": [
@@ -185,24 +185,24 @@ Feature: News API News Feed
         }
         """
 
-    Scenario: Parameter validation
-        When we get "/news/feed?page=2"
-        Then we get error 400
+  Scenario: Parameter validation
+    When we get "/news/feed?page=2"
+    Then we get error 400
         """
         {"code": 400, "message": "Unexpected parameter (page)"}
         """
-        When we get "/news/feed?page_size=25"
-        Then we get error 400
+    When we get "/news/feed?page_size=25"
+    Then we get error 400
         """
         {"code": 400, "message": "Unexpected parameter (page_size)"}
         """
-        When we get "/news/feed?sort=versioncreated:desc"
-        Then we get error 400
+    When we get "/news/feed?sort=versioncreated:desc"
+    Then we get error 400
         """
         {"code": 400, "message": "Unexpected parameter (sort)"}
         """
-        When we get "/news/feed?exclude_fields=versioncreated"
-        Then we get error 400
+    When we get "/news/feed?exclude_fields=versioncreated"
+    Then we get error 400
         """
         {"code": 400, "message": "Exclude fields contains a non-allowed value"}
         """

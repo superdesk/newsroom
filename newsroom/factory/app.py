@@ -6,23 +6,22 @@ This module implements WSGI application extending eve.Eve
 """
 
 import os
+import importlib
 
 import eve
 import flask
-import importlib
-
-from eve.io.mongo import MongoJSONEncoder
-
+from flask_mail import Mail
+from flask_caching import Cache
+from superdesk.validator import SuperdeskValidator
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
-from newsroom.auth import SessionAuth
-from flask_mail import Mail
-from flask_cache import Cache
+from superdesk.json_utils import SuperdeskJSONEncoder
+from superdesk.logging import configure_logging
 
+import newsroom
+from newsroom.auth import SessionAuth
 from newsroom.utils import is_json_request
 from newsroom.gettext import setup_babel
-import newsroom
-from superdesk.logging import configure_logging
 
 
 NEWSROOM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -61,10 +60,11 @@ class NewsroomApp(eve.Eve):
             auth=self.AUTH_SERVICE,
             template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
             static_folder=os.path.join(NEWSROOM_DIR, 'static'),
-            json_encoder=MongoJSONEncoder,
+            validator=SuperdeskValidator,
             **kwargs
         )
-        self.json_encoder = MongoJSONEncoder
+        self.json_encoder = SuperdeskJSONEncoder
+        self.data.json_encoder_class = SuperdeskJSONEncoder
 
         if config:
             try:
@@ -142,7 +142,6 @@ class NewsroomApp(eve.Eve):
         self.mail = Mail(self)
 
     def setup_cache(self):
-        # configuring for in-memory cache for now
         self.cache = Cache(self)
 
     def setup_error_handlers(self):

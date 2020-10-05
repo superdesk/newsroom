@@ -137,7 +137,7 @@ Companies.propTypes = {
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
     showSubscriberId: PropTypes.bool,
-    companiesById: PropTypes.array,
+    companiesById: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({

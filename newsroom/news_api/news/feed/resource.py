@@ -10,3 +10,4 @@ class NewsAPIFeedResource(Resource):
 
     item_methods = ['GET']
     resource_methods = ['GET']
+    projection = False

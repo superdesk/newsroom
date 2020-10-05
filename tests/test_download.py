@@ -154,8 +154,8 @@ def test_wire_download(client, app):
             content = zf.open(_format['filename']).read()
             if _format.get('test_content'):
                 _format['test_content'](content)
-    history = app.data.find('history', None, None)
-    assert (len(wire_formats) * len(items_ids)) == history.count()
+    history, count = app.data.find('history', None, None)
+    assert (len(wire_formats) * len(items_ids)) == count
     assert 'download' == history[0]['action']
     assert history[0].get('user')
     assert history[0].get('versioncreated') + timedelta(seconds=2) >= utcnow()
@@ -175,8 +175,8 @@ def test_agenda_download(client, app):
             _format['test_content'](resp.get_data())
         assert resp.headers.get('content-disposition') == 'attachment; filename=%s' % filename(
             _format['filename'], agenda_items[0])
-    history = app.data.find('history', None, None)
-    assert (len([w for w in wire_formats if w['format'] != 'picture']) * 1) == history.count()
+    history, count = app.data.find('history', None, None)
+    assert (len([w for w in wire_formats if w['format'] != 'picture']) * 1) == count
     assert 'download' == history[0]['action']
     assert history[0].get('user')
     assert history[0].get('versioncreated') + timedelta(seconds=2) >= utcnow()

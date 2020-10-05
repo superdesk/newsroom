@@ -191,13 +191,7 @@ class WireSearchService(BaseSearchService):
         search.company = company
         self.apply_section_filter(search)
 
-        aggs = {
-            'navigations': {
-                'filters': {
-                    'filters': {}
-                }
-            }
-        }
+        aggs = {}
 
         for navigation in navigations:
             navigation_id = navigation.get('_id')
@@ -210,7 +204,9 @@ class WireSearchService(BaseSearchService):
                     )
 
             if navigation_filter['bool']['should']:
-                aggs['navigations']['filters']['filters'][str(navigation_id)] = navigation_filter
+                aggs.setdefault('navigations', {}) \
+                    .setdefault('filters', {}) \
+                    .setdefault('filters', {})[str(navigation_id)] = navigation_filter
 
         source = {
             'query': search.query,
@@ -258,13 +254,7 @@ class WireSearchService(BaseSearchService):
                 'should': []
             }
         }
-        aggs = {
-            'topics': {
-                'filters': {
-                    'filters': {}
-                }
-            }
-        }
+        aggs = {}
 
         queried_topics = []
         # get all section filters
@@ -322,8 +312,9 @@ class WireSearchService(BaseSearchService):
                     )
                 )
                 continue
-
-            aggs['topics']['filters']['filters'][str(topic['_id'])] = topic_filter
+            aggs.setdefault('topics', {}) \
+                .setdefault('filters', {}) \
+                .setdefault('filters', {})[str(topic['_id'])] = topic_filter
             queried_topics.append(topic)
 
         source = {'query': query}

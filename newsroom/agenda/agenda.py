@@ -126,7 +126,11 @@ class AgendaResource(newsroom.Resource):
     schema['subject'] = planning_schema['subject']
     schema['urgency'] = planning_schema['urgency']
     schema['place'] = planning_schema['place']
-    schema['service'] = code_mapping
+    schema['service'] = {
+        'type': 'dict',
+        'mapping': code_mapping
+
+    }
     schema['state_reason'] = {'type': 'string'}
 
     # dates
@@ -153,7 +157,7 @@ class AgendaResource(newsroom.Resource):
 
     # coverages
     schema['coverages'] = {
-        'type': 'object',
+        'type': 'dict',
         'mapping': {
             'type': 'nested',
             'properties': {
@@ -203,7 +207,7 @@ class AgendaResource(newsroom.Resource):
 
     # event details
     schema['event'] = {
-        'type': 'object',
+        'type': 'dict',
         'mapping': not_enabled,
     }
 
@@ -282,8 +286,7 @@ def _agenda_query():
         'bool': {
             'must': [{'term': {'_type': 'agenda'}}],
             'should': [],
-            'must_not': [{'term': {'state': 'killed'}}],
-            'minimum_should_match': 1,
+            'must_not': [{'term': {'state': 'killed'}}]
         }
     }
 
@@ -378,8 +381,8 @@ def _set_event_date_range(search):
 
 
 aggregations = {
-    'calendar': {'terms': {'field': 'calendars.name', 'size': 0}},
-    'location': {'terms': {'field': 'location.name', 'size': 0}},
+    'calendar': {'terms': {'field': 'calendars.name', 'size': 100}},
+    'location': {'terms': {'field': 'location.name', 'size': 10000}},
     'service': {'terms': {'field': 'service.name', 'size': 50}},
     'subject': {'terms': {'field': 'subject.name', 'size': 20}},
     'urgency': {'terms': {'field': 'urgency'}},
@@ -674,8 +677,7 @@ class AgendaService(BaseSearchService):
                     name='products'
                 )
             )
-
-        search.query['bool']['minimum_should_match'] = 1
+            search.query['bool']['minimum_should_match'] = 1
 
         # Append the product query to the agenda query
         agenda_query = _agenda_query()

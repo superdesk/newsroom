@@ -88,7 +88,7 @@ class HistoryService(newsroom.Service):
         results = self.query_items(query)
         docs = results.docs
         if all:
-            while results.hits['hits']['total'] > len(docs):
+            while results.hits['hits']['total']['value'] > len(docs):
                 query['from'] = len(docs)
                 results = self.query_items(query)
                 docs.extend(results.docs)

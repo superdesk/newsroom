@@ -30,5 +30,5 @@ export default function AgendaLocation({item, isMobilePhone, border}) {
 AgendaLocation.propTypes = {
     item: PropTypes.object.isRequired,
     isMobilePhone: PropTypes.bool,
-    border: PropTypes.bool,
+    border: PropTypes.string,
 };

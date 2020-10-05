@@ -1,12 +1,12 @@
 Feature: News API Authorization
 
   Scenario: allowed_ip_list is used for request validation
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "companies"
+    Given "companies"
         """
         [
         {
@@ -16,15 +16,15 @@ Feature: News API Authorization
         }
         ]
         """
-     Given "news_api_tokens"
+    Given "news_api_tokens"
         """
         [{
           "company" : "#companies._id#",
           "enabled" : true
         }]
-        """+
-     When we save API token
-     Given "products"
+        """
+    When we save API token
+    Given "products"
         """
         [{"name": "A fishy Product",
         "decsription": "a product for those interested in fish",
@@ -40,12 +40,12 @@ Feature: News API Authorization
 
 
   Scenario: Proxy forward situation is handled appropirately
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "companies"
+    Given "companies"
         """
         [
         {
@@ -55,15 +55,15 @@ Feature: News API Authorization
         }
         ]
         """
-     Given "news_api_tokens"
+    Given "news_api_tokens"
         """
         [{
           "company" : "#companies._id#",
           "enabled" : true
         }]
         """
-     When we save API token
-     Given "products"
+    When we save API token
+    Given "products"
         """
         [{"name": "A fishy Product",
         "decsription": "a product for those interested in fish",
@@ -84,12 +84,12 @@ Feature: News API Authorization
      """
 
   Scenario: Supports subnet in allowed_ip_list from request
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "companies"
+    Given "companies"
         """
         [
         {
@@ -99,15 +99,15 @@ Feature: News API Authorization
         }
         ]
         """
-     Given "news_api_tokens"
+    Given "news_api_tokens"
         """
         [{
           "company" : "#companies._id#",
           "enabled" : true
         }]
         """
-     When we save API token
-     Given "products"
+    When we save API token
+    Given "products"
         """
         [{"name": "A fishy Product",
         "decsription": "a product for those interested in fish",
@@ -130,12 +130,12 @@ Feature: News API Authorization
   @rate_limit
   @notification
   Scenario: RATE_LIMIT_REQUESTS config is used for request validation
-     Given "items"
+    Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim"},
         {"body_html": "Once upon a time there was a aardvark that could not swim"}]
         """
-     Given "companies"
+    Given "companies"
         """
         [
         {
@@ -144,15 +144,15 @@ Feature: News API Authorization
         }
         ]
         """
-     Given "news_api_tokens"
+    Given "news_api_tokens"
         """
         [{
           "company" : "#companies._id#",
           "enabled" : true
         }]
         """
-     When we save API token
-     Given "products"
+    When we save API token
+    Given "products"
         """
         [{"name": "A fishy Product",
         "decsription": "a product for those interested in fish",
@@ -177,5 +177,5 @@ Feature: News API Authorization
          {"body_html": "Once upon a time there was a fish who could swim"}
      ]}
      """
-     When we get "news/search?q=fish&include_fields=body_html"
-     Then we get response code 429
+    When we get "news/search?q=fish&include_fields=body_html"
+    Then we get response code 429
