@@ -4,4 +4,4 @@ PyRTF3
 xhtml2pdf
 -e .
 git+git://github.com/superdesk/superdesk-planning.git@release/2.0#egg=superdesk-planning
-git+git://github.com/superdesk/superdesk-core.git@release/2.0#egg=superdesk-core
+git+git://github.com/superdesk/superdesk-core.git@v2.0#egg=superdesk-core
