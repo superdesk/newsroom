@@ -41,7 +41,7 @@ def remove_internal_renditions(item):
     # associations featuremedia will contain the internal newsroom renditions, we need to remove these.
     if ((item.get('associations') or {}).get('featuremedia') or {}).get('renditions'):
         for key, rendition in\
-                (((item.get('associations') or {}).get('featuremedia') or {}).get('renditions')).items():
+                item['associations']['featuremedia']['renditions'].items():
             if not key.startswith('_newsroom'):
                 clean_renditions[key] = rendition
         item['associations']['featuremedia']['renditions'] = clean_renditions

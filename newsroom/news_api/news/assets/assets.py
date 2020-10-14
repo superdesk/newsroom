@@ -1,6 +1,5 @@
 import superdesk
 import flask
-from newsroom.news_api.settings import URL_PREFIX
 from newsroom.news_api.api_tokens import CompanyTokenAuth
 from flask import abort
 from newsroom.upload import ASSETS_RESOURCE
@@ -12,7 +11,11 @@ from newsroom.news_api.utils import post_api_audit
 blueprint = superdesk.Blueprint('assets', __name__)
 
 
-@blueprint.route('/{}/assets/<path:asset_id>'.format(URL_PREFIX), methods=['GET'])
+def init_app(app):
+    superdesk.blueprint(blueprint, app)
+
+
+@blueprint.route('/assets/<path:asset_id>', methods=['GET'])
 def get_item(asset_id):
     if CompanyTokenAuth().check_auth(flask.request.headers.get('Authorization'), None, None, 'GET'):
         try:
