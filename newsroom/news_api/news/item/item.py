@@ -1,5 +1,4 @@
 import superdesk
-from newsroom.news_api.settings import URL_PREFIX
 import flask
 from superdesk import get_resource_service
 from flask import current_app as app, abort
@@ -10,7 +9,11 @@ from newsroom.news_api.api_tokens import CompanyTokenAuth
 blueprint = superdesk.Blueprint('news/item', __name__)
 
 
-@blueprint.route('/{}/news/item/<path:item_id>'.format(URL_PREFIX), methods=['GET'])
+def init_app(app):
+    superdesk.blueprint(blueprint, app)
+
+
+@blueprint.route('/news/item/<path:item_id>', methods=['GET'])
 def get_item(item_id):
     if CompanyTokenAuth().check_auth(flask.request.headers.get('Authorization'), None, None, 'GET'):
         _format = flask.request.args.get('format', 'NINJSFormatter')
