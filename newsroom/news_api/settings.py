@@ -14,18 +14,16 @@ CORE_APPS = [
     'newsroom.news_api.products',
     'newsroom.news_api.formatters',
     'newsroom.news_api.news',
-    'newsroom.news_api.news.item',
+    'newsroom.news_api.news.item.item',
     'newsroom.news_api.news.search',
     'newsroom.news_api.news.feed',
     'newsroom.products',
     'newsroom.news_api.api_audit',
+    'newsroom.news_api.news.assets.assets',
+    'newsroom.upload',
 ]
 
 INSTALLED_APPS = []
-
-BLUEPRINTS = [
-    'newsroom.news_api.news.item.item'
-]
 
 #: mongo db name, only used when mongo_uri is not set
 MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
