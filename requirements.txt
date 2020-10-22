@@ -6,4 +6,4 @@ werkzeug>=0.9.4,<=0.11.15
 email-validator==1.0.5
 -e .
 git+git://github.com/superdesk/superdesk-planning.git@1.10#egg=superdesk-planning
-git+git://github.com/superdesk/superdesk-core.git@5be3670#egg=superdesk-core
+git+git://github.com/superdesk/superdesk-core.git@49cf70d#egg=superdesk-core
