@@ -64,4 +64,5 @@ def init_app(app):
     app.config['DOMAIN'].setdefault('upload', {
         'authentication': None,
         'mongo_prefix': newsroom.MONGO_PREFIX,
+        'internal_resource': True
     })
