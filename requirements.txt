@@ -1,6 +1,7 @@
 httmock
 wooper
 PyRTF3
+reportlab==3.5.53
 xhtml2pdf
 werkzeug>=0.9.4,<=0.11.15
 email-validator==1.0.5

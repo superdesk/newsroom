@@ -51,5 +51,6 @@ export default class ArticleBodyHtml extends React.PureComponent {
 ArticleBodyHtml.propTypes = {
     item: PropTypes.shape({
         body_html: PropTypes.string,
+        es_highlight: PropTypes.Object
     }).isRequired,
 };
