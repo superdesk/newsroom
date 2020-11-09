@@ -16,7 +16,7 @@ from content_api.items.resource import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
 
 from newsroom.news_api.settings import ELASTIC_DATETIME_FORMAT
-from newsroom.news_api.utils import post_api_audit
+from newsroom.news_api.utils import post_api_audit, remove_internal_renditions
 from newsroom.search import BaseSearchService, query_string
 from newsroom.products.products import get_products_by_company
 
@@ -40,7 +40,7 @@ class NewsAPINewsService(BaseSearchService):
     # set of fields that can be specified in the include_fields parameter
     allowed_include_fields = {'type', 'urgency', 'priority', 'language', 'description_html', 'located', 'keywords',
                               'source', 'subject', 'place', 'wordcount', 'charcount', 'body_html', 'readtime',
-                              'profile', 'service', 'genre'}
+                              'profile', 'service', 'genre', 'associations'}
 
     default_fields = {
         '_id', 'uri', 'embargoed', 'pubstatus', 'ednote', 'signal', 'copyrightnotice', 'copyrightholder',
@@ -49,7 +49,7 @@ class NewsAPINewsService(BaseSearchService):
 
     # set of fields that will be removed from all responses, we are not currently supporting associations and
     # the products embedded in the items are the superdesk products
-    mandatory_exclude_fields = {'associations', '_current_version', 'products'}
+    mandatory_exclude_fields = {'_current_version', 'products'}
 
     section = 'news_api'
     limit_days_setting = 'news_api_time_limit_days'
@@ -63,9 +63,13 @@ class NewsAPINewsService(BaseSearchService):
         exclude_fields = self.mandatory_exclude_fields.union(
             set(orig_request_params.get('exclude_fields').split(','))) if orig_request_params.get(
             'exclude_fields') else self.mandatory_exclude_fields
+
         for doc in resp.docs:
             for field in exclude_fields:
                 doc.pop(field, None)
+
+            if 'associations' in orig_request_params.get('include_fields', ''):
+                remove_internal_renditions(doc)
 
         return resp
 

@@ -20,7 +20,7 @@ Feature: News API Item
       "headline": "Headline of the story"
     }]
     """
-    When we get "v1/news/item/#items._id#"
+    When we get "/news/item/#items._id#"
     Then we get OK response
 
   Scenario: Attempt to Retrieve an item with unknown format
@@ -32,7 +32,7 @@ Feature: News API Item
       "headline": "Headline of the story"
     }]
     """
-    When we get "v1/news/item/#items._id#?format=bogus"
+    When we get "/news/item/#items._id#?format=bogus"
     Then we get response code 404
 
   Scenario: Retrieve an item that does not exist
@@ -44,7 +44,7 @@ Feature: News API Item
       "headline": "Headline of the story"
     }]
     """
-    When we get "v1/news/item/999"
+    When we get "/news/item/999"
     Then we get response code 404
 
   Scenario: Retrieve a version of an item
@@ -57,7 +57,7 @@ Feature: News API Item
       "version" : "5"
     }]
     """
-    When we get "v1/news/item/111?version=5"
+    When we get "/news/item/111?version=5"
     Then we get OK response
 
   Scenario: Retrieve an item in ninjs
@@ -69,7 +69,7 @@ Feature: News API Item
       "headline": "Headline of the story"
     }]
     """
-    When we get "v1/news/item/#items._id#?format=NINJSFormatter"
+    When we get "/news/item/#items._id#?format=NINJSFormatter"
     Then we get existing resource
     """
      {"guid": "111",
@@ -86,7 +86,7 @@ Feature: News API Item
         "versioncreated": "2018-11-01T03:01:40.000Z"
       }]
       """
-    When we get "v1/news/item/#items._id#?format=NINJSFormatter"
+    When we get "/news/item/#items._id#?format=NINJSFormatter"
     Then we get response code 404
 
   Scenario: Retrieve an item in text format
@@ -99,7 +99,46 @@ Feature: News API Item
       "body_html": "<p>test&nbsp;test</p>"
     }]
     """
-    When we get "v1/news/item/#items._id#?format=TextFormatter"
+    When we get "/news/item/#items._id#?format=TextFormatter"
     Then we get OK response
     Then we get "test test" in text response
 
+  Scenario: Retrieve an item with associations
+    Given "items"
+    """
+    [{
+      "_id": "111",
+      "pubstatus": "usable",
+      "headline": "Headline of the story",
+      "body_html": "<p>test&nbsp;test</p>",
+      "associations": {
+        "featuremedia": {
+          "renditions": {
+            "16-9": {
+              "href": "/assets/1234567"
+            },
+            "_newsroom_thumbnail": {
+              "href": "/assets/987654"
+            }
+          }
+        }
+      }
+    }]
+    """
+    When we get "/news/item/#items._id#?format=NINJSFormatter2"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "Headline of the story",
+      "associations": {
+        "featuremedia": {
+          "renditions": {
+            "16-9": {
+              "href": "/assets/1234567"
+            }
+          }
+        }
+      }
+    }
+    """

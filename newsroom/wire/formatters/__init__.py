@@ -23,3 +23,4 @@ from .newsmlg2 import NewsMLG2Formatter  # noqa
 from .json import JsonFormatter  # noqa
 from .ninjs import NINJSFormatter  # noqa
 from .picture import PictureFormatter  # noqa
+from .ninjs2 import NINJSFormatter2  # noqa
