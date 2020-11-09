@@ -17,7 +17,7 @@ jobs:
           python-version: 3.5.4
 
       - name: docker-compose
-        run: docker-compose -f ../.actions-docker-compose.yml up -d
+        run: docker-compose -f .actions-docker-compose.yml up -d
 
       - name: cache pip
         uses: actions/cache@v2
@@ -61,6 +61,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm
             ${{ runner.os }}-
+
+      - run: npm install --no-audit
 
       - name: lint
         run: npm run lint
