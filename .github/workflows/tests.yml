@@ -62,7 +62,8 @@ jobs:
             ${{ runner.os }}-npm
             ${{ runner.os }}-
 
-      - run: npm install --no-audit
+      - name: npm ci
+        run: npm ci
 
       - name: lint
         run: npm run lint
