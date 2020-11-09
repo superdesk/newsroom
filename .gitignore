@@ -107,7 +107,6 @@ ENV/
 
 # js
 node_modules
-package-lock.json
 
 # editor
 .idea
