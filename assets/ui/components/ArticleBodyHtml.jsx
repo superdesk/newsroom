@@ -40,7 +40,7 @@ export default class ArticleBodyHtml extends React.PureComponent {
 
         return (
             <div
-                className='wire-column__preview__text'
+                className='wire-column__preview__text wire-column__preview__text--pre'
                 id='preview-body'
                 dangerouslySetInnerHTML={({__html: html})}
             />
