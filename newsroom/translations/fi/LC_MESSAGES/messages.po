@@ -29,7 +29,7 @@ msgstr "Uusi rekisteröitymispyyntö Mediapankkiin"
 
 #: newsroom/email.py:67 newsroom/email.py:88
 msgid "{} account created"
-msgstr "{} tili luotu"
+msgstr "fi Sinulle on luotu {}-käyttäjätili"
 
 #: newsroom/email.py:107
 msgid "{} password reset"
