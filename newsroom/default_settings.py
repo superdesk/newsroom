@@ -156,7 +156,7 @@ WTF_CSRF_ENABLED = True
 #: The number of days a token is valid
 RESET_PASSWORD_TOKEN_TIME_TO_LIVE = 7
 #: The number of days a validation token is valid
-VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 1
+VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 7
 #: The number login attempts allowed before account is locked
 MAXIMUM_FAILED_LOGIN_ATTEMPTS = 5
 #: default sender for superdesk emails
