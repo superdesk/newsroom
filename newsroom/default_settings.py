@@ -270,10 +270,12 @@ CLIENT_CONFIG = {
     'default_language': DEFAULT_LANGUAGE,
     'locale_formats': CLIENT_LOCALE_FORMATS,
     'coverage_types': COVERAGE_TYPES,
-    'display_abstract': DISPLAY_ABSTRACT,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
     'display_news_only': True,  # Displays news only switch in wire,
-    'default_timezone': DEFAULT_TIMEZONE
+    'default_timezone': DEFAULT_TIMEZONE,
+    'display_abstract': DISPLAY_ABSTRACT,
+    'display_word_count': True,
+    'display_char_count': False,
 }
 
 LANGUAGES = ['en', 'fi', 'cs']

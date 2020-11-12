@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
-import {gettext, fullDate, wordCount, LIST_ANIMATIONS, getSlugline} from 'utils';
+import {gettext, fullDate, wordCount, characterCount, LIST_ANIMATIONS, getSlugline, getConfig} from 'utils';
 import {getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled, getVideos} from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -14,10 +14,16 @@ import ActionMenu from '../../components/ActionMenu';
 import WireListItemDeleted from './WireListItemDeleted';
 import ListItemEmbargoed from '../../components/ListItemEmbargoed';
 
+
+export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
+export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
+
+
 class WireListItem extends React.Component {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item);
+        this.characterCount = characterCount(props.item);
         this.state = {previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
@@ -109,7 +115,12 @@ class WireListItem extends React.Component {
                                 <div className='wire-articles__item__meta-info'>
                                     <span className='bold'>{getSlugline(item, true)}</span>
                                     <span>{item.source}
-                                        {' // '}<span>{this.wordCount}</span> {gettext('words')}
+                                        {DISPLAY_WORD_COUNT && (
+                                            <span>{' // '}<span>{this.wordCount}</span> {gettext('words')}</span>
+                                        )}
+                                        {DISPLAY_CHAR_COUNT && (
+                                            <span>{' // '}<span>{this.characterCount}</span> {gettext('characters')}</span>
+                                        )}
                                         {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
                                         <ListItemEmbargoed item={item} />
                                     </span>
