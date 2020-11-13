@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
-import {gettext, fullDate, wordCount, characterCount, LIST_ANIMATIONS, getSlugline, getConfig} from 'utils';
+import {gettext, fullDate, wordCount, characterCount, LIST_ANIMATIONS, getSlugline, getConfig, isDisplayed} from 'utils';
 import {getPicture, getThumbnailRendition, showItemVersions, shortText, isKilled, getVideos} from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -115,14 +115,12 @@ class WireListItem extends React.Component {
                                 <div className='wire-articles__item__meta-info'>
                                     <span className='bold'>{getSlugline(item, true)}</span>
                                     <span>{item.source}
-                                        {DISPLAY_WORD_COUNT && (
-                                            <span>{' // '}<span>{this.wordCount}</span> {gettext('words')}</span>
-                                        )}
-                                        {DISPLAY_CHAR_COUNT && (
-                                            <span>{' // '}<span>{this.characterCount}</span> {gettext('characters')}</span>
-                                        )}
+                                        {isDisplayed('wordcount', this.props.listConfig) &&
+                                        <span>{' // '}<span>{this.wordCount}</span> {gettext('words')}</span>}
+                                        {isDisplayed('charcount', this.props.listConfig) &&
+                                        <span>{' // '}<span>{this.characterCount}</span> {gettext('characters')}</span>}
                                         {' // '}<time dateTime={fullDate(item.versioncreated)}>{fullDate(item.versioncreated)}</time>
-                                        <ListItemEmbargoed item={item} />
+                                        <ListItemEmbargoed item={item}/>
                                     </span>
                                 </div>
                             </div>
@@ -215,6 +213,7 @@ WireListItem.propTypes = {
     user: PropTypes.string,
     context: PropTypes.string,
     contextName: PropTypes.string,
+    listConfig: PropTypes.object,
 };
 
 export default WireListItem;

@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate } from 'utils';
+import { gettext, shortDate, fullDate, isDisplayed } from 'utils';
 
-function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayDivider, slugline}) {
+
+function CardMeta({wordCount, charCount, pictureAvailable, source, versioncreated, displayDivider, slugline, listConfig}) {
     return (<div className="wire-articles__item__meta">
         <div className="wire-articles__item__icons">
             <span className="wire-articles__item__icon">
@@ -16,8 +17,11 @@ function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayD
         <div className="wire-articles__item__meta-info">
             {slugline && <span className='bold'>{slugline}</span>}
             <span>
-                {source && `${source} // `}
-                <span>{wordCount}</span> {gettext('words')}
+                {source && source}
+                {isDisplayed('wordcount', listConfig) &&
+                <span>{'  //  '}<span>{wordCount}</span> {gettext('words')}</span>}
+                {isDisplayed('charcount', listConfig) &&
+                <span>{'  //  '}<span>{charCount}</span> {gettext('characters')}</span>}
                 {versioncreated && ' // '}
                 {versioncreated &&
                     <time dateTime={fullDate(versioncreated)}>{shortDate(versioncreated)}</time>
@@ -29,11 +33,13 @@ function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayD
 
 CardMeta.propTypes = {
     wordCount: PropTypes.number,
+    charCount: PropTypes.number,
     pictureAvailable: PropTypes.bool,
     source: PropTypes.string,
     versioncreated: PropTypes.string,
     displayDivider: PropTypes.bool,
     slugline: PropTypes.string,
+    listConfig: PropTypes.object,
 };
 
 CardMeta.defaultProps = {

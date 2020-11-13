@@ -1,0 +1,52 @@
+[
+    {
+        "_id": "wire",
+        "init_version": 1,
+        "preview": {
+            "wordcount": {
+                "displayed": false
+            },
+            "charcount": {
+                "displayed": true
+            }
+        },
+        "details": {
+            "wordcount": {
+                "displayed": false
+            },
+            "charcount": {
+                "displayed": true
+            }
+        },
+        "list": {
+            "wordcount": {
+                "displayed": false
+            },
+            "charcount": {
+                "displayed": true
+            }
+        },
+        "advanced_search_tabs": {},
+        "multi_select_topics": false
+    },
+    {
+        "_id": "home",
+        "init_version": 1,
+        "list": {
+            "wordcount": {
+                "displayed": false
+            },
+            "charcount": {
+                "displayed": true
+            }
+        },
+        "details": {
+            "wordcount": {
+                "displayed": false
+            },
+            "charcount": {
+                "displayed": true
+            }
+        }
+    }
+]

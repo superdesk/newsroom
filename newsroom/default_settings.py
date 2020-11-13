@@ -274,8 +274,6 @@ CLIENT_CONFIG = {
     'display_news_only': True,  # Displays news only switch in wire,
     'default_timezone': DEFAULT_TIMEZONE,
     'display_abstract': DISPLAY_ABSTRACT,
-    'display_word_count': True,
-    'display_char_count': False,
 }
 
 LANGUAGES = ['en', 'fi', 'cs']

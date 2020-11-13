@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {wordCount} from 'utils';
+import {characterCount, wordCount} from 'utils';
 import {getCaption, getPicture, getThumbnailRendition} from 'wire/utils';
 import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
 
-const getPictureTextPanel = (item, picture, openItem, cardId) => {
+const getPictureTextPanel = (item, picture, openItem, cardId, listConfig) => {
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
@@ -17,18 +17,20 @@ const getPictureTextPanel = (item, picture, openItem, cardId) => {
             <CardBody item={item} displaySource={false} />
             <CardFooter
                 wordCount={wordCount(item)}
+                charCount={characterCount(item)}
                 pictureAvailable={!!picture}
                 source={item.source}
                 versioncreated={item.versioncreated}
+                listConfig={listConfig}
             />
         </div>
     </div>);
 };
 
-function LargePictureTextCard ({items, title, product, openItem, isActive, cardId}) {
+function LargePictureTextCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getPictureTextPanel(item, getPicture(item), openItem, cardId))}
+            {items.map((item) => getPictureTextPanel(item, getPicture(item), openItem, cardId, listConfig))}
         </CardRow>
     );
 }
@@ -40,6 +42,7 @@ LargePictureTextCard.propTypes = {
     openItem: PropTypes.func,
     isActive: PropTypes.bool,
     cardId: PropTypes.string,
+    listConfig: PropTypes.object,
 };
 
 export default LargePictureTextCard;
