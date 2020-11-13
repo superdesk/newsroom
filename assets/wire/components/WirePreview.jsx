@@ -52,6 +52,8 @@ class WirePreview extends React.PureComponent {
 
         const previousVersions = 'preview_versions';
         const canFollowStory = followStory && user && (get(item, 'slugline') || '').trim();
+        const disableSelection = previewConfig.selection && previewConfig.selection.disabled === true
+
         return (
             <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
                 <div className='wire-column__preview__top-bar'>
@@ -68,7 +70,10 @@ class WirePreview extends React.PureComponent {
 
                     <PreviewActionButtons item={item} user={user} actions={actions} />
                 </div>
-                <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
+                <div id='preview-article' className={
+                    `wire-column__preview__content ${disableSelection ? 'noselect' : ''}`}
+                    ref={(preview) => this.preview = preview}
+                >
                     <ArticleEmbargoed item={item} />
                     {isDisplayed('slugline', previewConfig) && <ArticleSlugline item={item}/>}
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}

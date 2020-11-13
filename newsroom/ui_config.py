@@ -35,14 +35,16 @@ class UIConfigResource(newsroom.Resource):
         'multi_select_topics': {
             'type': 'boolean',
             'default': False
-        }
+        },
+        'init_version': {
+            'type': 'integer'
+        },
     }
     datasource = {
         'source': 'ui_config'
     }
     item_methods = ['GET']
     resource_methods = ['GET']
-
 
 class UIConfigService(newsroom.Service):
 
