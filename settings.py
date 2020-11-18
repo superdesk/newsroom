@@ -58,6 +58,7 @@ BLUEPRINTS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
+    'newsroom.agenda',
     'newsroom.settings',
     'newsroom.monitoring',
     'newsroom.history',
