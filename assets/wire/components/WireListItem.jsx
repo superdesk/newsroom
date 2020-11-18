@@ -1,7 +1,7 @@
-import React from "react";
-import PropTypes from "prop-types";
-import classNames from "classnames";
-import { get } from "lodash";
+import React from 'react';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import { get } from 'lodash';
 
 import {
     gettext,
@@ -12,7 +12,7 @@ import {
     getSlugline,
     getConfig,
     isDisplayed,
-} from "utils";
+} from 'utils';
 import {
     getPicture,
     getThumbnailRendition,
@@ -20,18 +20,18 @@ import {
     shortText,
     isKilled,
     getVideos,
-} from "wire/utils";
+} from 'wire/utils';
 
-import ActionButton from "components/ActionButton";
+import ActionButton from 'components/ActionButton';
 
-import ListItemPreviousVersions from "./ListItemPreviousVersions";
-import WireListItemIcons from "./WireListItemIcons";
-import ActionMenu from "../../components/ActionMenu";
-import WireListItemDeleted from "./WireListItemDeleted";
-import ListItemEmbargoed from "../../components/ListItemEmbargoed";
+import ListItemPreviousVersions from './ListItemPreviousVersions';
+import WireListItemIcons from './WireListItemIcons';
+import ActionMenu from '../../components/ActionMenu';
+import WireListItemDeleted from './WireListItemDeleted';
+import ListItemEmbargoed from '../../components/ListItemEmbargoed';
 
-export const DISPLAY_WORD_COUNT = getConfig("display_word_count");
-export const DISPLAY_CHAR_COUNT = getConfig("display_char_count");
+export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
+export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
 
 class WireListItem extends React.Component {
     constructor(props) {
@@ -47,12 +47,12 @@ class WireListItem extends React.Component {
 
     onKeyDown(event) {
         switch (event.key) {
-            case " ": // on space toggle selected item
-                this.props.toggleSelected();
-                break;
+        case ' ': // on space toggle selected item
+            this.props.toggleSelected();
+            break;
 
-            default:
-                return;
+        default:
+            return;
         }
 
         event.preventDefault();
@@ -82,7 +82,7 @@ class WireListItem extends React.Component {
             listConfig,
         } = this.props;
 
-        if (get(this.props, "item.deleted")) {
+        if (get(this.props, 'item.deleted')) {
             return (
                 <WireListItemDeleted
                     item={this.props.item}
@@ -101,23 +101,23 @@ class WireListItem extends React.Component {
                 : null;
 
         const cardClassName = classNames(
-            "wire-articles__item-wrap col-12 wire-item"
+            'wire-articles__item-wrap col-12 wire-item'
         );
         const wrapClassName = classNames(
-            "wire-articles__item wire-articles__item--list",
+            'wire-articles__item wire-articles__item--list',
             {
-                "wire-articles__item--visited": this.props.isRead,
-                "wire-articles__item--open": this.props.isActive,
-                "wire-articles__item--selected": this.props.isSelected,
+                'wire-articles__item--visited': this.props.isRead,
+                'wire-articles__item--open': this.props.isActive,
+                'wire-articles__item--selected': this.props.isSelected,
             }
         );
-        const selectClassName = classNames("no-bindable-select", {
-            "wire-articles__item-select-visible": !LIST_ANIMATIONS,
-            "wire-articles__item-select": LIST_ANIMATIONS,
+        const selectClassName = classNames('no-bindable-select', {
+            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const picture = getPicture(item);
         const videos = getVideos(item);
-        const isMarketPlace = this.props.context === "aapX";
+        const isMarketPlace = this.props.context === 'aapX';
 
         return (
             <article
@@ -132,10 +132,10 @@ class WireListItem extends React.Component {
                 {urgencyHighlightColor && ( // urgency left border
                     <span
                         style={{
-                            width: "4px",
+                            width: '4px',
                             backgroundColor: urgencyHighlightColor,
-                            position: "absolute",
-                            height: "100%",
+                            position: 'absolute',
+                            height: '100%',
                             zIndex: 1,
                         }}
                     ></span>
@@ -167,14 +167,14 @@ class WireListItem extends React.Component {
                             )}
                             {urgencyHighlightColor && (
                                 <span
-                                    className={`label label-rounded label-rounded--urgency mr-2`}
+                                    className={'label label-rounded label-rounded--urgency mr-2'}
                                     style={{
                                         color: urgencyHighlightColor,
                                         backgroundColor:
-                                            urgencyHighlightColor + "20", // color + alpha channel
+                                            urgencyHighlightColor + '20', // color + alpha channel
                                     }}
                                 >
-                                    {gettext("urgency")} {item.urgency}
+                                    {gettext('urgency')} {item.urgency}
                                 </span>
                             )}
                             {item.headline}
@@ -194,30 +194,30 @@ class WireListItem extends React.Component {
                                     <span>
                                         {item.source}
                                         {isDisplayed(
-                                            "wordcount",
+                                            'wordcount',
                                             this.props.listConfig
                                         ) && (
                                             <span>
-                                                {" // "}
+                                                {' // '}
                                                 <span>
                                                     {this.wordCount}
-                                                </span>{" "}
-                                                {gettext("words")}
+                                                </span>{' '}
+                                                {gettext('words')}
                                             </span>
                                         )}
                                         {isDisplayed(
-                                            "charcount",
+                                            'charcount',
                                             this.props.listConfig
                                         ) && (
                                             <span>
-                                                {" // "}
+                                                {' // '}
                                                 <span>
                                                     {this.characterCount}
-                                                </span>{" "}
-                                                {gettext("characters")}
+                                                </span>{' '}
+                                                {gettext('characters')}
                                             </span>
                                         )}
-                                        {" // "}
+                                        {' // '}
                                         <time
                                             dateTime={fullDate(
                                                 item.versioncreated
@@ -233,30 +233,30 @@ class WireListItem extends React.Component {
 
                         {isExtended &&
                             isMarketPlace && [
-                                <div
-                                    key="mage"
-                                    className="wire-articles__item__meta"
-                                >
-                                    <img
-                                        src={`/theme/logo/${item.source}.png`}
-                                    />
-                                </div>,
-                                <div
-                                    key="meta"
-                                    className="wire-articles__item__meta"
-                                >
-                                    <WireListItemIcons
-                                        item={item}
-                                        picture={picture}
-                                        videos={videos}
-                                    />
-                                    <div className="wire-articles__item__meta-info">
-                                        <span>
-                                            {this.wordCount} {gettext("words")}
-                                        </span>
-                                    </div>
-                                </div>,
-                            ]}
+                            <div
+                                key="mage"
+                                className="wire-articles__item__meta"
+                            >
+                                <img
+                                    src={`/theme/logo/${item.source}.png`}
+                                />
+                            </div>,
+                            <div
+                                key="meta"
+                                className="wire-articles__item__meta"
+                            >
+                                <WireListItemIcons
+                                    item={item}
+                                    picture={picture}
+                                    videos={videos}
+                                />
+                                <div className="wire-articles__item__meta-info">
+                                    <span>
+                                        {this.wordCount} {gettext('words')}
+                                    </span>
+                                </div>
+                            </div>,
+                        ]}
                         {!isExtended && (
                             <div className="wire-articles__item__meta">
                                 <div className="wire-articles__item__meta-info">
@@ -281,7 +281,7 @@ class WireListItem extends React.Component {
                                 onClick={this.togglePreviousVersions}
                             >
                                 {gettext(
-                                    "Show previous versions ({{ count }})",
+                                    'Show previous versions ({{ count }})',
                                     { count: item.ancestors.length }
                                 )}
                             </div>
@@ -291,16 +291,16 @@ class WireListItem extends React.Component {
                     {isExtended &&
                         !isKilled(item) &&
                         getThumbnailRendition(picture) && (
-                            <div className="wire-articles__item-image">
-                                <figure>
-                                    <img
-                                        src={
-                                            getThumbnailRendition(picture).href
-                                        }
-                                    />
-                                </figure>
-                            </div>
-                        )}
+                        <div className="wire-articles__item-image">
+                            <figure>
+                                <img
+                                    src={
+                                        getThumbnailRendition(picture).href
+                                    }
+                                />
+                            </figure>
+                        </div>
+                    )}
 
                     <div
                         className="wire-articles__item-actions"
