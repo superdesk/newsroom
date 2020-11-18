@@ -1,7 +1,7 @@
 [
     {
         "_id": "wire",
-        "init_version": 1,
+        "init_version": 2,
         "preview": {
             "wordcount": {
                 "displayed": false
@@ -24,6 +24,9 @@
             },
             "charcount": {
                 "displayed": true
+            },
+            "highlights": {
+                "urgency": ["#C20000", "#BE8502"]
             }
         },
         "advanced_search_tabs": {},
