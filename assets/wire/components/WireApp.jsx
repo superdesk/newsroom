@@ -52,6 +52,7 @@ import BookmarkTabs from 'components/BookmarkTabs';
 import {
     previewConfigSelector,
     detailsConfigSelector,
+    listConfigSelector,
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
 
@@ -210,6 +211,7 @@ class WireApp extends BaseApp {
                             <ItemsList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
+                                listConfig={this.props.listConfig}
                             />
                         </div>
 
@@ -282,6 +284,7 @@ WireApp.propTypes = {
     context: PropTypes.string.isRequired,
     previewConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
+    listConfig: PropTypes.object,
     groups: PropTypes.array,
     downloadVideo: PropTypes.func,
     advancedSearchTabConfig: PropTypes.object,
@@ -315,6 +318,7 @@ const mapStateToProps = (state) => ({
     context: state.context,
     previewConfig: previewConfigSelector(state),
     detailsConfig: detailsConfigSelector(state),
+    listConfig: listConfigSelector(state),
     advancedSearchTabConfig: advancedSearchTabsConfigSelector(state),
     groups: get(state, 'groups', []),
     searchParams: searchParamsSelector(state),

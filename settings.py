@@ -1,5 +1,6 @@
 from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
 
+
 SITE_NAME = 'Mediapankki'
 COPYRIGHT_HOLDER = 'STT'
 
@@ -15,6 +16,7 @@ INSTALLED_APPS = [
 
 CORE_APPS = [
     'superdesk.notification',
+    'superdesk.data_updates',
     'content_api.items',
     'content_api.items_versions',
     'content_api.search',
@@ -34,6 +36,7 @@ CORE_APPS = [
     'newsroom.cards',
     'newsroom.reports',
     'newsroom.public',
+    'newsroom.agenda',
     'newsroom.settings',
     'newsroom.photos',
     'newsroom.monitoring',
