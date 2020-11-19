@@ -4,6 +4,7 @@ from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDU
 SITE_NAME = 'Mediapankki'
 COPYRIGHT_HOLDER = 'STT'
 
+USER_MANUAL = 'https://stt.fi/ajankohtaista-tietoa-media-asiakkaille/stt-mediapankki/'
 PRIVACY_POLICY = PRIVACY_POLICY_EN = 'https://stt.fi/tietosuoja/'
 TERMS_AND_CONDITIONS = TERMS_AND_CONDITIONS_EN = 'https://stt.fi/kayttoehdot/'
 CONTACT_ADDRESS = 'https://stt.fi/yhteystiedot/'
