@@ -1,4 +1,7 @@
 <footer class="footer" id="footer">
+    {% if config.USER_MANUAL %}
+        <a href="{{ config.USER_MANUAL }}" target="_blank">{{ gettext('Support') }}</a>
+    {% endif %}
     <a href="{{ config.PRIVACY_POLICY_EN if get_locale() == 'en' else config.PRIVACY_POLICY }}" target="_blank">{{ gettext('Privacy Policy') }}</a>
     <a href="{{ config.TERMS_AND_CONDITIONS_EN if get_locale() == 'en' else config.TERMS_AND_CONDITIONS }}" target="_blank">{{ gettext('Terms and Conditions') }}</a>
     <a href="{{ config.CONTACT_ADDRESS_EN if get_locale() == 'en' else config.CONTACT_ADDRESS }}" target="_blank">{{ gettext('Contact Us') }}</a>
