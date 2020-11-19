@@ -91,7 +91,7 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
                                 <ListItemNextVersion item={item} displayConfig={detailsConfig}  />
                             }
                             {isDisplayed('item_versions', detailsConfig) && showItemVersions(item) &&
-                                <ListItemPreviousVersions item={item} isPreview={true}/>
+                                <ListItemPreviousVersions item={item} displayConfig={detailsConfig} isPreview={true}/>
                             }
 
                             {isDisplayed('agenda_links', detailsConfig) && <AgendaLinks item={item} />}

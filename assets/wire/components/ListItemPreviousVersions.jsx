@@ -49,6 +49,7 @@ class ListItemPreviousVersions extends React.Component {
                 baseClass={this.baseClass}
                 withDivider={this.props.isPreview}
                 onClick={this.open}
+                displayConfig={this.props.displayConfig}
             />
         ));
 
@@ -72,6 +73,7 @@ ListItemPreviousVersions.propTypes = {
     isPreview: PropTypes.bool.isRequired,
     dispatch: PropTypes.func,
     inputId: PropTypes.string,
+    displayConfig: PropTypes.object
 };
 
 export default connect()(ListItemPreviousVersions);

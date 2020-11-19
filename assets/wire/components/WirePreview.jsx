@@ -104,6 +104,7 @@ class WirePreview extends React.PureComponent {
                             item={item}
                             isPreview={true}
                             inputId={previousVersions}
+                            displayConfig={previewConfig}
                         />
                     }
                     {isDisplayed('agenda_links', previewConfig) &&
