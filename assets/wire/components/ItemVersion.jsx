@@ -13,8 +13,12 @@ export default function ItemVersion({version, baseClass, showDivider, onClick, d
                 <div className={`${baseClass}__versions__meta`}>
                     <div className={`${baseClass}__item__meta-info`}>
                         <span className="bold">{getSlugline(version, true)}</span>
-                        <span>{formatDate(version.versioncreated)} {' // '}
-                            <span>{wordCount(version)}</span> {gettext('words')}
+                        <span>{formatDate(version.versioncreated)}
+                            {isDisplayed('wordcount', displayConfig) && [
+                                '//',
+                                <span key='words-count'>{wordCount(version)}</span>,
+                                gettext('words')
+                            ]}
                             {isDisplayed('charcount', displayConfig) && [
                                 '//',
                                 <span key='char-count'>{characterCount(version)}</span>,
