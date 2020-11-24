@@ -1,6 +1,8 @@
 httmock
 wooper
 PyRTF3
+# reportlab is fixed due to support for python 3.5
+reportlab==3.5.53
 xhtml2pdf
 werkzeug>=0.9.4,<=0.11.15
 -e .
