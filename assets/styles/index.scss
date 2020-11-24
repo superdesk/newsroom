@@ -2360,7 +2360,7 @@ a.wire-articles__versions {
     margin: 0 8px;
 }
 
-.wire-column__preview__lead, .wire-column__preview__text {
+.wire-column__preview__lead, .wire-column__preview__text, .wire-column__preview__text--pre pre {
     font-size: 0.9375rem; // 15px
     color: #222222;
     line-height: 1.55;
@@ -2378,6 +2378,9 @@ a.wire-articles__versions {
 
 .wire-column__preview__text--pre pre{
     white-space: pre-wrap;
+    font-family: "Merriweather", serif;
+    font-weight: 300;
+    color: #444444;
 }
 
 .wire-column__preview__tags, .info-box--top {
