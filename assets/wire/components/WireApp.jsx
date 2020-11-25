@@ -136,6 +136,7 @@ class WireApp extends BaseApp {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 detailsConfig={this.props.detailsConfig}
+                listConfig={this.props.listConfig}
                 downloadVideo={this.props.downloadVideo}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
@@ -226,6 +227,7 @@ class WireApp extends BaseApp {
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
                                 downloadVideo={this.props.downloadVideo}
+                                listConfig={this.props.listConfig}
                             />
                             }
 

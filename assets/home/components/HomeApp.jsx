@@ -162,6 +162,7 @@ class HomeApp extends React.Component {
                         closePreview={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
                         previewConfig={this.props.previewConfig}
                         downloadVideo={this.props.downloadVideo}
+                        listConfig={this.props.listConfig}
                     />
                 )}
             </div>,

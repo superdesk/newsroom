@@ -1795,7 +1795,7 @@ article.list {
 
 .wire-articles__item__meta {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     flex-wrap: wrap;
     margin-bottom: 4px;
     margin-top: 10px;
@@ -2757,9 +2757,10 @@ a.wire-articles__versions {
     flex-direction: row;
     @include lg {
         flex-direction: column;
-        flex: 1 0 110px;
+        flex: 1 0 125px;
         align-items: flex-start;
         padding-top: 6px;
+        word-break: break-word;
     }
 }
 
