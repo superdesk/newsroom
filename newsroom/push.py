@@ -750,11 +750,12 @@ def push_binary_get(media_id):
 
 def publish_planning_featured(item):
     assert item.get('_id'), {'_id': 1}
-    assert item.get('tz'), {'tz': 1}
-    assert item.get('items'), {'items': 1}
     service = superdesk.get_resource_service('agenda_featured')
     orig = service.find_one(req=None, _id=item['_id'])
     if orig:
-        service.update(orig['_id'], {'items': item['items']}, orig)
+        service.update(orig['_id'], {'items': item.get('items') or []}, orig)
     else:
+        # Assert `tz` and `items` in initial push only
+        assert item.get('tz'), {'tz': 1}
+        assert item.get('items'), {'items': 1}
         service.create([item])
