@@ -1,13 +1,16 @@
 [
     {
         "_id": "wire",
-        "init_version": 2,
+        "init_version": 3,
         "preview": {
             "wordcount": {
                 "displayed": false
             },
             "charcount": {
                 "displayed": true
+            },
+            "slugline": {
+                "displayed": false
             }
         },
         "details": {
@@ -16,6 +19,9 @@
             },
             "charcount": {
                 "displayed": true
+            },
+            "slugline": {
+                "displayed": false
             }
         },
         "list": {
@@ -34,13 +40,16 @@
     },
     {
         "_id": "home",
-        "init_version": 1,
+        "init_version": 3,
         "list": {
             "wordcount": {
                 "displayed": false
             },
             "charcount": {
                 "displayed": true
+            },
+            "slugline": {
+                "displayed": false
             }
         },
         "details": {
@@ -49,6 +58,9 @@
             },
             "charcount": {
                 "displayed": true
+            },
+            "slugline": {
+                "displayed": false
             }
         }
     }
