@@ -17,7 +17,7 @@ function PreviewMeta({
         const previousVersions = document.getElementById(inputRef);
         previousVersions && previousVersions.scrollIntoView();
     };
-    const wordsSeparator = isDisplayed('charcount') && isDisplayed('wordcount');
+    const wordsSeparator = isDisplayed('charcount', displayConfig) && isDisplayed('wordcount', displayConfig);
 
     return (
         <div className="wire-articles__item__meta">
