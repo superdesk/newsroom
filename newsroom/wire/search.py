@@ -282,20 +282,17 @@ class WireSearchService(BaseSearchService):
             search.company = companies.get(str(user.get('company', '')))
 
             search.query = deepcopy(query)
-            search.query['bool']['must'] = [{'term': {'_id': item_id}}]
             search.section = topic.get('topic_type')
 
             self.prefill_search_products(search)
 
-            topic_filter = {'bool': {'must': []}}
-
             if topic.get('query'):
-                topic_filter['bool']['must'].append(
+                search.query['bool']['must'].append(
                     query_string(topic['query'])
                 )
 
             if topic.get('created'):
-                topic_filter['bool']['must'].append(
+                search.query['bool']['must'].append(
                     self.versioncreated_range(dict(
                         created_from=topic['created'].get('from'),
                         created_to=topic['created'].get('to'),
@@ -304,7 +301,7 @@ class WireSearchService(BaseSearchService):
                 )
 
             if topic.get('filter'):
-                topic_filter['bool']['must'] += self._filter_terms(topic['filter'])
+                search.query['bool']['must'].append(self._filter_terms(topic['filter']))
 
             # for now even if there's no active company matching for the user
             # continuing with the search
@@ -323,7 +320,7 @@ class WireSearchService(BaseSearchService):
                 )
                 continue
 
-            aggs['topics']['filters']['filters'][str(topic['_id'])] = topic_filter
+            aggs['topics']['filters']['filters'][str(topic['_id'])] = search.query
             queried_topics.append(topic)
 
         source = {'query': query}
