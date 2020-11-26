@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gettext, wordCount, isDisplayed, characterCount } from 'utils';
 import { getPicture } from 'wire/utils';
-import {UrgencyLabel} from './UrgencyLabel';
-
+import { UrgencyLabel } from './UrgencyLabel';
 
 function PreviewMeta({
     item,
@@ -17,7 +16,9 @@ function PreviewMeta({
         const previousVersions = document.getElementById(inputRef);
         previousVersions && previousVersions.scrollIntoView();
     };
-    const wordsSeparator = isDisplayed('charcount', displayConfig) && isDisplayed('wordcount', displayConfig);
+    const wordsSeparator =
+        isDisplayed('charcount', displayConfig) &&
+        isDisplayed('wordcount', displayConfig);
 
     return (
         <div className="wire-articles__item__meta">
@@ -34,26 +35,34 @@ function PreviewMeta({
                 )}
             </div>
             <div className="wire-articles__item__meta-info">
-                {isDisplayed('urgency', displayConfig) &&
-                    <UrgencyLabel item={item} listConfig={listConfig} alwaysShow />
-                }
+                {isDisplayed('urgency', displayConfig) && (
+                    <UrgencyLabel
+                        item={item}
+                        listConfig={listConfig}
+                        alwaysShow
+                    />
+                )}
                 <div>
                     {isDisplayed('source', displayConfig) &&
                         gettext('{{ source }}', {
                             source: item.source,
                         })}
-                    {isDisplayed('sttdepartment', displayConfig) && item.sttdepartment && <span>
-                        {isItemDetail ? <br />  : ' // '}
-                        <strong>{item.sttdepartment}</strong>
-                    </span>}
+                    {isDisplayed('sttdepartment', displayConfig) &&
+                        item.sttdepartment && (
+                        <span>
+                            {isItemDetail ? <br /> : ' // '}
+                            <strong>{item.sttdepartment}</strong>
+                        </span>
+                    )}
                 </div>
                 <div>
-                    {item.sttversion && isDisplayed('sttversion', listConfig) &&
-                        (
-                            isItemDetail ? item.sttversion :
-                                gettext('Version type: {{ version }}', {version: item.sttversion})
-                        )
-                    }
+                    {item.sttversion &&
+                        isDisplayed('sttversion', listConfig) &&
+                        (isItemDetail
+                            ? item.sttversion
+                            : gettext('Version type: {{ version }}', {
+                                version: item.sttversion,
+                            }))}
                 </div>
                 <div>
                     {isDisplayed('charcount', displayConfig) && (
@@ -63,8 +72,7 @@ function PreviewMeta({
                         </span>
                     )}
                     {wordsSeparator &&
-                            (isItemDetail ? <br />  : <span> / </span>)
-                    }
+                        (isItemDetail ? <br /> : <span> / </span>)}
                     {isDisplayed('wordcount', displayConfig) && (
                         <span>
                             <span>{wordCount(item)} </span>
