@@ -2,13 +2,13 @@
 # Copyright (C) 2020 ORGANIZATION
 # This file is distributed under the same license as the Newsroom project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
-# 
+#
 # Translators:
 # Tomi Toivio <tomi.toivio@ukuli.fi>, 2019
 # Andrey Podshivalov, 2020
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2020
 # Olli Vesala <olli.vesala@stt.fi>, 2020
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -35,7 +35,7 @@ msgstr "{}-tili luotu"
 
 #: newsroom/email.py:128
 msgid "{} password reset"
-msgstr "{} salasanan uusiminen"
+msgstr "{}-salasanan uusiminen"
 
 #: newsroom/email.py:147
 msgid "New story for followed topic: {}"
@@ -123,7 +123,7 @@ msgstr ""
 
 #: newsroom/settings.py:108
 msgid "System alerts recipients"
-msgstr "Hälytysten vastaanottaja"
+msgstr "Järjestelmähälytysten vastaanottaja"
 
 #: newsroom/settings.py:109
 msgid ""
@@ -244,7 +244,7 @@ msgstr "Agenda-tapahtumaa ei löytynyt"
 
 #: newsroom/auth/forms.py:9
 msgid "Editor"
-msgstr "Leikkaaja"
+msgstr "Päätoimittaja"
 
 #: newsroom/auth/forms.py:10
 msgid "Journalist"
@@ -348,7 +348,7 @@ msgstr "Kirjautumiskertojen määrä on ylitetty."
 #: newsroom/auth/views.py:161 newsroom/auth/views.py:165
 #: newsroom/news_api/news/item/item.py:25
 msgid "Invalid token"
-msgstr "Väärä suojaustunnus"
+msgstr "Virheellinen linkki"
 
 #: newsroom/auth/views.py:192
 msgid "Account already exists."
@@ -505,7 +505,7 @@ msgstr "Formaatti"
 #: assets/users/components/UsersList.jsx:29 newsroom/monitoring/forms.py:23
 #: newsroom/reports/reports.py:153 newsroom/users/forms.py:27
 msgid "Company"
-msgstr "Yhtiö"
+msgstr "Yhtiöraportti"
 
 #: assets/companies/components/CompanyListItem.jsx:17
 #: assets/companies/components/EditCompany.jsx:188
@@ -623,7 +623,7 @@ msgstr "Kategoria"
 #: assets/products/components/EditProduct.jsx:27
 #: newsroom/reports/content_activity.py:230
 msgid "Companies"
-msgstr "Yritykset"
+msgstr "Yhtiöt"
 
 #: assets/company-reports/components/ContentActivity.jsx:59
 #: assets/company-reports/components/ContentActivity.jsx:110
@@ -674,7 +674,7 @@ msgstr "Esikatselu"
 #: assets/company-reports/components/CompanyReportsApp.jsx:22
 #: newsroom/reports/content_activity.py:317
 msgid "Content activity"
-msgstr "Aktiviteetti"
+msgstr "Sisältöjen käyttötilasto"
 
 #: assets/company-reports/components/CompanyReportsApp.jsx:16
 #: newsroom/reports/reports.py:43
@@ -684,7 +684,7 @@ msgstr "Tallennettuja hakuja yhtiötä kohden"
 #: assets/company-reports/components/CompanyReportsApp.jsx:17
 #: newsroom/reports/reports.py:69
 msgid "Saved searches per user"
-msgstr "Käyttäjän tallentamat haut"
+msgstr "Käyttäjien tallentamat haut"
 
 #: assets/company-reports/components/CompanyReportsApp.jsx:18
 #: newsroom/reports/reports.py:97
@@ -694,11 +694,11 @@ msgstr "Tuotteiden määrä yhtiötä kohden"
 #: assets/company-reports/components/CompanyReportsApp.jsx:19
 #: newsroom/reports/reports.py:120
 msgid "Stories per product"
-msgstr "Tuotteen jutut"
+msgstr "Versioita tuotetta kohden"
 
 #: newsroom/reports/reports.py:243
 msgid "SubscriberActivity"
-msgstr "Tilaajatoiminta"
+msgstr "Yhtiöiden toimintatilasto"
 
 #: assets/company-reports/components/CompanyReportsApp.jsx:44
 #: newsroom/reports/reports.py:319
@@ -707,12 +707,12 @@ msgstr "Yhtiön uutis-APIn käyttö"
 
 #: newsroom/reports/reports.py:352
 msgid "Companies permissioned per product"
-msgstr ""
+msgstr "Yhtiöiden pääsy tuotteisiin"
 
 #: assets/company-reports/components/CompanyReportsApp.jsx:24
 #: newsroom/reports/reports.py:363
 msgid "Expired companies"
-msgstr ""
+msgstr "Vanhentuneet yhtiöt"
 
 #: newsroom/reports/views.py:19 newsroom/reports/views.py:46
 #: newsroom/reports/views.py:58
@@ -815,7 +815,7 @@ msgstr "Tekijänoikeudet"
 
 #: newsroom/templates/footer.html:2
 msgid "Privacy Policy"
-msgstr "Tietosuojakäytännöt"
+msgstr "Tietosuojalauseke"
 
 #: newsroom/templates/footer.html:3
 msgid "Terms and Conditions"
@@ -827,7 +827,7 @@ msgstr "Unohditko salasanasi?"
 
 #: newsroom/templates/login.html:41
 msgid "Click here to reset."
-msgstr "Paina tästä uusiaksesi salasanasi."
+msgstr "Klikkaa tästä uusiaksesi salasanasi."
 
 #: newsroom/templates/login.html:42
 msgid "Or you can"
@@ -883,7 +883,7 @@ msgstr "Uusi salasanasi"
 
 #: newsroom/templates/reset_password.html:30
 msgid "Please use 8 or more characters."
-msgstr "Käytä vähintään 8 merkkiä"
+msgstr "Käytä vähintään 8:aa merkkiä"
 
 #: newsroom/templates/reset_password.html:37
 msgid "Change Password"
@@ -906,7 +906,7 @@ msgstr "Rekisteröidy"
 
 #: newsroom/templates/signup.html:61
 msgid "terms and conditions"
-msgstr ""
+msgstr "Käyttöehdot"
 
 #: newsroom/templates/signup_success.html:12
 msgid "Newsroom sign up"
@@ -950,7 +950,7 @@ msgstr "sanoja"
 #: assets/wire/components/WireListItem.jsx:217
 #: newsroom/templates/wire_item.html:64 newsroom/templates/wire_item.html:110
 msgid "characters"
-msgstr "merkkejä"
+msgstr "merkkiä"
 
 #: newsroom/templates/wire_item.html:66
 msgid "Source:"
@@ -984,8 +984,8 @@ msgid ""
 "Please enable 'Receive notifications via email' option in your profile to "
 "receive topic notifications"
 msgstr ""
-"Ota aiheesi ilmoitukset käyttöön ottamalla profiiliisi vastaan ​​\"Ilmoita "
-"sähköpostitse\" -vaihtoehto"
+"Ota ilmoitukset käyttöön profiiliasetuksista. Aktivoi valinta: \"Ota vastaan"
+" ilmoituksia sähköpostilla\"."
 
 #: newsroom/users/__init__.py:14
 msgid "User Management"
@@ -1112,7 +1112,7 @@ msgstr "Uutistuotteiden aikarajoitus (päiviä)"
 
 #: assets/agenda/components/AgendaApp.jsx:111 newsroom/wire/__init__.py:115
 msgid "News Value"
-msgstr "Uutisarvo"
+msgstr "Prioriteetti"
 
 #: newsroom/wire/views.py:300
 msgid "Not found"
@@ -1791,11 +1791,11 @@ msgstr "Anna pääsy arkistoon"
 
 #: assets/companies/components/CompanyPermissions.jsx:75
 msgid "Events Only Access"
-msgstr "Vain tapahtumia"
+msgstr "*Ei käytössä*"
 
 #: assets/companies/components/CompanyPermissions.jsx:84
 msgid "Sections"
-msgstr "Osastot"
+msgstr "Osiot"
 
 #: assets/companies/components/EditCompany.jsx:25
 #: assets/monitoring/components/EditMonitoringProfile.jsx:27
@@ -1867,7 +1867,7 @@ msgstr "Alkaen:"
 #: assets/company-reports/components/ComapnyNewsApiUsage.jsx:88
 #: assets/company-reports/components/SubscriberActivity.jsx:173
 msgid "TO:"
-msgstr "TO:"
+msgstr "Päättyen:"
 
 #: assets/company-reports/components/Company.jsx:38
 msgid "Tel"
@@ -1922,11 +1922,11 @@ msgstr "Tuotteiden määrä"
 
 #: assets/company-reports/components/CompanyReportsApp.jsx:21
 msgid "Subscriber activity"
-msgstr "Tilaajatoiminta"
+msgstr "Yhtiöiden toimintatilastot"
 
 #: assets/company-reports/components/CompanyReportsApp.jsx:23
 msgid "Companies per Product"
-msgstr ""
+msgstr "Tuotteita käyttävät yhtiöt"
 
 #: assets/company-reports/components/CompanyReportsApp.jsx:66
 msgid "Run report"
@@ -1944,7 +1944,7 @@ msgstr "Tallennettujen hakujen määrä"
 #: assets/company-reports/components/ContentActivity.jsx:27
 #: assets/company-reports/components/SubscriberActivity.jsx:129
 msgid "Section"
-msgstr "Osasto"
+msgstr "Osio"
 
 #: assets/company-reports/components/ContentActivity.jsx:41
 msgid "Genres"
@@ -1956,15 +1956,15 @@ msgstr "Vie CSV:hen"
 
 #: assets/company-reports/components/ProductCompanies.jsx:19
 msgid "All Products"
-msgstr ""
+msgstr "Kaikki tuotteet"
 
 #: assets/company-reports/components/ProductCompanies.jsx:53
 msgid "Active Companies"
-msgstr ""
+msgstr "Aktiiviset yhtiöt"
 
 #: assets/company-reports/components/ProductCompanies.jsx:53
 msgid "Disabled Companies"
-msgstr ""
+msgstr "Passivoidut yhtiöt"
 
 #: assets/company-reports/components/ProductStories.jsx:27
 msgid "Last 24 hours"
@@ -2007,7 +2007,7 @@ msgstr "Kaikki toiminnot"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:28
 msgid "All Sections"
-msgstr "Kaikki osastot"
+msgstr "Kaikki osiot"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:129
 msgid "Item"
@@ -2071,7 +2071,7 @@ msgstr "Uusi {{ buttonName }}"
 
 #: assets/components/ListItemEmbargoed.jsx:36
 msgid "embargo"
-msgstr "kauppasaarto"
+msgstr "embargo"
 
 #: assets/components/ListViewOptions.jsx:14
 msgid "Large list"
@@ -2123,7 +2123,7 @@ msgstr "Jaa kohde"
 
 #: assets/components/ShareItemModal.jsx:103
 msgid "People"
-msgstr "Ihmiset"
+msgstr "Käyttäjät"
 
 #: assets/components/ShareItemModal.jsx:124
 msgid "Message"
@@ -2254,7 +2254,7 @@ msgstr "Aiheet"
 
 #: assets/layout/components/BaseApp.jsx:37
 msgid "My Topics"
-msgstr "Omat aiheeni"
+msgstr "Tallennetut haut"
 
 #: assets/layout/components/BaseApp.jsx:38
 msgid "Filters"
@@ -2502,7 +2502,7 @@ msgstr "Luo avain"
 
 #: assets/notifications/actions.js:40
 msgid "Notification cleared successfully"
-msgstr "Ilmoitus on poistettu"
+msgstr "Ilmoitus poistettu"
 
 #: assets/notifications/actions.js:58
 msgid "Notifications cleared successfully"
@@ -2568,7 +2568,7 @@ msgstr "Muokkaa"
 
 #: assets/search/components/FollowedTopics.jsx:77
 msgid "Would you like to delete topic {{name}}?"
-msgstr "Haluatko varmasti poistaa aiheen {{name}}?"
+msgstr "Haluatko varmasti poistaa haun {{name}}?"
 
 #: assets/search/components/MonitoringEditor.jsx:78
 msgid "Unsubscribed"
@@ -2611,7 +2611,7 @@ msgstr "Hae"
 
 #: assets/search/components/SearchResults.jsx:32
 msgid "search results found"
-msgstr "löydetyt hakutulokset"
+msgstr "hakutuloksia löytyi"
 
 #: assets/search/components/SearchResults.jsx:35
 msgid "search results for:"
@@ -2619,11 +2619,11 @@ msgstr "hakutulokset:"
 
 #: assets/search/components/SearchResultsInfo.jsx:35
 msgid "Update my topic"
-msgstr "Päivitä aihe"
+msgstr "Päivitä haku"
 
 #: assets/search/components/SearchResultsInfo.jsx:36
 msgid "Create my topic"
-msgstr "Luo uusi aihe"
+msgstr "Luo uusi haku"
 
 #: assets/search/components/TopicEditor.jsx:103
 msgid "Agenda Topic updated successfully"
@@ -2691,11 +2691,11 @@ msgstr "Seurannan tila"
 
 #: assets/search/components/TopicsTab.jsx:36
 msgid "No {{name}} created."
-msgstr "Nimeä ei annettu."
+msgstr "Ei tallennettuja hakuja"
 
 #: assets/search/components/TopicsTab.jsx:58
 msgid "Manage my {{name}}"
-msgstr "Hallinnoi omia aiheitani"
+msgstr "Hallinnoi omia hakujani"
 
 #: assets/section-filters/actions.js:72
 msgid "Section Filter updated successfully"
@@ -2763,11 +2763,11 @@ msgstr "Päivitä sivu vaihtaaksesi kieltä"
 
 #: assets/user-profile/actions.js:131
 msgid "Topic deleted successfully"
-msgstr "Aihe on poistettu"
+msgstr "Haku on poistettu"
 
 #: assets/user-profile/actions.js:163
 msgid "Topic was shared successfully."
-msgstr "Aihe on jaettu"
+msgstr "Haku on jaettu onnistuneesti"
 
 #: assets/user-profile/components/UserProfileApp.jsx:38
 msgid "My Profile"
@@ -2775,7 +2775,7 @@ msgstr "Profiilini"
 
 #: assets/user-profile/components/UserProfileApp.jsx:46
 msgid "My Wire Topics"
-msgstr "Tallennetut aiheeni"
+msgstr "Tallennetut hakuni"
 
 #: assets/user-profile/components/UserProfileApp.jsx:55
 msgid "My Agenda Topics"
@@ -2887,7 +2887,7 @@ msgstr "Tiedostomuoto"
 
 #: assets/wire/components/InfoBox.jsx:17
 msgid "{{name}}"
-msgstr ""
+msgstr "{{name}}"
 
 #: assets/wire/components/ListItemNextVersion.jsx:44
 msgid "Next version"
@@ -2931,7 +2931,7 @@ msgstr "{{ count }} kohde(tta) valittu"
 
 #: assets/wire/components/WireListItem.jsx:177
 msgid "urgency"
-msgstr ""
+msgstr "prio"
 
 #: assets/wire/components/WireListItem.jsx:283
 msgid "Show previous versions ({{ count }})"
