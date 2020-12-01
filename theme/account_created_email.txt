@@ -2,7 +2,7 @@
 {% block content %}
 Sinulle on luotu käyttäjätunnus STT:n {{app_name}}-palveluun. Ole hyvä ja klikkaa linkkiä aktivoidaksesi tunnuksesi: {{url}}
 
-Linkki vanhenee {{expires}} tunnissa.
+Linkki vanhenee {{(expires/24)|int}} päivän kuluttua.
 
 Jos luulet, että {{app_name}}-tunnus on luotu erheellisesti, jätä tämä viesti huomiotta.
 {% endblock %}

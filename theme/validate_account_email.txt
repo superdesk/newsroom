@@ -3,7 +3,7 @@
 Sinulle on luotu käyttäjätunnus {{app_name}}-palveluun.
 Ole hyvä klikkaa linkkiä aktivoidaksesi tunnuksesi: {{url}}
 
-Linkki vanhenee {{expires}} tunnissa.
+Linkki vanhenee {{(expires/24)|int}} päivän kuluttua.
 
 Jos luulet, että {{app_name}}-tili on luotu erheellisesti, jätä tämä viesti huomiotta.
 {% endblock %}

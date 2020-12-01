@@ -249,8 +249,7 @@ COVERAGE_TYPES = {
     'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
 }
 
-
-LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
+LANGUAGES = ['en', 'fi', 'cs']
 DEFAULT_LANGUAGE = 'en'
 
 CLIENT_LOCALE_FORMATS = {
@@ -275,9 +274,6 @@ CLIENT_CONFIG = {
     'default_timezone': DEFAULT_TIMEZONE,
     'display_abstract': DISPLAY_ABSTRACT,
 }
-
-LANGUAGES = ['en', 'fi', 'cs']
-DEFAULT_LANGUAGE = 'cs'
 
 # Enable iframely support for item body_html
 IFRAMELY = True
