@@ -1,8 +1,8 @@
 from flask import json
 from newsroom.topics.views import get_topic_url
-from .fixtures import init_company, PUBLIC_USER_ID, TEST_USER_ID  # noqa
+from ..fixtures import init_company, PUBLIC_USER_ID, TEST_USER_ID  # noqa
 from unittest import mock
-from .utils import mock_send_email
+from ..utils import mock_send_email
 
 topic = {
     'label': 'Foo',

@@ -3,7 +3,7 @@ from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
 from superdesk.utc import utcnow
-from tests.test_users import test_login_succeeds_for_admin, init as users_init
+from tests.core.test_users import test_login_succeeds_for_admin, init as users_init
 
 PUBLIC_USER_ID = ObjectId('59b4c5c61d41c8d736852fbf')
 TEST_USER_ID = ObjectId('5cc94454bc43165c045ffec9')

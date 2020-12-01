@@ -2,10 +2,10 @@ from flask import json
 from pytest import fixture
 from bson import ObjectId
 from .test_users import test_login_succeeds_for_admin, init as user_init  # noqa
-from .fixtures import PUBLIC_USER_ID
+from ..fixtures import PUBLIC_USER_ID
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from unittest import mock
-from .utils import mock_send_email
+from ..utils import mock_send_email
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from datetime import timedelta
 from superdesk import get_resource_service

@@ -26,7 +26,7 @@ def get_json(client, url):
 
 
 def get_admin_user_id(app):
-    from .test_users import ADMIN_USER_ID
+    from .core.test_users import ADMIN_USER_ID
     return (get_resource_service('users').find_one(req=None, _id=ADMIN_USER_ID) or {}).get('_id')
 
 

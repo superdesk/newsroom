@@ -2,7 +2,7 @@ import io
 import pytz
 from flask import json
 from .test_push import get_signature_headers
-from .utils import post_json, get_json, mock_send_email
+from ..utils import post_json, get_json, mock_send_email
 from datetime import datetime
 from copy import deepcopy
 
@@ -10,7 +10,7 @@ from superdesk import get_resource_service
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
 from newsroom.notifications import get_user_notifications
-from .fixtures import init_auth  # noqa
+from ..fixtures import init_auth  # noqa
 from unittest import mock
 
 

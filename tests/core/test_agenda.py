@@ -7,8 +7,8 @@ from unittest import mock
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts, get_entity_or_404, \
     get_local_date, get_end_date
-from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
+from ..utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
+from ..fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from copy import deepcopy
 from bson import ObjectId
 

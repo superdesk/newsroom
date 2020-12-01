@@ -6,10 +6,10 @@ from urllib import parse
 from bson import ObjectId
 from copy import deepcopy
 
-from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from .utils import get_json, get_admin_user_id, mock_send_email
+from ..fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
+from ..utils import get_json, get_admin_user_id, mock_send_email
 from unittest import mock
-from tests.test_users import ADMIN_USER_ID
+from tests.core.test_users import ADMIN_USER_ID
 from superdesk import get_resource_service
 
 

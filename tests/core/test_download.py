@@ -9,7 +9,7 @@ import icalendar
 from datetime import timedelta
 from superdesk.utc import utcnow
 
-from .fixtures import items, init_items, init_auth, agenda_items, init_agenda_items  # noqa
+from ..fixtures import items, init_items, init_auth, agenda_items, init_agenda_items  # noqa
 from .test_push import upload_binary
 
 items_ids = [item['_id'] for item in items[:2]]
