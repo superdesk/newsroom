@@ -1,18 +1,34 @@
 import sys
 from pathlib import Path
+
 from pytest import fixture
-from tests.conftest import update_config # noqa
+from flask import Config
+
+from newsroom.web import NewsroomWebApp
+from tests.conftest import update_config, clean_databases  # noqa
+
 
 root = (Path(__file__).parent / '..').resolve()
 sys.path.insert(0, str(root))
 
 
 @fixture
-def app():
-    from flask import Config
-    from newsroom.web import NewsroomWebApp
-
+def app(request):
     cfg = Config(root)
     cfg.from_object('newsroom.news_api.settings')
     update_config(cfg)
-    return NewsroomWebApp(config=cfg, testing=True)
+    app = NewsroomWebApp(config=cfg, testing=True)
+
+    # init elastic
+    with app.app_context():
+        app.data.init_elastic(app)
+
+    def teardown():
+        # drop mongo db and es index
+        with app.app_context():
+            clean_databases(app)
+
+    request.addfinalizer(teardown)
+
+    with app.app_context():
+        yield app

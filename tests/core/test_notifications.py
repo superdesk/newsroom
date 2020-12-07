@@ -4,7 +4,7 @@ import datetime
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
 from newsroom.notifications import get_user_notifications
-from .fixtures import init_company, PUBLIC_USER_ID, TEST_USER_ID  # noqa
+from ..fixtures import init_company, PUBLIC_USER_ID, TEST_USER_ID  # noqa
 
 user = str(PUBLIC_USER_ID)
 

@@ -1,8 +1,8 @@
 
 from newsroom.settings import get_setting
 
-from .fixtures import items, init_items, init_auth, init_company  # noqa
-from .utils import post_json, get_json
+from ..fixtures import items, init_items, init_auth, init_company  # noqa
+from ..utils import post_json, get_json
 
 
 def test_general_settings(client, app):

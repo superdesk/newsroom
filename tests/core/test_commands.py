@@ -5,7 +5,7 @@ from eve.utils import ParsedRequest
 
 from newsroom.mongo_utils import index_elastic_from_mongo, index_elastic_from_mongo_from_timestamp
 
-from .fixtures import items, init_items, init_auth, init_company  # noqa
+from ..fixtures import items, init_items, init_auth, init_company  # noqa
 
 
 def remove_elastic_index(app):

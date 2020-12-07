@@ -7,7 +7,7 @@ from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_login
-from .utils import mock_send_email
+from ..utils import mock_send_email
 from unittest import mock
 
 ADMIN_USER_ID = '5cc94b99bc4316684dc7dc07'

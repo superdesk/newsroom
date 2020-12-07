@@ -1,9 +1,9 @@
 from superdesk.utc import utcnow
 import datetime
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
-from .utils import post_json, mock_send_email
+from ..utils import post_json, mock_send_email
 from superdesk import get_resource_service
-from .fixtures import items, init_items, init_auth # noqa
+from ..fixtures import items, init_items, init_auth # noqa
 from unittest import mock
 
 

@@ -54,7 +54,7 @@ def test_ical_formatter_item(client, app, mocker):
 
 
 def test_ical_formatter_failing(client, app):
-    with open(os.path.join(os.path.dirname(__file__), 'agenda_fixture.json'), 'r') as fixture:
+    with open(os.path.join(os.path.dirname(__file__), '../fixtures', 'agenda_fixture.json'), 'r') as fixture:
         item = json.load(fixture)
     formatter = iCalFormatter()
     formatter.format_item(item, item_type='agenda')

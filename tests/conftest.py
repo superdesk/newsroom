@@ -3,6 +3,10 @@ import sys
 from pathlib import Path
 from pytest import fixture
 
+from flask import Config
+from newsroom.web import NewsroomWebApp
+
+
 root = (Path(__file__).parent / '..').resolve()
 sys.path.insert(0, str(root))
 
@@ -16,6 +20,7 @@ def update_config(conf):
     conf['WTF_CSRF_ENABLED'] = False
     conf['DEBUG'] = True
     conf['TESTING'] = True
+    conf['PRESERVE_CONTEXT_ON_EXCEPTION'] = True
     conf['WEBPACK_ASSETS_URL'] = None
     conf['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Prague'
     conf['DEFAULT_TIMEZONE'] = 'Europe/Prague'
@@ -40,29 +45,29 @@ def clean_databases(app):
     indices = '%s*' % app.config['CONTENTAPI_ELASTICSEARCH_INDEX']
     es = app.data.elastic.es
     es.indices.delete(indices, ignore=[404])
-    with app.app_context():
-        app.data.init_elastic(app)
 
 
 @fixture
-def app():
-    from flask import Config
-    from newsroom.web import NewsroomWebApp
-
+def app(request):
     cfg = Config(root)
     cfg.from_object('newsroom.default_settings')
     update_config(cfg)
-    return NewsroomWebApp(config=cfg, testing=True)
+    app = NewsroomWebApp(config=cfg, testing=True)
+    # init elastic
+    with app.app_context():
+        app.data.init_elastic(app)
+
+    def teardown():
+        # drop mongo db and es index
+        with app.app_context():
+            clean_databases(app)
+
+    request.addfinalizer(teardown)
+
+    with app.app_context():
+        yield app
 
 
 @fixture
 def client(app):
     return app.test_client()
-
-
-@fixture(autouse=True)
-def setup(app):
-    with app.app_context():
-        app.data.init_elastic(app)
-        clean_databases(app)
-        yield

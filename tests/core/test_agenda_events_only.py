@@ -2,8 +2,8 @@ from flask import json
 from pytest import fixture
 from copy import deepcopy
 from newsroom.notifications import get_user_notifications
-from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, setup_user_company, PUBLIC_USER_ID  # noqa
-from .utils import post_json, mock_send_email
+from ..fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, setup_user_company, PUBLIC_USER_ID  # noqa
+from ..utils import post_json, mock_send_email
 from .test_push_events import test_event, test_planning
 from unittest import mock
 

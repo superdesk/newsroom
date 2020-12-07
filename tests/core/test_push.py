@@ -10,8 +10,8 @@ import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from superdesk import get_resource_service
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
-from .fixtures import init_auth  # noqa
-from .utils import mock_send_email
+from ..fixtures import init_auth  # noqa
+from ..utils import mock_send_email
 from unittest import mock
 import pytest
 
@@ -99,7 +99,7 @@ def test_push_binary(client):
 
 
 def get_fixture_path(fixture):
-    return os.path.join(os.path.dirname(__file__), 'fixtures', fixture)
+    return os.path.join(os.path.dirname(__file__), '..', 'fixtures', fixture)
 
 
 def upload_binary(fixture, client, media_id=None):
