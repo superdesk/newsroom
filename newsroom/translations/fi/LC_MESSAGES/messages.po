@@ -8,15 +8,16 @@
 # Andrey Podshivalov, 2020
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2020
 # Olli Vesala <olli.vesala@stt.fi>, 2020
+# Oleg Pshenichniy <olegpshenichniy@gmail.com>, 2020
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-11-24 11:22+0100\n"
+"POT-Creation-Date: 2020-12-07 14:56+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Olli Vesala <olli.vesala@stt.fi>, 2020\n"
+"Last-Translator: Oleg Pshenichniy <olegpshenichniy@gmail.com>, 2020\n"
 "Language-Team: Finnish (https://www.transifex.com/sourcefabric/teams/6584/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -505,7 +506,7 @@ msgstr "Formaatti"
 #: assets/users/components/UsersList.jsx:29 newsroom/monitoring/forms.py:23
 #: newsroom/reports/reports.py:153 newsroom/users/forms.py:27
 msgid "Company"
-msgstr "Yhtiöraportti"
+msgstr "Yhtiö"
 
 #: assets/companies/components/CompanyListItem.jsx:17
 #: assets/companies/components/EditCompany.jsx:188
@@ -795,6 +796,7 @@ msgid "Login"
 msgstr "Kirjaudu sisään"
 
 #: newsroom/templates/base_layout.html:46 newsroom/templates/footer.html:4
+#: theme/footer.html:7
 msgid "Contact Us"
 msgstr "Ota yhteyttä"
 
@@ -813,11 +815,11 @@ msgstr "Tilastot"
 msgid "Copyright"
 msgstr "Tekijänoikeudet"
 
-#: newsroom/templates/footer.html:2
+#: newsroom/templates/footer.html:2 theme/footer.html:5
 msgid "Privacy Policy"
 msgstr "Tietosuojalauseke"
 
-#: newsroom/templates/footer.html:3
+#: newsroom/templates/footer.html:3 theme/footer.html:6
 msgid "Terms and Conditions"
 msgstr "Käyttöehdot"
 
@@ -939,15 +941,17 @@ msgstr "Kirjoittaja"
 
 #: assets/components/cards/render/CardMeta.jsx:22
 #: assets/wire/components/ItemVersion.jsx:20
-#: assets/wire/components/WireListItem.jsx:205
-#: assets/wire/components/WireListItem.jsx:255
+#: assets/wire/components/PreviewMeta.jsx:79
+#: assets/wire/components/WireListItem.jsx:181
+#: assets/wire/components/WireListItem.jsx:231
 #: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:108
 msgid "words"
 msgstr "sanoja"
 
 #: assets/components/cards/render/CardMeta.jsx:24
 #: assets/wire/components/ItemVersion.jsx:25
-#: assets/wire/components/WireListItem.jsx:217
+#: assets/wire/components/PreviewMeta.jsx:71
+#: assets/wire/components/WireListItem.jsx:193
 #: newsroom/templates/wire_item.html:64 newsroom/templates/wire_item.html:110
 msgid "characters"
 msgstr "merkkiä"
@@ -1359,13 +1363,13 @@ msgstr "Muokattu näkymä"
 
 #: assets/agenda/components/AgendaApp.jsx:173
 #: assets/am-news/components/AmNewsApp.jsx:122
-#: assets/wire/components/WireApp.jsx:150
+#: assets/wire/components/WireApp.jsx:151
 msgid "Close filter panel"
 msgstr "Sulje suodatinnäkymä"
 
 #: assets/agenda/components/AgendaApp.jsx:183
 #: assets/am-news/components/AmNewsApp.jsx:129
-#: assets/wire/components/WireApp.jsx:162
+#: assets/wire/components/WireApp.jsx:163
 msgid "Open filter panel"
 msgstr "Avaa suodattimet"
 
@@ -2611,7 +2615,7 @@ msgstr "Hae"
 
 #: assets/search/components/SearchResults.jsx:32
 msgid "search results found"
-msgstr "hakutuloksia löytyi"
+msgstr "hakutulosta löytyi"
 
 #: assets/search/components/SearchResults.jsx:35
 msgid "search results for:"
@@ -2623,7 +2627,7 @@ msgstr "Päivitä haku"
 
 #: assets/search/components/SearchResultsInfo.jsx:36
 msgid "Create my topic"
-msgstr "Luo uusi haku"
+msgstr "Tallenna haku"
 
 #: assets/search/components/TopicEditor.jsx:103
 msgid "Agenda Topic updated successfully"
@@ -2864,7 +2868,7 @@ msgstr "Kirjoittaja: {{ byline }}"
 msgid "Location: {{ located }}"
 msgstr "Sijainti: {{ located }}"
 
-#: assets/wire/actions.js:155 assets/wire/components/PreviewMeta.jsx:36
+#: assets/wire/actions.js:155
 msgid "Source: {{ source }}"
 msgstr "Lähde: {{ source }}"
 
@@ -2905,19 +2909,15 @@ msgstr "Vain uutiset"
 msgid "Note"
 msgstr "Huom"
 
-#: assets/wire/components/PreviewMeta.jsx:33
-msgid "News Value: {{ value }}"
-msgstr "Prioriteetti: {{ value }}"
+#: assets/wire/components/PreviewMeta.jsx:47
+msgid "{{ source }}"
+msgstr "{{ source }}"
 
-#: assets/wire/components/PreviewMeta.jsx:34
-msgid "Words:"
-msgstr "Sanoja:"
+#: assets/wire/components/PreviewMeta.jsx:63
+msgid "Version type: {{ version }}"
+msgstr "Versiotyyppi: {{ version }}"
 
-#: assets/wire/components/PreviewMeta.jsx:35
-msgid "Characters:"
-msgstr "Merkkejä:"
-
-#: assets/wire/components/PreviewMeta.jsx:39
+#: assets/wire/components/PreviewMeta.jsx:86
 msgid "{{ count }} previous versions"
 msgstr "Korvatut versiot {{ count }}"
 
@@ -2929,11 +2929,15 @@ msgstr "Slugline"
 msgid "{{ count }} item(s) selected"
 msgstr "{{ count }} kohde(tta) valittu"
 
-#: assets/wire/components/WireListItem.jsx:177
+#: assets/wire/components/UrgencyLabel.jsx:45
+msgid "News Value: {{ value }}"
+msgstr "Prioriteetti: {{ value }}"
+
+#: assets/wire/components/UrgencyLabel.jsx:61
 msgid "urgency"
 msgstr "prio"
 
-#: assets/wire/components/WireListItem.jsx:283
+#: assets/wire/components/WireListItem.jsx:259
 msgid "Show previous versions ({{ count }})"
 msgstr "Korvatut versiot ({{ count }})"
 
@@ -2968,3 +2972,7 @@ msgstr "Päättyen"
 #: assets/wire/components/filters/NavigationTab.jsx:39
 msgid "All"
 msgstr "Kaikki"
+
+#: theme/footer.html:3
+msgid "Support"
+msgstr "Tukisivusto"
