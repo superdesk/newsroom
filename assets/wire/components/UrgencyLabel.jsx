@@ -58,7 +58,10 @@ export function UrgencyLabel ({item, listConfig, alwaysShow = false}) {
                 backgroundColor: urgencyHighlightColor + '20', // color + alpha channel
             }}
         >
-            {gettext('urgency')} {item.urgency}
+            {/*{gettext('urgency')} {item.urgency}*/}
+            {gettext('News Value: {{ value }}', {
+                value: item.urgency || DEFAULT_URGENCY,
+            })}
         </span>
     );
 }
