@@ -29,6 +29,7 @@ import WireListItemIcons from './WireListItemIcons';
 import ActionMenu from '../../components/ActionMenu';
 import WireListItemDeleted from './WireListItemDeleted';
 import ListItemEmbargoed from '../../components/ListItemEmbargoed';
+import {UrgencyItemBorder, UrgencyLabel} from './UrgencyLabel';
 
 export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
 export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
@@ -91,15 +92,6 @@ class WireListItem extends React.Component {
             );
         }
 
-        const urgencyHighlightColor =
-            item.urgency > 0 &&
-            listConfig &&
-            listConfig.highlights &&
-            listConfig.highlights.urgency &&
-            listConfig.highlights.urgency.length >= item.urgency
-                ? listConfig.highlights.urgency[item.urgency - 1]
-                : null;
-
         const cardClassName = classNames(
             'wire-articles__item-wrap col-12 wire-item'
         );
@@ -129,17 +121,7 @@ class WireListItem extends React.Component {
                 onDoubleClick={() => onDoubleClick(item)}
                 onKeyDown={this.onKeyDown}
             >
-                {urgencyHighlightColor && ( // urgency left border
-                    <span
-                        style={{
-                            width: '4px',
-                            backgroundColor: urgencyHighlightColor,
-                            position: 'absolute',
-                            height: '100%',
-                            zIndex: 1,
-                        }}
-                    ></span>
-                )}
+                <UrgencyItemBorder item={item} listConfig={listConfig} />
                 <div className={wrapClassName}>
                     <div className="wire-articles__item-text">
                         <h4 className="wire-articles__item-headline">
@@ -165,18 +147,7 @@ class WireListItem extends React.Component {
                                     divider={false}
                                 />
                             )}
-                            {urgencyHighlightColor && (
-                                <span
-                                    className={'label label-rounded label-rounded--urgency mr-2'}
-                                    style={{
-                                        color: urgencyHighlightColor,
-                                        backgroundColor:
-                                            urgencyHighlightColor + '20', // color + alpha channel
-                                    }}
-                                >
-                                    {gettext('urgency')} {item.urgency}
-                                </span>
-                            )}
+                            <UrgencyLabel item={item} listConfig={listConfig} />
                             {item.headline}
                         </h4>
 
@@ -193,6 +164,11 @@ class WireListItem extends React.Component {
                                     </span>
                                     <span>
                                         {item.source}
+                                        {item.sttdepartment && isDisplayed('sttdepartment', listConfig) &&
+                                                <span>{' // '}
+                                                    <strong>{item.sttdepartment}</strong>
+                                                </span>
+                                        }
                                         {isDisplayed(
                                             'wordcount',
                                             this.props.listConfig
