@@ -1,7 +1,7 @@
 [
     {
         "_id": "wire",
-        "init_version": 3,
+        "init_version": 6,
         "preview": {
             "wordcount": {
                 "displayed": false
@@ -11,7 +11,13 @@
             },
             "slugline": {
                 "displayed": false
-            }
+            },
+            "metadata_fields": [
+              "urgency",
+              ["source", {"field": "sttdepartment", "styles": { "fontWeight": "bold" }}],
+              ["charcount", "wordcount"],
+              "previous_versions"
+            ]
         },
         "details": {
             "wordcount": {
@@ -22,7 +28,15 @@
             },
             "slugline": {
                 "displayed": false
-            }
+            },
+            "metadata_fields": [
+              "urgency",
+              "source",
+              {"field": "sttdepartment", "styles": { "fontWeight": "bold" }},
+              "charcount",
+              "previous_versions",
+              "embargo"
+            ]
         },
         "list": {
             "wordcount": {
@@ -33,7 +47,13 @@
             },
             "highlights": {
                 "urgency": ["#C20000", "#BE8502"]
-            }
+            },
+            "metadata_fields": [
+              "source",
+              {"field": "sttdepartment", "styles": { "fontWeight": "bold" }},
+              "charcount",
+              "versioncreated"
+            ]
         },
         "advanced_search_tabs": {},
         "multi_select_topics": false

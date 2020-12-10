@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, isEmpty } from 'lodash';
+import {get, isEmpty} from 'lodash';
 
-import { gettext, isDisplayed } from 'utils';
+import {gettext, isDisplayed} from 'utils';
 import {
     getPicture,
     getVideos,

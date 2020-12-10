@@ -212,7 +212,6 @@ class WireApp extends BaseApp {
                             <ItemsList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
-                                listConfig={this.props.listConfig}
                             />
                         </div>
 

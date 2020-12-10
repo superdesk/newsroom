@@ -39,12 +39,14 @@ module.exports = {
             "error",
             {"allow": ["warn", "error"]}
         ],
+        "object-curly-spacing": ["error", "never"],
         "react/no-deprecated": [
             1,
         ],
         "react/jsx-no-target-blank": [
             0,
         ],
+        "react/display-name": [0]
     },
     "settings": {
         "react": {
