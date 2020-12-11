@@ -1,7 +1,7 @@
 [
     {
         "_id": "wire",
-        "init_version": 4,
+        "init_version": 5,
         "preview": {
             "wordcount": {
                 "displayed": false
@@ -34,6 +34,7 @@
               "source",
               {"field": "sttdepartment", "styles": { "fontWeight": "bold" }},
               "charcount",
+              "wordcount",
               "previous_versions",
               "embargo"
             ]
