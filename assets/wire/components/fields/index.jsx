@@ -12,6 +12,10 @@ export function getComponentForField(item, field) {
         // example: { field: "source", styles: {fontWeight: "bold"} }
         const Component = getComponentForField(item, field.field);
 
+        if (!Component) {
+            return null;
+        }
+
         return (props) => (
             <span style={field.styles || {}}>
                 <Component {...props} />
@@ -24,6 +28,7 @@ export function getComponentForField(item, field) {
         return (props) => (
             <span>
                 {components
+                    .filter(Boolean) // skip null components
                     .map(({field, Component}) => <Component key={field} {...props} />)
                     .reduce((acc, curr) => [acc, ' // ', curr])
                 }
