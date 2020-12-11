@@ -59,8 +59,6 @@ PreviewMeta.propTypes = {
     inputRef: PropTypes.string,
     displayConfig: PropTypes.object,
     listConfig: PropTypes.object,
-    previewConfig: PropTypes.object,
-    detailsConfig: PropTypes.object,
 };
 
 export default PreviewMeta;
