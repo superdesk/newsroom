@@ -8,7 +8,6 @@ import {Embargo} from './Embargo';
 import {VersionCreated} from './VersionCreated';
 
 export function getComponentForField(item, field) {
-    console.log(field);
     if (typeof field === 'object' && typeof field.field === 'string') {
         // example: { field: "source", styles: {fontWeight: "bold"} }
         const Component = getComponentForField(item, field.field);
