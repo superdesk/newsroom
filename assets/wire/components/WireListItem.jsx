@@ -302,6 +302,7 @@ class WireListItem extends React.Component {
                     <ListItemPreviousVersions
                         item={this.props.item}
                         isPreview={false}
+                        displayConfig={this.props.listConfig}
                     />
                 )}
             </article>

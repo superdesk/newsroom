@@ -15,13 +15,13 @@ export default function ItemVersion({version, baseClass, showDivider, onClick, d
                         <span className="bold">{getSlugline(version, true)}</span>
                         <span>{formatDate(version.versioncreated)}
                             {isDisplayed('wordcount', displayConfig) && [
-                                '//',
-                                <span key='words-count'>{wordCount(version)}</span>,
+                                ' // ',
+                                <span key='words-count'>{wordCount(version)} </span>,
                                 gettext('words')
                             ]}
                             {isDisplayed('charcount', displayConfig) && [
-                                '//',
-                                <span key='char-count'>{characterCount(version)}</span>,
+                                ' // ',
+                                <span key='char-count'>{characterCount(version)} </span>,
                                 gettext('characters')
                             ]}
                         </span>
