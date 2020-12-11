@@ -55,10 +55,12 @@ export function getComponentForField(item, field) {
             if (typeof item[field] === 'string') {
                 return () => <span>{item[field]}</span>;
             }
+
+            return null;
         }
     }
 
-    console.warn(`Unknown field ${field}`);
+    console.warn(`Unknown field format ${field}`);
 
     return null;
 }
