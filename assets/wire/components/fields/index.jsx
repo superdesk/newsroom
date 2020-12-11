@@ -8,6 +8,7 @@ import {Embargo} from './Embargo';
 import {VersionCreated} from './VersionCreated';
 
 export function getComponentForField(item, field) {
+    console.log(field);
     if (typeof field === 'object' && typeof field.field === 'string') {
         // example: { field: "source", styles: {fontWeight: "bold"} }
         const Component = getComponentForField(item, field.field);
@@ -23,12 +24,13 @@ export function getComponentForField(item, field) {
         );
     } else if (Array.isArray(field)) {
         // example: ["source", "department"]
-        const components = field.map((f) => ({field: f, Component: getComponentForField(item, f)}));
+        const components = field
+            .map((f) => ({field: f, Component: getComponentForField(item, f)}))
+            .filter(({Component}) => Boolean(Component)); // skip null components
 
         return (props) => (
             <span>
                 {components
-                    .filter(Boolean) // skip null components
                     .map(({field, Component}) => <Component key={field} {...props} />)
                     .reduce((acc, curr) => [acc, ' // ', curr])
                 }
