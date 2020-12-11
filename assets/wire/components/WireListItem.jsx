@@ -89,10 +89,6 @@ class WireListItem extends React.Component {
             isExtended,
             listConfig,
         } = this.props;
-        item.headline = 'Kansanedustaja Arto Satosella on todettu koronavirustartunta';
-        item.body_html = 'Kansanedustaja Arto Satosella (kok.) on todettu koronavirustartunta, eduskunta tiedottaa. Tartunta on varmistettu tänään, ja eduskunnan työterveysasema jäljittää mahdollisia altistuksia viime torstain ja perjantain osalta. Kansanedustajille ja eduskunnan henkilöstölle on toimitettu tieto tartunnasta. Tiedotteen mukaan Satonen antoi luvan nimensä julkistamiseen.';
-        item.sttdepartment = 'Politiikka';
-        item.source = 'STT';
 
 
         if (get(this.props, 'item.deleted')) {
