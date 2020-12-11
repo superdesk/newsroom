@@ -45,12 +45,6 @@ function ItemDetails({
     downloadVideo,
     listConfig,
 }) {
-    item.urgency = 1;
-    item.headline = 'Kansanedustaja Arto Satosella on todettu koronavirustartunta';
-    item.body_html = 'Kansanedustaja Arto Satosella (kok.) on todettu koronavirustartunta, eduskunta tiedottaa. Tartunta on varmistettu tänään, ja eduskunnan työterveysasema jäljittää mahdollisia altistuksia viime torstain ja perjantain osalta. Kansanedustajille ja eduskunnan henkilöstölle on toimitettu tieto tartunnasta. Tiedotteen mukaan Satonen antoi luvan nimensä julkistamiseen.';
-    item.sttdepartment = 'Politiikka';
-    item.source = 'STT';
-
     const picture = getPicture(item);
     const videos = getVideos(item);
     const isCustom = isCustomRendition(picture);
