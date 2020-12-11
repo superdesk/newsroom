@@ -180,7 +180,7 @@ class WireListItem extends React.Component {
                                             return <span key={field}>
                                                 {<Field item={item} listConfig={listConfig} isItemDetail={false} />}
                                             </span>;
-                                        }).reduce((acc, curr) => [acc, ' // ', curr])
+                                        }).filter(Boolean).reduce((acc, curr) => [acc, ' // ', curr])
                                         }
                                     </span>
                                     <span>
