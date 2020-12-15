@@ -50,17 +50,17 @@ export function FieldComponents({config, item, fieldProps = {}}) {
 function getComponentForField(item, field) {
     if (typeof field === 'object' && typeof field.field === 'string') {
         // example: { field: "source", styles: {fontWeight: "bold"} }
-        const Component = getComponentForField(item, field.field);
+        const result = getComponentForField(item, field.field);
 
-        if (!Component) {
+        if (!result) {
             return null;
         }
 
         return {
-            key: field,
+            key: field.field,
             Component: (props) => (
                 <span style={field.styles || {}}>
-                    <Component {...props} />
+                    <result.Component {...props} />
                 </span>
             ),
         };

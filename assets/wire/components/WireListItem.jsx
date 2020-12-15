@@ -84,6 +84,12 @@ class WireListItem extends React.Component {
             isExtended,
             listConfig,
         } = this.props;
+        item.headline =
+            'Suomen Pankki paransi arviotaan Suomen talouden kehityksestä';
+        item.urgency = 2;
+        item.source = 'STT';
+        item.sttdepartment = 'Talous';
+        item.sttversion = 'Nettiuutiset';
 
         if (get(this.props, 'item.deleted')) {
             return (
