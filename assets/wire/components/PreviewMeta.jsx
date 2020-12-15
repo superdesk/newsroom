@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {getPicture} from 'wire/utils';
-import {getComponentForField} from './fields';
+import {FieldComponents} from './fields';
 
 const DEFAULT_META_FIELDS = [
     'urgency',
     'source',
     ['charcount', 'wordcount'],
-    'previous_versions'
+    'previous_versions',
 ];
 
 function PreviewMeta({
@@ -35,19 +35,16 @@ function PreviewMeta({
                 )}
             </div>
             <div className="wire-articles__item__meta-info">
-                {
-                    fields.map(field => {
-                        const Field = getComponentForField(item, field);
-
-                        if (!Field) {
-                            return null;
-                        }
-
-                        return <span key={field}>
-                            {<Field item={item} listConfig={listConfig} isItemDetail={isItemDetail} inputRef={inputRef} alwaysShow />}
-                        </span>;
-                    })
-                }
+                <FieldComponents
+                    config={fields}
+                    item={item}
+                    fieldProps={{
+                        listConfig,
+                        isItemDetail,
+                        inputRef,
+                        alwaysShow: true,
+                    }}
+                />
             </div>
         </div>
     );

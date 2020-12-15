@@ -11,7 +11,6 @@ import {
     LIST_ANIMATIONS,
     getSlugline,
     getConfig,
-    isDisplayed,
 } from 'utils';
 import {
     getPicture,
@@ -30,16 +29,12 @@ import ActionMenu from '../../components/ActionMenu';
 import WireListItemDeleted from './WireListItemDeleted';
 import {Embargo} from './fields/Embargo';
 import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
-import {getComponentForField} from './fields';
+import {FieldComponents} from './fields';
 
 export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
 export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
 
-const DEFAULT_META_FIELDS = [
-    'source',
-    'charcount',
-    'versioncreated'
-];
+const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
 
 class WireListItem extends React.Component {
     constructor(props) {
@@ -89,7 +84,6 @@ class WireListItem extends React.Component {
             isExtended,
             listConfig,
         } = this.props;
-
 
         if (get(this.props, 'item.deleted')) {
             return (
@@ -172,16 +166,14 @@ class WireListItem extends React.Component {
                                         {getSlugline(item, true)}
                                     </span>
                                     <span>
-                                        {fields.map(field => {
-                                            const Field = getComponentForField(item, field);
-                                            if (!Field) {
-                                                return null;
-                                            }
-                                            return <span key={field}>
-                                                {<Field item={item} listConfig={listConfig} isItemDetail={false} />}
-                                            </span>;
-                                        }).filter(Boolean).reduce((acc, curr) => [acc, ' // ', curr])
-                                        }
+                                        <FieldComponents
+                                            config={fields}
+                                            item={item}
+                                            fieldProps={{
+                                                listConfig,
+                                                isItemDetail: false,
+                                            }}
+                                        />
                                     </span>
                                     <span>
                                         <Embargo item={item} />
