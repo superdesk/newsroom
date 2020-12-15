@@ -6,6 +6,7 @@ import {WordCount} from './WordCount';
 import {PreviousVersions} from './PreviousVersions';
 import {Embargo} from './Embargo';
 import {VersionCreated} from './VersionCreated';
+import {VersionType} from './VersionType';
 
 const ALLOWED_SEPARATORS = ['/', '//', '-'];
 
@@ -49,21 +50,41 @@ export function FieldComponents({config, item, fieldProps = {}}) {
 
 function getComponentForField(item, field) {
     if (typeof field === 'object' && typeof field.field === 'string') {
-        // example: { field: "source", styles: {fontWeight: "bold"} }
-        const result = getComponentForField(item, field.field);
+        if (
+            typeof field.component === 'string' &&
+            typeof item[field.field] === 'string'
+        ) {
+            // example: { field: "version", component: "version_type" }
+            switch (field.component) {
+            case 'version_type':
+                return {
+                    key: field.field,
+                    Component: () => (
+                        <VersionType value={item[field.field]} />
+                    ),
+                };
+            }
 
-        if (!result) {
             return null;
         }
 
-        return {
-            key: field.field,
-            Component: (props) => (
-                <span style={field.styles || {}}>
-                    <result.Component {...props} />
-                </span>
-            ),
-        };
+        if (typeof field.styles === 'object') {
+            // example: { field: "source", styles: {fontWeight: "bold"} }
+            const result = getComponentForField(item, field.field);
+
+            return result
+                ? {
+                    key: field.field,
+                    Component: (props) => (
+                        <span style={field.styles || {}}>
+                            <result.Component {...props} />
+                        </span>
+                    ),
+                }
+                : null;
+        }
+
+        return null;
     } else if (Array.isArray(field) && field.length > 0) {
         // example: ["source", "//", "department"]
         const components = field

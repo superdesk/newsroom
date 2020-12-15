@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-export function VersionType({item}) {
-    return <span>{item.source}</span>;
+export function VersionType({value}) {
+    return (
+        <span>{gettext('Version type: {{version}}', {version: value})}</span>
+    );
 }
 
 VersionType.propTypes = {
-    item: PropTypes.object,
+    value: PropTypes.string,
 };
-
