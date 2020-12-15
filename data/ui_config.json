@@ -9,6 +9,10 @@
             "metadata_fields": [
               "urgency",
               ["source", "//", {"field": "sttdepartment", "styles": { "fontWeight": "bold" }}],
+              {
+                  "field": "sttversion",
+                  "component": "version_type"
+              },
               ["charcount", "/", "wordcount"],
               "previous_versions"
             ]
@@ -21,8 +25,8 @@
               "urgency",
               "source",
               {"field": "sttdepartment", "styles": { "fontWeight": "bold" }},
+              "sttversion",
               "charcount",
-              "wordcount",
               "previous_versions",
               "embargo"
             ]
