@@ -1,10 +1,10 @@
 import 'bootstrap';
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { gettext } from 'utils';
-import { connect } from 'react-redux';
-import { closeModal } from 'actions';
+import {get} from 'lodash';
+import {gettext} from 'utils';
+import {connect} from 'react-redux';
+import {closeModal} from 'actions';
 
 import CloseButton from './CloseButton';
 
@@ -75,7 +75,7 @@ class Modal extends React.Component {
     constructor(props) {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);
-        this.state = { submitting: false };
+        this.state = {submitting: false};
     }
 
     componentDidMount() {
@@ -97,7 +97,7 @@ class Modal extends React.Component {
 
     onSubmit(e) {
         if (this.props.disableButtonOnSubmit) {
-            this.setState({ submitting: true });
+            this.setState({submitting: true});
             this.props.onSubmit(e);
             return;
         }
@@ -157,6 +157,6 @@ Modal.defaultProps = {
     clickOutsideToClose: false,
 };
 
-const mapStateToProps = (state) => ({ formValid: get(state, 'modal.formValid') });
+const mapStateToProps = (state) => ({formValid: get(state, 'modal.formValid')});
 
 export default connect(mapStateToProps, {closeModal})(Modal);

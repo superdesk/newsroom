@@ -1,12 +1,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { omit, get, sortBy } from 'lodash';
-import { gettext, toggleValue } from 'utils';
+import {connect} from 'react-redux';
+import {omit, get, sortBy} from 'lodash';
+import {gettext, toggleValue} from 'utils';
 import {submitShareItem} from 'search/actions';
-import { submitShareTopic } from 'user-profile/actions';
-import { modalFormInvalid, modalFormValid } from 'actions';
+import {submitShareTopic} from 'user-profile/actions';
+import {modalFormInvalid, modalFormValid} from 'actions';
 
 import Modal from 'components/Modal';
 import SearchBar from 'search/components/SearchBar';
@@ -48,7 +48,7 @@ class ShareItemModal extends React.Component {
             newValue = toggleValue(this.state.users, userId);
         }
 
-        this.setState({ users: newValue });
+        this.setState({users: newValue});
 
         if (newValue.length === 0) {
             this.props.modalFormInvalid();
@@ -149,7 +149,7 @@ ShareItemModal.propTypes = {
     }),
 };
 
-const mapStateToProps = (state) => ({ formValid: get(state, 'modal.formValid') });
+const mapStateToProps = (state) => ({formValid: get(state, 'modal.formValid')});
 
 const mapDispatchToProps = (dispatch) => ({
     submit: (isFolllowedTopic, data) => isFolllowedTopic ? dispatch(submitShareTopic(data)) : dispatch(submitShareItem(data)),

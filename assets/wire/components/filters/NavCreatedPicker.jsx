@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 import NavLink from './NavLink';
 import NavGroup from './NavGroup';

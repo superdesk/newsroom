@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 import {
     hideModal,
@@ -27,7 +27,7 @@ import ProfileToggle from './ProfileToggle';
 
 import '../style';
 
-const modals = { shareItem: ShareItemModal };
+const modals = {shareItem: ShareItemModal};
 
 class UserProfileApp extends React.Component {
     constructor(props, context) {

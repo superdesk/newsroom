@@ -16,7 +16,7 @@ class ActionMenu extends React.Component {
     }
 
     render() {
-        const { item, plan, user, actions, group, onActionList, showActions } = this.props;
+        const {item, plan, user, actions, group, onActionList, showActions} = this.props;
         return (
             <div className='btn-group'>
                 <span

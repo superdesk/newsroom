@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { get } from 'lodash';
+import {get} from 'lodash';
 
-import { isEqualItem } from 'wire/utils';
+import {isEqualItem} from 'wire/utils';
 import PreviewActionButtons from 'components/PreviewActionButtons';
 
 import Preview from 'ui/components/Preview';

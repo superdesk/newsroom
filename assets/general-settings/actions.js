@@ -1,6 +1,6 @@
 import server from 'server';
 import {errorHandler} from '../utils';
-import { gettext, notify } from 'utils';
+import {gettext, notify} from 'utils';
 
 export const UPDATE_VALUES = 'UPDATE_VALUES';
 function updateValues(data) {

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, keyBy } from 'lodash';
+import {get, keyBy} from 'lodash';
 
 import SelectInput from 'components/SelectInput';
 import SortItems from 'components/SortItems';
-import { gettext, notify } from 'utils';
+import {gettext, notify} from 'utils';
 
 
 class ConfigNavigation extends React.Component {
@@ -39,12 +39,12 @@ class ConfigNavigation extends React.Component {
     }
 
     getNavigations() {
-        const navigationList = [{ value: '', text: '' }];
+        const navigationList = [{value: '', text: ''}];
         const dashboard = this.props.card.dashboard === 'newsroom' ? 'wire' : this.props.card.dashboard;
         this.props.navigations.forEach((navigation) => {
             if (!(get(this.props.card.config.navigations) || []).includes(navigation._id) &&
                 navigation.product_type === dashboard) {
-                navigationList.push({ value: navigation._id, text: navigation.name });
+                navigationList.push({value: navigation._id, text: navigation.name});
             }
         });
         return navigationList;

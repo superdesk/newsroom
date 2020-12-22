@@ -1,7 +1,7 @@
-import { createStore, render } from 'utils';
+import {createStore, render} from 'utils';
 import sectionFiltersReducer from './reducers';
 import SectionFiltersApp from './components/SectionFiltersApp';
-import { initViewData } from './actions';
+import {initViewData} from './actions';
 
 
 const store = createStore(sectionFiltersReducer, 'SectionFilters');

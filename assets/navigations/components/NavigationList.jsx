@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import NavigationListItem from './NavigationListItem';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 function NavigationList({navigations, onClick, activeNavigationId}) {

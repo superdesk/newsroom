@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Toggle from 'react-toggle';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 function AgendaFeaturedStoriesToogle ({featuredFilter, onChange}) {
     return (

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
-import { isEmpty } from 'lodash';
-import { gettext } from 'utils';
-import { getActiveDate } from 'local-store';
+import {isEmpty} from 'lodash';
+import {gettext} from 'utils';
+import {getActiveDate} from 'local-store';
 
 import NavCreatedPicker from './NavCreatedPicker';
 import FilterGroup from './FilterGroup';
@@ -24,7 +24,7 @@ import {
     selectDate
 } from '../../../agenda/actions';
 
-import { resultsFilteredSelector } from 'search/selectors';
+import {resultsFilteredSelector} from 'search/selectors';
 
 class FiltersTab extends React.Component {
     constructor(props) {

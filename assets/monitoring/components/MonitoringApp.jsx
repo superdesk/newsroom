@@ -1,8 +1,8 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
-import { connect } from 'react-redux';
-import { gettext } from 'utils';
+import {connect} from 'react-redux';
+import {gettext} from 'utils';
 import {
     newMonitoringProfile,
     setQuery,
@@ -24,8 +24,8 @@ class MonitoringApp extends React.Component {
         this.onSectionChange = this.onSectionChange.bind(this);
 
         this.sections = [
-            { name: gettext('Monitoring Profiles') },
-            { name: gettext('Schedules') },
+            {name: gettext('Monitoring Profiles')},
+            {name: gettext('Schedules')},
         ];
 
         this.state = {

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 class AgendaCoverageRequest extends React.Component {

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
-import { selectSection } from './actions';
-import { sectionsPropType } from './types';
+import {selectSection} from './actions';
+import {sectionsPropType} from './types';
 import {gettext} from '../../utils';
 
 function SectionSwitch({sections, activeSection, selectSection}) {

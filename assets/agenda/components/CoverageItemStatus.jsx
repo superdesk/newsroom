@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { gettext } from 'utils';
+import {get} from 'lodash';
+import {gettext} from 'utils';
 import {
     getCoverageStatusText,
     WORKFLOW_STATUS,
@@ -24,7 +24,7 @@ function getDeliveryId(coverage) {
 export default class CoverageItemStatus extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { wireItem: null };
+        this.state = {wireItem: null};
         this.filterActions = this.filterActions.bind(this);
         this.onAnchorClick = this.onAnchorClick.bind(this);
     }
@@ -44,7 +44,7 @@ export default class CoverageItemStatus extends React.Component {
     setWireItem(props) {
         const wireId = getDeliveryId(props.coverage);
         if (wireId && get(props, 'wireItems.length', 0) > 0) {
-            this.setState({ wireItem: props.wireItems.find((w) => w._id === wireId) });
+            this.setState({wireItem: props.wireItems.find((w) => w._id === wireId)});
         }
     }
 
@@ -181,4 +181,4 @@ CoverageItemStatus.propTypes = {
     hideViewContentItems: PropTypes.array,
 };
 
-CoverageItemStatus.defaultProps = { actions: [] };
+CoverageItemStatus.defaultProps = {actions: []};

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from '../utils';
-import { isEmpty, get, pickBy, isEqual } from 'lodash';
+import {isEmpty, get, pickBy, isEqual} from 'lodash';
 import CheckboxInput from 'components/CheckboxInput';
 
 class EditPanel extends React.Component {

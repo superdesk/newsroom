@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { formatHTML } from 'utils';
+import {get} from 'lodash';
+import {formatHTML} from 'utils';
 
 /**
  * using component to fix iframely loading

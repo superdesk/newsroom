@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { connect } from 'react-redux';
-import { gettext, fullDate, upperCaseFirstCharacter } from 'utils';
-import { get } from 'lodash';
+import {connect} from 'react-redux';
+import {gettext, fullDate, upperCaseFirstCharacter} from 'utils';
+import {get} from 'lodash';
 import ReportsTable from './ReportsTable';
 import DropdownFilter from '../../components/DropdownFilter';
 import CalendarButton from '../../components/CalendarButton';
@@ -14,7 +14,7 @@ class SubscriberActivity extends React.Component {
         super(props, context);
 
         this.companies = [...this.props.companies.map((c) => ({...c, 'label': c.name}))];
-        this.state = { company: this.props.companies[0] };
+        this.state = {company: this.props.companies[0]};
 
         this.filters = [{
             label: gettext('All Companies'),
@@ -48,7 +48,7 @@ class SubscriberActivity extends React.Component {
     }
 
     getDropdownItems(filter) {
-        const { toggleFilterAndQuery, sections } = this.props;
+        const {toggleFilterAndQuery, sections} = this.props;
         let getName = (text) => (text);
         let itemsArray = [];
         // Company is not filtered, always show full list
@@ -207,6 +207,6 @@ const mapStateToProps = (state) => ({
     sections: state.sections,
 });
 
-const mapDispatchToProps = { toggleFilterAndQuery, fetchReport, runReport };
+const mapDispatchToProps = {toggleFilterAndQuery, fetchReport, runReport};
 
 export default connect(mapStateToProps, mapDispatchToProps)(SubscriberActivity);

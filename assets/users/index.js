@@ -1,7 +1,7 @@
-import { createStore, render } from 'utils';
+import {createStore, render} from 'utils';
 import userReducer from './reducers';
 import UsersApp from './components/UsersApp';
-import { initViewData } from './actions';
+import {initViewData} from './actions';
 
 
 const store = createStore(userReducer, 'Users');

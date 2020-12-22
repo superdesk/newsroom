@@ -13,12 +13,12 @@ import {
     STOP_WATCHING_COVERAGE,
 } from './actions';
 
-import { get, isEmpty, uniqBy, uniq } from 'lodash';
-import { getActiveDate } from 'local-store';
-import { EXTENDED_VIEW } from 'wire/defaults';
-import { searchReducer } from 'search/reducers';
-import { defaultReducer } from '../reducers';
-import { EARLIEST_DATE } from './utils';
+import {get, isEmpty, uniqBy, uniq} from 'lodash';
+import {getActiveDate} from 'local-store';
+import {EXTENDED_VIEW} from 'wire/defaults';
+import {searchReducer} from 'search/reducers';
+import {defaultReducer} from '../reducers';
+import {EARLIEST_DATE} from './utils';
 import moment from 'moment';
 
 const initialState = {

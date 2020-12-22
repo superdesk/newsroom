@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { shortDate } from 'utils';
-import { gettext } from '../../utils';
+import {shortDate} from 'utils';
+import {gettext} from '../../utils';
 
 
 function getProductName(products, id) {

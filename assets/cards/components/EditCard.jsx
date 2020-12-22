@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import {get} from 'lodash';
 
 import TextInput from 'components/TextInput';
 import AuditInformation from 'components/AuditInformation';
 import SelectInput from 'components/SelectInput';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import {
     CARD_TYPES,
     getCardEditComponent,

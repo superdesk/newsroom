@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { get, isEmpty } from 'lodash';
-import { gettext } from 'utils';
+import {get, isEmpty} from 'lodash';
+import {gettext} from 'utils';
 
 import PreviewBox from 'ui/components/PreviewBox';
 import AgendaCoverages from './AgendaCoverages';

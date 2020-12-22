@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import SelectInput from 'components/SelectInput';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 class ConfigProduct extends React.Component {
@@ -13,9 +13,9 @@ class ConfigProduct extends React.Component {
     }
 
     getProducts() {
-        const productList = [{ value: '', text: '' }];
+        const productList = [{value: '', text: ''}];
         this.props.products.map((product) => {
-            productList.push({ value: product._id, text: product.name });
+            productList.push({value: product._id, text: product.name});
         });
         return productList;
     }

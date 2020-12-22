@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { gettext } from 'utils';
-import { hasAttachments } from '../utils';
+import {gettext} from 'utils';
+import {hasAttachments} from '../utils';
 
 import PreviewBox from 'ui/components/PreviewBox';
 import AgendaAttachments from './AgendaAttachments';

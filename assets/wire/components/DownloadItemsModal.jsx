@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { gettext } from 'utils';
-import { submitDownloadItems } from 'wire/actions';
-import { modalFormValid } from 'actions';
-import { context, modalOptions, modalSecondaryFormatOptions } from '../../selectors';
-import { get } from 'lodash';
+import {connect} from 'react-redux';
+import {gettext} from 'utils';
+import {submitDownloadItems} from 'wire/actions';
+import {modalFormValid} from 'actions';
+import {context, modalOptions, modalSecondaryFormatOptions} from '../../selectors';
+import {get} from 'lodash';
 
 import Modal from 'components/Modal';
 import SelectInput from 'components/SelectInput';

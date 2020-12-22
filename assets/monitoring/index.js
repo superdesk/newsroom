@@ -1,11 +1,11 @@
 import {get, startsWith} from 'lodash';
 
-import { createStore, render, getInitData, initWebSocket, closeItemOnMobile, isMobilePhone } from 'utils';
+import {createStore, render, getInitData, initWebSocket, closeItemOnMobile, isMobilePhone} from 'utils';
 import {getReadItems} from 'local-store';
 import monitoringReducer from './reducers';
 import WireApp from 'wire/components/WireApp';
 import MonitoringApp from './components/MonitoringApp';
-import { initViewData, fetchMonitoring } from './actions';
+import {initViewData, fetchMonitoring} from './actions';
 import {
     fetchItems,
     initData,

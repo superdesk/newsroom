@@ -4,7 +4,7 @@ import moment from 'moment';
 import {get} from 'lodash';
 import ReportsTable from './ReportsTable';
 import CalendarButton from 'components/CalendarButton';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import {REPORTS} from '../actions';
 
 

@@ -1,6 +1,6 @@
-import { get, startsWith } from 'lodash';
+import {get, startsWith} from 'lodash';
 
-import { createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone } from '../utils';
+import {createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone} from '../utils';
 
 import {getReadItems} from 'local-store';
 import  AmNewsApp from './components/AmNewsApp';

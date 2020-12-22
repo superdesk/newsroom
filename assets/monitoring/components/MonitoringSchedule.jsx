@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import moment from 'moment';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -80,7 +80,7 @@ class MonitoringSchedule extends React.Component {
 
     componentDidUpdate(prevPops) {
         if (get(this.props, 'item._id') !== get(prevPops, 'item._id')) {
-            this.setState({ needTime: this.getNeedTime(get(this.props, 'item.schedule.interval')) });
+            this.setState({needTime: this.getNeedTime(get(this.props, 'item.schedule.interval'))});
         }
     }
 
@@ -91,13 +91,13 @@ class MonitoringSchedule extends React.Component {
     onChangeSchedule(event) {
         const needTime = this.getNeedTime(event.target.value);
         if (needTime) {
-            this.setState({ needTime: true });
+            this.setState({needTime: true});
             if (!get(this.props, 'item.schedule.time')) {
                 this.onTimeChange(moment(), event.target.value);
                 return;
             }
         } else if (this.state.needTime) {
-            this.setState({ needTime: false });
+            this.setState({needTime: false});
         }
 
         this.props.onChange({
@@ -140,7 +140,7 @@ class MonitoringSchedule extends React.Component {
     }
 
     render() {
-        const { item, onsaveMonitoringProfileSchedule, noForm, readOnly } = this.props;
+        const {item, onsaveMonitoringProfileSchedule, noForm, readOnly} = this.props;
         let timeValue = get(item, 'schedule.time');
         if (get(timeValue, 'length', 0) > 0) {
             timeValue = moment();

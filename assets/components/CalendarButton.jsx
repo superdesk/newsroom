@@ -12,17 +12,17 @@ class CalendarButton extends React.Component {
     constructor (props) {
         super(props);
 
-        this.state = { startDate: moment(this.props.activeDate) };
+        this.state = {startDate: moment(this.props.activeDate)};
         this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange(date) {
         this.props.selectDate(date.valueOf(), 'day');
-        this.setState({ startDate: date });
+        this.setState({startDate: date});
     }
 
     componentDidUpdate(prevProps) {
-        prevProps.activeDate === EARLIEST_DATE && this.setState({ startDate: moment(this.props.activeDate) });
+        prevProps.activeDate === EARLIEST_DATE && this.setState({startDate: moment(this.props.activeDate)});
     }
 
     render() {

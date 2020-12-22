@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, formatDate } from 'utils';
-import { get, groupBy } from 'lodash';
+import {gettext, formatDate} from 'utils';
+import {get, groupBy} from 'lodash';
 import ReportsTable from './ReportsTable';
 
 

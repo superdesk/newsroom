@@ -1,4 +1,4 @@
-import { gettext, notify, errorHandler } from 'utils';
+import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {initSections} from 'features/sections/actions';
 import {activeSectionSelector} from 'features/sections/selectors';

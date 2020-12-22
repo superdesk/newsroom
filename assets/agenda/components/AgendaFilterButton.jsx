@@ -31,6 +31,6 @@ AgendaFilterButton.propTypes = {
     onClick: PropTypes.func,
 };
 
-AgendaFilterButton.defaultProps = { autoToggle: true };
+AgendaFilterButton.defaultProps = {autoToggle: true};
 
 export default AgendaFilterButton;

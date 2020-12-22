@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { gettext } from 'utils';
+import {get} from 'lodash';
+import {gettext} from 'utils';
 
 
 const NavigationCard = ({navigation}) => {

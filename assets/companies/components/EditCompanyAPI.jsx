@@ -16,16 +16,16 @@ export default class EditCompanyAPI extends React.Component {
         this.onCardPreview = this.onCardPreview.bind(this);
         this.onSaveIpList = this.onSaveIpList.bind(this);
 
-        this.state = { noListInput: true };
+        this.state = {noListInput: true};
     }
 
     componentWillReceiveProps(nextProps) {
         if (!isEqual(get(this.props, 'company.allowed_ip_list'), get(nextProps, 'company.allowed_ip_list'))) {
-            this.setState({ noListInput: true });
+            this.setState({noListInput: true});
         }
 
         if (get(nextProps, 'errors.allowed_ip_list')) {
-            this.setState({ noListInput: false });   
+            this.setState({noListInput: false});   
         }
     }
 
@@ -39,12 +39,12 @@ export default class EditCompanyAPI extends React.Component {
     }
 
     onCardEdit() {
-        this.setState({ noListInput: false });
+        this.setState({noListInput: false});
     }
 
     onCardPreview() {
         if (!this.state.noListInput) {
-            this.setState({ noListInput: true });
+            this.setState({noListInput: true});
         }
 
         // Reset to original values if errors are present
@@ -60,7 +60,7 @@ export default class EditCompanyAPI extends React.Component {
 
     onSaveIpList() {
         this.props.onSave();
-        this.setState({ noListInput: true });
+        this.setState({noListInput: true});
     }
 
     renderIPWhiteList() {

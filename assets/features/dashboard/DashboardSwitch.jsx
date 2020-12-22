@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { get } from 'lodash';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
 
-import { selectDashboard } from './actions';
-import { dashboardPropType } from './types';
+import {selectDashboard} from './actions';
+import {dashboardPropType} from './types';
 
 function DashboardSwitch({dashboards, activeDashboard, selectDashboard}) {
     if (get(dashboards, 'length', 0) <= 1) {

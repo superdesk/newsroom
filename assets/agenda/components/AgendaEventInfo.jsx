@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { get, isEmpty } from 'lodash';
+import {get, isEmpty} from 'lodash';
 
 import {gettext} from 'utils';
 import AgendaName from './AgendaName';

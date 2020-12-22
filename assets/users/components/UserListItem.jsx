@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate } from 'utils';
+import {gettext, shortDate, fullDate} from 'utils';
 import {getUserLabel} from '../utils';
 import {get} from 'lodash';
 
