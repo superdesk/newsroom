@@ -1,7 +1,7 @@
-import { createStore, render } from 'utils';
+import {createStore, render} from 'utils';
 import companyReducer from './reducers';
 import CompaniesApp from './components/CompaniesApp';
-import { initViewData } from './actions';
+import {initViewData} from './actions';
 
 const store = createStore(companyReducer, 'Company');
 

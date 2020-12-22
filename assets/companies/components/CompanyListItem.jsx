@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { gettext, shortDate, isInPast } from 'utils';
-import { getCountryLabel } from '../utils';
+import {gettext, shortDate, isInPast} from 'utils';
+import {getCountryLabel} from '../utils';
 
 function CompanyListItem({company, type, isActive, onClick, showSubscriberId}) {
     return (

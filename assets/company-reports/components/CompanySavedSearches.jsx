@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReportsTable from './ReportsTable';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 function CompanySavedSearches({results, print}) {

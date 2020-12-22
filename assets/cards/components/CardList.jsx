@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import CardListItem from './CardListItem';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 function CardList({cards, products, onClick, activeCardId}) {

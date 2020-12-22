@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
-import { EXTENDED_VIEW, COMPACT_VIEW } from 'wire/defaults';
+import {EXTENDED_VIEW, COMPACT_VIEW} from 'wire/defaults';
 import {isTouchDevice} from 'utils';
 
 class ListViewOptions extends React.PureComponent {

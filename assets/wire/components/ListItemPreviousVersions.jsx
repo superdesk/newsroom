@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import {fetchVersions, openItem} from '../actions';
 
 import ItemVersion from './ItemVersion';

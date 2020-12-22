@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { isEmpty } from 'lodash';
-import { gettext } from 'utils';
+import {isEmpty} from 'lodash';
+import {gettext} from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
 import {
     getDataFromCoverages,

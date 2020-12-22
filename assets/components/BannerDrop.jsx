@@ -5,19 +5,19 @@ import classNames from 'classnames';
 class BannerDrop extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { open: this.props.isOpen };
+        this.state = {open: this.props.isOpen};
         this.toggleOpen = this.toggleOpen.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.id !== nextProps.id &&
                 this.state.open !== nextProps.isOpen) {
-            this.setState({ open: nextProps.isOpen });
+            this.setState({open: nextProps.isOpen});
         }
     }
 
     toggleOpen() {
-        this.setState({ open: !this.state.open});
+        this.setState({open: !this.state.open});
     }
 
     render() {

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import AgendaFilterButton from './AgendaFilterButton';
 
 function AgendaEventsOnlyFilter ({toggleFilter, eventsOnlyView}) {

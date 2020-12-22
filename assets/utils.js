@@ -1,12 +1,12 @@
 import React from 'react';
 import server from 'server';
 import analytics from 'analytics';
-import { get, isInteger, keyBy, isEmpty, cloneDeep, throttle } from 'lodash';
-import { Provider } from 'react-redux';
-import { createStore as _createStore, applyMiddleware } from 'redux';
-import { createLogger } from 'redux-logger';
+import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle} from 'lodash';
+import {Provider} from 'react-redux';
+import {createStore as _createStore, applyMiddleware} from 'redux';
+import {createLogger} from 'redux-logger';
 import thunk from 'redux-thunk';
-import { render as _render } from 'react-dom';
+import {render as _render} from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
 import {

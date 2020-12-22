@@ -15,8 +15,8 @@ const canWatchAgendaItem = (state, item, includeCoverages) => {
 };
 
 export const getAgendaItemActions = (dispatch) => {
-    const { watchEvents, stopWatchingEvents } = agendaActions;
-    return getItemActions(dispatch, { ...agendaActions }).concat([
+    const {watchEvents, stopWatchingEvents} = agendaActions;
+    return getItemActions(dispatch, {...agendaActions}).concat([
         {
             name: gettext('Watch'),
             icon: 'watch',
@@ -35,7 +35,7 @@ export const getAgendaItemActions = (dispatch) => {
 };
 
 export const getCoverageItemActions = (dispatch) => {
-    const { watchCoverage, stopWatchingCoverage } = agendaActions;
+    const {watchCoverage, stopWatchingCoverage} = agendaActions;
     return [
         {
             name: gettext('Watch'),

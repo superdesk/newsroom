@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { get } from 'lodash';
+import {get} from 'lodash';
 
 import {
     gettext,
@@ -11,7 +11,6 @@ import {
     LIST_ANIMATIONS,
     getSlugline,
     getConfig,
-    isDisplayed,
 } from 'utils';
 import {
     getPicture,
@@ -28,22 +27,25 @@ import ListItemPreviousVersions from './ListItemPreviousVersions';
 import WireListItemIcons from './WireListItemIcons';
 import ActionMenu from '../../components/ActionMenu';
 import WireListItemDeleted from './WireListItemDeleted';
-import ListItemEmbargoed from '../../components/ListItemEmbargoed';
-import {UrgencyItemBorder, UrgencyLabel} from './UrgencyLabel';
+import {Embargo} from './fields/Embargo';
+import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
+import {FieldComponents} from './fields';
 
 export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
 export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
+
+const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
 
 class WireListItem extends React.Component {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item);
         this.characterCount = characterCount(props.item);
-        this.state = { previousVersions: false };
+        this.state = {previousVersions: false};
         this.onKeyDown = this.onKeyDown.bind(this);
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
 
-        this.dom = { article: null };
+        this.dom = {article: null};
     }
 
     onKeyDown(event) {
@@ -61,7 +63,7 @@ class WireListItem extends React.Component {
 
     togglePreviousVersions(event) {
         event.stopPropagation();
-        this.setState({ previousVersions: !this.state.previousVersions });
+        this.setState({previousVersions: !this.state.previousVersions});
     }
 
     componentDidMount() {
@@ -110,6 +112,7 @@ class WireListItem extends React.Component {
         const picture = getPicture(item);
         const videos = getVideos(item);
         const isMarketPlace = this.props.context === 'aapX';
+        const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;
 
         return (
             <article
@@ -163,45 +166,17 @@ class WireListItem extends React.Component {
                                         {getSlugline(item, true)}
                                     </span>
                                     <span>
-                                        {item.source}
-                                        {item.sttdepartment && isDisplayed('sttdepartment', listConfig) &&
-                                                <span>{' // '}
-                                                    <strong>{item.sttdepartment}</strong>
-                                                </span>
-                                        }
-                                        {isDisplayed(
-                                            'wordcount',
-                                            this.props.listConfig
-                                        ) && (
-                                            <span>
-                                                {' // '}
-                                                <span>
-                                                    {this.wordCount}
-                                                </span>{' '}
-                                                {gettext('words')}
-                                            </span>
-                                        )}
-                                        {isDisplayed(
-                                            'charcount',
-                                            this.props.listConfig
-                                        ) && (
-                                            <span>
-                                                {' // '}
-                                                <span>
-                                                    {this.characterCount}
-                                                </span>{' '}
-                                                {gettext('characters')}
-                                            </span>
-                                        )}
-                                        {' // '}
-                                        <time
-                                            dateTime={fullDate(
-                                                item.versioncreated
-                                            )}
-                                        >
-                                            {fullDate(item.versioncreated)}
-                                        </time>
-                                        <ListItemEmbargoed item={item} />
+                                        <FieldComponents
+                                            config={fields}
+                                            item={item}
+                                            fieldProps={{
+                                                listConfig,
+                                                isItemDetail: false,
+                                            }}
+                                        />
+                                    </span>
+                                    <span>
+                                        <Embargo item={item} />
                                     </span>
                                 </div>
                             </div>
@@ -258,7 +233,7 @@ class WireListItem extends React.Component {
                             >
                                 {gettext(
                                     'Show previous versions ({{ count }})',
-                                    { count: item.ancestors.length }
+                                    {count: item.ancestors.length}
                                 )}
                             </div>
                         )}

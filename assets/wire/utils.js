@@ -1,5 +1,5 @@
-import { get, isEmpty, isEqual, pickBy } from 'lodash';
-import { getTextFromHtml, getConfig } from 'utils';
+import {get, isEmpty, isEqual, pickBy} from 'lodash';
+import {getTextFromHtml, getConfig} from 'utils';
 
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 

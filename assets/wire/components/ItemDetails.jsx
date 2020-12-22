@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from 'lodash';
+import {isEmpty} from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
-import { isDisplayed, fullDate, gettext } from 'utils';
+import {isDisplayed, fullDate, gettext} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import PreviewActionButtons from 'components/PreviewActionButtons';
@@ -36,7 +36,15 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 
 
-function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo, listConfig}) {
+function ItemDetails({
+    item,
+    user,
+    actions,
+    onClose,
+    detailsConfig,
+    downloadVideo,
+    listConfig,
+}) {
     const picture = getPicture(item);
     const videos = getVideos(item);
     const isCustom = isCustomRendition(picture);

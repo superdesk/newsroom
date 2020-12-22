@@ -1,39 +1,49 @@
 [
     {
         "_id": "wire",
-        "init_version": 3,
+        "init_version": 4,
         "preview": {
-            "wordcount": {
-                "displayed": false
-            },
-            "charcount": {
-                "displayed": true
-            },
             "slugline": {
                 "displayed": false
-            }
+            },
+            "metadata_fields": [
+              "urgency",
+              ["source", "//", {"field": "sttdepartment", "styles": { "fontWeight": "bold" }}],
+              {
+                  "field": "sttversion",
+                  "component": "version_type"
+              },
+              ["charcount", "/", "wordcount"],
+              "previous_versions"
+            ]
         },
         "details": {
-            "wordcount": {
-                "displayed": false
-            },
-            "charcount": {
-                "displayed": true
-            },
             "slugline": {
                 "displayed": false
-            }
+            },
+            "metadata_fields": [
+              "urgency",
+              "source",
+              {"field": "sttdepartment", "styles": { "fontWeight": "bold" }},
+              "sttversion",
+              "charcount",
+              "previous_versions",
+              "embargo"
+            ]
         },
         "list": {
-            "wordcount": {
-                "displayed": false
-            },
-            "charcount": {
-                "displayed": true
-            },
             "highlights": {
                 "urgency": ["#C20000", "#BE8502"]
-            }
+            },
+            "metadata_fields": [
+              "source",
+              "//",
+              {"field": "sttdepartment", "styles": { "fontWeight": "bold" }},
+              "//",
+              "charcount",
+              "//",
+              "versioncreated"
+            ]
         },
         "advanced_search_tabs": {},
         "multi_select_topics": false

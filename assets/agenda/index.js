@@ -1,10 +1,10 @@
-import { createStore, render, initWebSocket, getInitData, isMobilePhone, closeItemOnMobile } from 'utils';
+import {createStore, render, initWebSocket, getInitData, isMobilePhone, closeItemOnMobile} from 'utils';
 
 import agendaReducer from './reducers';
 import {getActiveDate, getReadItems, getFeaturedOnlyParam} from 'local-store';
 import AgendaApp from './components/AgendaApp';
-import { fetchItems, setState, initData, initParams, pushNotification, openItemDetails, previewItem } from './actions';
-import { setView } from 'search/actions';
+import {fetchItems, setState, initData, initParams, pushNotification, openItemDetails, previewItem} from './actions';
+import {setView} from 'search/actions';
 
 const store = createStore(agendaReducer, 'Agenda');
 

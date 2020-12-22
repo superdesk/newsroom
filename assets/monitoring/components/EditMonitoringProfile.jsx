@@ -12,7 +12,7 @@ import AuditInformation from 'components/AuditInformation';
 
 import MonitoringSchedule from './MonitoringSchedule';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 

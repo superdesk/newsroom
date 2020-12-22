@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import ItemVersion from './ItemVersion';
-import { fetchNext, openItem } from '../actions';
+import {fetchNext, openItem} from '../actions';
 
 class ListItemNextVersion extends React.Component {
     constructor(props) {

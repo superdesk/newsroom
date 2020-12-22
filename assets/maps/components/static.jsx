@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getMapSource } from '../utils';
+import {getMapSource} from '../utils';
 
 
 class StaticMap extends React.Component{

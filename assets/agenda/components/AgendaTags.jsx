@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext } from 'utils';
-import { isEmpty, uniqBy } from 'lodash';
+import {gettext} from 'utils';
+import {isEmpty, uniqBy} from 'lodash';
 import InfoBox from 'wire/components/InfoBox';
 import PreviewTagsBlock from 'wire/components/PreviewTagsBlock';
 import PreviewTagsLink from 'wire/components/PreviewTagsLink';

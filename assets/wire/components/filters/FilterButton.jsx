@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import NavLink from './NavLink';
 
 export default function FilterButton({label, onClick, className, primary}) {

@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 export default class CardEditor extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { open: this.props.forceEditor };
+        this.state = {open: this.props.forceEditor};
 
         this.onEditClick = this.onEditClick.bind(this);
         this.onCancelClick = this.onCancelClick.bind(this);
@@ -15,19 +15,19 @@ export default class CardEditor extends React.Component {
 
     componentWillReceiveProps(nextProps, nextState) {
         if (!nextState.open && nextProps.forceEditor) {
-            this.setState({ open: true });
+            this.setState({open: true});
         }
     }
 
     onEditClick() {
-        this.setState({ open: true });
+        this.setState({open: true});
         if (this.props.onEdit) {
             this.props.onEdit();
         }
     }
 
     onCancelClick() {
-        this.setState({ open: false });
+        this.setState({open: false});
         if (this.props.onCancel) {
             this.props.onCancel();
         }
@@ -35,7 +35,7 @@ export default class CardEditor extends React.Component {
 
     onSave(event) {
         this.props.onSave(event);
-        this.setState({ open: false });
+        this.setState({open: false});
     }
 
     renderEditor() {

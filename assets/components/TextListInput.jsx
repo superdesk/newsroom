@@ -16,7 +16,7 @@ class TextListInput extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = { inputText: '' };
+        this.state = {inputText: ''};
 
         this.addKeyword = this.addKeyword.bind(this);
         this.removeKeyword = this.removeKeyword.bind(this);
@@ -41,9 +41,9 @@ class TextListInput extends React.Component {
                     value: newValue
                 }
             });
-            this.setState({ inputText: '' });
+            this.setState({inputText: ''});
         } else {
-            this.setState({ inputText: ''});
+            this.setState({inputText: ''});
         }
     }
 
@@ -60,7 +60,7 @@ class TextListInput extends React.Component {
     }
 
     inputChange(event) {
-        this.setState({ inputText: get(event, 'target.value')});
+        this.setState({inputText: get(event, 'target.value')});
     }
 
     render() {

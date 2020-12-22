@@ -1,7 +1,7 @@
-import { createStore, render } from 'utils';
+import {createStore, render} from 'utils';
 import cardReducer from './reducers';
 import CardsApp from './components/CardsApp';
-import { initViewData } from './actions';
+import {initViewData} from './actions';
 
 
 const store = createStore(cardReducer, 'Cards');

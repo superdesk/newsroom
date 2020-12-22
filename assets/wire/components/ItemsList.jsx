@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import classNames from 'classnames';
 import {isEqual} from 'lodash';
 
 
 import {gettext, isDisplayed} from 'utils';
 import WireListItem from './WireListItem';
-import { setActive, previewItem, toggleSelected, openItem } from '../actions';
-import { EXTENDED_VIEW } from '../defaults';
-import { getIntVersion } from '../utils';
+import {setActive, previewItem, toggleSelected, openItem} from '../actions';
+import {EXTENDED_VIEW} from '../defaults';
+import {getIntVersion} from '../utils';
 import {searchNavigationSelector} from 'search/selectors';
-import {previewConfigSelector} from 'ui/selectors';
+import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
 import {getContextName} from 'selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
@@ -199,8 +199,8 @@ ItemsList.propTypes = {
     resultsFiltered: PropTypes.bool,
     isLoading: PropTypes.bool,
     previewConfig: PropTypes.object,
-    contextName: PropTypes.string,
     listConfig: PropTypes.object,
+    contextName: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -220,6 +220,7 @@ const mapStateToProps = (state) => ({
     resultsFiltered: state.resultsFiltered,
     isLoading: state.isLoading,
     previewConfig: previewConfigSelector(state),
+    listConfig: listConfigSelector(state),
     contextName: getContextName(state),
 });
 

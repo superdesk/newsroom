@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import {get} from 'lodash';
 
 export function getNavigationImageUrl(navigation) {
     if (get(navigation, 'tile_images.length', 0) === 0) {

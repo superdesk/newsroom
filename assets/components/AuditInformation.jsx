@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {get} from 'lodash';
 
 import {getEditUsers} from 'actions';
-import { gettext, fullDate, getItemFromArray} from 'utils';
+import {gettext, fullDate, getItemFromArray} from 'utils';
 
 class AuditInformation extends React.Component {
     componentWillMount() {
@@ -74,7 +74,7 @@ AuditInformation.propTypes = {
     noPadding: PropTypes.bool
 };
 
-const mapStateToProps = (state) => ({ editUsers: state.editUsers });
+const mapStateToProps = (state) => ({editUsers: state.editUsers});
 
 const mapDispatchToProps = (dispatch) => ({
     getEditUsers: (item) => dispatch(getEditUsers(item))
