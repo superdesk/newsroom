@@ -1,7 +1,7 @@
 [
     {
         "_id": "wire",
-        "init_version": 9,
+        "init_version": 4,
         "preview": {
             "slugline": {
                 "displayed": false
