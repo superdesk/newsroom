@@ -9,8 +9,17 @@ import {VersionCreated} from './VersionCreated';
 import {VersionType} from './VersionType';
 
 const ALLOWED_SEPARATORS = ['/', '//', '-'];
-
 const SEPARATOR_KEY = 'separator';
+
+const MAP_FIELD_TO_COMPONENT = {
+    urgency: UrgencyLabel,
+    source: Source,
+    charcount: CharCount,
+    wordcount: WordCount,
+    previous_versions: PreviousVersions,
+    embargo: Embargo,
+    versioncreated: VersionCreated,
+};
 
 // Example config:
 // [
@@ -119,33 +128,12 @@ function getComponentForField(item, field) {
         let Component = null;
 
         // example: "source"
-        switch (field) {
-        case 'urgency':
-            Component = UrgencyLabel;
-            break;
-        case 'source':
-            Component = Source;
-            break;
-        case 'charcount':
-            Component = CharCount;
-            break;
-        case 'wordcount':
-            Component = WordCount;
-            break;
-        case 'previous_versions':
-            Component = PreviousVersions;
-            break;
-        case 'embargo':
-            Component = Embargo;
-            break;
-        case 'versioncreated':
-            Component = VersionCreated;
-            break;
-        default:
-            if (typeof item[field] === 'string') {
-                Component = () => <span>{item[field]}</span>;
-            }
-            break;
+        if (MAP_FIELD_TO_COMPONENT.hasOwnProperty(field)) {
+            // predefined component
+            Component = MAP_FIELD_TO_COMPONENT[field];
+        } else if (typeof item[field] === 'string') {
+            // string value from item
+            Component = () => <span>{item[field]}</span>;
         }
 
         if (Component) {
