@@ -52,7 +52,7 @@ class WirePreview extends React.PureComponent {
 
         const previousVersions = 'preview_versions';
         const canFollowStory = followStory && user && (get(item, 'slugline') || '').trim();
-        const disableSelection = previewConfig.selection && previewConfig.selection.disabled === true
+        const disableSelection = previewConfig.selection && previewConfig.selection.disabled === true;
 
         return (
             <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
