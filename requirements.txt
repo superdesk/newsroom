@@ -1,8 +1,3 @@
-httmock
-wooper
-PyRTF3
-xhtml2pdf
-werkzeug>=0.9.4,<=0.11.15
 -e .
-git+git://github.com/superdesk/superdesk-planning.git@1.10#egg=superdesk-planning
-git+git://github.com/superdesk/superdesk-core.git@master#egg=superdesk-core
+superdesk-planning==1.33.2
+superdesk-core>=1.33,<1.34
