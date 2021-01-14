@@ -46,6 +46,7 @@ class UIConfigResource(newsroom.Resource):
     item_methods = ['GET']
     resource_methods = ['GET']
 
+
 class UIConfigService(newsroom.Service):
 
     def getSectionConfig(self, section_name):

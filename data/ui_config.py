@@ -10,7 +10,7 @@
         "details": {},
         "list": {},
         "advanced_search_tabs": {},
-        "multi_select_topics": false
+        "multi_select_topics": False
     },
     {
         "_id": "home",
