@@ -155,6 +155,7 @@ class ItemsList extends React.Component {
                 user={this.props.user}
                 context={this.props.context}
                 contextName={this.props.contextName}
+                listConfig={this.props.listConfig}
             />
         );
 
@@ -199,6 +200,7 @@ ItemsList.propTypes = {
     isLoading: PropTypes.bool,
     previewConfig: PropTypes.object,
     contextName: PropTypes.string,
+    listConfig: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({

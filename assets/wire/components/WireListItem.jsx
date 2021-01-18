@@ -204,6 +204,7 @@ WireListItem.propTypes = {
     user: PropTypes.string,
     context: PropTypes.string,
     contextName: PropTypes.string,
+    listConfig: PropTypes.object,
 };
 
 export default WireListItem;
