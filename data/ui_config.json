@@ -4,13 +4,13 @@
         "init_version": 1,
         "preview": {
             "selection": {
-                "disabled": False,
+                "disabled": false
             }
         },
         "details": {},
         "list": {},
         "advanced_search_tabs": {},
-        "multi_select_topics": False
+        "multi_select_topics": false
     },
     {
         "_id": "home",
