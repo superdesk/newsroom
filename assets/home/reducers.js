@@ -14,7 +14,6 @@ const initialState = {
     itemsByCard: {},
     products: [],
     activeCard: null,
-    uiConfig: {},
 };
 
 export default function homeReducer(state = initialState, action) {
@@ -31,8 +30,7 @@ export default function homeReducer(state = initialState, action) {
             company: action.data.company,
             formats: action.data.formats || [],
             userSections: action.data.userSections,
-            context: 'wire',
-            uiConfig: action.data.ui_config || {},
+            context: 'wire'
         };
 
     case OPEN_ITEM:{

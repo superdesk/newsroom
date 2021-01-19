@@ -16,7 +16,7 @@ import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import WirePreview from 'wire/components/WirePreview';
 import {followStory} from 'search/actions';
 import {downloadVideo} from 'wire/actions';
-import {previewConfigSelector, listConfigSelector, detailsConfigSelector} from 'ui/selectors';
+import {previewConfigSelector} from 'ui/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -79,7 +79,6 @@ class HomeApp extends React.Component {
                 title={card.label}
                 moreUrl={card.config.more_url}
                 moreUrlLabel={card.config.more_url_label}
-                listConfig={this.props.listConfig}
             />;
         }
         if (card.type === '2x2-events') {
@@ -99,7 +98,6 @@ class HomeApp extends React.Component {
             openItem={this.props.openItemDetails}
             isActive={this.props.activeCard === card._id}
             cardId={card._id}
-            listConfig={this.props.listConfig}
         />;
     }
 
@@ -137,7 +135,6 @@ class HomeApp extends React.Component {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
-                detailsConfig={this.props.detailsConfig}
             />, modal] :
                 this.renderContent()
             )
@@ -194,8 +191,6 @@ HomeApp.propTypes = {
     fetchCardExternalItems: PropTypes.func,
     followStory: PropTypes.func,
     previewConfig: PropTypes.object,
-    listConfig: PropTypes.object,
-    detailsConfig: PropTypes.object,
     downloadVideo: PropTypes.func,
     topics: PropTypes.array,
 };
@@ -212,8 +207,6 @@ const mapStateToProps = (state) => ({
     modal: state.modal,
     activeCard: state.activeCard,
     previewConfig: previewConfigSelector(state),
-    listConfig: listConfigSelector(state),
-    detailsConfig: detailsConfigSelector(state),
     topics: state.topics || [],
 });
 

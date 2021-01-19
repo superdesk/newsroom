@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { wordCount, characterCount } from 'utils';
+import { wordCount } from 'utils';
 import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
 import CardRow from './CardRow';
 import CardMeta from './CardMeta';
 
-const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
+const getTopNewsPanel = (item, picture, openItem, cardId) => {
+    
     const rendition = getThumbnailRendition(picture, true);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
@@ -18,7 +19,6 @@ const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
                 <CardMeta
                     pictureAvailable={!!picture}
                     wordCount={wordCount(item)}
-                    charCount={characterCount(item)}
                     source={item.source}
                     versioncreated={item.versioncreated}
                     displayDivider={false}
@@ -31,10 +31,10 @@ const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
     </div>);
 };
 
-function TopNewsOneByOneCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
+function TopNewsOneByOneCard ({items, title, product, openItem, isActive, cardId}) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getTopNewsPanel(item, getPicture(item), openItem, cardId, listConfig))}
+            {items.map((item) => getTopNewsPanel(item, getPicture(item), openItem, cardId))}
         </CardRow>
     );
 }
@@ -46,7 +46,6 @@ TopNewsOneByOneCard.propTypes = {
     openItem: PropTypes.func,
     isActive: PropTypes.bool,
     cardId: PropTypes.string,
-    listConfig: PropTypes.object,
 };
 
 export default TopNewsOneByOneCard;
