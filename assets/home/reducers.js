@@ -32,7 +32,7 @@ export default function homeReducer(state = initialState, action) {
             formats: action.data.formats || [],
             userSections: action.data.userSections,
             context: 'wire',
-            uiConfig: action.data.ui_config || {},
+            uiConfig: action.data.ui_config || {},
         };
 
     case OPEN_ITEM:{
