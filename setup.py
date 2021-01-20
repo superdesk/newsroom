@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 install_requires = [
     'Babel>=2.5.3,<3.0',
+    'WTForms==2.2.1',
     'flask-webpack>=0.1.0,<0.2',
     'Flask-WTF>=0.14.2,<0.15',
     'flask-limiter>=0.9.5.1,<0.9.6',
