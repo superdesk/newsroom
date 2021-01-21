@@ -17,6 +17,7 @@ install_requires = [
     'urllib3<1.26',
     'superdesk-planning==1.33.2',
     'superdesk-core>=1.33,<1.34',
+    'urllib3<1.26'
 ]
 
 setup(
