@@ -1,0 +1,21 @@
+[
+    {
+        "_id": "wire",
+        "init_version": 5,
+        "preview": {
+            "selection": {
+                "disabled": false
+            }
+        },
+        "details": {},
+        "list": {},
+        "advanced_search_tabs": {},
+        "multi_select_topics": false
+    },
+    {
+        "_id": "home",
+        "init_version": 1,
+        "list": {},
+        "details": {}
+    }
+]

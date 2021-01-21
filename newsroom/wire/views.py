@@ -120,6 +120,7 @@ def get_home_data():
         'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types'], 'assets': f['assets']}
                     for f in app.download_formatters.values()],
         'context': 'wire',
+        'ui_config': get_resource_service('ui_config').getSectionConfig('home'),
     }
 
 
