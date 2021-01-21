@@ -32,4 +32,3 @@ def app(request):
 
     with app.app_context():
         yield app
-
