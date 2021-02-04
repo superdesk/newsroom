@@ -14,14 +14,17 @@ from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
 
+
 logger = logging.getLogger(__name__)
 
 
 def query_string(query, default_operator='AND'):
+    query_string_settings = app.config['ELASTICSEARCH_SETTINGS']['settings']['query_string']
     return {
         'query_string': {
             'query': query,
             'default_operator': default_operator,
+            'analyze_wildcard': query_string_settings['analyze_wildcard'],
             'lenient': True,
         }
     }
@@ -322,11 +325,19 @@ class BaseSearchService(Service):
 
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get('q')
+        query_string_settings = app.config['ELASTICSEARCH_SETTINGS']['settings']['query_string']
         if app.data.elastic.should_highlight(req) and query_string:
-            field_settings = {'highlight_query': {'query_string': {"query": query_string,
-                                                                   "default_operator": "AND",
-                                                                   "lenient": False}},
-                              'number_of_fragments': 0}
+            field_settings = {
+                'highlight_query': {
+                    'query_string': {
+                        'query': query_string,
+                        'default_operator': "AND",
+                        'analyze_wildcard': query_string_settings['analyze_wildcard'],
+                        "lenient": False
+                    }
+                },
+                'number_of_fragments': 0
+            }
 
             elastic_highlight_query = {
                 'require_field_match': False,

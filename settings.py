@@ -1,3 +1,4 @@
+from newsroom.default_settings import ELASTICSEARCH_SETTINGS
 from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
 
 
@@ -95,3 +96,6 @@ CELERY_BEAT_SCHEDULE = {key: val for key, val in CELERY_BEAT_SCHEDULE_DEFAULT.it
 ENABLE_WATCH_LISTS = False
 
 NEWS_API_ENABLED = False
+
+# SDAN-695
+ELASTICSEARCH_SETTINGS['settings']['query_string']['analyze_wildcard'] = True
