@@ -5,7 +5,7 @@ import {get} from 'lodash';
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import {sectionsPropType} from '../../features/sections/types';
 
 class EditSectionFilter extends React.Component {

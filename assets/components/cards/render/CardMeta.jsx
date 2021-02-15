@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, shortDate, fullDate, isDisplayed } from 'utils';
+import {gettext, shortDate, fullDate, isDisplayed} from 'utils';
 
 
 function CardMeta({wordCount, charCount, pictureAvailable, source, versioncreated, displayDivider, slugline, listConfig}) {

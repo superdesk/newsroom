@@ -7,12 +7,12 @@ import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 import DateInput from 'components/DateInput';
 
-import { isEmpty, get, sortBy } from 'lodash';
-import { gettext, shortDate, getDateInputDate, isInPast } from 'utils';
+import {isEmpty, get, sortBy} from 'lodash';
+import {gettext, shortDate, getDateInputDate, isInPast} from 'utils';
 import CompanyPermissions from './CompanyPermissions';
 import EditCompanyAPI from './EditCompanyAPI';
 import AuditInformation from 'components/AuditInformation';
-import { countries } from '../utils';
+import {countries} from '../utils';
 
 class EditCompany extends React.Component {
     constructor(props) {

@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { isEmpty } from 'lodash';
+import {connect} from 'react-redux';
+import {isEmpty} from 'lodash';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
-import { selectAll, selectNone } from 'wire/actions';
+import {selectAll, selectNone} from 'wire/actions';
 
 class SelectedItemsBar extends React.PureComponent {
     constructor(props) {

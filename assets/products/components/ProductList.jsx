@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ProductListItem from './ProductListItem';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 function ProductList({products, onClick, activeProductId, activeSection}) {

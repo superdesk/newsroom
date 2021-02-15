@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, isDisplayed } from 'utils';
+import {gettext, isDisplayed} from 'utils';
 
 export default function ArticleAuthor({item, displayConfig}) {
     const inStr = item.located && item.byline ? gettext('in ') : '';

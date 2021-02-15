@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { isTouchDevice } from 'utils';
+import {isTouchDevice} from 'utils';
 
 
 class ActionButton extends React.Component {
     componentDidMount() {
         if ( !isTouchDevice() ) {
-            this.elem && $(this.elem).tooltip({ trigger: 'hover' });
+            this.elem && $(this.elem).tooltip({trigger: 'hover'});
         }
     }
 

@@ -1,4 +1,4 @@
-import { get, isEmpty, includes } from 'lodash';
+import {get, isEmpty, includes} from 'lodash';
 import moment from 'moment';
 
 import server from 'server';
@@ -16,8 +16,8 @@ import {
 } from 'utils';
 import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
 
-import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
-import { renderModal, setSavedItemsCount } from 'actions';
+import {markItemAsRead, toggleFeaturedOnlyParam} from 'local-store';
+import {renderModal, setSavedItemsCount} from 'actions';
 import {
     getCalendars,
     getDateInputDate,
@@ -112,7 +112,7 @@ export function openItemDetails(item, group, plan) {
 export function requestCoverage(item, message) {
     return () => {
         const url = '/agenda/request_coverage';
-        const data = { item: item._id, message };
+        const data = {item: item._id, message};
         return server.post(url, data)
             .then(() => notify.success(gettext('Your inquiry has been sent successfully')))
             .catch(errorHandler);
@@ -539,7 +539,7 @@ export function setAndUpdateNewItems(data) {
         dispatch(updateItems(data));
 
         // Do not use 'killed' items for new-item notifications
-        let newItemsData = { ...data };
+        let newItemsData = {...data};
         if (get(newItemsData, '_items.length', 0) > 0) {
             newItemsData._items = newItemsData._items.filter((item) => item.state !== 'killed');
         }

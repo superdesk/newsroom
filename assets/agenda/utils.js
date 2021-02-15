@@ -1,4 +1,4 @@
-import { get, isEmpty, includes, keyBy, sortBy, partition } from 'lodash';
+import {get, isEmpty, includes, keyBy, sortBy, partition} from 'lodash';
 import moment from 'moment/moment';
 import {
     formatDate,
@@ -730,7 +730,7 @@ export const groupRegions = (filter, aggregations, props) => {
     if (props.locators && Object.keys(props.locators).length > 0) {
         let regions = sortBy(props.locators.filter((l) => l.state).map((l) => ({...l, 'key': l.name, 'label': l.state})), 'label');
         const others = props.locators.filter((l) => !l.state).map((l) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
-        const separator = { 'key': 'divider'};
+        const separator = {'key': 'divider'};
 
         if (others.length > 0) {
             if (regions.length > 0) {

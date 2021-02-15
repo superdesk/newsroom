@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TextInput from 'components/TextInput';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import {get} from 'lodash';
 
 

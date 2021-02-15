@@ -52,7 +52,7 @@ class AmNewsApp extends BaseApp {
     constructor(props) {
         super(props);
         this.modals = modals;
-        this.state = { isMobile: false };    // to cater for responsive behaviour during widnow resize
+        this.state = {isMobile: false};    // to cater for responsive behaviour during widnow resize
         this.setIsMobile = this.setIsMobile.bind(this);
         this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
     }
@@ -73,9 +73,9 @@ class AmNewsApp extends BaseApp {
 
     setIsMobile() {
         if (window.innerWidth <= 768 && !this.state.isMobile) {
-            this.setState({ isMobile: true });
+            this.setState({isMobile: true});
         } else if (window.innerWidth > 768 && this.state.isMobile) {
-            this.setState({ isMobile: false });
+            this.setState({isMobile: false});
         }
     }
 

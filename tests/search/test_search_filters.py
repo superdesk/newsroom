@@ -31,6 +31,7 @@ def init(app):
 
 def test_apply_section_filter(client, app):
     with app.test_request_context():
+        query_string_settings = app.config['ELASTICSEARCH_SETTINGS']['settings']['query_string']
         session['user'] = ADMIN_USER_ID
         search = SearchQuery()
         service.section = 'wire'
@@ -39,6 +40,7 @@ def test_apply_section_filter(client, app):
         assert {'query_string': {
             'query': SECTION_FILTERS[0]['query'],
             'default_operator': 'AND',
+            'analyze_wildcard': query_string_settings['analyze_wildcard'],
             'lenient': True
         }} in search.query['bool']['must']
 
@@ -48,6 +50,7 @@ def test_apply_section_filter(client, app):
         assert {'query_string': {
             'query': SECTION_FILTERS[1]['query'],
             'default_operator': 'AND',
+            'analyze_wildcard': query_string_settings['analyze_wildcard'],
             'lenient': True
         }} in search.query['bool']['must']
 
@@ -103,6 +106,7 @@ def test_apply_time_limit_filter(client, app):
 def test_apply_products_filter(client, app):
     def assert_products_query(user_id, args=None, products=None):
         with app.test_request_context():
+            query_string_settings = app.config['ELASTICSEARCH_SETTINGS']['settings']['query_string']
             session['user'] = user_id
             search = SearchQuery()
 
@@ -120,6 +124,7 @@ def test_apply_products_filter(client, app):
                 assert {'query_string': {
                     'query': product['query'],
                     'default_operator': 'AND',
+                    'analyze_wildcard': query_string_settings['analyze_wildcard'],
                     'lenient': True
                 }} in search.query['bool']['should']
 
@@ -148,12 +153,14 @@ def test_apply_products_filter(client, app):
 
 def test_apply_request_filter__query_string(client, app):
     with app.test_request_context():
+        query_string_settings = app.config['ELASTICSEARCH_SETTINGS']['settings']['query_string']
         search = SearchQuery()
         search.args = {'q': 'Sport AND Tennis'}
         service.apply_request_filter(search)
         assert {'query_string': {
             'query': 'Sport AND Tennis',
             'default_operator': 'AND',
+            'analyze_wildcard': query_string_settings['analyze_wildcard'],
             'lenient': True
         }} in search.query['bool']['must']
 
@@ -165,6 +172,7 @@ def test_apply_request_filter__query_string(client, app):
         assert {'query_string': {
             'query': 'Sport AND Tennis',
             'default_operator': 'OR',
+            'analyze_wildcard': query_string_settings['analyze_wildcard'],
             'lenient': True
         }} in search.query['bool']['must']
 

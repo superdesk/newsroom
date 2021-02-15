@@ -118,7 +118,7 @@ export default class EditAPIToken extends React.Component {
 
         if (this.props.onSave) {
             this.props.onSave();
-            this.setState({ creating: false });
+            this.setState({creating: false});
             return;
         }
 

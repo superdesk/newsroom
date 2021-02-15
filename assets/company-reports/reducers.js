@@ -1,6 +1,6 @@
 import {get} from 'lodash';
 
-import { getTimezoneOffset } from 'utils';
+import {getTimezoneOffset} from 'utils';
 import {
     SET_ERROR,
     RECEIVED_DATA,

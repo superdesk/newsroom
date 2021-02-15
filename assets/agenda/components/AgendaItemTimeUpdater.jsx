@@ -11,7 +11,7 @@ class AgendaItemTimeUpdater extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = { timeText: '' };
+        this.state = {timeText: ''};
         this.interval = 60; // In minutes
         this.timerIntervalId = 0;  // handle ID of our interval object
 
@@ -51,7 +51,7 @@ class AgendaItemTimeUpdater extends React.Component {
     deactivateTimer() {
         if (this.timerIntervalId > 0) {
             clearInterval(this.timerIntervalId);
-            this.setState({ timeText: '' });
+            this.setState({timeText: ''});
         }
     }
 
@@ -81,9 +81,9 @@ class AgendaItemTimeUpdater extends React.Component {
         }
 
         if (timeDiff === 0) {
-            this.setState({ timeText: `${itemState} ${gettext('just now')}`});
+            this.setState({timeText: `${itemState} ${gettext('just now')}`});
         } else {
-            this.setState({ timeText: `${itemState} ${timeDiff} ${gettext('minute(s) ago')}`});
+            this.setState({timeText: `${itemState} ${timeDiff} ${gettext('minute(s) ago')}`});
         }
     }
 

@@ -2,7 +2,7 @@ import {get} from 'lodash';
 
 import {createStore, render} from 'utils';
 import {runReport} from '../actions';
-import { panels } from '../utils';
+import {panels} from '../utils';
 import companyReportReducer from '../reducers';
 
 const store = createStore(companyReportReducer, 'CompanyReports');

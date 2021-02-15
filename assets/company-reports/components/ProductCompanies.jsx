@@ -1,19 +1,19 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import { get } from 'lodash';
+import {get} from 'lodash';
 import DropdownFilter from '../../components/DropdownFilter';
 import ReportsTable from './ReportsTable';
 import {toggleFilterAndQuery, runReport} from '../actions';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 class ProductCompanies extends React.Component {
     constructor(props, context) {
         super(props, context);
 
         this.products = [...this.props.products.map((p) => ({...p, 'label': p.name}))];
-        this.state = { product: this.props.products[0] };
+        this.state = {product: this.props.products[0]};
 
         this.filters = [{
             label: gettext('All Products'),
@@ -24,7 +24,7 @@ class ProductCompanies extends React.Component {
     }
 
     getDropdownItems(filter) {
-        const { toggleFilterAndQuery } = this.props;
+        const {toggleFilterAndQuery} = this.props;
         let getName = (text) => (text);
         let itemsArray = [];
         switch (filter.field) {
@@ -105,6 +105,6 @@ const mapStateToProps = (state) => ({
     isLoading: state.isLoading,
 });
 
-const mapDispatchToProps = { toggleFilterAndQuery, runReport};
+const mapDispatchToProps = {toggleFilterAndQuery, runReport};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductCompanies);

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { gettext } from 'utils';
-import { get } from 'lodash';
+import {connect} from 'react-redux';
+import {gettext} from 'utils';
+import {get} from 'lodash';
 
 import CheckboxInput from 'components/CheckboxInput';
 

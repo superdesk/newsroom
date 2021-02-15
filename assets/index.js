@@ -1,7 +1,7 @@
 import 'babel-polyfill';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
-import { isTouchDevice } from 'utils';
+import {isTouchDevice} from 'utils';
 
 // Carousel caption parallax
 $('.content-main').scroll(function() {

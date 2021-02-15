@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import CompanyListItem from './CompanyListItem';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 function CompanyList({companies, onClick, activeCompanyId, companyTypes, showSubscriberId}) {

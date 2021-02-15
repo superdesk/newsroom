@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import MonitoringItem from './MonitoringItem';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 function MonitoringList({list, onClick, activeMonitoringProfileId, companiesById}) {

@@ -223,7 +223,7 @@ class AgendaApp extends BaseApp {
                                     props={{
                                         ...this.props,
                                         groups,
-                                        fetchItems: this.fetchItemsOnNavigation }}
+                                        fetchItems: this.fetchItemsOnNavigation}}
                                 />
                             )}
                         </div>

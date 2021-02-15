@@ -5,7 +5,7 @@ import FileInput from 'components/FileInput';
 import DateInput from'components/DateInput';
 import TextAreaInput from'components/TextAreaInput';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 function ConfigEvent ({card, onChange, errors}) {

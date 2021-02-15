@@ -33,6 +33,6 @@ DropdownFilterButton.propTypes = {
     getFilterLabel: PropTypes.func,
 };
 
-DropdownFilterButton.defaultProps = { autoToggle: true };
+DropdownFilterButton.defaultProps = {autoToggle: true};
 
 export default DropdownFilterButton;

@@ -1,12 +1,12 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { get } from 'lodash';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
 
 import {
     toggleNavigation
 } from '../../search/actions';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 import {
     fetchItems

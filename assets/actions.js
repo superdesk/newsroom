@@ -1,4 +1,4 @@
-import { get, differenceBy } from 'lodash';
+import {get, differenceBy} from 'lodash';
 import server from 'server';
 
 export const RENDER_MODAL = 'RENDER_MODAL';
@@ -62,7 +62,7 @@ export function getEditUsers(item) {
             return Promise.resolve();
         }
         
-        findUsers = differenceBy(editUsers, itemUsers.map((u) => ({ '_id': u})), '_id');
+        findUsers = differenceBy(editUsers, itemUsers.map((u) => ({'_id': u})), '_id');
         if (editUsers.length === 0 || findUsers.length > 0) {
             return server.get(`/users/search?ids=${itemUsers.join(',')}`)
                 .then((data) => {

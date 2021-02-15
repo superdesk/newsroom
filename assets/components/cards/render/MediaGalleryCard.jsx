@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { shortDate } from 'utils';
-import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
+import {shortDate} from 'utils';
+import {getPicture, getThumbnailRendition, getCaption} from 'wire/utils';
 import CardRow from './CardRow';
-import ListItemEmbargoed from '../../ListItemEmbargoed';
+import {Embargo} from '../../../wire/components/fields/Embargo';
 
 const getMediaPanel = (item, picture, openItem, cardId) => {
 
@@ -21,7 +21,7 @@ const getMediaPanel = (item, picture, openItem, cardId) => {
                     </div>
                 </div>
                 <h4 className='card-title'>{item.headline}</h4>
-                <ListItemEmbargoed item={item} isCard={true} />
+                <Embargo item={item} isCard={true} />
             </div>
         </div>
     </div>);

@@ -1,4 +1,4 @@
-import { keyBy } from 'lodash';
+import {keyBy} from 'lodash';
 import * as utils from '../utils';
 
 

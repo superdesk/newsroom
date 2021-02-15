@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MoreNewsButton from './MoreNewsButton';
 import moment from 'moment/moment';
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
 
 const getEventPanel = (event, index) => {

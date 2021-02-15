@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
-import { groupBy } from 'lodash';
+import {connect} from 'react-redux';
+import {createSelector} from 'reselect';
+import {groupBy} from 'lodash';
 import moment from 'moment/moment';
 
 import {gettext, formatDate, DATE_FORMAT} from 'utils';

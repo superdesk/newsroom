@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gettext, fullDate, getEmbargo } from 'utils';
+import {gettext, fullDate, getEmbargo} from 'utils';
 import classNames from 'classnames';
 
-export default class ListItemEmbargoed extends React.Component {
+export class Embargo extends React.Component {
     constructor(props) {
         super(props);
         this.state = {embargo: getEmbargo(props.item)};
@@ -38,7 +38,7 @@ export default class ListItemEmbargoed extends React.Component {
     }
 }
 
-ListItemEmbargoed.propTypes = {
+Embargo.propTypes = {
     item: PropTypes.shape({
         embargoed: PropTypes.string,
     }),

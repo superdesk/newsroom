@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {isEmpty, get} from 'lodash';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
-import { getLocations, mapsKey } from 'maps/utils';
+import {getLocations, mapsKey} from 'maps/utils';
 import StaticMap from 'maps/components/static';
 
 import PreviewActionButtons from 'components/PreviewActionButtons';

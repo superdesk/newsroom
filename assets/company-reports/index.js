@@ -1,6 +1,6 @@
-import { createStore, render } from 'utils';
+import {createStore, render} from 'utils';
 import companyReportReducer from './reducers';
-import { initData } from './actions';
+import {initData} from './actions';
 import CompanyReportsApp from './components/CompanyReportsApp';
 
 

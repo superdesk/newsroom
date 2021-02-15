@@ -11,7 +11,7 @@ import {
     SET_TOPIC_EDITOR_FULLSCREEN,
 } from './actions';
 
-import { RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID } from 'actions';
+import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID} from 'actions';
 import {GET_COMPANY_USERS} from 'companies/actions';
 import {SET_USER_COMPANY_MONITORING_LIST} from 'monitoring/actions';
 

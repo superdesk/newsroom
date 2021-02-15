@@ -4,7 +4,7 @@ import localStorage from 'store/storages/localStorage';
 import operationsPlugin from 'store/plugins/operations';
 import expirePlugin from 'store/plugins/expire';
 
-import { get } from 'lodash';
+import {get} from 'lodash';
 
 const READ_ITEMS_STORE = 'read_items';
 const NEWS_ONLY_STORE = 'news_only';

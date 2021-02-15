@@ -1,4 +1,4 @@
-import { gettext } from './utils';
+import {gettext} from './utils';
 
 
 export function getItemActions(dispatch, actions) {
