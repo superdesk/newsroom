@@ -68,3 +68,39 @@ Feature: News API News Search
     Then we get OK response
     Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
     Then we "get" "<media:credit>Mick Tsikas/AAP PHOTOS</media:credit>" in atom xml response
+
+  Scenario: Simple atom request with embedded image
+    Given "items"
+        """
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p><!-- EMBED START Image {id: \"editor_19\"} --><figure><img src=\"somthing\" alt=\"alt text\" id=\"editor_19\"<figcaption>Some caption</figcaption></figure><!-- EMBED END Image {id: \"editor_19\"} -->",
+        "headline": "headline 1",
+        "byline": "S Smith", "pubstatus": "usable", "service" : [{"name" : "Australian General News", "code" : "a"}],
+        "description_text": "summary",
+        "associations" : {
+            "editor_19" : {
+                "mimetype" : "image/jpeg",
+                "description_text" : "Deputy Prime Minister Michael McCormack during Question Time",
+                "version" : "1",
+                "byline" : "Mick Tsikas/AAP PHOTOS",
+                "body_text" : "QUESTION TIME ALT",
+                "renditions" : {
+                    "16-9" : {
+                        "href" : "/assets/5fc5dce16369ab07be3325fa",
+                        "height" : 720,
+                        "width" : 1280,
+                        "media" : "5fc5dce16369ab07be3325fa",
+                        "poi" : {
+                            "x" : 453,
+                            "y" : 335
+                        },
+                        "mimetype" : "image/jpeg"
+                    }
+            }
+        }},
+         "firstpublished": "#DATE-1#", "versioncreated": "#DATE#"}]
+        """
+    When we get "atom"
+    Then we get OK response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
+    Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
+    Then we "get" "src="http://" in atom xml response
