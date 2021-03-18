@@ -1,6 +1,6 @@
 import superdesk
 from flask import Blueprint
-from flask_babel import gettext
+from flask_babel import lazy_gettext
 
 blueprint = Blueprint('media_releases', __name__)
 
@@ -19,5 +19,5 @@ def init_app(app):
     app.section('media_releases', 'Media Releases', 'wire')
     app.sidenav('Media Releases', 'media_releases.index', 'factory', section='media_releases')
 
-    app.sidenav(gettext('Saved/Watched Items'), 'media_releases.bookmarks', 'bookmark',
+    app.sidenav(lazy_gettext('Saved/Watched Items'), 'media_releases.bookmarks', 'bookmark',
                 group=1, blueprint='media_releases', badge='saved-items-count')

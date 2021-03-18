@@ -11,10 +11,10 @@ import eve
 import flask
 import importlib
 
-from eve.io.mongo import MongoJSONEncoder
-
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
+from superdesk.json_utils import SuperdeskJSONEncoder
+from superdesk.validator import SuperdeskValidator
 from newsroom.auth import SessionAuth
 from flask_mail import Mail
 from flask_cache import Cache
@@ -61,10 +61,11 @@ class NewsroomApp(eve.Eve):
             auth=self.AUTH_SERVICE,
             template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
             static_folder=os.path.join(NEWSROOM_DIR, 'static'),
-            json_encoder=MongoJSONEncoder,
+            validator=SuperdeskValidator,
             **kwargs
         )
-        self.json_encoder = MongoJSONEncoder
+        self.json_encoder = SuperdeskJSONEncoder
+        self.data.json_encoder_class = SuperdeskJSONEncoder
 
         if config:
             try:

@@ -4,7 +4,7 @@ from copy import deepcopy
 from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
 from flask import json, abort, current_app as app
-from flask_babel import gettext
+from flask_babel import lazy_gettext
 from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE, WORKFLOW_STATE
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
@@ -42,24 +42,24 @@ PLANNING_ITEMS_FIELDS = [
 
 agenda_notifications = {
     'event_updated': {
-        'message': gettext('An event you have been watching has been updated'),
-        'subject': gettext('Event updated')
+        'message': lazy_gettext('An event you have been watching has been updated'),
+        'subject': lazy_gettext('Event updated')
     },
     'event_unposted': {
-        'message': gettext('An event you have been watching has been cancelled'),
-        'subject': gettext('Event cancelled')
+        'message': lazy_gettext('An event you have been watching has been cancelled'),
+        'subject': lazy_gettext('Event cancelled')
     },
     'planning_added': {
-        'message': gettext('An event you have been watching has a new planning'),
-        'subject': gettext('Planning added')
+        'message': lazy_gettext('An event you have been watching has a new planning'),
+        'subject': lazy_gettext('Planning added')
     },
     'planning_cancelled': {
-        'message': gettext('An event you have been watching has a planning cancelled'),
-        'subject': gettext('Planning cancelled')
+        'message': lazy_gettext('An event you have been watching has a planning cancelled'),
+        'subject': lazy_gettext('Planning cancelled')
     },
     'coverage_added': {
-        'message': gettext('An event you have been watching has a new coverage added'),
-        'subject': gettext('Coverage added')
+        'message': lazy_gettext('An event you have been watching has a new coverage added'),
+        'subject': lazy_gettext('Coverage added')
     },
 }
 
@@ -1163,7 +1163,7 @@ class AgendaService(BaseSearchService):
         set_saved_items_query(search.query, str(search.user['_id']))
 
         cursor = self.get_items_by_query(search.query, size=0)
-        return cursor.count()
+        return cursor.count() if cursor else 0
 
     def get_featured_stories(self, req, lookup):
         for_date = datetime.strptime(req.args.get('date_from'), '%d/%m/%Y %H:%M')
