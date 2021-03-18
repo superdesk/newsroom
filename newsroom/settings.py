@@ -3,7 +3,7 @@
 import re
 import copy
 import flask
-from flask_babel import gettext
+from flask_babel import gettext, lazy_gettext
 from superdesk.utc import utcnow
 from newsroom.utils import get_json_or_400, set_version_creator
 from newsroom.template_filters import newsroom_config
@@ -94,22 +94,22 @@ def validate_general_settings(values):
 
 
 def init_app(app):
-    app.settings_app('general-settings', gettext('General Settings'), weight=800, data=get_initial_data)
+    app.settings_app('general-settings', lazy_gettext('General Settings'), weight=800, data=get_initial_data)
     app.add_template_global(get_setting)
     app.add_template_global(get_client_config)
 
     # basic settings
-    app.general_setting('google_analytics', gettext('Google Analytics ID'), default=app.config['GOOGLE_ANALYTICS'])
-    app.general_setting('company_expiry_alert_recipients', gettext('Company expiry alert recipients'),
-                        description=gettext('Comma separated list of email addresses to which the expiration alerts of companies will be sent to.'))  # noqa
-    app.general_setting('coverage_request_recipients', gettext('Coverage request recipients'),
-                        description=gettext(
+    app.general_setting('google_analytics', lazy_gettext('Google Analytics ID'), default=app.config['GOOGLE_ANALYTICS'])
+    app.general_setting('company_expiry_alert_recipients', lazy_gettext('Company expiry alert recipients'),
+                        description=lazy_gettext('Comma separated list of email addresses to which the expiration alerts of companies will be sent to.'))  # noqa
+    app.general_setting('coverage_request_recipients', lazy_gettext('Coverage request recipients'),
+                        description=lazy_gettext(
                             'Comma separated list of email addresses who will receive the coverage request emails.'))  # noqa
-    app.general_setting('system_alerts_recipients', gettext('System alerts recipients'),
-                        description=gettext(
+    app.general_setting('system_alerts_recipients', lazy_gettext('System alerts recipients'),
+                        description=lazy_gettext(
                             'Comma separated list of email addresses who will receive system alerts.'))
-    app.general_setting('monitoring_report_logo_path', gettext('Monitoring report logo image'),
-                        description=gettext('Monitoring report logo image (jpg or png) for RTF reports.'))
+    app.general_setting('monitoring_report_logo_path', lazy_gettext('Monitoring report logo image'),
+                        description=lazy_gettext('Monitoring report logo image (jpg or png) for RTF reports.'))
 
 
 class SettingsApp():
