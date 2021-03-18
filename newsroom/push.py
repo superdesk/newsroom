@@ -109,6 +109,8 @@ def publish_item(doc, original):
     doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
     doc.setdefault('charcount', get_char_count(doc.get('body_html', '')))
     service = superdesk.get_resource_service('content_api')
+    service.datasource = 'items'
+
     if 'evolvedfrom' in doc:
         parent_item = service.find_one(req=None, _id=doc['evolvedfrom'])
         if parent_item:
