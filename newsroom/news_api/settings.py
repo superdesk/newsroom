@@ -21,6 +21,7 @@ CORE_APPS = [
     'newsroom.news_api.api_audit',
     'newsroom.news_api.news.assets.assets',
     'newsroom.upload',
+    'newsroom.news_api.news.atom.atom'
 ]
 
 INSTALLED_APPS = []

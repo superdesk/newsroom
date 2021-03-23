@@ -128,6 +128,11 @@ def publish_item(doc, original):
             assoc.setdefault('subscribers', [])
     if doc.get('associations', {}).get('featuremedia'):
         app.generate_renditions(doc)
+
+    # If there is a function defined that generates renditions for embedded images call it.
+    if app.generate_embed_renditions:
+        app.generate_embed_renditions(doc)
+
     if doc.get('coverage_id'):
         agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
         if agenda_items:

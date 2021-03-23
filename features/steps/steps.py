@@ -12,6 +12,7 @@ from superdesk.tests.steps import apply_placeholders, json_match, get_json_data
 from superdesk.tests import set_placeholder
 from behave import when, then
 import json
+import lxml
 from wooper.general import (
     get_body
 )
@@ -54,3 +55,15 @@ def we_get_text_in_response(context, text):
     with context.app.test_request_context(context.app.config['URL_PREFIX']):
         assert(isinstance(get_body(context.response), str))
         assert(text in get_body(context.response))
+
+
+@then('we "{get}" "{text}" in atom xml response')
+def we_get_text_in_atom_xml_response(context, get, text):
+    with context.app.test_request_context(context.app.config['URL_PREFIX']):
+        assert(isinstance(get_body(context.response), str))
+        tree = lxml.etree.fromstring(get_body(context.response).encode('utf-8'))
+        assert '{http://www.w3.org/2005/Atom}feed' == tree.tag
+        if get == 'get':
+            assert(text in get_body(context.response))
+        else:
+            assert (text not in get_body(context.response))
