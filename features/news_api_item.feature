@@ -113,9 +113,12 @@ Feature: News API Item
       "body_html": "<p>test&nbsp;test</p>",
       "associations": {
         "featuremedia": {
+          "products": ["12345", "6789"],
+          "subscribers": ["12345", "6789"],
           "renditions": {
             "16-9": {
-              "href": "/assets/1234567"
+              "href": "/assets/1234567",
+              "media": "/12345/6789.jpg"
             },
             "_newsroom_thumbnail": {
               "href": "/assets/987654"
