@@ -218,7 +218,8 @@ def get_subscriber_activity_report():
             doc['item'] = {
                 'item_text': wire_items[doc['item']].get('headline'),
                 '_id': wire_items[doc['item']]['_id'],
-                'item_href': '/{}?item={}'.format(doc['section'], doc['item'])
+                'item_href': '/{}?item={}'.format(doc['section'] if doc['section'] != 'news_api' else 'wire',
+                                                  doc['item'])
             }
         elif doc.get('item') in agenda_items:
             doc['item'] = {
@@ -235,7 +236,7 @@ def get_subscriber_activity_report():
             doc['user'] = "{0} {1}".format(user.get('first_name'), user.get('last_name'))
 
         doc['section'] = get_section_name(doc['section'])
-        doc['action'] = doc['action'].capitalize()
+        doc['action'] = doc['action'].capitalize() if doc['action'].lower() != 'api' else 'API retrieval'
 
     if not request.args.get('export'):
         results = {

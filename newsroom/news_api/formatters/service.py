@@ -43,4 +43,4 @@ class APIFormattersService(Service):
                                                                                               utcnow()):
             abort(404)
         ret = formatter.format_item(item)
-        return {'formatted_item': ret, 'mimetype': formatter.MIMETYPE}
+        return {'formatted_item': ret, 'mimetype': formatter.MIMETYPE, 'version': item.get('version')}
