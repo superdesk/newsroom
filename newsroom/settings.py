@@ -7,7 +7,7 @@ from flask_babel import gettext, lazy_gettext
 from superdesk.utc import utcnow
 from newsroom.utils import get_json_or_400, set_version_creator
 from newsroom.template_filters import newsroom_config
-from newsroom.decorator import admin_only
+from newsroom.decorator import admin_only, account_manager_only
 
 
 blueprint = flask.Blueprint('settings', __name__)
@@ -20,7 +20,7 @@ def get_settings_collection():
 
 
 @blueprint.route('/settings/<app_id>')
-@admin_only
+@account_manager_only
 def app(app_id):
     for app in flask.current_app.settings_apps:
         if app._id == app_id:
@@ -114,11 +114,12 @@ def init_app(app):
 
 class SettingsApp():
 
-    def __init__(self, _id, name, weight=1000, data=None):
+    def __init__(self, _id, name, weight=1000, data=None, allow_account_mgr=False):
         self._id = _id
         self.name = name
         self.weight = weight
         self.data = data if data is not None else self._default_data
+        self.allow_account_mgr = allow_account_mgr
 
     def _default_data(self):
         return {}

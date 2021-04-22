@@ -119,6 +119,10 @@ def is_current_user_admin():
     return flask.session['user_type'] == 'administrator'
 
 
+def is_current_user_account_mgr():
+    return flask.session['user_type'] == 'account_management'
+
+
 def is_current_user(user_id):
     """
     Checks if the current session user is the same as given user id

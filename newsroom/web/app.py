@@ -169,12 +169,13 @@ class NewsroomWebApp(NewsroomApp):
             'secondary_endpoints': secondary_endpoints
         })
 
-    def settings_app(self, app, name, weight=1000, data=None):
+    def settings_app(self, app, name, weight=1000, data=None, allow_account_mgr=False):
         self.settings_apps.append(SettingsApp(
             _id=app,
             name=name,
             data=data,
-            weight=weight
+            weight=weight,
+            allow_account_mgr=allow_account_mgr
         ))
 
     def dashboard(self, _id, name, cards=[]):

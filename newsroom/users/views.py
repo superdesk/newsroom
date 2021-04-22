@@ -9,8 +9,8 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from newsroom.auth import get_user, get_user_by_email
 from newsroom.auth.views import send_token, add_token_data, \
-    is_current_user_admin, is_current_user
-from newsroom.decorator import admin_only, login_required
+    is_current_user_admin, is_current_user, is_current_user_account_mgr
+from newsroom.decorator import admin_only, login_required, account_manager_only
 from newsroom.companies import get_user_company_name, get_company_sections_monitoring_data
 from newsroom.notifications.notifications import get_user_notifications
 from newsroom.notifications import push_user_notification
@@ -52,7 +52,7 @@ def user_profile():
 
 
 @blueprint.route('/users/search', methods=['GET'])
-@admin_only
+@account_manager_only
 def search():
     lookup = None
     if flask.request.args.get('q'):
@@ -67,7 +67,7 @@ def search():
 
 
 @blueprint.route('/users/new', methods=['POST'])
-@admin_only
+@account_manager_only
 def create():
     form = UserForm()
     if form.validate():
@@ -97,7 +97,7 @@ def _is_email_address_valid(email):
 @blueprint.route('/users/<_id>', methods=['GET', 'POST'])
 @login_required
 def edit(_id):
-    if not is_current_user_admin() and not is_current_user(_id):
+    if not (is_current_user_admin() or is_current_user_account_mgr()) and not is_current_user(_id):
         flask.abort(401)
 
     user = find_one('users', _id=ObjectId(_id))
@@ -115,6 +115,9 @@ def edit(_id):
             if form.company.data:
                 updates['company'] = ObjectId(form.company.data)
 
+            if is_current_user_account_mgr() and updates.get('user_type', '') != user.get('user_type', ''):
+                flask.abort(401)
+
             user = get_resource_service('users').patch(ObjectId(_id), updates=updates)
             app.cache.delete(user.get('email'))
             app.cache.delete(_id)
@@ -130,7 +133,7 @@ def validate(_id):
 
 
 @blueprint.route('/users/<_id>/reset_password', methods=['POST'])
-@admin_only
+@account_manager_only
 def resend_token(_id):
     return _resend_token(_id, token_type='reset_password')
 

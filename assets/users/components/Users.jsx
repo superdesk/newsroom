@@ -15,6 +15,7 @@ import {
     cancelEdit
 } from '../actions';
 import {searchQuerySelector} from 'search/selectors';
+import {userSelector} from '../selectors';
 
 import EditUser from './EditUser';
 import UsersList from './UsersList';
@@ -99,6 +100,7 @@ class Users extends React.Component {
                         onResetPassword={this.props.resetPassword}
                         onClose={this.props.cancelEdit}
                         onDelete={this.deleteUser}
+                        currentUser={this.props.currentUser}
                     />
                 }
             </div>
@@ -124,6 +126,7 @@ Users.propTypes = {
     companiesById: PropTypes.object,
     errors: PropTypes.object,
     dispatch: PropTypes.func,
+    currentUser: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -136,6 +139,7 @@ const mapStateToProps = (state) => ({
     companies: state.companies,
     companiesById: state.companiesById,
     errors: state.errors,
+    currentUser: userSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -17,7 +17,8 @@ from . import views # noqa
 def init_app(app):
     superdesk.register_resource('monitoring', MonitoringResource, MonitoringService, _app=app)
     app.section('monitoring', 'Monitoring', 'monitoring', 'wire')
-    app.settings_app('monitoring', lazy_gettext('Monitoring'), weight=200, data=views.get_settings_data)
+    app.settings_app('monitoring', lazy_gettext('Monitoring'), weight=200, data=views.get_settings_data,
+                     allow_account_mgr=True)
     app.sidenav('Monitoring', 'monitoring.index', 'monitoring', section='monitoring')
     app.sidenav(lazy_gettext('Saved/Watched Items'), 'monitoring.bookmarks', 'bookmark',
                 group=1, blueprint='monitoring', badge='saved-items-count')
