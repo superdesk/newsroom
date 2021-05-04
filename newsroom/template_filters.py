@@ -132,6 +132,14 @@ def is_admin_or_account_manager(user=None):
     return flask.session.get('user_type') in allowed_user_types
 
 
+def authorized_settings_apps(user=None):
+    if is_admin(user):
+        return app.settings_apps
+    if is_admin_or_account_manager(user):
+        return [app for app in app.settings_apps if app.allow_account_mgr]
+    return []
+
+
 def get_multi_line_message(message):
     new_message = message.replace('\r', '')
     return new_message.replace('\n', '\r\n')

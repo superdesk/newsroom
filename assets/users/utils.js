@@ -1,4 +1,5 @@
 import {gettext} from '../utils';
+import {get} from 'lodash';
 
 export const userTypes = [
     {value: 'administrator', text: gettext('Administrator')},
@@ -9,4 +10,8 @@ export const userTypes = [
 
 export function getUserLabel(code) {
     return (userTypes.find(c => c.value === code) || {}).text;
+}
+
+export function isUserAdmin(user) {
+    return get(user, 'user_type') === 'administrator';
 }

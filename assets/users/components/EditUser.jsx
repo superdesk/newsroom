@@ -6,7 +6,7 @@ import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 
 import { gettext } from 'utils';
-import {userTypes} from '../utils';
+import {userTypes, isUserAdmin} from '../utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
@@ -69,7 +69,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={user.role}
                         onChange={onChange}
                         error={errors ? errors.role : null} />
-                    { currentUser.user_type === 'administrator' &&
+                    { isUserAdmin(currentUser) &&
                     <SelectInput
                         name='user_type'
                         label={gettext('User Type')}
@@ -122,7 +122,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={gettext('Save')}
                         onClick={onSave} />
 
-                    {user._id && currentUser.user_type === 'administrator' && <input
+                    {user._id && isUserAdmin(currentUser) && <input
                         type='button'
                         className='btn btn-outline-primary'
                         value={gettext('Delete')}
