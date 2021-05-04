@@ -103,7 +103,7 @@
     window.profileData = {{ get_user_profile_data() | tojson | safe }};
     window.translations = {{ get_client_translations() | tojson | safe }};
     window.locales = {{ get_client_locales() | tojson | safe }};
-    window.locale = {{ get_locale() | tojson | safe }};
+    window.locale = "{{ get_locale() | safe }}";
 </script>
 
 {{ javascript_tag('newsroom_js') | safe }}
