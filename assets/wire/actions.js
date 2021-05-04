@@ -125,7 +125,7 @@ export function removeItems(items) {
                 if (items.length > 1) {
                     notify.success(gettext('Items were removed successfully'));
                 } else {
-                    notify.success(gettext('Item wes removed successfully'));
+                    notify.success(gettext('Item was removed successfully'));
                 }
             })
             .catch(notifyErrors);
