@@ -61,4 +61,5 @@ def section(_id):
 def init_app(app):
     superdesk.register_resource('companies', CompaniesResource, CompaniesService, _app=app)
     app.add_template_global(get_user_company_name)
-    app.settings_app('companies', lazy_gettext('Company Management'), weight=100, data=views.get_settings_data)
+    app.settings_app('companies', lazy_gettext('Company Management'), weight=100, data=views.get_settings_data,
+                     allow_account_mgr=True)

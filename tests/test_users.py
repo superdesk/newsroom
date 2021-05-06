@@ -417,3 +417,42 @@ def test_is_valid_login(client, app):
         assert is_valid_login('5cc94b99bc4316684dc7dc07') is True
         assert is_valid_login('2') is False
         assert is_valid_login('3') is False
+
+
+def test_account_manager_can_update_user(app, client):
+    company_ids = app.data.insert('companies', [{
+        'phone': '2132132134',
+        'sd_subscriber_id': '12345',
+        'name': 'Press Co.',
+        'is_enabled': True,
+        'contact_name': 'Tom'
+    }])
+    account_mgr = {
+        '_id': ObjectId("5c5914275f627d5885fee6a8"),
+        'first_name': 'Account',
+        'last_name': 'Manager',
+        'email': 'accountmgr@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'account_management',
+        'is_validated': True,
+        'is_enabled': True,
+        'is_approved': True,
+        'receive_email': True,
+        'phone': '2132132134',
+        'company': company_ids[0]}
+    app.data.insert('users', [account_mgr])
+    response = client.post(
+        url_for('auth.login'),
+        data={'email': 'accountmgr@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+    account_mgr['first_name'] = 'Updated Account'
+    response = client.post('users/5c5914275f627d5885fee6a8', data=account_mgr,
+                           follow_redirects=True)
+    assert response.status_code == 200
+    # account manager can't promote themselves
+    account_mgr['user_type'] = 'administrator'
+    response = client.post('users/5c5914275f627d5885fee6a8', data=account_mgr,
+                           follow_redirects=True)
+    assert response.status_code == 401

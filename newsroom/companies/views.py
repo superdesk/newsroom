@@ -8,7 +8,7 @@ from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound
 
-from newsroom.decorator import admin_only, login_required
+from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.companies import blueprint
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400, set_original_creator, \
     set_version_creator
@@ -35,7 +35,7 @@ def get_settings_data():
 
 
 @blueprint.route('/companies/search', methods=['GET'])
-@admin_only
+@account_manager_only
 def search():
     lookup = None
     if flask.request.args.get('q'):
@@ -46,7 +46,7 @@ def search():
 
 
 @blueprint.route('/companies/new', methods=['POST'])
-@admin_only
+@account_manager_only
 def create():
     company = get_json_or_400()
     errors = get_errors_company(company)
@@ -100,7 +100,7 @@ def get_company_updates(company):
 
 
 @blueprint.route('/companies/<_id>', methods=['GET', 'POST'])
-@admin_only
+@account_manager_only
 def edit(_id):
     company = find_one('companies', _id=ObjectId(_id))
 
@@ -158,7 +158,7 @@ def update_company(data, _id):
 
 
 @blueprint.route('/companies/<_id>/permissions', methods=['POST'])
-@admin_only
+@account_manager_only
 def save_company_permissions(_id):
     orig = get_entity_or_404(_id, 'companies')
     data = get_json_or_400()

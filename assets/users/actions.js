@@ -1,6 +1,7 @@
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {searchQuerySelector} from 'search/selectors';
+import {get} from 'lodash';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id) {
@@ -11,6 +12,11 @@ export function selectUser(id) {
 
 function select(id) {
     return {type: SELECT_USER, id};
+}
+
+export const GET_USER = 'GET_USER';
+export function getUser(user) {
+    return {type: GET_USER, user};
 }
 
 export const EDIT_USER = 'EDIT_USER';
@@ -144,6 +150,7 @@ export function initViewData(data) {
     return function (dispatch) {
         dispatch(getUsers(data.users));
         dispatch(getCompanies(data.companies));
+        dispatch(getUser(get(window.profileData, 'user', {})));
         //return {type: INIT_VIEW_DATA, data};
     };
 }

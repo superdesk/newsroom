@@ -6,11 +6,11 @@ import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 
 import { gettext } from 'utils';
-import {userTypes} from '../utils';
+import {userTypes, isUserAdmin} from '../utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
-function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose, onDelete}) {
+function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose, onDelete, currentUser}) {
     return (
         <div className='list-item__preview'>
             <div className='list-item__preview-header'>
@@ -69,15 +69,15 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={user.role}
                         onChange={onChange}
                         error={errors ? errors.role : null} />
-
+                    { isUserAdmin(currentUser) &&
                     <SelectInput
                         name='user_type'
                         label={gettext('User Type')}
                         value={user.user_type}
                         options={userTypes}
                         onChange={onChange}
-                        error={errors ? errors.user_type : null} />
-
+                        error={errors ? errors.user_type : null}/>
+                    }
                     <SelectInput
                         name='company'
                         label={gettext('Company')}
@@ -122,7 +122,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={gettext('Save')}
                         onClick={onSave} />
 
-                    {user._id && <input
+                    {user._id && isUserAdmin(currentUser) && <input
                         type='button'
                         className='btn btn-outline-primary'
                         value={gettext('Delete')}
@@ -144,6 +144,7 @@ EditUser.propTypes = {
     onResetPassword: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+    currentUser: PropTypes.object,
 };
 
 export default EditUser;

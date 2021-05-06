@@ -53,7 +53,7 @@
         {% if session.get('name') %}
         <nav class="sidenav">
             <ul class="sidenav-icons">
-                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin()%}
+                {% for app in authorized_settings_apps()|sort(attribute='weight') %}{% if loop.first %}
                 <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-md-p-block d-lg-l-block {% if request.blueprint == 'settings' %}active{% endif %}">
                   <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
                       <i class="icon--cog icon--mid-blue"></i>
