@@ -6,7 +6,7 @@ from flask import jsonify, current_app
 from flask_babel import gettext
 from superdesk import get_resource_service
 
-from newsroom.decorator import admin_only
+from newsroom.decorator import admin_only, account_manager_only
 from newsroom.products import blueprint
 from newsroom.utils import get_json_or_400, get_entity_or_404, set_original_creator, set_version_creator, query_resource
 
@@ -31,7 +31,7 @@ def index():
 
 
 @blueprint.route('/products/search', methods=['GET'])
-@admin_only
+@account_manager_only
 def search():
     lookup = None
     if flask.request.args.get('q'):
@@ -89,7 +89,7 @@ def edit(id):
 
 
 @blueprint.route('/products/<id>/companies', methods=['POST'])
-@admin_only
+@account_manager_only
 def update_companies(id):
     updates = flask.request.get_json()
     get_resource_service('products').patch(id=ObjectId(id), updates=updates)
