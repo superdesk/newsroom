@@ -117,6 +117,7 @@ def get_type():
         'aapX': 'items',
         'media_releases': 'items',
         'monitoring': 'items',
+        'factcheck': 'items',
     }
     return types[item_type]
 

@@ -1,0 +1,19 @@
+{% extends "products_layout.html" %}
+
+{% block title %}{{ gettext('FactCheck') }}{% endblock %}
+
+{% block breadcrumb %}
+<span class="breadcrumb-item active">{{ gettext('FactCheck') }}</span>
+<span id="nav-breadcrumb" class="breadcrumb-item active breadcrumb-sub-item"></span>
+{% endblock %}
+
+{% block content %}
+<div id="factcheck-app" class="content factcheck"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        window.factCheckData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('factcheck_js') | safe }}
+{% endblock %}

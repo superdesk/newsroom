@@ -1,0 +1,12 @@
+{% extends "bookmark_layout.html" %}
+
+{% block content %}
+<div id="factcheck-app" class="content factcheck"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        window.factCheckData = {{ data | tojson | safe }};
+    </script>
+    {{ javascript_tag('factcheck_js') | safe }}
+{% endblock %}
