@@ -9,7 +9,8 @@ export PYTHONUNBUFFERED=true
 
 # install build dependencies
 apt-get update
-apt-get install -y python3-venv python3-pip docker docker-compose
+apt-get install -yy --no-install-recommends python3-venv python3-pip docker docker-compose \
+  libjpeg-dev libxml2-dev libxslt-dev
 
 docker-compose -f /vagrant/docker-compose.yml up -d
 
@@ -32,7 +33,7 @@ honcho start -p 5050 &
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "ubuntu/focal64"
 
   config.vm.network "forwarded_port", guest: 5050, host: 5050
   config.vm.network "forwarded_port", guest: 5150, host: 5100
