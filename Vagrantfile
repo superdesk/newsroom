@@ -9,10 +9,13 @@ export PYTHONUNBUFFERED=true
 
 # install build dependencies
 apt-get update
-apt-get install -yy --no-install-recommends python3-venv python3-pip docker docker-compose \
-  libjpeg-dev libxml2-dev libxslt-dev
+apt-get install -yy --no-install-recommends \
+  python3-dev python3-venv python3-pip python3-wheel \
+  docker.io docker-compose git gcc \
+  libxml2-dev libxslt-dev zlib1g-dev libjpeg-dev
 
 docker-compose -f /vagrant/docker-compose.yml up -d
+while ! curl -sfo /dev/null 'http://localhost:9200/'; do echo -n '.' && sleep .5; done
 
 cd /vagrant
 
@@ -23,7 +26,7 @@ export ASSETS_URL='http://localhost:8080/'
 python3 -m venv /opt/venv
 source /opt/venv/bin/activate
 
-pip install -U pip wheel
+pip install -U pip wheel setuptools
 pip install -Ur requirements.txt
 
 python manage.py create_user admin@localhost.com admin admin admin true
@@ -33,10 +36,10 @@ honcho start -p 5050 &
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/focal64"
+  config.vm.box = "ubuntu/bionic64"
 
   config.vm.network "forwarded_port", guest: 5050, host: 5050
-  config.vm.network "forwarded_port", guest: 5150, host: 5100
+  config.vm.network "forwarded_port", guest: 5150, host: 5150
 
   config.vm.provision :shell, inline: $start, run: "always"
 end
