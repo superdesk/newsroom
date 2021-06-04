@@ -42,4 +42,9 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 5150, host: 5150
 
   config.vm.provision :shell, inline: $start, run: "always"
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    v.cpus = 2
+  end
 end
