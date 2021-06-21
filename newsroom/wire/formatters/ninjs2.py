@@ -1,5 +1,5 @@
 from .ninjs import NINJSFormatter
-from newsroom.news_api.utils import remove_internal_renditions
+from newsroom.news_api.utils import remove_internal_renditions, check_association_permission
 
 
 class NINJSFormatter2(NINJSFormatter):
@@ -11,4 +11,6 @@ class NINJSFormatter2(NINJSFormatter):
         self.direct_copy_properties += ('associations',)
 
     def _transform_to_ninjs(self, item):
+        if not check_association_permission(item):
+            item.pop('associations', None)
         return remove_internal_renditions(super()._transform_to_ninjs(item))

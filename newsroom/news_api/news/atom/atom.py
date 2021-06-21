@@ -9,6 +9,7 @@ from flask import current_app as app
 import datetime
 import logging
 import re
+from newsroom.news_api.utils import check_association_permission
 
 blueprint = superdesk.Blueprint('atom', __name__)
 
@@ -58,27 +59,33 @@ def get_atom():
 
     for item in response[0].get('_items'):
         try:
-            complete_item = item = superdesk.get_resource_service('items').find_one(req=None, _id=item.get('_id'))
+            complete_item = superdesk.get_resource_service('items').find_one(req=None, _id=item.get('_id'))
+
+            # If featuremedia is not allowed for the company don't add the item
+            if ((complete_item.get('associations') or {}).get('featuremedia') or {}).get('renditions'):
+                if not check_association_permission(complete_item):
+                    continue
+
             entry = SubElement(feed, 'entry')
 
             # If the item has any parents we use the id of the first, this should be constant throught the update
             # history
-            if item.get('ancestors') and len(item.get('ancestors')):
-                SubElement(entry, 'id').text = item.get('ancestors')[0]
+            if complete_item.get('ancestors') and len(complete_item.get('ancestors')):
+                SubElement(entry, 'id').text = complete_item.get('ancestors')[0]
             else:
-                SubElement(entry, 'id').text = item.get('_id')
+                SubElement(entry, 'id').text = complete_item.get('_id')
 
-            SubElement(entry, 'title').text = etree.CDATA(item.get('headline'))
+            SubElement(entry, 'title').text = etree.CDATA(complete_item.get('headline'))
             SubElement(entry, 'published').text = _format_date(complete_item.get('firstpublished'))
-            SubElement(entry, 'updated').text = _format_update_date(item.get('versioncreated'))
+            SubElement(entry, 'updated').text = _format_update_date(complete_item.get('versioncreated'))
             SubElement(entry, 'link', attrib={'rel': 'self', 'href': flask.url_for('news/item.get_item',
                                                                                    item_id=item.get('_id'),
                                                                                    format='TextFormatter',
                                                                                    _external=True)})
-            if item.get('byline'):
-                SubElement(SubElement(entry, 'author'), 'name').text = item.get('byline')
+            if complete_item.get('byline'):
+                SubElement(SubElement(entry, 'author'), 'name').text = complete_item.get('byline')
 
-            if item.get('pubstatus') == 'usable':
+            if complete_item.get('pubstatus') == 'usable':
                 SubElement(entry, etree.QName(_message_nsmap.get('dcterms'), 'valid')).text = \
                     'start={}; end={}; scheme=W3C-DTF'.format(_format_date(utcnow()),
                                                               _format_date(utcnow() + datetime.timedelta(days=30)))
@@ -88,7 +95,7 @@ def get_atom():
                     'start={}; end={}; scheme=W3C-DTF'.format(_format_date(utcnow()),
                                                               _format_date(utcnow() - datetime.timedelta(days=30)))
 
-            categories = [{'name': s.get('name')} for s in item.get('service', [])]
+            categories = [{'name': s.get('name')} for s in complete_item.get('service', [])]
             for category in categories:
                 SubElement(entry, 'category', attrib={'term': category.get('name')})
 
@@ -118,9 +125,10 @@ def get_atom():
 
             SubElement(entry, 'content', attrib={'type': 'html'}).text = etree.CDATA(complete_item.get('body_html', ''))
 
-            if ((item.get('associations') or {}).get('featuremedia') or {}).get('renditions'):
-                image = ((item.get('associations') or {}).get('featuremedia') or {}).get('renditions').get("16-9")
-                metadata = ((item.get('associations') or {}).get('featuremedia') or {})
+            if ((complete_item.get('associations') or {}).get('featuremedia') or {}).get('renditions'):
+                image = ((complete_item.get('associations') or {}).get('featuremedia') or {}).get('renditions').get(
+                    "16-9")
+                metadata = ((complete_item.get('associations') or {}).get('featuremedia') or {})
 
                 url = flask.url_for('assets.get_item', _external=True, asset_id=image.get('media'))
                 media = SubElement(entry, etree.QName(_message_nsmap.get('media'), 'content'),

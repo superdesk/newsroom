@@ -550,3 +550,50 @@ Feature: News API News Search
         """
         {"code": 400, "message": "Bad parameter value for Parameter (timezone)"}
         """
+
+    Scenario: Search request response restricted by featured image product
+      Given "items"
+          """
+          [{"_id": "111", "body_html": "Once upon a time there was a fish who could swim", "headline": "headline 1",
+           "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
+           "associations": {"featuremedia": {"products": [{"code": "1234"}], "renditions": {"original": {}} }}},
+          {"_id": "222", "body_html": "Once upon a time there was a aardvark that could not swim", "headline": "headline 2",
+          "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
+           "associations": {"featuremedia": {"products": [{"code": "4321"}], "renditions": {"original": {}} }}}]
+          """
+      Given "products"
+          """
+          [{"name": "A fishy Product",
+          "decsription": "a product for those interested in fish",
+          "companies" : [
+            "#companies._id#"
+          ],
+          "query": "Once upon a time",
+          "product_type": "news_api"
+          },
+          {"name": "A fishy superdesk product",
+          "description": "a superdesk product restricting images in the atom feed",
+          "companies" : [
+            "#companies._id#"
+          ],
+          "sd_product_id": "1234",
+          "product_type": "news_api"
+          }
+          ]
+          """
+      When we get "news/search?q=fish&include_fields=associations"
+      Then we get list with 1 items
+      """
+        {"_items": [
+        {"_id": "111",
+        "associations": {"featuremedia": {"products": [{"code": "1234"}], "renditions": {"original": {}} }}}
+        ]}
+      """
+      When we get "news/search?q=aardvark&include_fields=associations"
+      Then we get list with 1 items
+      """
+        {"_items": [
+        {"_id": "222",
+        "associations": "__no_value__"}
+        ]}
+      """
