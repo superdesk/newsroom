@@ -43,7 +43,13 @@ def remove_internal_renditions(item):
         for key, rendition in\
                 item['associations']['featuremedia']['renditions'].items():
             if not key.startswith('_newsroom'):
+                rendition.pop('media', None)
                 clean_renditions[key] = rendition
+
         item['associations']['featuremedia']['renditions'] = clean_renditions
+    for key, meta in item.get('associations', {}).items():
+        if isinstance(meta, dict):
+            meta.pop('products', None)
+            meta.pop('subscribers', None)
 
     return item
