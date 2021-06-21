@@ -321,3 +321,6 @@ MAX_EXPIRY_QUERY_LIMIT = os.environ.get('MAX_EXPIRY_QUERY_LIMIT', 100)
 CONTENT_API_EXPIRY_DAYS = os.environ.get('CONTENT_API_EXPIRY_DAYS', 180)
 
 NEWS_API_ENABLED = strtobool(env('NEWS_API_ENABLED', 'false'))
+
+# Enables the application of product filtering to image references in the API and ATOM responses
+NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env('NEWS_API_IMAGE_PERMISSIONS_ENABLED', 'false'))

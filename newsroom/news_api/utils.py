@@ -1,6 +1,6 @@
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
-from flask import request, g
+from flask import request, g, current_app as app
 from newsroom.products.products import get_products_by_company
 
 
@@ -57,6 +57,9 @@ def check_association_permission(item):
     :param item:
     :return:
     """
+    if not app.config.get('NEWS_API_IMAGE_PERMISSIONS_ENABLED'):
+        return True
+
     if ((item.get('associations') or {}).get('featuremedia') or {}).get('products'):
         # Extract the products that the image matched in Superdesk
         im_products = [p.get('code') for p in
