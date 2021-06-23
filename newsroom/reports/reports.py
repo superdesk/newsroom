@@ -204,8 +204,10 @@ def get_subscriber_activity_report():
 
         company_ids.append(ObjectId(doc.get('company')))
         user_ids.append(ObjectId(doc.get('user')))
-
-    agenda_items = get_entity_dict(get_items_by_id(agenda_ids, 'agenda'))
+    try:
+        agenda_items = get_entity_dict(get_items_by_id(agenda_ids, 'agenda'))
+    except KeyError:
+        agenda_items = {}
     wire_items = get_entity_dict(get_items_by_id(wire_ids, 'items'))
     company_items = get_entity_dict(get_items_by_id(company_ids, 'companies'), True)
     user_items = get_entity_dict(get_items_by_id(user_ids, 'users'), True)
