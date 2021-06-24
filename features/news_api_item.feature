@@ -104,6 +104,17 @@ Feature: News API Item
     Then we get "test test" in text response
 
   Scenario: Retrieve an item with associations
+    Given "products"
+        """
+        [{
+        "companies" : [
+          "#companies._id#"
+        ],
+        "sd_product_id": "12345",
+        "product_type": "news_api"
+        }
+        ]
+        """
     Given "items"
     """
     [{
@@ -113,7 +124,7 @@ Feature: News API Item
       "body_html": "<p>test&nbsp;test</p>",
       "associations": {
         "featuremedia": {
-          "products": ["12345", "6789"],
+          "products": [{"code": "12345"}, {"code": "6789"}],
           "subscribers": ["12345", "6789"],
           "renditions": {
             "16-9": {
@@ -191,6 +202,6 @@ Feature: News API Item
     {
       "guid": "111",
       "headline": "headline 1",
-      "associations": {"featuremedia": {"products": [{"code": "1234"}], "renditions": {"original": {}} }}
+      "associations": {"featuremedia": {"renditions": {"original": {}} }}
     }
     """
