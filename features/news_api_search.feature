@@ -586,7 +586,7 @@ Feature: News API News Search
       """
         {"_items": [
         {"_id": "111",
-        "associations": {"featuremedia": {"products": [{"code": "1234"}], "renditions": {"original": {}} }}}
+        "associations": {"featuremedia": {"renditions": {"original": {}} }}}
         ]}
       """
       When we get "news/search?q=aardvark&include_fields=associations"
