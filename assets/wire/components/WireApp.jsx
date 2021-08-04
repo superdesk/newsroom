@@ -48,6 +48,7 @@ import ItemDetails from './ItemDetails';
 import ShareItemModal from 'components/ShareItemModal';
 import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
+import ItemStatisticsModal from './ItemStatisticsModal';
 
 import {
     previewConfigSelector,
@@ -59,6 +60,7 @@ import {
 const modals = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
+    itemStatistics: ItemStatisticsModal,
 };
 
 class WireApp extends BaseApp {

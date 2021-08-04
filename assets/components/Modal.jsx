@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import {closeModal} from 'actions';
 
 import CloseButton from './CloseButton';
+import classNames from 'classnames';
 
 /**
  * Primary modal button for actions like save/send/etc
@@ -107,8 +108,10 @@ class Modal extends React.Component {
 
     render() {
         return (
-            <div className="modal mt-xl-5"
-                ref={(elem) => this.elem = elem}>
+            <div className={classNames('modal mt-xl-5', {
+                'modal--full-width': this.props.width === 'full',
+            })}
+            ref={(elem) => this.elem = elem}>
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
@@ -118,20 +121,22 @@ class Modal extends React.Component {
                         <div className="modal-body">
                             {this.props.children}
                         </div>
-                        <div className="modal-footer">
-                            <ModalSecondaryButton
-                                type="reset"
-                                label={this.props.onCancelLabel}
-                                onClick={this.props.closeModal}
-                            />
-                            {' '}
-                            <ModalPrimaryButton
-                                type="submit"
-                                label={this.props.onSubmitLabel}
-                                onClick={this.onSubmit}
-                                disabled={this.state.submitting || !this.props.formValid}
-                            />
-                        </div>
+                        {this.props.onSubmit && (
+                            <div className="modal-footer">
+                                <ModalSecondaryButton
+                                    type="reset"
+                                    label={this.props.onCancelLabel}
+                                    onClick={this.props.closeModal}
+                                />
+                                {' '}
+                                <ModalPrimaryButton
+                                    type="submit"
+                                    label={this.props.onSubmitLabel}
+                                    onClick={this.onSubmit}
+                                    disabled={this.state.submitting || !this.props.formValid}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -142,13 +147,14 @@ class Modal extends React.Component {
 Modal.propTypes = {
     title: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
-    onSubmit: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func,
     onSubmitLabel: PropTypes.string,
     onCancelLabel: PropTypes.string,
     closeModal: PropTypes.func.isRequired,
     disableButtonOnSubmit: PropTypes.bool,
     formValid: PropTypes.bool,
     clickOutsideToClose: PropTypes.bool,
+    width: PropTypes.string,
 };
 
 Modal.defaultProps = {
