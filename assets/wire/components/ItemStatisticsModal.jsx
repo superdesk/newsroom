@@ -1,12 +1,16 @@
 import React from 'react';
 import Modal from 'components/Modal';
 import PropTypes from 'prop-types';
+import {gettext} from 'utils';
 
 export default class ItemStatisticsModal extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {loading: true, iframe: null};
+    }
+
+    componentDidMount() {
         this.fetchState();
     }
 
@@ -41,11 +45,11 @@ export default class ItemStatisticsModal extends React.Component {
 
         return (
             <Modal
-                title={'Article Statistics'}
+                title={gettext('Article Statistics')}
                 width={'full'}
             >
                 {this.state.iframe == null && (
-                    <h3>{'There are no statistics available for selected item.'}</h3>
+                    <h3>{gettext('There are no statistics available for selected item.')}</h3>
                 )}
                 {this.state.iframe != null && (
                     <iframe src={this.state.iframe}></iframe>
@@ -56,11 +60,11 @@ export default class ItemStatisticsModal extends React.Component {
 }
 
 ItemStatisticsModal.propTypes = {
-    data: {
-        item: {
-            extra: {
+    data: PropTypes.shape({
+        item: PropTypes.shape({
+            extra: PropTypes.shape({
                 newsItem_guid: PropTypes.string,
-            },
-        },
-    },
+            }),
+        }),
+    }),
 };
