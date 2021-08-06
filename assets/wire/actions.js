@@ -566,3 +566,7 @@ export function initParams(params) {
         }
     };
 }
+
+export function itemStatistics(item) {
+    return (dispatch) => dispatch(renderModal('itemStatistics', {item}));
+}

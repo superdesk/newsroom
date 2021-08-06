@@ -11,6 +11,7 @@ export function getItemActions(dispatch, actions) {
         bookmarkItems,
         removeBookmarks,
         removeItems,
+        itemStatistics,
     } = actions;
 
 
@@ -54,6 +55,12 @@ export function getItemActions(dispatch, actions) {
             visited: (user, item) => user && item && item.downloads &&  item.downloads.includes(user),
             when: (state) => state.user && state.company,
             action: (items) => dispatch(downloadItems(items)),
+        },
+        {
+            id: 'statistics',
+            name: gettext('Statistics'),
+            icon: 'statistics',
+            action: (item) => dispatch(itemStatistics(item)),
         },
         {
             id: 'save',
