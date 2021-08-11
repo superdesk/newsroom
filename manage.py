@@ -11,6 +11,7 @@ from newsroom.auth import get_user_by_email
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 from newsroom.monitoring .email_alerts import MonitoringEmailAlerts
 from newsroom.data_updates import GenerateUpdate, Upgrade, get_data_updates_files, Downgrade
+from newsroom.initialize_data import AppInitializeWithDataCommand
 
 import content_api
 
@@ -140,6 +141,27 @@ def data_upgrade(data_update_id=None, fake=False, dry=False):
 def data_downgrade(data_update_id=None, fake=False, dry=False):
     cmd = Downgrade()
     cmd.run(data_update_id, fake, dry)
+
+
+@manager.option(
+    '-n', '--entity_name', dest='entity_name', action='append', required=False,
+    help='entity(ies) to initialize'
+)
+@manager.option(
+    '-f', '--force', dest='force', action='store_true', required=False,
+    help='if True, update item even if it has been modified by user'
+)
+@manager.option(
+    '-i', '--init-index-only', dest='init_index_only', action='store_true', required=False,
+    help='if True, it only initializes index only'
+)
+def initialize_data(entity_name=None, path=None, force=False, init_index_only=False):
+    cmd = AppInitializeWithDataCommand()
+    cmd.run(
+        entity_name=entity_name,
+        force=force,
+        init_index_only=init_index_only,
+    )
 
 
 if __name__ == "__main__":
