@@ -123,7 +123,7 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', {{ get_setting('google_analytics') | tojson | safe }}, {
+  gtag('config', '{{ get_setting('google_analytics') | safe }}', {
       custom_map: {
           dimension1: 'company',
           dimension2: 'user',
@@ -131,7 +131,7 @@
   });
 
   {% if session.get('user') %}
-  gtag('set', {'user_id': {{ hash(session['user']) | tojson | safe }} });
+  gtag('set', {'user_id': '{{ hash(session['user']) | safe }}' });
   {% endif %}
 
   {% with messages = get_flashed_messages(category_filter=['analytics']) %}
