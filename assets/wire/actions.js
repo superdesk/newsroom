@@ -411,13 +411,19 @@ export function submitDownloadItems(items, params) {
             uri = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
             uri = `${uri}&secondary_format=${secondaryFormat}`;
         }
-        window.open(uri, '_blank');
+        browserDownload(uri);
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
         analytics.multiItemEvent('download', items.map((_id) => getState().itemsById[_id]));
     };
 }
 
+function browserDownload(url) {
+    const link = document.createElement('a');
+    link.download = '';
+    link.href = url;
+    link.click();
+}
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
 export function removeNewItems(data) {
