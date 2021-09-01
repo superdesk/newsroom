@@ -5,7 +5,7 @@ import superdesk
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app, request, jsonify, url_for
+from flask import current_app as app, request, jsonify
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -30,7 +30,7 @@ from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
 
 from .search import get_bookmarks_count
-from ..upload import ASSETS_RESOURCE
+from ..upload import ASSETS_RESOURCE, get_upload
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
 HOME_EXTERNAL_ITEMS_CACHE_KEY = 'home_external_items'
@@ -195,10 +195,7 @@ def download(_ids):
         if len(items) == 1:
             try:
                 picture = formatter.format_item(items[0], item_type=item_type)
-                return flask.redirect(
-                    url_for('upload.get_upload',
-                            media_id=picture['media'],
-                            filename='baseimage%s' % picture['file_extension']))
+                return get_upload(picture["media"], filename='baseimage%s' % picture['file_extension'])
             except ValueError:
                 return flask.abort(404)
         else:

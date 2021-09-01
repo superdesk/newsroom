@@ -25,7 +25,7 @@ def get_file(key):
 
 @blueprint.route('/assets/<path:media_id>', methods=['GET'])
 @login_required
-def get_upload(media_id):
+def get_upload(media_id, filename=None):
     try:
         media_file = flask.current_app.media.get(media_id, ASSETS_RESOURCE)
     except bson.errors.InvalidId:
@@ -46,9 +46,11 @@ def get_upload(media_id):
     response.cache_control.public = True
     response.make_conditional(flask.request)
 
-    if flask.request.args.get('filename'):
+    if flask.request.args.get('filename') or filename:
         response.headers['Content-Type'] = media_file.content_type
-        response.headers['Content-Disposition'] = 'attachment; filename="%s"' % flask.request.args['filename']
+        response.headers['Content-Disposition'] = 'attachment; filename="%s"' % (
+            filename if filename else flask.request.args['filename']
+        )
     else:
         response.headers['Content-Disposition'] = 'inline'
 
