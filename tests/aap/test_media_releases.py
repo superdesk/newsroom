@@ -303,17 +303,17 @@ def test_time_limited_access(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 1
+    g.settings['media_releases_time_limit_days']['value'] = 1
     resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 100
+    g.settings['media_releases_time_limit_days']['value'] = 100
     resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 1
+    g.settings['media_releases_time_limit_days']['value'] = 1
     company = app.data.find_one('companies', req=None, _id=1)
     app.data.update('companies', 1, {'archive_access': True}, company)
     resp = client.get('/media_releases/search')
