@@ -21,6 +21,7 @@ cd /vagrant
 
 export WEBPACK_SERVER_URL='http://10.0.2.2:8080/'
 export ASSETS_URL='http://localhost:8080/'
+export SECRET_KEY='newsroom'
 
 # use python venv
 python3 -m venv /opt/venv
@@ -32,7 +33,14 @@ pip install -Ur requirements.txt
 python manage.py create_user admin@localhost.com admin admin admin true
 python manage.py elastic_init
 
-honcho start -p 5050 &
+if [[ -d /vagrant/dump ]]; then
+    echo 'installing demo data'
+    apt-get install -yy --no-install-recommends mongo-tools
+    mongorestore --gzip /vagrant/dump
+    python manage.py index_from_mongo
+fi
+
+honcho start -p 5050 > /var/log/newsroom.log &
 SCRIPT
 
 Vagrant.configure("2") do |config|
