@@ -10,15 +10,16 @@ import importlib
 
 import eve
 import flask
+import newsroom
+
 from flask_mail import Mail
-from flask_caching import Cache
-from superdesk.validator import SuperdeskValidator
+from flask_cache import Cache
+from newsroom.auth import SessionAuth
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from superdesk.json_utils import SuperdeskJSONEncoder
-from superdesk.logging import configure_logging
+from superdesk.validator import SuperdeskValidator
 
-import newsroom
 from newsroom.auth import SessionAuth
 from newsroom.utils import is_json_request
 from newsroom.gettext import setup_babel

@@ -1,6 +1,7 @@
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
-from flask import request, g
+from flask import request, g, current_app as app
+from newsroom.products.products import get_products_by_company
 
 
 def post_api_audit(doc):
@@ -53,3 +54,28 @@ def remove_internal_renditions(item):
             meta.pop('subscribers', None)
 
     return item
+
+
+def check_association_permission(item):
+    """
+    Check if any of the products that the passed image item matches are permissioned superdesk products for the
+     company
+    :param item:
+    :return:
+    """
+    if not app.config.get('NEWS_API_IMAGE_PERMISSIONS_ENABLED'):
+        return True
+
+    if ((item.get('associations') or {}).get('featuremedia') or {}).get('products'):
+        # Extract the products that the image matched in Superdesk
+        im_products = [p.get('code') for p in
+                       ((item.get('associations') or {}).get('featuremedia') or {}).get('products')]
+
+        # Check if the one of the companies products that has a superdesk product id matches one of the
+        # image product id's
+        sd_products = [p.get('sd_product_id') for p in get_products_by_company(g.user, None, 'news_api') if
+                       p.get('sd_product_id')]
+
+        return True if len(set(im_products) & set(sd_products)) else False
+    else:
+        return True

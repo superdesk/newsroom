@@ -104,6 +104,17 @@ Feature: News API Item
     Then we get "test test" in text response
 
   Scenario: Retrieve an item with associations
+    Given "products"
+        """
+        [{
+        "companies" : [
+          "#companies._id#"
+        ],
+        "sd_product_id": "12345",
+        "product_type": "news_api"
+        }
+        ]
+        """
     Given "items"
     """
     [{
@@ -113,7 +124,7 @@ Feature: News API Item
       "body_html": "<p>test&nbsp;test</p>",
       "associations": {
         "featuremedia": {
-          "products": ["12345", "6789"],
+          "products": [{"code": "12345"}, {"code": "6789"}],
           "subscribers": ["12345", "6789"],
           "renditions": {
             "16-9": {
@@ -143,5 +154,54 @@ Feature: News API Item
           }
         }
       }
+    }
+    """
+
+  Scenario: Item request response restricted by featured image product
+    Given "items"
+        """
+        [{"_id": "111", "body_html": "Once upon a time there was a fish who could swim", "headline": "headline 1",
+         "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
+         "associations": {"featuremedia": {"products": [{"code": "1234"}], "renditions": {"original": {}} }}},
+        {"_id": "222", "body_html": "Once upon a time there was a aardvark that could not swim", "headline": "headline 2",
+        "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
+         "associations": {"featuremedia": {"products": [{"code": "4321"}], "renditions": {"original": {}} }}}]
+        """
+    Given "products"
+        """
+        [{"name": "A fishy Product",
+        "decsription": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "Once upon a time",
+        "product_type": "news_api"
+        },
+        {"name": "A fishy superdesk product",
+        "description": "a superdesk product restricting images in the atom feed",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "sd_product_id": "1234",
+        "product_type": "news_api"
+        }
+        ]
+        """
+    When we get "/news/item/222?format=NINJSFormatter2"
+    Then we get existing resource
+    """
+    {
+      "guid": "222",
+      "headline": "headline 2",
+      "associations": "__no_value__"
+    }
+    """
+    When we get "/news/item/111?format=NINJSFormatter2"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "headline 1",
+      "associations": {"featuremedia": {"renditions": {"original": {}} }}
     }
     """

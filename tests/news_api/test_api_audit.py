@@ -15,7 +15,7 @@ def audit_check(item_id):
 
 @fixture(autouse=True)
 def init(app):
-    app.data.insert('companies', [{"_id": "company_123", "name": "Test Company", "is_enabled": True}])
+    app.data.insert('companies', [{"_id": ObjectId(company_id), "name": "Test Company", "is_enabled": True}])
     app.data.insert('products', [{
         "_id": ObjectId("5ab03a87bdd78169bb6d0783"),
         "name": "Sample Product X",
@@ -40,8 +40,8 @@ def test_get_item_audit_creation(client, app):
         "pubstatus": "usable",
         "headline": "Headline of the story"
     }])
-    app.data.insert('news_api_tokens', [{"company": "company_123", "enabled": True}])
-    token = app.data.find_one('news_api_tokens', req=None, company='company_123')
+    app.data.insert('news_api_tokens', [{"company": ObjectId(company_id), "enabled": True}])
+    token = app.data.find_one('news_api_tokens', req=None, company=ObjectId(company_id))
     response = client.get('api/v1/news/item/111?format=NINJSFormatter', headers={'Authorization': token.get('token')})
     assert response.status_code == 200
     audit_check('111')
@@ -72,7 +72,7 @@ def test_search_audit_creation(client, app):
                         "body_html": "Once upon a time there was a aardvark that could not swim"
                     }])
     with app.test_request_context(query_string='q=fish&include_fields=body_html', path='/news'):
-        g.user = 'company_123'
+        g.user = company_id
         response = get_internal('news/search')
         assert len(response[0]['_items']) == 1
         audit_check('5ab03a87bdd78169bb6d0785')

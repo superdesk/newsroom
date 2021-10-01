@@ -12,6 +12,11 @@ from superdesk.utc import utcnow
 from newsroom.auth import get_user
 
 
+def to_json(value):
+    """Jinja filter to address the encoding of special values to json"""
+    return app.json_encoder().dumps(value)
+
+
 def parse_date(datetime):
     """Return datetime instance for datetime."""
     if isinstance(datetime, str):
@@ -125,6 +130,14 @@ def is_admin_or_account_manager(user=None):
     if user:
         return user.get('user_type') in allowed_user_types
     return flask.session.get('user_type') in allowed_user_types
+
+
+def authorized_settings_apps(user=None):
+    if is_admin(user):
+        return app.settings_apps
+    if is_admin_or_account_manager(user):
+        return [app for app in app.settings_apps if app.allow_account_mgr]
+    return []
 
 
 def get_multi_line_message(message):

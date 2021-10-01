@@ -53,7 +53,7 @@
         {% if session.get('name') %}
         <nav class="sidenav">
             <ul class="sidenav-icons">
-                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin()%}
+                {% for app in authorized_settings_apps()|sort(attribute='weight') %}{% if loop.first %}
                 <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-md-p-block d-lg-l-block {% if request.blueprint == 'settings' %}active{% endif %}">
                   <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
                       <i class="icon--cog icon--mid-blue"></i>
@@ -103,7 +103,7 @@
     window.profileData = {{ get_user_profile_data() | tojson | safe }};
     window.translations = {{ get_client_translations() | tojson | safe }};
     window.locales = {{ get_client_locales() | tojson | safe }};
-    window.locale = {{ get_locale() | tojson | safe }};
+    window.locale = "{{ get_locale() | safe }}";
 </script>
 
 {{ javascript_tag('newsroom_js') | safe }}
@@ -123,7 +123,7 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', {{ get_setting('google_analytics') | tojson | safe }}, {
+  gtag('config', '{{ get_setting('google_analytics') | safe }}', {
       custom_map: {
           dimension1: 'company',
           dimension2: 'user',
@@ -131,7 +131,7 @@
   });
 
   {% if session.get('user') %}
-  gtag('set', {'user_id': {{ hash(session['user']) | tojson | safe }} });
+  gtag('set', {'user_id': '{{ hash(session['user']) | safe }}' });
   {% endif %}
 
   {% with messages = get_flashed_messages(category_filter=['analytics']) %}
@@ -145,7 +145,7 @@
 {% if config.GOOGLE_MAPS_KEY %}
 <script>
     window.mapsProvider = 'google';
-    window.googleMapsKey = {{ config.GOOGLE_MAPS_KEY | tojson }};
+    window.googleMapsKey = "{{ config.GOOGLE_MAPS_KEY | safe }}";
     function setMapsLoaded() {
         window.mapsLoaded = true;
     }

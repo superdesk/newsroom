@@ -1,6 +1,6 @@
-httmock
-wooper
 PyRTF3
+# reportlab is fixed due to support for python 3.5
+reportlab==3.5.53
 xhtml2pdf
 -e .
 git+git://github.com/superdesk/superdesk-planning.git@release/2.0#egg=superdesk-planning

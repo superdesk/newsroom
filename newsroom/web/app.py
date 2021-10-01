@@ -7,7 +7,8 @@ from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, char_count, newsroom_config, is_admin,
     hash_string, date_header, get_date, get_multi_line_message,
-    sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager
+    sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager,
+    to_json, authorized_settings_apps
 )
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
@@ -38,6 +39,7 @@ class NewsroomWebApp(NewsroomApp):
         self.config.from_envvar('NEWSROOM_SETTINGS', silent=True)
 
     def _setup_jinja(self):
+        self.add_template_filter(to_json, name='tojson')
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
         self.add_template_filter(date_header)
@@ -50,6 +52,7 @@ class NewsroomWebApp(NewsroomApp):
         self.add_template_global(sidenavs_by_names)
         self.add_template_global(sidenavs_by_group)
         self.add_template_global(is_admin_or_account_manager)
+        self.add_template_global(authorized_settings_apps)
         self.add_template_global(newsroom_config)
         self.add_template_global(is_admin)
         self.add_template_global(get_initial_notifications)
@@ -167,12 +170,13 @@ class NewsroomWebApp(NewsroomApp):
             'secondary_endpoints': secondary_endpoints
         })
 
-    def settings_app(self, app, name, weight=1000, data=None):
+    def settings_app(self, app, name, weight=1000, data=None, allow_account_mgr=False):
         self.settings_apps.append(SettingsApp(
             _id=app,
             name=name,
             data=data,
-            weight=weight
+            weight=weight,
+            allow_account_mgr=allow_account_mgr
         ))
 
     def dashboard(self, _id, name, cards=[]):

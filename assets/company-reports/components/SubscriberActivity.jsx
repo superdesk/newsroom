@@ -48,7 +48,7 @@ class SubscriberActivity extends React.Component {
     }
 
     getDropdownItems(filter) {
-        const { toggleFilterAndQuery, sections } = this.props;
+        const { toggleFilterAndQuery, sections, apiEnabled } = this.props;
         let getName = (text) => (text);
         let itemsArray = [];
         // Company is not filtered, always show full list
@@ -59,26 +59,33 @@ class SubscriberActivity extends React.Component {
 
         case 'action':
             itemsArray = [{
-                'name': 'download'
+                name: 'download'
             },
             {
-                'name': 'copy'
+                name: 'copy'
             },
             {
-                'name': 'share'
+                name: 'share'
             },
             {
-                'name': 'print'
+                name: 'print'
             },
             {
-                'name': 'open'
+                name: 'open'
             },
             {
-                'name': 'preview'
+                name: 'preview'
             },
             {
-                'name': 'clipboard'
+                name: 'clipboard'
             }];
+
+            if (apiEnabled) {
+                itemsArray.push({
+                    name: 'api retrieval',
+                    value: 'api'
+                });}
+
             getName = upperCaseFirstCharacter;
             break;
 
@@ -91,12 +98,14 @@ class SubscriberActivity extends React.Component {
         return itemsArray.map((item, i) => (<button
             key={i}
             className='dropdown-item'
-            onClick={() => toggleFilterAndQuery(filter.field, item.name)}
+            onClick={() => toggleFilterAndQuery(filter.field, item.value || item.name)}
         >{getName(item.name)}</button>));
     }
 
     getFilterLabel(filter, activeFilter) {
         if (activeFilter[filter.field]) {
+            if (activeFilter.action === 'api' && filter.field === 'action')
+                return 'api retrieval';
             return activeFilter[filter.field];
         } else {
             return filter.label;
@@ -201,6 +210,7 @@ SubscriberActivity.propTypes = {
     fetchReport: PropTypes.func,
     reportParams: PropTypes.object,
     sections: PropTypes.array,
+    apiEnabled: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({

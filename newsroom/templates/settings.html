@@ -15,12 +15,12 @@
     <div class="settings-inner">
         <div class='side-navigation' id='settings-menu'>
             <ul>
-                {% for app in settings_apps|sort(attribute='weight') %}
-                <li>
-                    <a class="side-navigation__btn {{ "active" if setting_type == app._id }}"
-                        href="{{ url_for('settings.app', app_id=app._id) }}">
-                        {{ gettext(app.name) }}</a>
-                </li>
+                {% for app in authorized_settings_apps()|sort(attribute='weight') %}
+                    <li>
+                        <a class="side-navigation__btn {{ "active" if setting_type == app._id }}"
+                            href="{{ url_for('settings.app', app_id=app._id) }}">
+                            {{ gettext(app.name) }}</a>
+                    </li>
                 {% endfor %}
             </ul>
         </div>

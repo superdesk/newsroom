@@ -14,6 +14,7 @@ from superdesk.default_settings import (   # noqa
     CONTENTAPI_MONGO_URI,
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,
+    CONTENTAPI_ELASTICSEARCH_SETTINGS,
     ELASTICSEARCH_URL,
     ELASTICSEARCH_SETTINGS,
     ELASTIC_DATE_FORMAT,
@@ -157,7 +158,7 @@ WTF_CSRF_ENABLED = True
 #: The number of days a token is valid
 RESET_PASSWORD_TOKEN_TIME_TO_LIVE = 7
 #: The number of days a validation token is valid
-VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 1
+VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 7
 #: The number login attempts allowed before account is locked
 MAXIMUM_FAILED_LOGIN_ATTEMPTS = 5
 #: default sender for superdesk emails
@@ -321,3 +322,6 @@ MAX_EXPIRY_QUERY_LIMIT = os.environ.get('MAX_EXPIRY_QUERY_LIMIT', 100)
 CONTENT_API_EXPIRY_DAYS = os.environ.get('CONTENT_API_EXPIRY_DAYS', 180)
 
 NEWS_API_ENABLED = strtobool(env('NEWS_API_ENABLED', 'false'))
+
+# Enables the application of product filtering to image references in the API and ATOM responses
+NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env('NEWS_API_IMAGE_PERMISSIONS_ENABLED', 'false'))

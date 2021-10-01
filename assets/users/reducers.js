@@ -1,5 +1,6 @@
 import {
     GET_USERS,
+    GET_USER,
     SELECT_USER,
     EDIT_USER,
     QUERY_USERS,
@@ -17,6 +18,7 @@ import {ADD_EDIT_USERS} from 'actions';
 import {searchReducer} from 'search/reducers';
 
 const initialState = {
+    user: null,
     query: null,
     users: [],
     usersById: {},
@@ -53,6 +55,13 @@ export default function userReducer(state = initialState, action) {
             activeUserId: action.id || null,
             userToEdit: action.id ? Object.assign(defaultUser, state.usersById[action.id]) : null,
             errors: null,
+        };
+    }
+
+    case GET_USER: {
+        return {
+            ...state,
+            user: action.user,
         };
     }
 
