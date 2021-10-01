@@ -254,7 +254,13 @@ class WireSearchService(BaseSearchService):
                 'should': []
             }
         }
-        aggs = {}
+        aggs = {
+            'topics': {
+                'filters': {
+                    'filters': {}
+                }
+            }
+        }
 
         queried_topics = []
         # get all section filters
@@ -291,7 +297,7 @@ class WireSearchService(BaseSearchService):
                 )
 
             if topic.get('filter'):
-                search.query['bool']['must'].append(self._filter_terms(topic['filter']))
+                search.query['bool']['must'] += self._filter_terms(topic['filter'])
 
             # for now even if there's no active company matching for the user
             # continuing with the search
@@ -311,11 +317,14 @@ class WireSearchService(BaseSearchService):
                 continue
 
             aggs['topics']['filters']['filters'][str(topic['_id'])] = search.query
+
             queried_topics.append(topic)
 
         source = {'query': query}
-        source['aggs'] = aggs
+        source['aggs'] = aggs if aggs["topics"]["filters"]["filters"] else {}
         source['size'] = 0
+
+        print("source", json.dumps(source, indent=2))
 
         req = ParsedRequest()
         req.args = {'source': json.dumps(source)}
@@ -329,6 +338,7 @@ class WireSearchService(BaseSearchService):
                     topic_matches.append(topic['_id'])
 
         except Exception as exc:
+            raise
             logger.error('Error in get_matching_topics for query: {}'.format(json.dumps(source)),
                          exc, exc_info=True)
 
