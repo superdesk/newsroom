@@ -52,21 +52,7 @@
     <div class="contentWrap flex-column flex-md-p-row flex-lg-l-row {% block custom_content_style %}{% endblock %}">
         {% if session.get('name') %}
         <nav class="sidenav">
-            <ul class="sidenav-icons">
-                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin()%}
-                <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-md-p-block d-lg-l-block {% if request.blueprint == 'settings' %}active{% endif %}">
-                  <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
-                      <i class="icon--cog icon--mid-blue"></i>
-                  </a>
-                </li>
-                {% endif %}{% endfor %}
-                {% if is_admin_or_account_manager() %}
-                <li class="sidenav-icons__item sidenav-icons__item--report d-none d-md-p-block d-lg-l-block {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
-                  <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" data-toggle="tooltip" data-placement="right">
-                      <i class="icon--report icon--mid-blue"></i>
-                  </a>
-                </li>
-                {% endif %}
+            <ul class="sidenav-icons">                
 
                 {% block default_navs %}
                     {% for group in range(0, 10) %}
@@ -78,7 +64,22 @@
                         {% include "sidenav_icon.html" %}
                         {% endfor %}
                     {% endfor %}
-            {%  endblock %}
+                {%  endblock %}
+
+                {% if is_admin_or_account_manager() %}
+                <li class="sidenav-icons__item sidenav-icons__item--report d-none d-md-p-block d-lg-l-block {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
+                  <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" data-toggle="tooltip" data-placement="right">
+                      <i class="icon--report icon--mid-blue"></i>
+                  </a>
+                </li>
+                {% endif %}
+                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin()%}
+                <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-md-p-block d-lg-l-block {% if request.blueprint == 'settings' %}active{% endif %}">
+                  <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
+                      <i class="icon--cog icon--mid-blue"></i>
+                  </a>
+                </li>
+                {% endif %}{% endfor %}
             </ul>
 
             {% block sidenav %}

@@ -147,25 +147,27 @@ class WireApp extends BaseApp {
                         actions={this.props.actions}
                     />
                     <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
-                        {this.state.withSidebar && <span
+                        {this.state.withSidebar && <button
                             className='content-bar__menu content-bar__menu--nav--open'
                             ref={this.setOpenRef}
                             title={gettext('Close filter panel')}
+                            aria-label={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--close-thin icon--white" />
-                        </span>}
+                        </button>}
 
                         {this.props.bookmarks &&
                             <BookmarkTabs active={this.props.context} sections={this.props.userSections}/>
                         }
 
-                        {!this.state.withSidebar && !this.props.bookmarks && <span
+                        {!this.state.withSidebar && !this.props.bookmarks && <button
                             className="content-bar__menu content-bar__menu--nav"
                             ref={this.setCloseRef}
                             title={gettext('Open filter panel')}
+                            aria-label={gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--hamburger" />
-                        </span>}
+                        </button>}
 
                         <SearchBar
                             fetchItems={this.props.fetchItems}
@@ -185,6 +187,7 @@ class WireApp extends BaseApp {
                 <section key="contentMain" className='content-main'>
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                            <h3 className="a11y-only">{gettext('Side filter panel')}</h3>
                             {this.state.withSidebar &&
                                 <SearchSidebar tabs={this.tabs} props={{...this.props}} />
                             }

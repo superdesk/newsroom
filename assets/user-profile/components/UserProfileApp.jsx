@@ -96,7 +96,7 @@ class UserProfileApp extends React.Component {
             <div className="profile-container">
                 <div className="profileWrap">
                     <div className="profile__mobile-close d-md-none">
-                        <button className="icon-button" onClick={this.props.hideModal}>
+                        <button className="icon-button" aria-label={gettext('Close')} onClick={this.props.hideModal}>
                             <i className="icon--close-thin icon--gray-light" />
                         </button>
                     </div>
@@ -116,9 +116,9 @@ class UserProfileApp extends React.Component {
                                     {links.find((link) => link.active).label}
                                 </h5>
                                 <div className="content-bar__right">
-                                    <span className="content-bar__menu" onClick={this.props.hideModal}>
+                                    <button className="content-bar__menu" aria-label="Close" onClick={this.props.hideModal}>
                                         <i className="icon--close-thin" />
-                                    </span>
+                                    </button>
                                 </div>
                             </nav>
                         </section>

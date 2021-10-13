@@ -54,7 +54,7 @@ class EditNavigation extends React.Component {
                         type='button'
                         className='icon-button'
                         data-dismiss='modal'
-                        aria-label='Close'
+                        aria-label={gettext('Close')}
                         onClick={this.props.onClose}>
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>

@@ -48,6 +48,14 @@ label {
     font-size: 14px;
     margin-bottom: 0.3rem;
 }
+.label__news-only {
+    width: 32px;
+    margin-bottom: 0;
+    line-height: 1;
+    @include md {
+        width: auto;
+    }
+}
 
 
 .alertify-notifier {
@@ -193,6 +201,12 @@ body.print {
           @include sm {
             padding: 0 10px;
           }
+        &:focus {
+            outline: none;
+        }
+        &:focus-visible {
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 3px 4px rgba(255, 255, 255, .7);
+        }
       }
   }
   .active i {
@@ -362,6 +376,7 @@ article.list {
     background-color: #fff;
     cursor: pointer;
     z-index: 1002;
+    border: none;
     border-left: 1px solid #ebebeb;
 
     // Only show the content-bar menu on mobile phones
@@ -372,6 +387,12 @@ article.list {
     @include phone {
         width: 45px;
         height: 45px;
+    }
+    &:focus {
+        outline: 0;       
+    }
+    &:focus-visible {
+        box-shadow: inset 0 0 0 1px rgba(0, 172, 236, .6), inset 0 0 3px 4px rgba(0, 172, 236, .4);
     }
 }
 
@@ -636,19 +657,33 @@ article.list {
 
 .search__form {
     flex: 0 1 auto;
-    margin: 0 10px;
+    margin: 0;
     form {
         flex: 1 1 auto;
     }
     input {
         background: #fff;
+        transition: all 0.2s ease-out;
         &:focus {
             background: #fff;
-            box-shadow: inset 0 0px 2px rgba(0, 0, 0, 0.15);
+            //box-shadow: inset 0 0 0 1px rgba(61,143,177,0.5), inset 0 0 0 6px rgba(61,143,177,0.15);
+            box-shadow: inset 0 0 0 1px rgba(0, 172, 236, .5), inset 0 0 0 6px rgba(0, 172, 236, .2);        
         }
     }
     @include sm {
         flex: 1 1 auto;
+    }
+    .search__clear {
+        outline: none;
+        border: none;
+        background: white;
+        padding: 0.5rem 0.6rem;
+        &:focus {
+            outline: none;
+        }
+        &:focus-visible {
+            box-shadow: 0 0 0 1px rgba(0, 172, 236, .6), 0 0 3px 4px rgba(0, 172, 236, .4);
+        }
     }
 }
 
@@ -667,7 +702,7 @@ article.list {
     color: #d5d5d5;
     font-weight: 500;
     border: 0px;
-    padding: 0;
+    padding: 0 0 0 12px;
     &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
         color: #d5d5d5;
     }
@@ -1028,6 +1063,12 @@ article.list {
             color: #fff;
             border-bottom: 3px solid $main-blue;
         }
+        &:focus {
+            outline: 0;       
+        }
+        &:focus-visible {
+            box-shadow: 0 0 0 1px rgba(0, 172, 236, .6), 0 0 3px 4px rgba(0, 172, 236, .4);
+        }
 
         @include lg {
             padding: .5rem .4rem;
@@ -1229,6 +1270,7 @@ article.list {
     outline: none;
 
     @include xxsm {
+        margin-bottom: 10px;
         padding-left: 8px;
         padding-right: 8px;
     }
@@ -1246,7 +1288,7 @@ article.list {
     flex-direction: column;
     padding: 12px;
     @include xxsm {
-        padding: 6px;
+        padding: 4px;
     }
     @include sm {
         padding: 12px 10px 6px 15px;
@@ -1456,8 +1498,8 @@ article.list {
         > * {
             margin-bottom: 0px;
         }
-        > .icon-button {
-            height: 32px;
+        .icon-button {
+            height: 28px;
         }
         > .btn-group {
             order: 1;
@@ -1748,18 +1790,34 @@ article.list {
     flex-grow: 1;
     flex-basis: 100%; // IE fix
     order: 2;
+    padding-right: 24px;
+    @include sm {
+        padding-right: 0;
+    }
     @include md {
         order: 0;
     }
 }
 
 .wire-articles__item-headline {
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 700;
     margin-bottom: 4px;
+    line-height: 1.3;
 
+    @include sm {
+        font-size: 1rem;
+        line-height: 1.2;
+    }
     i {
         margin: 0 4px 0 2px;
+    }
+}
+.wire-articles__item-headline--indent {
+    display: inline-block;
+    text-indent: 30px;
+    @include sm {
+        text-indent: 0;
     }
 }
 
@@ -1774,6 +1832,12 @@ article.list {
     width: 24px;
     opacity: 1;
     margin-right: 10px;
+    // position: absolute;
+    // top: 4px;
+    // left: 2px;
+    // @include sm {
+    //     position: inherit;
+    // }
     @include xl {
         width: 0;
         opacity: 0;
@@ -1807,11 +1871,15 @@ article.list {
 
 .wire-articles__item__meta {
     display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    margin-bottom: 4px;
-    margin-top: 10px;
+    align-items: center;
+    flex-wrap: nowrap;
+    margin-bottom: 0;
+    margin-top: 0;
 
+    @include sm {
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
     @include lg {
         margin-top: 0;
     }
@@ -1832,7 +1900,7 @@ article.list {
 .wire-articles__item__icons {
     display: contents;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
 
     @include md {
         display: flex;
@@ -1855,10 +1923,13 @@ article.list {
 }
 
 .wire-articles__item__icon {
-    margin-right: 2px;
+    margin-right: 6px;
     display: flex;
     position: relative;
 
+    @include sm {
+        margin-right: 2px;
+    }
     &.dashed-border {
         padding-right: 10px;
         border-right: 1px dotted #c4c4c4;
@@ -1878,7 +1949,7 @@ article.list {
     display: flex;
     flex-direction: column;
     overflow-y: visible;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
 
     @include xxsm {
         margin-bottom: 0;
@@ -2026,6 +2097,10 @@ article.list {
     font-weight: 300;
     margin: 5px 0 0;
     line-height: 1.3;
+    display: none;
+    @include sm {
+        display: block;
+    }
     p {
         margin: 0px;
     }
@@ -2085,6 +2160,12 @@ article.list {
     align-items: flex-end;
     justify-content: flex-end;
     order: 3;
+    position: absolute;
+    top: 0;
+    right: 0;
+    @include sm {
+        position: relative;
+    }
     @include md {
         order: 0;
         flex-direction: column;
@@ -2562,6 +2643,12 @@ a.wire-articles__versions {
         color: #444444;
         background: #e2e1e1;
         text-decoration: none;
+    }
+    &:focus {
+        outline: 0;       
+    }
+    &:focus-visible {
+        box-shadow: 0 0 0 1px rgba(0, 172, 236, .6), 0 0 3px 4px rgba(0, 172, 236, .4);
     }
 }
 

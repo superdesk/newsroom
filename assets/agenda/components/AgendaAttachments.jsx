@@ -39,7 +39,7 @@ export default function AgendaAttachments({item}) {
                 </div>
             </div>
             <div className="coverage-item__column">
-                <a className="icon-button" href={attachment.href + '?filename=' + attachment.name}>
+                <a className="icon-button" href={attachment.href + '?filename=' + attachment.name} aria-label={gettext('Download')}>
                     <i className="icon--download icon--gray"></i>
                 </a>
             </div>

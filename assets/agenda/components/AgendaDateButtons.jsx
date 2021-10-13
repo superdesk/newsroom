@@ -18,6 +18,7 @@ function AgendaDateButtons({selectDate, activeDate, activeGrouping}) {
             key='left'
             type='button'
             className='icon-button icon-button--small mr-2'
+            aria-label={gettext('Left')}>
             onClick={() => selectDate(getPrevious(activeDate, activeGrouping), activeGrouping)}>
             <i className='icon--arrow-right icon--rotate-180'></i>
         </button>,
@@ -25,6 +26,7 @@ function AgendaDateButtons({selectDate, activeDate, activeGrouping}) {
             key='right'
             type='button'
             className='icon-button icon-button--small mr-3'
+            aria-label={gettext('Right')}>
             onClick={() => selectDate(getNext(activeDate, activeGrouping), activeGrouping)}>
             <i className='icon--arrow-right'></i>
         </button>,

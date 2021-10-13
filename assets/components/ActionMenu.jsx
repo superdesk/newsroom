@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import ActionList from './ActionList';
 import {Popover, PopoverBody} from 'reactstrap';
 
+import {gettext} from 'utils';
+
 class ActionMenu extends React.Component {
     constructor(props) {
         super(props);
@@ -19,11 +21,13 @@ class ActionMenu extends React.Component {
         const {item, plan, user, actions, group, onActionList, showActions} = this.props;
         return (
             <div className='btn-group'>
-                <span
+                <button
                     ref={(elem) => this.referenceElem = elem}
-                    onClick={(event) => onActionList(event, item, group, plan)}>
+                    onClick={(event) => onActionList(event, item, group, plan)}
+                    className="icon-button"
+                    aria-label={gettext('More Actions')}>
                     <i className='icon--more icon--gray-light'></i>
-                </span>
+                </button>
                 {this.referenceElem &&
               <Popover placement="left" isOpen={showActions} target={this.referenceElem} className="action-popover">
                   <PopoverBody>

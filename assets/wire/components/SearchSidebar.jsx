@@ -17,6 +17,8 @@ class SearchSidebar extends React.Component {
                         <li className='wire-column__nav__tab nav-item' key={tab.id}>
                             <a className={`nav-link ${this.state.active === tab.id && 'active'}`}
                                 role='tab'
+                                aria-selected={`${this.state.active === tab.id ? 'true' : 'false'}`}
+                                aria-label={tab.label}
                                 href=''
                                 onClick={(event) => {
                                     event.preventDefault();

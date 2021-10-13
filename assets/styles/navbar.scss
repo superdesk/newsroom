@@ -198,6 +198,13 @@
 
     a {
         line-height: 1.1;
+        padding: 2px;
+        &:focus {
+            outline: none;
+        }
+        &:focus-visible {
+            box-shadow: 0 0 0 1px rgba(0, 172, 236, .6), 0 0 3px 4px rgba(0, 172, 236, .4);
+        }
     }
 
     &--small {
