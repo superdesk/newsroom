@@ -128,6 +128,7 @@ class MonitoringEditor extends React.Component {
                         className="icon-button"
                         onClick={this.props.closeEditor}
                         disabled={this.state.saving}
+                        aria-label={gettext('Close')}
                     >
                         <i className="icon--close-thin icon--gray" />
                     </button>

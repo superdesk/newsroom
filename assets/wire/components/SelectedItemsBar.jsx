@@ -30,6 +30,7 @@ class SelectedItemsBar extends React.PureComponent {
             <button className='icon-button'
                 key={action.name}
                 onClick={(e) => this.onAction(e, action)}
+                aria-label={gettext(action.name)}
             >
                 <i className={`icon--${action.icon}`}></i>
             </button>

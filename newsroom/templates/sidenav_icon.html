@@ -2,6 +2,7 @@
     <a href="{{ url_for(nav.endpoint) if nav.endpoint else nav.url }}" title="{{  gettext(nav.name) }}"
         data-toggle="tooltip"
         data-placement="right"
+        aria-label="{{  gettext(nav.name) }}"
         {% if nav.url %}target="_blank"{% endif %}
     >
         {% if nav.badge %}

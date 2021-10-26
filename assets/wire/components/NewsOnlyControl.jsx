@@ -8,7 +8,7 @@ function NewsOnlyControl ({newsOnly, toggleNews, activeNavigation}) {
     return !noNavigationSelected(activeNavigation) ? null : (
         <div className="d-flex align-items-center px-2 px-sm-3">
             <div className={'d-flex align-items-center'}>
-                <label htmlFor='news-only' className="mr-2">{gettext('News only')}</label>
+                <label htmlFor='news-only' className="label__news-only mr-2">{gettext('News only')}</label>
                 <Toggle
                     id="news-only"
                     defaultChecked={newsOnly}

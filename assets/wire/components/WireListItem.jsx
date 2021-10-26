@@ -107,7 +107,7 @@ class WireListItem extends React.Component {
         );
         const selectClassName = classNames('no-bindable-select', {
             'wire-articles__item-select-visible': !LIST_ANIMATIONS,
-            'wire-articles__item-select': LIST_ANIMATIONS,
+            'wire-articles__item-select float-left float-sm-none': LIST_ANIMATIONS,
         });
         const picture = getPicture(item);
         const videos = getVideos(item);

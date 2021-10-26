@@ -20,7 +20,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                     type='button'
                     className='icon-button'
                     data-dismiss='modal'
-                    aria-label='Close'
+                    aria-label={gettext('Close')}
                     onClick={onClose}>
                     <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                 </button>

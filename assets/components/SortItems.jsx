@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
+import {gettext} from 'utils';
 
 
 class SortItems extends React.Component {
@@ -42,6 +43,7 @@ class SortItems extends React.Component {
                 <span>{item.text}</span>
                 <button type="button"
                     className="icon-button icon-button--small float-right"
+                    aria-label={gettext('Close')}
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();

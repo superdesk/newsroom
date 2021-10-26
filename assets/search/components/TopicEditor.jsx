@@ -160,6 +160,7 @@ class TopicEditor extends React.Component {
                         className="icon-button"
                         onClick={this.props.closeEditor}
                         disabled={this.state.saving}
+                        aria-label={gettext('Close')}
                     >
                         <i className="icon--close-thin icon--gray" />
                     </button>
@@ -186,6 +187,7 @@ class TopicEditor extends React.Component {
                         value={gettext('Cancel')}
                         onClick={this.props.closeEditor}
                         disabled={this.state.saving}
+                        aria-label={gettext('Cancel')}
                     />
                     <input
                         type="button"
@@ -193,6 +195,7 @@ class TopicEditor extends React.Component {
                         value={gettext('Save')}
                         onClick={this.saveTopic}
                         disabled={this.state.saving || !this.state.valid}
+                        aria-label={gettext('Save')}
                     />
                 </div>
             </div>

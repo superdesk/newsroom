@@ -61,6 +61,7 @@ export default class CardEditor extends React.Component {
                                     className="btn btn-outline-primary ml-auto"
                                     onClick={this.onSave}
                                     disabled={Object.keys(errors || {}).length > 0}
+                                    aria-label={gettext('Save')}
                                 >
                                     {saveText}
                                 </button>
@@ -68,6 +69,7 @@ export default class CardEditor extends React.Component {
                                     <button
                                         className='btn btn-outline-secondary ml-3'
                                         onClick={this.onCancelClick}
+                                        aria-label={gettext('Cancel')}
                                     >
                                         {gettext('Cancel')}
                                     </button>
@@ -97,10 +99,10 @@ export default class CardEditor extends React.Component {
                         <div className="card mt-3 d-block">
                             <div className="card-header d-flex justify-content-start align-items-center">
                                 <span className={titleClassNames}>{previewTitle || label}</span>
-                                <button className="icon-button ml-auto" onClick={this.onEditClick}>
+                                <button className="icon-button ml-auto" aria-label={gettext('Edit')} onClick={this.onEditClick}>
                                     <i className="icon--edit" />
                                 </button>
-                                {!this.props.noDelete && <button className="icon-button" onClick={onDelete}>
+                                {!this.props.noDelete && <button className="icon-button" aria-label={gettext('Delete')} onClick={onDelete}>
                                     <i className="icon--trash" />
                                 </button>}
                             </div>
