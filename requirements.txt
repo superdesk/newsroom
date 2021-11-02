@@ -5,5 +5,5 @@ xhtml2pdf
 werkzeug>=0.9.4,<=0.11.15
 urllib3<1.26
 -e .
-git+git://github.com/superdesk/superdesk-planning.git@support/1.33#egg=superdesk-planning
-git+git://github.com/superdesk/superdesk-core.git@support/1.33#egg=superdesk-core
+git+https://github.com/superdesk/superdesk-planning.git@support/1.33#egg=superdesk-planning
+git+https://github.com/superdesk/superdesk-core.git@support/1.33#egg=superdesk-core
