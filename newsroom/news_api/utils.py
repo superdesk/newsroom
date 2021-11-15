@@ -2,6 +2,7 @@ from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from flask import request, g, current_app as app
 from newsroom.products.products import get_products_by_company
+from newsroom.settings import get_setting
 
 
 def post_api_audit(doc):
@@ -43,7 +44,7 @@ def remove_internal_renditions(item):
     if ((item.get('associations') or {}).get('featuremedia') or {}).get('renditions'):
         for key, rendition in\
                 item['associations']['featuremedia']['renditions'].items():
-            if not key.startswith('_newsroom'):
+            if key in get_setting('news_api_allowed_renditions').split(','):
                 rendition.pop('media', None)
                 clean_renditions[key] = rendition
 
