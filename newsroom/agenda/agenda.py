@@ -829,6 +829,9 @@ class AgendaService(BaseSearchService):
             query['bool']['must'].append({'exists': {'field': 'event'}})
             _remove_fields(source, PLANNING_ITEMS_FIELDS)
 
+        if not is_admin_or_internal(user):
+            _remove_fields(source, PRIVATE_FIELDS)
+
         internal_req = ParsedRequest()
         internal_req.args = {'source': json.dumps(source)}
         cursor = self.internal_get(internal_req, lookup)
