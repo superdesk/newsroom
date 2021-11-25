@@ -103,7 +103,7 @@ def test_index_from_mongo_from_timestamp(app, client):
     sleep(1)
     assert 0 == app.data.elastic.find('items', ParsedRequest(), {}).count()
 
-    timestamp = (datetime.now() - timedelta(hours=3)).strftime('%Y-%m-%dT%H:%M')
+    timestamp = (datetime.now() - timedelta(hours=3, minutes=30)).strftime('%Y-%m-%dT%H:%M')
     index_elastic_from_mongo_from_timestamp('items', timestamp, 'older')
     sleep(1)
     assert 4 == app.data.elastic.find('items', ParsedRequest(), {}).count()
