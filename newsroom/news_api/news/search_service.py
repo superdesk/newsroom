@@ -105,6 +105,7 @@ class NewsAPINewsService(BaseSearchService):
         self.apply_date_filter(search)
         self.apply_request_filter(search)
         self.apply_projections(search)
+        self.apply_time_limit_filter(search)
 
         if len(search.query['bool'].get('should', [])):
             search.query['bool']['minimum_should_match'] = 1

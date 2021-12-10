@@ -58,6 +58,7 @@ Feature: News API News Feed
             }
         ]
         """
+        When we set api time limit to 36500
         When we get "news/feed"
         Then we get list with 4 items
         """
@@ -97,6 +98,7 @@ Feature: News API News Feed
             }
         ]
         """
+        When we set api time limit to 36500
         When we get "news/feed?include_fields=body_html&max_results=2&products=#products._id#"
         Then we get list with 5 items
         """
@@ -174,6 +176,7 @@ Feature: News API News Feed
             }
         ]
         """
+        When we set api time limit to 36500
         When we get "news/feed?include_fields=body_html&max_results=2&products=#products._id#"
         Then we get list with 2 items
         """
