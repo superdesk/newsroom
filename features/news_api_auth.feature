@@ -42,8 +42,8 @@ Feature: News API Authorization
   Scenario: Proxy forward situation is handled appropirately
      Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE#"},
+        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE#"}]
         """
      Given "companies"
         """
@@ -86,8 +86,8 @@ Feature: News API Authorization
   Scenario: Supports subnet in allowed_ip_list from request
      Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE#"},
+        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE#"}]
         """
      Given "companies"
         """
@@ -132,8 +132,8 @@ Feature: News API Authorization
   Scenario: RATE_LIMIT_REQUESTS config is used for request validation
      Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE#"},
+        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE#"}]
         """
      Given "companies"
         """

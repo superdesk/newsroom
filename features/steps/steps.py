@@ -11,6 +11,7 @@
 from superdesk.tests.steps import apply_placeholders, json_match, get_json_data
 from superdesk.tests import set_placeholder
 from behave import when, then
+from newsroom.settings import get_settings_collection
 import json
 import lxml
 from wooper.general import (
@@ -55,6 +56,12 @@ def we_get_text_in_response(context, text):
     with context.app.test_request_context(context.app.config['URL_PREFIX']):
         assert(isinstance(get_body(context.response), str))
         assert(text in get_body(context.response))
+
+
+@when('we set api time limit to {value}')
+def we_set_api_time_limit(context, value):
+    with context.app.test_request_context():
+        get_settings_collection().insert_one({"_id": "general_settings", "values": {"news_api_time_limit_days": value}})
 
 
 @then('we "{get}" "{text}" in atom xml response')

@@ -14,8 +14,8 @@ Feature: News API News Search
   Scenario: Simple query string request for fish
      Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE#"},
+        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE#"}]
         """
      Given "products"
         """
@@ -105,6 +105,7 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
+    When we set api time limit to 36500
     When we get "news/search?start_date=2018-11-11T03:48:38&end_date=2018-11-12T02:48:40&include_fields=body_html"
     Then we get list with 1 items
      """
@@ -597,3 +598,29 @@ Feature: News API News Search
         "associations": "__no_value__"}
         ]}
       """
+
+  Scenario: Time limit test
+     Given "items"
+        """
+        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE-9#" },
+        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE-1#" }]
+        """
+     Given "products"
+        """
+        [{"name": "A Product",
+        "decsription": "a product for text",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "type:text",
+        "product_type": "news_api"
+        }]
+        """
+    When we set api time limit to 5
+    When we get "news/search?start_date=now-10d&include_fields=body_html"
+    Then we get list with 1 items
+     """
+     {"_items": [
+         {"body_html": "Once upon a time there was a aardvark that could not swim"}
+     ]}
+     """
