@@ -21,8 +21,9 @@ import datetime
 import logging
 from bson import ObjectId
 from eve.utils import ParsedRequest
-from .utils import get_monitoring_file, truncate_article_body
+from .utils import get_monitoring_file, truncate_article_body, get_date_items_dict
 import base64
+import os
 
 try:
     from urllib.parse import urlparse
@@ -181,6 +182,48 @@ class MonitoringEmailAlerts(Command):
                 alert_monitoring['four']['w_lists'].append(profile)
                 return
 
+    def send_email_alert(self, items, subject, m):
+        """
+        Send an email alert with the details in the body of the email. If a logo image is set in the
+        monitoring_report_logo_path settings it will be attached to the email and can be referenced in the
+        monitoring_export.html template as <img src="CID:logo" />
+        :param items:
+        :param subject:
+        :param m:
+        :return:
+        """
+        from newsroom.email import send_email
+
+        general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
+
+        data = {
+            'date_items_dict': get_date_items_dict(items),
+            'monitoring_profile': m,
+            'current_date': utc_to_local(app.config['DEFAULT_TIMEZONE'], utcnow()).strftime(
+                '%d/%m/%Y'),
+            'monitoring_report_name': app.config.get('MONITORING_REPORT_NAME', 'Newsroom')
+        }
+
+        # Attach logo to email if defined
+        logo = None
+        if general_settings and general_settings['values'].get('monitoring_report_logo_path'):
+            image_filename = general_settings['values'].get('monitoring_report_logo_path')
+            if os.path.exists(image_filename):
+                with open(image_filename, 'rb') as img:
+                    bts = base64.b64encode(img.read())
+                    logo = [{'file': bts,
+                             'file_name': 'logo{}'.format(os.path.splitext(image_filename)[1]),
+                             'content_type': 'image/{}'.format(
+                                 os.path.splitext(image_filename)[1].replace('.', '')),
+                             'headers': [('Content-ID', 'logo')]}]
+
+        send_email(
+            [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
+            subject,
+            text_body=render_template('monitoring_export.txt', **data),
+            html_body=render_template('monitoring_export.html', **data),
+            attachments_info=logo)
+
     def send_alerts(self, monitoring_list, created_from, created_from_time, now):
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         error_recipients = []
@@ -207,9 +250,6 @@ class MonitoringEmailAlerts(Command):
                             'section': 'wire',
                         })
                         truncate_article_body(items, m)
-                        _file = get_monitoring_file(m, items)
-                        attachment = base64.b64encode(_file.read())
-                        formatter = app.download_formatters[m['format_type']]['formatter']
 
                         # If there is only one story to send and the headline is to be used as the subject
                         if m.get('headline_subject', False) and len(items) == 1:
@@ -217,19 +257,27 @@ class MonitoringEmailAlerts(Command):
                         else:
                             subject = m.get('subject') or m['name']
 
-                        send_email(
-                            [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
-                            subject,
-                            text_body=render_template('monitoring_email.txt', **template_kwargs),
-                            html_body=render_template('monitoring_email.html', **template_kwargs),
-                            attachments_info=[{
-                                'file': attachment,
-                                'file_name': formatter.format_filename(None),
-                                'content_type': 'application/{}'.format(formatter.FILE_EXTENSION),
-                                'file_desc': 'Monitoring Report for Celery monitoring alerts for profile: {}'.format(
-                                        m['name'])
-                            }]
-                        )
+                        if m.get('format_type') == 'monitoring_email':
+                            self.send_email_alert(items, subject, m)
+                        else:
+                            _file = get_monitoring_file(m, items)
+                            attachment = base64.b64encode(_file.read())
+                            formatter = app.download_formatters[m['format_type']]['formatter']
+
+                            send_email(
+                                [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
+                                subject,
+                                text_body=render_template('monitoring_email.txt', **template_kwargs),
+                                html_body=render_template('monitoring_email.html', **template_kwargs),
+                                attachments_info=[{
+                                    'file': attachment,
+                                    'file_name': formatter.format_filename(None),
+                                    'content_type': 'application/{}'.format(formatter.FILE_EXTENSION),
+                                    'file_desc':
+                                        'Monitoring Report for Celery monitoring alerts for profile: {}'.format(
+                                            m['name'])
+                                }]
+                            )
                     except Exception:
                         logger.exception('{0} Error processing monitoring profile {1} for company {2}.'.format(
                             self.log_msg, m['name'], company['name']))

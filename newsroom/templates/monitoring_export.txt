@@ -1,0 +1,17 @@
+{{ monitoring_report_name }} Monitoring: {{ monitoring_profile.name }} {% if current_date %}({{ current_date }}){% endif %}
+    {% for d in date_items_dict.keys() %}
+        {{ d.strftime('%d/%m/%Y') }}
+        {% for item in date_items_dict[d]  %}
+            Headline: {{ item.get('headline', '') }}
+            Source: {{ item.get('source', '') }}
+            Keywords: {{ get_keywords_in_text(item.get('body_str', ''), monitoring_profile.keywords)|join(',') }}
+            {% if item.byline %}
+                By {{ item.get('byline', '') }}
+            {% endif %}
+                {{ item.get('body_str', '') | safe }}
+            {% if monitoring_profile.alert_type == 'linked_text' and not print%}
+                {{ url_for('monitoring.index', item=item._id, _external=True) }}
+            {% endif %}
+
+        {% endfor %}
+    {% endfor %}

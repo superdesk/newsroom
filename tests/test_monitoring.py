@@ -820,3 +820,32 @@ def test_send_immediate_headline_subject_alerts(client, app):
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Article headline about product'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
+
+
+@mock.patch('newsroom.monitoring.email_alerts.utcnow', mock_utcnow)
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_send_immediate_email_alerts(client, app):
+    test_login_succeeds_for_admin(client)
+    post_json(client, '/settings/general_settings',
+              {"monitoring_report_logo_path": get_fixture_path('thumbnail.jpg')})
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'product immediate',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow(),
+        'byline': 'Testy McTestface',
+        'body_html': '<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>',
+        'source': 'AAAA'
+    }])
+    w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
+    assert w is not None
+    app.data.update('monitoring', ObjectId('5db11ec55f627d8aa0b545fb'),
+                    {"format_type": "monitoring_email", "alert_type": "linked_text",
+                     'keywords': ['text']}, w)
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 1
+        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert outbox[0].sender == 'newsroom@localhost'
+        assert outbox[0].subject == 'Monitoring Subject'
+        assert 'Newsroom Monitoring: W1' in outbox[0].body

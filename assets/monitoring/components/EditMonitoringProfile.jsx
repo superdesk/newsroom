@@ -179,7 +179,8 @@ class EditMonitoringProfile extends React.Component {
                                         value={item.format_type || 'monitoring_pdf'}
                                         options={[
                                             {value: 'monitoring_pdf', text: 'PDF'},
-                                            {value: 'monitoring_rtf', text: 'RTF'}
+                                            {value: 'monitoring_rtf', text: 'RTF'},
+                                            {value: 'monitoring_email', text: 'Email'}
                                         ]}
                                         onChange={onChange}
                                         error={getError('format_type')} />
