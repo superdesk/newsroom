@@ -25,7 +25,7 @@ def _send_email(self, to, subject, text_body, html_body=None, sender=None, attac
         try:
             content = base64.b64decode(a['file'])
             decoded_attachments.append(Attachment(a['file_name'],
-                                                  a['content_type'], data=content))
+                                                  a['content_type'], data=content, headers=a.get('headers')))
         except Exception as e:
             logger.error('Error attaching {} file to mail. Receipient(s): {}. Error: {}'.format(
                 a['file_desc'], to, e))

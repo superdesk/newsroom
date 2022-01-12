@@ -5,7 +5,8 @@ from wtforms import SelectField
 from wtforms.validators import DataRequired
 
 alert_types = [('full_text', gettext('Full text')), ('linked_text', gettext('Linked extract(s)'))]
-format_types = [('monitoring_pdf', gettext('PDF')), ('monitoring_rtf', gettext('RTF'))]
+format_types = [('monitoring_pdf', gettext('PDF')), ('monitoring_rtf', gettext('RTF')),
+                ('monitoring_email', gettext('Email'))]
 
 
 class MonitoringForm(FlaskForm):
