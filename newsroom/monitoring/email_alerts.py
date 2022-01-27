@@ -215,7 +215,7 @@ class MonitoringEmailAlerts(Command):
                              'file_name': 'logo{}'.format(os.path.splitext(image_filename)[1]),
                              'content_type': 'image/{}'.format(
                                  os.path.splitext(image_filename)[1].replace('.', '')),
-                             'headers': [('Content-ID', 'logo')]}]
+                             'headers': [('Content-ID', '<logo>')]}]
 
         send_email(
             [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
