@@ -34,6 +34,12 @@ class HistoryResource(newsroom.Resource):
             'type': 'string',
             'mapping': not_analyzed
         },
+        # reference to a monitoring profile if relevant
+        'monitoring': {
+            'type': 'string',
+            'mapping': not_analyzed,
+            'required': False
+        },
         'extra_data': {
             'type': 'object',
             'mapping': not_enabled
@@ -52,7 +58,7 @@ class HistoryResource(newsroom.Resource):
 
 
 class HistoryService(newsroom.Service):
-    def create(self, docs, action, user, section='wire', **kwargs):
+    def create(self, docs, action, user, section='wire', monitoring=None, **kwargs):
         now = utcnow()
 
         def transform(item):
@@ -64,6 +70,7 @@ class HistoryService(newsroom.Service):
                 'item': item['_id'],
                 'version': item.get('version', item.get('_current_version')),
                 'section': section,
+                'monitoring': monitoring,
             }
 
         for doc in docs:
@@ -72,8 +79,8 @@ class HistoryService(newsroom.Service):
             except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
                 continue
 
-    def create_history_record(self, items, action, user, section):
-        self.create(items, action, user, section)
+    def create_history_record(self, items, action, user, section, monitoring=None):
+        self.create(items, action, user, section, monitoring)
 
     def query_items(self, query):
         if query['from'] >= 1000:

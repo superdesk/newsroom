@@ -50,6 +50,7 @@ def process_form_request(updates, request_updates, form):
         updates['schedule'] = request_updates['schedule']
         if updates['schedule'].get('interval') == 'immediate':
             updates['always_send'] = False
+            updates['last_run_time'] = None
 
     if 'users' in request_updates:
         updates['users'] = [ObjectId(u) for u in request_updates['users']]

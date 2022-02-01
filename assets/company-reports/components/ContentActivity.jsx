@@ -67,6 +67,7 @@ class ContentActivity extends React.Component {
                     {label: gettext('Preview'), value: 'preview'},
                     {label: gettext('Clipboard'), value: 'clipboard'},
                     {label: gettext('API retrieval'), value: 'api'},
+                    {label: gettext('Email'), value: 'email'},
                 ],
                 onChange: this.props.toggleFilter,
                 showAllButton: true,
@@ -95,7 +96,7 @@ class ContentActivity extends React.Component {
         let actions = get(this.props, 'reportParams.action');
 
         if (!get(actions, 'length', 0)) {
-            actions = ['download', 'copy', 'share', 'print', 'open', 'preview', 'clipboard', 'api'];
+            actions = ['download', 'copy', 'share', 'print', 'open', 'preview', 'clipboard', 'api', 'email'];
         }
 
         return actions;
@@ -122,6 +123,7 @@ class ContentActivity extends React.Component {
         actions.includes('preview') && headers.push(gettext('Preview'));
         actions.includes('clipboard') && headers.push(gettext('Clipboard'));
         actions.includes('api') && headers.push(gettext('API retrieval'));
+        actions.includes('email') && headers.push(gettext('Email'));
 
         return headers;
     }
@@ -180,6 +182,7 @@ class ContentActivity extends React.Component {
                     preview: get(item, 'aggs.actions.preview') || 0,
                     clipboard: get(item, 'aggs.actions.clipboard') || 0,
                     api: get(item, 'aggs.actions.api') || 0,
+                    email: get(item, 'aggs.actions.email') || 0,
                 }
             })
         );
@@ -243,6 +246,7 @@ class ContentActivity extends React.Component {
                     {actions.includes('preview') && <td>{item.actions.preview}</td>}
                     {actions.includes('clipboard') && <td>{item.actions.clipboard}</td>}
                     {actions.includes('api') && <td>{item.actions.api}</td>}
+                    {actions.includes('email') && <td>{item.actions.email}</td>}
                 </tr>
             );
         }
