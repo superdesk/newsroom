@@ -78,6 +78,9 @@ class SubscriberActivity extends React.Component {
             },
             {
                 name: 'clipboard'
+            },
+            {
+                name: 'email'
             }];
 
             if (apiEnabled) {

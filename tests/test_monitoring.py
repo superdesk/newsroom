@@ -830,6 +830,7 @@ def test_send_immediate_email_alerts(client, app):
               {"monitoring_report_logo_path": get_fixture_path('thumbnail.jpg')})
     app.data.insert('items', [{
         '_id': 'foo',
+        'version': '1',
         'headline': 'product immediate',
         'products': [{'code': '12345'}],
         "versioncreated": utcnow(),
@@ -849,3 +850,33 @@ def test_send_immediate_email_alerts(client, app):
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
+
+
+@mock.patch('newsroom.monitoring.email_alerts.utcnow', mock_utcnow)
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_dont_send_immediate_email_alerts_twice(client, app):
+    test_login_succeeds_for_admin(client)
+    post_json(client, '/settings/general_settings',
+              {"monitoring_report_logo_path": get_fixture_path('thumbnail.jpg')})
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'version': '1',
+        'headline': 'product immediate',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow(),
+        'byline': 'Testy McTestface',
+        'body_html': '<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>',
+        'source': 'AAAA'
+    }])
+    app.data.insert('history', docs=[
+
+        {
+            "_id": "foo",
+            "version": "1",
+        }
+
+    ], action='email', user={'_id': None, 'company': ObjectId("5c3eb6975f627db90c84093c")}, section='monitoring',
+                    monitoring=ObjectId('5db11ec55f627d8aa0b545fb'))
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 0

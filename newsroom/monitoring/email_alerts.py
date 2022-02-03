@@ -224,6 +224,21 @@ class MonitoringEmailAlerts(Command):
             html_body=render_template('monitoring_export.html', **data),
             attachments_info=logo)
 
+    def already_sent(self, item, profile):
+        """
+        Checks the history for this item/version being sent by the profile already
+        :param item:
+        :param profile:
+        :return:
+        """
+        lookup = {'item': item.get('_id'),
+                  'version': item.get('version', ''),
+                  'action': 'email',
+                  'company': profile.get('company'),
+                  'monitoring': profile.get('_id')}
+
+        return get_resource_service('history').get(req=None, lookup=lookup).count()
+
     def send_alerts(self, monitoring_list, created_from, created_from_time, now):
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         error_recipients = []
@@ -232,6 +247,14 @@ class MonitoringEmailAlerts(Command):
 
         from newsroom.email import send_email
         for m in monitoring_list:
+
+            # if immediate set the created from to the time of the last item sent, if available
+            if m.get('schedule', {}).get('interval') == 'immediate' and m.get('last_run_time', False):
+                created_from = m.get('last_run_time').strftime('%Y-%m-%d')
+                created_from_time = m.get('last_run_time').strftime('%H:%M:%S')
+
+            last_run_time = local_to_utc(app.config['DEFAULT_TIMEZONE'], now)
+
             if m.get('users'):
                 internal_req = ParsedRequest()
                 internal_req.args = {
@@ -241,6 +264,7 @@ class MonitoringEmailAlerts(Command):
                     'skip_user_validation': True
                 }
                 items = list(get_resource_service('monitoring_search').get(req=internal_req, lookup=None))
+                items[:] = [item for item in items if not self.already_sent(item, m)]
                 template_kwargs = {'profile': m}
                 if items:
                     company = get_entity_or_404(m['company'], 'companies')
@@ -278,6 +302,12 @@ class MonitoringEmailAlerts(Command):
                                             m['name'])
                                 }]
                             )
+                        get_resource_service('history').create_history_record(items, action='email',
+                                                                              user={'_id': None,
+                                                                                    'company': m['company']},
+                                                                              section='monitoring',
+                                                                              monitoring=m['_id'])
+
                     except Exception:
                         logger.exception('{0} Error processing monitoring profile {1} for company {2}.'.format(
                             self.log_msg, m['name'], company['name']))
@@ -302,8 +332,13 @@ class MonitoringEmailAlerts(Command):
                         html_body=render_template('monitoring_email_no_updates.html', **template_kwargs),
                     )
 
-            get_resource_service('monitoring').patch(m['_id'], {
-                'last_run_time': local_to_utc(app.config['DEFAULT_TIMEZONE'], now)})
+                if m.get('schedule', {}).get('interval') == 'immediate' and len(items):
+                    # determine the version created time for the most recent item
+                    last_article_created = max(item.get('versioncreated') for item in items)
+                    # last run time is either the time of the last sent item or the last run time.
+                    last_run_time = last_article_created if last_article_created else last_run_time
+
+            get_resource_service('monitoring').patch(m['_id'], {'last_run_time': last_run_time})
 
 
 @celery.task(soft_time_limit=600)
