@@ -2,6 +2,7 @@ from flask import current_app as app
 import collections
 from superdesk.text_utils import get_text
 from newsroom.utils import get_items_by_id
+from superdesk import etree as sd_etree
 
 
 def get_monitoring_file(monitoring_profile, items):
@@ -30,6 +31,16 @@ def get_date_items_dict(items):
     return date_items_dict
 
 
+def clean_html(body_html):
+    '''
+    Make sure the html will parse and inject \r\n in an attempt to avoid issues with lines being too long for SMTP
+    :param body_html:
+    :return: parsed and re-written html
+    '''
+    root = sd_etree.parse_html(body_html, content='html', lf_on_block=True)
+    return sd_etree.to_string(root, method='html', pretty_print=True).replace('>\n', '>\r\n')
+
+
 def truncate_article_body(items, monitoring_profile, full_text=False):
     # To make sure PDF creator and RTF creator does truncate for linked_text settings
     # Manually truncate it
@@ -46,6 +57,9 @@ def truncate_article_body(items, monitoring_profile, full_text=False):
                 altered_html = '{}<div class="line">{}</div>'.format(altered_html, line)
 
             i['body_str'] = altered_html
+
+        if monitoring_profile.get('format_type') == 'monitoring_email':
+            i['body_html'] = clean_html(i['body_html'])
 
 
 def get_items_for_monitoring_report(_ids, monitoring_profile, full_text=False):
