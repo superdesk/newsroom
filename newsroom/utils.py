@@ -165,8 +165,8 @@ def date_short(datetime):
 
 
 def get_agenda_dates(agenda, date_paranthesis=False):
-    start = agenda.get('dates', {}).get('start')
-    end = agenda.get('dates', {}).get('end')
+    start = parse_date_str(agenda.get('dates', {}).get('start'))
+    end = parse_date_str(agenda.get('dates', {}).get('end'))
 
     if start + timedelta(minutes=DAY_IN_MINUTES) < end:
         # Multi day event
