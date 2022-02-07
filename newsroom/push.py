@@ -133,10 +133,15 @@ def publish_item(doc, original):
     if app.generate_embed_renditions:
         app.generate_embed_renditions(doc)
 
-    if doc.get('coverage_id'):
-        agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
-        if agenda_items:
-            [notify_new_item(item, check_topics=False) for item in agenda_items]
+    try:
+        if doc.get('coverage_id'):
+            agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
+            if agenda_items:
+                [notify_new_item(item, check_topics=False) for item in agenda_items]
+    except Exception as ex:
+        logger.info('Failed to notify new wire item for Agenda watches')
+        logger.exception(ex)
+
     publish_item_signal.send(app._get_current_object(), item=doc, is_new=original is None)
     _id = service.create([doc])[0]
     if 'associations' not in doc and original is not None and bool(original.get('associations', {})):
