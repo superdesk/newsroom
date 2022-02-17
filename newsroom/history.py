@@ -68,7 +68,7 @@ class HistoryService(newsroom.Service):
                 'user': user['_id'],
                 'company': user.get('company'),
                 'item': item['_id'],
-                'version': item.get('version', item.get('_current_version')),
+                'version': item.get('version') if item.get('version') else item.get('_current_version', ''),
                 'section': section,
                 'monitoring': monitoring,
             }

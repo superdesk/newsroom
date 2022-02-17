@@ -232,8 +232,8 @@ class MonitoringEmailAlerts(Command):
         :return:
         """
         lookup = {'item': item.get('_id'),
-                  'version': item.get('version', ''),
                   'action': 'email',
+                  'version': item.get('version') if item.get('version') else item.get('_current_version', ''),
                   'company': profile.get('company'),
                   'monitoring': profile.get('_id')}
 
