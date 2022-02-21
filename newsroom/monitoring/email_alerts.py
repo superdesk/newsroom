@@ -239,6 +239,16 @@ class MonitoringEmailAlerts(Command):
 
         return get_resource_service('history').get(req=None, lookup=lookup).count()
 
+    def filter_users(self, m, company):
+        """
+        return a list of users from the profile that are enabled and belong to the company the profile belongs to.
+        :param m:
+        :param company:
+        :return: List of valid users
+        """
+        return [email['email'] for email in [u for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users') if
+                                             u['is_enabled'] and u['company'] == company['_id']]]
+
     def send_alerts(self, monitoring_list, created_from, created_from_time, now):
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         error_recipients = []
@@ -255,7 +265,9 @@ class MonitoringEmailAlerts(Command):
 
             last_run_time = local_to_utc(app.config['DEFAULT_TIMEZONE'], now)
 
-            if m.get('users'):
+            company = get_entity_or_404(m['company'], 'companies')
+            user_list = self.filter_users(m, company)
+            if len(user_list) and company.get('is_enabled'):
                 internal_req = ParsedRequest()
                 internal_req.args = {
                     'navigation': str(m['_id']),
@@ -267,7 +279,6 @@ class MonitoringEmailAlerts(Command):
                 items[:] = [item for item in items if not self.already_sent(item, m)]
                 template_kwargs = {'profile': m}
                 if items:
-                    company = get_entity_or_404(m['company'], 'companies')
                     try:
                         template_kwargs.update({
                             'items': items,
@@ -289,7 +300,7 @@ class MonitoringEmailAlerts(Command):
                             formatter = app.download_formatters[m['format_type']]['formatter']
 
                             send_email(
-                                [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
+                                user_list,
                                 subject,
                                 text_body=render_template('monitoring_email.txt', **template_kwargs),
                                 html_body=render_template('monitoring_email.html', **template_kwargs),
@@ -326,7 +337,7 @@ class MonitoringEmailAlerts(Command):
                             )
                 elif m['schedule'].get('interval') != 'immediate' and m.get('always_send'):
                     send_email(
-                        [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
+                        user_list,
                         m.get('subject') or m['name'],
                         text_body=render_template('monitoring_email_no_updates.txt', **template_kwargs),
                         html_body=render_template('monitoring_email_no_updates.html', **template_kwargs),
