@@ -41,14 +41,14 @@ def init(app):
         'first_name': 'Foo_First_name',
         'is_enabled': True,
         'receive_email': True,
-        'company': '',
+        'company': ObjectId(company_id),
     }, {
         '_id': ObjectId("5c4684645f627debec1dc3db"),
         'email': 'foo_user2@bar.com',
         'first_name': 'Foo_First_name2',
         'is_enabled': True,
         'receive_email': True,
-        'company': '',
+        'company': ObjectId(company_id),
     }
     ])
 
@@ -860,7 +860,6 @@ def test_dont_send_immediate_email_alerts_twice(client, app):
               {"monitoring_report_logo_path": get_fixture_path('thumbnail.jpg')})
     app.data.insert('items', [{
         '_id': 'foo',
-        'version': '1',
         'headline': 'product immediate',
         'products': [{'code': '12345'}],
         "versioncreated": utcnow(),
@@ -869,14 +868,83 @@ def test_dont_send_immediate_email_alerts_twice(client, app):
         'source': 'AAAA'
     }])
     app.data.insert('history', docs=[
-
         {
             "_id": "foo",
-            "version": "1",
         }
-
     ], action='email', user={'_id': None, 'company': ObjectId("5c3eb6975f627db90c84093c")}, section='monitoring',
                     monitoring=ObjectId('5db11ec55f627d8aa0b545fb'))
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 0
+
+
+@mock.patch('newsroom.monitoring.email_alerts.utcnow', mock_utcnow)
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_dont_send_email_to_disabled_users(client, app):
+    test_login_succeeds_for_admin(client)
+    app.data.insert('users', [{
+        '_id': ObjectId("5d4ccb7265af3eaa4a8395bc"),
+        'email': 'boo_user@bar.com',
+        'first_name': 'Boo_First_name',
+        'is_enabled': False,
+        'receive_email': True,
+        'company': ObjectId(company_id),
+        }, {
+        '_id': ObjectId("617f257c04bfdad4366b6997"),
+        'email': 'ringin@bar.com',
+        'first_name': 'Ring_In_First_name',
+        'is_enabled': True,
+        'receive_email': True,
+        'company': 'ring in',
+    }
+    ])
+    w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
+    assert w is not None
+    users = [ObjectId("5c53afa45f627d8333220f15"), ObjectId("5c4684645f627debec1dc3db"),
+             ObjectId("5d4ccb7265af3eaa4a8395bc"), ObjectId("617f257c04bfdad4366b6997")]
+    app.data.update('monitoring', ObjectId('5db11ec55f627d8aa0b545fb'), {'users': users}, w)
+
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'product immediate',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow(),
+        'byline': 'Testy McTestface',
+        'body_html': '<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>',
+        'source': 'AAAA'
+    }])
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 1
+        assert len(outbox[0].recipients) == 2
+        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+
+
+@mock.patch('newsroom.monitoring.email_alerts.utcnow', mock_utcnow)
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_dont_send_email_to_disabled_companies(client, app):
+    test_login_succeeds_for_admin(client)
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'product immediate',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow(),
+        'byline': 'Testy McTestface',
+        'body_html': '<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>',
+        'source': 'AAAA'
+    }])
+    c = app.data.find_one('companies', None, _id=company_id)
+    assert c is not None
+    app.data.update('companies', ObjectId(company_id), {'is_enabled': False}, c)
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 0
+
+
+def test_save_only_users_belonging_to_company(client, app):
+    test_login_succeeds_for_admin(client)
+    client.post('/monitoring/5db11ec55f627d8aa0b545fb/users', data=json.dumps({
+        'users': ["5c53afa45f627d8333220f15", "111111111111111111111111"]
+    }), content_type='application/json')
+    m = app.data.find_one('monitoring', None, _id="5db11ec55f627d8aa0b545fb")
+    assert m['users'] == [ObjectId("5c53afa45f627d8333220f15")]

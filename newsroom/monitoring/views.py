@@ -53,7 +53,8 @@ def process_form_request(updates, request_updates, form):
             updates['last_run_time'] = None
 
     if 'users' in request_updates:
-        updates['users'] = [ObjectId(u) for u in request_updates['users']]
+        updates['users'] = [u['_id'] for u in get_items_by_id([ObjectId(u) for u in request_updates['users']], 'users')
+                            if u['company'] == ObjectId(form.company.data)]
 
     if form.company.data:
         updates['company'] = ObjectId(form.company.data)
@@ -70,9 +71,14 @@ def get_monitoring_for_company(user):
 @blueprint.route('/monitoring/<id>/users', methods=['POST'])
 @account_manager_only
 def update_users(id):
+    profile = find_one('monitoring', _id=ObjectId(id))
+    if not profile:
+        return NotFound(gettext('monitoring Profile not found'))
+
     updates = flask.request.get_json()
     if 'users' in updates:
-        updates['users'] = [ObjectId(u_id) for u_id in updates['users']]
+        updates['users'] = [u['_id'] for u in get_items_by_id([ObjectId(u) for u in updates['users']], 'users')
+                            if u['company'] == profile.get('company')]
         get_resource_service('monitoring').patch(id=ObjectId(id), updates=updates)
         return jsonify({'success': True}), 200
 
