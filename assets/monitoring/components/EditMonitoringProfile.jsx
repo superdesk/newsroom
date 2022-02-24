@@ -143,6 +143,15 @@ class EditMonitoringProfile extends React.Component {
                                         onChange={onChange}
                                         error={getError('company')} />
 
+                                    <TextInput
+                                        name='email'
+                                        label={gettext('Email Address')}
+                                        value={item.email || ''}
+                                        onChange={onChange}
+                                        error={getError('email')}
+                                        description={gettext('Optional comma seperated list of email addresses')}
+                                    />
+
                                     <TextAreaInput
                                         name='query'
                                         label={gettext('Query')}

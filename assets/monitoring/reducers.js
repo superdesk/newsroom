@@ -50,6 +50,7 @@ export default function monitoringReducer(state = initialState, action) {
                 name: '',
                 subject: '',
                 description: '',
+                email: '',
                 alert_type: 'full_text',
                 format_type: 'monitoring_pdf',
                 company: '',

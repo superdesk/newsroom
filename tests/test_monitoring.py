@@ -948,3 +948,26 @@ def test_save_only_users_belonging_to_company(client, app):
     }), content_type='application/json')
     m = app.data.find_one('monitoring', None, _id="5db11ec55f627d8aa0b545fb")
     assert m['users'] == [ObjectId("5c53afa45f627d8333220f15")]
+
+
+@mock.patch('newsroom.monitoring.email_alerts.utcnow', mock_utcnow)
+@mock.patch('newsroom.email.send_email', mock_send_email)
+def test_send_profile_email(client, app):
+    test_login_succeeds_for_admin(client)
+    app.data.insert('items', [{
+        '_id': 'foo',
+        'headline': 'product immediate',
+        'products': [{'code': '12345'}],
+        "versioncreated": utcnow(),
+        'byline': 'Testy McTestface',
+        'body_html': '<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>',
+        'source': 'AAAA'
+    }])
+    m = app.data.find_one('monitoring', None, _id="5db11ec55f627d8aa0b545fb")
+    assert m is not None
+    app.data.update('monitoring', ObjectId("5db11ec55f627d8aa0b545fb"), {'email': 'atest@a.com, btest@b.com'}, m)
+    with app.mail.record_messages() as outbox:
+        MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 1
+        assert 'atest@a.com' in outbox[0].recipients
+        assert 'btest@b.com' in outbox[0].recipients

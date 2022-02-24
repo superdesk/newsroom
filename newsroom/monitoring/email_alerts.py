@@ -24,6 +24,7 @@ from eve.utils import ParsedRequest
 from .utils import get_monitoring_file, truncate_article_body, get_date_items_dict
 import base64
 import os
+import re
 
 try:
     from urllib.parse import urlparse
@@ -241,13 +242,22 @@ class MonitoringEmailAlerts(Command):
 
     def filter_users(self, m, company):
         """
-        return a list of users from the profile that are enabled and belong to the company the profile belongs to.
+        return a list of users email addresses from the profile that are enabled and belong to the company the
+        profile belongs to. It will also add any email addresses that may be associated with the profile if are
+        available and are unique
         :param m:
         :param company:
         :return: List of valid users
         """
-        return [email['email'] for email in [u for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users') if
-                                             u['is_enabled'] and u['company'] == company['_id']]]
+        email_addresses = [email['email'] for email in
+                           [u for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users') if
+                            u['is_enabled'] and u['company'] == company['_id']]]
+        # append any addresses from the profile
+        if m.get('email'):
+            for address in re.split(r'[, ]*', m.get('email')):
+                if m.get('email') not in email_addresses:
+                    email_addresses.append(address)
+        return email_addresses
 
     def send_alerts(self, monitoring_list, created_from, created_from_time, now):
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
