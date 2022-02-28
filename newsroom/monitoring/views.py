@@ -62,6 +62,9 @@ def process_form_request(updates, request_updates, form):
     if 'keywords' in request_updates:
         updates['keywords'] = request_updates['keywords']
 
+    if 'email' in request_updates:
+        updates['email'] = request_updates.get('email').replace(' ', '')
+
 
 def get_monitoring_for_company(user):
     company = user['company'] if user and user.get('company') else None

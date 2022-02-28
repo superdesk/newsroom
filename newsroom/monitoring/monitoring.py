@@ -22,6 +22,12 @@ class MonitoringResource(newsroom.Resource):
         'company': {
             'type': 'objectid'
         },
+        # Additional email addresses to send the monitoring email to, They do not need to belong to a newsroom user,
+        # they are intended to usually belong to a distribution list of the client company
+        'email': {
+            'type': 'string',
+            'nullable': True
+        },
         'query': {
             'type': 'string'
         },
