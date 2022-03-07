@@ -183,7 +183,7 @@ class MonitoringEmailAlerts(Command):
                 alert_monitoring['four']['w_lists'].append(profile)
                 return
 
-    def send_email_alert(self, items, subject, m):
+    def send_email_alert(self, items, subject, m, recipients):
         """
         Send an email alert with the details in the body of the email. If a logo image is set in the
         monitoring_report_logo_path settings it will be attached to the email and can be referenced in the
@@ -191,6 +191,7 @@ class MonitoringEmailAlerts(Command):
         :param items:
         :param subject:
         :param m:
+        :param recipients:
         :return:
         """
         from newsroom.email import send_email
@@ -219,7 +220,7 @@ class MonitoringEmailAlerts(Command):
                              'headers': [('Content-ID', '<logo>')]}]
 
         send_email(
-            [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
+            recipients,
             subject,
             text_body=render_template('monitoring_export.txt', **data),
             html_body=render_template('monitoring_export.html', **data),
@@ -255,7 +256,7 @@ class MonitoringEmailAlerts(Command):
         # append any addresses from the profile
         if m.get('email'):
             for address in re.split(r'[, ]*', m.get('email')):
-                if m.get('email') not in email_addresses:
+                if address not in email_addresses:
                     email_addresses.append(address)
         return email_addresses
 
@@ -303,7 +304,7 @@ class MonitoringEmailAlerts(Command):
                             subject = m.get('subject') or m['name']
 
                         if m.get('format_type') == 'monitoring_email':
-                            self.send_email_alert(items, subject, m)
+                            self.send_email_alert(items, subject, m, user_list)
                         else:
                             _file = get_monitoring_file(m, items)
                             attachment = base64.b64encode(_file.read())

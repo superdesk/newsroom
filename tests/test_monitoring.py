@@ -954,6 +954,8 @@ def test_save_only_users_belonging_to_company(client, app):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_send_profile_email(client, app):
     test_login_succeeds_for_admin(client)
+    post_json(client, '/settings/general_settings',
+              {"monitoring_report_logo_path": get_fixture_path('thumbnail.jpg')})
     app.data.insert('items', [{
         '_id': 'foo',
         'headline': 'product immediate',
@@ -965,9 +967,12 @@ def test_send_profile_email(client, app):
     }])
     m = app.data.find_one('monitoring', None, _id="5db11ec55f627d8aa0b545fb")
     assert m is not None
-    app.data.update('monitoring', ObjectId("5db11ec55f627d8aa0b545fb"), {'email': 'atest@a.com, btest@b.com'}, m)
+    app.data.update('monitoring', ObjectId("5db11ec55f627d8aa0b545fb"),
+                    {'email': 'atest@a.com,btest@b.com,foo_user2@bar.com',
+                     'format_type': 'monitoring_email'}, m)
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 1
+        assert len(outbox[0].recipients) == 4
         assert 'atest@a.com' in outbox[0].recipients
         assert 'btest@b.com' in outbox[0].recipients
