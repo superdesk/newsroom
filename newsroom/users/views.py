@@ -94,6 +94,21 @@ def _is_email_address_valid(email):
     return not existing_user
 
 
+def _user_allowed_field(updates, user):
+    """
+    For public users there is a restricted list of fields that can be updated this function  ensures that only the
+    listed fields have changed, The list corresponds to the field in UserProfile.jsx
+    :param updates:
+    :param user:
+    :return:
+    """
+    allowed_fields = ('first_name', 'last_name', 'phone', 'mobile', 'role', 'receive_email', 'locale')
+    for key, value in updates.items():
+        if key in updates and key not in allowed_fields and value != user.get(key, ''):
+            return False
+    return True
+
+
 @blueprint.route('/users/<_id>', methods=['GET', 'POST'])
 @login_required
 def edit(_id):
@@ -115,7 +130,12 @@ def edit(_id):
             if form.company.data:
                 updates['company'] = ObjectId(form.company.data)
 
+            # account manager can do anything but promote themselves to admin
             if is_current_user_account_mgr() and updates.get('user_type', '') != user.get('user_type', ''):
+                flask.abort(401)
+
+            if not (is_current_user_admin() or is_current_user_account_mgr())\
+                    and not _user_allowed_field(updates, user):
                 flask.abort(401)
 
             user = get_resource_service('users').patch(ObjectId(_id), updates=updates)
