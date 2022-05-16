@@ -45,6 +45,18 @@ def test_create_fails_in_validation(client):
     assert 'name' in response.get_data(as_text=True)
 
 
+def test_update_fails_in_validation(client):
+    test_login_succeeds_for_admin(client)
+    response = client.post('/section_filters/59b4c5c61d41c8d736852fbf', data=json.dumps({
+        'name': 'Sport',
+        'description': 'Breaking <script>bad</script> news',
+        'is_enabled': True,
+    }), content_type='application/json')
+
+    assert response.status_code == 400
+    assert 'Illegal Character' in response.get_data(as_text=True)
+
+
 def test_update_filters(client):
     test_login_succeeds_for_admin(client)
 

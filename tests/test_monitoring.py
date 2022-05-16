@@ -149,6 +149,56 @@ def test_post_monitoring(client):
     assert "W2" == items[1]['name']
 
 
+def test_monitoring_valiation(client):
+    test_login_succeeds_for_admin(client)
+    response = client.post('/monitoring/new', data=json.dumps({
+        "is_enabled": True,
+        "users": [
+            ObjectId("5c53afa45f627d8333220f15"),
+            ObjectId("5c4684645f627debec1dc3db")
+        ],
+        "company": ObjectId("5c3eb6975f627db90c84093c"),
+        "subject": "<script>alert</script>",
+        "name": "W2",
+        "_etag": "f023a8db3cdbe31e63ac4b0e6864f5a86ef07253",
+        "description": "D3",
+        "alert_type": "full_text",
+        "query": "hgnhgnhg",
+        "schedule": {
+            "interval": "immediate"
+        }}), content_type='application/json')
+    assert response.status_code == 400
+    assert 'Illegal character' in response.get_data(as_text=True)
+
+
+def test_company_update_validation(client):
+    test_login_succeeds_for_admin(client)
+    response = client.post('/monitoring/new', data=json.dumps({
+        "is_enabled": True,
+        "users": [
+            ObjectId("5c53afa45f627d8333220f15"),
+            ObjectId("5c4684645f627debec1dc3db")
+        ],
+        "company": ObjectId("5c3eb6975f627db90c84093c"),
+        "subject": "",
+        "name": "W2",
+        "_etag": "f023a8db3cdbe31e63ac4b0e6864f5a86ef07253",
+        "description": "D3",
+        "alert_type": "full_text",
+        "query": "a*b c?[:]",
+        "schedule": {
+            "interval": "immediate"
+        }}), content_type='application/json')
+    assert response.status_code == 201
+    item = json.loads(response.get_data())
+    response = client.post('/monitoring/{}'.format(item.get('_id')),
+                           data=json.dumps({"name": "<script>alert</script>",
+                                            "company": ObjectId("5c3eb6975f627db90c84093c"),
+                                            "query": "a*b c?"}),
+                           content_type='application/json')
+    assert response.status_code == 400
+
+
 def test_always_send_override_for_immediate_monitoring(client):
     test_login_succeeds_for_admin(client)
     response = client.post('/monitoring/new', data=json.dumps({

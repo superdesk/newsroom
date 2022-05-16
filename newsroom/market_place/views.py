@@ -13,7 +13,7 @@ from newsroom.companies import section
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.wire.search import get_bookmarks_count
 from newsroom.wire.views import update_action_list, get_previous_versions, set_permissions
-from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type, query_resource
+from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type, query_resource, clean_card
 from newsroom.notifications import push_user_notification
 
 
@@ -59,7 +59,7 @@ def get_home_page_data():
         'user': str(user['_id']) if user else None,
         'company': str(user['company']) if user and user.get('company') else None,
         'navigations': navigations,
-        'cards': list(query_resource('cards', lookup={'dashboard': SECTION_ID})),
+        'cards': [clean_card(card) for card in query_resource('cards', lookup={'dashboard': SECTION_ID})],
         'saved_items': get_bookmarks_count(user['_id'], SECTION_ID),
         'context': SECTION_ID,
         'home_page': True,

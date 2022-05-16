@@ -11,7 +11,8 @@ from werkzeug.exceptions import NotFound
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.companies import blueprint
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400, set_original_creator, \
-    set_version_creator
+    set_version_creator, is_safe_string, PHONE_REGEX, clean_product, clean_company, clean_user
+from wtforms.validators import Email, URL, Regexp, ValidationError
 import ipaddress
 
 
@@ -24,9 +25,9 @@ def get_company_types_options(company_types):
 
 def get_settings_data():
     return {
-        'companies': list(query_resource('companies')),
+        'companies': [clean_company(company) for company in query_resource('companies')],
         'services': app.config['SERVICES'],
-        'products': list(query_resource('products')),
+        'products': [clean_product(product) for product in query_resource('products')],
         'sections': app.sections,
         'company_types': get_company_types_options(app.config.get('COMPANY_TYPES', [])),
         'api_enabled': app.config.get('NEWS_API_ENABLED', False),
@@ -41,7 +42,7 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'name': regex}
-    companies = list(query_resource('companies', lookup=lookup))
+    companies = [clean_company(company) for company in query_resource('companies', lookup=lookup)]
     return jsonify(companies), 200
 
 
@@ -59,9 +60,45 @@ def create():
     return jsonify({'success': True, '_id': ids[0]}), 201
 
 
+class DummyField:
+    pass
+
+
 def get_errors_company(company):
     if not company.get('name'):
         return jsonify({'name': gettext('Name not found')}), 400
+
+    # check string fields for dangerous content
+    for field in ("name", "contact_name", "country", "account_manager", "sd_subscriber_id"):
+        if not is_safe_string(company.get(field)):
+            return jsonify({field: gettext(' Illegal character')}), 400
+
+    if company.get("contact_email"):
+        email_validator = Email(message='')
+        field = DummyField()
+        field.data = company.get("contact_email")
+        try:
+            email_validator(None, field)
+        except ValidationError:
+            return jsonify({"contact_email": gettext('Invalid email address.')}), 400
+
+    if company.get("url"):
+        url_validator = URL(require_tld=False, message='')
+        field = DummyField
+        field.data = company.get("url")
+        try:
+            url_validator(None, field)
+        except ValidationError:
+            return jsonify({"url": gettext('Invalid URL.')}), 400
+
+    if company.get("phone"):
+        phone_validator = Regexp(message='', regex=PHONE_REGEX, flags=re.IGNORECASE)
+        field = DummyField
+        field.data = company.get('phone')
+        try:
+            phone_validator(None, field)
+        except ValidationError:
+            return jsonify({"phone": gettext('Invalid phone number.')}), 400
 
     if company.get('allowed_ip_list'):
         errors = []
@@ -138,7 +175,7 @@ def delete(_id):
 @login_required
 def company_users(_id):
     """TODO(petr): use projection to hide fields like token/email."""
-    users = list(query_resource('users', lookup={'company': ObjectId(_id)}))
+    users = [clean_user(user) for user in query_resource('users', lookup={'company': ObjectId(_id)})]
     return jsonify(users), 200
 
 

@@ -500,3 +500,27 @@ def test_user_cant_updated_protected_fields(app, client):
     response = client.post('users/5c5914275f627d5885fee6a8', data=user,
                            follow_redirects=True)
     assert response.status_code == 401
+
+
+def test_validate_new_user(client):
+    test_login_succeeds_for_admin(client)
+    # Register a new account
+    response = client.post('/users/new', data={
+        'email': 'newuser@abc.org',
+        'first_name': 'John',
+        'last_name': 'Doe<script></script>',
+        'password': 'abc',
+        'phone': '1234567',
+        'company': ObjectId('59b4c5c61d41c8d736852fbf'),
+        'user_type': 'public'
+    })
+    assert response.status_code == 400
+    assert ' Illegal character' in response.get_data(as_text=True)
+
+
+def test_clean_user(client, app):
+    current_user = app.data.find_one('users', None, _id=ADMIN_USER_ID)
+    app.data.update('users', current_user['_id'], {'first_name': 'Evil<script></script>'}, current_user)
+    test_login_succeeds_for_admin(client)
+    response = client.get('/users/search')
+    assert 'script' not in response.get_data(as_text=True)

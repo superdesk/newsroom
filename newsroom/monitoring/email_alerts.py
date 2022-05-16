@@ -21,7 +21,8 @@ import datetime
 import logging
 from bson import ObjectId
 from eve.utils import ParsedRequest
-from .utils import get_monitoring_file, truncate_article_body, get_date_items_dict
+from .utils import get_monitoring_file, truncate_article_body, get_date_items_dict, DELAYED_INTERVALS,\
+    IMMEDIATE_INTERVAL
 import base64
 import os
 import re
@@ -70,14 +71,13 @@ class MonitoringEmailAlerts(Command):
                          local_to_utc(app.config['DEFAULT_TIMEZONE'], last_minute).strftime('%H:%M:%S'), now)
 
     def get_scheduled_monitoring_list(self):
-        return list(get_resource_service('monitoring').find(where={'schedule.interval': {'$in': ['one_hour', 'two_hour',
-                                                                                                 'four_hour', 'weekly',
-                                                                                                 'daily']},
+        return list(get_resource_service('monitoring').find(where={'schedule.interval': {'$in': DELAYED_INTERVALS},
                                                                    'is_enabled': True}))
 
     def get_immediate_monitoring_list(self):
         return list(
-            get_resource_service('monitoring').find(where={'schedule.interval': 'immediate', 'is_enabled': True}))
+            get_resource_service('monitoring').find(where={'schedule.interval': IMMEDIATE_INTERVAL,
+                                                           'is_enabled': True}))
 
     def scheduled_worker(self, now):
         monitoring_list = self.get_scheduled_monitoring_list()

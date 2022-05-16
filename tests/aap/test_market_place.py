@@ -190,7 +190,7 @@ def test_search_filtered_by_users_products(client, app):
     app.data.insert('products', [{
         '_id': 10,
         'name': 'product test',
-        'sd_product_id': 1,
+        'sd_product_id': '1',
         'companies': ['1'],
         'is_enabled': True,
         'product_type': 'aapX'
@@ -222,7 +222,7 @@ def test_search_filter_by_individual_navigation(client, app):
     app.data.insert('products', [{
         '_id': 10,
         'name': 'product test',
-        'sd_product_id': 1,
+        'sd_product_id': '1',
         'companies': ['1'],
         'navigations': ['51'],
         'product_type': 'aapX',
@@ -230,7 +230,7 @@ def test_search_filter_by_individual_navigation(client, app):
     }, {
         '_id': 11,
         'name': 'product test 2',
-        'sd_product_id': 2,
+        'sd_product_id': '2',
         'companies': ['1'],
         'navigations': ['52'],
         'product_type': 'aapX',

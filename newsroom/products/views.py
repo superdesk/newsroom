@@ -8,13 +8,14 @@ from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only
 from newsroom.products import blueprint
-from newsroom.utils import get_json_or_400, get_entity_or_404, set_original_creator, set_version_creator, query_resource
+from newsroom.utils import get_json_or_400, get_entity_or_404, set_original_creator, set_version_creator,\
+    query_resource, clean_product, clean_navigation, is_safe_string
 
 
 def get_settings_data():
     return {
-        'products': list(query_resource('products')),
-        'navigations': list(query_resource('navigations')),
+        'products': [clean_product(product) for product in query_resource('products')],
+        'navigations': [clean_navigation(navigation) for navigation in query_resource('navigations')],
         'companies': list(query_resource('companies')),
         'sections': [s for s in current_app.sections if s.get('_id') != 'monitoring'],  # monitoring has no products
     }
@@ -26,7 +27,7 @@ def index():
     lookup = None
     if flask.request.args.get('q'):
         lookup = flask.request.args.get('q')
-    products = list(query_resource('products', lookup=lookup))
+    products = [clean_product(product) for product in query_resource('products', lookup=lookup)]
     return jsonify(products), 200
 
 
@@ -37,13 +38,25 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'name': regex}
-    products = list(query_resource('products', lookup=lookup))
+    products = [clean_product(product) for product in query_resource('products', lookup=lookup)]
     return jsonify(products), 200
 
 
 def validate_product(product):
     if not product.get('name'):
         return jsonify({'name': gettext('Name not found')}), 400
+
+    if not is_safe_string(product.get('name')):
+        return jsonify({'name': gettext('Illegal Character')}), 400
+
+    if not is_safe_string(product.get('description')):
+        return jsonify({'description': gettext('Illegal Character')}), 400
+
+    if not is_safe_string(product.get('sd_product_id')):
+        return jsonify({'sd_product_id': gettext('Illegal Character')}), 400
+
+    if not is_safe_string(product.get('query'), allowed_punctuation="~'"):
+        return jsonify({'query': gettext('Illegal Character')}), 400
 
 
 @blueprint.route('/products/new', methods=['POST'])

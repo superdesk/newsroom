@@ -45,6 +45,32 @@ def test_create_fails_in_validation(client):
     assert 'name' in response.get_data(as_text=True)
 
 
+def test_update_fails_in_validation(client):
+    test_login_succeeds_for_admin(client)
+    response = client.post('/products/59b4c5c61d41c8d736852fbf', data=json.dumps({
+        'description': 'Breaking <script>bad</script> news',
+        'is_enabled': True,
+        'name': 'test'
+    }), content_type='application/json')
+
+    assert response.status_code == 400
+    assert 'Illegal Character' in response.get_data(as_text=True)
+
+
+def test_clean_product_returned(client, app):
+    app.data.insert('products', [{
+        '_id': ObjectId('123456789012345678901234'),
+        'name': 'Sport <script>Stored</script>',
+        'description': 'Top level sport product',
+        'is_enabled': True,
+    }])
+    test_login_succeeds_for_admin(client)
+    response = client.get('/products')
+    assert response.status_code == 200
+    products = json.loads(response.get_data())
+    assert 'script' not in products[0].get('name')
+
+
 def test_update_products(client):
     test_login_succeeds_for_admin(client)
 

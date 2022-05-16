@@ -24,7 +24,7 @@ from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
-    get_agenda_dates, get_location_string, get_public_contacts, get_links, get_items_for_user_action
+    get_agenda_dates, get_location_string, get_public_contacts, get_links, get_items_for_user_action, clean_card
 from newsroom.notifications import push_user_notification, push_notification
 from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
@@ -106,7 +106,7 @@ def get_items_by_card(cards):
 
 def get_home_data():
     user = get_user()
-    cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
+    cards = [clean_card(card) for card in query_resource('cards', lookup={'dashboard': 'newsroom'})]
     company_id = str(user['company']) if user and user.get('company') else None
     items_by_card = get_items_by_card(cards)
 

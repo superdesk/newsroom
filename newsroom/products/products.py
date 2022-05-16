@@ -2,6 +2,7 @@ from bson import ObjectId
 
 import newsroom
 import superdesk
+from newsroom.utils import clean_product
 
 
 class ProductsResource(newsroom.Resource):
@@ -74,7 +75,8 @@ def get_products_by_navigation(navigation_id, product_type=None):
     if product_type is not None:
         lookup['product_type'] = product_type
 
-    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
+    return [clean_product(product) for product in superdesk.get_resource_service('products').get(req=None,
+                                                                                                 lookup=lookup)]
 
 
 def get_product_by_id(product_id, product_type=None, company_id=None):
@@ -89,7 +91,8 @@ def get_product_by_id(product_id, product_type=None, company_id=None):
     if product_type is not None:
         lookup['product_type'] = product_type
 
-    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
+    return [clean_product(product) for product in superdesk.get_resource_service('products').get(req=None,
+                                                                                                 lookup=lookup)]
 
 
 def get_products_by_company(company_id, navigation_id=None, product_type=None):
@@ -105,10 +108,12 @@ def get_products_by_company(company_id, navigation_id=None, product_type=None):
     if product_type:
         lookup['product_type'] = product_type
 
-    products = list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
+    products = [clean_product(product) for product in superdesk.get_resource_service('products').get(req=None,
+                                                                                                     lookup=lookup)]
     return products
 
 
 def get_products_dict_by_company(company_id):
     lookup = {'is_enabled': True, 'companies': str(company_id)}
-    return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))
+    return [clean_product(product) for product in superdesk.get_resource_service('products').get(req=None,
+                                                                                                 lookup=lookup)]

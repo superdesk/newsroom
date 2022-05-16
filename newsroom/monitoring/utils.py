@@ -5,6 +5,11 @@ from newsroom.utils import get_items_by_id
 from superdesk import etree as sd_etree
 
 
+DELAYED_INTERVALS = ['one_hour', 'two_hour', 'four_hour', 'weekly', 'daily']
+IMMEDIATE_INTERVAL = 'immediate'
+SCHEDULE_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
+
 def get_monitoring_file(monitoring_profile, items):
     _format = monitoring_profile.get('format_type', 'monitoring_pdf')
     formatter = app.download_formatters[_format]['formatter']

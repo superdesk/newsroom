@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext
 from .agenda import AgendaResource, AgendaService
 from .featured import FeaturedResource, FeaturedService
 from . import formatters
-from .utils import get_coverage_email_text
+from .utils import get_coverage_email_text, validate_google_maps_styles
 from newsroom.utils import url_for_agenda
 
 blueprint = Blueprint('agenda', __name__)
@@ -30,5 +30,6 @@ def init_app(app):
         lazy_gettext('Google Maps Styles'),
         default='',
         description=lazy_gettext('Provide styles delimited by &(ampersand). For example, feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to https://developers.google.com/maps/documentation/maps-static/styling for more details'),  # noqa
-        client_setting=True
+        client_setting=True,
+        validator=validate_google_maps_styles
     )

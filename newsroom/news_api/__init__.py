@@ -22,5 +22,13 @@ def init_app(app):
         lazy_gettext('Image renditions the API can serve'),
         weight=600,
         description=lazy_gettext('A comma seperated list of the renditions that the API will return'),
-        default=app.config.get('NEWS_API_ALLOWED_RENDITIONS', '')
+        default=app.config.get('NEWS_API_ALLOWED_RENDITIONS', ''),
+        validator=validate_renditions
     )
+
+
+def validate_renditions(value):
+    from newsroom.utils import is_safe_string
+
+    if not is_safe_string(value, allowed_punctuation='|'):
+        return lazy_gettext("Illegal character in the Image renditions the API can serve")

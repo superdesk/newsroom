@@ -12,6 +12,7 @@ from newsroom.monitoring import blueprint
 from .forms import MonitoringForm, alert_types
 from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400, \
     set_original_creator, set_version_creator, is_json_request, get_items_for_user_action
+from newsroom.companies import clean_company
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
 from newsroom.wire.utils import update_action_list
@@ -19,10 +20,11 @@ from newsroom.wire.views import item as wire_print
 from newsroom.notifications import push_user_notification
 from newsroom.wire.search import get_bookmarks_count
 from newsroom.monitoring.utils import get_date_items_dict, get_monitoring_file, \
-    get_items_for_monitoring_report
+    get_items_for_monitoring_report, DELAYED_INTERVALS, IMMEDIATE_INTERVAL, SCHEDULE_DAYS
 from superdesk.logging import logger
 from newsroom.email import send_email
 import base64
+import re
 
 
 def get_view_data():
@@ -42,7 +44,8 @@ def get_view_data():
 
 
 def get_settings_data():
-    return {"companies": list(query_resource('companies', lookup={'sections.monitoring': True}))}
+    return {"companies": [clean_company(company) for company in query_resource('companies',
+                                                                               lookup={'sections.monitoring': True})]}
 
 
 def process_form_request(updates, request_updates, form):
@@ -68,7 +71,7 @@ def process_form_request(updates, request_updates, form):
 
 def get_monitoring_for_company(user):
     company = user['company'] if user and user.get('company') else None
-    return list(query_resource('monitoring', lookup={'company': company}))
+    return [clean_company(company) for company in query_resource('monitoring', lookup={'company': company})]
 
 
 @blueprint.route('/monitoring/<id>/users', methods=['POST'])
@@ -79,7 +82,7 @@ def update_users(id):
         return NotFound(gettext('monitoring Profile not found'))
 
     updates = flask.request.get_json()
-    if 'users' in updates:
+    if 'users' in updates and len(updates.keys()) == 1:
         updates['users'] = [u['_id'] for u in get_items_by_id([ObjectId(u) for u in updates['users']], 'users')
                             if u['company'] == profile.get('company')]
         get_resource_service('monitoring').patch(id=ObjectId(id), updates=updates)
@@ -89,7 +92,8 @@ def update_users(id):
 @blueprint.route('/monitoring/schedule_companies', methods=['GET'])
 @account_manager_only
 def monitoring_companies():
-    monitoring_list = list(query_resource('monitoring', lookup={'schedule.interval': {'$ne': None}}))
+    monitoring_list = [clean_company(company) for company in
+                       query_resource('monitoring', lookup={'schedule.interval': {'$ne': None}})]
     companies = get_items_by_id([ObjectId(m['company']) for m in monitoring_list], 'companies')
     return jsonify(companies), 200
 
@@ -98,13 +102,24 @@ def monitoring_companies():
 @account_manager_only
 def update_schedule(id):
     updates = flask.request.get_json()
-    get_resource_service('monitoring').patch(id=ObjectId(id), updates=updates)
-    return jsonify({'success': True}), 200
+    if 'schedule' in updates and len(updates.keys()) == 1:
+        schedule = updates.get('schedule')
+        if schedule.get('interval') and not schedule.get('interval') in DELAYED_INTERVALS + [IMMEDIATE_INTERVAL]:
+            return jsonify({'success': False})
+        if schedule.get('time'):
+            regex = r"^[0-2][0-9]:[0|3][0]$"
+            if not re.match(regex, schedule.get('time')):
+                return jsonify({'success': False})
+        if schedule.get('day') and not schedule.get('day') in SCHEDULE_DAYS:
+            return jsonify({'success': False})
+
+        get_resource_service('monitoring').patch(id=ObjectId(id), updates=updates)
+        return jsonify({'success': True}), 200
 
 
 @blueprint.route('/monitoring/all', methods=['GET'])
 def search_all():
-    monitoring_list = list(query_resource('monitoring'))
+    monitoring_list = [clean_company(company) for company in query_resource('monitoring')]
     return jsonify(monitoring_list), 200
 
 

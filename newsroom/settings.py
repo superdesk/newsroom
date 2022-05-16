@@ -3,9 +3,11 @@
 import re
 import copy
 import flask
+import bleach
+import html
 from flask_babel import gettext, lazy_gettext
 from superdesk.utc import utcnow
-from newsroom.utils import get_json_or_400, set_version_creator
+from newsroom.utils import get_json_or_400, set_version_creator, is_safe_string
 from newsroom.template_filters import newsroom_config
 from newsroom.decorator import admin_only, account_manager_only
 
@@ -58,7 +60,7 @@ def get_setting(setting_key=None, include_audit=False):
         if values:
             for key, val in values.get('values', {}).items():
                 if val and settings.get(key):
-                    settings[key]['value'] = val
+                    settings[key]['value'] = html.unescape(bleach.clean(val, strip=True))
             if include_audit:
                 settings['_updated'] = values.get('_updated')
                 settings['version_creator'] = values.get('version_creator')
@@ -92,6 +94,23 @@ def validate_general_settings(values):
             if email and not email_regex.match(email.strip()):
                 return gettext('{}: Email IDs not in proper format'.format(field_txt))
 
+    for (key, value) in values.items():
+        setting = flask.current_app._general_settings.get(key)
+        if setting.get('validator'):
+            error = setting.get('validator')(value)
+            if error:
+                return error
+
+
+def validate_google_analytics(value):
+    if not is_safe_string(value):
+        return gettext("Invalid character in the Google Analytics ID")
+
+
+def validate_monitoring_report_logo_path(value):
+    if not is_safe_string(value):
+        return gettext("Invalid character in Monitoring report logo image")
+
 
 def init_app(app):
     app.settings_app('general-settings', lazy_gettext('General Settings'), weight=800, data=get_initial_data)
@@ -99,7 +118,8 @@ def init_app(app):
     app.add_template_global(get_client_config)
 
     # basic settings
-    app.general_setting('google_analytics', lazy_gettext('Google Analytics ID'), default=app.config['GOOGLE_ANALYTICS'])
+    app.general_setting('google_analytics', lazy_gettext('Google Analytics ID'), default=app.config['GOOGLE_ANALYTICS'],
+                        validator=validate_google_analytics)
     app.general_setting('company_expiry_alert_recipients', lazy_gettext('Company expiry alert recipients'),
                         description=lazy_gettext('Comma separated list of email addresses to which the expiration alerts of companies will be sent to.'))  # noqa
     app.general_setting('coverage_request_recipients', lazy_gettext('Coverage request recipients'),
@@ -109,7 +129,8 @@ def init_app(app):
                         description=lazy_gettext(
                             'Comma separated list of email addresses who will receive system alerts.'))
     app.general_setting('monitoring_report_logo_path', lazy_gettext('Monitoring report logo image'),
-                        description=lazy_gettext('Monitoring report logo image (jpg or png) for RTF reports.'))
+                        description=lazy_gettext('Monitoring report logo image (jpg or png) for RTF reports.'),
+                        validator=validate_monitoring_report_logo_path)
 
 
 class SettingsApp():

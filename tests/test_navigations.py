@@ -145,3 +145,15 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
     assert navigations[0].get('name') == 'Uber'
     navigations = get_navigations_by_company('c-1', 'wire')
     assert navigations[0].get('name') == 'Sport'
+
+
+def test_validation_on_new_navigations(client):
+    test_login_succeeds_for_admin(client)
+    response = client.post('/navigations/new', data={'navigation': json.dumps({
+        'name': 'Breaking <script>Bad</script>',
+        'description': 'Breaking news',
+        'product_type': 'wire',
+        'is_enabled': True,
+    })})
+    assert response.status_code == 400
+    assert 'Illegal Character' in response.get_data(as_text=True)

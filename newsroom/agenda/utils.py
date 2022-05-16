@@ -3,6 +3,7 @@ from newsroom.template_filters import time_short, parse_date, format_datetime
 from flask_babel import gettext
 from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
 from superdesk.metadata.item import CONTENT_STATE
+from newsroom.utils import is_safe_string
 
 DAY_IN_MINUTES = 24 * 60 - 1
 TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed'
@@ -130,3 +131,8 @@ def remove_fields_for_public_user(item):
         clean_coverages(p.get('coverages', []))
 
     clean_coverages(item.get('coverages', []))
+
+
+def validate_google_maps_styles(value):
+    if not is_safe_string(value, allowed_punctuation='|'):
+        return gettext("Illegal character in Google Maps Styles")
