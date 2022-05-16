@@ -456,3 +456,47 @@ def test_account_manager_can_update_user(app, client):
     response = client.post('users/5c5914275f627d5885fee6a8', data=account_mgr,
                            follow_redirects=True)
     assert response.status_code == 401
+
+
+def test_user_cant_updated_protected_fields(app, client):
+    company_ids = app.data.insert('companies', [{
+        'phone': '2132132134',
+        'sd_subscriber_id': '12345',
+        'name': 'Press Co.',
+        'is_enabled': True,
+        'contact_name': 'Tom'
+    }])
+    user = {
+        '_id': ObjectId("5c5914275f627d5885fee6a8"),
+        'first_name': 'Normal',
+        'last_name': 'User',
+        'email': 'normal@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'public',
+        'is_validated': True,
+        'is_enabled': True,
+        'is_approved': True,
+        'receive_email': True,
+        'phone': '2132132134',
+        'expiry_alert': True,
+        'company': company_ids[0]}
+    app.data.insert('users', [user])
+    response = client.post(
+        url_for('auth.login'),
+        data={'email': 'normal@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+    user['first_name'] = 'Updated Account'
+    response = client.post('users/5c5914275f627d5885fee6a8', data=user,
+                           follow_redirects=True)
+    assert response.status_code == 200
+    # public user can't promote themselves
+    user['user_type'] = 'administrator'
+    response = client.post('users/5c5914275f627d5885fee6a8', data=user,
+                           follow_redirects=True)
+    assert response.status_code == 401
+    user['email'] = 'foo@a.com'
+    response = client.post('users/5c5914275f627d5885fee6a8', data=user,
+                           follow_redirects=True)
+    assert response.status_code == 401
