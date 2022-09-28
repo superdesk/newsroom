@@ -61,3 +61,13 @@ def test_delete_card_succeeds(client):
     response = client.get('/cards')
     data = json.loads(response.get_data())
     assert 0 == len(data)
+
+
+def test_update_validation_card(client):
+    test_login_succeeds_for_admin(client)
+
+    response = client.post('/cards/59b4c5c61d41c8d736852fbf/',
+                           data={'card': json.dumps({'label': 'Sport<script></script>',
+                                                     'dashboard': 'newsroom',
+                                                     'type': '4-picture-text'})})
+    assert response.status_code == 400

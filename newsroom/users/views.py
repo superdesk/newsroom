@@ -11,20 +11,20 @@ from newsroom.auth import get_user, get_user_by_email
 from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user, is_current_user_account_mgr
 from newsroom.decorator import admin_only, login_required, account_manager_only
-from newsroom.companies import get_user_company_name, get_company_sections_monitoring_data
+from newsroom.companies import get_user_company_name, get_company_sections_monitoring_data, clean_company
 from newsroom.notifications.notifications import get_user_notifications
 from newsroom.notifications import push_user_notification
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
-from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
+from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary, clean_user
 from newsroom.monitoring.views import get_monitoring_for_company
 
 
 def get_settings_data():
     return {
-        'users': list(query_resource('users')),
-        "companies": list(query_resource('companies')),
+        'users': [clean_user(u) for u in query_resource('users')],
+        "companies": [clean_company(company) for company in query_resource('companies')]
     }
 
 
@@ -62,7 +62,7 @@ def search():
     if flask.request.args.get('ids'):
         lookup = {'_id': {'$in': (flask.request.args.get('ids') or '').split(',')}}
 
-    users = list(query_resource('users', lookup=lookup))
+    users = [clean_user(u) for u in query_resource('users', lookup=lookup)]
     return jsonify(users), 200
 
 

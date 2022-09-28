@@ -1,5 +1,6 @@
 from flask import request, current_app as app
 from newsroom.auth import get_user_id
+from newsroom.utils import is_safe_string, gettext
 
 
 def get_picture(item):
@@ -41,3 +42,8 @@ def update_action_list(items, action_list, force_insert=False, item_type='items'
             if result.modified_count:
                 modified = db.find_one({'_id': item_id})
                 elastic.update(item_type, item_id, {action_list: modified[action_list]})
+
+
+def validate_news_only_filter(value):
+    if not is_safe_string(value):
+        return gettext("Invalid character in News only filter")

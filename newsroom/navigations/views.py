@@ -9,21 +9,22 @@ from superdesk import get_resource_service
 from newsroom.decorator import admin_only
 from newsroom.navigations import blueprint
 from newsroom.products.products import get_products_by_navigation
-from newsroom.utils import get_json_or_400, get_entity_or_404, query_resource, set_original_creator, set_version_creator
+from newsroom.utils import get_json_or_400, get_entity_or_404, query_resource, set_original_creator,\
+    set_version_creator, clean_navigation, is_safe_string, clean_product
 from newsroom.upload import get_file
 
 
 def get_settings_data():
     return {
-        'products': list(query_resource('products')),
-        'navigations': list(query_resource('navigations')),
+        'products': [clean_product(product) for product in query_resource('products')],
+        'navigations': [clean_navigation(navigation) for navigation in query_resource('navigations')],
         'sections': [s for s in app.sections if s.get('_id') != 'monitoring'],  # monitoring has no navigation
     }
 
 
 @blueprint.route('/navigations', methods=['GET'])
 def index():
-    navigations = list(query_resource('navigations', lookup=None))
+    navigations = [clean_navigation(navigation) for navigation in query_resource('navigations', lookup=None)]
     return jsonify(navigations), 200
 
 
@@ -41,6 +42,11 @@ def search():
 @admin_only
 def create():
     data = json.loads(flask.request.form['navigation'])
+
+    errors = _validate_navigation(data)
+    if errors:
+        return errors
+
     nav_data = _get_navigation_data(data)
 
     set_original_creator(nav_data)
@@ -48,9 +54,18 @@ def create():
     return jsonify({'success': True, '_id': ids[0]}), 201
 
 
-def _get_navigation_data(data):
+def _validate_navigation(data):
     if not data.get('name'):
-        return jsonify(gettext('Name not found')), 400
+        return jsonify({'name': gettext('Name not found')}), 400
+
+    if not is_safe_string(data.get('name')):
+        return jsonify({'name': gettext('Illegal Character')}), 400
+
+    if not is_safe_string(data.get('description')):
+        return jsonify({'description': gettext('Illegal Character')}), 400
+
+
+def _get_navigation_data(data):
 
     navigation_data = {
         'name': data.get('name'),
@@ -74,6 +89,11 @@ def edit(_id):
     get_entity_or_404(_id, 'navigations')
 
     data = json.loads(flask.request.form['navigation'])
+
+    errors = _validate_navigation(data)
+    if errors:
+        return errors
+
     nav_data = _get_navigation_data(data)
 
     set_version_creator(nav_data)
@@ -102,13 +122,15 @@ def delete(_id):
 def save_navigation_products(_id):
     get_entity_or_404(_id, 'navigations')
     data = get_json_or_400()
-    products = list(query_resource('products'))
 
-    db = app.data.get_mongo_collection('products')
-    for product in products:
-        if str(product['_id']) in data.get('products', []):
-            db.update_one({'_id': product['_id']}, {'$addToSet': {'navigations': _id}})
-        else:
-            db.update_one({'_id': product['_id']}, {'$pull': {'navigations': _id}})
+    if 'products' in data and len(data.keys()) == 1:
+        products = list(query_resource('products'))
 
-    return jsonify(), 200
+        db = app.data.get_mongo_collection('products')
+        for product in products:
+            if str(product['_id']) in data.get('products', []):
+                db.update_one({'_id': product['_id']}, {'$addToSet': {'navigations': _id}})
+            else:
+                db.update_one({'_id': product['_id']}, {'$pull': {'navigations': _id}})
+
+        return jsonify(), 200

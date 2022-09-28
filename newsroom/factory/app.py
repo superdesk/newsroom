@@ -165,7 +165,7 @@ class NewsroomApp(eve.Eve):
         self.register_error_handler(403, render_403)
 
     def general_setting(self, _id, label, type='text', default=None,
-                        weight=0, description=None, min=None, client_setting=False):
+                        weight=0, description=None, min=None, client_setting=False, validator=None):
         self._general_settings[_id] = {
             'type': type,
             'label': label,
@@ -173,7 +173,8 @@ class NewsroomApp(eve.Eve):
             'default': default,
             'description': description,
             'min': min,
-            'client_setting': client_setting
+            'client_setting': client_setting,
+            'validator': validator
         }
 
         if flask.g:  # reset settings cache

@@ -119,3 +119,33 @@ def test_company_ip_whitelist_validation(client):
     test_login_succeeds_for_admin(client)
     resp = client.post('companies/new', data=json.dumps(new_company), content_type='application/json')
     assert resp.status_code == 400
+
+
+def test_validate_company(client):
+    test_login_succeeds_for_admin(client)
+    # Register a new company
+    response = client.post('/companies/new', data=json.dumps({
+        'phone': '2132132134',
+        'sd_subscriber_id': '12345',
+        'name': 'Press Co.<BAD>',
+        'is_enabled': True,
+        'contact_name': 'Tom'
+    }), content_type='application/json')
+
+    assert response.status_code == 400
+
+
+def test_clean_company(client, app):
+    test_login_succeeds_for_admin(client)
+    app.data.insert('companies', [{
+            '_id': 'c-1',
+            'phone': '2132132134',
+            'sd_subscriber_id': '12345',
+            'name': 'Press & Co.<script></script>',
+            'is_enabled': True,
+            'contact_name': 'Tom'
+        }])
+
+    response = client.get('/companies/search?q=Press')
+    assert response.status_code == 200
+    assert json.loads(response.get_data(as_text=True))[0].get('name') == 'Press & Co.'

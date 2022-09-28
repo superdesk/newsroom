@@ -77,7 +77,8 @@ def init_app(app):
         'news_only_filter',
         lazy_gettext('News only filter'),
         weight=200,
-        description=lazy_gettext("This query defines what is NOT considered 'news' content. It is used by the News only switch to filter the view. When switched on, stories matching this filter will not be displayed.")  # noqa
+        description=lazy_gettext("This query defines what is NOT considered 'news' content. It is used by the News only switch to filter the view. When switched on, stories matching this filter will not be displayed."),  # noqa
+        validator=utils.validate_news_only_filter
     )
 
     app.general_setting(

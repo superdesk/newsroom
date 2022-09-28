@@ -180,7 +180,7 @@ def test_search_filtered_by_users_products(client, app):
     app.data.insert('products', [{
         '_id': 10,
         'name': 'product test',
-        'sd_product_id': 1,
+        'sd_product_id': '1',
         'companies': ['1'],
         'is_enabled': True,
         'product_type': 'am_news'

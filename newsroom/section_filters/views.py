@@ -9,7 +9,7 @@ from superdesk import get_resource_service
 from newsroom.decorator import admin_only
 from newsroom.section_filters import blueprint
 from newsroom.utils import get_json_or_400, get_entity_or_404, set_original_creator, set_version_creator
-from newsroom.utils import query_resource
+from newsroom.utils import query_resource, clean_section_filter, is_safe_string
 
 
 def get_settings_data():
@@ -18,7 +18,7 @@ def get_settings_data():
     :param context
     """
     data = {
-        'section_filters': list(query_resource('section_filters')),
+        'section_filters': [clean_section_filter(filter) for filter in query_resource('section_filters')],
         'sections': current_app.sections,
     }
     return data
@@ -30,7 +30,7 @@ def index():
     lookup = None
     if flask.request.args.get('q'):
         lookup = flask.request.args.get('q')
-    section_filters = list(query_resource('section_filters', lookup=lookup))
+    section_filters = [clean_section_filter(filter) for filter in query_resource('section_filters', lookup=lookup)]
     return jsonify(section_filters), 200
 
 
@@ -41,13 +41,25 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'name': regex}
-    section_filters = list(query_resource('section_filters', lookup=lookup))
+    section_filters = [clean_section_filter(filter) for filter in query_resource('section_filters', lookup=lookup)]
     return jsonify(section_filters), 200
 
 
 def validate_section_filter(section_filter):
     if not section_filter.get('name'):
         return jsonify({'name': gettext('Name not found')}), 400
+
+    if not is_safe_string(section_filter.get('name')):
+        return jsonify({'name': gettext('Illegal Character')}), 400
+
+    if not is_safe_string(section_filter.get('description')):
+        return jsonify({'description': gettext('Illegal Character')}), 400
+
+    if not is_safe_string(section_filter.get('sd_product_id')):
+        return jsonify({'sd_product_id': gettext('Illegal Character')}), 400
+
+    if not is_safe_string(section_filter.get('query'), allowed_punctuation="~'"):
+        return jsonify({'query': gettext('Illegal Character')}), 400
 
 
 @blueprint.route('/section_filters/new', methods=['POST'])

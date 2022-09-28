@@ -7,23 +7,25 @@ from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, login_required
 from newsroom.cards import blueprint
-from newsroom.utils import get_entity_or_404, query_resource, set_original_creator, set_version_creator
+from newsroom.utils import get_entity_or_404, query_resource, set_original_creator, set_version_creator,\
+    clean_navigation, clean_product, clean_card, is_safe_string
 from newsroom.upload import get_file
 
 
 def get_settings_data():
     return {
-        'products': list(query_resource('products', lookup={'is_enabled': True})),
-        'cards': list(query_resource('cards')),
+        'products': [clean_product(product) for product in query_resource('products', lookup={'is_enabled': True})],
+        'cards': [clean_card(card) for card in query_resource('cards')],
         'dashboards': app.dashboards,
-        'navigations': list(query_resource('navigations', lookup={'is_enabled': True}))
+        'navigations': [clean_navigation(navigation) for navigation in query_resource('navigations',
+                                                                                      lookup={'is_enabled': True})]
     }
 
 
 @blueprint.route('/cards', methods=['GET'])
 @login_required
 def index():
-    cards = list(query_resource('cards', lookup=None))
+    cards = [clean_card(card) for card in query_resource('cards')]
     return jsonify(cards), 200
 
 
@@ -34,8 +36,8 @@ def search():
     if flask.request.args.get('q'):
         regex = re.compile('.*{}.*'.format(flask.request.args.get('q')), re.IGNORECASE)
         lookup = {'label': regex}
-    products = list(query_resource('cards', lookup=lookup))
-    return jsonify(products), 200
+    cards = [clean_card(card) for card in query_resource('cards', lookup=lookup)]
+    return jsonify(cards), 200
 
 
 @blueprint.route('/cards/new', methods=['POST'])
@@ -44,16 +46,33 @@ def create():
     data = json.loads(flask.request.form['card'])
     card_data = _get_card_data(data)
     set_original_creator(card_data)
+
+    errors = _validate_card(card_data)
+    if errors:
+        return errors
+
     ids = get_resource_service('cards').post([card_data])
     return jsonify({'success': True, '_id': ids[0]}), 201
+
+
+def _validate_card(data):
+
+    if not data.get('label'):
+        return jsonify({'label': gettext('Label not found')}), 400
+
+    if not is_safe_string(data.get('label')):
+        return jsonify({'label': gettext('Illegal Character')}), 400
+
+    if not is_safe_string(data.get('dashboard')):
+        return jsonify({'dashboard': gettext('Illegal Character')}), 400
+
+    if not is_safe_string(data.get('type')):
+        return jsonify({'type': gettext('Illegal Character')}), 400
 
 
 def _get_card_data(data):
     if not data:
         flask.abort(400)
-
-    if not data.get('label'):
-        raise ValueError(gettext('Label not found'))
 
     if not data.get('type'):
         raise ValueError(gettext('Type not found'))
@@ -94,6 +113,11 @@ def edit(id):
     data = json.loads(flask.request.form['card'])
     card_data = _get_card_data(data)
     set_version_creator(card_data)
+
+    errors = _validate_card(card_data)
+    if errors:
+        return errors
+
     get_resource_service('cards').patch(id=ObjectId(id), updates=card_data)
     return jsonify({'success': True}), 200
 

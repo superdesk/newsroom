@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
 import pytz
+import bleach
 
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
@@ -13,9 +14,14 @@ from flask import current_app as app, json, abort, request, g, flash, session, u
 from flask_babel import gettext
 from newsroom.template_filters import time_short, parse_date as parse_short_date, format_datetime, is_admin
 from newsroom.auth import get_user_id
+from unicodedata import category
+from html import unescape
 
 
 DAY_IN_MINUTES = 24 * 60 - 1
+
+# A whitelist of the characters allowed in the Telephone and mobile fields
+PHONE_REGEX = r"^[0-9-+\s()#]+$"
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None):
@@ -350,7 +356,7 @@ def get_items_by_id(ids, resource):
 
 def get_vocabulary(id):
     vocabularies = app.data.pymongo('items').db.vocabularies
-    if vocabularies and vocabularies.count() > 0 and id:
+    if vocabularies and vocabularies.count_documents({}) > 0 and id:
         return vocabularies.find_one({'_id': id})
 
     return None
@@ -422,3 +428,57 @@ def get_end_date(date_range, start_date):
     if date_range == 'now/M':
         return start_date + relativedelta(months=+1) - timedelta(days=1)
     return start_date
+
+
+def is_safe_string(field, allowed_punctuation=("'")):
+    """
+
+    You can find a full list of categories here:
+    http://www.fileformat.info/info/unicode/category/index.htm
+    :rtype: Boolean
+    """
+    if field is None:
+        return True
+
+    letters = ('LC', 'Ll', 'Lm', 'Lo', 'Lt', 'Lu')
+    numbers = ('Nd', 'Nl', 'No')
+    marks = ('Mc', 'Me', 'Mn')
+    punctuation = ('Pc', 'Pd', 'Pe', 'Ps', 'Po')
+    symbol = ('Sc', 'Sk', 'So')
+    space = ('Zs',)
+
+    allowed_categories = letters + numbers + marks + punctuation + symbol + space
+    clean = u''.join([c for c in field if
+                      (category(c) in allowed_categories or (c in allowed_punctuation))])
+    return clean == field
+
+
+def clean_item(item, fields):
+    for entry in fields:
+        if item.get(entry):
+            item[entry] = unescape(bleach.clean(item.get(entry), strip=True))
+    return item
+
+
+def clean_company(company):
+    return clean_item(company, ("contact_name", "country", "name", "account_manager", "company_type"))
+
+
+def clean_user(user):
+    return clean_item(user, ('first_name', 'last_name', 'email', 'role', 'phone', 'mobile', 'locale', 'country'))
+
+
+def clean_navigation(navigation):
+    return clean_item(navigation, ("name", "description", "product_type"))
+
+
+def clean_product(product):
+    return clean_item(product, ("name", "description", "product_type", "sd_product_id", "query"))
+
+
+def clean_section_filter(filter):
+    return clean_item(filter, ('name', 'description', 'sd_product_id', 'query', 'filter_type', 'search_type'))
+
+
+def clean_card(card):
+    return clean_item(card, ('label', 'dashboard', 'type'))

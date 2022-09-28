@@ -3,6 +3,7 @@ from flask_babel import lazy_gettext
 import superdesk
 from .users import UsersResource, UsersService
 
+
 blueprint = Blueprint('users', __name__)
 
 from . import views  # noqa
