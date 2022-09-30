@@ -98,7 +98,10 @@ class WireListItem extends React.Component {
                                 </label>
                             </div>
                             {!isExtended && (
-                                <WireListItemIcons item={item} picture={picture} videos={videos} divider={false} />
+                                <React.Fragment>
+                                    <WireListItemIcons item={item} picture={picture} videos={videos} divider={false} />
+                                    <div key='meta' className='wire-articles__item__icons'><WireListItemEmbargoed item={item} /></div>
+                                </React.Fragment>
                             )}
                             {item.headline}
                         </h4>
@@ -124,7 +127,7 @@ class WireListItem extends React.Component {
                             <div key='meta' className='wire-articles__item__meta'>
                                 <WireListItemIcons item={item} picture={picture} videos={videos} />
                                 <div className='wire-articles__item__meta-info'>
-                                    <span>{this.wordCount} {gettext('words')}</span>
+                                    <span>{this.wordCount} {gettext('words')}<WireListItemEmbargoed item={item} /></span>
                                 </div>
                             </div>]
                         )}
