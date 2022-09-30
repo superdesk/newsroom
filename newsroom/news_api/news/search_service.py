@@ -40,7 +40,7 @@ class NewsAPINewsService(BaseSearchService):
     # set of fields that can be specified in the include_fields parameter
     allowed_include_fields = {'type', 'urgency', 'priority', 'language', 'description_html', 'located', 'keywords',
                               'source', 'subject', 'place', 'wordcount', 'charcount', 'body_html', 'readtime',
-                              'profile', 'service', 'genre', 'associations'}
+                              'profile', 'service', 'genre', 'associations', 'headline', 'extra'}
 
     default_fields = {
         '_id', 'uri', 'embargoed', 'pubstatus', 'ednote', 'signal', 'copyrightnotice', 'copyrightholder',
