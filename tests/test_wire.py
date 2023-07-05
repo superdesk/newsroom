@@ -9,6 +9,7 @@ from .fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID
 from .utils import get_json, get_admin_user_id, mock_send_email
 from unittest import mock
 from tests.test_users import ADMIN_USER_ID
+from tests.test_download import setup_embeds
 from superdesk import get_resource_service
 
 
@@ -647,3 +648,22 @@ def test_highlighting(client, app):
     data = json.loads(resp.get_data())
     assert data['_items'][0]['es_highlight']['body_html'][0] == 'Story that involves <span class="es-highlight">' \
                                                                 'cheese</span> and onions'
+
+
+def test_embed_mark_disable_download(client, app):
+    app.config['EMBED_PRODUCT_FILTERING'] = True
+    user = app.data.find_one('users', req=None, _id=ADMIN_USER_ID)
+    app.data.update('users', user['_id'], {'company': 1}, user)
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'product test',
+        'sd_product_id': '123',
+        'companies': ['1'],
+        'is_enabled': True,
+        'product_type': 'wire'
+    }])
+    setup_embeds(client, app)
+    resp = client.get('/wire/search?type=wire')
+    data = json.loads(resp.get_data())
+    assert "data-disable-download" in data['_items'][0]['body_html']
+    assert data['_items'][0]['body_html'].count("data-disable-download") == 1

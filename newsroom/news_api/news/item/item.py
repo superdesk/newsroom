@@ -17,7 +17,12 @@ def init_app(app):
 def get_item(item_id):
     auth = app.auth
     if not auth.authorized([], None, flask.request.method):
-        return abort(401, gettext('Invalid token'))
+        token = flask.request.args.get('token')
+        if token:
+            if not auth.check_auth(token, allowed_roles=None, resource=None, method='GET'):
+                abort(401, gettext('Invalid token'))
+        else:
+            return abort(401, gettext('Invalid token'))
 
     _format = flask.request.args.get('format', 'NINJSFormatter')
     _version = flask.request.args.get('version')

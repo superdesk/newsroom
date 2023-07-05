@@ -1,6 +1,6 @@
 import superdesk
 import flask
-from flask import abort
+from flask import abort, request
 from newsroom.upload import ASSETS_RESOURCE
 from flask_babel import gettext
 import bson.errors
@@ -15,12 +15,32 @@ def init_app(app):
     superdesk.blueprint(blueprint, app)
 
 
+@blueprint.route('/assets/<path:asset_id>/<item_id>', methods=['GET'])
+def download(asset_id, item_id):
+    """
+    Called on download of a media item, keeps a record of the download
+    :param media_id:
+    :param item_id:
+    :return:
+    """
+    response = get_item(asset_id)
+    superdesk.get_resource_service('history').log_api_media_download(item_id, asset_id)
+    return response
+
+
 @blueprint.route('/assets/<path:asset_id>', methods=['GET'])
 def get_item(asset_id):
     auth = app.auth
     if not auth.authorized([], None, flask.request.method):
-        return abort(401, gettext('Invalid token'))
-
+        token = request.args.get('token')
+        if token:
+            if not auth.check_auth(token, allowed_roles=None, resource=None, method='GET'):
+                # a try for a client that is not encoding the token
+                token = token.replace(' ', '+')
+                if not auth.check_auth(token, allowed_roles=None, resource=None, method='GET'):
+                    abort(401, gettext('Invalid token'))
+        else:
+            return abort(401, gettext('Invalid token'))
     try:
         media_file = flask.current_app.media.get(asset_id, ASSETS_RESOURCE)
     except bson.errors.InvalidId:

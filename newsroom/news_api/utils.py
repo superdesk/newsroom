@@ -1,3 +1,6 @@
+from lxml import html as lxml_html
+from superdesk.etree import to_string
+import re
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from flask import request, g, current_app as app
@@ -80,3 +83,50 @@ def check_association_permission(item):
         return True if len(set(im_products) & set(sd_products)) else False
     else:
         return True
+
+
+def set_embed_links(item):
+    """
+    Sets the reference links in the embeds to include the item id so that calls to them can be logged against the
+    item that the embed belongs to
+    :param item:
+    :return:
+    """
+    if not app.config.get("EMBED_PRODUCT_FILTERING"):
+        return
+    if not item.get('body_html', ''):
+        return
+
+    regex = r" EMBED START (?:Image|Video|Audio) {id: \"editor_([0-9]+)"
+    html_updated = False
+    root_elem = lxml_html.fromstring(item.get('body_html', ''))
+    comments = root_elem.xpath('//comment()')
+    for comment in comments:
+        m = re.search(regex, comment.text)
+        if m and m.group(1):
+            # Assumes the sibling of the Embed Image comment is the figure tag containing the image
+            figure_elem = comment.getnext()
+            if figure_elem is not None and figure_elem.tag == "figure":
+                image_elem = figure_elem.find("./img")
+                if image_elem is not None:
+                    html_updated = True
+                    image_elem.attrib["src"] = image_elem.attrib["src"] + "/" + item.get("_id")
+                elem = (
+                    figure_elem.find("./audio")
+                    if figure_elem.find("./audio") is not None
+                    else figure_elem.find("./video")
+                )
+                if elem is not None:
+                    elem.attrib["src"] = elem.attrib["src"] + "/" + item.get("_id")
+                    html_updated = True
+
+    for key, ass in item.get("associations", {}).items():
+        if isinstance(ass, dict) and not key == "featuremedia":
+            for rendition in ass.get("renditions"):
+                if ass.get('renditions', {}).get(rendition, {}).get("href"):
+                    ass.get('renditions', {}).get(rendition, {})["href"] = ass.get('renditions', {}).get(rendition,
+                                                                                                         {}).get(
+                        "href") + '/' + item.get("_id")
+
+    if html_updated:
+        item["body_html"] = to_string(root_elem, method="html")

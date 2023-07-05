@@ -211,7 +211,7 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-   When we get "news/search?start_date=now-10d&include_fields=headline"
+   When we get "news/search?start_date=now-10d&include_fields=slugline"
    Then we get response code 400
 
  Scenario: exclude fields
