@@ -221,6 +221,17 @@ def get_subscriber_activity_report():
                 'item_href': '/{}?item={}'.format(doc['section'] if doc['section'] != 'news_api' else 'wire',
                                                   doc['item'])
             }
+            try:
+                if 'download' in doc.get('action') and not doc.get('extra_data') is None:
+                    ass = wire_items[doc['item']['_id']].get('associations', {}).get(doc.get('extra_data'), {})
+                    doc['association'] = {
+                        'text': ass.get('headline', 'N/A'),
+                        'href': '/assets/{}'.format(ass.get('renditions', {}).get('original', {}).get('media')),
+                        'type': ass.get('type')
+                    }
+            except Exception:
+                pass
+
         elif doc.get('item') in agenda_items:
             doc['item'] = {
                 'item_text': (agenda_items[doc['item']].get('name') or agenda_items[doc['item']].get('slugline')),

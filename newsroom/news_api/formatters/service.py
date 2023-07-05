@@ -2,12 +2,14 @@ from newsroom.wire.formatters import get_all_formatters
 from superdesk.utils import ListCursor
 from flask import abort
 from superdesk import get_resource_service
-from flask import current_app as app
+from flask import current_app as app, g
 from eve.versioning import versioned_id_field
 from datetime import timedelta
 from superdesk.utc import utcnow
 from newsroom.settings import get_setting
 from newsroom import Service
+from newsroom.wire.formatters.utils import remove_unpermissioned_embeds
+from ..utils import set_embed_links
 
 
 class APIFormattersService(Service):
@@ -42,5 +44,7 @@ class APIFormattersService(Service):
         if utcnow() - timedelta(days=int(get_setting('news_api_time_limit_days'))) > item.get('versioncreated',
                                                                                               utcnow()):
             abort(404)
+        remove_unpermissioned_embeds(item, g.user)
+        set_embed_links(item)
         ret = formatter.format_item(item)
         return {'formatted_item': ret, 'mimetype': formatter.MIMETYPE, 'version': item.get('version')}

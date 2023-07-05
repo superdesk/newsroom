@@ -67,7 +67,7 @@ function ItemDetails({item, user, actions, onClose, detailsConfig, downloadVideo
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
-                            {!isEmpty(videos) && videos.map((video) => <ArticleVideo
+                            {isDisplayed('media', detailsConfig) && !isEmpty(videos) && videos.map((video) => <ArticleVideo
                                 key={video.guid}
                                 video={getOriginalVideo(video)}
                                 isKilled={isKilled(item)}

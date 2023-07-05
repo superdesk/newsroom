@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { formatHTML } from 'utils';
+import {get, memoize} from 'lodash';
+import {formatHTML} from 'utils';
 import {connect} from 'react-redux';
-import { selectCopy } from '../../wire/actions';
+import {selectCopy} from '../../wire/actions';
 
 /**
  * using component to fix iframely loading
@@ -14,10 +14,16 @@ class ArticleBodyHtml extends React.PureComponent {
         super(props);
         this.copyClicked = this.copyClicked.bind(this);
         this.clickClicked = this.clickClicked.bind(this);
+
+        // use memoize so this function is only called when `body_html` changes
+        this.getBodyHTML = memoize(this._getBodyHTML.bind(this));
+
+        this.bodyRef = React.createRef();
     }
 
     componentDidMount() {
         this.loadIframely();
+        this.executeScripts();
         document.addEventListener('copy', this.copyClicked);
         document.addEventListener('click', this.clickClicked);
     }
@@ -53,6 +59,7 @@ class ArticleBodyHtml extends React.PureComponent {
 
     componentDidUpdate() {
         this.loadIframely();
+        this.executeScripts();
     }
 
     loadIframely() {
@@ -61,6 +68,62 @@ class ArticleBodyHtml extends React.PureComponent {
         if (window.iframely && html && html.includes('iframely')) {
             window.iframely.load();
         }
+    }
+
+    executeScripts() {
+        const tree = this.bodyRef.current;
+        const loaded = [];
+
+        if (tree == null) {
+            return;
+        }
+
+        if (window.Plyr != null) {
+            window.Plyr.setup('.js-player');
+        }
+
+        tree.querySelectorAll('script').forEach((s) => {
+            if (s.hasAttribute('src') && !loaded.includes(s.getAttribute('src'))) {
+                let url = s.getAttribute('src');
+
+                loaded.push(url);
+
+                if (url.includes('twitter.com/') && window.twttr != null) {
+                    window.twttr.widgets.load();
+                    return;
+                }
+
+                if (url.includes('instagram.com/') && window.instgrm != null) {
+                    window.instgrm.Embeds.process();
+                    return;
+                }
+
+                // Force Flourish to always load
+                if (url.includes('flourish.studio/')) {
+                    delete window.FlourishLoaded;
+                }
+
+                if (url.startsWith('http')) {
+                    // change https?:// to // so it uses schema of the client
+                    url = url.substring(url.indexOf(':') + 1);
+                }
+
+                const script = document.createElement('script');
+
+                script.src = url;
+                script.async = true;
+
+                script.onload = () => {
+                    document.body.removeChild(script);
+                };
+
+                script.onerrror = (error) => {
+                    throw new URIError('The script ' + error.target.src + 'didn\'t load.');
+                };
+
+                document.body.appendChild(script);
+            }
+        });
     }
 
     copyClicked() {
@@ -72,23 +135,100 @@ class ArticleBodyHtml extends React.PureComponent {
         document.removeEventListener('click', this.clickClicked);
     }
 
-    render() {
+    _getBodyHTML(bodyHtml) {
+        return !bodyHtml ?
+            null :
+            this._updateImageEmbedSources(formatHTML(bodyHtml));
+    }
+
+    /**
+     * Update Image Embeds to use the Web APIs Assets endpoint
+     *
+     * @param html - The `body_html` value (could also be the ES Highlight version)
+     * @returns {string}
+     * @private
+     */
+    _updateImageEmbedSources(html) {
         const item = this.props.item;
 
-        if (!item.body_html) {
+        // Get the list of Original Rendition IDs for all Image Associations
+        const imageEmbedOriginalIds = Object
+            .keys(item.associations || {})
+            .filter((key) => key.startsWith('editor_'))
+            .map((key) => get(item.associations[key], 'renditions.original.media'))
+            .filter((value) => value);
+
+        if (!imageEmbedOriginalIds.length) {
+            // This item has no Image Embeds
+            // return the supplied html as-is
+            return html;
+        }
+
+        // Create a DOM node tree from the supplied html
+        // We can then efficiently find and update the image sources
+        const container = document.createElement('div');
+        let imageSourcesUpdated = false;
+
+        container.innerHTML = html;
+        container
+            .querySelectorAll('img')
+            .forEach((imageTag) => {
+                // Using the tag's `src` attribute, find the Original Rendition's ID
+                const originalMediaId = imageEmbedOriginalIds.find((mediaId) => (
+                    !imageTag.src.startsWith('/assets/') &&
+                    imageTag.src.includes(mediaId))
+                );
+
+                if (originalMediaId) {
+                    // We now have the Original Rendition's ID
+                    // Use that to update the `src` attribute to use Newshub's Web API
+                    imageSourcesUpdated = true;
+                    imageTag.src = `/assets/${originalMediaId}`;
+                }
+            });
+
+        // Find all Audio and Video tags and mark them up for the player
+        container.querySelectorAll('video, audio')
+            .forEach((vTag) => {
+                vTag.classList.add('js-player');
+                if (vTag.getAttribute('data-disable-download')) {
+                    vTag.setAttribute('data-plyr-config', '{"controls": ["play-large", "play",' +
+                        '"progress", "volume", "mute", "rewind", "fast-forward", "current-time",' +
+                        '"captions", "restart", "duration"]}');
+
+                } else {
+                    vTag.setAttribute('data-plyr-config', '{"controls": ["play-large", "play",' +
+                        '"progress", "volume", "mute", "rewind", "fast-forward", "current-time",' +
+                        '"captions", "restart", "duration", "download"], "urls": {"download": ' +
+                        '"' + vTag.getAttribute('src') + '/' + item._id + '"' +
+                        '}}');
+                }
+
+                imageSourcesUpdated = true;
+            });
+
+        // If Image tags were not updated, then return the supplied html as-is
+        return imageSourcesUpdated ?
+            container.innerHTML :
+            html;
+    }
+
+    render() {
+        const item = this.props.item;
+        const html = this.getBodyHTML(
+            get(item, 'es_highlight.body_html.length', 0) > 0 ?
+                item.es_highlight.body_html[0] :
+                item.body_html
+        );
+
+        if (!html) {
             return null;
         }
 
-        const esHighlightedItem = get(item, 'es_highlight.body_html.length', 0) > 0 ? 
-            {
-                ...item,
-                body_html: item.es_highlight.body_html[0]
-            } : item;
-        const html = formatHTML(esHighlightedItem.body_html);
-
         return (
             <div
-                className='wire-column__preview__text'
+                ref={this.bodyRef}
+                className='wire-column__preview__text wire-column__preview__text--pre'
                 id='preview-body'
                 dangerouslySetInnerHTML={({__html: html})}
             />
@@ -99,7 +239,11 @@ class ArticleBodyHtml extends React.PureComponent {
 ArticleBodyHtml.propTypes = {
     item: PropTypes.shape({
         body_html: PropTypes.string,
-        es_highlight: PropTypes.Object
+        _id: PropTypes.string,
+        es_highlight: PropTypes.shape({
+            body_html: PropTypes.arrayOf(PropTypes.string),
+        }),
+        associations: PropTypes.object,
     }).isRequired,
     reportCopy: PropTypes.func,
 };

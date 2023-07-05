@@ -2,6 +2,7 @@ import io
 import flask
 import zipfile
 import superdesk
+import json
 
 from bson import ObjectId
 from operator import itemgetter
@@ -11,6 +12,7 @@ from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
 from flask_babel import gettext
 from superdesk.utc import utcnow
+from .formatters.utils import add_media
 
 from superdesk import get_resource_service
 
@@ -211,6 +213,20 @@ def download(_ids):
                     except ValueError:
                         pass
             _file.seek(0)
+    elif _format == 'downloadninjs':
+        with zipfile.ZipFile(_file, mode='w') as zf:
+            for item in items:
+                formated_item = json.loads(formatter.format_item(item, item_type=item_type))
+                add_media(zf, item)
+                zf.writestr(secure_filename(formatter.format_filename(item)), json.dumps(formated_item).encode('utf-8'))
+        _file.seek(0)
+    elif _format == 'htmlpackage':
+        with zipfile.ZipFile(_file, mode='w') as zf:
+            for item in items:
+                formated_item = formatter.format_item(item, item_type=item_type)
+                add_media(zf, item)
+                zf.writestr(secure_filename(formatter.format_filename(item)), formated_item)
+        _file.seek(0)
     elif len(items) == 1 or _format == 'monitoring':
         item = items[0]
         args_item = item if _format != 'monitoring' else items

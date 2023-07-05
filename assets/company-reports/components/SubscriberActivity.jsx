@@ -62,6 +62,18 @@ class SubscriberActivity extends React.Component {
                 name: 'download'
             },
             {
+                name: 'download audio',
+                value: 'audio'
+            },
+            {
+                name: 'download video',
+                value: 'video'
+            },
+            {
+                name: 'download picture',
+                value: 'picture'
+            },
+            {
                 name: 'copy'
             },
             {
@@ -150,6 +162,11 @@ class SubscriberActivity extends React.Component {
                     {get(item, 'item.item_href', null) &&
                         <a href={get(item, 'item.item_href', '#')} target="_blank">{get(item, 'item.item_text')}</a>}
                     {!get(item, 'item.item_href') && <span>{get(item, 'item.item_text')}</span>}
+                    {get(item, 'association.href', null) &&
+                        ' / '
+                    }
+                    {get(item, 'association.href', null) &&
+                    <a href={get(item, 'association.href', '#')} target="_blank">{get(item, 'association.text')}</a>}
                 </td>
                 <td>{item.action}</td>
                 <td>{item.user}</td>

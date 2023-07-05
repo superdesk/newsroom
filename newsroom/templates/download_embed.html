@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shring-to-fit=no">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+          integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif">
+
+    {{ javascript_tag('common') | safe }}
+    {{ javascript_tag('newsroom_css') | safe }}
+
+</head>
+<body class="print">
+
+<div class="container">
+    <div id="print-content">
+
+
+        <article>
+            <pre>{{ item.slugline }}</pre>
+
+            <h1>{{ item.headline }}</h1>
+            <p>{{ _('By:') }} <b>{{ item.byline }}</b> {{ _('On:') }} {{ item.versioncreated|datetime_long }}</p>
+
+            <div class="row">
+                <div class="col-9">
+                    <div class="lead">
+                        {{ item.description_html | safe }}
+                    </div>
+
+                    {{ item.body_html | safe }}
+                </div>
+            </div>
+        </article>
+
+
+    </div>
+</div>
+
+<footer class="container">
+    <p class="text-right">
+        <small>All contents &copy; Copyright {{ get_date().year }} {{ config.COPYRIGHT_HOLDER }}. All rights reserved.
+        </small>
+    </p>
+</footer>
+
+</body>
+</html>

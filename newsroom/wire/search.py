@@ -2,10 +2,13 @@ import logging
 from datetime import datetime, timedelta
 from copy import deepcopy
 
-from eve.utils import ParsedRequest
-from flask import current_app as app, json
+from eve.utils import ParsedRequest, config
+from flask import current_app as app, json, request
 from superdesk import get_resource_service
+from superdesk.etree import to_string
 from werkzeug.exceptions import Forbidden
+from lxml import html as lxml_html
+import re
 
 import newsroom
 from newsroom.products.products import get_products_by_navigation
@@ -13,6 +16,10 @@ from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
 from newsroom.search import BaseSearchService, SearchQuery, query_string
+from newsroom.auth import get_user
+from newsroom.companies import get_user_company
+from newsroom.products.products import get_products_by_company
+
 
 logger = logging.getLogger(__name__)
 
@@ -518,3 +525,59 @@ class WireSearchService(BaseSearchService):
                     bookmark_users.append(bookmark)
 
         return bookmark_users
+
+    def permission_embeds_in_item(self, item, permitted_products):
+        """
+        Given the permitted products for the current user and an item, mark any video or audio embedded elements
+        that are not associated with any products that the user is allowed.
+        :param item:
+        :param permitted_products:
+        :return:
+        """
+        disable_download = []
+        for key, embed_item in item.get("associations", {}).items():
+            if key.startswith("editor_") and embed_item.get('type') in ['audio', 'video']:
+                # get the list of products that the embedded item matched in Superdesk
+                embed_products = [p.get('code') for p in
+                                  ((item.get('associations') or {}).get(key) or {}).get('products', [])]
+
+                if not len(set(embed_products) & set(permitted_products)):
+                    disable_download.append(key)
+
+        if len(disable_download) == 0:
+            return
+
+        # mark the each embed as allowed or not, except for images
+        root_elem = lxml_html.fromstring(item.get('body_html', ''))
+        regex = r" EMBED START (?:Video|Audio) {id: \"editor_([0-9]+)"
+        html_updated = False
+        comments = root_elem.xpath('//comment()')
+        for comment in comments:
+            m = re.search(regex, comment.text)
+            # if we've found an Embed Start comment
+            if m and m.group(1):
+                figure = comment.getnext()
+                for elem in figure.iterchildren():
+                    if elem.tag in ['video', 'audio']:
+                        if "editor_" + m.group(1) in disable_download:
+                            elem.attrib['data-disable-download'] = 'true'
+                    if elem.text and ' EMBED END ' in elem.text:
+                        break
+                html_updated = True
+
+        if html_updated:
+            item["body_html"] = to_string(root_elem, method="html")
+
+    def on_fetched(self, doc):
+        if app.config.get("EMBED_PRODUCT_FILTERING"):
+            current_user = get_user(required=True)
+            company = get_user_company(current_user)
+            if company is None:
+                return
+            # get a list of products that match Superdesk products for this user/company
+            permitted_products = [p.get('sd_product_id') for p in
+                                  get_products_by_company(company.get('_id'), None, request.args.get('type', 'wire'))
+                                  if p.get('sd_product_id')]
+
+            for item in doc[config.ITEMS]:
+                self.permission_embeds_in_item(item, permitted_products)

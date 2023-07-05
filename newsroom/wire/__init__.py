@@ -61,13 +61,18 @@ def init_app(app):
     app.sidenav(lazy_gettext('Saved/Watched Items'), 'wire.bookmarks', 'bookmark',
                 group=1, blueprint='wire', badge='saved-items-count')
 
-    from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter, PictureFormatter
+    from .formatters import TextFormatter, NITFFormatter, NewsMLG2Formatter, JsonFormatter, PictureFormatter, \
+        NINJSDownloadFormatter, HTMLFormatter, HTMLMediaFormatter, HTMLPackageFormatter
     app.download_formatter('text', TextFormatter(), lazy_gettext('Plain Text'), ['wire', 'agenda'], ['text'])
     app.download_formatter('nitf', NITFFormatter(), 'NITF', ['wire'], ['text'])
     app.download_formatter('newsmlg2', NewsMLG2Formatter(), 'NewsMLG2', ['wire'], ['text'])
     app.download_formatter('json', JsonFormatter(), 'Json', ['agenda'], ['text'])
     if app.config.get('ALLOW_PICTURE_DOWNLOAD', True):
         app.download_formatter('picture', PictureFormatter(), lazy_gettext('Story Image'), ['wire'], ['picture'])
+    app.download_formatter('downloadninjs', NINJSDownloadFormatter(), 'Ninjs', ['wire'])
+    app.download_formatter('html', HTMLFormatter(), 'Plain HTML', ['wire'])
+    app.download_formatter('htmlmedia', HTMLMediaFormatter(), 'HTML with embedded media', ['wire'])
+    app.download_formatter('htmlpackage', HTMLPackageFormatter(), 'HTML package', ['wire'])
 
     app.add_template_global(utils.get_picture, 'get_picture')
     app.add_template_global(utils.get_caption, 'get_caption')

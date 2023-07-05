@@ -1,8 +1,9 @@
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
-from flask import request, g, current_app as app
+from flask import request, g, current_app as app, url_for
 from newsroom.products.products import get_products_by_company
 from newsroom.settings import get_setting
+from newsroom.utils import update_embeds_in_body
 
 
 def post_api_audit(doc):
@@ -80,3 +81,55 @@ def check_association_permission(item):
         return True if len(set(im_products) & set(sd_products)) else False
     else:
         return True
+
+
+def set_embed_links(item):
+    """
+    Sets the reference links in the embeds to include the item id so that calls to them can be logged against the
+    item that the embed belongs to
+    :param item:
+    :return:
+    """
+
+    def update_url(item, elem, group):
+        elem.attrib["src"] = elem.attrib["src"] + "/" + item.get("_id")
+        return True
+
+    if not app.config.get("EMBED_PRODUCT_FILTERING"):
+        return
+    if not item.get('body_html', ''):
+        return
+
+    update_embeds_in_body(item, update_url, update_url, update_url)
+
+    for key, ass in item.get("associations", {}).items():
+        if isinstance(ass, dict) and not key == "featuremedia":
+            for rendition in ass.get("renditions"):
+                if ass.get('renditions', {}).get(rendition, {}).get("href"):
+                    ass.get('renditions', {}).get(rendition, {})["href"] = ass.get('renditions', {}).get(rendition,
+                                                                                                         {}).get(
+                        "href") + '/' + item.get("_id")
+
+
+def update_embed_urls(item, token):
+    """
+    Update the urls in the embeds to the endpoint that allows logging
+    :param item:
+    :param token:
+    :return:
+    """
+    def update_embed(item, elem, group):
+        embed_id = "editor_" + group
+        if elem.tag in ["audio", "video"]:
+            rendition = "original"
+        elif elem.tag == "img":
+            rendition = "16-9"
+        src = item.get("associations", {}).get(embed_id, {}).get("renditions", {}).get(
+            rendition)
+        if src is not None and elem is not None:
+            token_param = {'token': token} if token else {}
+            elem.attrib["src"] = url_for('assets.download', asset_id=src.get('media'), item_id=item.get("_id"),
+                                         _external=True, **token_param)
+        return True
+
+    update_embeds_in_body(item, update_embed, update_embed, update_embed)

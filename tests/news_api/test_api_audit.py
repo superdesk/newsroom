@@ -38,7 +38,8 @@ def test_get_item_audit_creation(client, app):
     app.data.insert('items', [{
         "_id": "111",
         "pubstatus": "usable",
-        "headline": "Headline of the story"
+        "headline": "Headline of the story",
+        "body_html": "<p></p>"
     }])
     app.data.insert('news_api_tokens', [{"company": ObjectId(company_id), "enabled": True}])
     token = app.data.find_one('news_api_tokens', req=None, company=ObjectId(company_id))

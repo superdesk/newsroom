@@ -22,6 +22,7 @@ CORE_APPS = [
     'newsroom.news_api.news.assets.assets',
     'newsroom.upload',
     'newsroom.news_api.news.atom.atom',
+    'newsroom.news_api.news.rss.rss',
     'newsroom.history'
 ]
 

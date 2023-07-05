@@ -42,6 +42,16 @@ def nitf_content_test(content):
     assert items[0]['headline'] == head.find('title').text
 
 
+def ninjs_content_test(content):
+    data = json.loads(content.decode('utf-8'))
+    assert data.get('associations').get('editor_1')
+    assert not data.get('associations').get('editor_0')
+    assert not data.get('associations').get('editor_2')
+    assert data.get('headline') == 'Amazon Is Opening More Bookstores'
+    assert 'editor_1' in data.get('body_html')
+    assert 'editor_0' not in data.get('body_html')
+
+
 def newsmlg2_content_test(content):
     tree = lxml.etree.parse(io.BytesIO(content))
     root = tree.getroot()
@@ -124,15 +134,124 @@ def setup_image(client, app):
     associations = {
         'featuremedia': {
             'mimetype': 'image/jpeg',
+            'type': 'picture',
             'renditions': {
                 'baseImage': {
                     'mimetype': 'image/jpeg',
                     'media': media_id,
+                    'href': 'http://a.b.c/xxx.jpg',
                 },
             }
         }
     }
     app.data.update('items', item['_id'], {'associations': associations}, item)
+
+
+def setup_embeds(client, app):
+    media_id = str(bson.ObjectId())
+    upload_binary('picture.jpg', client, media_id=media_id)
+    associations = {
+        'featuremedia': {
+            'mimetype': 'image/jpeg',
+            'type': 'picture',
+            'renditions': {
+                '16-9': {
+                    'mimetype': 'image/jpeg',
+                    'href': 'http://a.b.c/xxx.jpg',
+                    'media': media_id,
+                    'width': 1280,
+                    'height': 720,
+                },
+                '4-3': {
+                    "href": "/assets/633d11b9fb5122dcf06a6f02",
+                    "width": 800,
+                    "height": 600,
+                    'media': media_id,
+                    "mimetype": "image/jpeg",
+                    "media": media_id,
+                }
+            }
+        },
+        "editor_1": {
+            "type": "video",
+            "renditions": {
+                "original": {
+                    "mimetype": "video/mp4",
+                    "href": "/assets/640ff0bdfb5122dcf06a6fc3",
+                    'media': media_id,
+                }
+            },
+            "mimetype": "video/mp4",
+            "products": [{"code": "123", "name": "Product A"}, {"code": "321", "name": "Product B"}]
+        },
+        "editor_0": {
+            "type": "audio",
+            "renditions": {
+                "original": {
+                    "mimetype": "audio/mp3",
+                    "href": "/assets/640feb9bfb5122dcf06a6f7c",
+                    "media": "640feb9bfb5122dcf06a6f7c"
+                }
+            },
+            "mimetype": "audio/mp3",
+            "products": [
+                {
+                    "code": "999",
+                    "name": "NSW News"
+                }
+            ]
+        },
+        "editor_2": {
+            "type": "picture",
+            "renditions": {
+                "4-3": {
+                    "href": "/assets/633d11b9fb5122dcf06a6f02",
+                    "width": 800,
+                    "height": 600,
+                    "mimetype": "image/jpeg",
+                    "media": "633d11b9fb5122dcf06a6f02",
+                },
+                "16-9": {
+                    "href": "/assets/633d0f59fb5122dcf06a6ee8",
+                    "width": 1280,
+                    "height": 720,
+                    "mimetype": "image/jpeg",
+                    "media": "633d0f59fb5122dcf06a6ee8",
+                    "poi": {
+                    }
+                }
+            },
+            "products": [{"code": "888"}]
+        }
+    }
+    app.data.update('items', item['_id'], {'associations': associations, 'body_html':
+                                           '<p>Par 1</p><!-- EMBED START Audio {id: \"editor_0\"} --><figure>'
+                                           '<audio controls src=\"/assets/640feb9bfb5122dcf06a6f7c\" alt=\"minns\" '
+                                           'width=\"100%\" height=\"100%\"></audio>'
+                                           '<figcaption>minns</figcaption>'
+                                           '</figure>'
+                                           '<!-- EMBED END Audio {id: \"editor_0\"} -->'
+                                           '<p><br></p>'
+                                           '<p>Par 2</p>'
+                                           '<!-- EMBED START Video {id: \"editor_1\"} -->'
+                                           '<figure>'
+                                           '<video controls src=\"/assets/640ff0bdfb5122dcf06a6fc3\" '
+                                           'alt=\"Scomo text\" width=\"100%\" height=\"100%\">'
+                                           '</video>'
+                                           '<figcaption>Scomo whinging</figcaption>'
+                                           '</figure>'
+                                           '<!-- EMBED END Video {id: \"editor_1\"} -->'
+                                           '<p><br></p>Par 3<p></p>'
+                                           '<!-- EMBED START Image {id: \"editor_2\"} -->'
+                                           '<figure>'
+                                           '<img src=\"/assets/6189e8a48b37621081610714_newsroom_custom\" '
+                                           'alt=\"SCOTT MORRISON MELBOURNE VISIT\"'
+                                           ' id=\"editor_2\">'
+                                           '<figcaption>Prime Minister Scott Morrison and Liberal member for '
+                                           'Higgins Katie Allen</figcaption>'
+                                           '</figure>'
+                                           '<!-- EMBED END Image {id: \"editor_2\"} -->'
+                                           '<p>Par 4</p>'}, item)
 
 
 def test_download_single(client, app):
@@ -162,6 +281,45 @@ def test_wire_download(client, app):
     assert history[0].get('item') in items_ids
     assert history[0].get('version')
     assert history[0].get('company') is None
+    assert history[0].get('section') == 'wire'
+
+
+def test_ninjs_download(client, app):
+    setup_embeds(client, app)
+    app.config['EMBED_PRODUCT_FILTERING'] = True
+    app.data.insert('companies', [{
+        '_id': '1',
+        'name': 'Press co.',
+        'is_enabled': True,
+    }])
+    user = app.data.find_one('users', req=None, first_name='admin')
+    assert user
+    app.data.update('users', user['_id'], {'company': '1'}, user)
+    app.data.insert('products', [{
+        '_id': 10,
+        'name': 'product test',
+        'sd_product_id': '123',
+        'companies': ['1'],
+        'is_enabled': True,
+        'product_type': 'wire'
+    }])
+    app.general_setting('news_api_allowed_renditions', 'Foo', default='16-9,4-3')
+
+    _file = download_zip_file(client, 'downloadninjs', 'wire')
+    with zipfile.ZipFile(_file) as zf:
+        assert filename('amazon-bookstore-opening.json', item) in zf.namelist()
+        content = zf.open(filename('amazon-bookstore-opening.json', item)).read()
+        ninjs_content_test(content)
+
+    history = app.data.find('history', None, None)
+    assert 4 == history.count()
+    assert 'download' in history[0]['action']
+    assert 'download' in history[1]['action']
+    assert history[0].get('user')
+    assert history[0].get('versioncreated') + timedelta(seconds=2) >= utcnow()
+    assert history[0].get('item') in items_ids
+    assert history[0].get('version')
+    assert history[0].get('company') == '1'
     assert history[0].get('section') == 'wire'
 
 

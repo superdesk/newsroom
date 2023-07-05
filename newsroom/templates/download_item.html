@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    {% block title %}<title>{{ item.headline }}</title>{% endblock %}
+</head>
+<body>
+{% block content %}
+    <p>{{ item.slugline }}</p>
+
+    <h1>{{ item.headline }}</h1>
+    <p>{{ _('By:') }} <b>{{ item.byline }}</b> {{ _('On:') }} {{ item.versioncreated|datetime_long }}</p>
+
+    {{ item.description_html | safe }}
+    {{ item.body_html | safe }}
+{% endblock %}
+</body>

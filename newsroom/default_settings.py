@@ -324,3 +324,10 @@ NEWS_API_ENABLED = strtobool(env('NEWS_API_ENABLED', 'false'))
 
 # Enables the application of product filtering to image references in the API and ATOM responses
 NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env('NEWS_API_IMAGE_PERMISSIONS_ENABLED', 'false'))
+
+
+# Enable the Plyr media player in the body_html
+PLYR = strtobool(env('PLYR', 'false'))
+
+# If enabled Superdesk product filtering will be applied to the media items embedded in the stories
+EMBED_PRODUCT_FILTERING = strtobool(env('EMBED_PRODUCT_FILTERING', 'false'))

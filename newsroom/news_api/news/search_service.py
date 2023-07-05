@@ -16,9 +16,11 @@ from content_api.items.resource import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
 
 from newsroom.news_api.settings import ELASTIC_DATETIME_FORMAT
-from newsroom.news_api.utils import post_api_audit, remove_internal_renditions, check_association_permission
+from newsroom.news_api.utils import post_api_audit, remove_internal_renditions, check_association_permission,\
+    set_embed_links
 from newsroom.search import BaseSearchService, query_string
 from newsroom.products.products import get_products_by_company
+from newsroom.wire.formatters.utils import remove_unpermissioned_embeds
 
 
 class NewsAPINewsService(BaseSearchService):
@@ -40,7 +42,7 @@ class NewsAPINewsService(BaseSearchService):
     # set of fields that can be specified in the include_fields parameter
     allowed_include_fields = {'type', 'urgency', 'priority', 'language', 'description_html', 'located', 'keywords',
                               'source', 'subject', 'place', 'wordcount', 'charcount', 'body_html', 'readtime',
-                              'profile', 'service', 'genre', 'associations'}
+                              'profile', 'service', 'genre', 'associations', 'headline', 'extra'}
 
     default_fields = {
         '_id', 'uri', 'embargoed', 'pubstatus', 'ednote', 'signal', 'copyrightnotice', 'copyrightholder',
@@ -69,6 +71,8 @@ class NewsAPINewsService(BaseSearchService):
                 doc.pop(field, None)
 
             if 'associations' in orig_request_params.get('include_fields', ''):
+                remove_unpermissioned_embeds(doc, g.user)
+                set_embed_links(doc)
                 if not check_association_permission(doc):
                     doc.pop('associations', None)
                 else:
