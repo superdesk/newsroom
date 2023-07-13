@@ -24,3 +24,7 @@ from .json import JsonFormatter  # noqa
 from .ninjs import NINJSFormatter  # noqa
 from .picture import PictureFormatter  # noqa
 from .ninjs2 import NINJSFormatter2  # noqa
+from .downloadninjs import NINJSDownloadFormatter  # noqa
+from .html import HTMLFormatter  # noqa
+from .htmlwithmedia import HTMLMediaFormatter  # noqa
+from .htmlpackage import HTMLPackageFormatter  # noqa

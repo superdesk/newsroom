@@ -7,6 +7,7 @@ from werkzeug.wsgi import wrap_file
 from werkzeug.utils import secure_filename
 from flask import request, url_for, current_app as newsroom_app
 from superdesk.upload import upload_url as _upload_url
+from superdesk import get_resource_service
 from newsroom.decorator import login_required
 
 
@@ -21,6 +22,19 @@ def get_file(key):
         filename = secure_filename(file.filename)
         newsroom_app.media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
         return url_for('upload.get_upload', media_id=filename)
+
+
+@blueprint.route('/assets/<path:media_id>/<item_id>', methods=['GET'])
+@login_required
+def download(media_id, item_id):
+    """
+    Called on download of a media item, keeps a record of the download
+    :param media_id:
+    :param item_id:
+    :return:
+    """
+    get_resource_service('history').log_media_download(item_id, media_id)
+    return get_upload(media_id)
 
 
 @blueprint.route('/assets/<path:media_id>', methods=['GET'])

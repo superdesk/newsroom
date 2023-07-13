@@ -85,7 +85,7 @@ class WirePreview extends React.PureComponent {
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                     {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
 
-                    {!isEmpty(videos) && videos.map((video) => <ArticleVideo
+                    {isDisplayed('media', previewConfig) && !isEmpty(videos) && videos.map((video) => <ArticleVideo
                         key={video.guid}
                         video={getOriginalVideo(video)}
                         isKilled={isKilled(item)}

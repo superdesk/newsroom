@@ -123,16 +123,25 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', '{{ get_setting('google_analytics') | safe }}', {
-      custom_map: {
-          dimension1: 'company',
-          dimension2: 'user',
-      }
+  gtag('set', 'user_properties', {
+      company: (window.profileData || {}).companyName || 'none',
+      user: ((window.profileData || {}).user || {}).first_name || 'unknown',
   });
 
   {% if session.get('user') %}
   gtag('set', {'user_id': '{{ hash(session['user']) | safe }}' });
   {% endif %}
+
+  if ('{{ get_setting('google_analytics') }}'.startsWith('UA')) {
+      gtag('config', '{{ get_setting('google_analytics') | safe }}', {
+          custom_map: {
+              dimension1: 'company',
+              dimension2: 'user',
+          }
+      });
+  } else {
+      gtag('config', '{{ get_setting('google_analytics') | safe }}');
+  }
 
   {% with messages = get_flashed_messages(category_filter=['analytics']) %}
     {% if messages %}
@@ -156,6 +165,11 @@
 
 {% if config.IFRAMELY %}
 <script src="//cdn.iframe.ly/embed.js" async></script>
+{% endif %}
+
+{% if config.PLYR %}
+<script src="//cdn.plyr.io/3.6.3/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/3.6.3/plyr.css" />
 {% endif %}
 
 <textarea id="copy-area"></textarea>

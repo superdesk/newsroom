@@ -3,7 +3,10 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
 import pytz
+import re
+from lxml import html as lxml_html
 
+from superdesk.etree import to_string
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from bson import ObjectId
@@ -422,3 +425,38 @@ def get_end_date(date_range, start_date):
     if date_range == 'now/M':
         return start_date + relativedelta(months=+1) - timedelta(days=1)
     return start_date
+
+
+def update_embeds_in_body(item, update_image=None, update_audio=None, update_video=None):
+    """
+    Scans the story body for editor3 embeds and calls the appropriate passed function for each embed type.
+     The functions should expect the item, element and the number associated with the association
+    :param item:
+    :param update_image:
+    :param update_audio:
+    :param update_video:
+    :return:
+    """
+    regex = r" EMBED START (?:Image|Video|Audio) {id: \"editor_([0-9]+)"
+    body_updated = False
+    root_elem = lxml_html.fromstring(item.get('body_html', ''))
+    comments = root_elem.xpath('//comment()')
+    for comment in comments:
+        m = re.search(regex, comment.text)
+        if m and m.group(1):
+            # Assumes the sibling of the Embed Image comment is the figure tag containing the image
+            figure_elem = comment.getnext()
+            if figure_elem is not None and figure_elem.tag == "figure":
+                elem = figure_elem.find("./img")
+                if elem is not None and update_image:
+                    body_updated = update_image(item, elem, m.group(1)) or body_updated
+                    continue
+                elem = figure_elem.find("./audio")
+                if elem is not None and update_audio:
+                    body_updated = update_audio(item, elem, m.group(1)) or body_updated
+                    continue
+                elem = figure_elem.find("./video")
+                if elem is not None and update_video:
+                    body_updated = update_video(item, elem, m.group(1)) or body_updated
+    if body_updated:
+        item['body_html'] = to_string(root_elem, method="html")
