@@ -228,7 +228,7 @@ class ArticleBodyHtml extends React.PureComponent {
         return (
             <div
                 ref={this.bodyRef}
-                className='wire-column__preview__text wire-column__preview__text--pre'
+                className='wire-column__preview__text'
                 id='preview-body'
                 dangerouslySetInnerHTML={({__html: html})}
             />
