@@ -92,7 +92,7 @@ def set_embed_links(item):
     """
 
     def update_url(item, elem, group):
-        elem.attrib["src"] = elem.attrib["src"] + "/" + item.get("_id")
+        elem.attrib["src"] = elem.attrib["src"] + "?item_id=" + item.get("_id")
         return True
 
     if not app.config.get("EMBED_PRODUCT_FILTERING"):
@@ -108,7 +108,7 @@ def set_embed_links(item):
                 if ass.get('renditions', {}).get(rendition, {}).get("href"):
                     ass.get('renditions', {}).get(rendition, {})["href"] = ass.get('renditions', {}).get(rendition,
                                                                                                          {}).get(
-                        "href") + '/' + item.get("_id")
+                        "href") + '?item_id=' + item.get("_id")
 
 
 def update_embed_urls(item, token):
@@ -127,9 +127,12 @@ def update_embed_urls(item, token):
         src = item.get("associations", {}).get(embed_id, {}).get("renditions", {}).get(
             rendition)
         if src is not None and elem is not None:
-            token_param = {'token': token} if token else {}
-            elem.attrib["src"] = url_for('assets.download', asset_id=src.get('media'), item_id=item.get("_id"),
-                                         _external=True, **token_param)
+            params = {"item_id": item.get("_id")}
+            if token:
+                params["token"] = token
+            elem.attrib["src"] = url_for('assets.get_item', asset_id=src.get('media'),
+                                         _external=True, **params)
         return True
 
-    update_embeds_in_body(item, update_embed, update_embed, update_embed)
+    if app.config.get("EMBED_PRODUCT_FILTERING"):
+        update_embeds_in_body(item, update_embed, update_embed, update_embed)

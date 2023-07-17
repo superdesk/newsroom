@@ -44,7 +44,7 @@ class APIFormattersService(Service):
         if utcnow() - timedelta(days=int(get_setting('news_api_time_limit_days'))) > item.get('versioncreated',
                                                                                               utcnow()):
             abort(404)
-        remove_unpermissioned_embeds(item, g.user)
+        remove_unpermissioned_embeds(item, g.user, 'news_api')
         set_embed_links(item)
         ret = formatter.format_item(item)
         return {'formatted_item': ret, 'mimetype': formatter.MIMETYPE, 'version': item.get('version')}

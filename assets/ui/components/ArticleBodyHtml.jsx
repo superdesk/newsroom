@@ -200,7 +200,7 @@ class ArticleBodyHtml extends React.PureComponent {
                     vTag.setAttribute('data-plyr-config', '{"controls": ["play-large", "play",' +
                         '"progress", "volume", "mute", "rewind", "fast-forward", "current-time",' +
                         '"captions", "restart", "duration", "download"], "urls": {"download": ' +
-                        '"' + vTag.getAttribute('src') + '/' + item._id + '"' +
+                        '"' + vTag.getAttribute('src') + '?item_id=' + item._id + '"' +
                         '}}');
                 }
 

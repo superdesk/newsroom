@@ -71,7 +71,7 @@ class NewsAPINewsService(BaseSearchService):
                 doc.pop(field, None)
 
             if 'associations' in orig_request_params.get('include_fields', ''):
-                remove_unpermissioned_embeds(doc, g.user)
+                remove_unpermissioned_embeds(doc, g.user, 'news_api')
                 set_embed_links(doc)
                 if not check_association_permission(doc):
                     doc.pop('associations', None)

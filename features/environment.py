@@ -31,7 +31,8 @@ def before_scenario(context, scenario):
         'NEWS_API_ENABLED': True,
         'NEWS_API_IMAGE_PERMISSIONS_ENABLED': True,
         'NEWS_API_TIME_LIMIT_DAYS': 100,
-        'NEWS_API_ALLOWED_RENDITIONS': 'original,16-9'
+        'NEWS_API_ALLOWED_RENDITIONS': 'original,16-9',
+        'EMBED_PRODUCT_FILTERING': True,
     }
 
     if 'rate_limit' in scenario.tags:

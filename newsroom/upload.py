@@ -24,19 +24,6 @@ def get_file(key):
         return url_for('upload.get_upload', media_id=filename)
 
 
-@blueprint.route('/assets/<path:media_id>/<item_id>', methods=['GET'])
-@login_required
-def download(media_id, item_id):
-    """
-    Called on download of a media item, keeps a record of the download
-    :param media_id:
-    :param item_id:
-    :return:
-    """
-    get_resource_service('history').log_media_download(item_id, media_id)
-    return get_upload(media_id)
-
-
 @blueprint.route('/assets/<path:media_id>', methods=['GET'])
 @login_required
 def get_upload(media_id):
@@ -65,6 +52,10 @@ def get_upload(media_id):
         response.headers['Content-Disposition'] = 'attachment; filename="%s"' % flask.request.args['filename']
     else:
         response.headers['Content-Disposition'] = 'inline'
+
+    item_id = request.args.get('item_id')
+    if item_id:
+        get_resource_service('history').log_media_download(item_id, media_id)
 
     return response
 

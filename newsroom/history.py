@@ -7,11 +7,12 @@ from bson import ObjectId
 from superdesk import get_resource_service
 from superdesk.resource import not_analyzed, not_enabled
 from superdesk.utc import utcnow
-from flask import json, abort, Blueprint, jsonify, g
+from flask import json, abort, Blueprint, jsonify, g, current_app as app
 from flask_babel import gettext
 from eve.utils import ParsedRequest
 from newsroom.utils import get_json_or_400
 from newsroom.auth import get_user
+from newsroom.products.products import get_products_by_company
 
 blueprint = Blueprint('history', __name__)
 
@@ -111,7 +112,48 @@ class HistoryService(newsroom.Service):
         except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
             pass
 
-    def log_media_download(self, item_id, media_id):
+    def _find_association(self, item, media_id):
+        """
+        Find the matching media association in the item
+        :param item: item object
+        :param media_id: ID of the media
+        :return: tuple (name, association) or a 404
+        """
+        for name, association in (item.get('associations') or {}).items():
+            for rendition in association.get("renditions", []):
+                if association.get('renditions').get(rendition).get('media') == media_id:
+                    return name, association
+        # not found
+        abort(404)
+
+    def _get_permitted_products(self, company, section):
+        """
+        Get the list of permitted Superdesk products for the user's company
+        :param company: company
+        :param section: section name
+        :return: list of permitted products
+        """
+        return [p.get('sd_product_id') for p in get_products_by_company(company, None, section) if
+                p.get('sd_product_id')]
+
+    def _check_permissions(self, item, company, name, section):
+        """
+        Check the passed item rendition is allowed for the given company if required
+        :param item:
+        :param company:
+        :param name:
+        :param section:
+        :return:
+        """
+        if app.config.get("EMBED_PRODUCT_FILTERING"):
+            permitted_products = self._get_permitted_products(company, section)
+            embed_products = [p.get('code') for p in
+                              ((item.get('associations') or {}).get(name) or {}).get('products', [])]
+
+            if not len(set(embed_products) & set(permitted_products)):
+                abort(403)
+
+    def log_media_download(self, item_id, media_id, section='wire'):
         """
         Given am item, media reference and a user record the download
         :param item:
@@ -123,17 +165,9 @@ class HistoryService(newsroom.Service):
         if not item:
             abort(404)
 
-        found = False
-        # Find the matching media in the item
-        for name, association in (item.get('associations') or {}).items():
-            for rendition in item.get("associations").get(name).get("renditions"):
-                if association.get('renditions').get(rendition).get('media') == media_id:
-                    found = True
-                    break
-            if found:
-                break
-        if not found:
-            abort(404)
+        name, association = self._find_association(item, media_id)
+        self._check_permissions(item, user.get('company'), name, section)
+
         action = 'download ' + association.get('type')
         self.create_media_history_record(item, name, action, user, 'wire')
 
@@ -148,17 +182,9 @@ class HistoryService(newsroom.Service):
         if not item:
             abort(404)
 
-        found = False
-        # Find the matching media in the item
-        for name, association in (item.get('associations') or {}).items():
-            for rendition in item.get("associations").get(name).get("renditions"):
-                if association.get('renditions').get(rendition).get('media') == media_id:
-                    found = True
-                    break
-            if found:
-                break
-        if not found:
-            abort(404)
+        name, association = self._find_association(item, media_id)
+        self._check_permissions(item, g.user, name, 'news_api')
+
         action = 'download ' + association.get('type')
         self.create_media_history_record(item, name, action, {'_id': None, 'company': ObjectId(g.user)}, 'news_api')
 

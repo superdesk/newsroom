@@ -87,7 +87,7 @@ Feature: News API News Search
         ],
         "query": "",
         "sd_product_id": "1",
-        "product_type": "wire"
+        "product_type": "news_api"
         }]
         """
     Given "items"
