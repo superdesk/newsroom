@@ -31,6 +31,17 @@ export function getVideos(item) {
     return item.type === 'video' ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'video');
 }
 
+/**
+ * Get audio for an item
+ *
+ * if item is audio return it, otherwise look for audio association
+ *
+ * @param {Object} item
+ * @return {Array}
+ */
+export function getAudio(item) {
+    return item.type === 'audio' ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'audio');
+}
 
 /**
  * Get picture for an item
