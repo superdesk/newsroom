@@ -15,19 +15,6 @@ def init_app(app):
     superdesk.blueprint(blueprint, app)
 
 
-@blueprint.route('/assets/<path:asset_id>/<item_id>', methods=['GET'])
-def download(asset_id, item_id):
-    """
-    Called on download of a media item, keeps a record of the download
-    :param media_id:
-    :param item_id:
-    :return:
-    """
-    response = get_item(asset_id)
-    superdesk.get_resource_service('history').log_api_media_download(item_id, asset_id)
-    return response
-
-
 @blueprint.route('/assets/<path:asset_id>', methods=['GET'])
 def get_item(asset_id):
     auth = app.auth
@@ -41,6 +28,10 @@ def get_item(asset_id):
                     abort(401, gettext('Invalid token'))
         else:
             return abort(401, gettext('Invalid token'))
+
+    item_id = request.args.get('item_id')
+    if item_id:
+        superdesk.get_resource_service('history').log_api_media_download(item_id, asset_id)
     try:
         media_file = flask.current_app.media.get(asset_id, ASSETS_RESOURCE)
     except bson.errors.InvalidId:

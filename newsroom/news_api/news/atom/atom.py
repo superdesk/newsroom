@@ -71,7 +71,7 @@ def get_atom(token=None):
             if ((complete_item.get('associations') or {}).get('featuremedia') or {}).get('renditions'):
                 if not check_association_permission(complete_item):
                     continue
-            remove_unpermissioned_embeds(complete_item, g.user)
+            remove_unpermissioned_embeds(complete_item, g.user, 'news_api')
 
             entry = SubElement(feed, 'entry')
 
