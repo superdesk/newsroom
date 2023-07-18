@@ -210,7 +210,8 @@
 .icon--coverage-live-video:before {
     content: "\e629";
 }
-.icon--coverage-audio:before {
+.icon--coverage-audio:before,
+.icon--audio:before {
     content: "\e62a";
 }
 .icon--coverage-live-blog:before {

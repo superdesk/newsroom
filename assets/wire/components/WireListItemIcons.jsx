@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {isEmpty} from 'lodash';
 
-function WireListItemIcons({item, picture, videos, divider}) {
+function WireListItemIcons({item, picture, videos, audio, divider}) {
     return (
         <div className='wire-articles__item__icons'>
             {item.type === 'text' &&
@@ -20,6 +20,11 @@ function WireListItemIcons({item, picture, videos, divider}) {
                     <i className='icon--video icon--gray-light'></i>
                 </span>
             }
+            {!isEmpty(audio) &&
+                <span className='wire-articles__item__icon'>
+                    <i className='icon--audio icon--gray-light'></i>
+                </span>
+            }
             {divider &&
                 <span className='wire-articles__item__divider' />
             }
@@ -31,6 +36,7 @@ WireListItemIcons.propTypes = {
     item: PropTypes.object,
     picture: PropTypes.object,
     videos: PropTypes.array,
+    audio: PropTypes.array,
     divider: PropTypes.bool,
 };
 
