@@ -8,7 +8,7 @@ from flask import current_app as app, g
 from email import utils
 import datetime
 import logging
-from newsroom.news_api.utils import check_association_permission, update_embed_urls
+from newsroom.news_api.utils import check_featuremedia_association_permission, update_embed_urls
 from newsroom.wire.formatters.utils import remove_unpermissioned_embeds
 
 blueprint = superdesk.Blueprint('rss', __name__)
@@ -70,7 +70,7 @@ def get_rss(token=None):
 
             # If featuremedia is not allowed for the company don't add the item
             if ((complete_item.get('associations') or {}).get('featuremedia') or {}).get('renditions'):
-                if not check_association_permission(complete_item):
+                if not check_featuremedia_association_permission(complete_item):
                     continue
             remove_unpermissioned_embeds(complete_item, g.user, 'news_api')
 

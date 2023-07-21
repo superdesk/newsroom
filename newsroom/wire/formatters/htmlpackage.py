@@ -68,7 +68,7 @@ class HTMLPackageFormatter(BaseFormatter):
 
     def format_item(self, item, item_type='items'):
         remove_unpermissioned_embeds(item)
-        remove_internal_renditions(item)
+        remove_internal_renditions(item, remove_media=False)
         self.rewire_embeded_images(item)
         rewire_featuremedia(item)
         log_media_downloads(item)

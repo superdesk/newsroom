@@ -9,7 +9,7 @@ from superdesk.utc import utcnow
 from newsroom.settings import get_setting
 from newsroom import Service
 from newsroom.wire.formatters.utils import remove_unpermissioned_embeds
-from ..utils import set_embed_links
+from ..utils import update_embed_urls, set_association_links
 
 
 class APIFormattersService(Service):
@@ -45,6 +45,7 @@ class APIFormattersService(Service):
                                                                                               utcnow()):
             abort(404)
         remove_unpermissioned_embeds(item, g.user, 'news_api')
-        set_embed_links(item)
+        update_embed_urls(item, None)
+        set_association_links(item)
         ret = formatter.format_item(item)
         return {'formatted_item': ret, 'mimetype': formatter.MIMETYPE, 'version': item.get('version')}
