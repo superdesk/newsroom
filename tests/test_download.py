@@ -168,7 +168,6 @@ def setup_embeds(client, app):
                     "height": 600,
                     'media': media_id,
                     "mimetype": "image/jpeg",
-                    "media": media_id,
                 }
             }
         },

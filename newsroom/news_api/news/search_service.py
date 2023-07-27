@@ -7,6 +7,8 @@ from dateutil import parser
 import pytz
 from bson import ObjectId
 from flask import current_app as app, g
+from werkzeug.datastructures import ImmutableMultiDict
+from eve.utils import ParsedRequest
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, local_to_utc
@@ -16,11 +18,11 @@ from content_api.items.resource import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
 
 from newsroom.news_api.settings import ELASTIC_DATETIME_FORMAT
-from newsroom.news_api.utils import post_api_audit, remove_internal_renditions, check_association_permission,\
-    set_embed_links
+from newsroom.news_api.utils import post_api_audit, check_featuremedia_association_permission,\
+    update_embed_urls, set_association_links
 from newsroom.search import BaseSearchService, query_string
 from newsroom.products.products import get_products_by_company
-from newsroom.wire.formatters.utils import remove_unpermissioned_embeds
+from newsroom.wire.formatters.utils import remove_unpermissioned_embeds, remove_internal_renditions
 
 
 class NewsAPINewsService(BaseSearchService):
@@ -57,9 +59,19 @@ class NewsAPINewsService(BaseSearchService):
     limit_days_setting = 'news_api_time_limit_days'
 
     def get(self, req, lookup):
-        resp = super().get(req, lookup)
-
         orig_request_params = getattr(req, 'args', MultiDict())
+
+        # The associations are needed to reset the embeded urls in the body_html
+        if app.config.get("EMBED_PRODUCT_FILTERING") and \
+                'body_html' in orig_request_params.get('include_fields', '') and \
+                'associations' not in orig_request_params.get('include_fields', ''):
+            args = orig_request_params.to_dict()
+            args['include_fields'] = args.get('include_fields') + ',associations'
+            areq = ParsedRequest()
+            areq.args = ImmutableMultiDict(args)
+            resp = super().get(areq, lookup)
+        else:
+            resp = super().get(req, lookup)
 
         # Can't get the exclude projection to work do pop the exclude fields here
         exclude_fields = self.mandatory_exclude_fields.union(
@@ -70,13 +82,21 @@ class NewsAPINewsService(BaseSearchService):
             for field in exclude_fields:
                 doc.pop(field, None)
 
-            if 'associations' in orig_request_params.get('include_fields', ''):
+            if app.config.get("EMBED_PRODUCT_FILTERING") and \
+                    'body_html' in orig_request_params.get('include_fields', ''):
+                update_embed_urls(doc, None)
                 remove_unpermissioned_embeds(doc, g.user, 'news_api')
-                set_embed_links(doc)
-                if not check_association_permission(doc):
-                    doc.pop('associations', None)
-                else:
-                    remove_internal_renditions(doc)
+
+            if 'associations' in orig_request_params.get('include_fields', ''):
+                set_association_links(doc)
+                if not check_featuremedia_association_permission(doc):
+                    if doc.get('associations', {}).get('featuremedia'):
+                        doc.get('associations').pop('featuremedia')
+                        if not doc.get('associations'):
+                            doc.pop('associations', None)
+                remove_internal_renditions(doc, remove_media=True)
+            else:
+                doc.pop('associations', None)
 
         return resp
 

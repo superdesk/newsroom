@@ -10,10 +10,12 @@ from newsroom.products.products import get_products_by_company
 from newsroom.auth import get_user
 
 
-def remove_internal_renditions(item):
+def remove_internal_renditions(item, remove_media=False):
     """
-    Remove the internal and original image renditions from the feature media and embedded media
+    Remove the internal and original image renditions from the feature media and embedded media. The media can
+    optionaly be removed as we do not serve this on the api.
     :param item:
+    :param remove_media:
     :return:
     """
     allowed_pic_renditions = get_setting('news_api_allowed_renditions').split(',')
@@ -22,6 +24,8 @@ def remove_internal_renditions(item):
         for key, rendition in association_item.get('renditions', {}).items():
             if association_item.get('type') == 'picture':
                 if key in allowed_pic_renditions:
+                    if remove_media:
+                        rendition.pop('media', None)
                     clean_renditions[key] = rendition
             else:
                 clean_renditions[key] = rendition

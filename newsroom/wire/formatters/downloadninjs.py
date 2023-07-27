@@ -73,7 +73,7 @@ class NINJSDownloadFormatter(NINJSFormatter):
     def _transform_to_ninjs(self, item):
         remove_unpermissioned_embeds(item)
         # Remove the renditions we should not be showing the world
-        remove_internal_renditions(item)
+        remove_internal_renditions(item, remove_media=False)
         # set the references embedded in the html body of the story
         self.rewire_embeded_images(item)
         rewire_featuremedia(item)

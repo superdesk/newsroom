@@ -2,7 +2,6 @@ from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from flask import request, g, current_app as app, url_for
 from newsroom.products.products import get_products_by_company
-from newsroom.settings import get_setting
 from newsroom.utils import update_embeds_in_body
 
 
@@ -38,27 +37,7 @@ def format_report_results(search_result, unique_endpoints, companies):
     return results
 
 
-def remove_internal_renditions(item):
-    clean_renditions = dict()
-
-    # associations featuremedia will contain the internal newsroom renditions, we need to remove these.
-    if ((item.get('associations') or {}).get('featuremedia') or {}).get('renditions'):
-        for key, rendition in\
-                item['associations']['featuremedia']['renditions'].items():
-            if key in get_setting('news_api_allowed_renditions').split(','):
-                rendition.pop('media', None)
-                clean_renditions[key] = rendition
-
-        item['associations']['featuremedia']['renditions'] = clean_renditions
-    for key, meta in item.get('associations', {}).items():
-        if isinstance(meta, dict):
-            meta.pop('products', None)
-            meta.pop('subscribers', None)
-
-    return item
-
-
-def check_association_permission(item):
+def check_featuremedia_association_permission(item):
     """
     Check if any of the products that the passed image item matches are permissioned superdesk products for the
      company
@@ -83,24 +62,14 @@ def check_association_permission(item):
         return True
 
 
-def set_embed_links(item):
+def set_association_links(item):
     """
-    Sets the reference links in the embeds to include the item id so that calls to them can be logged against the
-    item that the embed belongs to
+    Updates the links in the associations to the endpoint that logs the download
     :param item:
     :return:
     """
-
-    def update_url(item, elem, group):
-        elem.attrib["src"] = elem.attrib["src"] + "?item_id=" + item.get("_id")
-        return True
-
     if not app.config.get("EMBED_PRODUCT_FILTERING"):
         return
-    if not item.get('body_html', ''):
-        return
-
-    update_embeds_in_body(item, update_url, update_url, update_url)
 
     for key, ass in item.get("associations", {}).items():
         if isinstance(ass, dict) and not key == "featuremedia":
