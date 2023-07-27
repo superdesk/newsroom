@@ -278,7 +278,7 @@ superdesk.command('data:downgrade', Downgrade())
 class DataUpdate:
 
     def apply(self, direction):
-        assert(direction in ['forwards', 'backwards'])
+        assert (direction in ['forwards', 'backwards'])
         collection = current_app.data.get_mongo_collection(self.resource)
         db = current_app.data.driver.db
         getattr(self, direction)(collection, db)
