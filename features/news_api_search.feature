@@ -599,6 +599,55 @@ Feature: News API News Search
         ]}
       """
 
+    Scenario: Search request response restricted by embedded image product
+      Given "items"
+          """
+          [{"_id": "111", "body_html": "<p>Once upon a time there</p><!-- EMBED START Image {id: \"editor_19\"} --><figure><img src=\"something\" alt=\"alt text\" id=\"editor_19\"<figcaption>Some caption</figcaption></figure><!-- EMBED END Image {id: \"editor_19\"} --><p>was a fish who could swim</p>",
+           "headline": "headline 1",
+           "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
+           "associations": {"editor_19": {"products": [{"code": "1234"}], "renditions": {"16-9": {"media" : "something"}} }}},
+          {"_id": "222", "body_html": "<p>Once upon a time there</p><!-- EMBED START Image {id: \"editor_19\"} --><figure><img src=\"something\" alt=\"alt text\" id=\"editor_19\"<figcaption>Some caption</figcaption></figure><!-- EMBED END Image {id: \"editor_19\"} --><p>was a aardvark who could swim</p>",
+          "headline": "headline 2",
+          "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
+           "associations": {"editor_19": {"products": [{"code": "4321"}], "renditions": {"16-9": {"media" : "something"}} }}}]
+          """
+      Given "products"
+          """
+          [{"name": "A fishy Product",
+          "decsription": "a product for those interested in fish",
+          "companies" : [
+            "#companies._id#"
+          ],
+          "query": "Once upon a time",
+          "product_type": "news_api"
+          },
+          {"name": "A fishy superdesk product",
+          "description": "a superdesk product restricting images in the atom feed",
+          "companies" : [
+            "#companies._id#"
+          ],
+          "sd_product_id": "1234",
+          "product_type": "news_api"
+          }
+          ]
+          """
+      When we get "news/search?q=fish&include_fields=associations,body_html"
+      Then we get list with 1 items
+      """
+        {"_items": [
+        {"_id": "111",
+        "associations": {"editor_19": {"renditions": {"16-9": {"media" : "something"}} }}}
+        ]}
+      """
+      Then we get "<img src=\"http://localhost/api/assets/something?item_id=111\"" in text response
+      When we get "news/search?q=aardvark&include_fields=associations,body_html"
+      Then we get list with 1 items
+      """
+        {"_items": [
+        {"_id": "222"}
+        ]}
+      """
+
   Scenario: Time limit test
      Given "items"
         """

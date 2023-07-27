@@ -439,7 +439,7 @@ def update_embeds_in_body(item, update_image=None, update_audio=None, update_vid
     """
     regex = r" EMBED START (?:Image|Video|Audio) {id: \"editor_([0-9]+)"
     body_updated = False
-    root_elem = lxml_html.fromstring(item.get('body_html', '<p></p>'))
+    root_elem = lxml_html.fromstring(item.get('body_html', '<p></p>') or '<p></p>')
     comments = root_elem.xpath('//comment()')
     for comment in comments:
         m = re.search(regex, comment.text)
