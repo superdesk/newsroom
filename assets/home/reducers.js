@@ -5,6 +5,7 @@ import {
     SET_ACTIVE,
     SET_CARD_ITEMS,
 } from './actions';
+import {unescape, get} from 'lodash';
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
 import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from '../actions';
 import {modalReducer} from '../reducers';
@@ -30,13 +31,18 @@ export default function homeReducer(state = initialState, action) {
             company: action.data.company,
             formats: action.data.formats || [],
             userSections: action.data.userSections,
-            context: 'wire'
+            context: 'wire',
+            uiConfig: action.data.ui_config || {}
         };
 
     case OPEN_ITEM:{
+        var itemToOpen = action.item;
+        if (itemToOpen) {
+            itemToOpen.body_html = unescape(get(action, 'item.body_html'));
+        }
         return {
             ...state,
-            itemToOpen: action.item || null,
+            itemToOpen: itemToOpen || null,
         };
     }
 
