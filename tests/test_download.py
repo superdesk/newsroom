@@ -221,7 +221,8 @@ def setup_embeds(client, app):
                 }
             },
             "products": [{"code": "888"}]
-        }
+        },
+        "editor_3": None
     }
     app.data.update('items', item['_id'], {'associations': associations, 'body_html':
                                            '<p>Par 1</p><!-- EMBED START Audio {id: \"editor_0\"} --><figure>'
