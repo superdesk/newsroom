@@ -835,7 +835,14 @@ def test_send_immediate_email_alerts(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": utcnow(),
         'byline': 'Testy McTestface',
-        'body_html': '<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>',
+        'body_html': '<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>'
+                     '<!-- EMBED START Audio {id: "editor_2\"} -->'
+                     '<figure>'
+                     '    <audio controls src="/assets.mp3"></audio>'
+                     '    <figcaption>Assistant Treasurer</figcaption>'
+                     '</figure>'
+                     '<!-- EMBED END Audio {id: \"editor_2\"} -->'
+                     '<p>Something after the embed',
         'source': 'AAAA'
     }])
     w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
@@ -849,6 +856,8 @@ def test_send_immediate_email_alerts(client, app):
         assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
+        assert 'Something after the embed' in outbox[0].body
+        assert 'Assistant Treasurer' not in outbox[0].body
         assert 'Newsroom Monitoring: W1' in outbox[0].body
 
 
