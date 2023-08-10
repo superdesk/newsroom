@@ -135,6 +135,7 @@ class HomeApp extends React.Component {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
+                detailsConfig={this.props.previewConfig}
             />, modal] :
                 this.renderContent()
             )

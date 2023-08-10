@@ -184,8 +184,13 @@ class WireSearchService(BaseSearchService):
         self.gen_source_from_search(search)
         search.source['post_filter'] = {'bool': {'must': []}}
         internal_req = self.get_internal_request(search)
+        docs = list(self.internal_get(internal_req, None))
 
-        return list(self.internal_get(internal_req, None))
+        if app.config.get("EMBED_PRODUCT_FILTERING"):
+            for item in docs:
+                self.permission_embeds_in_item(item, self.get_permitted_products())
+
+        return docs
 
     def get_navigation_story_count(self, navigations, section, company, user):
         """Get story count by navigation"""
@@ -526,6 +531,16 @@ class WireSearchService(BaseSearchService):
 
         return bookmark_users
 
+    def get_permitted_products(self):
+        current_user = get_user(required=True)
+        company = get_user_company(current_user)
+        if company is None:
+            return []
+        # get a list of products that match Superdesk products for this user/company
+        return [p.get('sd_product_id') for p in
+                get_products_by_company(company.get('_id'), None, request.args.get('type', 'wire'))
+                if p.get('sd_product_id')]
+
     def permission_embeds_in_item(self, item, permitted_products):
         """
         Given the permitted products for the current user and an item, mark any video or audio embedded elements
@@ -570,14 +585,5 @@ class WireSearchService(BaseSearchService):
 
     def on_fetched(self, doc):
         if app.config.get("EMBED_PRODUCT_FILTERING"):
-            current_user = get_user(required=True)
-            company = get_user_company(current_user)
-            if company is None:
-                return
-            # get a list of products that match Superdesk products for this user/company
-            permitted_products = [p.get('sd_product_id') for p in
-                                  get_products_by_company(company.get('_id'), None, request.args.get('type', 'wire'))
-                                  if p.get('sd_product_id')]
-
             for item in doc[config.ITEMS]:
-                self.permission_embeds_in_item(item, permitted_products)
+                self.permission_embeds_in_item(item, self.get_permitted_products())

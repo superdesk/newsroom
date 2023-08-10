@@ -3,6 +3,7 @@ import flask
 import zipfile
 import superdesk
 import json
+from html import escape
 
 from bson import ObjectId
 from operator import itemgetter
@@ -95,8 +96,12 @@ def get_items_by_card(cards):
     items_by_card = {}
     for card in cards:
         if card['config'].get('product'):
-            items_by_card[card['label']] = superdesk.get_resource_service('wire_search').\
+            items = superdesk.get_resource_service('wire_search'). \
                 get_product_items(ObjectId(card['config']['product']), card['config']['size'])
+            if items:
+                for item in items:
+                    item["body_html"] = escape(item["body_html"])
+            items_by_card[card['label']] = items
         elif card['type'] == '4-photo-gallery':
             # Omit external media, let the client manually request these
             # using '/media_card_external' endpoint
@@ -122,6 +127,7 @@ def get_home_data():
         'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types'], 'assets': f['assets']}
                     for f in app.download_formatters.values()],
         'context': 'wire',
+        'ui_config': get_resource_service('ui_config').getSectionConfig('wire')
     }
 
 
