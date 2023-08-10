@@ -9,7 +9,7 @@ from newsroom.search import SearchQuery, BaseSearchService
 from newsroom.utils import get_local_date
 
 from .fixtures import PUBLIC_USER_ID, ADMIN_USER_ID, TEST_USER_ID, USERS, \
-    COMPANIES,\
+    COMPANIES, \
     NAV_1, NAV_3, NAV_5, NAVIGATIONS, \
     PRODUCTS, \
     SECTION_FILTERS

@@ -18,7 +18,7 @@ from content_api.items.resource import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
 
 from newsroom.news_api.settings import ELASTIC_DATETIME_FORMAT
-from newsroom.news_api.utils import post_api_audit, check_featuremedia_association_permission,\
+from newsroom.news_api.utils import post_api_audit, check_featuremedia_association_permission, \
     update_embed_urls, set_association_links
 from newsroom.search import BaseSearchService, query_string
 from newsroom.products.products import get_products_by_company

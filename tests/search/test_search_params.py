@@ -9,7 +9,7 @@ from newsroom import auth  # noqa
 from newsroom.search import SearchQuery, BaseSearchService
 
 from .fixtures import PUBLIC_USER_ID, ADMIN_USER_ID, TEST_USER_ID, USERS, \
-    COMPANY_1, COMPANY_2, COMPANY_3, COMPANIES,\
+    COMPANY_1, COMPANY_2, COMPANY_3, COMPANIES, \
     NAV_1, NAV_2, NAV_3, NAV_4, NAV_5, NAV_6, NAVIGATIONS, \
     PROD_1, PROD_2, PROD_3, PRODUCTS
 
