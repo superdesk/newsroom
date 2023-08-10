@@ -5,7 +5,7 @@ on:
 
 jobs:
 
-  server:
+  server-py-36:
     runs-on: ubuntu-20.04
 
     steps:
@@ -42,7 +42,7 @@ jobs:
       - name: behave
         run: behave --format progress2 --logging-level=ERROR
 
-  client:
+  client-node-12:
     runs-on: ubuntu-latest
 
     steps:

@@ -5,7 +5,7 @@ on:
 
 jobs:
 
-  server:
+  server-py-38:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,7 +42,7 @@ jobs:
       - name: behave
         run: behave --format progress2 --logging-level=ERROR
 
-  client:
+  client-node-14:
     runs-on: ubuntu-latest
 
     steps:
@@ -51,7 +51,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: cache npm
         uses: actions/cache@v2
