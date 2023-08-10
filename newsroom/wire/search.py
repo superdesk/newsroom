@@ -551,7 +551,7 @@ class WireSearchService(BaseSearchService):
         """
         disable_download = []
         for key, embed_item in item.get("associations", {}).items():
-            if key.startswith("editor_") and embed_item.get('type') in ['audio', 'video']:
+            if key.startswith("editor_") and embed_item and (embed_item.get('type', '')) in ['audio', 'video']:
                 # get the list of products that the embedded item matched in Superdesk
                 embed_products = [p.get('code') for p in
                                   ((item.get('associations') or {}).get(key) or {}).get('products', [])]
