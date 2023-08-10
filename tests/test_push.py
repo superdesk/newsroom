@@ -625,7 +625,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
 def test_push_parsed_item(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'wire_search')
-    assert type(parsed['firstcreated']) == datetime
+    assert isinstance(parsed['firstcreated'], datetime)
     assert 2 == parsed['wordcount']
     assert 7 == parsed['charcount']
 
@@ -635,9 +635,9 @@ def test_push_parsed_dates(client, app):
     payload['embargoed'] = '2019-01-31T00:01:00+00:00'
     client.post('/push', data=json.dumps(payload), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'items')
-    assert type(parsed['firstcreated']) == datetime
-    assert type(parsed['versioncreated']) == datetime
-    assert type(parsed['embargoed']) == datetime
+    assert isinstance(parsed['firstcreated'], datetime)
+    assert isinstance(parsed['versioncreated'], datetime)
+    assert isinstance(parsed['embargoed'], datetime)
 
 
 def test_push_event_coverage_info(client, app):

@@ -3,11 +3,12 @@ PyRTF3>=0.47.5
 # Fix an issue between xhtml2pdf v0.2.4 and reportlab v3.6.7
 # https://github.com/xhtml2pdf/xhtml2pdf/issues/589
 reportlab==3.6.6
-xhtml2pdf>=0.2.4
+xhtml2pdf==0.2.5
 
 
 werkzeug>=0.9.4,<=0.11.15
 urllib3<1.26
+
 -e .
 git+https://github.com/superdesk/superdesk-planning.git@support/1.33#egg=superdesk-planning
-git+https://github.com/superdesk/superdesk-core.git@support/1.33#egg=superdesk-core
+git+https://github.com/superdesk/superdesk-core.git@hotfix/1.33.17#egg=Superdesk-Core

@@ -5,8 +5,8 @@ on:
 
 jobs:
 
-  server-py-36:
-    runs-on: ubuntu-20.04
+  server-py-38:
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -14,14 +14,10 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.6
+          python-version: 3.8
 
       - name: docker-compose
         run: docker-compose -f .actions-docker-compose.yml up -d
-
-      - run: |
-             sudo apt-get update
-             sudo apt-get install pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl
 
       - name: cache pip
         uses: actions/cache@v2
@@ -46,7 +42,7 @@ jobs:
       - name: behave
         run: behave --format progress2 --logging-level=ERROR
 
-  client-node-12:
+  client-node-14:
     runs-on: ubuntu-latest
 
     steps:
@@ -55,7 +51,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: cache npm
         uses: actions/cache@v2
