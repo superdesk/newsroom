@@ -58,15 +58,20 @@ def elastic_init():
 @manager.option('-c', '--collection', dest='collection', default=None)
 @manager.option('-t', '--timestamp', dest='timestamp', default=None)
 @manager.option('-d', '--direction', dest='direction', choices=['older', 'newer'], default='older')
-def index_from_mongo(hours, collection, timestamp, direction):
-    print('Checking if elastic index exists, a new one will be created if not')
-    app.data.init_elastic(app)
-    print('Elastic index check has been completed')
+@manager.option('-s', '--start_id', dest='start_id', default=None)
+@manager.option('-i', '--skip_init', dest='skip_init', default=False)
+def index_from_mongo(hours, collection, timestamp, direction, start_id, skip_init):
+    if not skip_init:
+        print('Checking if elastic index exists, a new one will be created if not')
+        app.data.init_elastic(app)
+        print('Elastic index check has been completed')
+    else:
+        print('Skipping index initialisation')
 
     if timestamp:
         index_elastic_from_mongo_from_timestamp(collection, timestamp, direction)
     else:
-        index_elastic_from_mongo(hours=hours, collection=collection)
+        index_elastic_from_mongo(hours=hours, collection=collection, start_id=start_id)
 
 
 @manager.command
