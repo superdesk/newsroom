@@ -4,6 +4,7 @@ import newsroom
 import superdesk
 import pymongo.errors
 import werkzeug.exceptions
+from html import escape
 
 from bson import ObjectId
 from superdesk.utc import utcnow
@@ -71,6 +72,8 @@ def get_initial_notifications():
     items = []
     try:
         items.extend(superdesk.get_resource_service('wire_search').get_items(item_ids))
+        for item in items:
+            item["body_html"] = escape(item["body_html"])
     except KeyError:  # wire disabled
         pass
     try:
