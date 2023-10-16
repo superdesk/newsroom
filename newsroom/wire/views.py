@@ -253,7 +253,8 @@ def download(_ids):
 
     update_action_list(_ids.split(','), 'downloads', force_insert=True)
     get_resource_service('history').create_history_record(items, 'download', user, request.args.get('type', 'wire'))
-    return flask.send_file(_file, mimetype=mimetype, attachment_filename=attachment_filename, as_attachment=True)
+    return flask.send_file(_file, mimetype=mimetype, attachment_filename=attachment_filename, as_attachment=True,
+                           cache_timeout=0)
 
 
 @blueprint.route('/wire_share', methods=['POST'])

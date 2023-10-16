@@ -5,6 +5,7 @@ from uuid import uuid4
 import pytz
 import re
 from lxml import html as lxml_html
+from lxml.html import clean
 
 from superdesk.etree import to_string
 from superdesk.utc import utcnow
@@ -460,3 +461,36 @@ def update_embeds_in_body(item, update_image=None, update_audio=None, update_vid
                     body_updated = update_video(item, elem, m.group(1)) or body_updated
     if body_updated:
         item['body_html'] = to_string(root_elem, method="html")
+
+
+def remove_all_embeds(item):
+    """
+    Remove the all embeds from the body of the article, including any divs with the embed_block attribute
+    :param item:
+    :return:
+    """
+
+    if not item.get("body_html", ""):
+        return
+
+    # clean all the embedded figures from the html
+    blacklist = ["figure"]
+    root_elem = lxml_html.fromstring(item.get("body_html", ""))
+
+    cleaner = clean.Cleaner(
+        add_nofollow=False,
+        kill_tags=blacklist
+    )
+    cleaned_xhtml = cleaner.clean_html(root_elem)
+
+    # all embedded tweets etc should be in a div with the class embeded-block, these are removed
+    embeds = cleaned_xhtml.xpath('//div[@class=\'embed-block\']')
+    for embed in embeds:
+        cleaned_xhtml.remove(embed)
+
+    # remove the associations relating to the embeds
+    kill_keys = [key for key in item.get("associations", {}) if key.startswith("editor_")]
+    for key in kill_keys:
+        item.get("associations", {}).pop(key, None)
+
+    item["body_html"] = to_string(cleaned_xhtml, encoding="unicode", method='html')
