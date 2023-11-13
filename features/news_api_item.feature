@@ -234,6 +234,35 @@ Feature: News API Item
         }
         ]
         """
+    When we get "/news/item/111?format=NINJSFormatter&no_embeds=true&no_media=1"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "headline 1",
+      "body_html": "<p>Once upon a time there was </p><p> who could swim</p><p></p>"
+    }
+    """
+    When we get "/news/item/111?format=NINJSFormatter2&no_embeds=true"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "headline 1",
+      "body_html": "<p>Once upon a time there was </p><p> who could swim</p><p><!-- EMBED START Image {id: \"editor_19\"} --><figure><img src=\"somthing\" alt=\"alt text\" id=\"editor_19\">Some caption</figure><!-- EMBED END Image {id: \"editor_19\"} --></p>",
+      "associations": {"editor_19": {"renditions": {"original": {}}}}
+    }
+    """
+    When we get "/news/item/111?format=NINJSFormatter2&no_media=true"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "headline 1",
+      "body_html": "<p>Once upon a time there was </p><div class=\"embed-block\">a fish</div><p> who could swim</p><p></p>",
+      "associations": {}
+    }
+    """
     When we get "/news/item/111?format=NINJSFormatter3"
     Then we get existing resource
     """

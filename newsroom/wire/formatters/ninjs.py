@@ -1,6 +1,8 @@
+import flask
 import json
 from .base import BaseFormatter
 from superdesk.utils import json_serialize_datetime_objectId
+from newsroom.utils import remove_all_embeds
 
 
 class NINJSFormatter(BaseFormatter):
@@ -20,7 +22,21 @@ class NINJSFormatter(BaseFormatter):
 
         return json.dumps(ninjs, default=json_serialize_datetime_objectId)
 
+    @staticmethod
+    def test_for_true(value):
+        """
+        Test if the value indicates false
+        :param value:
+        :return:
+        """
+        return value.lower() == 'true' or value == '1'
+
     def _transform_to_ninjs(self, item):
+        no_embeds = flask.request.args.get('no_embeds', default=False, type=self.test_for_true)
+        no_media = flask.request.args.get('no_media', default=False, type=self.test_for_true)
+        if no_media or no_embeds:
+            remove_all_embeds(item, remove_media_embeds=no_media, remove_by_class=no_embeds)
+
         ninjs = {
             'guid': item.get('_id'),
             'version': str(item.get('version', 1)),
