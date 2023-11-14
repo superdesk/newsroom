@@ -1,5 +1,5 @@
 import pytz
-from flask import json
+from flask import json, session
 from datetime import datetime
 from urllib import parse
 from unittest import mock
@@ -7,6 +7,7 @@ from unittest import mock
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts, get_entity_or_404, \
     get_local_date, get_end_date
+from newsroom.agenda.views import related_wire_items
 from .fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from .utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
 from copy import deepcopy
@@ -569,3 +570,49 @@ def test_filter_events_only(client):
     assert 'urn:conference' == data['_items'][0]['_id']
     assert 'planning_items' not in data['_items'][0]
     assert 'coverages' not in data['_items'][0]
+
+
+def test_related_wire_items(client, app):
+    test_planning_with_coveragre = deepcopy(test_planning)
+    test_planning_with_coveragre["coverages"] = [
+        {
+            "coverage_id": "d01ce39aed17",
+            "delivery_id": "812f8bb5a5d7",
+            "coverage_type": "text"
+        },
+        {
+            "coverage_id": "250363d911b0",
+            "delivery_id": "05e339456ea0",
+            "coverage_type": "text"
+        },
+        {
+            "coverage_id": "7a53221bca0a",
+            "planning_id": "a1f6f076f7b4",
+            "coverage_type": "picture"
+        },
+        {
+            "coverage_id": "954757c9881c",
+            "delivery_id": "97d3b5cd0861",
+            "coverage_type": "text"
+        }
+    ]
+
+    coverage_items = [{"_id": "812f8bb5a5d7", 'service': [{'code': 'a', 'name': 'Service A'}]},
+                      {"_id": "05e339456ea0", 'service': [{'code': 'b', 'name': 'Service B'}]},
+                      {"_id": "97d3b5cd0861", 'service': [{'code': 'a', 'name': 'Service A'}]}]
+    app.data.insert('agenda', [test_planning_with_coveragre])
+    app.data.insert('items', coverage_items)
+    app.data.insert('products', [{
+        '_id': ObjectId('5e65964bf5db68883df561d0'), 'name': 'Sport1', 'description': 'sport product 1',
+        'is_enabled': True, 'product_type': 'wire',
+        'navigations': [],
+        'companies': ['1'],
+        'query': 'service.code:a'
+    }])
+    with app.test_request_context():
+        session['user'] = PUBLIC_USER_ID
+        session['name'] = 'Test'
+        resp = related_wire_items("05e339456ea0")
+        data = json.loads(resp[0].get_data())
+        assert data.get('agenda_item').get('_id') == 'foo'
+        assert (next(item for item in data.get('wire_items') if item["_id"] == "05e339456ea0").get("_access")) is False

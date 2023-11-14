@@ -229,13 +229,10 @@ def related_wire_items(wire_id):
             wire_ids.append(cov['delivery_id'])
 
     wire_items = get_entities_elastic_or_mongo_or_404(wire_ids, 'items')
-    aggregations = {"uid": {"terms": {"field": "_uid"}}}
-    permissioned_result = get_resource_service('wire_search').get_items(wire_ids, size=0, aggregations=aggregations,
+    # Find those items that the user is permitted to view
+    permissioned_result = get_resource_service('wire_search').get_items(wire_ids, size=len(wire_ids),
                                                                         apply_permissions=True)
-    buckets = permissioned_result.hits['aggregations']['uid']['buckets']
-    permissioned_ids = []
-    for b in buckets:
-        permissioned_ids.append(b['key'].replace('items#', ''))
+    permissioned_ids = [item.get("_id") for item in permissioned_result] if permissioned_result else []
 
     for wire_item in wire_items:
         set_item_permission(wire_item, wire_item.get('_id') in permissioned_ids)
