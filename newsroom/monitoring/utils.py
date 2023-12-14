@@ -1,9 +1,7 @@
 from flask import current_app as app
-from lxml import html as lxml_html
-import re
 import collections
 from superdesk.text_utils import get_text
-from newsroom.utils import get_items_by_id
+from newsroom.utils import get_items_by_id, remove_all_embeds
 from superdesk import etree as sd_etree
 
 
@@ -69,28 +67,3 @@ def get_items_for_monitoring_report(_ids, monitoring_profile, full_text=False):
     items = get_items_by_id(_ids, 'items')
     truncate_article_body(items, monitoring_profile, full_text)
     return items
-
-
-def remove_all_embeds(item):
-    """
-    Remove the all embeds from the body of the article
-    :param item:
-    :return:
-    """
-    root_elem = lxml_html.fromstring(item.get('body_html') or '<p></p>')
-    regex = r" EMBED START (?:Image|Video|Audio) {id: \"editor_([0-9]+)"
-    html_updated = False
-    comments = root_elem.xpath('//comment()')
-    for comment in comments:
-        m = re.search(regex, comment.text)
-        # if we've found an Embed Start comment
-        if m and m.group(1):
-            parent = comment.getparent()
-            for elem in comment.itersiblings():
-                parent.remove(elem)
-                if elem.text and ' EMBED END ' in elem.text:
-                    break
-            parent.remove(comment)
-            html_updated = True
-    if html_updated:
-        item["body_html"] = sd_etree.to_string(root_elem, method="html")

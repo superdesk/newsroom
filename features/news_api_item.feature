@@ -205,3 +205,71 @@ Feature: News API Item
       "associations": {"featuremedia": {"renditions": {"original": {}} }}
     }
     """
+
+  Scenario: Item request response strips embeds
+    Given "items"
+        """
+        [{"_id": "111", "body_html": "<p>Once upon a time there was </p><div class=\"embed-block\">a fish</div><p> who could swim</p><p><!-- EMBED START Image {id: \"editor_19\"} --><figure><img src=\"somthing\" alt=\"alt text\" id=\"editor_19\"<figcaption>Some caption</figcaption></figure><!-- EMBED END Image {id: \"editor_19\"} --></p>",
+         "headline": "headline 1",
+         "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
+         "associations": {"editor_19": {"products": [{"code": "1234"}], "renditions": {"original": {}} }}}]
+        """
+    Given "products"
+        """
+        [{"name": "A fishy Product",
+        "decsription": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "Once upon a time",
+        "product_type": "news_api"
+        },
+        {"name": "A fishy superdesk product",
+        "description": "a superdesk product restricting images in the atom feed",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "sd_product_id": "1234",
+        "product_type": "news_api"
+        }
+        ]
+        """
+    When we get "/news/item/111?format=NINJSFormatter&no_embeds=true&no_media=1"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "headline 1",
+      "body_html": "<p>Once upon a time there was </p><p> who could swim</p><p></p>"
+    }
+    """
+    When we get "/news/item/111?format=NINJSFormatter2&no_embeds=true"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "headline 1",
+      "body_html": "<p>Once upon a time there was </p><p> who could swim</p><p><!-- EMBED START Image {id: \"editor_19\"} --><figure><img src=\"somthing\" alt=\"alt text\" id=\"editor_19\">Some caption</figure><!-- EMBED END Image {id: \"editor_19\"} --></p>",
+      "associations": {"editor_19": {"renditions": {"original": {}}}}
+    }
+    """
+    When we get "/news/item/111?format=NINJSFormatter2&no_media=true"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "headline 1",
+      "body_html": "<p>Once upon a time there was </p><div class=\"embed-block\">a fish</div><p> who could swim</p><p></p>",
+      "associations": {}
+    }
+    """
+    When we get "/news/item/111?format=NINJSFormatter3"
+    Then we get existing resource
+    """
+    {
+      "guid": "111",
+      "headline": "headline 1",
+      "body_html": "<p>Once upon a time there was </p><p> who could swim</p><p></p>",
+      "associations": {}
+    }
+    """

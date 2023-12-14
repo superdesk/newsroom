@@ -4,6 +4,7 @@ from flask import current_app as app
 
 from superdesk.publish.formatters.nitf_formatter import NITFFormatter
 from superdesk.publish.formatters.newsml_g2_formatter import NewsMLG2Formatter as SuperdeskFormatter
+from newsroom.utils import remove_all_embeds
 
 from .base import BaseFormatter
 
@@ -34,6 +35,7 @@ class NewsMLG2Formatter(BaseFormatter):
     nitf_formatter = NITFFormatter()
 
     def format_item(self, item, item_type='items'):
+        remove_all_embeds(item)
         item = item.copy()
         item.setdefault('guid', item['_id'])
         item.setdefault('_current_version', item['version'])

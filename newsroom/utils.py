@@ -5,6 +5,7 @@ from uuid import uuid4
 import pytz
 import re
 from lxml import html as lxml_html
+from lxml.html import clean
 
 from superdesk.etree import to_string
 from superdesk.utc import utcnow
@@ -460,3 +461,39 @@ def update_embeds_in_body(item, update_image=None, update_audio=None, update_vid
                     body_updated = update_video(item, elem, m.group(1)) or body_updated
     if body_updated:
         item['body_html'] = to_string(root_elem, method="html")
+
+
+def remove_all_embeds(item, remove_by_class=True, remove_media_embeds=True):
+    """
+    Remove the all embeds from the body of the article, including any divs with the embed_block attribute
+    :param item:
+    :param remove_by_class: If true removes any divs that have the embed-block class, should remove such things as
+    embedded tweets
+    :param remove_media_embeds: Remove any figure tags if the passed value is true
+    :return:
+    """
+    if not item.get("body_html", ""):
+        return
+
+    root_elem = lxml_html.fromstring(item.get("body_html", ""))
+
+    if remove_by_class:
+        # all embedded tweets etc should be in a div with the class embeded-block, these are removed
+        embeds = root_elem.xpath('//div[@class=\'embed-block\']')
+        for embed in embeds:
+            embed.getparent().remove(embed)
+
+    if not remove_media_embeds:
+        item["body_html"] = to_string(root_elem, encoding="unicode", method='html')
+        return
+
+    # clean all the embedded figures from the html, it will remove the comments as well
+    cleaner = clean.Cleaner(add_nofollow=False, kill_tags=["figure"])
+    cleaned_xhtml = cleaner.clean_html(root_elem)
+
+    # remove the associations relating to the embeds
+    kill_keys = [key for key in item.get("associations", {}) if key.startswith("editor_")]
+    for key in kill_keys:
+        item.get("associations", {}).pop(key, None)
+
+    item["body_html"] = to_string(cleaned_xhtml, encoding="unicode", method='html')
