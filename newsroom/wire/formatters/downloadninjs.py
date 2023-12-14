@@ -1,6 +1,7 @@
 from superdesk.logging import logger
 from .ninjs import NINJSFormatter
-from .utils import remove_internal_renditions, rewire_featuremedia, log_media_downloads, remove_unpermissioned_embeds
+from .utils import remove_internal_renditions, rewire_featuremedia, log_media_downloads, remove_unpermissioned_embeds,\
+    remove_unpermissioned_featuremedia
 from newsroom.utils import update_embeds_in_body
 
 
@@ -71,6 +72,7 @@ class NINJSDownloadFormatter(NINJSFormatter):
         update_embeds_in_body(item, update_image, update_video_or_audio, update_video_or_audio)
 
     def _transform_to_ninjs(self, item):
+        remove_unpermissioned_featuremedia(item)
         remove_unpermissioned_embeds(item)
         # Remove the renditions we should not be showing the world
         remove_internal_renditions(item, remove_media=False)
