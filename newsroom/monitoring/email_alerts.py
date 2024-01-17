@@ -24,7 +24,6 @@ from eve.utils import ParsedRequest
 from .utils import get_monitoring_file, truncate_article_body, get_date_items_dict
 import base64
 import os
-import re
 
 try:
     from urllib.parse import urlparse
@@ -255,9 +254,10 @@ class MonitoringEmailAlerts(Command):
                             u['is_enabled'] and u['company'] == company['_id']]]
         # append any addresses from the profile
         if m.get('email'):
-            for address in re.split(r'[, ]*', m.get('email')):
-                if address not in email_addresses:
-                    email_addresses.append(address)
+            address_list = m.get('email').split(',')
+            for address in address_list:
+                if address.strip() not in email_addresses:
+                    email_addresses.append(address.strip())
         return email_addresses
 
     def send_alerts(self, monitoring_list, created_from, created_from_time, now):

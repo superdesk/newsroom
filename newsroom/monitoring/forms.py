@@ -4,7 +4,6 @@ from wtforms import StringField, HiddenField, BooleanField, TextAreaField
 from wtforms import SelectField
 from wtforms.validators import DataRequired, Email, Optional
 from copy import deepcopy
-import re
 
 alert_types = [('full_text', gettext('Full text')), ('linked_text', gettext('Linked extract(s)'))]
 format_types = [('monitoring_pdf', gettext('PDF')), ('monitoring_rtf', gettext('RTF')),
@@ -32,10 +31,10 @@ class MonitoringForm(FlaskForm):
     query = TextAreaField(gettext('Query'))
 
     def validate_email(form, field):
-        address_list = re.split(r'[, ]*', field.data)
+        address_list = field.data.split(',')
         input_data = deepcopy(field.data)
         for address in address_list:
-            v = Email(message=field.gettext('Invalid email address: ') + address)
-            field.data = address
+            v = Email(message=field.gettext('Invalid email address: ') + address.strip())
+            field.data = address.strip()
             v(form, field)
         field.data = input_data
