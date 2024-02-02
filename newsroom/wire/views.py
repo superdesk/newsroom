@@ -89,6 +89,14 @@ def get_view_data():
     }
 
 
+def escape_strings(obj):
+    for k, v in obj.items():
+        if isinstance(v, dict):
+            escape_strings(v)
+        elif isinstance(v, str):
+            obj[k] = escape(v)
+
+
 def get_items_by_card(cards):
     if app.cache.get(HOME_ITEMS_CACHE_KEY):
         return app.cache.get(HOME_ITEMS_CACHE_KEY)
@@ -100,7 +108,7 @@ def get_items_by_card(cards):
                 get_product_items(ObjectId(card['config']['product']), card['config']['size'])
             if items:
                 for item in items:
-                    item["body_html"] = escape(item["body_html"])
+                    escape_strings(item)
             items_by_card[card['label']] = items
         elif card['type'] == '4-photo-gallery':
             # Omit external media, let the client manually request these
