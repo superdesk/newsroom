@@ -985,3 +985,19 @@ def test_send_profile_email(client, app):
         assert len(outbox[0].recipients) == 4
         assert 'atest@a.com' in outbox[0].recipients
         assert 'btest@b.com' in outbox[0].recipients
+
+
+def test_save_monitoring_email(client, app):
+    test_login_succeeds_for_admin(client)
+    m = app.data.find_one('monitoring', None, _id="5db11ec55f627d8aa0b545fb")
+    m['email'] = 'axb.com, a@b.com'
+    response = client.post('/monitoring/5db11ec55f627d8aa0b545fb', data=json.dumps(m), content_type='application/json')
+    data = json.loads(response.get_data())
+    assert data['email'][0] == 'Invalid email address: axb.com'
+    m['email'] = 'a@b.com , d@e.com'
+    response = client.post('/monitoring/5db11ec55f627d8aa0b545fb', data=json.dumps(m), content_type='application/json')
+    data = json.loads(response.get_data())
+    assert data['success'] is True
+    response = client.get('/monitoring/5db11ec55f627d8aa0b545fb')
+    data = json.loads(response.get_data())
+    assert data['email'] == 'a@b.com,d@e.com'
