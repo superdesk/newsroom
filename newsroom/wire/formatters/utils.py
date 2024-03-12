@@ -142,3 +142,28 @@ def remove_unpermissioned_embeds(item, company_id=None, section='wire'):
         item.get("associations", {}).pop(key, None)
         if "refs" in item:
             item["refs"] = [r for r in item.get("refs", []) if r["key"] != key]
+
+
+def remove_unpermissioned_featuremedia(item):
+    """
+    Remove the feature media if it's not permitted, used by the interactive download formatters
+    :param item:
+    :return:
+    """
+    if not app.config.get("EMBED_PRODUCT_FILTERING"):
+        return
+
+    user = get_user(required=True)
+    company_id = user.get('company')
+
+    permitted_products = {p.get('sd_product_id') for p in get_products_by_company(company_id, None, 'wire') if
+                          p.get('sd_product_id')}
+    feature_media_products = {p.get('code') for p in
+                              ((item.get('associations') or {}).get('featuremedia') or {}).get('products', {})}
+
+    permitted = any(feature_media_products & permitted_products) if feature_media_products else True
+
+    if not permitted:
+        item.get('associations', {}).pop('featuremedia', None)
+        if not item.get('associations'):
+            item.pop('associations', None)
