@@ -10,6 +10,10 @@ from bson import ObjectId
 from superdesk.utc import utcnow
 from flask import current_app as app, session
 
+# The set of fields we need to return to satisfy the notifications
+ITEM_FIELDS = ('_id', 'type', 'headline', 'versioncreated')
+AGENDA_FIELDS = ('_id', 'type', 'name', 'versioncreated')
+
 
 class NotificationsResource(newsroom.Resource):
     url = 'users/<regex("[a-f0-9]{24}"):user>/notifications'
@@ -72,14 +76,25 @@ def get_initial_notifications():
     items = []
     try:
         items.extend(superdesk.get_resource_service('wire_search').get_items(item_ids))
-        for item in items:
-            item["body_html"] = escape(item["body_html"])
     except KeyError:  # wire disabled
         pass
     try:
         items.extend(superdesk.get_resource_service('agenda').get_items(item_ids))
     except KeyError:  # agenda disabled
         pass
+
+    for item in items:
+        fields = AGENDA_FIELDS if item.get('type') == 'agenda' else ITEM_FIELDS
+        keys_to_remove = set(item.keys()) - set(fields)
+
+        for key in keys_to_remove:
+            item.pop(key, None)
+
+        # escape any strings to be sure
+        for key, value in item.items():
+            if isinstance(value, str):
+                item[key] = escape(value)
+
     return {
         'user': str(session['user']) if session['user'] else None,
         'notifications': list(items),
