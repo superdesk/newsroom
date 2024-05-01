@@ -1,6 +1,7 @@
 import flask
 from .base import BaseFormatter
-from .utils import remove_internal_renditions, log_media_downloads, remove_unpermissioned_embeds
+from .utils import remove_internal_renditions, log_media_downloads, remove_unpermissioned_embeds,\
+    remove_unpermissioned_featuremedia
 from newsroom.utils import update_embeds_in_body
 from ...upload import ASSETS_RESOURCE
 import base64
@@ -72,6 +73,7 @@ class HTMLMediaFormatter(BaseFormatter):
                 mimetype) + base64.b64encode(file.read()).decode()
 
     def format_item(self, item, item_type='items'):
+        remove_unpermissioned_featuremedia(item)
         remove_unpermissioned_embeds(item)
         remove_internal_renditions(item)
         self.rewire_embedded_images(item)

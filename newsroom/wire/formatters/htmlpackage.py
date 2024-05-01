@@ -1,6 +1,7 @@
 import flask
 from .base import BaseFormatter
-from .utils import remove_internal_renditions, rewire_featuremedia, log_media_downloads, remove_unpermissioned_embeds
+from .utils import remove_internal_renditions, rewire_featuremedia, log_media_downloads, remove_unpermissioned_embeds,\
+    remove_unpermissioned_featuremedia
 from newsroom.utils import update_embeds_in_body
 from superdesk.logging import logger
 
@@ -67,6 +68,7 @@ class HTMLPackageFormatter(BaseFormatter):
         update_embeds_in_body(item, update_image, update_video_or_audio, update_video_or_audio)
 
     def format_item(self, item, item_type='items'):
+        remove_unpermissioned_featuremedia(item)
         remove_unpermissioned_embeds(item)
         remove_internal_renditions(item, remove_media=False)
         self.rewire_embeded_images(item)
