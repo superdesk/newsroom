@@ -231,6 +231,17 @@ class NewsAPINewsService(BaseSearchService):
         if not search.company:
             raise SuperdeskApiError.forbiddenError()
 
+        # Check if 'products' argument is has been passed
+        products_arg = search.args.get('products')
+        if products_arg:
+            valid_product_ids = {str(c.get('_id')) for c in search.products}
+            requested_products = products_arg.split(',')
+            if not all(product in valid_product_ids for product in requested_products):
+                raise BadParameterValueError('Bad product value')
+        # Make sure it has a value
+        elif products_arg == '':
+            raise BadParameterValueError('Bad product value')
+
         self.validate_page(search)
 
     def validate_include_exclude_fields(self, search):
