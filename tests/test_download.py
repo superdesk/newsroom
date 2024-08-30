@@ -11,6 +11,7 @@ from superdesk.utc import utcnow
 
 from .fixtures import items, init_items, init_auth, agenda_items, init_agenda_items  # noqa
 from .test_push import upload_binary
+from pytest import fixture
 
 items_ids = [item['_id'] for item in items[:2]]
 item = items[:2][0]
@@ -254,6 +255,7 @@ def setup_embeds(client, app):
                                            '<p>Par 4</p>'}, item)
 
 
+@fixture
 def test_download_single(client, app):
     setup_image(client, app)
     for _format in wire_formats:
@@ -264,6 +266,7 @@ def test_download_single(client, app):
                                                            'attachment; filename="%s"' % _format['filename']]
 
 
+@fixture
 def test_wire_download(client, app):
     setup_image(client, app)
     for _format in wire_formats:
@@ -284,6 +287,7 @@ def test_wire_download(client, app):
     assert history[0].get('section') == 'wire'
 
 
+@fixture
 def test_ninjs_download(client, app):
     setup_embeds(client, app)
     app.config['EMBED_PRODUCT_FILTERING'] = True
@@ -323,6 +327,7 @@ def test_ninjs_download(client, app):
     assert history[0].get('section') == 'wire'
 
 
+@fixture
 def test_agenda_download(client, app):
     setup_image(client, app)
     for _format in agenda_formats:

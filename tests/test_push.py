@@ -13,6 +13,7 @@ from newsroom.utils import get_entity_or_404
 from .fixtures import init_auth  # noqa
 from .utils import mock_send_email
 from unittest import mock
+from pytest import fixture
 
 
 def get_signature_headers(data, key):
@@ -49,6 +50,7 @@ item = {
 }
 
 
+@fixture
 def test_push_item_inserts_missing(client, app):
     assert not app.config['PUSH_KEY']
     resp = client.post('/push', data=json.dumps(item), content_type='application/json')
@@ -61,6 +63,7 @@ def test_push_item_inserts_missing(client, app):
     assert '/assets/bar' == data['associations']['featured']['renditions']['thumbnail']['href']
 
 
+@fixture
 def test_push_valid_signature(client, app, mocker):
     key = b'something random'
     app.config['PUSH_KEY'] = key
@@ -70,6 +73,7 @@ def test_push_valid_signature(client, app, mocker):
     assert 200 == resp.status_code
 
 
+@fixture
 def test_notify_invalid_signature(client, app):
     app.config['PUSH_KEY'] = b'foo'
     data = json.dumps({})
@@ -78,6 +82,7 @@ def test_notify_invalid_signature(client, app):
     assert 403 == resp.status_code
 
 
+@fixture
 def test_push_binary(client):
     media_id = str(bson.ObjectId())
 
@@ -114,6 +119,7 @@ def upload_binary(fixture, client, media_id=None):
     return client.get('/assets/%s' % media_id)
 
 
+@fixture
 def test_push_binary_thumbnail_saves_copy(client):
     resp = upload_binary('thumbnail.jpg', client)
     assert resp.content_type == 'image/jpeg'
@@ -121,6 +127,7 @@ def test_push_binary_thumbnail_saves_copy(client):
         assert resp.content_length == len(picture.read())
 
 
+@fixture
 def test_push_featuremedia_generates_renditions(client):
     media_id = str(bson.ObjectId())
     upload_binary('picture.jpg', client, media_id=media_id)
@@ -160,6 +167,7 @@ def test_push_featuremedia_generates_renditions(client):
         assert 200 == resp.status_code
 
 
+@fixture
 def test_push_update_removes_featuremedia(client):
     media_id = str(bson.ObjectId())
     upload_binary('picture.jpg', client, media_id=media_id)
@@ -209,6 +217,7 @@ def test_push_update_removes_featuremedia(client):
     assert data['associations'] is None
 
 
+@fixture
 def test_push_featuremedia_has_renditions_for_existing_media(client):
     media_id = str(bson.ObjectId())
     upload_binary('picture.jpg', client, media_id=media_id)
@@ -254,6 +263,7 @@ def test_push_featuremedia_has_renditions_for_existing_media(client):
         assert 200 == resp.status_code
 
 
+@fixture
 def test_push_binary_invalid_signature(client, app):
     app.config['PUSH_KEY'] = b'foo'
     resp = client.post('/push_binary', data=dict(
@@ -263,6 +273,7 @@ def test_push_binary_invalid_signature(client, app):
     assert 403 == resp.status_code
 
 
+@fixture
 def test_notify_topic_matches_for_new_item(client, app, mocker):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -292,6 +303,7 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
     assert len(push_mock.call_args[1]['topics']) == 1
 
 
+@fixture
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
@@ -333,6 +345,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
 
 
+@fixture
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
@@ -379,6 +392,7 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     assert notification['item'] == 'bar'
 
 
+@fixture
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     app.data.insert('companies', [{
@@ -445,6 +459,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
 
 
+@fixture
 def test_do_not_notify_inactive_user(client, app, mocker):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -470,6 +485,7 @@ def test_do_not_notify_inactive_user(client, app, mocker):
     assert push_mock.call_args[1]['_items'][0]['_id'] == 'foo'
 
 
+@fixture
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_checks_service_subscriptions(client, app, mocker):
     app.data.insert('companies', [{
@@ -515,6 +531,7 @@ def test_notify_checks_service_subscriptions(client, app, mocker):
     assert len(outbox) == 0
 
 
+@fixture
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_send_notification_emails(client, app):
     user_ids = app.data.insert('users', [{
@@ -551,6 +568,7 @@ def test_send_notification_emails(client, app):
     assert 'http://localhost:5050/wire?item=foo' in outbox[0].body
 
 
+@fixture
 def test_matching_topics(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
     search = get_resource_service('wire_search')
@@ -567,6 +585,7 @@ def test_matching_topics(client, app):
     assert ['created_from_future', 'query'] == matching
 
 
+@fixture
 def test_matching_topics_for_public_user(client, app):
     app.data.insert('products', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
@@ -594,6 +613,7 @@ def test_matching_topics_for_public_user(client, app):
     assert ['created_from_future', 'query'] == matching
 
 
+@fixture
 def test_matching_topics_for_user_with_inactive_company(client, app):
     app.data.insert('products', [{
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
@@ -622,6 +642,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         assert ['created_from_future', 'query'] == matching
 
 
+@fixture
 def test_push_parsed_item(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'wire_search')
@@ -630,6 +651,7 @@ def test_push_parsed_item(client, app):
     assert 7 == parsed['charcount']
 
 
+@fixture
 def test_push_parsed_dates(client, app):
     payload = item.copy()
     payload['embargoed'] = '2019-01-31T00:01:00+00:00'
@@ -640,6 +662,7 @@ def test_push_parsed_dates(client, app):
     assert isinstance(parsed['embargoed'], datetime)
 
 
+@fixture
 def test_push_event_coverage_info(client, app):
     client.post('/push', data=json.dumps(item), content_type='application/json')
     parsed = get_entity_or_404(item['guid'], 'items')

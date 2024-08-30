@@ -12,6 +12,7 @@ from .fixtures import items, init_items, agenda_items, init_agenda_items, init_a
 from .utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
 from copy import deepcopy
 from bson import ObjectId
+from pytest import fixture
 
 date_time_format = '%Y-%m-%dT%H:%M:%S'
 
@@ -79,6 +80,7 @@ def mock_utcnow():
     return datetime.strptime('2018-11-23T22:00:00', date_time_format)
 
 
+@fixture
 def test_item_detail(client):
     resp = client.get('/agenda/urn:conference')
     assert resp.status_code == 200
@@ -86,6 +88,7 @@ def test_item_detail(client):
     assert 'Conference Planning' in resp.get_data().decode()
 
 
+@fixture
 def test_item_json(client):
     resp = client.get('/agenda/urn:conference?format=json')
     data = json.loads(resp.get_data())
@@ -96,6 +99,7 @@ def test_item_json(client):
     assert 'internal_note' in data['coverages'][0]['planning']
 
 
+@fixture
 def test_item_json_does_not_return_files(client, app):
     # public user
     with client.session_transaction() as session:
@@ -110,6 +114,7 @@ def test_item_json_does_not_return_files(client, app):
     assert 'internal_note' not in data['coverages'][0]['planning']
 
 
+@fixture
 def get_bookmarks_count(client, user):
     resp = client.get('/agenda/search?bookmarks=%s' % str(user))
     assert resp.status_code == 200
@@ -117,6 +122,7 @@ def get_bookmarks_count(client, user):
     return data['_meta']['total']
 
 
+@fixture
 def test_bookmarks(client, app):
     user_id = get_admin_user_id(app)
     assert user_id
@@ -138,6 +144,7 @@ def test_bookmarks(client, app):
     assert 0 == get_bookmarks_count(client, user_id)
 
 
+@fixture
 def test_item_copy(client, app):
     resp = client.post('/wire/{}/copy?type=agenda'.format('urn:conference'), content_type='application/json')
     assert resp.status_code == 200
@@ -150,6 +157,7 @@ def test_item_copy(client, app):
     assert str(user_id) in data['copies']
 
 
+@fixture
 @mock.patch('newsroom.wire.views.send_email', mock_send_email)
 def test_share_items(client, app, mocker):
     user_ids = app.data.insert('users', [{
@@ -183,6 +191,7 @@ def test_share_items(client, app, mocker):
     assert str(user_id) in data['shares']
 
 
+@fixture
 def test_agenda_search_filtered_by_query_product(client, app):
     app.data.insert('navigations', [{
         '_id': 51,
@@ -233,6 +242,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert '_aggregations' in data
 
 
+@fixture
 @mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 def test_coverage_request(client, app):
     post_json(client, '/settings/general_settings', {'coverage_request_recipients': 'admin@bar.com'})
@@ -252,6 +262,7 @@ def test_coverage_request(client, app):
         assert 'Some info message' in outbox[0].body
 
 
+@fixture
 def test_watch_event(client, app):
     user_id = get_admin_user_id(app)
     assert 0 == get_bookmarks_count(client, user_id)
@@ -263,6 +274,7 @@ def test_watch_event(client, app):
     assert 0 == get_bookmarks_count(client, user_id)
 
 
+@fixture
 def test_watch_coverages(client, app):
     user_id = get_admin_user_id(app)
 
@@ -275,6 +287,7 @@ def test_watch_coverages(client, app):
     assert after_watch_item['coverages'][0]['watches'] == [user_id]
 
 
+@fixture
 def test_unwatch_coverages(client, app):
     user_id = get_admin_user_id(app)
 
@@ -295,6 +308,7 @@ def test_unwatch_coverages(client, app):
     assert after_watch_item['coverages'][0]['watches'] == []
 
 
+@fixture
 def test_remove_watch_coverages_on_watch_item(client, app):
     user_id = ObjectId(get_admin_user_id(app))
     other_user_id = PUBLIC_USER_ID
@@ -318,6 +332,7 @@ def test_remove_watch_coverages_on_watch_item(client, app):
     assert after_watch_item['watches'] == [user_id]
 
 
+@fixture
 def test_fail_watch_coverages(client, app):
     user_id = get_admin_user_id(app)
 
@@ -344,6 +359,7 @@ def test_fail_watch_coverages(client, app):
         assert resp.status_code == 403
 
 
+@fixture
 @mock.patch('newsroom.utils.get_utcnow', mock_utcnow)
 def test_local_time(client, app, mocker):
     # 9 am Sydney Time - day light saving on
@@ -372,6 +388,7 @@ def test_local_time(client, app, mocker):
     assert '2018-12-23T12:59:59' == end_date.strftime(date_time_format)
 
 
+@fixture
 def test_get_location_string():
     agenda = {}
     assert get_location_string(agenda) == ''
@@ -402,6 +419,7 @@ def test_get_location_string():
     assert get_location_string(agenda) == 'Sydney Opera House, 2 Macquarie Street, Sydney, Sydney, 2000, Australia'
 
 
+@fixture
 def test_get_public_contacts():
     agenda = {}
     assert get_public_contacts(agenda) == []
@@ -436,6 +454,7 @@ def test_get_public_contacts():
     }]
 
 
+@fixture
 def test_get_agenda_dates():
     agenda = {
         'dates': {
@@ -470,6 +489,7 @@ def test_get_agenda_dates():
     assert get_agenda_dates(agenda) == '08:00 30/05/2018'
 
 
+@fixture
 def test_filter_agenda_by_coverage_status(client):
     client.post('/push', data=json.dumps(test_planning), content_type='application/json')
 
@@ -497,6 +517,7 @@ def test_filter_agenda_by_coverage_status(client):
     assert 'urn:conference' == data['_items'][2]['_id']
 
 
+@fixture
 def test_filter_events_only(client):
     test_planning = {
         "description_text": "description here",
@@ -572,6 +593,7 @@ def test_filter_events_only(client):
     assert 'coverages' not in data['_items'][0]
 
 
+@fixture
 def test_related_wire_items(client, app):
     test_planning_with_coveragre = deepcopy(test_planning)
     test_planning_with_coveragre["coverages"] = [

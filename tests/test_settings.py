@@ -3,8 +3,10 @@ from newsroom.settings import get_setting
 
 from .fixtures import items, init_items, init_auth, init_company  # noqa
 from .utils import post_json, get_json
+from pytest import fixture
 
 
+@fixture
 def test_general_settings(client, app):
     app.general_setting('foo', 'Foo', default='bar')
     assert 'bar' == get_setting('foo')
@@ -19,6 +21,7 @@ def test_general_settings(client, app):
     assert 'bar' == get_setting()['foo']['default']
 
 
+@fixture
 def test_news_only_filter(client, app):
     query = get_setting('news_only_filter')
     assert query is None

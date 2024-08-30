@@ -11,8 +11,10 @@ from unittest import mock
 from tests.test_users import ADMIN_USER_ID
 from tests.test_download import setup_embeds
 from superdesk import get_resource_service
+from pytest import fixture
 
 
+@fixture
 def test_item_detail(client):
     resp = client.get('/wire/tag:foo')
     assert resp.status_code == 200
@@ -20,12 +22,14 @@ def test_item_detail(client):
     assert 'Amazon Is Opening More Bookstores' in html
 
 
+@fixture
 def test_item_json(client):
     resp = client.get('/wire/tag:foo?format=json')
     data = json.loads(resp.get_data())
     assert 'headline' in data
 
 
+@fixture
 @mock.patch('newsroom.wire.views.send_email', mock_send_email)
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
@@ -62,6 +66,7 @@ def test_share_items(client, app):
     assert str(user_id) in data['shares']
 
 
+@fixture
 def get_bookmarks_count(client, user):
     resp = client.get('/api/wire_search?bookmarks=%s' % str(user))
     assert resp.status_code == 200
@@ -69,6 +74,7 @@ def get_bookmarks_count(client, user):
     return data['_meta']['total']
 
 
+@fixture
 def test_bookmarks(client, app):
     user_id = get_admin_user_id(app)
     assert user_id
@@ -90,6 +96,7 @@ def test_bookmarks(client, app):
     assert 0 == get_bookmarks_count(client, user_id)
 
 
+@fixture
 def test_bookmarks_by_section(client, app):
     products = [
         {
@@ -129,6 +136,7 @@ def test_bookmarks_by_section(client, app):
     assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID)
 
 
+@fixture
 def test_item_copy(client, app):
     resp = client.post('/wire/{}/copy'.format(items[0]['_id']), content_type='application/json')
     assert resp.status_code == 200
@@ -141,6 +149,7 @@ def test_item_copy(client, app):
     assert str(user_id) in data['copies']
 
 
+@fixture
 def test_versions(client, app):
     resp = client.get('/wire/%s/versions' % items[0]['_id'])
     assert 200 == resp.status_code
@@ -155,6 +164,7 @@ def test_versions(client, app):
     assert 'c' == data['_items'][1]['service'][0]['code']
 
 
+@fixture
 def test_search_filters_items_with_updates(client, app):
     resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
@@ -162,6 +172,7 @@ def test_search_filters_items_with_updates(client, app):
     assert 'tag:weather' not in [item['_id'] for item in data['_items']]
 
 
+@fixture
 def test_search_includes_killed_items(client, app):
     app.data.insert('items', [{'_id': 'foo', 'pubstatus': 'canceled', 'headline': 'killed'}])
     resp = client.get('/wire/search?q=headline:killed')
@@ -169,6 +180,7 @@ def test_search_includes_killed_items(client, app):
     assert 1 == len(data['_items'])
 
 
+@fixture
 def test_search_by_products_id(client, app):
     app.data.insert('items', [{'_id': 'foo', 'headline': 'product test', 'products': [{'code': '12345'}]}])
     resp = client.get('/wire/search?q=products.code:12345')
@@ -176,12 +188,14 @@ def test_search_by_products_id(client, app):
     assert 1 == len(data['_items'])
 
 
+@fixture
 def test_search_filter_by_category(client, app):
     resp = client.get('/wire/search?filter=%s' % json.dumps({'service': ['Service A']}))
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
 
+@fixture
 def test_filter_by_product_anonymous_user_gets_all(client, app):
     resp = client.get('/wire/search?products=%s' % json.dumps({'10': True}))
     data = json.loads(resp.get_data())
@@ -189,6 +203,7 @@ def test_filter_by_product_anonymous_user_gets_all(client, app):
     assert '_aggregations' in data
 
 
+@fixture
 def test_logged_in_user_no_product_gets_no_results(client, app):
     with client.session_transaction() as session:
         session['user'] = str(PUBLIC_USER_ID)
@@ -197,6 +212,7 @@ def test_logged_in_user_no_product_gets_no_results(client, app):
     assert 403 == resp.status_code
 
 
+@fixture
 def test_logged_in_user_no_company_gets_no_results(client, app):
     with client.session_transaction() as session:
         session['user'] = str(PUBLIC_USER_ID)
@@ -206,6 +222,7 @@ def test_logged_in_user_no_company_gets_no_results(client, app):
     assert resp.status_code == 403
 
 
+@fixture
 def test_administrator_gets_all_results(client, app):
     with client.session_transaction() as session:
         session['user'] = ADMIN_USER_ID
@@ -216,6 +233,7 @@ def test_administrator_gets_all_results(client, app):
     assert 3 == len(data['_items'])
 
 
+@fixture
 def test_search_filtered_by_users_products(client, app):
     app.data.insert('products', [{
         '_id': 10,
@@ -236,6 +254,7 @@ def test_search_filtered_by_users_products(client, app):
     assert '_aggregations' in data
 
 
+@fixture
 def test_search_filter_by_individual_navigation(client, app):
     app.data.insert('navigations', [{
         '_id': 51,
@@ -293,6 +312,7 @@ def test_search_filter_by_individual_navigation(client, app):
     assert 1 == len(data['_items'])
 
 
+@fixture
 def test_search_filtered_by_query_product(client, app):
     app.data.insert('navigations', [{
         '_id': 51,
@@ -338,6 +358,7 @@ def test_search_filtered_by_query_product(client, app):
     assert '_aggregations' in data
 
 
+@fixture
 def test_search_pagination(client):
     resp = client.get('/wire/search?from=25')
     assert 200 == resp.status_code
@@ -349,6 +370,7 @@ def test_search_pagination(client):
     assert 400 == resp.status_code
 
 
+@fixture
 def test_search_created_from(client):
     resp = client.get('/wire/search?created_from=now/d')
     data = json.loads(resp.get_data())
@@ -364,6 +386,7 @@ def test_search_created_from(client):
     assert 1 <= len(data['_items'])
 
 
+@fixture
 def test_search_created_to(client):
     resp = client.get('/wire/search?created_to=%s' % datetime.now().strftime('%Y-%m-%d'))
     data = json.loads(resp.get_data())
@@ -377,6 +400,7 @@ def test_search_created_to(client):
     assert 0 == len(data['_items'])
 
 
+@fixture
 def test_item_detail_access(client, app):
     item_url = '/wire/%s' % items[0]['_id']
     data = get_json(client, item_url)
@@ -409,6 +433,7 @@ def test_item_detail_access(client, app):
     assert data['body_html']
 
 
+@fixture
 def test_search_using_section_filter_for_public_user(client, app):
     app.data.insert('navigations', [{
         '_id': 51,
@@ -474,6 +499,7 @@ def test_search_using_section_filter_for_public_user(client, app):
     assert 0 == len(data['_items'])
 
 
+@fixture
 def test_administrator_gets_results_based_on_section_filter(client, app):
     with client.session_transaction() as session:
         session['user'] = ADMIN_USER_ID
@@ -492,6 +518,7 @@ def test_administrator_gets_results_based_on_section_filter(client, app):
     assert 1 == len(data['_items'])
 
 
+@fixture
 def test_time_limited_access(client, app):
     app.data.insert('products', [{
         '_id': 10,
@@ -529,6 +556,7 @@ def test_time_limited_access(client, app):
     assert 2 == len(data['_items'])
 
 
+@fixture
 def test_company_type_filter(client, app):
     app.data.insert('products', [{
         '_id': 10,
@@ -569,6 +597,7 @@ def test_company_type_filter(client, app):
     assert 'WEATHER' != data['_items'][0]['slugline']
 
 
+@fixture
 def test_search_by_products_and_filtered_by_embargoe(client, app):
     app.data.insert('products', [{
         '_id': 10,
@@ -601,6 +630,7 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
     assert items[0]['headline'] == 'china story'
 
 
+@fixture
 def test_wire_delete(client, app):
     docs = [
         items[1],
@@ -642,6 +672,7 @@ def test_wire_delete(client, app):
         assert get_resource_service('items_versions').find_one(req=None, _id_document=doc['_id']) is None
 
 
+@fixture
 def test_highlighting(client, app):
     app.data.insert('items', [{'_id': 'foo', 'body_html': 'Story that involves cheese and onions'}])
     resp = client.get('/wire/search?q=cheese&es_highlight=1')
@@ -650,6 +681,7 @@ def test_highlighting(client, app):
                                                                 'cheese</span> and onions'
 
 
+@fixture
 def test_embed_mark_disable_download(client, app):
     app.config['EMBED_PRODUCT_FILTERING'] = True
     user = app.data.find_one('users', req=None, _id=ADMIN_USER_ID)
