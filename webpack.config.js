@@ -1,5 +1,3 @@
-/* eslint-env node */
-
 const path = require('path');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
@@ -8,6 +6,7 @@ const NODE_MODULES = process.env.NODE_MODULES || 'node_modules';
 module.exports = {
     entry: {
         newsroom_js: './assets/index.js',
+        newsroom_images: './assets/images.js',
         companies_js: './assets/companies/index.js',
         users_js: './assets/users/index.js',
         products_js: './assets/products/index.js',
@@ -76,11 +75,26 @@ module.exports = {
                     'sass-loader',
                 ],
             },
+            {
+                test: /\.(png|jpe?g|gif|svg)$/i,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[hash].[ext]',
+                        },
+                    },
+                ],
+            },
+
         ]
     },
     resolve: {
-        extensions: ['.js', '.jsx'],
+        extensions: ['.js', '.jsx', '.json', '.png', '.jpg', '.gif', '.svg'],
         modules: [path.resolve(__dirname, 'assets'), NODE_MODULES],
+        alias: {
+            assets: path.resolve(__dirname, 'assets'),
+        },
     },
     resolveLoader: {
         modules: [NODE_MODULES],

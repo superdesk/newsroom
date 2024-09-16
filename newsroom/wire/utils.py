@@ -9,9 +9,9 @@ def get_picture(item):
 
 
 def get_body_picture(item):
-    pictures = [assoc for assoc in item.get('associations', {}).values() if assoc.get('type') == 'picture']
-    if pictures:
-        return pictures[0]
+    pictures = [assoc for assoc in item.get('associations', {}).values()
+                if assoc is not None and assoc.get('type') == 'picture']
+    return pictures[0] if pictures else None
 
 
 def get_caption(picture):

@@ -13,6 +13,7 @@ module.exports = function(config) {
             'assets/tests.js': ['webpack', 'sourcemap'],
         },
 
+
         webpack: {
             module: webpackConfig.module,
             resolve: webpackConfig.resolve,

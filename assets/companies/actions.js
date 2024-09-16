@@ -116,7 +116,17 @@ export function postCompany() {
 
     };
 }
-
+export function savePermissions(company, permissions) {
+    return function (dispatch) {
+        return server.postWithCsrfToken(`/companies/${company._id}/permissions`, permissions)
+            .then(() => {
+                notify.success(gettext('Company updated successfully'));
+                dispatch(fetchProducts());
+                dispatch(fetchCompanies());
+            })
+            .catch((error) => errorHandler(error, dispatch, setError));
+    };
+}
 
 /**
  * Fetches products
@@ -137,19 +147,6 @@ export function fetchProducts() {
  * Save permissions for a company
  *
  */
-export function savePermissions(company, permissions) {
-    return function (dispatch) {
-        return server.post(`/companies/${company._id}/permissions`, permissions)
-            .then(() => {
-                notify.success(gettext('Company updated successfully'));
-                dispatch(fetchProducts());
-                dispatch(fetchCompanies());
-            })
-            .catch((error) => errorHandler(error, dispatch, setError));
-    };
-}
-
-
 /**
  * Deletes a company
  *

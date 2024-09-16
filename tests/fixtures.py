@@ -3,10 +3,11 @@ from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
 from superdesk.utc import utcnow
-from tests.test_users import test_login_succeeds_for_admin, init as users_init
+from flask import url_for
 
 PUBLIC_USER_ID = ObjectId('59b4c5c61d41c8d736852fbf')
 TEST_USER_ID = ObjectId('5cc94454bc43165c045ffec9')
+ADMIN_USER_ID = '5cc94b99bc4316684dc7dc07'
 
 items = [
     {
@@ -216,3 +217,28 @@ def setup_user_company(app):
 @fixture(autouse=True)
 def init_company(app):
     setup_user_company(app)
+
+
+def test_login_succeeds_for_admin(client):
+    response = client.post(
+        url_for('auth.login'),
+        data={'email': 'admin@sourcefabric.org', 'password': 'admin'},
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+
+
+def users_init(app):
+
+    app.data.insert('users', [{
+        '_id': ObjectId(ADMIN_USER_ID),
+        'first_name': 'admin',
+        'last_name': 'admin',
+        'email': 'admin@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'administrator',
+        'is_validated': True,
+        'is_enabled': True,
+        'is_approved': True,
+        'receive_email': True,
+    }])

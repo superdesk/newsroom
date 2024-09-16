@@ -29,6 +29,12 @@ class Server {
      * @param {String} url
      * @return {Promise}
      */
+
+    getCsrfToken() {
+        return this.get('/companies/get-csrf-token')
+            .then(response => response.csrf_token);
+    }
+
     get(url) {
         return fetch(url, options({}))
             .then(checkStatus);
@@ -61,6 +67,19 @@ class Server {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data),
         })).then(checkStatus);
+    }
+
+    postWithCsrfToken(url, data) {
+        return this.getCsrfToken().then(csrfToken => {
+            return fetch(url, options({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken
+                },
+                body: JSON.stringify(data),
+            })).then(checkStatus);
+        });
     }
 
     /**

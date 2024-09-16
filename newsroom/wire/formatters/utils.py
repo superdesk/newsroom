@@ -40,22 +40,39 @@ def remove_internal_renditions(item, remove_media=False):
 
 
 def add_media(zf, item):
-    """
-    Add the media files associated with the item
-    :param zf: Zipfile
-    :param item:
-    :return:
-    """
     added_files = []
-    for _key, associated_item in item.get('associations', {}).items():
-        for rendition in associated_item.get('renditions'):
-            name = associated_item.get('renditions').get(rendition).get('href').lstrip('/')
+    associations = item.get('associations', {})
+    for associated_item in associations.values():
+        if not associated_item:
+            continue
+
+        renditions = associated_item.get('renditions')
+        if not renditions or not isinstance(renditions, dict):
+            continue
+
+        for rendition_data in renditions.values():
+            if not rendition_data:
+                continue
+
+            name = rendition_data.get('href', '').lstrip('/')
             if name in added_files:
                 continue
-            file = flask.current_app.media.get(associated_item.get('renditions').get(rendition).get('media'),
-                                               ASSETS_RESOURCE)
-            zf.writestr(name, file.read())
-            added_files.append(name)
+
+            media_id = rendition_data.get('media')
+            if not media_id:
+                flask.current_app.logger.warning(f"Media ID not found for rendition: {name}")
+                continue
+
+            file = flask.current_app.media.get(media_id, ASSETS_RESOURCE)
+            if not file:
+                flask.current_app.logger.warning(f"File not found: {name}")
+                continue
+
+            try:
+                zf.writestr(name, file.read())
+                added_files.append(name)
+            except Exception as e:
+                flask.current_app.logger.error(f"Error adding file to zip: {name}. Error: {str(e)}")
 
 
 def rewire_featuremedia(item):

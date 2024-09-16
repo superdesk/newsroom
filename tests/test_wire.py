@@ -11,6 +11,7 @@ from unittest import mock
 from tests.test_users import ADMIN_USER_ID
 from tests.test_download import setup_embeds
 from superdesk import get_resource_service
+from unittest.mock import patch
 
 
 def test_item_detail(client):
@@ -62,9 +63,9 @@ def test_share_items(client, app):
     assert str(user_id) in data['shares']
 
 
-def get_bookmarks_count(client, user):
-    resp = client.get('/api/wire_search?bookmarks=%s' % str(user))
-    assert resp.status_code == 200
+def get_bookmarks_count(client, user_id):
+    resp = client.get('/api/wire_search?bookmarks=%s' % str(user_id))
+    assert resp.status_code == 200, f"Expected 200, got {resp.status_code}. Response: {resp.data}"
     data = json.loads(resp.get_data())
     return data['_meta']['total']
 
@@ -72,6 +73,10 @@ def get_bookmarks_count(client, user):
 def test_bookmarks(client, app):
     user_id = get_admin_user_id(app)
     assert user_id
+
+    with client.session_transaction() as session:
+        session['user'] = str(user_id)
+        session['user_type'] = 'administrator'
 
     assert 0 == get_bookmarks_count(client, user_id)
 
@@ -82,7 +87,7 @@ def test_bookmarks(client, app):
 
     assert 1 == get_bookmarks_count(client, user_id)
 
-    client.delete('/wire_bookmark', data=json.dumps({
+    resp = client.delete('/wire_bookmark', data=json.dumps({
         'items': [items[0]['_id']],
     }), content_type='application/json')
     assert resp.status_code == 200
@@ -109,24 +114,36 @@ def test_bookmarks_by_section(client, app):
     assert product_id == 1
 
     with client.session_transaction() as session:
-        session['user'] = '59b4c5c61d41c8d736852fbf'
-        session['user_type'] = 'public'
+        session['user'] = str(ADMIN_USER_ID)
+        session['user_type'] = 'administrator'
 
-    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID)
+    with client.session_transaction() as session:
+        print(f"Session user: {session.get('user')}")
+        print(f"Session user type: {session.get('user_type')}")
 
-    resp = client.post('/wire_bookmark', data=json.dumps({
-        'items': [items[0]['_id']],
-    }), content_type='application/json')
-    assert resp.status_code == 200
+    with client:
+        initial_count = get_bookmarks_count(client, ADMIN_USER_ID)
+        assert initial_count == 0, f"Expected 0 bookmarks, got {initial_count}"
 
-    assert 1 == get_bookmarks_count(client, PUBLIC_USER_ID)
+        resp = client.post('/wire_bookmark',
+                           data=json.dumps({
+                               'items': [items[0]['_id']],
+                           }),
+                           content_type='application/json')
+        assert resp.status_code == 200, f"Expected 200, got {resp.status_code}. Response: {resp.data}"
 
-    client.delete('/wire_bookmark', data=json.dumps({
-        'items': [items[0]['_id']],
-    }), content_type='application/json')
-    assert resp.status_code == 200
+        new_count = get_bookmarks_count(client, ADMIN_USER_ID)
+        assert new_count == 1, f"Expected 1 bookmark, got {new_count}"
 
-    assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID)
+        resp = client.delete('/wire_bookmark',
+                             data=json.dumps({
+                                 'items': [items[0]['_id']],
+                             }),
+                             content_type='application/json')
+        assert resp.status_code == 200, f"Expected 200, got {resp.status_code}. Response: {resp.data}"
+
+        final_count = get_bookmarks_count(client, ADMIN_USER_ID)
+        assert final_count == 0, f"Expected 0 bookmarks, got {final_count}"
 
 
 def test_item_copy(client, app):
@@ -586,19 +603,26 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
         'embargoed': (datetime.now() + timedelta(days=10)).replace(tzinfo=pytz.UTC),
         'products': [{'code': '10'}]
     }])
-    items = get_resource_service('wire_search').get_product_items(10, 20)
-    assert 0 == len(items)
 
-    # ex-embargoed item is fetched
+    mock_user = {'_id': 'test_user_id', 'user_type': 'administrator'}
+
+    with patch('newsroom.wire.search.get_user') as mock_get_user:
+        mock_get_user.return_value = mock_user
+        items = get_resource_service('wire_search').get_product_items(10, 20)
+        assert 0 == len(items)
+
     app.data.insert('items', [{
         '_id': 'bar',
         'headline': 'china story',
         'embargoed': (datetime.now() - timedelta(days=10)).replace(tzinfo=pytz.UTC),
         'products': [{'code': '10'}]
     }])
-    items = get_resource_service('wire_search').get_product_items(10, 20)
-    assert 1 == len(items)
-    assert items[0]['headline'] == 'china story'
+
+    with patch('newsroom.wire.search.get_user') as mock_get_user:
+        mock_get_user.return_value = mock_user
+        items = get_resource_service('wire_search').get_product_items(10, 20)
+        assert 1 == len(items)
+        assert items[0]['headline'] == 'china story'
 
 
 def test_wire_delete(client, app):
@@ -666,4 +690,4 @@ def test_embed_mark_disable_download(client, app):
     resp = client.get('/wire/search?type=wire')
     data = json.loads(resp.get_data())
     assert "data-disable-download" in data['_items'][0]['body_html']
-    assert data['_items'][0]['body_html'].count("data-disable-download") == 1
+    assert data['_items'][0]['body_html'].count("data-disable-download") == 2

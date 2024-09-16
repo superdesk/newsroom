@@ -22,7 +22,7 @@ Feature: News API Authorization
           "company" : "#companies._id#",
           "enabled" : true
         }]
-        """+
+        """
      When we save API token
      Given "products"
         """
@@ -118,7 +118,7 @@ Feature: News API Authorization
         "product_type": "news_api"
         }]
         """
-    When we set header "X-Forwarded-For" to value "123.123.123.001, 192.192.192.192"
+    When we set header "X-Forwarded-For" to value "123.123.123.1, 192.192.192.192"
     When we get "news/search?q=fish&include_fields=body_html"
     Then we get list with 1 items
      """

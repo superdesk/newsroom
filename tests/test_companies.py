@@ -85,7 +85,17 @@ def test_save_company_permissions(client, app):
 
     test_login_succeeds_for_admin(client)
     data = json.dumps({'products': {'p-2': True}, 'sections': {'wire': True}, 'archive_access': True})
-    client.post('companies/c-1/permissions', data=data, content_type='application/json')
+    response = client.get('/companies/get-csrf-token')
+    data_token = json.loads(response.get_data())
+    csrf_token = data_token['csrf_token']
+    headers = {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrf_token
+    }
+    response = client.post('companies/c-1/permissions', data=data, headers=headers, content_type='application/json')
+
+    assert response.status_code == 200
+    assert json.loads(response.get_data())['message'] == 'Permissions updated successfully'
 
     response = client.get('/products')
     data = json.loads(response.get_data())

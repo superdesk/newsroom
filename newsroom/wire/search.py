@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime, timedelta
 from copy import deepcopy
-
 from eve.utils import ParsedRequest, config
 from flask import current_app as app, json, request
 from superdesk import get_resource_service
@@ -19,8 +18,7 @@ from newsroom.search import BaseSearchService, SearchQuery, query_string
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.products.products import get_products_by_company
-from newsroom.user_roles import UserRole
-
+from newsroom.wire.block_media.filter_media import filter_media
 
 logger = logging.getLogger(__name__)
 
@@ -53,9 +51,6 @@ class WireSearchResource(newsroom.Resource):
 
     item_methods = ['GET']
     resource_methods = ['GET']
-
-    allowed_roles = [role for role in UserRole]
-    allowed_item_roles = allowed_roles
 
 
 def versioncreated_range(created):
@@ -189,7 +184,6 @@ class WireSearchService(BaseSearchService):
         search.source['post_filter'] = {'bool': {'must': []}}
         internal_req = self.get_internal_request(search)
         docs = list(self.internal_get(internal_req, None))
-
         if app.config.get("EMBED_PRODUCT_FILTERING"):
             for item in docs:
                 self.permission_embeds_in_item(item, self.get_permitted_products())
@@ -545,18 +539,12 @@ class WireSearchService(BaseSearchService):
                 get_products_by_company(company.get('_id'), None, request.args.get('type', 'wire'))
                 if p.get('sd_product_id')]
 
+    @filter_media
     def permission_embeds_in_item(self, item, permitted_products):
-        """
-        Given the permitted products for the current user and an item, mark any video or audio embedded elements
-        that are not associated with any products that the user is allowed.
-        :param item:
-        :param permitted_products:
-        :return:
-        """
         disable_download = []
         for key, embed_item in item.get("associations", {}).items():
-            if key.startswith("editor_") and embed_item and (embed_item.get('type', '')) in ['audio', 'video']:
-                # get the list of products that the embedded item matched in Superdesk
+            if (key.startswith("editor_") and embed_item
+                    and embed_item.get('type', '') in ['audio', 'video', 'picture']):
                 embed_products = [p.get('code') for p in
                                   ((item.get('associations') or {}).get(key) or {}).get('products', [])]
 
@@ -564,22 +552,24 @@ class WireSearchService(BaseSearchService):
                     disable_download.append(key)
 
         if len(disable_download) == 0:
+            logger.info("No embedded items require download disabling.")
             return
 
-        # mark the each embed as allowed or not, except for images
         root_elem = lxml_html.fromstring(item.get('body_html', ''))
-        regex = r" EMBED START (?:Video|Audio) {id: \"editor_([0-9]+)"
+        regex = r" EMBED START (?:Video|Audio|Image) {id: \"editor_([0-9]+)"
         html_updated = False
         comments = root_elem.xpath('//comment()')
         for comment in comments:
             m = re.search(regex, comment.text)
-            # if we've found an Embed Start comment
             if m and m.group(1):
                 figure = comment.getnext()
                 for elem in figure.iterchildren():
-                    if elem.tag in ['video', 'audio']:
+                    if elem.tag in ['video', 'audio', 'img']:
                         if "editor_" + m.group(1) in disable_download:
-                            elem.attrib['data-disable-download'] = 'true'
+                            if 'data-disable-download' not in elem.attrib or \
+                                    elem.attrib['data-disable-download'] != 'true':
+                                elem.attrib['data-disable-download'] = 'true'
+                                html_updated = True
                     if elem.text and ' EMBED END ' in elem.text:
                         break
                 html_updated = True

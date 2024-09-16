@@ -12,6 +12,7 @@ CORE_APPS = [
     'content_api.items_versions',
     'newsroom.news_api.section_filters',
     'newsroom.news_api.products',
+    'newsroom.news_api.news.syndicate',
     'newsroom.news_api.formatters',
     'newsroom.news_api.news',
     'newsroom.news_api.news.item.item',
@@ -21,8 +22,6 @@ CORE_APPS = [
     'newsroom.news_api.api_audit',
     'newsroom.news_api.news.assets.assets',
     'newsroom.upload',
-    'newsroom.news_api.news.atom.atom',
-    'newsroom.news_api.news.rss.rss',
     'newsroom.history'
 ]
 

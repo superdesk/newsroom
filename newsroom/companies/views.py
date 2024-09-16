@@ -3,7 +3,7 @@ from datetime import datetime
 
 import flask
 from bson import ObjectId
-from flask import jsonify, current_app as app
+from flask import current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound
@@ -13,6 +13,8 @@ from newsroom.companies import blueprint
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400, set_original_creator, \
     set_version_creator
 import ipaddress
+from flask import request, jsonify, current_app, session
+import secrets
 
 
 def get_company_types_options(company_types):
@@ -154,14 +156,45 @@ def update_products(updates, company_id):
 
 def update_company(data, _id):
     updates = {k: v for k, v in data.items() if k in ('sections', 'archive_access', 'events_only')}
+
+    embedded_fields = [
+        'video_display', 'audio_display', 'social_media_display', 'images_display', 'sdpermit_display', 'all_display',
+        'social_media_download', 'video_download', 'audio_download', 'images_download', 'sdpermit_download',
+        'all_download'
+    ]
+
+    if 'embedded' in data:
+        embedded_updates = {k: v for k, v in data['embedded'].items() if k in embedded_fields}
+        if embedded_updates:
+            updates['embedded'] = embedded_updates
+
     get_resource_service('companies').patch(_id, updates=updates)
 
 
 @blueprint.route('/companies/<_id>/permissions', methods=['POST'])
 @account_manager_only
 def save_company_permissions(_id):
+    csrf_token = request.headers.get('X-CSRF-Token')
+    expected_csrf_token = session.pop('csrf_token')
     orig = get_entity_or_404(_id, 'companies')
     data = get_json_or_400()
-    update_products(data['products'], _id)
-    update_company(data, orig['_id'])
-    return jsonify(), 200
+    if not csrf_token or csrf_token != expected_csrf_token:
+        current_app.logger.error("Permisson CSRF validation failed:")
+        return jsonify({"error": "Permisson CSRF token validation failed"}), 403
+
+    try:
+        update_products(data['products'], _id)
+        update_company(data, orig['_id'])
+    except Exception as e:
+        current_app.logger.error(f"Error updating company permissions: {str(e)}")
+        return jsonify({"error": "An error occurred while updating permissions"}), 500
+
+    return jsonify({"message": "Permissions updated successfully"}), 200
+
+
+@blueprint.route('/companies/get-csrf-token', methods=['GET'])
+@account_manager_only
+def get_csrf_token():
+    csrf_token = secrets.token_hex(32)
+    session['csrf_token'] = csrf_token
+    return jsonify({'csrf_token': csrf_token})

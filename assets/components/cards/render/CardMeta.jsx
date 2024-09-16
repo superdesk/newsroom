@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {isEmpty} from 'lodash';
-import { gettext, shortDate, fullDate } from 'utils';
+import {gettext, shortDate, fullDate} from 'utils';
 
-function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayDivider, slugline ,audio, video}) {
+function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayDivider, slugline, audio, video}) {
     return (<div className="wire-articles__item__meta">
         <div className="wire-articles__item__icons">
             <span className="wire-articles__item__icon">
@@ -15,12 +15,13 @@ function CardMeta({wordCount, pictureAvailable, source, versioncreated, displayD
             </span>}
             {!isEmpty(audio) &&
                 <span className='wire-articles__item__icon'>
-                    <i className='icon--video icon--gray-light'></i>
+                    <i className='icon--audio icon--gray-light'></i>
+
                 </span>
             }
             {!isEmpty(video) &&
                 <span className='wire-articles__item__icon'>
-                    <i className='icon--audio icon--gray-light'></i>
+                    <i className='icon--video icon--gray-light'></i>
                 </span>
             }
             {displayDivider && <span className='wire-articles__item__divider'></span>}

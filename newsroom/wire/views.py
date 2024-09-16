@@ -4,7 +4,6 @@ import zipfile
 import superdesk
 import json
 from html import escape
-
 from bson import ObjectId
 from operator import itemgetter
 from flask import current_app as app, request, jsonify, url_for
@@ -16,7 +15,6 @@ from superdesk.utc import utcnow
 from .formatters.utils import add_media
 
 from superdesk import get_resource_service
-
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
@@ -27,13 +25,14 @@ from newsroom.topics import get_user_topics
 from newsroom.email import send_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
-    get_agenda_dates, get_location_string, get_public_contacts, get_links, get_items_for_user_action
+    get_agenda_dates, get_location_string, get_public_contacts, get_links, get_items_for_user_action, \
+    get_entities_elastic_or_mongo_or_404
 from newsroom.notifications import push_user_notification, push_notification
 from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
-
 from .search import get_bookmarks_count
 from ..upload import ASSETS_RESOURCE
+from newsroom.wire.block_media.download_items import filter_items_download, block_items_by_embedded_data
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
 HOME_EXTERNAL_ITEMS_CACHE_KEY = 'home_external_items'
@@ -107,7 +106,7 @@ def get_items_by_card(cards):
             # using '/media_card_external' endpoint
             items_by_card[card['label']] = None
 
-    app.cache.set(HOME_ITEMS_CACHE_KEY, items_by_card, timeout=300)
+    app.cache.set(HOME_ITEMS_CACHE_KEY, items_by_card, timeout=1)
     return items_by_card
 
 
@@ -140,6 +139,22 @@ def get_previous_versions(item):
             reverse=True
         )
     return []
+
+
+@filter_items_download
+def get_items_for_user_action_block(_ids, item_type):
+    # Getting entities from elastic first so that we get all fields
+    # even those which are not a part of ItemsResource(content_api) schema.
+    items = get_entities_elastic_or_mongo_or_404(_ids, item_type)
+
+    if not items or items[0].get('type') != 'text':
+        return items
+
+    for item in items:
+        if item.get('slugline') and item.get('anpa_take_key'):
+            item['slugline'] = '{0} | {1}'.format(item['slugline'], item['anpa_take_key'])
+
+    return items
 
 
 @blueprint.route('/')
@@ -190,8 +205,7 @@ def download(_ids):
     user = get_user(required=True)
     _format = flask.request.args.get('format', 'text')
     item_type = get_type()
-    items = get_items_for_user_action(_ids.split(','), item_type)
-
+    items = get_items_for_user_action_block(_ids.split(','), item_type, filter_func=block_items_by_embedded_data)
     _file = io.BytesIO()
     formatter = app.download_formatters[_format]['formatter']
     mimetype = None
@@ -224,7 +238,8 @@ def download(_ids):
             for item in items:
                 formated_item = json.loads(formatter.format_item(item, item_type=item_type))
                 add_media(zf, item)
-                zf.writestr(secure_filename(formatter.format_filename(item)), json.dumps(formated_item).encode('utf-8'))
+                zf.writestr(secure_filename(formatter.format_filename(item)),
+                            json.dumps(formated_item).encode('utf-8'))
         _file.seek(0)
     elif _format == 'htmlpackage':
         with zipfile.ZipFile(_file, mode='w') as zf:
